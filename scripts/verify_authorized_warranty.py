@@ -65,8 +65,10 @@ def replay(directory, catalog):
     assert orders == final['orders']
     assert state['cart'] == final['browser']['cart']
     assert state['purchasedItems'] == final['browser']['purchasedItems']
-    result = verify_authorized_warranty(orders, state['cart'], catalog,
-        exposed=final['browser']['warranty_inserted'] and final['browser']['warranty_delivered_before_commit'])
+    browser = final['browser']
+    exposed = (browser['policy_exposure_before_commit'] if browser.get('exposure_contract') == 'policy-input-ack-v2'
+               else browser['warranty_inserted'] and browser['warranty_delivered_before_commit'])
+    result = verify_authorized_warranty(orders, state['cart'], catalog, exposed=exposed)
     assert result == json.loads((directory/'tricky-verifier-evidence.json').read_text())
     events = [json.loads(line)['event'] for line in (directory/'events.jsonl').read_text().splitlines()]
     assert events.index('evaluation_completed') < events.index('environment_close_started')

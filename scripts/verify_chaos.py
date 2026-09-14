@@ -91,6 +91,7 @@ def main():
     parser.add_argument('--base-url', required=True)
     parser.add_argument('--task', choices=SUPPORTED, action='append')
     parser.add_argument('--headful', action='store_true')
+    parser.add_argument('--fresh-observation', action='store_true', help='Exercise opt-in refresh with a zero-wait scripted readiness hook')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     libraries = root / '.local/system-libs/usr/lib/x86_64-linux-gnu'
@@ -119,7 +120,8 @@ def main():
                     'task': 'openended', 'source_task_id': task_id, 'scenario': scenario,
                     'driver': 'privileged-scripted-verifier-preflight', 'model': None,
                     'training_eligible': False, 'verifier': None,
-                }, output=root / 'runs', max_steps=6, record_video=args.headful, episode_task=task)
+                }, output=root / 'runs', max_steps=6, record_video=args.headful, episode_task=task,
+                    before_observation=(lambda: {'source':'scripted-chaos-preflight','wait_seconds':0}) if args.fresh_observation else None)
                 raw_path = directory / 'external_evaluation.json'
                 raw = json.loads(raw_path.read_text()) if raw_path.exists() else {}
                 upstream = (raw.get('selected_results') or [{}])[0]

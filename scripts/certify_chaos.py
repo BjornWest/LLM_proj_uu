@@ -25,6 +25,7 @@ def read(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('reports', nargs='+', type=Path)
+    parser.add_argument('--output', type=Path, default=ROOT/'.local/preflight/chaos-verifier-validation.json')
     args = parser.parse_args()
     selected = {}
     builds = []
@@ -45,6 +46,12 @@ def main():
         descriptor = read(directory / 'chaos-contract.json')
         external = read(directory / 'external_evaluation.json')
         episode = read(directory / 'episode.json')
+        # Replaying old labels cannot certify execution by today's runner.
+        runtime = episode.get('runtime', {}).get('source_sha256', {})
+        for name in ('runner.py', 'observation.py', 'trace.py', 'chaos.py', 'chaos_verifier.py'):
+            current = hashlib.sha256((ROOT/'intent_browser'/name).read_bytes()).hexdigest()
+            if runtime.get(name) != current:
+                raise ValueError('Fresh current-runtime evidence required: '+case['episode']+' / '+name)
         snapshots = [read(directory / 'initial-state.json')['task_state']['browser_state']]
         snapshots += [read(p) for p in sorted(directory.glob('task-state-*.json'))]
         start_url = session['base_url'] + session['selected']['taskUrl']
@@ -68,7 +75,7 @@ def main():
                   'scope': 'Scripted local interaction contracts; not policy performance or transaction-ledger validation.',
                   'reports': [str(p) for p in args.reports], 'cases': list(selected.values()),
                   'files_sha256': builds[0], 'verifier_source_sha256': verifier_fingerprints()}
-    output = ROOT / '.local/preflight/chaos-verifier-validation.json'
+    output = args.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     write_json(output, validation)
     config = {k: validation[k] for k in ('schema_version', 'validated_at', 'scope', 'files_sha256', 'verifier_source_sha256')}

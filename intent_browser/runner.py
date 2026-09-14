@@ -155,6 +155,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 trace.event("model_completed", call_id=f"model-{index:03d}",
                             model_output=completion.text, model_response=completion.raw,
                             model_request=completion.request)
+                phase = "policy_input_evidence"
+                if episode_task and hasattr(episode_task, 'on_policy_input'):
+                    event['privileged_policy_evidence'] = episode_task.on_policy_input(
+                        env, trace, event, acknowledged=True)
                 phase = "action_parse"
                 decision = parse_decision(completion.text, allow_search=search_backend is not None)
                 action = decision.code
@@ -197,6 +201,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     # must not inherit the preceding call's request instead.
                     if event['model_request'] is None and backend.last_request is not previous_request:
                         event['model_request'] = backend.last_request
+                if phase == 'model' and episode_task and hasattr(episode_task, 'on_policy_input'):
+                    try:
+                        event['privileged_policy_evidence'] = episode_task.on_policy_input(
+                            env, trace, event, acknowledged=False)
+                    except (Exception, KeyboardInterrupt) as evidence_error:
+                        event['policy_evidence_error'] = f'{type(evidence_error).__name__}: {evidence_error}'
                 trace.event("decision_error", step=index, error=event["error"])
                 raise
             finally:
