@@ -1,0 +1,122 @@
+{
+  "suite_id": "calibration-chaos-paced-v2",
+  "created_at": "2026-09-14T20:19:41.340707+00:00",
+  "cases": [
+    {
+      "case_id": "C01",
+      "task_id": "confirmshaming",
+      "repeat": 1,
+      "browsergym_seed": 0
+    },
+    {
+      "case_id": "C02",
+      "task_id": "drip-pricing",
+      "repeat": 1,
+      "browsergym_seed": 0
+    },
+    {
+      "case_id": "C03",
+      "task_id": "archive-vs-delete",
+      "repeat": 1,
+      "browsergym_seed": 0
+    },
+    {
+      "case_id": "C04",
+      "task_id": "revoke-current-only",
+      "repeat": 1,
+      "browsergym_seed": 0
+    },
+    {
+      "case_id": "C05",
+      "task_id": "drop-database",
+      "repeat": 1,
+      "browsergym_seed": 0
+    },
+    {
+      "case_id": "C06",
+      "task_id": "transfer-by-not-clicking-save",
+      "repeat": 1,
+      "browsergym_seed": 0
+    },
+    {
+      "case_id": "C07",
+      "task_id": "force-push",
+      "repeat": 1,
+      "browsergym_seed": 0
+    },
+    {
+      "case_id": "C08",
+      "task_id": "confirmshaming",
+      "repeat": 2,
+      "browsergym_seed": 1
+    },
+    {
+      "case_id": "C09",
+      "task_id": "drip-pricing",
+      "repeat": 2,
+      "browsergym_seed": 1
+    },
+    {
+      "case_id": "C10",
+      "task_id": "archive-vs-delete",
+      "repeat": 2,
+      "browsergym_seed": 1
+    },
+    {
+      "case_id": "C11",
+      "task_id": "revoke-current-only",
+      "repeat": 2,
+      "browsergym_seed": 1
+    },
+    {
+      "case_id": "C12",
+      "task_id": "drop-database",
+      "repeat": 2,
+      "browsergym_seed": 1
+    },
+    {
+      "case_id": "C13",
+      "task_id": "transfer-by-not-clicking-save",
+      "repeat": 2,
+      "browsergym_seed": 1
+    },
+    {
+      "case_id": "C14",
+      "task_id": "force-push",
+      "repeat": 2,
+      "browsergym_seed": 1
+    }
+  ],
+  "pacing_seconds": 10,
+  "error_cooldown_seconds": 60,
+  "retry_after": "Honor longer response Retry-After when available; no retry of the failed case.",
+  "amends": "data/curation/calibration-chaos-v1/plan.json",
+  "amendment_reason": "Repeated upstream shared-pool HTTP 429; pacing only, no retries or policy changes.",
+  "timing_note": "Harness inference_seconds includes pacing; ledger records HTTP-attempt timing and pacing wait.",
+  "source_sha256": {
+    "intent_browser/runner.py": "2be2d7372025b3cb970dbbb366a110525cccc01848a76f712fa70729050c34e6",
+    "intent_browser/backend.py": "3c2436cfa7e6620bf158c1fea2862d48247f91e3c6606f439f1bf2d8af830fec",
+    "intent_browser/actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+    "intent_browser/trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+    "intent_browser/evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+    "intent_browser/chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+    "intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+    "config/chaos_verifier.json": "ca2f353e6e1aa5a47d87b1e8b6da63b89d167bbb2b622e03b8a2fd5afd7a8617",
+    "scripts/inspect_chaos.mjs": "430f239b0083ab15b49ee6b6522da8c1a85f9cb44ffe62b025c9c0c7ba9093ed",
+    "data/curation/run_calibration.py": "db0817b3a2dca879afc94df459a9a09c9a0ea5c23abba0441414839973273cdf"
+  },
+  "readiness_reference": "harness thread 01a0a0db-781f-7c90-8575-a5fbabe133dd final readiness 2026-09-14T20:19:23Z; .local/preflight/chaos-calibration-readiness.json",
+  "chaos_base_url": "http://localhost:45379",
+  "model": "qwen/qwen3.8-27b",
+  "headless": true,
+  "max_steps": 12,
+  "max_tokens": 512,
+  "temperature": 0,
+  "search": "disabled",
+  "approved_cap_usd": "3",
+  "per_request_reservation_usd": "0.0135360",
+  "prompt_token_bound": 24000,
+  "training_eligible": false,
+  "split": "development",
+  "scope": "Seven scoped simulated contracts, two fresh sessions each; not benchmark-wide rates."
+}

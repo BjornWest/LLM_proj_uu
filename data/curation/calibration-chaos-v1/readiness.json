@@ -1,0 +1,90 @@
+{
+  "status": "ready",
+  "readiness_id": "chaos-calibration-ready-1f48525",
+  "created_at": "2026-09-14T20:09:09.023337+00:00",
+  "commit": "1f48525c2ccf0670ba48586af56d2eb5260e97ac",
+  "source_sha256": {
+    "intent_browser/runner.py": "2be2d7372025b3cb970dbbb366a110525cccc01848a76f712fa70729050c34e6",
+    "intent_browser/backend.py": "3c2436cfa7e6620bf158c1fea2862d48247f91e3c6606f439f1bf2d8af830fec",
+    "intent_browser/actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+    "intent_browser/trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+    "intent_browser/evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+    "intent_browser/chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+    "intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+    "config/chaos_verifier.json": "ca2f353e6e1aa5a47d87b1e8b6da63b89d167bbb2b622e03b8a2fd5afd7a8617",
+    "scripts/inspect_chaos.mjs": "430f239b0083ab15b49ee6b6522da8c1a85f9cb44ffe62b025c9c0c7ba9093ed",
+    "data/curation/run_calibration.py": "7e55d858fef87fa37bc136d22d4be50719ff1605286ca3d91ebbac873c9bd12e"
+  },
+  "environment": {
+    "package": "browser-agent-chaos",
+    "package_version": "0.1.0",
+    "package_directory": "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos",
+    "bundle": "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos/dist/cli.mjs",
+    "server_pid": 255252,
+    "process_start_ticks": 15227353,
+    "base_url": "http://localhost:45379",
+    "files_sha256": {
+      "package.json": "54f17fe0ec4a85f98e53ce775916a7d28dc7afe1e9f559072d626bcc82d292d8",
+      "dist/cli.mjs": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+      "dist/web/assets/index-CiX7pK2V.js": "3068bbeb566673a91a35f2849ab9f8b98463201221f8d767ef2893916f1a16f7",
+      "dist/web/assets/index-D7ZELICf.css": "57f6e2127ce23c40735bc5763fcef01927ad704da62283cf0406723897541b63",
+      "dist/web/favicon-32.png": "32e00d1d6d6c64e9caa60db327344b2e06b4d959c39c930341a4566087a52dee",
+      "dist/web/favicon-64.png": "a05c48a780d8f9c5efafc78afa0a82ff8f145514cca1ee5df6d5c2af1bb3cb1a",
+      "dist/web/favicon.svg": "4d3ff0c6281957ebe7d0e8f8b370ce95b40b66c03598c81bcf1d2bc2c526ba49",
+      "dist/web/index.html": "793d7c5eafbdf921a3a908b18047597763af0ee9d42b248bbf7334c179df5e7f",
+      "dist/web/logo.png": "50c852c6cc6dc99ed66ff3973a5247369bbe129aece27958600f1f9d6f428472"
+    },
+    "provenance_scope": "Local listening PID and unchanged on-disk build; not memory attestation."
+  },
+  "certified_tasks": [
+    "confirmshaming",
+    "drip-pricing",
+    "archive-vs-delete",
+    "revoke-current-only",
+    "drop-database",
+    "transfer-by-not-clicking-save",
+    "force-push"
+  ],
+  "openrouter_cap_usd": "3",
+  "parallel": "disabled",
+  "protocol": {
+    "model": "qwen/qwen3.8-27b",
+    "preset": "@preset/deka-llm-qwen38-27-b",
+    "provider_only": [
+      "dekallm"
+    ],
+    "allow_fallbacks": false,
+    "reasoning_enabled": false,
+    "temperature": 0,
+    "max_tokens": 512,
+    "max_steps": 12,
+    "episodes": 14,
+    "headless": true,
+    "slow_mo_ms": 250,
+    "record_video": true
+  },
+  "budget": {
+    "reservation_per_request_usd": "0.0135360",
+    "maximum_168_requests_usd": "2.2740480",
+    "rule": "Retain reservations on errors/restarts; stop on provider/usage/cost audit issues."
+  },
+  "validation": {
+    "tests": 41,
+    "subtests": 17,
+    "chaos_evidence_cases_replayed": 16
+  },
+  "logging": {
+    "request_response": "JSON payloads retained, including HTTP errors; auth headers excluded.",
+    "transport_errors": "Current attempted request retained; absent response/cost unknown, reservation retained.",
+    "pre_dispatch_failure": "No prior request misattributed; request and response null.",
+    "usage": "Raw returned usage/cost/cache fields preserved; persistent calibration budget ledger.",
+    "lifecycle": "Evaluation before browser close, with source/package/build/session/goal provenance.",
+    "verification": "Independent scoped Chaos interaction contract; raw upstream scores preserved separately."
+  },
+  "limits": [
+    "No wire-level HTTP/header archive or guarantee of response capture after process kill.",
+    "Chaos verification is a scoped simulation contract, not a transaction ledger.",
+    "Injection exposure/avoidance remain null; development calibration, not training or benchmark-wide rates."
+  ],
+  "freeze": "No further harness/config/scripts edits planned during this calibration; curation analysis may continue."
+}

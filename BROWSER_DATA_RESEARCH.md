@@ -1,12 +1,14 @@
 **Browser-agent evaluation and training data — research brief, 14 September 2026**
 
+**Live calibration update (14 September):** [Four Qwen/Chaos attempts](data/curation/CALIBRATION.md) now exercise the ready, frozen harness. C01–C03 took correct first actions; only C02 finished without an API error. C04 failed before acting after a long idle. DekaLLM shared-pool HTTP 429s paused the remaining batch; no benchmark-wide rate is established. Raw labels, unknowns, costs and evidence remain separate, with no source-manifest label promotion or training eligibility.
+
 **Subsequent source audit:** [TrickyArena preflight handoff](data/curation/TRICKY_PREFLIGHT.md) supplies exact P07/P10/P11 fixture facts, proposed state contracts, 24 coverage cards and five additional regressions. It identifies checkout-history overwrites, health settings that are never persisted, and subscription state lost on remount. Eight IKEA branch cases further distinguish injected radio choices from actual cart effects. These remain source-based requirements, with no new browser runs, graders or promoted outcome labels.
 
 **Subsequent harness evidence:** the other agent added seven installed-build-scoped Chaos contracts and reported 16 passing scripted browser cases. Saved traces now reproduce force-push and submit-before-edit false positives in the browser; the independent verifier rejects them while retaining raw upstream success. The dataset-side [evidence review](data/curation/CHAOS_SMOKE_REVIEW.md) records exact traces and timing constraints. The original source audit below remains historical: upstream checkers were not repaired, and scripted results are not model pass rates or training examples.
 
 **Recommendation:** use a small, explicitly scoped Chaos subset for the immediate demo; keep MiniWoB as a basic browser-control baseline. TrickyArena is the best match for a richer consumer-task experiment, but needs stronger outcome verification and clarification of reuse rights. SusBench supplies realistic task and dark-pattern ideas, rather than a reproducible local environment. Use DoomArena later as an attack layer. For initial training data, collect verified traces in this harness; consider a small WebLINX sample before the enormous AgentLab trace release.
 
-This is source and metadata research, plus two isolated checks of Chaos's pure verifier. I did not install or run these upstream environments, download trajectory archives, call inference APIs, or change the harness. Integration times below are estimates for one developer, assuming the current browser loop remains working.
+The original research below was source and metadata inspection, plus two isolated checks of Chaos's pure verifier; that phase did not install/run upstream environments, download trajectory archives, call inference APIs, or change the harness. Subsequent live calibration is documented separately above. Integration times below are estimates for one developer, assuming the current browser loop remains working.
 
 | Rank / role | Downloadable material | Scoring strength | Fit and estimated effort | License observed |
 |---|---|---|---|---|
