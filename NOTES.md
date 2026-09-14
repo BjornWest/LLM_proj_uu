@@ -1,5 +1,16 @@
 # Engineering notes — 2026-09-14
 
+## Calibration readiness logging fix
+
+Before the 14-episode Chaos model calibration, corrected failed-call attribution:
+transport failures retain the current request, while a pre-dispatch budget or
+fingerprint rejection cannot inherit the preceding call's request. Missing
+request/response fields are explicit nulls. Exact decoded HTTP error bodies and
+successful usage/cost fields remain preserved. Forty-one tests and 17 subtests
+pass including calibration budget checks; all 16 saved Chaos preflight cases
+were replayed and the certification hashes refreshed. No paid requests were
+needed for this validation.
+
 ## P07 Tricky and repository portability
 
 The pinned shopping UI now runs locally with a Python checkout journal. Twelve

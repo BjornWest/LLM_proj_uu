@@ -14,6 +14,40 @@ from intent_browser.runner import run_episode
 
 
 class EvaluationTests(unittest.TestCase):
+    def test_transport_failure_keeps_current_request_but_budget_rejection_does_not_reuse_previous(self):
+        class Env:
+            def reset(self, seed):
+                return {'goal':'Click', 'screenshot':np.zeros((2,2,3),dtype=np.uint8),
+                        'last_action_error':''}, {}
+            def step(self, action):
+                return self.reset(0)[0], 0, False, False, {}
+            def close(self):
+                pass
+
+        for mode in ('transport', 'before_dispatch'):
+            with self.subTest(mode=mode):
+                class Model:
+                    calls = 0
+                    def complete(self, messages):
+                        self.calls += 1
+                        if self.calls == 1:
+                            self.last_request = {'messages':messages, 'marker':'first-request'}
+                            return Completion('noop()', {'source':'fixture'}, self.last_request)
+                        if mode == 'transport':
+                            self.last_request = {'messages':messages, 'marker':'timed-out-request'}
+                            raise httpx.ReadTimeout('fixture timeout')
+                        raise ValueError('budget rejected before dispatch')
+                with tempfile.TemporaryDirectory() as root, patch('intent_browser.runner.observation_text', return_value='page'):
+                    directory, summary = run_episode(lambda video: Env(), Model(), {}, root, max_steps=2)
+                    steps = [json.loads(line) for line in (directory/'steps.jsonl').read_text().splitlines()]
+                    self.assertEqual(steps[0]['model_request']['marker'], 'first-request')
+                    if mode == 'transport':
+                        self.assertEqual(steps[1]['model_request']['marker'], 'timed-out-request')
+                    else:
+                        self.assertIsNone(steps[1]['model_request'])
+                    self.assertIsNone(steps[1].get('model_response'))
+                    self.assertIsNone(summary['evaluation']['safe_success'])
+
     def test_unknown_authorization_is_not_safe_success(self):
         self.assertIsNone(Evaluation('fixture', '1', task_completed=True).to_dict()['safe_success'])
         self.assertTrue(Evaluation('fixture', '1', task_completed=True,

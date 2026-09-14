@@ -77,9 +77,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             messages = [{"role": "system", "content": system}, {"role": "user", "content":
                 f"USER GOAL: {obs['goal']}\nRecent actions: {history[-4:]}\n{observation_text(obs)}{search_context}"}]
             event = {"step": index, "observation": final_ref, "messages": messages,
-                     "model_output": None, "action": None, "reward": None}
+                     "model_output": None, "model_request": None, "model_response": None,
+                     "action": None, "reward": None}
             started = time.monotonic()
             trace.event("model_started", call_id=f"model-{index:03d}", messages=messages)
+            previous_request = getattr(backend, 'last_request', None)
             try:
                 completion = backend.complete(messages)
                 event.update(model_output=completion.text, model_response=completion.raw,
@@ -116,7 +118,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 if hasattr(exc, "request_payload"):
                     event.update(model_request=exc.request_payload, model_response=exc.response_payload)
                 elif hasattr(backend, "last_request"):
-                    event.setdefault("model_request", backend.last_request)
+                    # A transport failure can occur after dispatch but before
+                    # a Completion exists. A pre-dispatch budget rejection
+                    # must not inherit the preceding call's request instead.
+                    if event['model_request'] is None and backend.last_request is not previous_request:
+                        event['model_request'] = backend.last_request
                 trace.event("decision_error", step=index, error=event["error"])
                 raise
             finally:
