@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from decimal import Decimal
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 from pathlib import Path
 
@@ -133,6 +134,60 @@ class BudgetTests(unittest.TestCase):
         self.assertGreater(sleep.call_args.args[0], 118)
         self.assertLessEqual(sleep.call_args.args[0], 120)
         self.assertEqual(len(self.sent), 2)
+
+    def test_fake_clock_wait_has_no_send_or_reservation_within_case_and_restart(self):
+        class Clock(datetime):
+            current = datetime(2026, 9, 14, tzinfo=timezone.utc)
+
+            @classmethod
+            def now(cls, tz=None):
+                return cls.current
+
+        waits = []
+
+        def advance(seconds):
+            ledger = json.loads(self.path.read_text())
+            prior = len(self.sent)
+            self.assertEqual(len(ledger["requests"]), prior)
+            self.assertEqual(Decimal(ledger["reserved_cost_usd"]), prior * RESERVATION)
+            waits.append(seconds)
+            Clock.current += timedelta(seconds=seconds)
+
+        with patch("run_calibration.datetime", Clock), patch("run_calibration.time.sleep", advance):
+            backend = self.backend()
+            backend.pace_seconds = 10
+            message = [{"role": "user", "content": "Click Finish"}]
+            backend.complete(message)
+            backend.complete(message)
+            restarted = self.backend()
+            restarted.case_id = "next-case"
+            restarted.pace_seconds = 10
+            restarted.complete(message)
+        self.assertEqual(waits, [10, 10])
+        rows = json.loads(self.path.read_text())["requests"]
+        starts = [datetime.fromisoformat(row["started_at"]) for row in rows]
+        self.assertEqual([(start - starts[0]).total_seconds() for start in starts], [0, 10, 20])
+        self.assertEqual([row["case_id"] for row in rows], ["test", "test", "next-case"])
+        self.assertEqual(len(self.sent), 3)
+
+    def test_post_wait_fingerprint_change_stops_before_reservation_and_send(self):
+        backend = self.backend()
+        backend.complete([{"role": "user", "content": "Click Finish"}])
+        before = self.path.read_bytes()
+        backend.pace_seconds = 10
+        backend.pinned = {"source": "original"}
+        ordering = []
+
+        def changed():
+            ordering.append("fingerprint")
+            return {"source": "changed"}
+
+        with patch("run_calibration.time.sleep", lambda seconds: ordering.append("wait")), patch("run_calibration.fingerprints", changed):
+            with self.assertRaisesRegex(ValueError, "changed; no request sent"):
+                backend.complete([{"role": "user", "content": "Click Finish"}])
+        self.assertEqual(ordering, ["wait", "fingerprint"])
+        self.assertEqual(self.path.read_bytes(), before)
+        self.assertEqual(len(self.sent), 1)
 
 
 if __name__ == "__main__":

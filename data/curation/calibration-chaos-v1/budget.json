@@ -1,6 +1,6 @@
 {
   "approved_cap_usd": "3",
-  "reserved_cost_usd": "0.0947520",
+  "reserved_cost_usd": "0.1082880",
   "requests": [
     {
       "index": 0,
@@ -177,6 +177,23 @@
       "reported_cost_usd": null,
       "error_type": "BackendResponseError",
       "finished_at": "2026-09-14T20:19:45.917024+00:00",
+      "http": {
+        "http_status": 429,
+        "retry_after": null,
+        "retry_after_seconds": null
+      }
+    },
+    {
+      "index": 7,
+      "case_id": "C05",
+      "started_at": "2026-09-14T20:29:23.472190+00:00",
+      "reservation_usd": "0.0135360",
+      "status": "error",
+      "pacing_seconds": 10,
+      "pacing_wait_seconds": 0.0,
+      "reported_cost_usd": null,
+      "error_type": "BackendResponseError",
+      "finished_at": "2026-09-14T20:29:25.930983+00:00",
       "http": {
         "http_status": 429,
         "retry_after": null,

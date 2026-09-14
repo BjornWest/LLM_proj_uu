@@ -1,0 +1,45 @@
+{
+  "record_type": "historical_readiness_supplement",
+  "recorded_at": "2026-09-14T20:36:36.726402+00:00",
+  "original_review_timestamp": null,
+  "source": "Harness-agent readiness review received as a coordination message",
+  "reviewed_wrapper_sha256": "92e0f3d20b6b077a44ded66ab28f675e2922d29d2ffeeeb3710b7682f598f1d8",
+  "reported_baseline_plan_sha256": "3e35ef599837a75d527a40e7e3d3692cbe0577f6ebad899005edc881a17d20d8",
+  "actual_baseline_plan_sha256": "3e35ef599837a75d527a40e7e3d3692cbe0577f6ebad899005edc881a17d20d8",
+  "baseline_hash_matches": true,
+  "review_scope": {
+    "permitted_case": "C04 only",
+    "pace_seconds": 10,
+    "budget_cap_usd": "3",
+    "tests_reported": 7,
+    "frozen_harness_files_reported": 9,
+    "harness_commit": "1f48525",
+    "automatic_60_second_cooldown_implemented": false,
+    "retry_after_implemented": false,
+    "fake_clock_advancement_implemented": false,
+    "ledger_attempts_at_review": 6,
+    "ledger_reserved_usd_at_review": "0.0812160",
+    "C04_started_at_review": false,
+    "seconds_since_C03_completion_at_review_lower_bound": 374,
+    "stop_on_429": true,
+    "automatic_C05_permitted": false
+  },
+  "instructions": [
+    "Preserve baseline plan hash in amendment evidence.",
+    "Wait before fingerprint recheck and reservation; use shared suite lock and budget; no retries.",
+    "Do not interpret fallback started_at on an interrupted request as confirmed HTTP completion.",
+    "Original readiness JSON certifies unchanged harness, not the wrapper."
+  ],
+  "executed_C04": {
+    "episode": "runs/20260914T201941Z-be316592",
+    "wrapper_sha256": "db0817b3a2dca879afc94df459a9a09c9a0ea5c23abba0441414839973273cdf",
+    "readiness_reference": "harness thread 01a0a0db-781f-7c90-8575-a5fbabe133dd final readiness 2026-09-14T20:19:23Z; .local/preflight/chaos-calibration-readiness.json",
+    "matches_this_historical_review": false
+  },
+  "applicability": "Superseded for the executed C04 by the later nine-test readiness review including cooldown and response-hook validation. This record does not authorize a duplicate case or new inference.",
+  "current_ledger_snapshot": {
+    "attempts": 8,
+    "reserved_usd": "0.1082880"
+  },
+  "new_inference_calls": 0
+}

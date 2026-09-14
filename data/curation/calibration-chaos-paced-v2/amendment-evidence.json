@@ -1,0 +1,51 @@
+{
+  "record_type": "post_execution_provenance_linkage",
+  "created_at": "2026-09-14T20:35:20.373899+00:00",
+  "baseline_plan": {
+    "path": "data/curation/calibration-chaos-v1/plan.json",
+    "sha256": "3e35ef599837a75d527a40e7e3d3692cbe0577f6ebad899005edc881a17d20d8"
+  },
+  "paced_plan": {
+    "path": "data/curation/calibration-chaos-paced-v2/plan.json",
+    "sha256": "6a3e9f07156382b792cd80cf7922c9a4c21e7e017fdcc82d62dc348b13db091e"
+  },
+  "wrapper": {
+    "path": "data/curation/run_calibration.py",
+    "sha256": "db0817b3a2dca879afc94df459a9a09c9a0ea5c23abba0441414839973273cdf",
+    "matches_paced_execution_plan": true
+  },
+  "amendment_reason": "Repeated upstream shared-pool HTTP 429; pacing only, no retries or policy changes.",
+  "pacing_seconds": 10,
+  "error_cooldown_seconds": 60,
+  "not_before_representation": "Derived at dispatch from persisted previous finished_at/status/http.retry_after_seconds; no separate not_before field in the original attempt rows.",
+  "derived_error_not_before": [
+    {
+      "attempt_index": 1,
+      "case_id": "C01",
+      "finished_at": "2026-09-14T20:10:00.968230+00:00",
+      "derived_not_before": "2026-09-14T20:11:00.968230+00:00"
+    },
+    {
+      "attempt_index": 5,
+      "case_id": "C03",
+      "finished_at": "2026-09-14T20:11:04.946890+00:00",
+      "derived_not_before": "2026-09-14T20:12:04.946890+00:00"
+    },
+    {
+      "attempt_index": 6,
+      "case_id": "C04",
+      "finished_at": "2026-09-14T20:19:45.917024+00:00",
+      "derived_not_before": "2026-09-14T20:20:45.917024+00:00"
+    },
+    {
+      "attempt_index": 7,
+      "case_id": "C05",
+      "finished_at": "2026-09-14T20:29:25.930983+00:00",
+      "derived_not_before": "2026-09-14T20:30:25.930983+00:00"
+    }
+  ],
+  "budget_ledger": "data/curation/calibration-chaos-v1/budget.json",
+  "offline_budget_tests_passed": 11,
+  "new_inference_calls": 0,
+  "scope": "Adds explicit hash linkage after execution without modifying historical plans, cases, raw traces or the frozen wrapper."
+}

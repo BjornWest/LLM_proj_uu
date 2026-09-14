@@ -1,0 +1,44 @@
+{
+  "record_type": "paced_v2_readiness_supplement",
+  "recorded_at": "2026-09-14T20:38:01.758825+00:00",
+  "original_review_timestamp": null,
+  "source": "Harness-agent readiness review received as a coordination message; original review time was not supplied in this message.",
+  "supersedes": "data/curation/calibration-chaos-paced-v2/readiness-review-92e0f3d.json",
+  "reviewed_wrapper_sha256": "db0817b3a2dca879afc94df459a9a09c9a0ea5c23abba0441414839973273cdf",
+  "current_wrapper_matches_review": true,
+  "executed_C04_wrapper_matches_review": true,
+  "reported_baseline_plan_sha256": "3e35ef599837a75d527a40e7e3d3692cbe0577f6ebad899005edc881a17d20d8",
+  "baseline_plan_matches_review": true,
+  "review_scope": {
+    "permitted_case": "C04 once only; inspect before C05",
+    "pace_seconds": 10,
+    "budget_cap_usd": "3",
+    "offline_tests_reported": 9,
+    "additional_mocktransport_retry_after_check": true,
+    "retry_after_test_seconds": 120,
+    "header_whitelist_checked": true,
+    "internal_retry": false,
+    "frozen_harness_files_reported": 9,
+    "harness_commit": "1f48525",
+    "ledger_attempts_at_review": 6,
+    "ledger_reserved_usd_at_review": "0.0812160",
+    "C04_started_at_review": false,
+    "stop_on_429": true,
+    "automatic_C05_permitted": false,
+    "parallel": "disabled"
+  },
+  "command": ".venv/bin/python data/curation/run_calibration.py --live --case C04 --pace-seconds 10 --chaos-base-url http://localhost:45379 --readiness-reference .local/preflight/chaos-calibration-readiness.json",
+  "executed_C04": {
+    "episode": "runs/20260914T201941Z-be316592",
+    "status": "completed",
+    "error": "BackendResponseError: Model endpoint HTTP 429",
+    "prior_readiness_reference": "harness thread 01a0a0db-781f-7c90-8575-a5fbabe133dd final readiness 2026-09-14T20:19:23Z; .local/preflight/chaos-calibration-readiness.json"
+  },
+  "later_C05": "Executed only after the separate CURRENT EXPLICIT READY SIGNAL authorizing continuation; not an automatic continuation of the C04 probe.",
+  "current_ledger_snapshot": {
+    "attempts": 8,
+    "reserved_usd": "0.1082880"
+  },
+  "scope_note": "Links the subsequently received review to the preserved executed wrapper; does not rewrite historical plans or authorize duplicate execution.",
+  "new_inference_calls": 0
+}
