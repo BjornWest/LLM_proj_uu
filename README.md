@@ -52,6 +52,10 @@ live model and free scripted modes, visible browser steps, results and trace lin
 Launch with `.venv/bin/python -m intent_browser.demo --live`; see [DEMO.md](DEMO.md)
 for setup, example requests, verification limits and the separate demo cost ledger.
 
+The separate [authorized-warranty development check](AUTHORIZED_EXTRA.md) verifies
+that explicitly requested extras are kept. It reuses the Tricky fixture without
+changing P07, and runs entirely through free scripted tests.
+
 ## Setup
 
 Use Python 3.11 or 3.12 on Linux/WSL. From this repository:
