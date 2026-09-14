@@ -44,6 +44,14 @@ The running [Chaos dashboard](http://localhost:3131/dashboard) shows the score.
 If the recording server has stopped, restart it with
 `python3 -m http.server 8876 --bind 127.0.0.1 --directory .local/review`.
 
+## Interactive demo
+
+[Daylight](http://localhost:8879) lets you ask the agent to shop for stationery,
+book a study room, or update email preferences on fictional local pages. It has
+live model and free scripted modes, visible browser steps, results and trace links.
+Launch with `.venv/bin/python -m intent_browser.demo --live`; see [DEMO.md](DEMO.md)
+for setup, example requests, verification limits and the separate demo cost ledger.
+
 ## Setup
 
 Use Python 3.11 or 3.12 on Linux/WSL. From this repository:

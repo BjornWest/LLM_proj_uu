@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daylight — a little help with the everyday</title>
+<link rel="stylesheet" href="/assets/style.css">
+<body class="dashboard">
+<header class="app-header"><a class="brand" href="/" aria-label="Daylight home"><span class="sun">✳</span> daylight<span class="brand-note">a little help with the everyday</span></a><span class="tag">Local demo</span></header>
+<main class="app-layout">
+<section class="assistant-panel">
+ <div class="eyebrow">YOUR BROWSER, WITH A LITTLE HELP</div>
+ <h1>What can I<br>take care of?</h1>
+ <p class="intro">Tell me what you need. Watch it happen.<br> Keep the rest of your day.</p>
+ <div class="examples" aria-label="Choose an example">
+  <button data-area="shop" class="example active"><span>↗</span><strong>A few essentials</strong><small>Shop & collect on campus</small></button>
+  <button data-area="booking" class="example"><span>◷</span><strong>Make a little space</strong><small>Book a study room</small></button>
+  <button data-area="preferences" class="example"><span>☷</span><strong>Less in your inbox</strong><small>Update your preferences</small></button>
+ </div>
+ <label class="field-label" for="goal">Your request</label>
+ <textarea id="goal" rows="4" spellcheck="false"></textarea>
+ <div class="mode-line"><label for="mode">Run with</label><select id="mode"><option value="rehearsal">Scripted rehearsal</option><option value="live" disabled>Live agent</option></select></div>
+ <p id="mode-note" class="fine">Rehearsal follows the selected example without a model call.</p>
+ <button class="primary run-button" id="run">Take care of it <span>→</span></button>
+ <div id="notice" role="status" aria-live="polite"></div>
+ <div class="activity"><div class="section-line"><h2>Along the way</h2><span id="status" class="status">Ready</span></div><ol id="steps"><li>Choose a task and I’ll get started.</li></ol></div>
+ <div id="outcome" class="outcome" hidden></div>
+ <div class="panel-footer"><a id="trace" href="http://localhost:8878" target="_blank" rel="noopener">Open activity record ↗</a><span id="cost"></span></div>
+</section>
+<section class="browser-panel" aria-label="Browser workspace">
+ <div class="workspace-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h2 id="workspace-title">Campus Supply</h2></div><button id="reset" class="quiet">Start fresh ↺</button></div>
+ <div class="browser-window"><div class="browser-chrome"><span class="dots"><i></i><i></i><i></i></span><span class="address" id="address">campus.local / shop</span><span id="watching">Explore the page</span></div>
+ <iframe id="site" title="Demo website"></iframe><img id="screen" hidden alt="Live browser observation">
+ </div>
+ <p class="workspace-footnote">A small, fictional corner of the web. Orders and bookings stay inside this demo.</p>
+</section>
+</main>
+<script src="/assets/dashboard.js"></script>
+</body></html>
