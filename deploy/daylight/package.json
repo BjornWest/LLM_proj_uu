@@ -1,0 +1,8 @@
+{
+  "name": "daylight-team-demo",
+  "private": true,
+  "type": "module",
+  "engines": {"node": "24.x"},
+  "scripts": {"build": "node build.mjs", "test": "node --test tests/*.test.mjs", "dev": "node dev.mjs"},
+  "dependencies": {"@vercel/blob": "2.8.0"}
+}

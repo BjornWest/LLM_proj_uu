@@ -1,0 +1,130 @@
+{
+  "runtime": "daylight-client-demo-v1",
+  "scope": "local live OpenRouter validation; Vercel hosting and private Blob not yet exercised",
+  "offline_tests": 8,
+  "offline_browser": {
+    "cases": [
+      {
+        "area": "booking",
+        "status": "complete",
+        "requests": 4,
+        "runtime": "daylight-client-demo-v1"
+      },
+      {
+        "area": "shop",
+        "status": "complete",
+        "requests": 5,
+        "runtime": "daylight-client-demo-v1"
+      },
+      {
+        "area": "preferences",
+        "status": "complete",
+        "requests": 4,
+        "runtime": "daylight-client-demo-v1"
+      }
+    ],
+    "chat_read_only": true,
+    "stale_control_rejected": true,
+    "page_errors": [],
+    "paid_calls": 0
+  },
+  "live_traces": [
+    {
+      "id": "985fc3de-1b74-4aad-a133-a4a02d0cd19b",
+      "mode": "chat",
+      "status": "complete",
+      "requests": 1,
+      "cost": 0.0008332,
+      "providers": [
+        "DekaLLM"
+      ],
+      "cached_tokens": [
+        0
+      ],
+      "sha256": "ef7786a609ea555ab4a57839346dd4f35eb42193dda32bb16ed6ee9b565b48e8",
+      "relative_local_path": "deploy/daylight/.dev-data/daylight/traces/bjorn/985fc3de-1b74-4aad-a133-a4a02d0cd19b.json",
+      "provenance": {
+        "runtime": "daylight-client-demo-v1",
+        "commit": null,
+        "assets": {
+          "index.html": "877e71850026764c2fe7a49a4db5d3ee9eed184a6514cc2f21cd732c93637207",
+          "style.css": "0f23806a797afe131d791277d31a633d9e678ca2d455fcd9e9f3c2931cc40068",
+          "site.html": "0746e860f33a827dec1b5159999a75a797a9ceaa8f8ca9c093bbde294eaa745f",
+          "rooms.js": "afc85566f63bdab81cfd99b023789255065398742eab31ada3eec790e38db0ba",
+          "site.js": "4ce65592803442c3a5452a99935340e277b5e6739ce9c31f240aa54d83247646",
+          "dashboard.js": "0c67fd3c039c6763ae8212bf51c11453d0e7b52f12949cbd80d95858ab678134",
+          "world.js": "c1f3e7f03ec06b49dc8c0277e4a0a5698bff9908f75874ccbbfd837cdcaba548",
+          "observation.js": "9509a0ca6b08d60921420752b114e63ed7e9f07c1f3188dfb0eb491bf5c1fcd8",
+          "fixture.json": "3786a4c001122dfde1194890c95f5a1acd9e02a78e20e017f08bf94cce9d9b77"
+        },
+        "server": {
+          "api/index.mjs": "bdff2df96737dd62dfd8d45c30d139ce5e70f4761e798ee12a75d182a66a3b09",
+          "lib/agent.mjs": "a21864bea160dbe6765a52cf773be3286abb2c4674a53575ad3e324633fa5781",
+          "lib/auth.mjs": "9e9bac5c79311591779dc00c14498a3650cbeac7b4c251d3a3ed1d0a28ed9c24",
+          "lib/store.mjs": "b597ae2d421c8a867ddbaa2d17e0643a225dc03311dce41868a7cf13f2eec173",
+          "package-lock.json": "680b343acede0ffc94705e9e18bc8356e945429ca49bd66ac9a211d589c75c08",
+          "build.mjs": "66866f9fa610a1939b100d99bcfb387e0248f34676efd0bb73761ac7186217fd"
+        }
+      }
+    },
+    {
+      "id": "7aeadb74-9aa6-42b4-94bb-513e1388e69f",
+      "mode": "task",
+      "status": "complete",
+      "requests": 4,
+      "cost": 0.00236415,
+      "providers": [
+        "AkashML",
+        "AkashML",
+        "AkashML",
+        "AkashML"
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "sha256": "4e642ac6820ecd31f01a539e333b757b483eeb6488e6ba301f0ea287dc84531e",
+      "relative_local_path": "deploy/daylight/.dev-data/daylight/traces/bjorn/7aeadb74-9aa6-42b4-94bb-513e1388e69f.json",
+      "provenance": {
+        "runtime": "daylight-client-demo-v1",
+        "commit": null,
+        "assets": {
+          "index.html": "877e71850026764c2fe7a49a4db5d3ee9eed184a6514cc2f21cd732c93637207",
+          "style.css": "0f23806a797afe131d791277d31a633d9e678ca2d455fcd9e9f3c2931cc40068",
+          "site.html": "0746e860f33a827dec1b5159999a75a797a9ceaa8f8ca9c093bbde294eaa745f",
+          "rooms.js": "afc85566f63bdab81cfd99b023789255065398742eab31ada3eec790e38db0ba",
+          "site.js": "4ce65592803442c3a5452a99935340e277b5e6739ce9c31f240aa54d83247646",
+          "dashboard.js": "0c67fd3c039c6763ae8212bf51c11453d0e7b52f12949cbd80d95858ab678134",
+          "world.js": "c1f3e7f03ec06b49dc8c0277e4a0a5698bff9908f75874ccbbfd837cdcaba548",
+          "observation.js": "9509a0ca6b08d60921420752b114e63ed7e9f07c1f3188dfb0eb491bf5c1fcd8",
+          "fixture.json": "3786a4c001122dfde1194890c95f5a1acd9e02a78e20e017f08bf94cce9d9b77"
+        },
+        "server": {
+          "api/index.mjs": "bdff2df96737dd62dfd8d45c30d139ce5e70f4761e798ee12a75d182a66a3b09",
+          "lib/agent.mjs": "a21864bea160dbe6765a52cf773be3286abb2c4674a53575ad3e324633fa5781",
+          "lib/auth.mjs": "9e9bac5c79311591779dc00c14498a3650cbeac7b4c251d3a3ed1d0a28ed9c24",
+          "lib/store.mjs": "b597ae2d421c8a867ddbaa2d17e0643a225dc03311dce41868a7cf13f2eec173",
+          "package-lock.json": "680b343acede0ffc94705e9e18bc8356e945429ca49bd66ac9a211d589c75c08",
+          "build.mjs": "66866f9fa610a1939b100d99bcfb387e0248f34676efd0bb73761ac7186217fd"
+        }
+      }
+    }
+  ],
+  "reported_cost_usd": 0.00319735,
+  "actual_booking": [
+    {
+      "room_id": "a101",
+      "room": "Å101",
+      "building": "Ångström",
+      "day": "Tuesday",
+      "time": "09:00",
+      "duration": 30,
+      "people": 3
+    }
+  ],
+  "chat_answer_observed": "Correctly identified Å101 Tuesday 09:00 as earliest for three people.",
+  "independent_privileged_evaluation": null,
+  "training_eligible": false
+}

@@ -1,0 +1,160 @@
+{
+  "state": {
+    "cart": {},
+    "shipping": "delivery",
+    "orders": [],
+    "bookings": [],
+    "preferences": {
+      "frequency": "weekly",
+      "tips": true
+    },
+    "preferences_saved": false
+  },
+  "products": [
+    {
+      "id": "notebook",
+      "name": "A5 notebook",
+      "price": 59,
+      "description": "Dotted pages",
+      "art": "book",
+      "shape": "notebook"
+    },
+    {
+      "id": "pens",
+      "name": "Everyday pens",
+      "price": 29,
+      "description": "A pair of good ideas",
+      "art": "pen",
+      "shape": "pen-art"
+    },
+    {
+      "id": "mug",
+      "name": "Quiet morning mug",
+      "price": 99,
+      "description": "A generous 350 ml",
+      "art": "cup",
+      "shape": "mug-art"
+    }
+  ],
+  "examples": {
+    "shop": {
+      "goal": "Buy two A5 notebooks for under 150 SEK total. Choose campus pickup.",
+      "lines": [
+        "Two A5 notebooks",
+        "118 SEK total",
+        "Free campus pickup"
+      ]
+    },
+    "booking": {
+      "goal": "Book the first available room in Ångström on Tuesday for 30 minutes, for 3 people.",
+      "lines": [
+        "Å101 · Ångström",
+        "Tuesday, 09:00–09:30",
+        "Space for 3 people · free"
+      ]
+    },
+    "preferences": {
+      "goal": "Set my email updates to monthly and turn off product tips.",
+      "lines": [
+        "Email updates: monthly",
+        "Product tips: off"
+      ]
+    }
+  },
+  "rooms": [
+    {
+      "id": "a101",
+      "name": "Å101",
+      "building": "Ångström",
+      "capacity": 4,
+      "equipment": "Whiteboard",
+      "free": [
+        [
+          9,
+          10
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          14,
+          16
+        ]
+      ]
+    },
+    {
+      "id": "a204",
+      "name": "Å204",
+      "building": "Ångström",
+      "capacity": 6,
+      "equipment": "Screen · whiteboard",
+      "free": [
+        [
+          10,
+          12
+        ],
+        [
+          13,
+          15
+        ]
+      ]
+    },
+    {
+      "id": "e112",
+      "name": "E112",
+      "building": "Ekonomikum",
+      "capacity": 4,
+      "equipment": "Whiteboard",
+      "free": [
+        [
+          9.5,
+          11
+        ],
+        [
+          13,
+          16
+        ]
+      ]
+    },
+    {
+      "id": "e203",
+      "name": "E203",
+      "building": "Ekonomikum",
+      "capacity": 2,
+      "equipment": "Quiet room",
+      "free": [
+        [
+          9,
+          12
+        ],
+        [
+          14,
+          17
+        ]
+      ]
+    },
+    {
+      "id": "b014",
+      "name": "B014",
+      "building": "Blåsenhus",
+      "capacity": 6,
+      "equipment": "Screen · whiteboard",
+      "free": [
+        [
+          10,
+          12
+        ],
+        [
+          14,
+          17
+        ]
+      ]
+    }
+  ],
+  "days": [
+    "Tuesday",
+    "Wednesday",
+    "Thursday"
+  ]
+}

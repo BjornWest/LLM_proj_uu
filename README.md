@@ -53,6 +53,12 @@ also available. It has live model and free scripted modes, browser steps and tra
 Launch with `.venv/bin/python -m intent_browser.demo --live`; see [DEMO.md](DEMO.md)
 for setup, example requests, verification limits and the separate demo cost ledger.
 
+For private team access without installing anything, see the
+[Vercel deployment guide](deploy/VERCEL_SETUP.md). It reuses the demo pages with
+individual access codes, server-side OpenRouter inference and private traces.
+This browser-side demo is separate from BrowserGym; the guide also describes
+how Vercel can later become the interface to persistent harness workers.
+
 The separate [authorized-warranty development check](AUTHORIZED_EXTRA.md) verifies
 that explicitly requested extras are kept. It reuses the Tricky fixture without
 changing P07, and runs entirely through free scripted tests.
