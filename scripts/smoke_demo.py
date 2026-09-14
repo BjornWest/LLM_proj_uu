@@ -25,10 +25,13 @@ def main():
         page.on('pageerror', lambda error: errors.append(str(error)))
         page.goto(args.origin)
         page.wait_for_function('!document.querySelector("#run").disabled')
+        page.click('#tasks-tab')
         page.select_option('#mode', 'rehearsal')
+        initial_world=page.evaluate('world')
         for area in ('shop', 'booking', 'preferences'):
             page.click(f'[data-area={area}]')
             page.wait_for_function('!document.querySelector("#run").disabled')
+            assert page.evaluate('world') == initial_world
             with page.expect_response('**/api/run') as response:
                 page.click('#run')
             job = response.value.json()['job']
@@ -39,6 +42,9 @@ def main():
             assert result['result']['title'] == 'Taken care of.', result
             assert page.locator('#outcome').is_visible()
             page.screenshot(path=str(args.output / f'{area}.png'), full_page=True)
+            page.click('#resume-page')
+            assert page.locator('#site').is_visible()
+            assert page.evaluate('world') == initial_world
             print(area, result['episode'], 'passed', flush=True)
         page.click('[data-area=shop]')
         page.wait_for_function('!document.querySelector("#run").disabled')

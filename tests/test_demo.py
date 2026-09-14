@@ -26,12 +26,30 @@ class DemoTests(unittest.TestCase):
     def test_bookings_validate_values_and_preferences_do_not_change_other_state(self):
         world=World();before=world.snapshot()
         with self.assertRaises(ValueError):
-            world.action({'type':'book','day':'Tuesday','time':'25:00','duration':'30','people':'3'})
+            world.action({'type':'book','room_id':'a101','day':'Tuesday','time':'25:00','duration':'30','people':'3'})
         self.assertEqual(world.snapshot(),before)
         world.action({'type':'preferences','frequency':'monthly','tips':False})
         self.assertEqual(verify('preferences',EXAMPLES['preferences']['goal'],before,world.snapshot()),(True,True))
-        world.action({'type':'book','day':'Tuesday','time':'14:00','duration':'30','people':'3'})
+        world.action({'type':'book','room_id':'a101','day':'Tuesday','time':'14:00','duration':'30','people':'3'})
         self.assertEqual(verify('preferences',EXAMPLES['preferences']['goal'],before,world.snapshot()),(True,False))
+
+    def test_demo_action_reminder_is_logged_without_mutating_selected_context(self):
+        with tempfile.TemporaryDirectory() as root:
+            config={'model':'qwen/qwen3.8-27b','key':'test-secret','providers':'parasail'}
+            backend=DemoBackend(Path(root)/'budget.json',config,threading.Lock(),action_format=True)
+            self.addCleanup(backend.close);backend.begin_episode('format-test');backend.client.close()
+            def respond(request):
+                payload=json.loads(request.content)
+                self.assertIn('ACTION RESPONSE FORMAT',payload['messages'][-1]['content'])
+                return httpx.Response(200,json={'model':config['model'],'provider':'Parasail',
+                    'choices':[{'message':{'content':"click('12')"}}],
+                    'usage':{'cost':0.00001,'prompt_tokens':100,'completion_tokens':5}})
+            backend.client=httpx.Client(transport=httpx.MockTransport(respond))
+            original=[{'role':'user','content':'A visible page'}]
+            result=backend.complete(original)
+            self.assertEqual(original[0]['content'],'A visible page')
+            ledger=json.loads((Path(root)/'budget.json').read_text())
+            self.assertEqual(result.request,ledger['requests'][0]['model_request'])
 
     def test_cost_audit_persists_and_reservation_precedes_send(self):
         with tempfile.TemporaryDirectory() as root:

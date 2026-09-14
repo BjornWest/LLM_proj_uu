@@ -46,9 +46,10 @@ If the recording server has stopped, restart it with
 
 ## Interactive demo
 
-[Daylight](http://localhost:8879) lets you ask the agent to shop for stationery,
-book a study room, or update email preferences on fictional local pages. It has
-live model and free scripted modes, visible browser steps, results and trace links.
+[Daylight](http://localhost:8879) has a browser-extension-style sidebar with
+page/activity chat and task controls. Its TimeEdit-inspired room calendar supports
+building filters and local bookings; shopping and email-preference examples are
+also available. It has live model and free scripted modes, browser steps and traces.
 Launch with `.venv/bin/python -m intent_browser.demo --live`; see [DEMO.md](DEMO.md)
 for setup, example requests, verification limits and the separate demo cost ledger.
 

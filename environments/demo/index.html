@@ -1,36 +1,42 @@
 <!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Daylight — a little help with the everyday</title>
+<title>Daylight — browser assistant demo</title>
 <link rel="stylesheet" href="/assets/style.css">
-<body class="dashboard">
-<header class="app-header"><a class="brand" href="/" aria-label="Daylight home"><span class="sun">✳</span> daylight<span class="brand-note">a little help with the everyday</span></a><span class="tag">Local demo</span></header>
-<main class="app-layout">
-<section class="assistant-panel">
- <div class="eyebrow">YOUR BROWSER, WITH A LITTLE HELP</div>
- <h1>What can I<br>take care of?</h1>
- <p class="intro">Tell me what you need. Watch it happen.<br> Keep the rest of your day.</p>
- <div class="examples" aria-label="Choose an example">
-  <button data-area="shop" class="example active"><span>↗</span><strong>A few essentials</strong><small>Shop & collect on campus</small></button>
-  <button data-area="booking" class="example"><span>◷</span><strong>Make a little space</strong><small>Book a study room</small></button>
-  <button data-area="preferences" class="example"><span>☷</span><strong>Less in your inbox</strong><small>Update your preferences</small></button>
- </div>
- <label class="field-label" for="goal">Your request</label>
- <textarea id="goal" rows="4" spellcheck="false"></textarea>
- <div class="mode-line"><label for="mode">Run with</label><select id="mode"><option value="rehearsal">Scripted rehearsal</option><option value="live" disabled>Live agent</option></select></div>
- <p id="mode-note" class="fine">Rehearsal follows the selected example without a model call.</p>
- <button class="primary run-button" id="run">Take care of it <span>→</span></button>
- <div id="notice" role="status" aria-live="polite"></div>
- <div class="activity"><div class="section-line"><h2>Along the way</h2><span id="status" class="status">Ready</span></div><ol id="steps"><li>Choose a task and I’ll get started.</li></ol></div>
- <div id="outcome" class="outcome" hidden></div>
- <div class="panel-footer"><a id="trace" href="http://localhost:8878" target="_blank" rel="noopener">Open activity record ↗</a><span id="cost"></span></div>
-</section>
+<body class="dashboard extension-demo">
+<header class="browser-topbar"><div class="demo-tab"><span class="site-dot">C</span> <span id="browser-tab-title">Campus Rooms</span> <span>×</span></div><span class="demo-label">Local browser demo</span></header>
+<div class="browser-toolbar"><span class="nav-arrows" aria-hidden="true">← &nbsp; →</span><button id="reset" title="Start a fresh demo">↻ <span>Start fresh</span></button><div class="url-bar"><span>▣</span> <span id="address">campus.local / shop</span></div><span class="extension-badge" title="Daylight sidebar">✳</span><button id="toggle-sidebar" aria-expanded="true" aria-controls="agent-sidebar" title="Toggle assistant sidebar">◧</button></div>
+<main class="extension-layout">
 <section class="browser-panel" aria-label="Browser workspace">
- <div class="workspace-heading"><div><span class="eyebrow">YOUR WORKSPACE</span><h2 id="workspace-title">Campus Supply</h2></div><button id="reset" class="quiet">Start fresh ↺</button></div>
- <div class="browser-window"><div class="browser-chrome"><span class="dots"><i></i><i></i><i></i></span><span class="address" id="address">campus.local / shop</span><span id="watching">Explore the page</span></div>
- <iframe id="site" title="Demo website"></iframe><img id="screen" hidden alt="Live browser observation">
+ <div class="page-tabs" aria-label="Choose a demo page">
+  <button data-area="shop" class="example active">Shop</button><button data-area="booking" class="example">Study rooms</button><button data-area="preferences" class="example">My account</button><span id="watching">Explore the page</span><button id="resume-page" hidden>Use page ↗</button>
  </div>
- <p class="workspace-footnote">A small, fictional corner of the web. Orders and bookings stay inside this demo.</p>
+ <h2 id="workspace-title" class="sr-only">Campus Supply</h2>
+ <div class="browser-window"><iframe id="site" title="Demo website"></iframe><img id="screen" hidden alt="Live browser observation"></div>
+ <p class="workspace-footnote">Fictional local website · No real purchases or accounts</p>
 </section>
+<aside class="assistant-panel" id="agent-sidebar" aria-label="Daylight browser extension sidebar">
+ <header class="extension-header"><div class="extension-logo">✳</div><div><strong>Daylight</strong><small>Browser assistant</small></div><span class="connected-dot" title="Connected to this demo page"></span></header>
+ <div class="sidebar-tabs" role="tablist" aria-label="Assistant mode"><button id="chat-tab" role="tab" aria-selected="true" aria-controls="chat-panel">Chat</button><button id="tasks-tab" role="tab" aria-selected="false" aria-controls="tasks-panel">Tasks</button></div>
+ <section id="chat-panel" role="tabpanel" aria-labelledby="chat-tab">
+  <div class="page-context"><span>▣</span><span id="chat-context">Reading this page</span><span class="read-only-tag">Read only</span></div>
+  <div id="conversation" role="log" aria-live="polite"><div class="chat-welcome"><div class="welcome-icon">✳</div><h1>A little help,<br>right beside you.</h1><p>Ask about this page, compare your options, or catch up on what I’ve done.</p></div></div>
+  <div class="chat-suggestions"><button data-question="When are rooms in Ångström available on Tuesday for 3 people?">When is Ångström free?</button><button data-question="What can I do on this page?">What’s on this page?</button><button data-question="What have you done so far?">What have you done?</button></div>
+  <form id="chat-form"><label for="question" class="sr-only">Ask Daylight about this page</label><textarea id="question" rows="3" maxlength="2000" placeholder="Ask about this page…"></textarea><div class="composer-bottom"><span id="chat-hint">Questions won’t change the page</span><button id="send-chat" type="submit" aria-label="Send message">↑</button></div></form>
+  <p id="chat-notice" role="status"></p>
+ </section>
+ <section id="tasks-panel" role="tabpanel" aria-labelledby="tasks-tab" hidden>
+  <h2>Let me take care of it.</h2><p class="task-intro">Give me a goal and watch the browser steps.</p>
+  <label class="field-label" for="goal">Your task</label><textarea id="goal" rows="4" spellcheck="false"></textarea>
+  <div class="mode-line"><label for="mode">Run with</label><select id="mode"><option value="rehearsal">Scripted rehearsal</option><option value="live" disabled>Live agent</option></select></div>
+  <p id="mode-note" class="fine">Rehearsal follows the example without a model call.</p>
+  <button class="primary run-button" id="run">Take care of it <span>→</span></button>
+  <div id="notice" role="status" aria-live="polite"></div>
+  <div class="activity"><div class="section-line"><h2>Activity</h2><span id="status" class="status">Ready</span></div><ol id="steps"><li>Choose a task and I’ll get started.</li></ol></div>
+  <div id="outcome" class="outcome" hidden></div>
+  <div class="panel-footer"><a id="trace" href="http://localhost:8878" target="_blank" rel="noopener">Open activity record ↗</a><span id="cost"></span></div>
+ </section>
+ <footer class="extension-footer"><span id="sidebar-state">● Connected to this page</span><span>Daylight demo</span></footer>
+</aside>
 </main>
 <script src="/assets/dashboard.js"></script>
 </body></html>

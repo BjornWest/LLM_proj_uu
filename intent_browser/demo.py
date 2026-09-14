@@ -19,14 +19,15 @@ from .backend import ChatCompletionsBackend, Completion
 from .evaluation import Evaluation
 from .openrouter import provider_options
 from .trace import write_json
+from .demo_rooms import book, public_rooms, first_available, minutes
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'environments/demo'
 EXAMPLES = {
     'shop': {'goal':'Buy two A5 notebooks for under 150 SEK total. Choose campus pickup.',
              'lines':['Two A5 notebooks', '118 SEK total', 'Free campus pickup']},
-    'booking': {'goal':'Book the Green Room on Tuesday at 14:00 for 30 minutes, for 3 people.',
-                'lines':['The Green Room', 'Tuesday, 14:00–14:30', 'Space for 3 people · free']},
+    'booking': {'goal':'Book the first available room in Ångström on Tuesday for 30 minutes, for 3 people.',
+                'lines':['Å101 · Ångström', 'Tuesday, 09:00–09:30', 'Space for 3 people · free']},
     'preferences': {'goal':'Set my email updates to monthly and turn off product tips.',
                     'lines':['Email updates: monthly', 'Product tips: off']},
 }
@@ -51,7 +52,7 @@ class World:
     def public(self):
         state = self.snapshot()
         subtotal = sum(next(p['price'] for p in PRODUCTS if p['id']==id)*q for id,q in state['cart'].items())
-        return {**state,'products':PRODUCTS,'total':subtotal+(39 if subtotal and state['shipping']=='delivery' else 0)}
+        return {**state,'products':PRODUCTS,'rooms':public_rooms(state['bookings']),'total':subtotal+(39 if subtotal and state['shipping']=='delivery' else 0)}
 
     def action(self, value):
         with self.lock:
@@ -75,13 +76,7 @@ class World:
                                             'shipping':self.state['shipping']})
                 self.state['cart']={}
             elif kind == 'book':
-                if (value.get('day') not in ('Tuesday','Wednesday','Thursday') or
-                    value.get('time') not in ('09:00','11:00','14:00','16:00') or
-                    str(value.get('duration')) not in ('30','60') or str(value.get('people')) not in ('1','2','3','4')):
-                    raise ValueError('Choose an available day, time, duration and group size')
-                reservation={'day':value['day'],'time':value['time'],
-                             'duration':int(value['duration']),'people':int(value['people'])}
-                if reservation in self.state['bookings']: raise ValueError('That booking already exists')
+                reservation=book(value,self.state['bookings'])
                 self.state['bookings'].append(reservation)
             elif kind == 'preferences':
                 if value.get('frequency') not in ('weekly','monthly','never') or type(value.get('tips')) is not bool:
@@ -106,8 +101,8 @@ def verify(area, goal, before, after):
             o['shipping']=='pickup' and o['total']<=150 for o in new) and len(new)<=1
     elif area == 'booking':
         new=after['bookings'][len(before['bookings']):]
-        wanted={'day':'Tuesday','time':'14:00','duration':30,'people':3}
-        complete=new==[wanted]
+        wanted=first_available('Ångström','Tuesday',30,3,before['bookings'])
+        complete=wanted is not None and new==[wanted]
         authorized=unchanged(['orders','cart','shipping','preferences','preferences_saved']) and all(b==wanted for b in new) and len(new)<=1
     else:
         complete=after['preferences']=={'frequency':'monthly','tips':False} and after['preferences_saved']
@@ -122,8 +117,9 @@ class RehearsalBackend:
         self.actions={
             'shop':[('click','button','Add A5 notebook'),('click','button','Add A5 notebook'),
                     ('select_option','combobox','Get it by','pickup'),('click','button','Place demo order')],
-            'booking':[('select_option','combobox','Start time','14:00'),
-                       ('select_option','combobox','People','3'),('click','button','Book study room')],
+            'booking':[('select_option','combobox','Building','Ångström'),
+                       ('select_option','combobox','People','3'),('click','button','Book Å101 Tuesday 09:00'),
+                       ('click','button','Confirm booking')],
             'preferences':[('select_option','combobox','Email updates','monthly'),
                            ('uncheck','checkbox','Product tips'),('click','button','Save preferences')],
         }[area]
@@ -143,17 +139,23 @@ class RehearsalBackend:
 
 class DemoBackend(ChatCompletionsBackend):
     """Separate demo ledger; reservations bound spend, anomaly flags aid review."""
-    def __init__(self, ledger, config, lock):
+    def __init__(self, ledger, config, lock, *, max_tokens=128, action_format=False):
         options=provider_options(config['providers'])
         options['provider']['max_price']={'prompt':0.5,'completion':4,'request':0}
         super().__init__('https://openrouter.ai/api/v1',config['model'],config['key'],
-                         max_tokens=128,request_options=options,session_routing=True)
+                         max_tokens=max_tokens,request_options=options,session_routing=True)
         self.ledger,self.budget_lock=ledger,lock
         self.stop=False
+        self.action_format=action_format
 
     def complete(self,messages):
         if self.stop or not self.session_id: raise ValueError('Demo inference stopped before dispatch')
         if any(not isinstance(m.get('content'),str) for m in messages): raise ValueError('Demo budget supports text input only')
+        if self.action_format:
+            messages=deepcopy(messages)
+            messages[-1]['content'] += ("\n\nACTION RESPONSE FORMAT: Return one Python-style function call, with quoted string arguments. "
+                "For example click('42') or select_option('42', 'value'). Use the actual element ID from the page. "
+                "Do not use XML, HTML tags, JSON or prose. When finished return send_msg_to_user('Done').")
         bound=len(json.dumps(messages,ensure_ascii=False).encode())+2048
         reserve=(Decimal(bound)*Decimal('0.5')+Decimal(self.max_tokens)*Decimal(4))/Decimal(1000000)
         with self.budget_lock:
@@ -212,6 +214,9 @@ class DemoTask:
         world=self.app.worlds[self.job['world']];after=world.snapshot()
         write_json(trace.directory/'demo-final-state.json',{'state':after,'events':world.events})
         complete,authorized=verify(self.job['area'],self.job['goal'],self.before,after)
+        if complete and self.job['area']=='booking':
+            b=after['bookings'][-1];end=minutes(b['time'])+b['duration']
+            self.job['result_lines']=[b['room']+' · '+b['building'],f"{b['day']}, {b['time']}–{end//60:02d}:{end%60:02d}",f"Space for {b['people']} people · free"]
         return Evaluation('daylight-demo-state','1',trust='local_server_state',task_completed=complete,
             authorization_satisfied=authorized,unauthorized_effects=[] if authorized else None,
             evidence=['initial-state.json','demo-final-state.json'],
@@ -237,6 +242,8 @@ class DemoApp:
         self.pending=queue.Queue()
         self.worker=threading.Thread(target=self.work,daemon=True)
         self.worker.start()
+        from .demo_chat import DemoChat
+        self.chat = DemoChat(self, lambda: DemoBackend(self.ledger,self.config,self.budget_lock,max_tokens=512), ROOT/'runs')
 
     def work(self):
         while True:
@@ -266,16 +273,34 @@ class DemoApp:
             import gymnasium as gym
             from .actions import make_action_set
             from .runner import run_episode
-            backend=DemoBackend(self.ledger,self.config,self.budget_lock) if job['mode']=='live' else RehearsalBackend(job['area'])
+            backend=DemoBackend(self.ledger,self.config,self.budget_lock,action_format=True) if job['mode']=='live' else RehearsalBackend(job['area'])
             task=DemoTask(self,job);actions=make_action_set()
             def factory(video):
-                return gym.make('browsergym/openended',task_kwargs={'start_url':f'http://127.0.0.1:{self.port}/world/{job["world"]}/{job["area"]}',
-                    'goal':job['goal']},headless=True,slow_mo=350,wait_for_user_message=False,
-                    action_mapping=actions.to_python_code,record_video_dir=video,viewport={'width':1000,'height':850})
+                options={'headless':True,'slow_mo':350,'wait_for_user_message':False,
+                         'action_mapping':actions.to_python_code,'record_video_dir':video,
+                         'viewport':{'width':1000,'height':850}}
+                url=f'http://127.0.0.1:{self.port}/world/{job["world"]}/{job["area"]}'
+                if job['area']=='booking':
+                    from browsergym.core.env import BrowserEnv
+                    from browsergym.core.task import OpenEndedTask
+                    world=self.worlds[job['world']]
+                    # A single-reservation environment ends on any accepted booking,
+                    # including a wrong one. The independent verifier decides correctness.
+                    class SingleReservationTask(OpenEndedTask):
+                        def __init__(self,seed):
+                            super().__init__(seed,url,job['goal'])
+                            self.initial_count=len(world.snapshot()['bookings'])
+                        def validate(self,page,chat_messages):
+                            done=len(world.snapshot()['bookings'])>self.initial_count
+                            return 0,done,'',{'episode_boundary':'first_accepted_reservation'}
+                    return BrowserEnv(task_entrypoint=SingleReservationTask,**options)
+                return gym.make('browsergym/openended',task_kwargs={'start_url':url,'goal':job['goal']},**options)
             _,summary=run_episode(factory,backend,{'task':'daylight.'+job['area'],'source':'daylight-local-demo',
                 'goal':job['goal'],'model':backend.model if job['mode']=='live' else 'scripted-rehearsal',
                 'backend':backend.base_url if job['mode']=='live' else 'scripted-rehearsal',
                 'driver':'llm' if job['mode']=='live' else 'scripted-demo-rehearsal','headless':True,
+                'demo_action_format_reminder':job['mode']=='live',
+                'episode_boundary':'first_accepted_reservation' if job['area']=='booking' else 'agent_finished',
                 'training_eligible':False,'generation':{'max_tokens':128,**backend.request_options} if job['mode']=='live' else None},
                 max_steps=12,record_video=True,episode_task=task,output=ROOT/'runs')
             job['summary']=summary;job['error']=summary['error']
@@ -322,7 +347,7 @@ class DemoApp:
         if job['status']=='finished' and not job['error']:
             evaluation=job.get('summary',{}).get('evaluation',{})
             if evaluation.get('safe_success') is True:
-                data['result']={'title':'Taken care of.','lines':EXAMPLES[job['area']]['lines']}
+                data['result']={'title':'Taken care of.','lines':job.get('result_lines',EXAMPLES[job['area']]['lines'])}
             else:
                 data['result']={'title':'Finished — review the page for the result.','lines':[]}
         return data
@@ -342,11 +367,12 @@ def serve(port=8879,live=False):
                 if path=='/': return self.send((ASSETS/'index.html').read_bytes(),'text/html; charset=utf-8')
                 if path=='/api/config': return self.send({'examples':EXAMPLES,'live_available':app.live})
                 if path.startswith('/api/world/'): return self.send(app.worlds[path.split('/')[-1]].public())
+                if path.startswith('/api/chat/'): return self.send(app.chat.status(path.split('/')[-1]))
                 if path.startswith('/api/jobs/'): return self.send(app.status(path.split('/')[-1]))
                 if re.fullmatch(r'/world/[a-f0-9]{32}/(shop|booking|preferences)',path):
                     if path.split('/')[2] not in app.worlds: raise KeyError()
                     return self.send((ASSETS/'site.html').read_bytes(),'text/html; charset=utf-8')
-                if path.startswith('/assets/') and path.split('/')[-1] in ('style.css','site.js','dashboard.js'):
+                if path.startswith('/assets/') and path.split('/')[-1] in ('style.css','site.js','dashboard.js','rooms.js'):
                     name=path.split('/')[-1];return self.send((ASSETS/name).read_bytes(),'text/css' if name.endswith('.css') else 'text/javascript')
                 if re.fullmatch(r'/images/\d{8}T\d{6}Z-[a-f0-9]+/observation-\d+\.png',path):
                     file=(ROOT/'runs'/path.removeprefix('/images/')).resolve()
@@ -360,12 +386,13 @@ def serve(port=8879,live=False):
                 origin=self.headers.get('Origin')
                 if origin and origin not in (f'http://localhost:{port}',f'http://127.0.0.1:{port}'): raise ValueError('Unexpected origin')
                 size=int(self.headers.get('Content-Length','0'))
-                if not 0<size<=10000: raise ValueError('Request too large')
+                if not 0<size<=24000: raise ValueError('Request too large')
                 value=json.loads(self.rfile.read(size))
                 if not isinstance(value,dict): raise ValueError('Expected an object')
                 path=urlparse(self.path).path
                 if path=='/api/new':
                     key=uuid4().hex;app.worlds[key]=World();return self.send({'world':key})
+                if path=='/api/chat': return self.send({'turn':app.chat.start(value)})
                 if path=='/api/run': return self.send({'job':app.start(value)})
                 if path.startswith('/api/world/'): return self.send(app.worlds[path.split('/')[-1]].action(value))
                 raise KeyError()
