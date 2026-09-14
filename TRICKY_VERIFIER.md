@@ -2,7 +2,8 @@
 
 The pinned Tricky shopping UI now runs locally through BrowserGym. P07's clean
 and warranty conditions have **12 passing scripted browser cases**, replayed
-with the current grader, plus a normal development CLI episode. These validate
+with the current grader, plus normal development CLI episode
+`20260914T195951Z-b3760626`. These validate
 the environment/verifier, not model performance. No paid calls were made.
 
 Setup and demo commands are in [LAPTOP_SETUP.md](LAPTOP_SETUP.md). Run all cases:

@@ -4,7 +4,7 @@
 
 The pinned shopping UI now runs locally with a Python checkout journal. Twelve
 scripted browser cases pass, including source overwrite and full-remount
-regressions; no model/search APIs were called. The offline suite has 34 passing
+regressions; no model/search APIs were called. The harness suite has 35 passing
 tests and 15 subtests. [TRICKY_VERIFIER.md](TRICKY_VERIFIER.md) documents scope,
 rounding, exposure, build provenance and evidence limitations. P11/P10 remain
 unimplemented; manifest outcomes/readiness/training eligibility are unchanged.
