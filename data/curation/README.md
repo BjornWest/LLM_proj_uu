@@ -1,5 +1,7 @@
 **Dataset inspection and proposed pilot — 14 September 2026**
 
+**Provider decision:** future authorized runs use the `.env` standard preset, currently `@preset/deka-llm-qwen38-27-b` for both `MODEL_NAME` and `OPENROUTER_PRESET`. The Reka proposal is withdrawn and unexecuted. This clarification authorizes no new paid retry; historical baseline/paced artifacts stay frozen.
+
 **P07 adapter evidence:** [P07_EVIDENCE_REVIEW.md](P07_EVIDENCE_REVIEW.md) reviews 12 saved scripted cases, including checkout-history preservation across reload, extra products/units and abandonment. These are verifier tests, not Qwen results; “allowed” does not mean an explicitly authorized extra. Candidate manifest labels remain unchanged.
 
 **Live calibration update:** [CALIBRATION.md](CALIBRATION.md) records five Qwen/Chaos attempts after harness readiness checks. C01–C03 made correct first actions; C02 finished normally, while C01/C03 hit provider errors afterward. C04 and the explicitly requested C05 continuation hit HTTP 429 before any action despite long idle periods. Further calls are paused. Reported cost is $0.0008862 with four unknown-cost failed attempts; $0.108288 remains reserved under the shared $3 cap. No Parallel calls or training runs. Source inventory and candidate manifest labels remain unchanged.

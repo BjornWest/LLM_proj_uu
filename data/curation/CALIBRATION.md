@@ -6,6 +6,13 @@ C06–C14 remain unrun. Bjorn authorized up
 to **$3 OpenRouter** for this calibration.
 Parallel remains disabled; this suite adds no Parallel calls or charges.
 
+**Provider clarification:** future authorized runs must use the standard preset
+configured in `.env`. A read limited to non-secret fields confirmed both
+`MODEL_NAME` and `OPENROUTER_PRESET` equal `@preset/deka-llm-qwen38-27-b`.
+The Reka proposal is withdrawn and was never executed. This clarification does
+not authorize another paid retry. Existing baseline/paced plans, runner and
+traces remain frozen as evidence of their actual hardcoded settings.
+
 The harness owner confirmed readiness at commit
 `1f48525c2ccf0670ba48586af56d2eb5260e97ac`, documented in
 `.local/preflight/chaos-calibration-readiness.json`. That check repaired stale
@@ -92,20 +99,20 @@ seven Chaos certifications were checked again before dispatch. Its first request
 also received shared-pool HTTP 429, more than nine minutes after C04, with no
 Retry-After. Further paid calls are paused under the error rule.
 
-**Next calibration step:** restore reliable inference before attempting C06–C07
-(the form/state-edit contracts) and the remaining repetitions. A separately
-labeled provider comparison for the same Qwen model is an available alternative
-to waiting for DekaLLM. A read-only [OpenRouter endpoint catalogue
-query](https://openrouter.ai/api/v1/models/qwen/qwen3.8-27b/endpoints) returned other
-providers within the current price ceilings, including Reka and Parasail FP8;
-DekaLLM's quantization is listed as unknown. This is not evidence that those
-providers will avoid rate limits or behave identically. The response is retained
-in `calibration-chaos-v1/provider-endpoints.json`; no alternative-provider
-inference was run. A concrete one-case Reka FP8 proposal is retained in
-`provider_probe_proposal.json`: same model, no fallback, at most $0.162432
-additional reservation against the same $3 ledger. It needs approval because
-the current explicit protocol pins DekaLLM and its named preset. Do not pool
-provider/protocol versions into one headline rate.
+**Next calibration step:** after a future run is authorized, use the configured
+preset and record the exact requested model/preset plus the resolved model and
+provider returned by OpenRouter. The normal CLI reads `.env`; the historical
+budgeted runner hardcodes `qwen/qwen3.8-27b` plus the named preset. A future
+budgeted run needs a separate protocol revision that reads the configured
+preset while retaining cumulative spending controls. Do not rewrite historical
+requests or use the archived runner unchanged as the new preset configuration.
+
+The read-only endpoint catalogue in
+`calibration-chaos-v1/provider-endpoints.json` and the proposed settings in
+`provider_probe_proposal.json` remain historical research evidence. The proposal
+is marked `withdrawn_not_run`, with `execution_authorized: false`; its original
+rationale is retained separately from Bjorn's decision. Reka inference is not
+authorized, and no alternative-provider choice remains pending.
 
 Potential later harness improvement: detect a validated terminal outcome before
 requesting an extra finish message. C01/C03 show why this could improve runtime
@@ -168,7 +175,7 @@ Run the offline plan and checks with:
 .venv/bin/python -m unittest discover -s data/curation -p test_calibration_budget.py -v
 ```
 
-After readiness confirmation, the invocation shape is:
+The original unpaced invocation was (historical evidence, not a future-run instruction):
 
 ```bash
 .venv/bin/python data/curation/run_calibration.py --live --case C01 \

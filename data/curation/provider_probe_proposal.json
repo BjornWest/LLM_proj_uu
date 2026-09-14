@@ -1,6 +1,5 @@
 {
-  "status": "proposed_not_run",
-  "approval_needed": "Current explicit protocol pins DekaLLM; this changes the provider and removes its named preset.",
+  "status": "withdrawn_not_run",
   "reason": "Four shared-pool HTTP 429 errors across C01-C05, including first-call failures after long idle periods.",
   "source_catalogue": "data/curation/calibration-chaos-v1/provider-endpoints.json",
   "cohort": "qwen-reka-fp8-probe-v1",
@@ -9,15 +8,23 @@
   "session": "new isolated Chaos session, never reuse C05",
   "model": "qwen/qwen3.8-27b",
   "provider": {
-    "only": ["reka/fp8"],
+    "only": [
+      "reka/fp8"
+    ],
     "allow_fallbacks": false,
     "require_parameters": true,
-    "max_price": {"prompt": 0.5, "completion": 3, "request": 0}
+    "max_price": {
+      "prompt": 0.5,
+      "completion": 3,
+      "request": 0
+    }
   },
   "expected_response_provider": "Reka",
   "reported_quantization": "fp8",
   "preset": null,
-  "reasoning": {"enabled": false},
+  "reasoning": {
+    "enabled": false
+  },
   "temperature": 0,
   "max_tokens": 512,
   "max_steps": 12,
@@ -31,5 +38,18 @@
   "maximum_additional_reservation_usd": "0.1624320",
   "stop_rule": "Inspect one case; stop on API, provider, usage, cost, provenance or evidence errors.",
   "reporting": "Separate provider/preset cohort, never pool into the DekaLLM rate. Preserve all prior cases.",
-  "training_eligible": false
+  "training_eligible": false,
+  "original_status": "proposed_not_run",
+  "original_approval_rationale": "Current explicit protocol pins DekaLLM; this changes the provider and removes its named preset.",
+  "execution_authorized": false,
+  "resolution": {
+    "decision": "Bjorn directed future authorized runs to use the standard model preset configured in .env. Reka inference is not authorized; no provider choice remains pending.",
+    "observed_non_secret_config": {
+      "MODEL_NAME": "@preset/deka-llm-qwen38-27-b",
+      "OPENROUTER_PRESET": "@preset/deka-llm-qwen38-27-b"
+    },
+    "new_run_authorized_by_clarification": false,
+    "historical_proposal_retained": true,
+    "inference_calls_for_proposal": 0
+  }
 }
