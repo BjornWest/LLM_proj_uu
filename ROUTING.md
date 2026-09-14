@@ -22,6 +22,25 @@ The last pair cost $0.00103816 and $0.00029248 respectively; both completed the 
 
 Configuration and reproduction: `README.md`, `scripts/smoke_session_routing.py`. Machine-readable evidence: `config/session_routing_validation.json`; raw payloads, screenshots and videos stay under the linked `runs/` directories. The shared viewer reads them without conversion. All tests are training-ineligible, and MiniWoB reward does not verify broader authorization preservation.
 
+All ten requests used `max_tokens=128`; the historical Chaos calibration used
+512. Native task success is true for all five probes, while authorization and
+safe-success labels remain null.
+
+Runtime provenance is not identical across all five probes. The first three
+record `openrouter.py` SHA256 `723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1`;
+the final two record `810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4`.
+The change adds type checks to `routing_record`, the logging projection, so a
+malformed response or nested field produces null metadata instead of masking
+the original error with an exception. It changes neither `provider_options`
+nor request construction. The reconstructed earlier file matches its recorded
+SHA256 exactly. An offline replay of both versions on all ten saved exchanges
+produced identical routing records. That establishes equivalence of the logged
+fields for these exchanges, not identical runtime versions or broader behavior.
+The JSON report includes the diff and per-case recorded runtime fingerprints.
+Its top-level source hashes describe the final checkout; probe-script versions
+were not recorded per episode and must not be treated as a uniform historical
+script fingerprint.
+
 The current Chaos certification was refreshed by replaying the same 16 saved verifier cases after the runner change. This was an offline replay, not another browser/model evaluation. Historical calibration plans, requests and outcomes remain unchanged.
 
 References: [OpenRouter prompt caching and session IDs](https://openrouter.ai/docs/guides/best-practices/prompt-caching), [provider allowlists](https://openrouter.ai/docs/guides/routing/provider-selection).
