@@ -23,6 +23,20 @@ The development-session runs are integration tests, **not controlled model
 evaluations**. Chaos's selected challenge uses client-validated outcomes.
 All traces and videos are retained in `runs/`; see the exact IDs in [NOTES.md](NOTES.md).
 
+Browse saved episodes with the shared `common_agent_util` viewer:
+
+```bash
+python3 scripts/view_traces.py
+```
+
+Open [http://localhost:8878](http://localhost:8878). Keep the `common_agent_util`
+[checkout](https://github.com/BjornWest/common_agent_util) beside this repository,
+or pass `--common-util /path/to/common_agent_util`.
+Its BrowserGym adapter reads the original episodes without conversion: screenshots,
+model inputs/outputs, actions, errors, separate verifier results and video links.
+This is the saved-session browser; port 8877 remains the latest live screenshot.
+No paid calls are needed. Existing calibration recordings and harness stay unchanged.
+
 For tomorrow, the recordings are available at
 [Chaos demo](http://localhost:8876/chaos-demo.webm) and
 [MiniWoB form demo](http://localhost:8876/miniwob-form.webm).

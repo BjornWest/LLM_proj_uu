@@ -84,3 +84,18 @@ python3 data/curation/check_preflight.py --fetch
 
 MiniWoB setup is optional and documented in [README.md](README.md). Finish the
 plain smoke test first; it does not require the MiniWoB source checkout.
+
+## Optional saved-trace viewer
+
+Clone the shared utility alongside this repository, then start the viewer:
+
+```bash
+git clone git@github.com:BjornWest/common_agent_util.git ../common_agent_util
+python3 scripts/view_traces.py
+```
+
+Open
+[http://localhost:8878](http://localhost:8878). A different checkout location can
+be supplied with `--common-util PATH`. Python's standard library is sufficient.
+Saved `runs/` are ignored by Git in both projects; copy the episodes you want to
+review separately when moving to the laptop.
