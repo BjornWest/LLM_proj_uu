@@ -3,6 +3,9 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 const source=path.resolve('../../environments/demo');
 await mkdir('private-assets',{recursive:true});await mkdir('public',{recursive:true});
+// Vercel rejects an empty output directory. This contains no application data;
+// all demo pages, scripts, API routes and traces remain behind the function.
+await writeFile('public/robots.txt','User-agent: *\nDisallow: /\n');
 for (const file of ['style.css','site.html','rooms.js']) await copyFile(path.join(source,file),'private-assets/'+file);
 let html=await readFile(path.join(source,'index.html'),'utf8');
 html=html.replace('Local browser demo','Private team demo').replace('Fictional local website','Fictional website')
@@ -20,4 +23,4 @@ const files=['index.html','style.css','site.html','rooms.js','site.js','dashboar
 const hashes={};for(const file of files)hashes[file]=createHash('sha256').update(await readFile('private-assets/'+file)).digest('hex');
 const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
 await writeFile('private-assets/provenance.json',JSON.stringify({runtime:'daylight-client-demo-v1',commit:process.env.VERCEL_GIT_COMMIT_SHA||null,assets:hashes,server},null,2));
-console.log('Built private assets; public/ intentionally contains no application files.');
+console.log('Built private assets; public/ contains only robots.txt.');

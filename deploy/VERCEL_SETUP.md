@@ -19,7 +19,7 @@ In [Vercel New Project](https://vercel.com/new), import `BjornWest/LLM_proj_uu` 
 | Build command | `npm run build` |
 | Output directory | `public` |
 
-`vercel.json` routes every request through the authenticated function. The `public` directory is deliberately empty; the application assets are bundled privately into the function. Do not copy the private assets into public or add a static-files bypass.
+`vercel.json` routes application requests through the authenticated function. The `public` directory contains only a non-sensitive `robots.txt`, because Vercel rejects an empty output directory. The application assets are bundled privately into the function. Do not copy the private assets into public or add a static-files bypass for application content.
 
 ## 2. Add the server environment variables
 
