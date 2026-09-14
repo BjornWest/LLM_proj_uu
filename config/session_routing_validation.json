@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "scope": "Development MiniWoB routing/cache probes; not historical Chaos calibration or training data.",
+  "source_sha256": {
+    "intent_browser/backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+    "intent_browser/runner.py": "4f33bb79c759de46ce45b5cdbf41ab3fc565f569017144022bc685f35f6838c8",
+    "intent_browser/openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+    "intent_browser/cli.py": "0337d00b9c95af716f2fe84accb3ad240b46e0963173b4fcba2760cb43af5ae0",
+    "scripts/smoke_session_routing.py": "8512d34c75a3b1df2bd6fcb39e1375423e8bd8aeac5bb60c355e442e9ab7590d"
+  },
+  "requests": 10,
+  "reported_cost_usd": "0.00552921",
+  "reservation_cap_usd": "0.05",
+  "reserved_cost_usd": "0.04925575",
+  "request_session_ids_match_episode_ids": true,
+  "all_resolved_providers_within_allowlist": true,
+  "provider_affinity_guaranteed": false,
+  "cache_hit_observed": true,
+  "endpoint_snapshot": ".local/preflight/session-routing-endpoints.json",
+  "endpoint_snapshot_sha256": "5b0029da656e9bc9e6abd6adf53a3e8c4910d22b8048e514e86f702f8b34124c",
+  "cases": [
+    {
+      "phase": "narrow",
+      "episode": "runs/20260914T205804Z-f1a76355",
+      "success": true,
+      "error": null,
+      "routing": [
+        {
+          "session_id": "20260914T205804Z-f1a76355",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "parasail"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "response_id": "gen-1789419485-NPP5iKFcLOB82HAqFrmN",
+          "reported_cost_usd": 0.00017512,
+          "cached_tokens": 0
+        },
+        {
+          "session_id": "20260914T205804Z-f1a76355",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "parasail"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "response_id": "gen-1789419496-0DeyDNIkU4o5WhaDKXpF",
+          "reported_cost_usd": 0.00017424,
+          "cached_tokens": 0
+        }
+      ],
+      "consistent_provider_observed": true,
+      "cache_hit_observed": false,
+      "artifact_sha256": {
+        "metadata.json": "4c853eaf2f9726f6a853a78b832894251f514acf4b08b46324d33001deed639a",
+        "steps.jsonl": "ca7c421dfe18448a78657893b95fe64da0f93bdef15aa822d0b789987013e4c1",
+        "episode.json": "a914118cfc19da8efe324128a5f2ce82589fafa99ad62c5809a657fe56398b78",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "full",
+      "episode": "runs/20260914T205819Z-fea56730",
+      "success": true,
+      "error": null,
+      "routing": [
+        {
+          "session_id": "20260914T205819Z-fea56730",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "response_id": "gen-1789419506-sSYbi0zs7BNqnztGVpaJ",
+          "reported_cost_usd": 0.00017512,
+          "cached_tokens": 0
+        },
+        {
+          "session_id": "20260914T205819Z-fea56730",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "response_id": "gen-1789419517-7S97Lv3pS083SoNZWJlE",
+          "reported_cost_usd": 0.00017424,
+          "cached_tokens": 0
+        }
+      ],
+      "consistent_provider_observed": true,
+      "cache_hit_observed": false,
+      "artifact_sha256": {
+        "metadata.json": "cde08021437f1e17d4de774a0bf8375ca3b3d3cce702562da2bf83832c7925e0",
+        "steps.jsonl": "6f413fc4019c32996ccde1d9b64ca67afa2a9ed89ba05821baf93633d7ac004a",
+        "episode.json": "8fd4f65bb8beb8710cbaac751d03ce539f52c79b9b2079ee82fe4c99440e51af",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "cache",
+      "episode": "runs/20260914T205932Z-9784088d",
+      "success": true,
+      "error": null,
+      "routing": [
+        {
+          "session_id": "20260914T205932Z-9784088d",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Cloudflare",
+          "response_id": "gen-1789419573-uyfQBnnEBQzLDevmudI9",
+          "reported_cost_usd": 0.0011309,
+          "cached_tokens": 0
+        },
+        {
+          "session_id": "20260914T205932Z-9784088d",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Phala",
+          "response_id": "gen-1789419588-8ZC0XZuRI06yT65m3S8M",
+          "reported_cost_usd": 0.0006072,
+          "cached_tokens": 0
+        }
+      ],
+      "consistent_provider_observed": false,
+      "cache_hit_observed": false,
+      "artifact_sha256": {
+        "metadata.json": "1c47f753d615446b780e571585439ea654a49a508cdf4168551825a23422832c",
+        "steps.jsonl": "5e881eeabae16d882e6285d92812e02336ea19bd2220aecd098a6db800d6b78c",
+        "episode.json": "836d678f32d3a2afc53540da13c18d3a6d893315186f94c7b2a4c6bb8f58ef4f",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "cache",
+      "episode": "runs/20260914T210103Z-c62b59d8",
+      "success": true,
+      "error": null,
+      "routing": [
+        {
+          "session_id": "20260914T210103Z-c62b59d8",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Ionstream",
+          "response_id": "gen-1789419664-Jhl1FGUwDP8CVc4aijSM",
+          "reported_cost_usd": 0.0008802,
+          "cached_tokens": 0
+        },
+        {
+          "session_id": "20260914T210103Z-c62b59d8",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Ionstream",
+          "response_id": "gen-1789419675-dcDfR2CXuibwwFtdEGCt",
+          "reported_cost_usd": 0.00088155,
+          "cached_tokens": 0
+        }
+      ],
+      "consistent_provider_observed": true,
+      "cache_hit_observed": false,
+      "artifact_sha256": {
+        "metadata.json": "ea2be5ef9504b379516db69be515a32129a9c5c215ad662d52a50a0a26096f6e",
+        "steps.jsonl": "183fb9dc483b23d008dfad06caca9b2d8c6d67f228309d323cab3c78c060d335",
+        "episode.json": "0d52e2dfdafe7d676d238d7b0e9650ad15556eaaa3c019208c62e8fde1aa8e23",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "cache-parasail",
+      "episode": "runs/20260914T210214Z-a29dfb9e",
+      "success": true,
+      "error": null,
+      "routing": [
+        {
+          "session_id": "20260914T210214Z-a29dfb9e",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "parasail"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "response_id": "gen-1789419735-lLm0Rk0O9w4JLrZ6ARa5",
+          "reported_cost_usd": 0.00103816,
+          "cached_tokens": 0
+        },
+        {
+          "session_id": "20260914T210214Z-a29dfb9e",
+          "requested_model": "qwen/qwen3.8-27b",
+          "requested_providers": [
+            "parasail"
+          ],
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "response_id": "gen-1789419746-xGwqGrROc0jHIRMFXdlP",
+          "reported_cost_usd": 0.00029248,
+          "cached_tokens": 3920
+        }
+      ],
+      "consistent_provider_observed": true,
+      "cache_hit_observed": true,
+      "artifact_sha256": {
+        "metadata.json": "f521c70afd3e788c2710fcfcbfc962483ff0e563873388f3b634d4292300828d",
+        "steps.jsonl": "f3f3f0601ba14b7690de1cc157c40ea6a73ff9ab9bafa93b5261bdc98dc6f3d4",
+        "episode.json": "66062dce2da38a2290d15444717a7ca0a4cdf4a5f9c70a7665759aaef1b4b97d",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    }
+  ]
+}

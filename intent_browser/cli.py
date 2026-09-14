@@ -77,7 +77,8 @@ def main():
     parser.add_argument("--model", default=os.getenv("MODEL_NAME"))
     parser.add_argument("--base-url", default=os.getenv("MODEL_BASE_URL"))
     parser.add_argument("--api-key-env", default="MODEL_API_KEY")
-    parser.add_argument("--preset", help="Optional OpenRouter @preset/... reference (or OPENROUTER_PRESET)")
+    parser.add_argument("--preset", help="Legacy explicit preset; cannot combine with provider allowlist")
+    parser.add_argument("--providers", help="Comma-separated OpenRouter allowlist (or OPENROUTER_PROVIDERS)")
     parser.add_argument("--max-steps", type=int, default=12)
     parser.add_argument("--timeout", type=float, default=90)
     parser.add_argument("--max-tokens", type=int, default=128)
@@ -109,6 +110,23 @@ def main():
         args.model = args.model or os.getenv("MODEL_NAME")
         args.base_url = args.base_url or os.getenv("MODEL_BASE_URL")
     args.preset = args.preset or os.getenv("OPENROUTER_PRESET")
+    args.providers = args.providers or os.getenv('OPENROUTER_PROVIDERS')
+    request_options = {}
+    session_routing = False
+    if args.mode == 'run' and urlparse(args.base_url or '').hostname == 'openrouter.ai':
+        from .openrouter import DEFAULT_PROVIDERS, provider_options
+        if args.preset and args.providers:
+            parser.error('Choose a model slug/provider allowlist or a legacy preset, not both')
+        if not args.preset:
+            try:
+                request_options = provider_options(args.providers or DEFAULT_PROVIDERS)
+            except ValueError as exc:
+                parser.error(str(exc))
+            session_routing = True
+    elif args.mode == 'run' and args.providers:
+        parser.error('--providers/OPENROUTER_PROVIDERS requires an OpenRouter endpoint')
+    if args.preset:
+        request_options = {'preset': args.preset}
     if args.preset and not args.preset.startswith("@preset/"):
         parser.error("OpenRouter preset must start with @preset/")
     if args.mode == "run" and args.preset and urlparse(args.base_url or "").hostname != "openrouter.ai":
@@ -183,7 +201,7 @@ def main():
                ) if args.mode in ("manual", "development")
                else ChatCompletionsBackend(args.base_url, args.model, os.getenv(args.api_key_env),
                                            args.timeout, args.max_tokens,
-                                           request_options={"preset": args.preset} if args.preset else None))
+                                           request_options=request_options, session_routing=session_routing))
     metadata = {"task": args.task, "goal": args.goal if args.task == "openended" else None,
                 "start_url": args.url or ("built-in smoke fixture" if args.task == "openended" else None),
                 "model": args.model if args.mode == "run" else args.mode,
@@ -191,7 +209,7 @@ def main():
                 "driver": "llm" if args.mode == "run" else args.mode,
                 "headless": args.headless, "verifier": "miniwob" if args.task.startswith("miniwob.") else None,
                 "generation": {"temperature": 0, "max_tokens": args.max_tokens,
-                               "preset": args.preset if args.mode == "run" else None}}
+                               **(request_options if args.mode == 'run' else {})}}
     metadata["environment"] = {"slow_mo_ms": 250, "record_video": args.video,
                                "miniwob_url": os.getenv("MINIWOB_URL") if args.task.startswith("miniwob.") else None}
     if args.chaos_task:

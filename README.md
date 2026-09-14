@@ -150,13 +150,56 @@ The OpenRouter URL and request format follow its
 [Chat Completions API](https://openrouter.ai/docs/api_reference/overview).
 The local server example is for future hardware, not a requirement for this PC.
 
-This workstation's `.env` selects `qwen/qwen3.8-27b` and
-`OPENROUTER_PRESET=@preset/deka-llm-qwen38-27-b`. Load it with `--env-file .env`;
-`--preset @preset/...` overrides the preset setting. The preset is passed in a
-separate request field, keeping the model ID explicit. See
-[OpenRouter presets](https://openrouter.ai/docs/guides/features/presets).
+This workstation's `.env` selects `MODEL_NAME=qwen/qwen3.8-27b` and
+`OPENROUTER_PROVIDERS=chutes,dekallm,phala,parasail,akashml,ionstream,cloudflare`.
+The old preset is unset. Run with:
 
-The small paid action-parsing test is:
+```bash
+.venv/bin/intent-browser run --env-file .env --api-key-env OPENROUTER_API_KEY \
+  --task miniwob.enter-text --max-steps 4 --video
+```
+
+OpenRouter receives the model slug, `provider.only`, and one top-level `session_id`
+equal to the episode ID. The session ID stays constant for all steps and changes
+for every new episode, including when reusing a backend object. Override the
+allowlist with `--providers parasail,phala`. No `provider.order` is supplied.
+Fallbacks are allowed within the allowlist; sticky routing is best effort, not
+an unconditional provider pin. A provider may change when unavailable. A cache
+hit requires reported `usage.prompt_tokens_details.cached_tokens > 0`; provider
+consistency alone does not establish caching. See
+[OpenRouter session routing](https://openrouter.ai/docs/guides/best-practices/prompt-caching)
+and [provider allowlists](https://openrouter.ai/docs/guides/routing/provider-selection).
+
+`metadata.json.routing` records the requested session/routing settings.
+Each step's `routing` records requested model/providers separately from resolved
+model/provider, response ID, reported cost and cached tokens; raw payloads remain
+available. Missing fields stay null. Legacy `--preset` remains available only
+when the provider allowlist is unset; it disables the new session-routing mode.
+
+The new bounded routing/cache test runs a Parasail-only episode followed by an
+episode with the full allowlist:
+
+```bash
+.venv/bin/python scripts/smoke_session_routing.py --live
+# Optional separate diagnostic with a longer repeated synthetic prefix:
+.venv/bin/python scripts/smoke_session_routing.py --live --phase cache
+# Larger-prefix diagnostic restricted to Parasail:
+.venv/bin/python scripts/smoke_session_routing.py --live --phase cache-parasail
+```
+
+Both commands share a persistent $0.05 reservation cap in
+`runs/openrouter-session-routing-budget.json`. Every attempted request is saved
+and reserved before sending, failed/unknown calls retain reservations, and there
+are no client retries. Reported cost is distinct from the conservative reservation.
+Results append to `runs/openrouter-session-routing-results.json`; episodes appear
+in the shared viewer at port 8878. These are development tests, separate from the
+historical DekaLLM calibration. Normal `run` still has step/token limits rather
+than this money cap. Only the optional cache diagnostic changes the prompt prefix.
+See [observed routing/cache results](ROUTING.md), including one provider change
+and a confirmed 3,920-token cache hit. This batch's reservations are exhausted
+for practical purposes; rerunning does not reset the ledger or its cap.
+
+The historical preset-based action-parsing test is:
 
 ```bash
 .venv/bin/python scripts/smoke_openrouter.py --live

@@ -295,7 +295,7 @@ The initial coordination plan above now has a working first increment:
   authenticated successfully and inference retry passed (details below).
   The earlier trace's legacy `success=false` accompanies a
   technical failure; newer traces use null for unterminated/errored episodes.
-- `.env` now includes `OPENROUTER_PRESET=@preset/deka-llm-qwen38-27-b`.
+- At that time `.env` included `OPENROUTER_PRESET=@preset/deka-llm-qwen38-27-b`.
   The ordinary launcher supports `--preset` / this environment variable.
   `scripts/smoke_openrouter.py --live` pins DekaLLM, disables fallback/reasoning,
   bounds input and output, and persists reservations across restarts in

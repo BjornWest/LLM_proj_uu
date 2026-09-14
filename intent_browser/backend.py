@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 from typing import Protocol
+from urllib.parse import urlparse
+from copy import deepcopy
 
 import httpx
 
@@ -32,11 +34,20 @@ class ChatCompletionsBackend:
     """
 
     def __init__(self, base_url: str, model: str, api_key: str | None = None,
-                 timeout: float = 90, max_tokens: int = 128, *, request_options=None):
+                 timeout: float = 90, max_tokens: int = 128, *, request_options=None,
+                 session_routing: bool = False):
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.max_tokens = max_tokens
-        self.request_options = request_options or {}
+        self.request_options = deepcopy(request_options or {})
+        self.session_routing = session_routing
+        self.session_id = None
+        if session_routing and (urlparse(self.base_url).hostname != 'openrouter.ai'
+                                or 'preset' in self.request_options or model.startswith('@preset/')):
+            raise ValueError('Session routing requires an OpenRouter model slug, without a preset')
+        if session_routing and ('session_id' in self.request_options or
+                                'order' in (self.request_options.get('provider') or {})):
+            raise ValueError('Session routing owns session_id and must not specify provider.order')
         if set(self.request_options) & {"model", "messages", "temperature", "max_tokens", "stream"}:
             raise ValueError("request_options cannot override core generation settings")
         self.client = httpx.Client(
@@ -45,11 +56,23 @@ class ChatCompletionsBackend:
             trust_env=False,
         )
 
+    def begin_episode(self, episode_id):
+        if not self.session_routing:
+            return None
+        if not isinstance(episode_id, str) or not 1 <= len(episode_id) <= 256:
+            raise ValueError('OpenRouter session_id must contain 1..256 characters')
+        self.session_id = episode_id
+        return {'session_id': episode_id, 'requested_model': self.model,
+                'provider': deepcopy(self.request_options.get('provider'))}
+
     def complete(self, messages: list[dict]) -> Completion:
+        if self.session_routing and self.session_id is None:
+            raise ValueError('Begin an episode before sending a session-routed request')
         request = {
             "model": self.model, "messages": messages, "temperature": 0,
             "max_tokens": self.max_tokens, "stream": False,
             **self.request_options,
+            **({'session_id': self.session_id} if self.session_routing else {}),
         }
         self.last_request = request
         response = self.client.post(self.base_url + "/chat/completions", json=request)

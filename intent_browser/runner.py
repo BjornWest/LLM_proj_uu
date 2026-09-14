@@ -7,6 +7,7 @@ from .actions import make_action_set, parse_decision
 from .evaluation import Evaluation
 from .search import SEARCH_DESCRIPTION, execute_search
 from .trace import Trace, write_json
+from .openrouter import routing_record
 
 
 def observation_text(obs):
@@ -37,6 +38,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
     info = {}
     reset_complete = False
     try:
+        if hasattr(backend, 'begin_episode'):
+            routing = backend.begin_episode(trace.episode_id)
+            if routing:
+                trace.metadata['routing'] = routing
+                write_json(trace.directory / 'metadata.json', trace.metadata)
+                trace.event('model_session_started', **routing)
         if episode_task:
             trace.event("task_prepare_started")
             task_record = episode_task.prepare(trace)
@@ -126,6 +133,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 trace.event("decision_error", step=index, error=event["error"])
                 raise
             finally:
+                event['routing'] = routing_record(event.get('model_request'), event.get('model_response'))
                 trace.append(event)
                 steps = index + 1
             print(f"Step {steps}: {action} -> reward={event['reward']}, terminated={terminated}, truncated={truncated}", flush=True)
