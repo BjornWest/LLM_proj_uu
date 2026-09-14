@@ -1,0 +1,96 @@
+{
+  "status": "static inspection; no browser runs or model calls",
+  "susbench": {
+    "rows": 313,
+    "websites": 55,
+    "injection_codes_used": 123,
+    "mapping_keys_detected": 126,
+    "patterns_normalized": {
+      "disguised_ad": 31,
+      "false_hierarchy": 29,
+      "preselection": 35,
+      "pop_up_ad": 29,
+      "double_negative": 45,
+      "confirm_shaming": 36,
+      "fake_social_proof": 36,
+      "forced_action": 36,
+      "hidden_information": 36
+    },
+    "exact_normalized_prompt_duplicate_groups": [
+      [
+        "1071",
+        "1073"
+      ],
+      [
+        "1103",
+        "1107"
+      ],
+      [
+        "1126",
+        "1128"
+      ],
+      [
+        "1267",
+        "1269"
+      ]
+    ],
+    "flags": {
+      "live_site_unvalidated": 313,
+      "reuse_terms_unspecified": 313,
+      "no_task_state_verifier": 313,
+      "requires_catalog_snapshot_or_comparison_rule": 92,
+      "manual_susceptibility_callback_at_injection_time": 8,
+      "manual_null_element_listener_risk": 3,
+      "subjective_or_underspecified": 6,
+      "time_or_version_dependent": 49,
+      "explicit_negative_constraint": 8,
+      "manual_label_mismatch_paid_plan_marked_avoided": 3
+    }
+  },
+  "trickyarena": {
+    "prompt_files": 95,
+    "prompt_occurrences": 375,
+    "unique_url_prompt_conditions": 260,
+    "unique_normalized_prompts": 59,
+    "sites": {
+      "spotify": 24,
+      "shop": 140,
+      "news": 39,
+      "health": 57
+    },
+    "pattern_count_conditions": {
+      "1": 141,
+      "2": 62,
+      "3": 18,
+      "4": 8,
+      "0": 31
+    },
+    "hint_conditions": {
+      "none": 233,
+      "general_safety_warning": 18,
+      "specific_constraint_or_solution_hint": 9
+    },
+    "missing_pattern_checkers": {
+      "pf": 3,
+      "cd": 3,
+      "bd": 3,
+      "sai": 3
+    },
+    "flags": {
+      "site_not_run_in_this_audit": 260,
+      "reuse_terms_unspecified": 260,
+      "no_backend_state_verifier": 260,
+      "manual_wrong_plan_susceptibility_coverage_incomplete": 11,
+      "subjective_or_underspecified": 16,
+      "answer_substring_scoring": 127,
+      "multiple_patterns_confounded": 88,
+      "manual_privacy_checker_omits_location": 33,
+      "requires_download_outcome_support": 8,
+      "manual_privacy_click_label_mismatch": 12,
+      "prompt_ablation_not_independent_task": 27,
+      "possible_procedural_hint": 6,
+      "missing_pattern_checker_static_mapping": 12
+    },
+    "coverage_method": "Static enum match with collector helper suffix, whitespace normalized; does not execute evaluator parser."
+  }
+}
