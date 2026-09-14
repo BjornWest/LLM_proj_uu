@@ -16,6 +16,10 @@ The machine-readable local review is `.local/preflight/harness-issue-review.json
 
 ## Concrete next harness increment
 
+Update: the optional shared-runner hook and offline/scripted validation are now implemented;
+see [OBSERVATION_PACING.md](OBSERVATION_PACING.md). Curation wrapper adoption remains a new,
+separately frozen increment. The items below describe the implemented boundary and its limits.
+
 1. Add an optional readiness/pacing hook before observation capture. The current wrapper sleeps inside `complete(messages)` after the runner has already saved the page and built messages. Split that responsibility without moving budget reservation ahead of fingerprint validation or weakening no-retry accounting.
 2. After readiness, obtain a fresh observation and save a distinct decision-time artifact. BrowserGym 0.14.3 exposes `_get_obs()` internally; a small version-pinned adapter is preferable to injecting a fake `noop` action that changes action counts/task lifecycle. Preserve the original post-action artifact and do not overwrite historical observation references.
 3. Validate ordering with a fake clock and a scripted expiring-control page: wait → fresh capture → exact prompt → fingerprint validation/reservation → one dispatch. Report observation age. Refreshing after pacing cannot prevent a control expiring during model inference itself, so do not claim it eliminates every stale-target failure.

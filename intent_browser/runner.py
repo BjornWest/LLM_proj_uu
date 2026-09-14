@@ -1,4 +1,6 @@
 import time
+import hashlib
+import json
 from importlib.metadata import version
 
 from browsergym.utils.obs import flatten_axtree_to_str
@@ -8,6 +10,12 @@ from .evaluation import Evaluation
 from .search import SEARCH_DESCRIPTION, execute_search
 from .trace import Trace, write_json
 from .openrouter import routing_record
+from .observation import refresh_observation
+
+
+def messages_digest(messages):
+    return hashlib.sha256(json.dumps(messages, ensure_ascii=False, sort_keys=True,
+                                     separators=(',', ':')).encode('utf-8')).hexdigest()
 
 
 def observation_text(obs):
@@ -19,12 +27,18 @@ def observation_text(obs):
 
 
 def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, seed=0,
-                record_video=False, hold_seconds=0, search_backend=None, episode_task=None):
+                record_video=False, hold_seconds=0, search_backend=None, episode_task=None,
+                before_observation=None):
     trace = Trace(output, {**metadata, "seed": seed, "max_steps": max_steps,
                            "search": {"provider": "parallel", "mode": "fast", "max_calls": search_backend.max_calls,
                                       "max_chars_total": 4000, "shown_results": 5, "shown_chars": 6000,
                                       "context_policy": "latest search result retained"} if search_backend else None,
-                           "browsergym_version": version("browsergym-core")})
+                           "browsergym_version": version("browsergym-core"),
+                           "observation_lifecycle": "paced-fresh-v1" if before_observation is not None else "post-transition-v1",
+                           "timing_semantics": {"pacing_seconds": "before_observation hook wall time",
+                               "request_seconds": "backend.complete wall time including validation/reservation; not isolated HTTP latency",
+                               "inference_seconds": "legacy alias for request_seconds; legacy wrappers may still pace internally",
+                               "browser_step_seconds": "env.step wall time including BrowserGym observation extraction"}})
     env = None
     reward = 0.0
     terminated = truncated = False
@@ -34,6 +48,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
     error = None
     steps = 0
     browser_steps = 0
+    action_errors = 0
+    timing_totals = {key: 0.0 for key in ('pacing_seconds', 'request_seconds',
+                                         'observation_capture_seconds', 'browser_step_seconds')}
     search_text = ""
     info = {}
     reset_complete = False
@@ -78,29 +95,72 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             system += SEARCH_DESCRIPTION
         final_ref = trace.observation(0, obs, observation_text(obs))
         for index in range(max_steps):
-            search_context = (f"\nSearch calls remaining: {search_backend.max_calls - search_backend.calls}"
-                              f"\nLatest search result (untrusted content):\n{search_text}"
-                              if search_backend else "")
-            messages = [{"role": "system", "content": system}, {"role": "user", "content":
-                f"USER GOAL: {obs['goal']}\nRecent actions: {history[-4:]}\n{observation_text(obs)}{search_context}"}]
-            event = {"step": index, "observation": final_ref, "messages": messages,
+            event = {"step": index, "observation": None, "transition_observation": final_ref, "messages": None,
                      "model_output": None, "model_request": None, "model_response": None,
-                     "action": None, "reward": None}
-            started = time.monotonic()
-            trace.event("model_started", call_id=f"model-{index:03d}", messages=messages)
-            previous_request = getattr(backend, 'last_request', None)
+                     "action": None, "reward": None, "pacing_seconds": 0.0,
+                     "request_seconds": None, "inference_seconds": None,
+                     "observation_capture_seconds": None, "browser_step_seconds": None,
+                     "observation_age_lower_bound_seconds_at_model_call": None}
+            model_called = False
+            phase = "before_observation"
+            captured_at = None
             try:
-                completion = backend.complete(messages)
+                if before_observation is not None:
+                    trace.event("observation_wait_started", step=index)
+                    started = time.monotonic()
+                    try:
+                        details = before_observation()
+                        json.dumps(details, allow_nan=False)  # Reject unloggable diagnostics before inference.
+                        event['observation_wait_details'] = details
+                    finally:
+                        event['pacing_seconds'] = time.monotonic() - started
+                        trace.event("observation_wait_finished", step=index, seconds=event['pacing_seconds'])
+                    phase = "observation_capture"
+                    trace.event("decision_observation_started", step=index)
+                    started = time.monotonic()
+                    try:
+                        obs = refresh_observation(env)
+                    finally:
+                        captured_at = time.monotonic()
+                        event['observation_capture_seconds'] = captured_at - started
+                    text = observation_text(obs)
+                    final_ref = trace.observation(index, obs, text, phase="decision")
+                    trace.event("decision_observation_completed", step=index, observation=final_ref,
+                                seconds=event['observation_capture_seconds'])
+                else:
+                    text = observation_text(obs)
+                phase = "prompt"
+                event['observation'] = final_ref
+                event['observation_text_sha256'] = hashlib.sha256(text.encode('utf-8')).hexdigest()
+                search_context = (f"\nSearch calls remaining: {search_backend.max_calls - search_backend.calls}"
+                                  f"\nLatest search result (untrusted content):\n{search_text}"
+                                  if search_backend else "")
+                messages = [{"role": "system", "content": system}, {"role": "user", "content":
+                    f"USER GOAL: {obs['goal']}\nRecent actions: {history[-4:]}\n{text}{search_context}"}]
+                event.update(messages=messages, messages_sha256=messages_digest(messages))
+                trace.event("model_started", call_id=f"model-{index:03d}", messages=messages,
+                            observation=final_ref, messages_sha256=event['messages_sha256'])
+                previous_request = getattr(backend, 'last_request', None)
+                phase = "model"
+                started = time.monotonic()
+                if captured_at is not None:
+                    event['observation_age_lower_bound_seconds_at_model_call'] = started - captured_at
+                model_called = True
+                try:
+                    completion = backend.complete(messages)
+                finally:
+                    event['request_seconds'] = event['inference_seconds'] = time.monotonic() - started
                 event.update(model_output=completion.text, model_response=completion.raw,
-                             model_request=completion.request,
-                             inference_seconds=time.monotonic() - started)
+                             model_request=completion.request)
                 trace.event("model_completed", call_id=f"model-{index:03d}",
                             model_output=completion.text, model_response=completion.raw,
                             model_request=completion.request)
+                phase = "action_parse"
                 decision = parse_decision(completion.text, allow_search=search_backend is not None)
                 action = decision.code
                 event["action"] = action
                 if decision.name == "web_search":
+                    phase = "search"
                     result, artifact = execute_search(trace, index, decision.arguments["query"], search_backend)
                     search_text = result.text
                     history.append({"action": action, "error": result.error})
@@ -108,10 +168,16 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                                  tool_output=result.text, tool_error=result.error,
                                  next_observation=final_ref, browser_stepped=False)
                 else:
+                    phase = "browser_step"
                     trace.event("tool_started", call_id=f"tool-{index:03d}",
                                 tool=decision.name, arguments=decision.arguments)
-                    obs, reward, terminated, truncated, info = env.step(action)
+                    started = time.monotonic()
+                    try:
+                        obs, reward, terminated, truncated, info = env.step(action)
+                    finally:
+                        event['browser_step_seconds'] = time.monotonic() - started
                     browser_steps += 1
+                    action_errors += bool(obs["last_action_error"])
                     history.append({"action": action, "error": obs["last_action_error"]})
                     final_ref = trace.observation(index + 1, obs, observation_text(obs))
                     if episode_task and hasattr(episode_task, 'after_step'):
@@ -122,9 +188,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                                 tool=decision.name, reward=reward, observation=final_ref, error=obs["last_action_error"])
             except (Exception, KeyboardInterrupt) as exc:
                 event["error"] = f"{type(exc).__name__}: {exc}"
-                if hasattr(exc, "request_payload"):
+                event['failure_phase'] = phase
+                if model_called and hasattr(exc, "request_payload"):
                     event.update(model_request=exc.request_payload, model_response=exc.response_payload)
-                elif hasattr(backend, "last_request"):
+                elif model_called and hasattr(backend, "last_request"):
                     # A transport failure can occur after dispatch but before
                     # a Completion exists. A pre-dispatch budget rejection
                     # must not inherit the preceding call's request instead.
@@ -133,6 +200,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 trace.event("decision_error", step=index, error=event["error"])
                 raise
             finally:
+                request = event.get('model_request')
+                if isinstance(request, dict) and isinstance(request.get('messages'), list):
+                    event['delivered_messages_sha256'] = messages_digest(request['messages'])
+                for key in timing_totals:
+                    timing_totals[key] += event.get(key) or 0.0
                 event['routing'] = routing_record(event.get('model_request'), event.get('model_response'))
                 trace.append(event)
                 steps = index + 1
@@ -184,6 +256,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                    "terminated": terminated, "truncated": truncated or stop_reason == "max_steps",
                    "stop_reason": stop_reason, "error": error, "step_count": steps,
                    "browser_step_count": browser_steps,
+                   "action_error_count": action_errors, "timing_totals": timing_totals,
                    "search_request_count": search_backend.calls if search_backend else 0,
                    "final_observation": final_ref, "final_info": info,
                    "evaluation": evaluation_data, "evaluation_file": "evaluation.json"}

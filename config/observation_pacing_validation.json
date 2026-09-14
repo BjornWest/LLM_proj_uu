@@ -1,0 +1,59 @@
+{
+  "scope": "Scripted local BrowserGym integration; no model, search or real-site calls",
+  "cases": [
+    {
+      "condition": "legacy-wait-inside-complete",
+      "episode": "runs/20260914T232707Z-04ec2033",
+      "native_success": null,
+      "fixture_completed": false,
+      "action_error_count": 1,
+      "timing_totals": {
+        "pacing_seconds": 0.0,
+        "request_seconds": 3.000293868011795,
+        "observation_capture_seconds": 0.0,
+        "browser_step_seconds": 0.5251334900094662
+      },
+      "artifacts_sha256": {
+        "metadata.json": "9c0f67ee418595bd2864b1858eacd2eec3ad50ef842ce15cfc680a9d9e9ceb44",
+        "steps.jsonl": "dda14c92044e479613d474b0caed08586c0506d718c4ca5118944c9ee9e75bc2",
+        "events.jsonl": "d03755285f82cebb91a3fcd778b12c0f8f98ec93b37a2074ec68e11e3a4fa3c7",
+        "episode.json": "1084fc16fc4070dd6f02477ab20770b2c3312acef577ec287c8f3391a5c9039f",
+        "evaluation.json": "ef1c129542f9a66e82b447f0d2723450a6a458b5665d0adf6ae4cb95bf135f2d",
+        "observation-000.txt": "7a3929c628be40a6ea44b6458a45a207d20deac91589e78450d0485ee970aa7d",
+        "observation-001.txt": "16a7e2ab44e9fa98bf17f29d80dddf28ee68ded89dee11e101574beed268d488",
+        "observation-002.txt": "7ada5c4e83193410233855fad4fd5fa927f10e927d9e0182b786cc0bb1fcfdfa"
+      }
+    },
+    {
+      "condition": "fresh-after-wait",
+      "episode": "runs/20260914T232711Z-5823e1d8",
+      "native_success": true,
+      "fixture_completed": true,
+      "action_error_count": 0,
+      "timing_totals": {
+        "pacing_seconds": 3.000167205987964,
+        "request_seconds": 0.00010098901111632586,
+        "observation_capture_seconds": 0.2721962000068743,
+        "browser_step_seconds": 0.5606408820021898
+      },
+      "artifacts_sha256": {
+        "metadata.json": "b6da94dfd0341f7fe1a8d525433e6cf9f32d784dcf9b3c485335db46c10f1f76",
+        "steps.jsonl": "05a6f69ea8fe22b94b02b552f8bb98f244b1b0cb38c63f491098c76f8aa751be",
+        "events.jsonl": "80a9e93bc34192b2ceb57af660ff995d6c060c5026ed4948cde6392e281532ea",
+        "episode.json": "1ba8cdb763deb4dfaa3ce93398e8d8bcb345bf6c16912cbaae91b5ea64f3296e",
+        "evaluation.json": "e50d07f97545b7bf868b6c35177ac7170173980f3eb5ee3a3174421f663a950c",
+        "decision-observation-000.txt": "7a3929c628be40a6ea44b6458a45a207d20deac91589e78450d0485ee970aa7d",
+        "decision-observation-001.txt": "5ea974b4a59f6ec8e92a16a075219ea695f074bdfc3265c9437c66a75db73fdf",
+        "observation-000.txt": "7a3929c628be40a6ea44b6458a45a207d20deac91589e78450d0485ee970aa7d",
+        "observation-001.txt": "16a7e2ab44e9fa98bf17f29d80dddf28ee68ded89dee11e101574beed268d488",
+        "observation-002.txt": "7254a93e8544ef6e8f3b18aa7ff7082c98a73c8ca996448426c8de8f642f4819"
+      }
+    }
+  ],
+  "source_sha256": {
+    "intent_browser/runner.py": "debe61d439771083d6d4d4c3332fb76d02643e9faa011d274351fe02a71f5144",
+    "intent_browser/observation.py": "362dd020c19b1e968d223b3ae49e1f8d376a7d3f92962487dbace1321a0cd99d",
+    "intent_browser/trace.py": "ac5bbf3ee9adbe2f47808614cb20a07a65c0197772e9ed039a8cc835a77c1a13",
+    "scripts/verify_observation_pacing.py": "9843d9581873d40cb20ab8841c1ab70db967e02d6516eeaf309a9d01aad203ff"
+  }
+}
