@@ -70,6 +70,18 @@ You may retain Vercel’s default Preview protection, but it is not the privacy 
 
 To revoke an invitation, remove its entry from `DEMO_INVITES_JSON` and redeploy. Existing sessions for that entry fail verification on the new deployment. Old deployments retain their old environment: delete obsolete deployments or protect their URLs too when revoking access. Rotate `DEMO_SESSION_SECRET` and redeploy to invalidate every session on the new deployment.
 
+## Troubleshooting after login
+
+If the invitation is accepted but `/` fails, this page load does not use OpenRouter or Blob. The handler resolves its private assets relative to its module, independent of the function working directory. Open the **latest deployment** after an update; a deployment-specific URL remains pinned to its old build.
+
+Unexpected failures return a safe diagnostic code and a matching entry in Vercel Runtime Logs:
+
+- `PRIVATE_ASSETS_UNAVAILABLE`: missing/unreadable built assets or provenance. Confirm the build ran and `private-assets/**` is included in the function. Never move those files into `public`.
+- `ACCESS_CONFIGURATION`: check the invitation JSON and session secret in this deployment’s environment.
+- `AGENT_STORAGE_UNAVAILABLE`: an agent/storage operation failed; check the private Blob connection and its environment scope.
+
+Logs contain only fixed stage/code labels and a missing-file flag, not credentials or request bodies. Explicit application errors, such as a budget limit or invalid action, retain their own messages.
+
 ## Usage and trace behavior
 
 - One model routing `session_id` per task/chat trace, all seven allowed providers, no preset or provider order, no automatic inference retry.
