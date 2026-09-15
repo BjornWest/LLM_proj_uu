@@ -22,6 +22,8 @@ This derived build explicitly switches to noncryptographic xorshift32 `(13,17,5)
 
 The local arithmetic check compares 32,768 outputs with an independent BigInt implementation. Separate curation review checked 65,920 outputs including unsigned boundary cases, and all six target-row/action-position combinations occurred in its 1,024-token-task sample. A later independent audit also checked 10,240 generated instances across five families and two seed corpora, covering every declared row/action or safe/dangerous-button position combination. See `data/curation/CHAOS_GENERATOR_CHOICE.md`. This rejects the observed collapse; it is not a statistical certification, cryptographic guarantee, proof of uniformity or coverage of every future task factory. Modulo sampling and the original shuffle remain unchanged.
 
+The offline validator now requires all four exact token device names and all six target-row/safe-action combinations, retaining their counts. Its previous marginal-only/two-name gate was weaker than the independent acceptance criteria. Four regression tests include a sample with balanced marginals but two missing joint cells. A fresh report, `.local/preflight/chaos-rng-joint-gate-v2.json`, passes on the unchanged copied v2 CLI: 32,768 exact arithmetic matches and joint counts `17/22/19/23/26/21` in sorted cell order. Historical validation reports and browser certificates are unchanged; this is a validator-only revision.
+
 ## Reproduce
 
 Use a cached exact `browser-agent-chaos@0.1.0` installation. If necessary, first install/start that pinned package using the existing laptop guide. Setup checks the original CLI and frontend hashes and reuses cached Node dependencies; it downloads nothing.
@@ -32,6 +34,7 @@ python3 scripts/setup_chaos_repair.py \
   --output .local/chaos-fifo-xor32-v2 --rng xorshift32-v1
 python3 scripts/start_chaos_repair.py --build .local/chaos-fifo-xor32-v2 --human-port 3145
 node --test environments/chaos/test-stage-queue.mjs
+node --test scripts/test_chaos_rng_coverage.mjs
 # Substitute the agent port printed by the launcher:
 .venv/bin/python -m scripts.verify_chaos --base-url http://localhost:AGENT_PORT --fresh-observation
 .venv/bin/python -m scripts.verify_chaos_queue --base-url http://localhost:AGENT_PORT --report .local/preflight/queue-new.json
