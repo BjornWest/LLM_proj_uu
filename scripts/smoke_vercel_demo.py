@@ -29,6 +29,7 @@ def main():
             page.goto('http://localhost:8881')
             page.get_by_label('Your invitation code').fill('offline-test-code-'*4)
             page.get_by_role('button',name='Open demo').click()
+            page.goto('http://localhost:8881/demo')
             page.wait_for_selector('#site')
             results=[]
             for area in ['booking','shop','preferences']:
