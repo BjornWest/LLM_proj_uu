@@ -14,6 +14,7 @@ from .chaos import ChaosClient, ChaosTask
 from .runner import run_episode
 from .search import ParallelSearch, run_search, validate_search_query
 from .preview import ensure_preview
+from .openrouter import completion_token_limit
 
 
 SMOKE_HTML = """<!doctype html><html lang="en"><title>BrowserGym smoke test</title>
@@ -81,7 +82,8 @@ def main():
     parser.add_argument("--providers", help="Comma-separated OpenRouter allowlist (or OPENROUTER_PROVIDERS)")
     parser.add_argument("--max-steps", type=int, default=12)
     parser.add_argument("--timeout", type=float, default=90)
-    parser.add_argument("--max-tokens", type=int, default=128)
+    parser.add_argument("--max-tokens", type=int, default=None,
+                        help="Combined reasoning/answer ceiling; OpenRouter defaults to OPENROUTER_MAX_TOKENS or 4096, local endpoints to 128")
     parser.add_argument("--seed", type=int, default=0)
     display = parser.add_mutually_exclusive_group()
     display.add_argument("--headless", dest="headless", action="store_true", help="Default: browser runs without desktop windows")
@@ -113,6 +115,12 @@ def main():
         load_dotenv(args.env_file, override=False)
         args.model = args.model or os.getenv("MODEL_NAME")
         args.base_url = args.base_url or os.getenv("MODEL_BASE_URL")
+    if args.max_tokens is None:
+        try:
+            args.max_tokens = (completion_token_limit(os.getenv('OPENROUTER_MAX_TOKENS'))
+                               if urlparse(args.base_url or '').hostname == 'openrouter.ai' else 128)
+        except ValueError as exc:
+            parser.error(str(exc))
     args.preset = args.preset or os.getenv("OPENROUTER_PRESET")
     args.providers = args.providers or os.getenv('OPENROUTER_PROVIDERS')
     request_options = {}
@@ -130,7 +138,7 @@ def main():
     elif args.mode == 'run' and args.providers:
         parser.error('--providers/OPENROUTER_PROVIDERS requires an OpenRouter endpoint')
     if args.preset:
-        request_options = {'preset': args.preset}
+        request_options = {'preset': args.preset, 'reasoning': {'enabled': True}}
     if args.preset and not args.preset.startswith("@preset/"):
         parser.error("OpenRouter preset must start with @preset/")
     if args.mode == "run" and args.preset and urlparse(args.base_url or "").hostname != "openrouter.ai":

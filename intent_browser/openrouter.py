@@ -2,6 +2,18 @@
 import re
 
 DEFAULT_PROVIDERS = ('chutes', 'dekallm', 'phala', 'parasail', 'akashml', 'ionstream', 'cloudflare')
+DEFAULT_MAX_TOKENS = 4096
+
+
+def completion_token_limit(value=None):
+    """Resolve the new-run output ceiling; reasoning and answer share it."""
+    if value is None:
+        return DEFAULT_MAX_TOKENS
+    if isinstance(value, str) and re.fullmatch(r'[0-9]+', value):
+        value = int(value)
+    if type(value) is not int or value <= 0:
+        raise ValueError('Completion token limit must be a positive integer')
+    return value
 
 
 def provider_options(providers):
@@ -11,7 +23,7 @@ def provider_options(providers):
     if not slugs or any(not re.fullmatch(r'[a-z0-9-]+(?:/[a-z0-9.-]+)*', p) for p in slugs):
         raise ValueError('Providers must be comma-separated OpenRouter slugs')
     return {'provider': {'only': slugs, 'allow_fallbacks': True, 'require_parameters': True},
-            'reasoning': {'enabled': False}}
+            'reasoning': {'enabled': True}}
 
 
 def routing_record(request, response):

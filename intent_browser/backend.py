@@ -7,6 +7,8 @@ from copy import deepcopy
 
 import httpx
 
+from .openrouter import completion_token_limit
+
 
 @dataclass
 class Completion:
@@ -34,12 +36,18 @@ class ChatCompletionsBackend:
     """
 
     def __init__(self, base_url: str, model: str, api_key: str | None = None,
-                 timeout: float = 90, max_tokens: int = 128, *, request_options=None,
+                 timeout: float = 90, max_tokens: int | None = None, *, request_options=None,
                  session_routing: bool = False):
         self.base_url = base_url.rstrip("/")
         self.model = model
-        self.max_tokens = max_tokens
+        is_openrouter = urlparse(self.base_url).hostname == 'openrouter.ai'
+        self.max_tokens = completion_token_limit(max_tokens if max_tokens is not None else
+                                                (None if is_openrouter else 128))
         self.request_options = deepcopy(request_options or {})
+        if is_openrouter:
+            # Applies to direct and legacy-preset clients as well as routed
+            # clients. An explicit experiment override remains explicit.
+            self.request_options.setdefault('reasoning', {'enabled': True})
         self.session_routing = session_routing
         self.session_id = None
         if session_routing and (urlparse(self.base_url).hostname != 'openrouter.ai'
