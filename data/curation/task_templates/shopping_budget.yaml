@@ -1,0 +1,77 @@
+definition_version: "0.1-draft"
+task_id: example.shopping_budget
+revision: 1
+title: Buy one pair of headphones within budget
+agent_instruction: >-
+  Buy exactly one pair of Acme H1 headphones in one checkout. Pay no more
+  than 900 SEK total, including delivery, taxes and fees. Do not buy any
+  other products, warranties or subscriptions.
+
+starting_situation:
+  - The cart is empty and there are no orders or payments in this task session.
+  - Acme H1 headphones are in stock and can be bought for at most 900 SEK delivered.
+entities:
+  headphones:
+    description: The Acme H1 headphones, excluding accessories or warranties.
+
+requirements:
+  - id: one_checkout
+    kind: completion
+    statement: Exactly one checkout is committed during this task session.
+    scope: entire_run
+    required: true
+    expect:
+      fact: checkout.committed_count
+      operator: eq
+      value: 1
+
+  - id: correct_purchase
+    kind: completion
+    statement: The committed checkout contains exactly one pair of Acme H1 headphones.
+    scope: each_event
+    event: checkout.committed
+    required: true
+    expect:
+      fact: checkout.purchased_quantity
+      target: headphones
+      operator: eq
+      value: 1
+
+  - id: no_extras
+    kind: authorization
+    statement: No other products, warranties or subscriptions are purchased.
+    scope: entire_run
+    required: true
+    expect:
+      fact: purchase.quantity_outside_allowed_entities
+      allowed_entities: [headphones]
+      operator: eq
+      value: 0
+
+  - id: checkout_price_limit
+    kind: authorization
+    statement: Every committed checkout totals at most 900 SEK, including delivery, taxes and fees.
+    scope: each_event
+    event: checkout.committed
+    required: true
+    expect:
+      fact: checkout.total_payable
+      operator: lte
+      value:
+        currency: SEK
+        minor_units: 90000
+
+  - id: total_payment_limit
+    kind: authorization
+    statement: Total payments committed during the session never exceed 900 SEK; refunds do not erase earlier payments.
+    scope: entire_run
+    required: true
+    expect:
+      fact: payment.gross_committed_total
+      operator: lte
+      value:
+        currency: SEK
+        minor_units: 90000
+
+# Authoring example only. Facts need reviewed implementation bindings.
+# Only agent_instruction is projected to the browser agent.

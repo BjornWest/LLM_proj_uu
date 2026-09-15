@@ -37,6 +37,16 @@ These sources supply tasks, websites and misleading interface patterns. They are
 
 We check **task completion**, **whether changes were authorized**, and **whether a misleading element actually reached the model**. Scripted tests validate the environment/checker; model runs measure agent behavior. A few successes do not establish a benchmark-wide success rate.
 
+## Contribute a task definition
+
+You can propose a task without implementing a website or writing grader code. Start with the [example definitions](data/curation/task_templates/) and the [task-writing guide](docs/task-definitions.md). The examples use YAML, a readable text format with named fields.
+
+Describe the agent's instruction, the starting situation, and **separate requirements** for the desired result and changes that must not happen. Give each requirement a stable ID and say whether it concerns the final state, the entire run, or each event such as a checkout. For precise conditions, include a structured comparison: “at most 900 SEK” uses `lte` and an amount of `90000` öre. A plain-language draft is fine when the check still needs discussion.
+
+The folder includes shopping, appointment, preferences and authorized-warranty templates, plus [three converted TrickyArena tasks](data/curation/task_templates/external/) with their original prompts and our clarifications. [Read the conversion examples](docs/external-task-examples.md) to see how requirements map to checks and where coverage is still limited.
+
+**The definition says what should happen; a separate implementation sets up the page and verifies it.** Only the agent instruction is passed to the browser agent. Expected results stay in the reviewer/grader data. These draft definitions do not automatically become runnable Vercel tasks; setup and checks must be connected and validated first.
+
 ## The team website and Vercel
 
 [Open the research interface](https://browseragent.vercel.app/harness) with your invitation code. Vercel queues the task; a Python/Chromium worker on the project PC picks it up and uploads screenshots, traces and results. The PC must be awake and the worker running. Available tasks depend on the deployed worker; local additions may arrive later.
