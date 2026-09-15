@@ -34,12 +34,57 @@ test('assist navigates, filters and answers with every request/receipt retained'
   assert.equal(calls.length,3);
   for(const call of calls) {
     assert.equal(call.session_id,id);assert.match(call.messages[0].content,/CAN follow/);
+    assert.equal(call.stream,false);assert.equal(call.response_format.type,'json_schema');
+    assert.equal(call.response_format.json_schema.strict,true);assert.equal(call.provider.require_parameters,true);
+    assert.deepEqual(call.response_format.json_schema.schema.required,['action','id','value','message']);
     assert.match(call.messages[0].content,/NOT a reservation/);
     assert.ok(!call.messages[0].content.includes('You cannot click'));
   }
   const trace=(await agent.read('one',id)).value;
   assert.equal(trace.protocol,'interactive-actions-v1');assert.equal(trace.evaluation,null);
   assert.equal(trace.steps.length,3);assert.ok(trace.steps.every(s=>s.request&&s.response_text&&s.client_result));
+});
+
+test('plain-text final answer preserves earlier receipts and raw error without replay or invented completion',async()=>{
+  const text='I have all the information needed to answer the question about room availability.';
+  const raw=JSON.stringify({provider:'Offline',choices:[{finish_reason:'stop',message:{content:text}}],usage:{cost:0}});
+  let calls=0;
+  const agent=new Agent(await store(),{env,fetcher:async()=>++calls===1?response({action:'select',id:'people',value:'3'}):new Response(raw)});
+  const {id}=await agent.start('one',{mode:'assist',goal:'When are rooms available for three people?'});
+  await agent.step('one',{id,observation:rooms});
+  await agent.event('one',{id,result:{description:'People filter set to 3'}});
+  const before=(await agent.read('one',id)).value.steps[0];
+  const result=await agent.step('one',{id,observation:rooms});
+  assert.equal(result.status,'error');assert.equal(result.action,null);assert.equal(result.answer,null);
+  assert.match(result.error,/invalid action format/);assert.ok(!result.error.includes("Unexpected token"));
+  const trace=(await agent.read('one',id)).value;
+  assert.deepEqual(trace.steps[0],before);assert.equal(trace.evaluation,null);
+  assert.equal(trace.steps[1].output,text);assert.equal(trace.steps[1].response_text,raw);
+  assert.equal(trace.steps[1].error_code,'MODEL_ACTION_INVALID_JSON');assert.ok(trace.steps[1].error_detail);
+  assert.ok(trace.steps[1].reservation);assert.equal(trace.steps[1].client_result,null);
+  await assert.rejects(agent.step('one',{id,observation:rooms}));assert.equal(calls,2);
+});
+
+test('structured done returns the answer and requires a saved receipt; length cutoff never executes an action',async()=>{
+  for(const finish of ['stop','length']) {
+    let request;
+    const action={action:'done',id:null,value:null,message:'A room for three is available at 10:00.'};
+    const agent=new Agent(await store(),{env,fetcher:async(_,options)=>{
+      request=JSON.parse(options.body);
+      return new Response(JSON.stringify({choices:[{finish_reason:finish,message:{content:JSON.stringify(action)}}],usage:{cost:0}}));
+    }});
+    const {id}=await agent.start('one',{mode:'assist',goal:'Find availability'});
+    const result=await agent.step('one',{id,observation:rooms});
+    assert.equal(request.response_format.json_schema.name,'daylight_action');
+    if(finish==='stop') {
+      assert.equal(result.answer,action.message);assert.equal(result.status,'awaiting_client');
+      assert.deepEqual(result.action,{action:'done',message:action.message});
+      assert.equal((await agent.event('one',{id,result:{description:'Answer shown'}})).status,'complete');
+    } else {
+      assert.equal(result.status,'error');assert.equal(result.action,null);assert.match(result.error,/token limit/);
+      assert.equal((await agent.read('one',id)).value.steps[0].output,JSON.stringify(action));
+    }
+  }
 });
 
 test('assist bad action stops without a client action or an implicit retry',async()=>{
