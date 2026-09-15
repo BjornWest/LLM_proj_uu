@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "scope": "Team worker and authenticated UI development validation; not training certification",
+  "python_tests": {
+    "directory": "tests",
+    "passed": 114,
+    "subtests": 33
+  },
+  "node_tests": {
+    "passed": 27
+  },
+  "container_integration": {
+    "report": ".local/team-worker/container-final-11dca758/report.json",
+    "sha256": "3720baff3ea5f6a704b33e6d51a5820651a0f392e0c818f103b2d5ff8ce733ac",
+    "checks": 101,
+    "model_calls": 0,
+    "image": "sha256:b55971af62447ad5d2cc4f3772b8652835684c2d0ed981647ca08ee45276c201"
+  },
+  "old_demo_browser_smoke": "passed: three tasks, chat, stale controls and private downloads",
+  "source_sha256": {
+    "intent_browser/team_worker.py": "f94614a65d5dd7e43e0a7c626ba96eebb168678fcff022afd18a9de92d708822",
+    "intent_browser/runner.py": "f8ba632799dd62c01612470ad0807e4ae294dd9f9e2223cdf826e0050ba8dde0",
+    "intent_browser/backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+    "intent_browser/actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+    "intent_browser/observation.py": "362dd020c19b1e968d223b3ae49e1f8d376a7d3f92962487dbace1321a0cd99d",
+    "deploy/daylight/lib/harness.mjs": "df76e3664ae7c464d620c1418c0705c20c0768dd1c37815722017e2b87909f70",
+    "deploy/daylight/api/index.mjs": "6911c2b4e5c8ae76ecc8e5db7b8ea21a4993e2ec21d9c3c6aaf4b6b1f3105e48",
+    "deploy/daylight/client/harness.js": "a3702bd72635dc0ae2c8b4d308f3637e4ddf54d4c26e9135f15792bd326e7552",
+    "deploy/daylight/client/harness.html": "91511babd75df677470053ef9614196dd95b4ebb01d527473bfa5e395985abcb",
+    "deploy/daylight/client/harness.css": "063fbcc1bebc08abae733d0160988d63c09d5457063bd19ebc49218b19ee770d",
+    "deploy/worker/Dockerfile": "d8c0e251b813fbf34ff5fb4ccccd691cbd9ae2a4124a5ba75776f8a2691d273c",
+    "deploy/worker/compose.yaml": "20a5700effbcbdeee42f27dbd5c0908bfc0cd9caabe75d83858c6e2b69eb368c"
+  },
+  "cloud_connection": "pending production deployment check",
+  "training_eligible": false
+}

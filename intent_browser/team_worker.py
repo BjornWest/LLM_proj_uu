@@ -1,0 +1,410 @@
+"""Outbound-only team worker. The existing runner owns each complete episode.
+
+Cloud jobs are a small allowlist; they cannot supply URLs, scripts, paths or grader
+inputs. Interrupted jobs are never replayed. Original traces stay on the worker.
+"""
+import argparse
+import base64
+from copy import deepcopy
+import hashlib
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import json
+import os
+from pathlib import Path
+import re
+import statistics
+import subprocess
+import threading
+import time
+from types import SimpleNamespace
+from urllib.parse import urlparse
+from uuid import uuid4
+import zipfile
+
+import httpx
+
+from .backend import ChatCompletionsBackend, Completion, BackendResponseError
+from .demo import ASSETS, ROOT, World, DemoTask, EXAMPLES, RehearsalBackend
+from .openrouter import DEFAULT_PROVIDERS, provider_options
+from .trace import write_json, runtime_provenance
+
+
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+class Broker:
+    def __init__(self, url, token):
+        parsed = urlparse(url)
+        if (parsed.scheme != 'https' and not (parsed.scheme == 'http' and parsed.hostname in ('localhost', '127.0.0.1'))
+                or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in ('', '/')):
+            raise ValueError('HARNESS_URL must be an HTTPS origin (or localhost for development)')
+        if not token or len(token) < 43:
+            raise ValueError('HARNESS_WORKER_TOKEN is missing or too short')
+        self.client = httpx.Client(base_url=url.rstrip('/'), headers={'Authorization': 'Bearer ' + token},
+                                   timeout=30, trust_env=False, follow_redirects=False)
+
+    def post(self, operation, value):
+        response = self.client.post('/api/harness/worker/' + operation, json=value)
+        if not response.is_success:
+            raise RuntimeError(f'Worker API {operation} returned HTTP {response.status_code}; no automatic replay')
+        return response.json()
+
+
+class Publisher:
+    """Separate readonly projection; reviewer notes are never read by the policy."""
+    def __init__(self, broker, job, folder):
+        self.broker, self.job, self.folder = broker, job, folder
+        self.directory = None
+        self.uploaded = set()
+        self.stopped = threading.Event()
+        self.failure = None
+        self.last_snapshot = None
+        self.last_heartbeat = 0.0
+        self.thread = threading.Thread(target=self.loop, daemon=True)
+
+    def rpc(self, operation, **value):
+        return self.broker.post(operation, {'id': self.job['id'], 'lease': self.job['lease'], **value})
+
+    def checkpoint(self):
+        if self.failure:
+            raise RuntimeError('Trace publication failed; worker stopped before another decision') from self.failure
+        return self.rpc('checkpoint')
+
+    def attach(self, trace):
+        self.directory = trace.directory
+
+    def upload(self, name, data):
+        fingerprint = digest(data)
+        if (name, fingerprint) in self.uploaded:
+            return
+        self.rpc('artifact', name=name, sha256=fingerprint, data=base64.b64encode(data).decode())
+        self.uploaded.add((name, fingerprint))
+
+    def project(self):
+        directory = self.directory
+        if not directory or not (directory / 'metadata.json').is_file():
+            return None
+        metadata = json.loads((directory / 'metadata.json').read_text())
+        rows = []
+        if (directory / 'steps.jsonl').exists():
+            for line in (directory / 'steps.jsonl').read_text().splitlines():
+                try:
+                    rows.append(json.loads(line))
+                except json.JSONDecodeError:
+                    break  # A flushed complete JSONL record is the publication boundary.
+        steps, latest = [], None
+        for row in rows:
+            observation = row.get('observation') or {}
+            artifact = {key: observation[source] for key, source in [('text', 'text'), ('image', 'screenshot')]
+                        if observation.get(source)}
+            for name in artifact.values():
+                self.upload(name, (directory / name).read_bytes())
+            next_obs = row.get('next_observation') or {}
+            if next_obs.get('screenshot'):
+                latest = next_obs['screenshot']
+                self.upload(latest, (directory / latest).read_bytes())
+            elif artifact.get('image'):
+                latest = artifact['image']
+            steps.append({'step': row['step'], 'action': row.get('action'),
+                          'error': row.get('error') or row.get('action_error'), 'artifact': artifact,
+                          'browser_stepped': row.get('browser_stepped', False)})
+        known, unknown, alerts, previous_provider = [], 0, [], None
+        for row in rows:
+            response = row.get('model_response') or {}
+            usage = response.get('usage') or {}
+            cost = usage.get('cost')
+            if type(cost) in (int, float) and cost >= 0:
+                if len(known) >= 3 and cost > 0.005 and cost > 3 * statistics.median(known):
+                    alerts.append('A request cost exceeded three times the earlier median; review its trace.')
+                known.append(cost)
+            elif row.get('model_request'):
+                unknown += 1
+            provider = response.get('provider')
+            if provider and previous_provider and provider != previous_provider:
+                alerts.append('Provider changed within this episode; caching continuity is not guaranteed.')
+            if provider: previous_provider = provider
+        return {'episode': directory.name, 'cost': {'reported_usd': sum(known) if known else
+                    (0 if metadata.get('driver') == 'scripted-rehearsal' else None),
+                    'unknown_attempts': unknown, 'alerts': sorted(set(alerts))},
+                'runtime': {'worker': 'team-browsergym-v1',
+                'driver': metadata.get('driver'), 'model': metadata.get('model'),
+                'generation': metadata.get('generation'), **metadata['runtime']},
+                'steps': steps, 'image': latest, 'evaluation': None, 'error': None}
+
+    def loop(self):
+        while not self.stopped.wait(3):
+            try:
+                if time.monotonic() - self.last_heartbeat >= 15:
+                    self.checkpoint()
+                    self.last_heartbeat = time.monotonic()
+                snapshot = self.project()
+                if snapshot and snapshot != self.last_snapshot:
+                    self.rpc('update', snapshot=snapshot)
+                    self.last_snapshot = snapshot
+            except Exception as exc:
+                self.failure = exc
+                return
+
+    def finish(self, error=None):
+        self.stopped.set()
+        self.thread.join(timeout=35)
+        if self.thread.is_alive():
+            raise RuntimeError('Publisher did not stop; retained local trace without replay')
+        snapshot = self.project() or {'steps': [], 'runtime': None, 'image': None}
+        parts = []
+        if self.directory:
+            summary_path = self.directory / 'episode.json'
+            if summary_path.exists():
+                summary = json.loads(summary_path.read_text())
+                snapshot['evaluation'] = summary.get('evaluation')
+                error = error or summary.get('error')
+            # ZIP retains every original file and relative path. No trace conversion.
+            archive = self.folder / 'trace.zip'
+            with zipfile.ZipFile(archive, 'x', zipfile.ZIP_DEFLATED) as zipped:
+                for file in sorted(self.directory.rglob('*')):
+                    if file.is_symlink():
+                        raise ValueError('Refusing symlink in original trace')
+                    if file.is_file():
+                        zipped.write(file, str(Path(self.directory.name) / file.relative_to(self.directory)))
+            with archive.open('rb') as stream:
+                for index in range(200):
+                    data = stream.read(1024 * 1024)
+                    if not data:
+                        break
+                    name = f'trace-{index:03d}.part'; self.upload(name, data); parts.append(name)
+                else:
+                    raise ValueError('Trace exceeds 200 MiB development archive limit')
+        snapshot.update(status='error' if error or self.failure else 'finished', error=error or
+                        ('Live publication was interrupted; inspect the original trace' if self.failure else None), trace_parts=parts)
+        self.rpc('update', snapshot=snapshot)
+        write_json(self.folder / 'publication.json', {'uploaded': True, 'episode': snapshot.get('episode'),
+                                                    'archive_parts': parts, 'status': snapshot['status']})
+
+
+class TeamBackend(ChatCompletionsBackend):
+    def __init__(self, publisher, env):
+        options = provider_options(env.get('OPENROUTER_PROVIDERS') or DEFAULT_PROVIDERS)
+        options['provider']['max_price'] = {'prompt': 0.5, 'completion': 4, 'request': 0}
+        key = env.get('DAYLIGHT_OPENROUTER_API_KEY')
+        if not key:
+            raise ValueError('Dedicated DAYLIGHT_OPENROUTER_API_KEY is required for live worker')
+        super().__init__('https://openrouter.ai/api/v1', env.get('MODEL_NAME', 'qwen/qwen3.8-27b'), key,
+                         max_tokens=512, request_options=options, session_routing=True)
+        self.publisher, self.index, self.last_finished = publisher, 0, 0.0
+        self.sources = runtime_provenance()['source_sha256']
+        self.client.event_hooks['response'] = [self.record_transport]
+
+    def record_transport(self, response):
+        response.read()
+        row = {'request_body': response.request.content.decode(), 'response_body': response.text,
+               'http_status': response.status_code, 'retry_after': response.headers.get('retry-after'),
+               'recorded_at_unix': time.time()}
+        with (self.publisher.directory / 'model-transport.jsonl').open('a') as file:
+            file.write(json.dumps(row) + '\n')
+
+    def before_observation(self):
+        wait = max(0, self.last_finished + 10 - time.monotonic())
+        if wait:
+            time.sleep(wait)
+        self.publisher.checkpoint()
+        return {'worker': 'team-browsergym-v1', 'pace_seconds': wait}
+
+    def complete(self, messages):
+        self.last_request = None
+        if runtime_provenance()['source_sha256'] != self.sources:
+            raise RuntimeError('Worker source changed during the episode')
+        self.publisher.checkpoint()
+        request = {'model': self.model, 'messages': messages, 'temperature': 0,
+                   'max_tokens': self.max_tokens, 'stream': False, **self.request_options,
+                   'session_id': self.session_id}
+        raw = httpx.Request('POST', self.base_url + '/chat/completions', json=request).content
+        receipt = self.publisher.rpc('reserve', step=self.index, input_bytes=len(raw), request_sha256=digest(raw))
+        with (self.publisher.directory / 'team-reservations.jsonl').open('a') as file:
+            file.write(json.dumps({'step': self.index, 'request_sha256': digest(raw), 'receipt': receipt}) + '\n')
+        self.index += 1
+        try:
+            result = super().complete(messages)
+            cost = result.raw.get('usage', {}).get('cost')
+            if type(cost) not in (int, float) or not 0 <= cost <= receipt['amount_usd']:
+                raise BackendResponseError('Unknown or unexpectedly high cost; stopped for review', result.request, result.raw)
+            try:
+                self.publisher.checkpoint()
+            except Exception as exc:
+                raise BackendResponseError('Worker connection lost before action delivery', result.request, result.raw) from exc
+            return result
+        finally:
+            self.last_finished = time.monotonic()
+
+
+class ConfirmRehearsal:
+    def __init__(self): self.done = False
+    def complete(self, messages):
+        if self.done:
+            return Completion("send_msg_to_user('Done')", {'source': 'scripted-chaos-rehearsal'})
+        # Read only the delivered page text, never the privileged task descriptor.
+        matches = re.findall(r"\[([^\]]+)\] button '([^']+)'", messages[-1]['content'])
+        decline = next((bid for bid, label in matches if 'no' in label.lower() and 'thank' in label.lower()), None)
+        if not decline:
+            raise ValueError('Expected newsletter decline control is absent')
+        self.done = True
+        return Completion(f'click({decline!r})', {'source': 'scripted-chaos-rehearsal'})
+    def close(self): pass
+
+
+class RoomsSite:
+    def __init__(self, goal):
+        self.world_id = uuid4().hex
+        self.world = World()
+        self.app = SimpleNamespace(worlds={self.world_id: self.world})
+        self.job = {'world': self.world_id, 'area': 'booking', 'goal': goal}
+        site = self
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args): pass
+            def send(self, data, mime='application/json', status=200):
+                if not isinstance(data, bytes): data = json.dumps(data).encode()
+                self.send_response(status);self.send_header('Content-Type', mime)
+                self.send_header('Content-Length', str(len(data)));self.end_headers();self.wfile.write(data)
+            def do_GET(self):
+                path = urlparse(self.path).path
+                if path == '/api/world/' + site.world_id: return self.send(site.world.public())
+                if path == f'/world/{site.world_id}/booking': return self.send((ASSETS/'site.html').read_bytes(), 'text/html')
+                if path in ('/assets/style.css', '/assets/site.js', '/assets/rooms.js'):
+                    return self.send((ASSETS/path.split('/')[-1]).read_bytes(), 'text/css' if path.endswith('.css') else 'text/javascript')
+                self.send({'error': 'Not found'}, status=404)
+            def do_POST(self):
+                try:
+                    if self.path != '/api/world/' + site.world_id: raise ValueError('Unsupported route')
+                    size = int(self.headers.get('Content-Length', '0'))
+                    if not 0 < size < 24000: raise ValueError('Invalid body size')
+                    self.send(site.world.action(json.loads(self.rfile.read(size))))
+                except (ValueError, TypeError, KeyError) as exc: self.send({'error': str(exc)}, status=400)
+        self.server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+        self.origin = f'http://127.0.0.1:{self.server.server_port}'
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True);self.thread.start()
+    def close(self): self.server.shutdown();self.server.server_close();self.thread.join()
+
+
+class PublishedTask:
+    def __init__(self, task, publisher, origin): self.task, self.publisher, self.origin = task, publisher, origin
+    def __getattr__(self, name): return getattr(self.task, name)
+    def prepare(self, trace):
+        self.publisher.attach(trace)
+        record = self.task.prepare(trace)
+        if self.publisher.job['task'] == 'chaos-confirmshaming' and not self.task.verifier_ready:
+            raise RuntimeError('Chaos build lacks current contract certification')
+        return record
+    def capture_initial(self, env, obs, info):
+        # The allowlisted synthetic site is the only browser network destination.
+        origin = self.origin or self.task.client.base_url
+        def route(request):
+            url = request.request.url
+            if url.startswith(origin + '/') or url.startswith(('data:', 'blob:')): request.continue_()
+            else: request.abort()
+        env.unwrapped.page.context.route('**/*', route)
+        return self.task.capture_initial(env, obs, info)
+
+
+def execute_job(broker, job, data_dir, env, chaos_url=None):
+    from .runner import run_episode
+    from .actions import make_action_set
+    import browsergym.core  # noqa: F401
+    import gymnasium as gym
+    folder = data_dir / 'jobs' / job['id'];folder.mkdir(parents=True, exist_ok=False)
+    write_json(folder / 'job.json', {k: v for k, v in job.items() if k != 'lease'})
+    publisher = Publisher(broker, job, folder);publisher.thread.start()
+    site = backend = task = None
+    error = None
+    try:
+        actions = make_action_set()
+        if job['task'] == 'rooms':
+            site = RoomsSite(job['goal']);task = DemoTask(site.app, site.job)
+            wrapped = PublishedTask(task, publisher, site.origin)
+            from browsergym.core.env import BrowserEnv
+            from browsergym.core.task import OpenEndedTask
+            class BookingTask(OpenEndedTask):
+                def __init__(self, seed): super().__init__(seed, f'{site.origin}/world/{site.world_id}/booking', job['goal'])
+                def validate(self, page, chat_messages):
+                    return 0, bool(site.world.snapshot()['bookings']), '', {'episode_boundary': 'first_accepted_reservation'}
+            def factory(video):
+                return BrowserEnv(task_entrypoint=BookingTask, headless=True, action_mapping=actions.to_python_code,
+                    viewport={'width': 1000, 'height': 850}, wait_for_user_message=False)
+            if job['mode'] == 'rehearsal' and job['goal'] != EXAMPLES['booking']['goal']:
+                raise ValueError('Rehearsal only supports the exact study-room example; use Live for custom goals')
+            backend = TeamBackend(publisher, env) if job['mode'] == 'live' else RehearsalBackend('booking')
+        elif job['task'] == 'chaos-confirmshaming' and chaos_url:
+            from .chaos import ChaosTask, ChaosClient
+            task = ChaosTask(ChaosClient(chaos_url), 'confirmshaming')
+            wrapped = PublishedTask(task, publisher, None)
+            def factory(video):
+                return gym.make('browsergym/openended', task_kwargs={'start_url': task.start_url, 'goal': task.policy_goal},
+                    headless=True, action_mapping=actions.to_python_code, viewport={'width': 1000, 'height': 850}, wait_for_user_message=False)
+            backend = TeamBackend(publisher, env) if job['mode'] == 'live' else ConfirmRehearsal()
+        else:
+            raise ValueError('Task is not available on this worker')
+        hook = backend.before_observation if isinstance(backend, TeamBackend) else publisher.checkpoint
+        run_episode(factory, backend, {'task': job['task'], 'goal': job['goal'], 'team_job': job['id'],
+                    'episode_boundary': 'first_accepted_reservation' if job['task'] == 'rooms' else 'agent_finished',
+                    'driver': 'llm' if job['mode'] == 'live' else 'scripted-rehearsal',
+                    'model': getattr(backend, 'model', 'scripted-rehearsal'), 'training_eligible': False,
+                    'generation': {'max_tokens': 512, **backend.request_options} if isinstance(backend, TeamBackend) else None},
+                    output=data_dir / 'runs', max_steps=12, before_observation=hook, episode_task=wrapped)
+    except Exception as exc:
+        error = f'{type(exc).__name__}: {exc}'
+        write_json(folder / 'worker-error.json', {'error': error})
+    finally:
+        if backend: backend.close()
+        if task and hasattr(task, 'close'): task.close()
+        if site: site.close()
+        try: publisher.finish(error)
+        except Exception as exc:
+            write_json(folder / 'publication-error.json', {'error': f'{type(exc).__name__}: {exc}',
+                       'replay_allowed': False, 'original_trace': str(publisher.directory) if publisher.directory else None})
+
+
+def start_chaos(build):
+    record = build / 'server.json'
+    if record.exists():
+        candidate = json.loads(record.read_text())
+        try:
+            from .chaos_verifier import fingerprint_server, certification
+            if certification(fingerprint_server(candidate['agent_url']), 'confirmshaming'): return candidate['agent_url']
+        except (OSError, ValueError, RuntimeError, subprocess.SubprocessError): pass
+    result = subprocess.run(['python3', str(ROOT/'scripts/start_chaos_repair.py'), '--build', str(build), '--human-port', '3147'],
+                            check=True, capture_output=True, text=True)
+    return json.loads(result.stdout)['agent_url']
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--env-file', type=Path)
+    parser.add_argument('--once', action='store_true', help='Poll once and execute at most one new job')
+    args = parser.parse_args()
+    if args.env_file:
+        from dotenv import load_dotenv
+        load_dotenv(args.env_file, override=False)
+    libraries = ROOT / '.local/system-libs/usr/lib/x86_64-linux-gnu'
+    if libraries.is_dir(): os.environ['LD_LIBRARY_PATH'] = str(libraries) + ':' + os.getenv('LD_LIBRARY_PATH', '')
+    env = dict(os.environ);mode = env.get('HARNESS_MODE', 'rehearsal')
+    if mode not in ('live', 'rehearsal'): raise ValueError('HARNESS_MODE must be rehearsal or live')
+    data_dir = Path(env.get('HARNESS_DATA_DIR', str(ROOT/'.local/team-worker/data'))).resolve();data_dir.mkdir(parents=True, exist_ok=True)
+    # Refuse two processes sharing the same worker state, including container restarts.
+    import fcntl
+    lock = (data_dir/'worker.lock').open('a');fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
+    broker = Broker(env.get('HARNESS_URL', ''), env.get('HARNESS_WORKER_TOKEN'))
+    identity = str(uuid4());chaos_url = start_chaos(Path(env['HARNESS_CHAOS_BUILD']).resolve()) if env.get('HARNESS_CHAOS_BUILD') else None
+    tasks = ['rooms'] + (['chaos-confirmshaming'] if chaos_url else [])
+    while True:
+        try:
+            result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks})
+            if result.get('job'):
+                print('Starting team job', result['job']['id'], flush=True)
+                execute_job(broker, result['job'], data_dir, env, chaos_url)
+                print('Finished team job', result['job']['id'], flush=True)
+        except Exception as exc:
+            print('Worker connection unavailable:', type(exc).__name__, flush=True)
+        if args.once: break
+        time.sleep(max(2, float(env.get('HARNESS_POLL_SECONDS', '5'))))
+
+
+if __name__ == '__main__': main()

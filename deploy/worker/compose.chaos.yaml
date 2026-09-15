@@ -1,0 +1,12 @@
+# Add after compose.yaml. Export the reviewed build and initialize its ownership
+# first; see README.md. This never mounts the original running/certified build.
+services:
+  worker:
+    environment:
+      HARNESS_CHAOS_BUILD: /data/chaos
+    volumes:
+      - type: bind
+        source: ../../.local/team-worker/chaos
+        target: /data/chaos
+        bind:
+          create_host_path: false

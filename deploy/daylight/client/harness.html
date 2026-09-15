@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daylight · Browser harness</title>
+  <link rel="stylesheet" href="/assets/harness.css">
+  <script type="module" src="/assets/harness.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/harness">Daylight <span>Browser harness</span></a><nav aria-label="Account"><a href="/">Page demo</a><a href="/logout">Sign out</a></nav></header>
+  <main class="workspace">
+    <section class="browser-panel" aria-label="Remote browser and recorded steps">
+      <div class="browser-toolbar"><span class="browser-dot" aria-hidden="true"></span><strong id="browser-title">Remote browser</strong><span id="run-state" class="pill">No run selected</span></div>
+      <div id="browser-empty" class="empty"><h1>Watch the real browser agent</h1><p>Choose a task in the sidebar. The worker runs BrowserGym and shares a screenshot after each step.</p><p>This view does not accept browser clicks.</p></div>
+      <div id="screenshot-wrap" hidden><img id="screenshot" alt="Latest recorded remote browser screenshot"><p id="screenshot-caption" class="muted"></p></div>
+      <section id="run-detail" class="run-detail" hidden>
+        <div class="section-heading"><h2>Recorded activity</h2><a id="trace-download" hidden>Download original trace</a></div>
+        <p id="run-summary" class="muted"></p><p id="run-cost" class="muted"></p><p id="cost-alerts" class="notice" hidden></p><p id="run-error" class="error" hidden></p>
+        <div id="evaluation" class="evaluation" aria-label="Independent verification"></div>
+        <p id="evaluation-note" class="muted"></p>
+        <div class="activity-grid"><ol id="steps" aria-label="Select a recorded step"></ol><div class="observation"><h3 id="observation-title">Step details</h3><pre id="observation-text">Select a step to inspect its recorded observation.</pre></div></div>
+        <details><summary>Runtime and provenance</summary><pre id="runtime">Not recorded yet.</pre></details>
+      </section>
+    </section>
+    <aside class="sidebar" aria-label="Agent controls and review">
+      <div class="sidebar-heading"><span class="agent-icon" aria-hidden="true">D</span><div><h1>Daylight agent</h1><p>Shared BrowserGym harness</p></div></div>
+      <p id="worker-status" class="worker-status" role="status">Checking worker…</p>
+      <p id="notice" class="notice" role="alert" hidden></p>
+      <form id="task-form"><h2>Give the agent a task</h2><label for="task">Environment</label><select id="task" disabled><option>Loading tasks…</option></select><label for="goal">Your request</label><textarea id="goal" rows="5" required maxlength="2000" disabled></textarea><p id="goal-note" class="muted"></p><button id="submit-run" type="submit" disabled>Queue run</button><p class="muted">One run executes at a time. Your PC must be awake with its worker running.</p></form>
+      <section class="history"><h2>Your runs</h2><label for="job-select" class="sr-only">Choose a run</label><select id="job-select"><option value="">No runs yet</option></select></section>
+      <section id="issue-panel" hidden><h2>Flag an issue</h2><p class="muted">Feedback is saved with this trace. It is not sent to the agent or used as a success label.</p><form id="issue-form"><label for="issue-step">Relevant step</label><select id="issue-step"><option value="">Whole run</option></select><label for="issue-comment">What did you notice?</label><textarea id="issue-comment" rows="3" required maxlength="4000" placeholder="What happened, and what did you expect?"></textarea><button id="submit-issue" type="submit" class="secondary">Save issue</button><p id="issue-status" role="status" class="muted"></p></form><ul id="issues" class="issues" aria-label="Saved issues"></ul></section>
+    </aside>
+  </main>
+</body>
+</html>

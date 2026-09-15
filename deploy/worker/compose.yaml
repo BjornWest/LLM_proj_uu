@@ -1,0 +1,33 @@
+services:
+  worker:
+    build:
+      context: ../..
+      dockerfile: deploy/worker/Dockerfile
+    image: intent-browser-worker:local
+    # Only this dedicated ignored file enters the container's runtime environment.
+    # Paths are relative to this compose file, not the invoking shell.
+    env_file:
+      - ../../.local/team-worker/worker.env
+    environment:
+      HARNESS_DATA_DIR: /data
+    volumes:
+      - worker-data:/data
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    shm_size: 1gb
+    mem_limit: 4g
+    cpus: 2
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # There are intentionally no published ports: this worker polls Vercel.
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+volumes:
+  worker-data:

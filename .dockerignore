@@ -1,0 +1,37 @@
+# Allow only the inputs needed by deploy/worker/Dockerfile into the build context.
+# In particular, credentials, local caches, historical runs and research data
+# never reach the Docker daemon.
+**
+!pyproject.toml
+!intent_browser/
+!intent_browser/*.py
+!environments/
+!environments/demo/
+!environments/demo/*.html
+!environments/demo/*.js
+!environments/demo/*.css
+!config/
+!config/chaos_verifier.json
+!scripts/
+!scripts/start_chaos_repair.py
+!scripts/inspect_chaos.mjs
+!deploy/
+!deploy/worker/
+!deploy/worker/Dockerfile
+!deploy/worker/requirements.txt
+
+# Keep these excluded even if a runtime-directory allowlist is widened later.
+**/.env
+**/.env.*
+**/node_modules
+**/__pycache__
+**/*.pyc
+.git
+.local
+.research
+.venv
+data
+runs
+training
+**/*secret*
+**/*credential*

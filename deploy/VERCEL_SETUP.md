@@ -1,5 +1,7 @@
 # Deploy the private Daylight team demo
 
+The additional `/harness` page connects to the PC's containerized BrowserGym worker. Follow [TEAM_HARNESS.md](../TEAM_HARNESS.md) for its extra `HARNESS_WORKER_TOKEN` configuration. The browser-side demo described below remains a separate mode at `/`.
+
 This is a Vercel-only version of the Daylight pages and sidebar. Teammates sign in with individual invitation codes, then use the shared OpenRouter key. No local setup, model account or GPU is needed.
 
 The agent operates the fictional page inside the teammate’s browser. **This is a separate demo runtime, not BrowserGym.** Browser-supplied state and action results are explicitly untrusted; all benchmark evaluation fields remain null. The local research harness and historical calibration runs are unchanged.

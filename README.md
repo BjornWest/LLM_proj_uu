@@ -1,5 +1,7 @@
 # Intent-preserving browser agent — first vertical slice
 
+The [shared research harness](TEAM_HARNESS.md) connects the private Vercel UI to the actual Python/BrowserGym worker on the PC, with screenshots, original traces and step-linked feedback. [Container setup](deploy/worker/README.md) keeps the worker portable to a server later.
+
 The overnight environment increment adds a [versioned Chaos repair](CHAOS_REPAIR.md), [membership](TRICKY_MEMBERSHIP.md) and [privacy](TRICKY_PRIVACY.md) fixtures, and [SusBench IKEA checker reproductions](SUSBench_IKEA.md). See [OVERNIGHT_WORK.md](OVERNIGHT_WORK.md) for validation and remaining limits. These use scripted local tests; the working Vercel demo and historical model episodes are unchanged.
 
 A small BrowserGym loop for the Uppsala University group project. It reads the
