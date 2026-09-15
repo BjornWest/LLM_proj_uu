@@ -5,9 +5,18 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 const sha=s=>crypto.createHash('sha256').update(s).digest('hex');
-const seeds=Array.from({length:1024},(_,i)=>crypto.createHash('sha256').update('token-rng-review:'+i).digest().readUInt32BE(0));
 const prefix='var __getOwnPropNames=Object.getOwnPropertyNames;var __esm=(fn,res)=>function(){return fn&&(res=(0,fn[__getOwnPropNames(fn)[0]])(fn=0)),res};';
 const exactNext=state=>{let x=BigInt(state);x=(x^(x<<13n))&0xffffffffn;x=x^(x>>17n);x=(x^(x<<5n))&0xffffffffn;return Number(x);};
+export function requireNewOutput(output) {
+  try { fs.lstatSync(output); }
+  catch(error) { if(error.code==='ENOENT')return; throw error; }
+  throw Error(`Refusing to overwrite existing report path: ${output}`);
+}
+export function writeNewReport(output,report) {
+  fs.mkdirSync(path.dirname(output),{recursive:true});
+  // The early check avoids wasted work; exclusive creation also closes its race.
+  fs.writeFileSync(output,JSON.stringify(report,null,2),{flag:'wx'});
+}
 export function tokenDiversity(variants,requireComplete=false) {
   const count=valueOf=>{
     const values=variants.map(valueOf);
@@ -28,6 +37,7 @@ export function tokenDiversity(variants,requireComplete=false) {
 }
 function summarize(bundle,repaired) {
   const code=fs.readFileSync(bundle,'utf8');
+  const seeds=Array.from({length:1024},(_,i)=>crypto.createHash('sha256').update('token-rng-review:'+i).digest().readUInt32BE(0));
   const section=code.slice(code.indexOf('// packages/core/dist/seedutil.js'),code.indexOf('// packages/core/dist/index.js'));
   const ctx=vm.createContext({seeds});vm.runInContext(prefix+section+';init_seedutil();',ctx,{timeout:1000});
   const rows=vm.runInContext('seeds.map(seed=>{const rng=new Seeded(seed);return {seed,values:Array.from({length:32},()=>rng.next())}})',ctx,{timeout:1000});
@@ -51,8 +61,9 @@ function summarize(bundle,repaired) {
     xorshift_mismatches:mismatches,first_mod4:histogram,diversity,variants};
 }
 if(path.resolve(process.argv[1]??'')===import.meta.filename) {
-const [original,derived,output='.local/preflight/chaos-rng-v2.json']=process.argv.slice(2);
+const [original,derived,output='.local/preflight/chaos-rng-joint-coverage-v2.json']=process.argv.slice(2);
 if(!original||!derived)throw Error('Usage: node scripts/verify_chaos_rng.mjs original-cli derived-cli [report]');
+requireNewOutput(output);
 const before=summarize(original,false),after=summarize(derived,true);
 const report={version:'chaos-xorshift32-v2-validation',scope:'Offline arithmetic and 128 realized token descriptors; not PRNG certification or model evaluation',
   coverage_requirement:'All four pinned token names and all six target-row/safe-action position combinations; full counts retained',
@@ -60,6 +71,6 @@ const report={version:'chaos-xorshift32-v2-validation',scope:'Offline arithmetic
   source_sha256:sha(fs.readFileSync(import.meta.filename)),inspector_sha256:sha(fs.readFileSync('scripts/inspect_chaos.mjs')),
   algorithm_reference:'https://www.jstatsoft.org/article/view/v008i14',original:before,derived:after,
   limitations:['Xorshift32 is a small deterministic fixture generator, not a cryptographic RNG.','Existing modulo choice/shuffle mapping is retained; no exhaustive distribution claim.','Historical sessions retain original generator semantics.'],passed:true};
-fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,JSON.stringify(report,null,2));
+writeNewReport(output,report);
 console.log(JSON.stringify({report:output,original:before.diversity,derived:after.diversity,derived_mod4:after.first_mod4,exact_mismatches:after.xorshift_mismatches}));
 }

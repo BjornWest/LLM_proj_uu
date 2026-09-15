@@ -24,6 +24,8 @@ The local arithmetic check compares 32,768 outputs with an independent BigInt im
 
 The offline validator now requires all four exact token device names and all six target-row/safe-action combinations, retaining their counts. Its previous marginal-only/two-name gate was weaker than the independent acceptance criteria. Four regression tests include a sample with balanced marginals but two missing joint cells. A fresh report, `.local/preflight/chaos-rng-joint-gate-v2.json`, passes on the unchanged copied v2 CLI: 32,768 exact arithmetic matches and joint counts `17/22/19/23/26/21` in sorted cell order. Historical validation reports and browser certificates are unchanged; this is a validator-only revision.
 
+Report output is also protected: the new default is `.local/preflight/chaos-rng-joint-coverage-v2.json`, and an existing path (including a dangling symlink) is rejected before reading bundles or performing validation. The final write uses exclusive creation, so a competing file created during validation cannot be overwritten. Supply a new explicit path for another run. Nine tests cover coverage and output handling. `.local/preflight/chaos-rng-exclusive-output-v2.json` retains the latest validator fingerprint; `.local/preflight/chaos-rng-output-preservation-v2.json` confirms identical results and unchanged hashes of all three preceding local reports.
+
 ## Reproduce
 
 Use a cached exact `browser-agent-chaos@0.1.0` installation. If necessary, first install/start that pinned package using the existing laptop guide. Setup checks the original CLI and frontend hashes and reuses cached Node dependencies; it downloads nothing.
