@@ -10,6 +10,11 @@ let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoR
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
 let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
 let activeTurn=null,interrupting=false;
+let manualConfig=null,manualSessions=[],manualBusy=false,manualUncertain=false,manualError='',manualFrameKey='',manualFrameLoaded=false;
+const manualChoices=new Map(),manualLive=session=>session&&['starting','ready','busy'].includes(session.status);
+const manualSite=()=>manualConfig?.sites?.find(site=>site.site_id===siteID);
+const manualCurrent=()=>manualSessions.find(session=>session.site_id===siteID&&manualLive(session))||manualSessions.find(session=>session.site_id===siteID);
+const manualOwnerLive=()=>manualSessions.find(manualLive);
 let sidebarBeforeFullscreen=true;
 const fullScreen=createFullScreenMode($('enter-fullscreen'),$('exit-fullscreen'),active=>{
   if(active){sidebarBeforeFullscreen=agentVisible;setAgentVisible(true);}else setAgentVisible(sidebarBeforeFullscreen);
@@ -35,6 +40,7 @@ async function api(path,data){
   if(!response.ok||value===null)throw Object.assign(Error(value?.error||'The server could not complete this request.'),{status:response.status});return value;
 }
 function gradeOf(record){
+  if(record.source==='manual')return 'ungraded';
   const evaluation=record.evaluation;
   if(evaluation?.safe_success===true)return 'success';
   if(evaluation?.safe_success===false)return 'failed';
@@ -44,7 +50,7 @@ function gradeOf(record){
   if(record.source==='demo'&&evaluation==null)return 'ungraded';
   return 'unknown';
 }
-function gradeBadge(record){const grade=gradeOf(record),span=node('span',gradeNames[grade],'grade '+grade);span.title=grade==='success'||grade==='failed'?'Recorded verifier safe_success: '+String(record.evaluation.safe_success):grade==='partial'?'Explicit recorded grade with rubric':grade==='ungraded'?'No independent verifier result is attached':'No supported final safe-success result recorded';return span;}
+function gradeBadge(record){const grade=gradeOf(record),span=node('span',gradeNames[grade],'grade '+grade);span.title=record.source==='manual'?'Human-controlled session; reference fixture checks are diagnostic, not an agent grade.':grade==='success'||grade==='failed'?'Recorded verifier safe_success: '+String(record.evaluation.safe_success):grade==='partial'?'Explicit recorded grade with rubric':grade==='ungraded'?'No independent verifier result is attached':'No supported final safe-success result recorded';return span;}
 function buildSites(){
   tasks=Array.isArray(config?.tasks)?config.tasks:[];
   for(const task of tasks)if(task.collection&&task.collection_name)collectionNames[task.collection]=task.collection_name;
@@ -69,14 +75,15 @@ function records(){
   const browserRecords=demoRows.map(trace=>({key:'d:'+trace.id,id:trace.id,source:'demo',kind:['task','ask'].includes(trace.interaction_kind)?trace.interaction_kind:null,
     site:trace.site_id||'unknown',collection:trace.collection||'unknown',title:trace.task_name||trace.goal||'Browser-side run',goal:trace.goal,task:trace.task_id||null,
     status:trace.status,at:trace.created_at,runtime:trace.runtime||'Browser-side demo',executionMode:trace.execution_mode||null,evaluation:trace.evaluation??null,raw:trace}));
-  return [...jobRecords,...browserRecords].sort((a,b)=>(Date.parse(b.at)||0)-(Date.parse(a.at)||0));
+  const manualRecords=manualSessions.map(session=>({key:'m:'+session.id,id:session.id,source:'manual',kind:'manual',site:session.site_id||'unknown',collection:session.collection||'unknown',title:session.task_name||session.task||'Manual session',condition:session.condition||null,goal:session.reference_goal,task:session.task,status:session.status,at:session.created_at,runtime:session.runtime||'BrowserGym',executionMode:'Human controlled',evaluation:null,raw:session}));
+  return [...jobRecords,...browserRecords,...manualRecords].sort((a,b)=>(Date.parse(b.at)||0)-(Date.parse(a.at)||0));
 }
 function renderSites(){
   const query=$('site-search').value.trim().toLowerCase();$('site-folders').replaceChildren();
   for(const collection of [...new Set(sites.map(s=>s.collection))]){
     const matching=sites.filter(s=>s.collection===collection&&[s.name,s.description,collection].join(' ').toLowerCase().includes(query));if(!matching.length)continue;
     const details=node('details',undefined,'site-folder');details.open=folderState.get(collection)??true;details.ontoggle=()=>{if(details.isConnected)folderState.set(collection,details.open);};const summary=node('summary',collectionNames[collection]||collection);summary.append(node('span',String(matching.length)));details.append(summary);
-    for(const site of matching){const button=node('button',undefined,'site-choice');button.type='button';button.dataset.site=site.id;button.disabled=askBusy;button.setAttribute('aria-current',String(!globalPage&&site.id===siteID));const text=node('span');text.append(node('strong',site.name),node('small',site.interactive?'Explore · tasks · replays':'Remote tasks · replays'));button.append(node('span',site.icon,'site-icon'),text);button.onclick=()=>selectSite(site.id);details.append(button);}
+    for(const site of matching){const button=node('button',undefined,'site-choice');button.type='button';button.dataset.site=site.id;button.disabled=askBusy;button.setAttribute('aria-current',String(!globalPage&&site.id===siteID));const text=node('span');text.append(node('strong',site.name),node('small',site.interactive?'Explore · tasks · replays':manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site.id)?'Manual explore · tasks · replays':'Remote tasks · replays'));button.append(node('span',site.icon,'site-icon'),text);button.onclick=()=>selectSite(site.id);details.append(button);}
     $('site-folders').append(details);
   }
   $('sites-empty').hidden=!!$('site-folders').children.length;
@@ -109,11 +116,11 @@ function syncControls(){
   const canLaunch=!!config?.enabled&&config?.worker?.mode==='live'&&pendingTask?.available!==false;
   $('try-task').disabled=launching||authExpired||!pendingTask||!canLaunch;
   $('try-task').textContent=launching?'Queuing…':config?.worker?.mode!=='live'?'Live worker required':config?.worker?.online?'Try this task →':'Queue task →';
-  document.querySelectorAll('.site-choice,#suggestions button').forEach(button=>button.disabled=askBusy||authExpired);
+  document.querySelectorAll('.site-choice,#suggestions button').forEach(button=>button.disabled=askBusy||manualBusy||authExpired);
 }
 function recordRow(record,all){
   const row=node('tr');row.dataset.run=record.key;row.dataset.site=record.site;row.dataset.kind=record.kind||'unknown';
-  const cell=node('td'),button=node('button',undefined,'run-title');button.type='button';button.append(node('span',record.kind==='task'?'Task':record.kind==='ask'?'Ask':'Activity unknown','run-kind '+(record.kind||'unknown')),document.createTextNode(' '+(record.kind==='ask'?record.goal||record.title:record.title)));button.onclick=()=>openRecord(record,all);
+  const cell=node('td'),button=node('button',undefined,'run-title');button.type='button';button.append(node('span',record.kind==='task'?'Task':record.kind==='ask'?'Ask':record.kind==='manual'?'Manual':'Activity unknown','run-kind '+(record.kind||'unknown')),document.createTextNode(' '+(record.kind==='ask'?record.goal||record.title:record.title)));button.onclick=()=>openRecord(record,all);
   cell.append(button,node('span',[record.runtime,record.executionMode,record.condition,record.status].filter(Boolean).join(' · '),'run-meta'));row.append(cell);
   if(all){const siteCell=node('td',undefined,'site-cell');siteCell.textContent=siteFor(record.site)?.name||(record.site==='unknown'?'Not recorded':record.site);siteCell.append(node('small',record.collection==='unknown'?'Collection not recorded':collectionNames[record.collection]||record.collection));row.append(siteCell);}
   const grade=node('td');grade.append(gradeBadge(record));row.append(grade,node('td',dateLabel(record.at),'when'));
@@ -142,9 +149,9 @@ function showTask(task){
 }
 function pathFor(){return globalPage?'/workspace/replays'+(currentRun&&view==='review'?'?run='+encodeURIComponent(currentRun.key):''):'/workspace?site='+encodeURIComponent(siteID)+(view!=='explore'?'&view='+view:'')+(view==='review'&&currentRun?'&run='+encodeURIComponent(currentRun.key):'');}
 function syncURL(replace=false){history[replace?'replaceState':'pushState'](null,'',pathFor());}
-function selectSite(id){if(askBusy)return;draft=$('question').value;siteID=id;globalPage=false;view='explore';currentRun=null;render();syncURL();}
-function setView(next){draft=$('question').value;globalPage=false;view=next;currentRun=null;render();syncURL();if(next==='research')refresh(true);}
-function openGlobal(event){event?.preventDefault();draft=$('question').value;globalPage=true;view='global';currentRun=null;render();syncURL();refresh(true);}
+function selectSite(id){if(askBusy||manualBusy)return;draft=$('question').value;siteID=id;globalPage=false;view='explore';currentRun=null;render();syncURL();}
+function setView(next){draft=$('question').value;globalPage=false;view=next;currentRun=null;render();syncURL();if(next==='research'){refresh(true);loadManual();}}
+function openGlobal(event){event?.preventDefault();draft=$('question').value;globalPage=true;view='global';currentRun=null;render();syncURL();refresh(true);loadManual();}
 async function openRecord(record,fromGlobal=globalPage){
   $('run-viewer').dataset.run='';
   currentRun=record;globalPage=fromGlobal;view='review';if(!fromGlobal&&siteFor(record.site))siteID=record.site;render();syncURL();
@@ -153,9 +160,10 @@ async function openRecord(record,fromGlobal=globalPage){
 function renderReview(){
   const record=currentRun;if(!record)return;
   $('back-to-research').textContent=globalPage?'← All traces & replays':'← Tasks & replays';$('recording-status').textContent=activeStatuses.has(record.status)?'In progress · recorded evidence':'Recorded evidence · view only';
-  $('review-kind').textContent=[record.kind==='task'?'Task attempt':record.kind==='ask'?'Ask the agent':'Activity not recorded',siteFor(record.site)?.name||record.site,record.runtime].join(' · ');
+  $('review-kind').textContent=[record.kind==='task'?'Task attempt':record.kind==='ask'?'Ask the agent':record.kind==='manual'?'Manual exploration':'Activity not recorded',siteFor(record.site)?.name||record.site,record.runtime].join(' · ');
   $('review-title').textContent=record.kind==='ask'?record.goal||record.title:record.title;$('review-grade').replaceChildren(gradeBadge(record));
-  const isJob=record.source==='harness';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isJob;
+  const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isJob||isManual;$('manual-review').hidden=!isManual;
+  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded human actions',session.condition].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
   if(isJob){const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
 }
 async function loadBrowserTrace(record){
@@ -166,15 +174,94 @@ function render(){
   const site=siteFor(siteID);if(!site)return;
   if(globalPage||view!=='explore'||!site.interactive)fullScreen.setActive(false,{focus:false});
   document.querySelector('.site-heading').hidden=globalPage;document.querySelector('.site-tabs').hidden=globalPage;
-  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=site.description;$('site-label').textContent=site.interactive?'Interactive website':'Remote worker environment';
+  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Explore a remote browser yourself, or start a separate agent task.':site.description;$('site-label').textContent=site.interactive?'Interactive website':'Remote worker environment';
   $('explore-view').hidden=globalPage||view!=='explore';$('research-view').hidden=globalPage||view!=='research';$('global-view').hidden=!globalPage||view==='review';$('review-view').hidden=view!=='review';
   $('explore-tab').setAttribute('aria-pressed',String(view==='explore'));$('research-tab').setAttribute('aria-pressed',String(view!=='explore'));$('replay-count').textContent=String(records().filter(r=>r.site===siteID).length);
   $('tab-note').textContent=view==='explore'?'Browse the site or open a reviewed task.':'Tasks and recorded attempts for this site.';
   renderSites();
   $('remote-explore').hidden=site.interactive;$('interactive-explore').hidden=!site.interactive;
+  if(!site.interactive)renderManual();
   if(!globalPage&&view==='explore'&&site.interactive){ensureFrame();updateAddress();$('agent-site').textContent='Campus · current page';renderConversation();}
   if(view==='research')renderTasks();if(globalPage&&view!=='review')renderGlobal();if(view==='review')renderReview();syncControls();
 }
+function updateManualViews(){
+  renderManual();renderSites();syncControls();
+  if(currentRun?.source==='manual')currentRun=records().find(record=>record.key===currentRun.key)||currentRun;
+  if(view==='research')renderTasks();if(globalPage&&view!=='review')renderGlobal();if(view==='review')renderReview();
+  $('replay-count').textContent=String(records().filter(record=>record.site===siteID).length);
+}
+function rememberManual(session){
+  if(!session?.id)throw Error('The manual browser returned no session. Check sessions before continuing.');
+  manualSessions=[session,...manualSessions.filter(row=>row.id!==session.id)];
+}
+function renderManual(){
+  const site=manualSite(),session=manualCurrent(),live=manualOwnerLive(),ready=session?.status==='ready';
+  const pending=manualBusy||!!manualLoading;
+  const selected=(manualLive(session)?session.task:null)||manualChoices.get(siteID)||site?.default_task||site?.tasks?.[0]?.id||'';
+  $('manual-task').replaceChildren(...(site?.tasks||[]).map(task=>{const option=node('option',(task.title||task.id)+(task.condition?' · '+task.condition:''));option.value=task.id;return option;}));$('manual-task').value=selected;
+  $('manual-task').disabled=pending||!!live||authExpired;
+  $('manual-open').disabled=pending||manualUncertain||!!live||authExpired||!manualConfig?.enabled||!selected;
+  $('manual-open').textContent=manualBusy&&!session?'Opening…':session?'Open new session':'Open website';
+  $('manual-check').disabled=pending||authExpired;
+  $('manual-close').disabled=pending||manualUncertain||authExpired||!manualLive(session)||!ready;
+  $('manual-other').hidden=!live||live.site_id===siteID;$('manual-other').disabled=manualBusy;
+  const error=manualError||session?.last_error||session?.error||'';$('manual-error').hidden=!error;$('manual-error').textContent=String(error);
+  $('manual-status').textContent=manualBusy?'Waiting for the remote browser…':manualUncertain?'Command outcome needs checking. Use Check sessions before another action.':live&&live.site_id!==siteID?'You already have a session open on another site. Close it there before opening this one.':session?'Session '+session.status+' · '+(session.action_count??0)+' human actions':manualConfig?.enabled&&site?'Open a private browser session. It may take up to 25 seconds.':manualConfig===null?'Checking manual browser availability…':'Manual exploration is unavailable for this site right now. Agent tasks remain separate.';
+  $('manual-browser').hidden=!session?.frame;
+  const f=session?.frame,key=f?session.id+'/'+f.id:'';
+  if(key!==manualFrameKey){manualFrameKey=key;manualFrameLoaded=false;if(f&&Number.isFinite(f.width)&&f.width>0&&Number.isFinite(f.height)&&f.height>0){$('manual-frame').width=f.width;$('manual-frame').height=f.height;$('manual-frame').src='/api/manual/sessions/'+encodeURIComponent(session.id)+'/frame/'+encodeURIComponent(f.id);}else $('manual-frame').removeAttribute('src');}
+  const controls=pending||manualUncertain||authExpired||!ready||!manualFrameLoaded;
+  $('manual-surface').setAttribute('aria-disabled',String(controls));$('manual-surface').tabIndex=controls?-1:0;
+  for(const id of ['manual-scroll-up','manual-scroll-down','manual-press','manual-key','manual-send-text'])$(id).disabled=controls;
+  $('manual-text').disabled=authExpired||!ready;
+  $('manual-refresh').disabled=pending||manualUncertain||authExpired||!ready;
+  $('manual-page-url').textContent=f?.page_url||'Remote browser';
+  $('manual-session-facts').textContent=session?[session.task_name||session.task,session.condition,'Human controlled · BrowserGym'].filter(Boolean).join(' · '):'';
+  $('manual-reference-goal').textContent=session?.reference_goal||'Resolved when the session starts.';
+}
+let manualLoading=null;
+async function loadManual(){
+  if(manualBusy||authExpired)return;if(manualLoading)return manualLoading;
+  manualLoading=(async()=>{
+    try{const settings=await api('/api/manual/config');manualConfig=settings;const result=await api('/api/manual/sessions');manualSessions=(result.sessions||[]).sort((a,b)=>(Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0));manualUncertain=manualSessions.some(session=>['starting','busy'].includes(session.status));manualError='';}
+    catch(error){if(error.status===404){manualConfig={enabled:false,sites:[]};manualError='';}else{manualError=error.message;manualUncertain=true;}}
+    finally{manualLoading=null;updateManualViews();}
+  })();renderManual();return manualLoading;
+}
+async function manualCommand(operation,action){
+  if(manualBusy||manualLoading||manualUncertain||authExpired)return;
+  const session=manualCurrent();
+  if(operation==='open'){if(manualOwnerLive()||!manualConfig?.enabled||!$('manual-task').value)return;}
+  else if(session?.status!=='ready'||operation==='action'&&!manualFrameLoaded)return;
+  const task=$('manual-task').value,request_id=crypto.randomUUID();manualBusy=true;manualError='';updateManualViews();
+  try{
+    const result=await api(operation==='open'?'/api/manual/sessions':'/api/manual/sessions/'+encodeURIComponent(session.id)+'/'+operation,
+      operation==='open'?{task}:{request_id,...(operation==='action'?{frame_id:session.frame.id,action}:{})});
+    rememberManual(result);if(result.last_error||result.error)manualError=String(result.last_error||result.error);
+  }catch(error){manualError=error.message+' No command will be retried. Use Check sessions to recover its recorded state.';manualUncertain=true;}
+  finally{manualBusy=false;updateManualViews();}
+}
+$('manual-task').onchange=()=>manualChoices.set(siteID,$('manual-task').value);
+$('manual-open').onclick=()=>manualCommand('open');$('manual-close').onclick=()=>manualCommand('close');$('manual-refresh').onclick=()=>manualCommand('observe');$('manual-check').onclick=()=>loadManual();
+$('manual-other').onclick=()=>{const session=manualOwnerLive();if(session)selectSite(session.site_id);};
+$('manual-frame').onload=()=>{manualFrameLoaded=true;renderManual();};
+$('manual-frame').onerror=()=>{manualFrameLoaded=false;manualError='The remote image could not be loaded. Check sessions or refresh the image.';renderManual();};
+$('manual-surface').onclick=event=>{
+  if($('manual-surface').getAttribute('aria-disabled')==='true')return;
+  const bounds=$('manual-frame').getBoundingClientRect(),f=manualCurrent()?.frame;if(!f||!bounds.width||!bounds.height)return;
+  const x=Math.floor((event.clientX-bounds.left)*f.width/bounds.width),y=Math.floor((event.clientY-bounds.top)*f.height/bounds.height);
+  if(x<0||y<0||x>=f.width||y>=f.height)return;$('manual-surface').focus({preventScroll:true});manualCommand('action',{type:'click',x,y});
+};
+const manualKeys=new Set(['Tab','Enter','Escape','Backspace','ArrowUp','ArrowDown','ArrowLeft','ArrowRight']);
+$('manual-surface').onkeydown=event=>{
+  if(event.shiftKey||event.ctrlKey||event.altKey||event.metaKey||!manualKeys.has(event.key))return;
+  event.preventDefault();if(event.repeat||event.isComposing||$('manual-surface').getAttribute('aria-disabled')==='true')return;
+  manualCommand('action',{type:'press',key:event.key});
+};
+$('manual-leave').onclick=()=>$('manual-text').focus();
+$('manual-scroll-up').onclick=()=>manualCommand('action',{type:'scroll',dx:0,dy:-500});$('manual-scroll-down').onclick=()=>manualCommand('action',{type:'scroll',dx:0,dy:500});
+$('manual-press').onclick=()=>manualCommand('action',{type:'press',key:$('manual-key').value});
+$('manual-text-form').onsubmit=async event=>{event.preventDefault();const field=$('manual-text'),text=field.value;if(!text||$('manual-send-text').disabled)return;field.value='';await manualCommand('action',{type:'type',text});};
 async function fetchDemoRows(){
   let cursor;const rows=[],seen=new Set();
   do{const page=await api('/api/traces?limit=100'+(cursor?'&cursor='+encodeURIComponent(cursor):''));rows.push(...(Array.isArray(page.traces)?page.traces:[]));if(!page.has_more)return rows;if(!page.cursor||seen.has(page.cursor))throw Error('Trace history pagination did not advance.');seen.add(page.cursor);cursor=page.cursor;}while(rows.length<10000);
@@ -267,4 +354,4 @@ async function readRoute(){const params=new URLSearchParams(location.search);glo
 document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden)refresh();});
 window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>clearTimeout(pollTimer));
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('run-viewer').contentWindow||event.data?.type!=='harness:size')return;const height=Number(event.data.height);if(Number.isFinite(height))$('run-viewer').style.height=Math.min(8000,Math.max(650,height))+'px';});
-try{const results=await Promise.allSettled([api('/assets/fixture.json'),api('/api/config')]);if(results[0].status==='fulfilled'){fixture=results[0].value;window.demoWorld=new World(fixture);}if(results[1].status==='fulfilled')modelConfig=results[1].value;for(const result of results)if(result.status==='rejected')notice(result.reason.message);await refresh(true);buildSites();await readRoute();if(!modelConfig?.live_available)$('chat-status').textContent='OpenRouter is not configured for this deployment.';}catch(error){notice(error.message);syncControls();}
+try{const results=await Promise.allSettled([api('/assets/fixture.json'),api('/api/config')]);if(results[0].status==='fulfilled'){fixture=results[0].value;window.demoWorld=new World(fixture);}if(results[1].status==='fulfilled')modelConfig=results[1].value;for(const result of results)if(result.status==='rejected')notice(result.reason.message);await refresh(true);buildSites();await loadManual();await readRoute();if(!modelConfig?.live_available)$('chat-status').textContent='OpenRouter is not configured for this deployment.';}catch(error){notice(error.message);syncControls();}

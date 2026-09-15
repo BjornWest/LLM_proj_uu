@@ -18,9 +18,38 @@ Campus dashboard; `/harness` retains the full research controls.
 - Fixed tasks submit their exact registry goal and revision. Session-generated
   goals are omitted from the request and display a pending objective until the
   worker prepares the actual session.
-- External dataset sites currently expose remote tasks and recorded evidence.
-  They do not support manual remote takeover. The sample Fieldnotes bookshop and
+- External dataset sites expose remote tasks and recorded evidence. The manual
+  exploration controls described below become available when the manual-session
+  backend is enabled. The sample Fieldnotes bookshop and
   all sample runs remain in the separate local design preview only.
+
+## Remote manual exploration
+
+The MANUAL-SITES-01 frontend increment is prepared for coordinated backend
+publication. It uses `/api/manual/config` and the invitation-scoped session API;
+it does not create sessions just by opening a site or loading history.
+
+Choose a website setup, including its clean/injected condition, and select
+**Open website**. Click the screenshot to interact. While the image has focus,
+Tab, arrows, Enter, Escape and Backspace control the remote browser; Shift+Tab
+leaves those controls. **Send text** types into the remote page's focused field.
+The key menu also supports selecting all field text and moving to the previous
+field. Scroll and image refresh are explicit commands. One command runs at a time.
+
+**Check sessions** reads recorded metadata to recover after a stale frame,
+uncertain response or page reload. It does not repeat a command or capture a new
+frame. Close the current session before opening another site; a new session uses
+an isolated browser. Unsent text remains local.
+
+Manual sessions appear as **Manual / Not graded** in site and global history.
+The read-only summary provides the finalized original ZIP when available and
+keeps reference fixture evaluation separate as diagnostic evidence. Manual
+exploration invokes no model. External Ask remains unavailable, and task launches
+start separate agent runs with fresh state.
+
+Frontend contract validation: `.venv/bin/python scripts/smoke_manual_workspace.py`
+uses mocked manual API responses and screenshots. It does not validate actual
+BrowserGym execution; combined backend checks are required before publication.
 
 ## Chat activity
 
