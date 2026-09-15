@@ -17,7 +17,7 @@ class Recorder:
     def rpc(self, operation, **data):
         self.calls.append((operation,data))
         if self.reject:raise RuntimeError('Budget rejected')
-        return {'amount_usd':0.1}
+        return {'amount_usd':0.1,'max_tokens':data['max_tokens']}
 
 
 def backend(tmp_path, handler, reject=False):
@@ -123,3 +123,31 @@ def test_transport_requires_https_except_explicit_loopback():
     for url in ['http://public.example','https://user:password@example.com','https://example.com/path','https://example.com?token=x']:
         with pytest.raises(ValueError):Broker(url,'x'*64)
     broker=Broker('http://127.0.0.1:8883','x'*64);broker.client.close()
+
+
+def test_new_worker_requires_acknowledged_exact_output_ceiling(tmp_path):
+    model,publisher=backend(tmp_path,lambda request:pytest.fail('No model call without exact reservation'))
+    assert model.max_tokens==4096
+    assert model.request_options['reasoning']=={'enabled':True}
+    publisher.rpc=lambda *args,**kwargs:{'amount_usd':.1}  # old broker
+    with pytest.raises(RuntimeError,match='acknowledge'):
+        model.complete([{'role':'user','content':'goal'}])
+    assert model.last_request is None
+    assert len((tmp_path/'team-reservations.jsonl').read_text().splitlines())==1
+    model.close()
+
+
+def test_custom_ceiling_sent_and_reserved_exactly(tmp_path):
+    publisher=Recorder(tmp_path)
+    model=TeamBackend(publisher,{'DAYLIGHT_OPENROUTER_API_KEY':'offline','OPENROUTER_MAX_TOKENS':'2048'})
+    model.client.close()
+    model.client=httpx.Client(transport=httpx.MockTransport(lambda request:httpx.Response(200,json={
+        'choices':[{'message':{'content':"send_msg_to_user('Done')",'reasoning':'retained'}}],'usage':{'cost':.001}})))
+    model.begin_episode('custom-limit')
+    result=model.complete([{'role':'user','content':'goal'}])
+    assert result.request['max_tokens']==2048
+    assert result.text=="send_msg_to_user('Done')"
+    assert result.raw['choices'][0]['message']['reasoning']=='retained'
+    reservation=next(data for event in publisher.calls if isinstance(event,tuple) for op,data in [event] if op=='reserve')
+    assert reservation['max_tokens']==2048
+    model.close()

@@ -17,7 +17,7 @@ from uuid import uuid4
 
 from .backend import ChatCompletionsBackend, Completion
 from .evaluation import Evaluation
-from .openrouter import provider_options
+from .openrouter import provider_options, completion_token_limit
 from .trace import write_json
 from .demo_rooms import book, public_rooms, first_available, minutes
 
@@ -139,11 +139,11 @@ class RehearsalBackend:
 
 class DemoBackend(ChatCompletionsBackend):
     """Separate demo ledger; reservations bound spend, anomaly flags aid review."""
-    def __init__(self, ledger, config, lock, *, max_tokens=128, action_format=False):
+    def __init__(self, ledger, config, lock, *, max_tokens=None, action_format=False):
         options=provider_options(config['providers'])
         options['provider']['max_price']={'prompt':0.5,'completion':4,'request':0}
         super().__init__('https://openrouter.ai/api/v1',config['model'],config['key'],
-                         max_tokens=max_tokens,request_options=options,session_routing=True)
+                         max_tokens=completion_token_limit(max_tokens if max_tokens is not None else config.get('max_tokens')),request_options=options,session_routing=True)
         self.ledger,self.budget_lock=ledger,lock
         self.stop=False
         self.action_format=action_format
@@ -235,7 +235,7 @@ class DemoApp:
             if values.get('MODEL_NAME')!='qwen/qwen3.8-27b' or not values.get('OPENROUTER_API_KEY') or values.get('OPENROUTER_PRESET'):
                 raise ValueError('Live demo needs Qwen model slug, OpenRouter key and provider allowlist in .env')
             self.config={'model':values['MODEL_NAME'],'providers':values.get('OPENROUTER_PROVIDERS',''),
-                         'key':values['OPENROUTER_API_KEY']}
+                         'key':values['OPENROUTER_API_KEY'],'max_tokens':completion_token_limit(values.get('OPENROUTER_MAX_TOKENS'))}
             provider_options(self.config['providers'])
         # BrowserGym caches a synchronous Playwright instance: keep all episodes
         # on its owning thread, including repeated runs from the dashboard.
@@ -243,7 +243,7 @@ class DemoApp:
         self.worker=threading.Thread(target=self.work,daemon=True)
         self.worker.start()
         from .demo_chat import DemoChat
-        self.chat = DemoChat(self, lambda: DemoBackend(self.ledger,self.config,self.budget_lock,max_tokens=512), ROOT/'runs')
+        self.chat = DemoChat(self, lambda: DemoBackend(self.ledger,self.config,self.budget_lock), ROOT/'runs')
 
     def work(self):
         while True:
@@ -301,7 +301,7 @@ class DemoApp:
                 'driver':'llm' if job['mode']=='live' else 'scripted-demo-rehearsal','headless':True,
                 'demo_action_format_reminder':job['mode']=='live',
                 'episode_boundary':'first_accepted_reservation' if job['area']=='booking' else 'agent_finished',
-                'training_eligible':False,'generation':{'max_tokens':128,**backend.request_options} if job['mode']=='live' else None},
+                'training_eligible':False,'generation':{'max_tokens':backend.max_tokens,**backend.request_options} if job['mode']=='live' else None},
                 max_steps=12,record_video=True,episode_task=task,output=ROOT/'runs')
             job['summary']=summary;job['error']=summary['error']
         except BaseException as exc: job['error']=f'{type(exc).__name__}: {exc}'

@@ -77,3 +77,23 @@ class DemoTests(unittest.TestCase):
 
 
 if __name__=='__main__': unittest.main()
+
+
+def test_configured_demo_ceiling_is_reserved_and_raw_reasoning_retained(tmp_path):
+    from decimal import Decimal
+    config={'model':'qwen/qwen3.8-27b','key':'offline','providers':'chutes','max_tokens':2048}
+    ledger=tmp_path/'budget.json'
+    model=DemoBackend(ledger,config,threading.Lock())
+    model.begin_episode('test');model.client.close()
+    model.client=httpx.Client(transport=httpx.MockTransport(lambda request:httpx.Response(200,json={
+        'model':config['model'],'provider':'chutes','choices':[{'message':{'content':"click('2')",'reasoning':'raw only'}}],
+        'usage':{'cost':0,'prompt_tokens':10,'completion_tokens':5}})))
+    result=model.complete([{'role':'user','content':'test'}]);row=json.loads(ledger.read_text())['requests'][0]
+    assert model.max_tokens==2048
+    assert row['model_request']['reasoning']=={'enabled':True}
+    assert row['model_request']['max_tokens']==2048
+    assert Decimal(row['reserved_usd'])>Decimal(2048*4)/Decimal(1000000)
+    assert row['model_response']['choices'][0]['message']['reasoning']=='raw only'
+    assert result.text=="click('2')"
+    assert json.loads(ledger.read_text())['cap_usd']=='3'
+    model.close()

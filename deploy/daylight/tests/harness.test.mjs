@@ -9,6 +9,17 @@ import {FileStore} from '../lib/store.mjs';
 import {Agent} from '../lib/agent.mjs';
 
 const env={HARNESS_WORKER_TOKEN:'w'.repeat(64),DEMO_DAILY_BUDGET_USD:'1',DEMO_DAILY_CALL_LIMIT:'100'};
+test('worker reservation acknowledges exact output ceiling and rejects over-ceiling before charging',async t=>{
+  const {h}=await fixture(t),job=await claim(h,'live');
+  const request={...job,step:0,input_bytes:1000,request_sha256:'b'.repeat(64)};
+  for(const max_tokens of [4097,0,-1,1.5,'4096',null,true])await assert.rejects(h.reserve({...request,max_tokens}),/Output token limit/);
+  const receipt=await h.reserve({...request,max_tokens:4096});
+  assert.equal(receipt.max_tokens,4096);
+  assert.equal(receipt.amount_usd,(1000+2048)*.5/1e6+4096*4/1e6);
+  await assert.rejects(h.reserve({...request,max_tokens:4096}),/already attempted/);
+  const legacy=await h.reserve({...request,step:1});
+  assert.equal(legacy.max_tokens,512);
+});
 async function fixture(t) {
   const dir=await mkdtemp(path.join(os.tmpdir(),'harness-broker-'));t.after(()=>rm(dir,{recursive:true,force:true}));
   let clock=Date.now();const store=new FileStore(dir),h=new Harness(store,{env,now:()=>clock});

@@ -59,7 +59,9 @@ test('direct local worker and remote frontend share owner isolation, lease and b
   const created=await front.start('alice',{task:'rooms',goal:'Book a room'});
   const job=(await back.poll({worker_id,mode:'live',tasks:['rooms']})).job;
   assert.equal(created.id,job.id);assert.equal((await front.list('bob')).jobs.length,0);
-  const reserved=await back.reserve({...job,step:0,input_bytes:100,request_sha256:'a'.repeat(64)});
+  const reserved=await back.reserve({...job,step:0,input_bytes:100,max_tokens:4096,request_sha256:'a'.repeat(64)});
+  assert.equal(reserved.max_tokens,4096);
+  assert.equal(reserved.amount_usd,(100+2048)*.5/1e6+4096*4/1e6);
   const next=await new Agent(remote,{env}).reserve(.01);
   assert.equal(next.daily_reserved_usd,reserved.amount_usd+.01);
   assert.equal((await back.poll({worker_id,mode:'live',tasks:['rooms']})).job,null);

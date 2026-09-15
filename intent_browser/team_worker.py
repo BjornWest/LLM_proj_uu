@@ -25,7 +25,7 @@ import httpx
 
 from .backend import ChatCompletionsBackend, Completion, BackendResponseError
 from .demo import ASSETS, ROOT, World, DemoTask, EXAMPLES, RehearsalBackend
-from .openrouter import DEFAULT_PROVIDERS, provider_options
+from .openrouter import DEFAULT_PROVIDERS, provider_options, completion_token_limit
 from .trace import write_json, runtime_provenance
 
 
@@ -192,7 +192,7 @@ class TeamBackend(ChatCompletionsBackend):
         if not key:
             raise ValueError('Dedicated DAYLIGHT_OPENROUTER_API_KEY is required for live worker')
         super().__init__('https://openrouter.ai/api/v1', env.get('MODEL_NAME', 'qwen/qwen3.8-27b'), key,
-                         max_tokens=512, request_options=options, session_routing=True)
+                         max_tokens=completion_token_limit(env.get("OPENROUTER_MAX_TOKENS")), request_options=options, session_routing=True)
         self.publisher, self.index, self.last_finished = publisher, 0, 0.0
         self.sources = runtime_provenance()['source_sha256']
         self.client.event_hooks['response'] = [self.record_transport]
@@ -221,10 +221,12 @@ class TeamBackend(ChatCompletionsBackend):
                    'max_tokens': self.max_tokens, 'stream': False, **self.request_options,
                    'session_id': self.session_id}
         raw = httpx.Request('POST', self.base_url + '/chat/completions', json=request).content
-        receipt = self.publisher.rpc('reserve', step=self.index, input_bytes=len(raw), request_sha256=digest(raw))
+        receipt = self.publisher.rpc('reserve', step=self.index, input_bytes=len(raw), request_sha256=digest(raw), max_tokens=self.max_tokens)
         with (self.publisher.directory / 'team-reservations.jsonl').open('a') as file:
             file.write(json.dumps({'step': self.index, 'request_sha256': digest(raw), 'receipt': receipt}) + '\n')
         self.index += 1
+        if receipt.get('max_tokens') != self.max_tokens:
+            raise RuntimeError('Broker did not acknowledge the requested output ceiling; no inference sent')
         try:
             result = super().complete(messages)
             cost = result.raw.get('usage', {}).get('cost')
@@ -376,7 +378,7 @@ def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=N
                     'driver': 'llm' if job['mode'] == 'live' else 'scripted-rehearsal',
                     'model': getattr(backend, 'model', 'scripted-rehearsal'), 'training_eligible': False,
                     'task_revision': job.get('task_revision'),
-                    'generation': {'max_tokens': 512, **backend.request_options} if isinstance(backend, TeamBackend) else None},
+                    'generation': {'max_tokens': backend.max_tokens, **backend.request_options} if isinstance(backend, TeamBackend) else None},
                     output=data_dir / 'runs', max_steps=12, before_observation=hook, episode_task=wrapped,
                     record_video=True)
     except Exception as exc:

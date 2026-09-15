@@ -7,7 +7,7 @@ import {configuredStore} from '../lib/remote-store.mjs';
 import {ManualClient} from '../lib/manual-client.mjs';
 import {inspectionAsset,inspectionHTML,inspectionCSP} from '../lib/inspection.mjs';
 import {createHash} from 'node:crypto';
-import {Agent} from '../lib/agent.mjs';
+import {Agent,completionTokenLimit} from '../lib/agent.mjs';
 import {checkStorage} from '../lib/storage-check.mjs';
 import {Harness,workerAuthorized} from '../lib/harness.mjs';
 // Resolve beside this module, including when the function starts at the monorepo root.
@@ -132,6 +132,7 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         stage='agent_storage';
         const agent=new Agent(activeStore,{env,fetcher,provenance});
         if(url.pathname==='/api/config'&&req.method==='GET')return send(200,{owner,live_available:!!env.OPENROUTER_API_KEY,
+          generation:{reasoning:{enabled:true},max_tokens:completionTokenLimit(env.OPENROUTER_MAX_TOKENS)},
           daily_budget_usd:Number(env.DEMO_DAILY_BUDGET_USD||1),runtime:'daylight-client-demo-v1',
           capabilities:{interactive_actions:'assist',interrupt:'/api/interrupt',trace_list:'/api/traces',max_steps:12}});
         if(url.pathname==='/api/traces'&&req.method==='GET') {

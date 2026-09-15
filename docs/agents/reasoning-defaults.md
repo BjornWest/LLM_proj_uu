@@ -56,3 +56,35 @@ replacement. A host source edit alone does not update an already-running worker
 image. Current ownership and rollout evidence are recorded under
 `.local/coordination/reasoning-default.md`; offline checks do not establish live
 provider compliance or deployment state.
+
+## Daylight and team-worker adoption
+
+Daylight, local demo task/chat, and `TeamBackend` now use a default 4096 ceiling;
+set `OPENROUTER_MAX_TOKENS` to a positive integer to override it. The broker has
+its own same-named upper bound: set both worker and control service when using
+an override above 4096. Vercel and local demo configuration are separate.
+The authenticated `/api/config` reports Daylight's effective generation settings.
+
+Each new worker reservation includes `max_tokens`. The broker validates that
+ceiling and reserves its full output component plus the existing conservative
+input bound; its receipt acknowledges the exact ceiling. A new worker talking
+to an old broker stops before inference if this acknowledgment is missing.
+Legacy workers that omit the field remain explicitly reserved for their old
+512-token contract. Reservation errors never cause an automatic retry/refund.
+All existing cumulative and daily dollar/call caps remain unchanged.
+
+Requests, provider responses (including reasoning), usage and cost are retained.
+Only final response content can become a browser action or chat reply; reasoning
+is not inserted into user-facing chat. Daylight retains raw truncated responses
+and stops without actions, even when the provider used the entire ceiling on
+reasoning. Existing cost-spike/provider-change alerts remain in place.
+
+The deployed worker's reviewed task/runner closure can be preserved with
+`deploy/worker/Dockerfile.inference`: pass its existing immutable runtime image
+as `RUNTIME_IMAGE`, then build the control image using that derived image. It
+copies only four inference/consumer modules, requires no downloads, and does not
+repackage environment assets or rewrite certificates. Verify the unchanged
+runner/verifier/task hashes before switching an idle worker. This targeted
+rollout does not promote old model cohorts to the new inference protocol.
+Offline request/budget tests and retained image fingerprints are rollout
+validation, not evidence that a live provider honored reasoning.

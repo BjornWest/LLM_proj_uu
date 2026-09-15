@@ -1,0 +1,7 @@
+# Update inference without replacing the installed, certified task/runner closure.
+# Supply an already-reviewed local runtime image; no install or download occurs.
+ARG RUNTIME_IMAGE
+FROM ${RUNTIME_IMAGE}
+USER root
+COPY intent_browser/openrouter.py intent_browser/backend.py intent_browser/demo.py intent_browser/team_worker.py /app/intent_browser/
+USER 10001:10001

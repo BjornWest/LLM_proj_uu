@@ -1,6 +1,6 @@
 // Durable control plane only. Python owns browser actions, policy inputs and grading.
 import {randomUUID,createHash,timingSafeEqual} from 'node:crypto';
-import {Agent} from './agent.mjs';
+import {Agent,completionTokenLimit} from './agent.mjs';
 import registry from '../../../config/team_tasks.json' with {type:'json'};
 import {interactionKind,siteForTask,recordedActivity,validateSite} from './activity.mjs';
 
@@ -154,14 +154,18 @@ export class Harness {
     insist(Number.isInteger(value.step)&&value.step>=0&&value.step<12,'Invalid request index');
     insist(Number.isInteger(value.input_bytes)&&value.input_bytes>0&&value.input_bytes<=250000,'Request input exceeds bound');
     insist(/^[a-f0-9]{64}$/.test(value.request_sha256),'Invalid request fingerprint');
-    const amount=(value.input_bytes+2048)*0.5/1e6+512*4/1e6;
+    // Legacy workers omitted the field and are pinned to 512. New workers
+    // require an acknowledged ceiling before dispatch; never silently underreserve.
+    const max_tokens=value.max_tokens===undefined?512:value.max_tokens;
+    insist(Number.isSafeInteger(max_tokens)&&max_tokens>0&&max_tokens<=completionTokenLimit(this.env.OPENROUTER_MAX_TOKENS),'Output token limit exceeds configured bound');
+    const amount=(value.input_bytes+2048)*0.5/1e6+max_tokens*4/1e6;
     await this.mutate(state=>{
       const job=this.leased(state,value);
       insist(job.mode==='live'&&job.reservations.length===value.step,'Request already attempted or out of order',409);
-      job.reservations.push({step:value.step,request_sha256:value.request_sha256,amount_usd:amount,status:'pending',at:iso(this.now())});
+      job.reservations.push({step:value.step,request_sha256:value.request_sha256,max_tokens,amount_usd:amount,status:'pending',at:iso(this.now())});
     });
     // Same daily ledger as the existing Vercel demo. Never retry or refund this reservation.
-    const reservation=await new Agent(this.store,{env:this.env}).reserve(amount);
+    const reservation={...await new Agent(this.store,{env:this.env}).reserve(amount),max_tokens};
     await this.mutate(state=>{
       const job=this.leased(state,value),row=job.reservations[value.step];
       insist(row.status==='pending','Reservation state changed',409);row.status='reserved';row.receipt=reservation;

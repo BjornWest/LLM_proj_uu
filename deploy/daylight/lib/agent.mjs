@@ -2,6 +2,12 @@ import {randomUUID} from 'node:crypto';
 import {interactionKind,siteForTask,recordedActivity,validateSite} from './activity.mjs';
 const PROVIDERS=['chutes','dekallm','phala','parasail','akashml','ionstream','cloudflare'];
 export const MAX_STEPS=12;
+export function completionTokenLimit(value) {
+  if(value===undefined||value===null)return 4096;
+  const parsed=typeof value==='string'&&/^[0-9]+$/.test(value)?Number(value):value;
+  insist(Number.isSafeInteger(parsed)&&parsed>0,'Invalid OPENROUTER_MAX_TOKENS; expected a positive integer',503);
+  return parsed;
+}
 // The provider must support the structured response parameter. Local validation
 // still checks the selected control against this exact observation.
 const actionResponseFormat={type:'json_schema',json_schema:{name:'daylight_action',strict:true,schema:{
@@ -177,15 +183,15 @@ export class Agent {
     const history=trace.steps.map(s=>({action:s.action,result:s.client_result?{
       description:s.client_result.description,error:s.client_result.error,stop_reason:s.client_result.stop_reason}:null}));
     const conversation=Array.isArray(body.conversation)?body.conversation.slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',content:String(m.content).slice(0,2000)})):[];
-    const request={model:this.env.MODEL_NAME||'qwen/qwen3.8-27b',session_id:trace.id,temperature:0,max_tokens:512,stream:false,
+    const request={model:this.env.MODEL_NAME||'qwen/qwen3.8-27b',session_id:trace.id,temperature:0,max_tokens:completionTokenLimit(this.env.OPENROUTER_MAX_TOKENS),stream:false,
       ...(trace.mode!=='chat'?{response_format:structuredClone(actionResponseFormat)}:{}),
-      reasoning:{enabled:false},provider:{only:(this.env.OPENROUTER_PROVIDERS||PROVIDERS.join(',')).split(',').map(x=>x.trim()),
+      reasoning:{enabled:true},provider:{only:(this.env.OPENROUTER_PROVIDERS||PROVIDERS.join(',')).split(',').map(x=>x.trim()),
         allow_fallbacks:true,require_parameters:true,max_price:{prompt:0.5,completion:4,request:0}},
       messages:[{role:'system',content:trace.mode==='task'?instruction:trace.mode==='assist'?assistInstruction:chatInstruction},
         ...(trace.mode!=='task'?conversation:[]),{role:'user',content:JSON.stringify({goal:trace.goal,page:obs,activity:history,
           ...(trace.mode!=='task'?{prior_activity:String(body.activity||'').slice(0,8000)}:{})})}]};
     insist(!request.model.startsWith('@preset/'),'Use a model slug for session routing',503);
-    const reserve=(Buffer.byteLength(JSON.stringify(request))+2048)*0.5/1e6+512*4/1e6;
+    const reserve=(Buffer.byteLength(JSON.stringify(request))+2048)*0.5/1e6+request.max_tokens*4/1e6;
     const step={index:trace.steps.length,attempt_id:randomUUID(),observation:obs,request,requested_at:new Date().toISOString(),
       response:null,response_text:null,http_status:null,usage:null,routing:null,action:null,error:null,client_result:null,reservation:null};
     trace.steps.push(step);trace.status='pending';
@@ -222,9 +228,10 @@ export class Agent {
       const priorProvider=trace.steps.at(-2)?.routing?.resolved_provider;
       if(priorProvider&&raw.provider&&priorProvider!==raw.provider)step.alerts.push('Provider changed within this trace; cache continuity is not guaranteed.');
       const text=raw?.choices?.[0]?.message?.content;
+      if(typeof text==='string')step.output=text;
+      insist(raw?.choices?.[0]?.finish_reason!=='length','The model response reached its token limit. No further action was executed.',502);
       insist(typeof text==='string'&&text.length>0,'Model returned no answer',502);
       step.output=text;
-      insist(raw.choices[0].finish_reason!=='length','The model response reached its token limit. No further action was executed.',502);
       if(trace.mode!=='chat') {step.action=parseAction(text,obs.controls);trace.status='awaiting_client';}
       else trace.status='complete';
     } catch(error) {step.error=error.message;step.error_code=error.code||null;step.error_detail=error.detail||null;trace.status='error';}

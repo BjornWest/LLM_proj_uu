@@ -38,6 +38,7 @@ HARNESS_MODE=rehearsal
 HARNESS_POLL_SECONDS=5
 MODEL_NAME=qwen/qwen3.8-27b
 OPENROUTER_PROVIDERS=chutes,dekallm,phala,parasail,akashml,ionstream,cloudflare
+OPENROUTER_MAX_TOKENS=4096
 ```
 
 `HARNESS_URL` is the deployment origin, without `/login` or another page path.
