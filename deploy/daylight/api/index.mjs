@@ -61,10 +61,11 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
-      if(req.method==='GET'&&(url.pathname==='/shop'||url.pathname.startsWith('/shop/'))){
-        if(url.searchParams.getAll('dp').some(v=>v!=='w'))return send(400,{error:'Unsupported shop condition'});
+      const inspectionSite=url.pathname==='/shop'||url.pathname.startsWith('/shop/')?'shop':url.pathname==='/health'||url.pathname.startsWith('/health/')?'health':url.pathname==='/spotify'||url.pathname.startsWith('/spotify/')?'music':null;
+      if(req.method==='GET'&&inspectionSite){
+        if(url.searchParams.getAll('dp').some(v=>v!==({shop:'w',health:'cs',music:'am'})[inspectionSite]))return send(400,{error:'Unsupported site condition'});
         stage='private_assets';res.setHeader('Content-Security-Policy',inspectionCSP);res.setHeader('X-Frame-Options','DENY');
-        return send(200,await inspectionHTML(assetRoot),'text/html; charset=utf-8');
+        return send(200,await inspectionHTML(assetRoot,inspectionSite),'text/html; charset=utf-8');
       }
       if(req.method==='GET'&&url.pathname.startsWith('/assets/')&&!allowed.has(url.pathname.slice(8))){
         stage='private_assets';const asset=await inspectionAsset(assetRoot,url.pathname);

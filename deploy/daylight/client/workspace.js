@@ -224,6 +224,8 @@ function rememberManual(session){
 function renderManual(){
   $('local-shop-launch').hidden=!['tricky-shop','authorized-warranty'].includes(siteID);
   $('local-shop-clean').hidden=siteID==='authorized-warranty';
+  $('local-music-launch').hidden=siteID!=='tricky-music';
+  $('local-health-launch').hidden=siteID!=='tricky-health';
   const site=manualSite(),session=manualCurrent(),live=manualOwnerLive(),ready=session?.status==='ready';
   const pending=manualBusy||!!manualLoading;
   const elsewhere=live&&live.site_id!==siteID,otherName=elsewhere?(siteFor(live.site_id)?.name||live.site_id):'';

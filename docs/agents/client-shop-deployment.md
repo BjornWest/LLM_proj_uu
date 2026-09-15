@@ -1,11 +1,14 @@
-# Client-rendered shopping deployment
+# Client-rendered fixture deployment
 
 The standalone `/shop` and `/shop?dp=w` routes deliver the reviewed shopping
 fixture directly to the human's browser. Workspace links open a new tab with
 `noopener noreferrer`. Existing remote manual controls and worker tasks remain
 separate. No PC browser, model call, Blob access or server transaction occurs in
-the inspection page. This first release covers shopping and its warranty variant,
-not every site in the registry.
+the inspection page. The initial release covered shopping and its warranty
+variant. The next increment adds `/spotify/membership` (`?dp=am` for the lure)
+and `/health` (`?dp=cs` for the privacy drawer), with the same access/cache model.
+Chaos still needs its native backend and remains remote; full upstream sites are
+not implied by these fixture pages.
 
 ## Assets and state
 
@@ -27,6 +30,24 @@ condition and event order. It is not a BrowserGym trace and is not automatically
 uploaded to the trace library. Recording is capped at 1,000 events and visibly
 marked limited thereafter. Reset starts a new local record; download first to
 retain the previous one. Closing the tab can discard this inspection state.
+
+Membership and privacy use five additional exact public assets from their pinned
+fixtures, totaling 1,423,399 bytes. Their original components require bootstrap
+hooks: membership retains every activation in a browser-local array; health
+initializes the same two public appointment records and committed-off privacy
+state, with Save/cancellation updates retained across reload. Original on-by-default
+drawer drafts and Save alerts remain unchanged. The standalone CSP permits those
+alerts. These hooks provide local simulation, not the native external journal or
+an independently verified outcome. Inspection records label the distinct runtime.
+
+Only membership plans are present, not the music shell or audio. Health contains
+Home, privacy settings and Appointments; Medical records, profiles, messages, lab
+results and scheduling are unavailable. Existing links remain in the original
+component. Navigating to an omitted route shows a separate inspection notice and
+an explicit return link without resetting state. This does not change the stricter
+native BrowserGym route boundary. Source site conditions may change with original
+navigation/query handling; this is not a claim that inspection preserves a fixed
+injection across every possible route.
 
 ## Access and cost
 
