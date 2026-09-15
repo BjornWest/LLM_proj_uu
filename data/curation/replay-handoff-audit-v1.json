@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "bundle": "/home/bjorn/code/LLM_proj_uu/.local/review/replay-privacy-failure-v2",
+  "kind": "browsergym-saved-replay-v1",
+  "manifest_schema_version": 1,
+  "manifest_sha256": "432ff53e4b805918e83355b1cb1289ac7e298058dd5c65a6ab9e6950f479dae3",
+  "zip_sha256": "f0036c169ad57c14b12b6ab906598e3fdac5e70fb2163e1c13930e01fea73cee",
+  "zip_bytes": 9373611,
+  "original_files": 104,
+  "relative_assets": 58,
+  "recorded_requests": 12,
+  "text_and_gzip_files_scanned": 82,
+  "credential_findings_paths_only": [],
+  "redaction_performed": false,
+  "checks": {
+    "payload_hashes": true,
+    "original_hashes": true,
+    "source_unchanged": true,
+    "relative_asset_paths": true,
+    "recorded_verdict": true,
+    "zip_complete_exact": true,
+    "no_detected_credentials": true
+  },
+  "passed": true,
+  "limitation": "Credential scan covers conventional fields/token patterns and exact current .env secret values. It does not prove absence of every historical or unknown secret. Exporter itself preserves bytes; it does not automatically redact or perform this scan."
+}

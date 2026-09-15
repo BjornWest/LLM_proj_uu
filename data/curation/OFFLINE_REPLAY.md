@@ -64,6 +64,38 @@ Current privacy and format-error packages use the tested final exporter.
 
 ## For the deployment and UI agents
 
+Concrete integration sample (verified 15 September):
+
+- Bundle directory: `/home/bjorn/code/LLM_proj_uu/.local/review/replay-privacy-failure-v2`.
+- ZIP: `replay.zip`, 9,373,611 bytes, SHA256
+  `f0036c169ad57c14b12b6ab906598e3fdac5e70fb2163e1c13930e01fea73cee`.
+- Format: `browsergym-saved-replay-v1`, manifest `schema_version: 1`.
+  The directory's `v2` names the viewer revision, not a second bundle schema.
+- Manifest SHA256: `432ff53e4b805918e83355b1cb1289ac7e298058dd5c65a6ab9e6950f479dae3`.
+- 104 unchanged original files, 58 relative asset mappings, 12 recorded requests.
+- `grader_recomputed: false` and `raw_outcomes` explicitly identify the recorded
+  verdict. Any later verifier replay must be a separate result with its own
+  grader provenance, not a replacement for those fields.
+
+Optional local HTTP command (opening `index.html` directly also works):
+
+```bash
+python3 -m http.server 8891 --bind 127.0.0.1 \
+  --directory /home/bjorn/code/LLM_proj_uu/.local/review/replay-privacy-failure-v2
+```
+
+Then open `http://localhost:8891/index.html`. The already-running preview above
+uses port 8876. This local command does not publish to Vercel or grant team access.
+
+`replay-handoff-audit-v1.json` verifies the hashes, complete ZIP, relative media
+paths and unchanged recorded verdict. A scan of 82 text/decompressed files found
+no conventional credential fields, bearer/OpenRouter tokens or exact current
+configured secret values. No redaction was performed. This is a check of this
+specific sample, not a guarantee for arbitrary future traces: the exporter
+preserves bytes and does not automatically scan or redact. If another source
+contains credentials, withhold that export and identify a separately labeled
+redacted derivative; retain authoritative originals under their existing access.
+
 The UI can consume `session.json` and `assets.json` directly and render within the
 existing invitation-protected site. Avoid a second trace parser or separate
 semantics for model input versus privileged verification. Resolve attachment
