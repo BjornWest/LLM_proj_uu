@@ -54,7 +54,7 @@ def main():
             page.route('**/world/*/booking',slow_navigation)
             locks=[]
             def inspect_locks(route):
-                locks.append(page.evaluate('''()=>({inputs:['run','reset','goal','question','send-chat'].every(id=>document.getElementById(id).disabled),
+                locks.append(page.evaluate('''()=>({draftEditable:!document.getElementById('question').disabled,inputs:['run','reset','goal','send-chat'].every(id=>document.getElementById(id).disabled),
                     examples:[...document.querySelectorAll('.example,[data-question]')].every(e=>e.disabled),inert:document.getElementById('site').inert})'''))
                 route.continue_()
             page.route('**/api/step',inspect_locks)
@@ -66,7 +66,7 @@ def main():
             check('Chat actually sets all requested room filters',all(next(c for c in controls if c['label']==label)['value']==value for label,value in [('Building','Ångström'),('Day','Wednesday'),('People','3'),('Duration','60')]))
             check('Availability request creates no booking or persisted state event',page.evaluate('window.demoWorld.state.bookings.length===0 && window.demoWorld.events.length===0'))
             check('Reply shown only from final recorded response',record['steps'][-1]['action']['message'] in page.locator('#conversation').inner_text())
-            check('Chat locks conflicting manual, task and chat inputs',locks and all(all(sample.values()) for sample in locks))
+            check('Chat permits drafting while locking conflicting controls and sending',locks and all(all(sample.values()) for sample in locks))
             check('Every response and receipt preserved without independent verdict',all(s['request'] and s['response_text'] and s['client_result'] for s in record['steps']) and record['evaluation'] is None)
             check('Original demo also puts browser tools between chat messages',page.locator('#conversation .tool-activity[data-state=applied]').count()==len(record['steps'])-1 and page.locator('#conversation .assistant .message-label').last.text_content()=='Daylight')
             (output/'availability.json').write_text(json.dumps(record,indent=2))

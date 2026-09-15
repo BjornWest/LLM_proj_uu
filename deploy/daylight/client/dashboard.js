@@ -23,7 +23,10 @@ function message(role,text,trace) {
 function busy(value) {
   running=value;
   for(const id of ['reset','goal'])$(id).disabled=value;
-  for(const id of ['run','question','send-chat'])$(id).disabled=value||!config.live_available;
+  for(const id of ['run','send-chat'])$(id).disabled=value||!config.live_available;
+  $('question').disabled=!config.live_available;
+  $('question').placeholder=value?'Draft your next message while Daylight works…':'Ask a question or give a request…';
+  $('send-chat').title=value?'You can send when the current request finishes':'Send message';
   document.querySelectorAll('.example,[data-question]').forEach(b=>b.disabled=value);
   $('site').style.pointerEvents=value?'none':'';$('site').inert=value;
   $('sidebar-state').textContent=value?'● Working on your request':'● Connected to this page';

@@ -31,6 +31,9 @@ are preserved.
 
 Enter sends a chat request; Shift+Enter inserts a new line. Composing text with
 an IME, holding Enter, blank input and disabled controls do not submit requests.
+You can draft the next message while Daylight works. Sending stays disabled until
+the current request finishes; the draft survives tool updates and completion and
+is sent only when you submit it.
 
 Browser actions appear as compact, expandable **Browser tool** cards inside both
 chat timelines. They show execution and record-saving status separately from

@@ -38,7 +38,7 @@ def main():
         def capture(route):
             if page.locator('#conversation .tool-activity').count()==5:
                 page.locator('#conversation').evaluate('log=>{log.scrollTop=0}')
-            locks.append(page.evaluate("()=>document.querySelector('#site-frames iframe').inert && document.querySelector('#question').disabled && document.querySelector('#send-question').disabled && [...document.querySelectorAll('.site-choice')].every(b=>b.disabled)"));route.continue_()
+            locks.append(page.evaluate("()=>document.querySelector('#site-frames iframe').inert && !document.querySelector('#question').disabled && document.querySelector('#send-question').disabled && [...document.querySelectorAll('.site-choice')].every(b=>b.disabled)"));route.continue_()
         page.route('**/api/step',capture)
         page.locator('#question').fill('When are rooms available for three people in Ångström on Wednesday for 60 minutes?');page.locator('#send-question').click();expect(page.locator('#send-question')).to_be_disabled();expect(page.locator('#send-question')).to_be_enabled(timeout=30000)
         record=page.request.get(origin+page.locator('#conversation .record-link').last.get_attribute('href')).json()

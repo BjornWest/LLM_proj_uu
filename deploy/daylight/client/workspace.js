@@ -92,12 +92,15 @@ function renderConversation(){
   log.replaceChildren();
   if(!messages.length){const welcome=node('div',undefined,'chat-welcome');welcome.append(node('span','✳'),node('h3','Explore first. Ask whenever you need.'),node('p','Click around the site, or ask the agent to find something. Tasks and previous runs are one tab away.'));$('conversation').append(welcome);}
   for(const message of messages){if(message.role==='tool'){log.append(message.element);continue;}const div=node('div',undefined,'message '+message.role);div.append(node('strong',message.role==='user'?'You':'Daylight'),document.createTextNode(message.text));if(message.trace){const a=node('a','Download original turn record ↗','record-link');a.href='/api/traces/'+encodeURIComponent(message.trace);div.append(a);}$('conversation').append(div);}
-  $('question').value=draft;showChatWorking(log,workingText);log.scrollTop=follow?log.scrollHeight:top;
+  if($('question').value!==draft)$('question').value=draft;
+  showChatWorking(log,workingText);log.scrollTop=follow?log.scrollHeight:top;
   $('suggestions').replaceChildren(...['Find a room for three people','What can I do on this page?'].map(text=>{const button=node('button',text);button.type='button';button.disabled=askBusy||authExpired;button.onclick=()=>{draft=text;$('question').value=text;$('question').focus();};return button;}));
 }
 function syncControls(){
-  const canAsk=!!modelConfig?.live_available&&!authExpired&&!askBusy&&!!fixture;
-  $('question').disabled=!canAsk;$('send-question').disabled=!canAsk;$('reset-page').disabled=askBusy||!fixture;
+  const canAsk=!!modelConfig?.live_available&&!authExpired&&!!fixture;
+  $('question').disabled=!canAsk;$('send-question').disabled=!canAsk||askBusy;$('reset-page').disabled=askBusy||!fixture;
+  $('question').placeholder=askBusy?'Draft your next message while Daylight works…':'Ask about this site, or give a request…';
+  $('send-question').title=askBusy?'You can send when the current request finishes':'Send message';
   if(frame){frame.inert=askBusy;frame.style.pointerEvents=askBusy?'none':'';}
   $('explore-status').textContent=askBusy?'The agent is using this page…':'You can click, type and navigate freely.';
   const canLaunch=!!config?.enabled&&config?.worker?.mode==='live'&&pendingTask?.available!==false;

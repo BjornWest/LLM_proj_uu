@@ -35,10 +35,25 @@ def main():
             page.screenshot(path=str(out/(name+'-mobile.png')),full_page=True);page.locator('#exit-fullscreen').click();page.set_viewport_size({'width':1512,'height':1040});page.locator('#enter-fullscreen').click()
             question.fill('Find rooms');question.press('Shift+Enter');question.press('f');question.type('or three people.');goal=question.input_value();check(name+' Shift+Enter inserts a newline without sending',goal=='Find rooms\nfor three people.' and len(starts)==count)
             question.dispatch_event('keydown',{'key':'Enter','code':'Enter','isComposing':True});question.dispatch_event('keydown',{'key':'Enter','code':'Enter','keyCode':229});question.dispatch_event('keydown',{'key':'Enter','code':'Enter','repeat':True});check(name+' composing and held Enter do not submit',len(starts)==count)
-            question.press('Enter');expect(page.locator(send)).to_be_disabled();question.dispatch_event('keydown',{'key':'Enter','code':'Enter'});expect(page.locator(send)).to_be_enabled(timeout=30000)
+            draft_checks=[];next_draft='My next\nmessage'
+            def draft_during_step(route):
+                expect(question).to_be_enabled();expect(page.locator(send)).to_be_disabled()
+                if not draft_checks:
+                    question.fill('My next');question.press('Enter');question.press('Shift+Enter');question.type('message')
+                    question.evaluate('q=>q.setSelectionRange(3,7)')
+                draft_checks.append(question.input_value()==next_draft and question.evaluate('q=>q.selectionStart===3 && q.selectionEnd===7 && document.activeElement===q'))
+                draft_checks.append(all(next_draft not in m.get('content','') for m in route.request.post_data_json.get('conversation',[])))
+                route.continue_()
+            page.route('**/api/step',draft_during_step)
+            question.press('Enter');expect(page.locator(send)).to_be_enabled(timeout=30000)
+            page.unroute('**/api/step',draft_during_step)
             check(name+' Enter sends the exact multiline request once',len(starts)==count+1 and starts[-1]['goal']==goal and starts[-1]['mode']=='assist')
+            check(name+' draft and cursor survive every tool update and completion',len(draft_checks)>2 and all(draft_checks) and question.input_value()==next_draft and question.evaluate('q=>q.selectionStart===3 && q.selectionEnd===7'))
+            check(name+' pending draft is not sent automatically or included in current request',len(starts)==count+1 and next_draft not in page.locator('#conversation').inner_text())
             check(name+' agent run keeps full screen active',page.locator('#exit-fullscreen').is_visible() and page.locator('#conversation .tool-activity[data-state=applied]').count()>0)
-            question.fill('   ');question.press('Enter');check(name+' blank Enter does not send',len(starts)==count+1)
+            question.press('Enter');expect(page.locator(send)).to_be_disabled();expect(page.locator(send)).to_be_enabled(timeout=30000)
+            check(name+' preserved draft sends only on the next explicit Enter',len(starts)==count+2 and starts[-1]['goal']==next_draft and question.input_value()=='')
+            question.fill('   ');question.press('Enter');check(name+' blank Enter does not send',len(starts)==count+2)
             page.screenshot(path=str(out/(name+'-desktop.png')),full_page=True)
             if name=='workspace':
                 page.locator('#sidebar-tasks').click();expect(page.locator('#research-view')).to_be_visible();check('Opening task view exits focused layout',not page.locator('body').evaluate("b=>b.classList.contains('site-fullscreen')"))
