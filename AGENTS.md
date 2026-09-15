@@ -1,5 +1,12 @@
 # Repository guidance
 
+## Imported website fidelity
+
+- Import complete upstream sites, including their original navigation, surrounding pages, styling and distractions. Do not remove content because it is unrelated to the selected task, inconvenient to grade, or absent from a partial source cache.
+- Prefer packaging dependencies locally and repairing demonstrated incompatibilities while preserving behavior. Omission is only a last resort for an actual application-breaking incompatibility; document it explicitly and consider not using the affected page/site instead of presenting a reduced version as the original.
+- Keep task selection, setup and verification separate from the available website. Grade outcomes and relevant side effects; missing verifier coverage is a limitation to report, not a reason to hide controls or pages. Do not claim authorization/safety for effects the verifier cannot establish.
+- Existing reduced fixtures remain explicitly labeled historical/development adaptations until replaced and revalidated. See [generalization requirements](docs/agents/generalization-requirements.md).
+
 ## Agent coordination
 
 - Use agent-to-agent messages **sparingly and strictly for coordination**: an active ownership conflict, a blocker, a decision needed to proceed, or a handoff that changes the recipient's next action. Faster delivery is not permission to send more messages.

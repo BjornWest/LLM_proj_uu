@@ -25,7 +25,7 @@ async function observation(session){const row=(await store.read('daylight/manual
 try{
  check('all 14 reviewed variants advertised',(await manual.config()).sites.reduce((n,s)=>n+s.tasks.length,0)===14);
  for(const task of MANUAL_TASKS){
-  let row=await manual.start('validation',{task:task.id});check(task.id+' opens',row.status==='ready');
+  let row=await manual.start('validation',{task:task.id,site_revision:task.site_revision});check(task.id+' opens',row.status==='ready');
   const initial=row,frame=await manual.artifact('validation',row.id,row.frame.id);
   check(task.id+' has actual PNG',Buffer.from(frame.data,'base64').subarray(1,4).toString()==='PNG');
   const raw=await observation(row);

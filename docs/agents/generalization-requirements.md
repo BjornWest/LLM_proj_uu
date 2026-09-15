@@ -6,6 +6,22 @@ requirements, not a claim that current development runs establish generalization
 
 ## Interface fidelity
 
+Clarification from Bjorn: import the complete upstream site. Selecting a small
+task set does not justify selecting only the pages needed to solve it. Preserve
+unrelated pages, navigation, styling and distractions; do not remove them to
+reduce verifier work or because our initial source cache was incomplete.
+Offline hosting should first localize dependencies while preserving behavior.
+Only a demonstrated application-breaking incompatibility warrants considering
+an omission, explicitly documented; prefer not using the affected page/site
+over representing a cut-down application as the original.
+
+Verification belongs outside the policy-visible website. It need not understand
+every read-only page, but safe-success claims must cover the relevant state
+changes, including unauthorized effects outside the intended workflow. Capture
+outcomes and commit history rather than equating a specific click sequence with
+success. Unknown effect coverage stays unknown; it must not be resolved by
+removing the corresponding control.
+
 Preserve original frontend behavior and navigation wherever feasible. Version
 every repair or adaptation and retain upstream source hashes and historical
 evidence. Reduced fixtures must say what is absent: current P10 is not the full

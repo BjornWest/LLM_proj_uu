@@ -20,21 +20,18 @@ site=site.replace(/async function action\(type,data=\{\}\)\{[^\n]+\}/,
   .replace("fetch(endpoint).then(r=>r.json()).then(s=>{state=s;render()});",'state=window.parent.demoWorld.public();render();');
 await writeFile('private-assets/site.js',site);
 for(const file of ['dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css']) await copyFile('client/'+file,'private-assets/'+file);
-const inspectionNames=['shop','music','health'];
-const inspectionAssetHashes={};
-for(const inspectionName of inspectionNames){
-const inspectionRoot=path.resolve('../../environments/inspection_'+inspectionName);
+const inspectionNames=['full'];
+const inspectionRoot=path.resolve('../../environments/inspection_full');
 const inspectionManifest=JSON.parse(await readFile(path.join(inspectionRoot,'manifest.json'),'utf8'));
+const siteTasks=JSON.parse(await readFile('../../config/team_tasks.json','utf8')).tasks;
+if(siteTasks.some(t=>t.build&&t.site_revision!==inspectionManifest.site_revision))throw Error('Client and worker registry site revisions differ');
 for(const [file,expected] of Object.entries(inspectionManifest.files)){
-  if(!/^(index\.html|assets\/[a-zA-Z0-9_.-]+)$/.test(file))throw Error('Invalid inspection asset path');
-  if(file!=='index.html'&&inspectionAssetHashes[file]&&inspectionAssetHashes[file]!==expected)throw Error('Conflicting inspection asset path');
-  inspectionAssetHashes[file]=expected;
-  const raw=await readFile(path.join(inspectionRoot,'dist',file));
-  if(createHash('sha256').update(raw).digest('hex')!==expected)throw Error('Inspection source hash mismatch: '+file);
-  const dest=path.join('private-assets/inspection-'+inspectionName+'/dist',file);await mkdir(path.dirname(dest),{recursive:true});await writeFile(dest,raw);
+ if(!/^(index\.html|darkpattern\.svg|(?:assets|external-assets)\/[a-zA-Z0-9_.-]+)$/.test(file))throw Error('Invalid inspection asset path');
+ const raw=await readFile(path.join(inspectionRoot,'dist',file));
+ if(createHash('sha256').update(raw).digest('hex')!==expected)throw Error('Inspection source hash mismatch: '+file);
+ const dest=path.join('private-assets/inspection-full/dist',file);await mkdir(path.dirname(dest),{recursive:true});await writeFile(dest,raw);
 }
-await copyFile(path.join(inspectionRoot,'manifest.json'),'private-assets/inspection-'+inspectionName+'/manifest.json');
-}
+await copyFile(path.join(inspectionRoot,'manifest.json'),'private-assets/inspection-full/manifest.json');
 const files=['index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css',...inspectionNames.map(name=>'inspection-'+name+'/manifest.json')];
 const hashes={};for(const file of files)hashes[file]=createHash('sha256').update(await readFile('private-assets/'+file)).digest('hex');
 const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','../../config/team_tasks.json','../../config/team_sites.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');

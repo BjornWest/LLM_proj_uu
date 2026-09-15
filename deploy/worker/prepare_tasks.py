@@ -90,7 +90,7 @@ def export(registry_path, output):
             raise ValueError('Pinned build changed')
         manifest = json.loads((base/'build.json').read_text())
         names = {'build.json': expected, **{'dist/'+p: h for p, h in manifest['dist_sha256'].items()}}
-        for field, name in [('catalog_sha256', 'catalog.json'), ('appointments_sha256', 'appointments.json')]:
+        for field, name in [('catalog_sha256', 'catalog.json'), ('appointments_sha256', 'appointments.json'), ('membership_catalog_sha256','membership-catalog.json')]:
             if field in manifest:
                 names[name] = manifest[field]
         for name, h in names.items():

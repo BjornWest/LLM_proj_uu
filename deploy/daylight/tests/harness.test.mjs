@@ -46,7 +46,7 @@ test('owner isolation and fixed/rehearsal task contract enforced by server',asyn
 });
 test('external task objectives/revisions are fixed and generated goals become immutable',async t=>{
   const {h}=await fixture(t),worker_id=randomUUID(),tasks=TASKS.map(t=>t.id);
-  await h.poll({worker_id,mode:'live',tasks});
+  await h.poll({worker_id,mode:'live',tasks,task_revisions:Object.fromEntries(TASKS.map(t=>[t.id,t.revision]))});
   const visible=await h.config();assert.equal(visible.tasks.length,15);
   for(const item of visible.tasks)for(const key of ['source_sha256','build','selector','kind'])assert.equal(key in item,false);
   const fixed=TASKS.find(t=>t.id==='tricky-p07-clean');
@@ -54,7 +54,7 @@ test('external task objectives/revisions are fixed and generated goals become im
   await assert.rejects(h.start('alice',{task:fixed.id,task_revision:'old'}),/revision changed/);
   const created=await h.start('alice',{task:'chaos-revoke-current-only',goal:''});
   assert.equal(created.goal,null);assert.equal(created.goal_resolution,'session_pending');
-  const job=(await h.poll({worker_id,mode:'live',tasks})).job;assert.equal(job.task_revision,created.task_revision);
+  const job=(await h.poll({worker_id,mode:'live',tasks,task_revisions:Object.fromEntries(TASKS.map(t=>[t.id,t.revision]))})).job;assert.equal(job.task_revision,created.task_revision);
   await h.update({...job,snapshot:{steps:[],resolved_goal:'Rotate only the token for this generated device.'}});
   const saved=await h.read('alice',job.id);assert.equal(saved.goal,'Rotate only the token for this generated device.');
   assert.equal(saved.goal_resolution,'resolved');
@@ -112,4 +112,16 @@ test('updates require unique ordered immutable steps and issues attach exact art
   await assert.rejects(h.issue('alice',job.id,{step:1,comment:'Missing step'}),/recorded step/);
   await assert.rejects(h.issue('bob',job.id,{step:0,comment:'Wrong owner'}),/not found/);
   const response=await h.read('alice',job.id);assert.equal(response.issues.length,1);assert.equal(response.evaluation,null);
+});
+test('complete-site tasks require matching worker revision before start and dispatch',async t=>{
+ const {h,store}=await fixture(t),worker_id=randomUUID(),task=TASKS.find(t=>t.site_revision);
+ await h.poll({worker_id,mode:'live',tasks:[task.id]});
+ assert.equal((await h.config()).tasks.find(t=>t.id===task.id).available,false);
+ await assert.rejects(h.start('alice',{task:task.id,goal:task.goal}),/not available/);
+ const task_revisions={[task.id]:task.revision};await h.poll({worker_id,mode:'live',tasks:[task.id],task_revisions});
+ const created=await h.start('alice',{task:task.id,goal:task.goal,task_revision:task.revision});assert.equal(created.site_revision,task.site_revision);
+ const before=(await store.read('daylight/harness/control-v1.json')).value.jobs[created.id];
+ assert.deepEqual(await h.poll({worker_id,mode:'live',tasks:[task.id],task_revisions:{[task.id]:'old'}}),{job:null});
+ assert.deepEqual((await store.read('daylight/harness/control-v1.json')).value.jobs[created.id],before);
+ assert.equal((await h.poll({worker_id,mode:'live',tasks:[task.id],task_revisions})).job.id,created.id);
 });

@@ -426,11 +426,11 @@ def main():
     lock = (data_dir/'worker.lock').open('a');fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
     broker = Broker(env.get('HARNESS_URL', ''), env.get('HARNESS_WORKER_TOKEN'))
     identity = str(uuid4());chaos_url = start_chaos(Path(env['HARNESS_CHAOS_BUILD']).resolve()) if env.get('HARNESS_CHAOS_BUILD') else None
-    from .hosted_tasks import capabilities
+    from .hosted_tasks import capabilities, registry
     tasks = ['rooms'] + capabilities(mode, env.get('HARNESS_FIXTURES_DIR'), chaos_url)
     while True:
         try:
-            result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks})
+            result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks, 'task_revisions': {t['id']:t['revision'] for t in registry()['tasks']}})
             if result.get('job'):
                 print('Starting team job', result['job']['id'], flush=True)
                 execute_job(broker, result['job'], data_dir, env, chaos_url)

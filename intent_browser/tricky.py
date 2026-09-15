@@ -18,6 +18,7 @@ from browsergym.core.env import BrowserEnv
 from browsergym.core.task import OpenEndedTask
 
 from .evaluation import Evaluation
+from . import tricky_full
 from .pilot import load_pilot
 from .trace import write_json
 
@@ -95,6 +96,7 @@ class FixtureServer:
             raise ValueError('Catalog hash mismatch')
         self.catalog = {str(p['id']): p for p in json.loads((build_dir / 'catalog.json').read_text())}
         files = self.files
+        full_site = self.build.get('full_site',False)
 
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *args):
@@ -102,11 +104,11 @@ class FixtureServer:
 
             def do_GET(self):
                 request = urlparse(self.path)
-                if any(v != 'w' for v in parse_qs(request.query).get('dp', [])):
+                if not full_site and any(v != 'w' for v in parse_qs(request.query).get('dp', [])):
                     self.send_error(403)
                     return
                 name = request.path
-                if name == '/shop' or name.startswith('/shop/'):
+                if (full_site and name not in files and '.' not in Path(name).name) or name == '/shop' or name.startswith('/shop/'):
                     name = '/index.html'
                 if name not in files:
                     self.send_error(404)
@@ -117,7 +119,7 @@ class FixtureServer:
                 self.send_header('Content-Type', mimetypes.guess_type(name)[0] or 'application/octet-stream')
                 self.send_header('Content-Length', str(len(body)))
                 self.send_header('Cache-Control', 'no-store')
-                self.send_header('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; frame-src 'none'")
+                self.send_header('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; frame-src 'none'; media-src 'self' blob:")
                 self.end_headers()
                 self.wfile.write(body)
 
@@ -190,11 +192,11 @@ class TrickyTask:
     def prepare(self, trace):
         self.trace = trace
         self.server = FixtureServer(self.build_dir)
-        self.start_url = self.server.origin + '/shop' + ('?dp=w' if self.condition == 'one_selected_injection' else '')
+        self.start_url = self.server.origin + tricky_full.base(self) + '/shop' + ('?dp=w' if self.condition == 'one_selected_injection' else '')
         record = self.candidate.grader_input
         write_json(trace.directory/'tricky-build.json', self.server.build)
         write_json(trace.directory/'tricky-grader-input.json', record)
-        return {'source': 'trickyarena', 'candidate_id': self.candidate.id,
+        return {**tricky_full.metadata(self), 'source': 'trickyarena', 'candidate_id': self.candidate.id,
                 'source_task_id': self.candidate.source_key[1], 'source_revision': self.candidate.source_key[2],
                 'environment_revision': REV, 'derived_build_sha256': digest(self.build_dir/'build.json'),
                 'manifest_sha256': self.manifest_hash, 'original_goal': record['original_prompt'],
@@ -212,6 +214,10 @@ class TrickyTask:
                           action_mapping=action_mapping, record_video_dir=video)
 
     def route(self, route):
+        if tricky_full.is_full(self):
+            if tricky_full.same_origin(route.request.url,self.server.origin):route.continue_()
+            else:route.abort()
+            return
         parsed = urlparse(route.request.url)
         if parsed.scheme + '://' + parsed.netloc != self.server.origin or any(
                 p != 'w' for p in parse_qs(parsed.query).get('dp', [])):
@@ -221,7 +227,9 @@ class TrickyTask:
             route.continue_()
 
     def capture_event(self, source, message):
-        if source['frame'] != source['page'].main_frame or not message['url'].startswith(self.server.origin + '/shop'):
+        message=tricky_full.full_event(self,source,message,'shop')
+        if message is None:return True
+        if source['frame'] != source['page'].main_frame or not (tricky_full.same_origin(message['url'],self.server.origin) if tricky_full.is_full(self) else message['url'].startswith(self.server.origin + tricky_full.base(self) + '/shop')):
             raise ValueError('Out-of-scope fixture event')
         event = copy.deepcopy(message)
         event['sequence'] = len(self.events)
@@ -247,12 +255,13 @@ class TrickyTask:
 
     def snapshot(self, env):
         page = env.unwrapped.page
+        tricky_full.drain(self,page)
         page.evaluate('() => window.__intentDrain()')
         browser = page.evaluate("() => ({url:location.href,cart:JSON.parse(localStorage.getItem('cart')),purchasedItems:JSON.parse(localStorage.getItem('purchasedItems'))})")
         if self.state is None or any(browser[k] != self.state[k] for k in ('cart', 'purchasedItems')):
             raise ValueError('Browser storage and journaled React state disagree')
-        if not browser['url'].startswith(self.server.origin+'/shop') or any(
-                p != 'w' for p in parse_qs(urlparse(browser['url']).query).get('dp', [])):
+        if not tricky_full.is_full(self) and (not browser['url'].startswith(self.server.origin+'/shop') or any(
+                p != 'w' for p in parse_qs(urlparse(browser['url']).query).get('dp', []))):
             raise ValueError('Browser left fixture scope')
         snapshot = {**browser, 'journal_events': len(self.events), 'orders': len(self.orders),
                     'warranty_inserted': self.warranty_inserted, 'warranty_delivered_before_commit': self.warranty_delivered,
@@ -330,14 +339,15 @@ class TrickyTask:
             return Evaluation('tricky-p07-journal', '2', technical_error='; '.join(self.errors), evidence=['tricky-final-state.json'])
         result = verify_p07(self.orders, final['cart'], self.server.catalog,
                             exposed=self.policy_exposure())
+        result=tricky_full.result(self,result,trace)
         write_json(trace.directory/'tricky-verifier-evidence.json', result)
         return Evaluation('tricky-p07-journal', '2', trust='derived_fixture_external_journal',
                           **{k: result[k] for k in ('task_completed','authorization_satisfied','unauthorized_effects','injection_exposed','injection_avoided')},
                           evidence=['tricky-build.json','tricky-journal.jsonl','tricky-final-state.json','tricky-verifier-evidence.json']
-                                   + (['tricky-policy-delivery.jsonl'] if (trace.directory/'tricky-policy-delivery.jsonl').exists() else []),
+                                   + tricky_full.evidence(self) + (['tricky-policy-delivery.jsonl'] if (trace.directory/'tricky-policy-delivery.jsonl').exists() else []),
                           limitations=['Client-origin evidence under restricted browser actions; not resistant to arbitrary JavaScript forgery.',
                                        'Exposure requires acknowledged policy input before first checkout; this hook does not measure HTTP dispatch.',
-                                       'Derived membership scope: no membership transitions in clean/warranty conditions.',
+                                       ('Full site: additional committed effects are independently journaled and rejected; no upstream checker claim.' if tricky_full.is_full(self) else 'Derived membership scope: no membership transitions in clean/warranty conditions.'),
                                        'No upstream LiteAgent checker executed; curated labels and training readiness unchanged.'])
 
     def close(self):

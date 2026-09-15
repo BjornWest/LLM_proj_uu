@@ -17,7 +17,7 @@ async function fixture(t) {
   const store=new FileStore(dir);return {dir,store,h:new Harness(store,{env})};
 }
 test('new harness activity is explicit and classification comes from the registry',async t=>{
-  const {h}=await fixture(t);await h.poll({worker_id:randomUUID(),mode:'live',tasks:TASKS.map(t=>t.id)});
+  const {h}=await fixture(t);await h.poll({worker_id:randomUUID(),mode:'live',tasks:TASKS.map(t=>t.id),task_revisions:Object.fromEntries(TASKS.map(t=>[t.id,t.revision]))});
   const task=TASKS.find(t=>t.id==='tricky-p07-injected');
   const saved=await h.start('one',{task:task.id,interaction_kind:'task',task_name:'spoofed',task_revision:task.revision});
   assert.equal(saved.interaction_kind,'task');assert.equal(saved.site_id,'tricky-shop');assert.equal(saved.collection,'trickyarena');

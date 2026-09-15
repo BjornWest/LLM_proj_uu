@@ -5,7 +5,7 @@ import {config,login,authenticate,sessionCookie} from '../lib/auth.mjs';
 import {StorageError} from '../lib/store.mjs';
 import {configuredStore} from '../lib/remote-store.mjs';
 import {ManualClient} from '../lib/manual-client.mjs';
-import {inspectionAsset,inspectionHTML,inspectionCSP} from '../lib/inspection.mjs';
+import {inspectionAsset,inspectionHTML,inspectionCSP,inspectionRevision} from '../lib/inspection.mjs';
 import {createHash} from 'node:crypto';
 import {Agent,completionTokenLimit} from '../lib/agent.mjs';
 import {checkStorage} from '../lib/storage-check.mjs';
@@ -61,13 +61,14 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
-      const inspectionSite=url.pathname==='/shop'||url.pathname.startsWith('/shop/')?'shop':url.pathname==='/health'||url.pathname.startsWith('/health/')?'health':url.pathname==='/spotify'||url.pathname.startsWith('/spotify/')?'music':null;
-      if(req.method==='GET'&&inspectionSite){
-        if(url.searchParams.getAll('dp').some(v=>v!==({shop:'w',health:'cs',music:'am'})[inspectionSite]))return send(400,{error:'Unsupported site condition'});
-        stage='private_assets';res.setHeader('Content-Security-Policy',inspectionCSP);res.setHeader('X-Frame-Options','DENY');
-        return send(200,await inspectionHTML(assetRoot,inspectionSite),'text/html; charset=utf-8');
+      if(req.method==='GET'&&/^\/(shop|health|spotify)(\/|$)/.test(url.pathname)){
+        res.statusCode=307;res.setHeader('Location','/sites/tricky'+url.pathname+url.search);return res.end();
       }
-      if(req.method==='GET'&&url.pathname.startsWith('/assets/')&&!allowed.has(url.pathname.slice(8))){
+      if(req.method==='GET'&&(url.pathname==='/sites/tricky'||url.pathname.startsWith('/sites/tricky/'))){
+        stage='private_assets';res.setHeader('Content-Security-Policy',inspectionCSP);res.setHeader('X-Frame-Options','DENY');res.setHeader('X-Site-Revision',inspectionRevision);
+        return send(200,await inspectionHTML(assetRoot),'text/html; charset=utf-8');
+      }
+      if(req.method==='GET'&&(url.pathname.startsWith('/assets/')||url.pathname.startsWith('/external-assets/')||url.pathname==='/darkpattern.svg')&&!allowed.has(url.pathname.slice(8))){
         stage='private_assets';const asset=await inspectionAsset(assetRoot,url.pathname);
         if(!asset)return send(404,{error:'Not found'});
         // Auth is checked above even for conditional requests. Browser-private
@@ -82,7 +83,14 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         if(!env.DAYLIGHT_CONTROL_URL){if(url.pathname==='/api/manual/config'&&req.method==='GET')return send(200,{enabled:false,sites:[]});return send(503,{error:'Manual environments are not configured.'});}
         const manual=new ManualClient({env});stage='manual_browser';
         if(url.pathname==='/api/manual/config'&&req.method==='GET')return send(200,await manual.call('config',{}));
-        if(url.pathname==='/api/manual/sessions')return send(200,req.method==='GET'?await manual.call('list',{owner}):await manual.call('start',{...(await body(req)),owner}));
+        if(url.pathname==='/api/manual/sessions'){
+          if(req.method==='GET')return send(200,await manual.call('list',{owner}));
+          const input=await body(req);
+          const config=await manual.call('config',{}),selected=config.sites?.flatMap(s=>s.tasks).find(t=>t.id===input.task);
+          if((input.task?.startsWith('tricky-')||input.task==='synthetic-dev-w01')&&selected?.site_revision!==inspectionRevision)
+            return send(409,{error:'The client and worker site versions differ. Please wait for deployment to finish and refresh.'});
+          return send(200,await manual.call('start',{...input,owner,site_revision:inspectionRevision}));
+        }
         const m=url.pathname.match(/^\/api\/manual\/sessions\/([a-f0-9-]{36})(?:\/(action|observe|close|frame|trace)(?:\/([a-f0-9-]{36}))?)?$/);
         if(!m)return send(404,{error:'Not found'});const [,id,op,frame_id]=m;
         if(!op&&req.method==='GET')return send(200,await manual.call('read',{owner,id}));

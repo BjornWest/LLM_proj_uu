@@ -166,7 +166,7 @@ function renderReview(){
   $('review-kind').textContent=[record.kind==='task'?'Task attempt':record.kind==='ask'?'Ask the agent':record.kind==='manual'?'Manual exploration':'Activity not recorded',siteFor(record.site)?.name||record.site,record.runtime].join(' · ');
   $('review-title').textContent=record.kind==='ask'?record.goal||record.title:record.title;$('review-grade').replaceChildren(gradeBadge(record));
   const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isManual;$('browser-trace-download').hidden=isJob;$('trace-raw-details').hidden=isJob;$('manual-review').hidden=!isManual;
-  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded human actions',session.condition].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
+  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded human actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
   if(isJob){renderJobConversation(record);const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
 }
 function recordForKey(key){return records().find(record=>record.key===key||record.turns?.some(turn=>'d:'+turn.id===key))||null;}
@@ -259,6 +259,7 @@ function renderManual(){
   $('manual-refresh').disabled=pending||manualUncertain||authExpired||!ready;
   $('manual-page-url').textContent=f?.page_url||'Remote browser';
   $('manual-session-facts').textContent=session?[session.task_name||session.task,session.condition,'Human controlled · BrowserGym'].filter(Boolean).join(' · '):'';
+  if(session?.site_revision&&!manualBusy&&!manualLoading)$('manual-status').textContent+=' · Site version '+session.site_revision.slice(0,12);
   $('manual-reference-goal').textContent=session?.reference_goal||'Resolved when the session starts.';
 }
 let manualLoading=null;

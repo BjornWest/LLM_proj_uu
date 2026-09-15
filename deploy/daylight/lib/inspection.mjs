@@ -1,31 +1,23 @@
-// Public fixture bytes only. Authentication is enforced by the caller, before
-// cache validation. Never expose the private harness package as a web root.
+// Authentication precedes all page and asset access. One exact application build
+// serves every Tricky site; private task/grade packages are never a web root.
 import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
-import expectedManifest from '../../../environments/inspection_shop/manifest.json' with {type:'json'};
-import musicManifest from '../../../environments/inspection_music/manifest.json' with {type:'json'};
-import healthManifest from '../../../environments/inspection_health/manifest.json' with {type:'json'};
-export const inspectionManifests={shop:expectedManifest,music:musicManifest,health:healthManifest};
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.webp':'image/webp'};
+import manifest from '../../../environments/inspection_full/manifest.json' with {type:'json'};
+export const inspectionManifests={shop:manifest,music:manifest,health:manifest};
+export const inspectionRevision=manifest.site_revision;
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.webp':'image/webp','.gif':'image/gif','.mp3':'audio/mpeg','.wav':'audio/wav','.ogg':'audio/ogg'};
 const hash=raw=>createHash('sha256').update(raw).digest('hex');
 export async function inspectionAsset(assetRoot,pathname) {
-  const name=pathname.startsWith('/assets/')?pathname.slice(1):null;
-  const found=Object.entries(inspectionManifests).find(([,m])=>name&&Object.hasOwn(m.files,name));
-  if(!found)return null;
-  const [site,manifest]=found;
-  const raw=await readFile(path.join(assetRoot,'inspection-'+site+'/dist',name));
-  if(hash(raw)!==manifest.files[name])throw Error('Inspection asset hash mismatch');
-  return {raw,type:mime[path.extname(name)]||'application/octet-stream',etag:'"'+manifest.files[name]+'"'};
+ const name=pathname.slice(1);
+ if(name==='index.html'||!Object.hasOwn(manifest.files,name))return null;
+ const raw=await readFile(path.join(assetRoot,'inspection-full/dist',name));
+ if(hash(raw)!==manifest.files[name])throw Error('Inspection asset hash mismatch');
+ return {raw,type:mime[path.extname(name)]||'application/octet-stream',etag:'"'+manifest.files[name]+'"'};
 }
-export async function inspectionHTML(assetRoot,site='shop') {
-  if(!Object.hasOwn(inspectionManifests,site))throw Error('Unknown inspection site');
-  const root=path.join(assetRoot,'inspection-'+site);
-  const manifest=JSON.parse(await readFile(path.join(root,'manifest.json'),'utf8'));
-  const raw=await readFile(path.join(root,'dist/index.html'));
-  if(hash(raw)!==manifest.files['index.html'])throw Error('Inspection HTML hash mismatch');
-  // The original page body and all dataset assets remain byte-identical. The
-  // bootstrap provides isolated tab state, local records and inspection chrome.
-  return raw.toString().replace('<head>','<head><script src="/assets/inspection.js"></script><link rel="stylesheet" href="/assets/inspection.css">');
+export async function inspectionHTML(assetRoot) {
+ const raw=await readFile(path.join(assetRoot,'inspection-full/dist/index.html'));
+ if(hash(raw)!==manifest.files['index.html'])throw Error('Inspection HTML hash mismatch');
+ return raw.toString().replace('<head>','<head><script defer src="/assets/inspection.js"></script><link rel="stylesheet" href="/assets/inspection.css">');
 }
-export const inspectionCSP="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none'; sandbox allow-scripts allow-same-origin allow-downloads allow-modals";
+export const inspectionCSP="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; font-src 'self' data:; connect-src 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'none'; sandbox allow-scripts allow-same-origin allow-downloads allow-modals";

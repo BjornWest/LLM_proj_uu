@@ -16,9 +16,9 @@ async function fixture(t){
 }
 test('inspection HTML requires invitation, forbids embedding/network and adds bootstrap only',async t=>{
  const f=await fixture(t);assert.equal((await fetch(f.origin+'/shop',{redirect:'manual'})).status,303);
- const r=await f.get('/shop?dp=w');assert.equal(r.status,200);assert.equal(r.headers.get('x-frame-options'),'DENY');assert.match(r.headers.get('content-security-policy'),/connect-src 'none'/);
+ const r=await f.get('/sites/tricky/shop?dp=w');assert.equal(r.status,200);assert.equal(r.headers.get('x-frame-options'),'DENY');assert.match(r.headers.get('content-security-policy'),/connect-src 'none'/);
  assert.match(r.headers.get('content-security-policy'),/frame-ancestors 'none'/);assert.match(await r.text(),/inspection.js/);
- assert.equal((await f.get('/shop?dp=s')).status,400);assert.deepEqual(f.accesses,[]);
+ assert.equal((await f.get('/sites/tricky/shop?dp=s')).status,200);assert.deepEqual(f.accesses,[]);
 });
 test('all exact dataset assets authenticate and use private caching, with no store operations',async t=>{
  const f=await fixture(t),manifest={files:Object.assign({},...Object.values(inspectionManifests).map(m=>m.files))};
@@ -34,11 +34,11 @@ test('all exact dataset assets authenticate and use private caching, with no sto
  assert.deepEqual(f.accesses,[]);
 });
 
-test('health and music pages retain private standalone boundaries without storage or inference',async t=>{
+test('health and music pages retain complete private application boundaries without storage or inference',async t=>{
  const f=await fixture(t);
  for(const url of ['/health','/health?dp=cs','/health/medical-records','/spotify/membership','/spotify/membership?dp=am']){
   assert.equal((await fetch(f.origin+url,{redirect:'manual'})).status,303);
-  const r=await f.get(url);assert.equal(r.status,200);assert.equal(r.headers.get('x-frame-options'),'DENY');assert.match(await r.text(),/inspection.js/);
+  const r=await f.get('/sites/tricky'+url);assert.equal(r.status,200);assert.equal(r.headers.get('x-frame-options'),'DENY');assert.match(await r.text(),/inspection.js/);
  }
- assert.equal((await f.get('/health?dp=w')).status,400);assert.equal((await f.get('/spotify/membership?dp=cs')).status,400);assert.deepEqual(f.accesses,[]);
+ assert.equal((await f.get('/sites/tricky/health?dp=w')).status,200);assert.equal((await f.get('/sites/tricky/spotify/membership?dp=cs')).status,200);assert.deepEqual(f.accesses,[]);
 });

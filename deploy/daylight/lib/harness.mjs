@@ -13,7 +13,7 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const TASKS=[
   {id:'rooms',title:'Study rooms · BrowserGym',goal:'Book the first available room in Ångström on Tuesday for 30 minutes, for 3 people.',custom_goal:true},
   ...registry.tasks.map(task=>({id:task.id,title:task.title,goal:task.goal,goal_mode:task.goal_mode,
-    custom_goal:false,revision:task.revision,site:task.site,condition:task.condition,
+    custom_goal:false,revision:task.revision,site_revision:task.site_revision??null,site:task.site,condition:task.condition,
     verification_scope:task.verification_scope,development_only:true})),
 ].map(task=>({...task,...siteForTask(task.id)}));
 export function workerAuthorized(header,env) {
@@ -61,7 +61,7 @@ export class Harness {
     return {enabled:this.enabled(),worker:{online:!!worker&&this.now()-Date.parse(worker.updated_at)<45000,
       updated_at:worker?.updated_at||null,mode:worker?.mode||null},
       tasks:TASKS.map(task=>({...task,custom_goal:task.custom_goal&&worker?.mode==='live',
-        available:worker?worker.tasks.includes(task.id):task.id==='rooms'}))};
+        available:worker?worker.tasks.includes(task.id)&&(!task.site_revision||worker.task_revisions?.[task.id]===task.revision):task.id==='rooms'}))};
   }
   async list(owner) {
     const state=await this.state();
@@ -89,12 +89,12 @@ export class Harness {
     const id=randomUUID();
     return this.mutate(state=>{
       this.expire(state);
-      insist(state.worker?state.worker.tasks.includes(task.id):task.id==='rooms','This task is not available on the configured worker',409);
+      insist(state.worker?state.worker.tasks.includes(task.id)&&(!task.site_revision||state.worker.task_revisions?.[task.id]===task.revision):task.id==='rooms','This task is not available on the configured worker',409);
       insist(dynamic||task.custom_goal||value.goal===undefined||value.goal===task.goal,'This task uses its fixed validated goal');
       insist(goal===task.goal||state.worker?.mode==='live','Custom requests require a live worker',409);
       insist(Object.keys(state.jobs).length<100,'This development queue reached 100 saved jobs; ask Bjorn to archive it',429);
       insist(Object.values(state.jobs).filter(j=>j.owner===owner&&!terminal.has(j.status)).length<3,'You already have three queued or active jobs',429);
-      const job={id,owner,task:task.id,goal:dynamic?null:goal.trim(),task_revision:task.revision||null,
+      const job={id,owner,task:task.id,goal:dynamic?null:goal.trim(),task_revision:task.revision||null,site_revision:task.site_revision??null,
         interaction_kind,required_execution_mode,...site,task_id:task.id,task_name:task.title,condition:task.condition||null,
         activity_metadata_source:{interaction_kind:interaction_kind?'client_declaration':null,
           task_registry_revision:sha(Buffer.from(JSON.stringify(registry))),site_registry_revision:site.site_registry_revision},
@@ -120,11 +120,12 @@ export class Harness {
     insist(['live','rehearsal'].includes(value.mode),'Invalid worker mode');
     insist(Array.isArray(value.tasks)&&value.tasks.every(id=>TASKS.some(t=>t.id===id)),'Invalid worker capabilities');
     const eligible=job=>job.status==='queued'&&value.tasks.includes(job.task)&&
+      (!TASKS.find(t=>t.id===job.task)?.site_revision||value.task_revisions?.[job.task]===job.task_revision)&&
       (!job.required_execution_mode||job.required_execution_mode===value.mode);
     const observed=await this.state();
     if(!observed.active&&!Object.values(observed.jobs).some(eligible)&&
         observed.worker?.id===value.worker_id&&observed.worker.mode===value.mode&&
-        JSON.stringify(observed.worker.tasks)===JSON.stringify(value.tasks)&&this.now()-Date.parse(observed.worker.updated_at)<30000)
+        JSON.stringify(observed.worker.tasks)===JSON.stringify(value.tasks)&&JSON.stringify(observed.worker.task_revisions??{})===JSON.stringify(value.task_revisions??{})&&this.now()-Date.parse(observed.worker.updated_at)<30000)
       return {job:null}; // Idle polling does not write a fresh control object every time.
     return this.mutate(state=>{
       this.expire(state);
@@ -134,7 +135,7 @@ export class Harness {
         // A lost claim response must never cause a second execution.
         return {job:null,active:active.id};
       }
-      state.worker={id:value.worker_id,mode:value.mode,tasks:value.tasks,updated_at:iso(this.now())};
+      state.worker={id:value.worker_id,mode:value.mode,tasks:value.tasks,task_revisions:value.task_revisions??{},updated_at:iso(this.now())};
       const job=Object.values(state.jobs).find(eligible);
       if(!job)return {job:null};
       job.status='running';job.worker_id=value.worker_id;job.lease=randomUUID();job.mode=value.mode;

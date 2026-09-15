@@ -1,5 +1,5 @@
 """Actual workspace/API/BrowserGym manual integration; isolated scripted validation."""
-import hashlib,io,json,os,subprocess,zipfile
+import gzip,hashlib,io,json,os,subprocess,zipfile
 from pathlib import Path
 from uuid import uuid4
 from playwright.sync_api import sync_playwright,expect
@@ -30,8 +30,9 @@ def main():
         page.locator('.site-choice[data-site=tricky-music]').click();page.locator('#manual-task').select_option('tricky-p11-clean');page.locator('#manual-open').click();settled();before=session()
         check('P11 clean opens real BrowserGym with exact setup and no model grade',before['task']=='tricky-p11-clean' and before['runtime']=='BrowserGym' and before['interaction_kind']=='manual' and before['evaluation'] is None and before['action_count']==0)
         initial=page.request.get(origin+before['frame']['url']);(out/'p11-before.png').write_bytes(initial.body())
-        frame=page.locator('#manual-frame');box=frame.bounding_box();frame.click(position={'x':350*box['width']/before['frame']['width'],'y':339*box['height']/before['frame']['height']});settled();after=session()
-        check('Scaled workspace click reaches the real P11 Buy control exactly once',after['action_count']==1 and after['last_action']['type']=='click' and abs(after['last_action']['x']-350)<=1 and abs(after['last_action']['y']-339)<=1)
+        raw=json.loads(gzip.decompress(max((out/'service').rglob('*.json.gz'),key=lambda p:p.stat().st_mtime).read_bytes()));target=next(n for n in raw['axtree_object']['nodes'] if n.get('name',{}).get('value')=='Buy now' and n.get('browsergym_id'));bbox=raw['extra_element_properties'][target['browsergym_id']]['bbox'];tx,ty=bbox[0]+bbox[2]/2,bbox[1]+bbox[3]/2
+        frame=page.locator('#manual-frame');box=frame.bounding_box();frame.click(position={'x':tx*box['width']/before['frame']['width'],'y':ty*box['height']/before['frame']['height']});settled();after=session()
+        check('Scaled workspace click reaches the real P11 Buy control exactly once',after['action_count']==1 and after['last_action']['type']=='click' and abs(after['last_action']['x']-tx)<=1 and abs(after['last_action']['y']-ty)<=1)
         current=page.request.get(origin+after['frame']['url']);(out/'p11-after.png').write_bytes(current.body())
         check('Action returns a new authenticated browser frame',after['frame']['id']!=before['frame']['id'] and hashlib.sha256(initial.body()).digest()!=hashlib.sha256(current.body()).digest())
         count=len([r for r in requests if r['method']=='POST']);page.reload();settled();check('Reload recovers same real session without capture or repeated Buy',session()['id']==before['id'] and session()['action_count']==1 and len([r for r in requests if r['method']=='POST'])==count)

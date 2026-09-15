@@ -61,10 +61,11 @@ export class Manual {
   async config(){
     let available=false;
     if(this.env.DAYLIGHT_MANUAL_PACKAGE&&this.env.DAYLIGHT_MANUAL_DRIVER){
-      try{const m=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'manifest.json')));available=MANUAL_TASKS.every(t=>m.datasets.some(d=>d.tasks.includes(t.id)));}catch{}
+      try{const m=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'manifest.json')));available=MANUAL_TASKS.every(t=>m.datasets.some(d=>d.tasks.includes(t.id)));
+        if(available&&MANUAL_TASKS.some(t=>t.site_revision)){const registry=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'runtime/config/team_tasks.json')));available=MANUAL_TASKS.every(t=>!t.site_revision||registry.tasks.some(r=>r.id===t.id&&r.revision===t.revision&&r.site_revision===t.site_revision));}}catch{}
     }
     const sites=[];
-    for(const t of MANUAL_TASKS){let s=sites.find(s=>s.site_id===t.site_id);if(!s){s={site_id:t.site_id,default_task:t.id,tasks:[]};sites.push(s);}s.tasks.push({id:t.id,title:t.title,condition:t.condition});}
+    for(const t of MANUAL_TASKS){let s=sites.find(s=>s.site_id===t.site_id);if(!s){s={site_id:t.site_id,default_task:t.id,tasks:[]};sites.push(s);}s.tasks.push({id:t.id,title:t.title,condition:t.condition,site_revision:t.site_revision??null});}
     return {enabled:available,sites,limits:{max_sessions:2,idle_seconds:300,max_seconds:900,max_actions:100}};
   }
   async record(owner,id){
@@ -87,16 +88,17 @@ export class Manual {
   }
   async read(owner,id){return publicSession((await this.record(owner,id)).value);}
   async save(row){const prior=await this.store.read(key(row.id));await this.store.write(key(row.id),row,prior?.etag??null);}
-  async start(owner,{task}={}){
+  async start(owner,{task,site_revision}={}){
     assert((await this.config()).enabled,'Manual environments are not configured on this worker',503);
     assert(typeof owner==='string'&&/^[a-z0-9-]{1,40}$/.test(owner),'Invalid owner');
     assert(!this.ownerLocks.has(owner),'Another manual session is starting',409);this.ownerLocks.add(owner);
     try{
       const selected=MANUAL_TASKS.find(t=>t.id===task);assert(selected,'Unsupported manual task');
+      assert(!selected.site_revision||site_revision===selected.site_revision,'Client and remote site versions differ; refresh after deployment',409);
       assert(!(await this.list(owner)).sessions.some(s=>!terminal.has(s.status)),'Close your current manual session before opening another',409);
       assert(this.live.size+this.reserved<2,'Both manual browser slots are in use; close a session or try later',429);
       const id=randomUUID(),directory=path.join(this.root,id),now=stamp();
-      const row={id,owner,task,site_id:selected.site_id,collection:selected.collection,condition:selected.condition??null,
+      const row={id,owner,task,site_revision:selected.site_revision??null,site_id:selected.site_id,collection:selected.collection,condition:selected.condition??null,
         task_name:selected.title,interaction_kind:'manual',runtime:'BrowserGym',status:'starting',created_at:now,updated_at:now,
         reference_goal:null,frame:null,action_count:0,last_action:null,last_error:null,evaluation:null,
         reference_evaluation:null,trace_ready:false,error:null,directory,commands:[],frame_files:{},process_token:this.processToken};

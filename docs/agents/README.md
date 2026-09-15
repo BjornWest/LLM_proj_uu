@@ -9,6 +9,8 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 
 ## Existing references
 
+- [Complete hosted sites](full-site-restoration.md): full-source restoration, shared native/client versions, known upstream gaps and validation.
+
 - [Generalization requirements](generalization-requirements.md): interface fidelity, site holdouts, messy observations and eventual real-site transfer.
 - [Manual environment hosting](manual-environment-hosting.md): owner-scoped native browser controls, package boundaries and trace semantics.
 - [Manual session recovery](manual-session-recovery.md): closed screenshots, status refresh, other-session controls and health route boundaries.

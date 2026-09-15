@@ -1,0 +1,14 @@
+# Use only with the full-site images and a validated immutable package.
+# Existing worker/control/manual volumes remain in place.
+services:
+  worker:
+    image: intent-browser-worker:full-sites-v2
+    volumes:
+      - type: bind
+        source: ${FULL_SITE_FIXTURES:?Set FULL_SITE_FIXTURES to the matching fixture export}
+        target: /fixtures
+        read_only: true
+        bind:
+          create_host_path: false
+  control:
+    image: intent-browser-control:full-sites-v2

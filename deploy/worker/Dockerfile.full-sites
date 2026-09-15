@@ -1,0 +1,8 @@
+# Overlay the complete-site adapters and registry on the certified browser loop.
+# No dependency downloads or installation; retain the supplied base image digest.
+ARG RUNTIME_IMAGE
+FROM ${RUNTIME_IMAGE}
+USER root
+COPY intent_browser/tricky.py intent_browser/tricky_privacy.py intent_browser/tricky_membership.py intent_browser/tricky_authorized.py intent_browser/tricky_full.py intent_browser/team_worker.py /app/intent_browser/
+COPY config/team_tasks.json /app/config/
+USER 10001:10001
