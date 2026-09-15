@@ -1,8 +1,8 @@
 # External objectives and verifiers in the team harness
 
-Candidate implementation, not yet deployed. The existing production worker
-continues running its prior image until a coordinated rollout with the UX
-owner. This is an end-to-end worker integration, not just static page hosting.
+Deployed on 2026-09-15 at https://browseragent.vercel.app/harness from
+commit `bb0e787`. All fifteen task choices are advertised by the live PC
+worker. This is an end-to-end worker integration, not just static page hosting.
 
 The private dispatch registry at `config/team_tasks.json` adds fourteen
 conditions alongside the existing study-room demo:
@@ -103,3 +103,20 @@ authenticated configuration and trace retrieval on the deployment. Do not
 restart the host curation server or alter its frozen build. Team runs continue
 using the dedicated Daylight key and demo ledger, separate from curation funds.
 No new paid test is required by this acceptance procedure.
+
+## Production rollout evidence
+
+The coordinated release passed 49 read-only production checks: all fifteen
+capabilities available, exact task revisions/goals, private registry fields
+excluded, five UI assets matching the committed build, and historical ZIPs
+retained byte-for-byte. Chromium loaded the production UI, switched task
+selection and entered replay with no writes or JavaScript errors. The worker
+was idle when switched; its data volume and two existing runs were preserved.
+The active curation sweep's 103 pinned files still match.
+
+`config/hosted_worker_rollout.json` records this separate deployment evidence.
+No new agent episodes or inference calls were made on production for this
+check. The 28 local and 28 container scripted episodes remain the execution
+evidence for the fourteen external conditions; this does not claim that each
+condition has completed a production model run. The earlier candidate
+validation record remains unchanged.
