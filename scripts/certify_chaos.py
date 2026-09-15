@@ -26,6 +26,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('reports', nargs='+', type=Path)
     parser.add_argument('--output', type=Path, default=ROOT/'.local/preflight/chaos-verifier-validation.json')
+    parser.add_argument('--certificate-output', type=Path, default=ROOT/'config/chaos_verifier.json',
+                        help='Write a separate candidate certificate without changing the active build gate')
     args = parser.parse_args()
     selected = {}
     builds = []
@@ -81,9 +83,10 @@ def main():
     config = {k: validation[k] for k in ('schema_version', 'validated_at', 'scope', 'files_sha256', 'verifier_source_sha256')}
     config.update(validated_task_ids=list(SUPPORTED), validation_report=str(output.relative_to(ROOT)),
                   validation_report_sha256=hashlib.sha256(output.read_bytes()).hexdigest())
-    (ROOT / 'config').mkdir(exist_ok=True)
-    write_json(ROOT / 'config/chaos_verifier.json', config)
-    print(f'Validated {len(selected)} cases in distinct sessions. Wrote config/chaos_verifier.json')
+    certificate = args.certificate_output.resolve()
+    certificate.parent.mkdir(parents=True, exist_ok=True)
+    write_json(certificate, config)
+    print(f'Validated {len(selected)} cases in distinct sessions. Wrote {certificate}')
 
 
 if __name__ == '__main__':

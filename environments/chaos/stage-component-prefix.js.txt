@@ -1,0 +1,45 @@
+function pg({challengeId:e}){
+ const t=Zt(),[n,r]=v.useState(null),[s,i]=v.useState(null),[a,o]=v.useState(null),[u,d]=v.useState(null);
+ fg(t,e,!!t);const[c,f]=v.useState({state:"idle"}),g=v.useRef(null);
+ v.useEffect(()=>{
+  if(!t)return;let w=false;const context={queue:null,mountNonce:null,unmountedAt:null};g.current=context;
+  // Bind diagnostics immediately, even while the next mount is pending.
+  // Each retained getter continues to identify its own closed/in-flight queue.
+  window.__intentChaosQueueSnapshot=()=>({
+   ...(context.queue?.snapshot()??{version:'stage-fifo-v2',closed:false,reason:null,events:[]}),
+   context:{session:t,challengeId:e,mountNonce:context.mountNonce},
+   unmountedAt:context.unmountedAt
+  });
+  r(null);o(null);f({state:"idle"});
+  fetch(`/api/stage/${encodeURIComponent(e)}/mount`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session:t})})
+   .then(m=>{if(!m.ok)throw Error('Mount rejected');return m.json();})
+   .then(m=>{
+    if(w||!m.mountNonce)return;
+    context.mountNonce=m.mountNonce;
+    context.queue=__intentCreateStageQueue({
+     send:async event=>{
+      const response=await fetch(`/api/stage/${encodeURIComponent(e)}/interact`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session:t,mountNonce:m.mountNonce,event})});
+      if(!response.ok)throw Error('Interaction request failed');
+      return response.json();
+     },
+     onOutcome:N=>{if(w)return;
+      if(N?.outcome==="success")f({state:"success",message:N.message??"Success."});
+      else if(N?.outcome==="failure")f({state:"failure",message:N.message??"Failure."});
+      else if(N?.outcome==="rejected")f({state:"sealed",message:N.message??"Rejected."});
+     },
+     onError:()=>{if(!w)f({state:"sealed",message:"The request failed. This attempt stopped without retrying."});}
+    });
+    // Privileged diagnostic state: not inserted into the DOM or policy prompt.
+    r(m.mountNonce);i(m.mountedAt);if(m.stage)o(m.stage);
+    if(m.meta)d({title:m.meta.title,goal:m.meta.goal,rules:m.meta.rules??[]});
+    if(m.attempt==="sealed"){
+     context.queue.close('already-sealed');const p=m.outcome;
+     f(p==="success"?{state:"success",message:"You already passed this challenge."}:p==="skipped"?{state:"skipped",message:"You already skipped this challenge."}:{state:"sealed",message:p==="failure"?"You already failed this challenge.":"This challenge is already sealed for this session."});
+    }
+   }).catch(()=>{if(!w)f({state:"sealed",message:"The challenge could not be loaded."});});
+  return()=>{w=true;context.unmountedAt=Date.now();context.queue?.close('unmounted');};
+ },[t,e]);
+ function y(w,m,p,h){const context=g.current;
+  if(!n||context?.mountNonce!==n||!context.queue||c.state!=="idle")return;
+  return context.queue.emit({target:w,kind:m,value:p,clientTs:Date.now(),isTrusted:h});
+ }
