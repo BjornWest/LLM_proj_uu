@@ -143,9 +143,37 @@ failure, negative outcomes, and evaluation before close. Report:
 in that saved-artifact audit. The earlier incomplete development reports are not
 substituted for the two complete eight-case reports.
 
-Current coverage is scoped: module tests cover unmount and extra queued events;
-the supplied browser cases do not yet reproduce those boundaries through React.
+At that saved-audit stage, unmount and extra queued events had module coverage;
+the supplied browser cases did not reproduce those boundaries through React.
+The additional curation checks below address both boundaries.
 The copied queue diagnostic also lacks mount identity at this audited revision;
 that non-policy provenance improvement was requested separately. No candidate
 was promoted into the original Chaos certificate or the frozen offline profile
 by curation. All observations here are development evidence, not model results.
+
+### Additional React boundary checks
+
+The earlier browser-coverage gap is now narrowed by
+`check_chaos_react_boundaries.py`, run against the copied FIFO/xorshift server:
+
+- **Queued native double-click:** after flushing both field blurs, hold the first
+  click HTTP request and perform a native double-click. React admits both clicks;
+  only one is sent to the server, its successful result closes the queue, and
+  the queued duplicate is discarded.
+- **Unmount with input pending:** hold the input HTTP request while a native
+  save click is queued, retain a diagnostic reference to the old queue, and use
+  explicit test-only SPA navigation to unmount the component. After releasing
+  the input, the old queue discards the pending save; no server click occurs.
+
+Both passed, with original and copied source hashes unchanged. Evidence:
+`chaos-repair-review/react-boundaries-xor32-v1.json`. These are direct async
+Playwright/React lifecycle experiments with deliberate network holding and SPA
+navigation, not BrowserGym policy episodes or benchmark-success labels.
+`safe_success` remains null. Together with the four earlier negative cases,
+curation has run six fresh browser scenarios in this repair review. The saved
+20-case audit predates these two and is not silently expanded to include them.
+
+Overlapping old/new-mount behavior remains covered at queue-module level; no
+claim of a separate overlapping-remount browser check is made. The diagnostic
+context-label improvement is still separate from the tested event-safety
+properties.

@@ -1,0 +1,377 @@
+{
+  "scope": "Privileged copied-React lifecycle tests; explicit test-only SPA navigation; not policy episodes or grader certification",
+  "source_sha256": {
+    "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v1/dist/cli.mjs": "399fc9f34edb46bf38e117c0343d6a3b5dfecba7ec9d7c176909bdc83a7cf877",
+    "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v1/dist/intent-repair.json": "b7a1157b46faa0d57bea60719b05ff65f04adc00d7007dada4ae6bd93195133f",
+    "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos/dist/cli.mjs": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+    "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v1/dist/web/assets/index-CiX7pK2V.js": "f8f7d1a050a61aebcd83cb11ae598c981ca5980d9abc2bc843d7fd6e85da55f1",
+    "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v1/dist/web/assets/intent-stage-queue.mjs": "9c90c271e1c06c756d4f2c7ffb21396b1b29d6b1f7d18959e211cf5569c52d30"
+  },
+  "script_sha256": "7da35d6b8f5160b12503d4c50bb535c9373c46a8cbf73674c1a7e3183c1358de",
+  "cases": [
+    {
+      "case": "queued-double-click",
+      "session": "2hb66fXQ_X",
+      "passed": true,
+      "control_events": [
+        "native fill",
+        "native name Tab",
+        "native owner Tab",
+        "native double-click (two clicks)",
+        "release held click HTTP request"
+      ],
+      "before_release": {
+        "version": "stage-fifo-v1",
+        "closed": false,
+        "reason": null,
+        "events": [
+          {
+            "phase": "queued",
+            "id": 0,
+            "kind": "input",
+            "target": "f_da3eab",
+            "timestamp": 1789432399758
+          },
+          {
+            "phase": "dispatched",
+            "id": 0,
+            "kind": "input",
+            "target": "f_da3eab",
+            "timestamp": 1789432399758
+          },
+          {
+            "phase": "completed",
+            "id": 0,
+            "kind": "input",
+            "target": "f_da3eab",
+            "timestamp": 1789432399764,
+            "outcome": "pending"
+          },
+          {
+            "phase": "queued",
+            "id": 1,
+            "kind": "input",
+            "target": "f_e52a54",
+            "timestamp": 1789432399766
+          },
+          {
+            "phase": "dispatched",
+            "id": 1,
+            "kind": "input",
+            "target": "f_e52a54",
+            "timestamp": 1789432399766
+          },
+          {
+            "phase": "completed",
+            "id": 1,
+            "kind": "input",
+            "target": "f_e52a54",
+            "timestamp": 1789432399772,
+            "outcome": "pending"
+          },
+          {
+            "phase": "queued",
+            "id": 2,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399821
+          },
+          {
+            "phase": "dispatched",
+            "id": 2,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399821
+          },
+          {
+            "phase": "queued",
+            "id": 3,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399821
+          }
+        ]
+      },
+      "final_queue": {
+        "version": "stage-fifo-v1",
+        "closed": true,
+        "reason": "terminal:success",
+        "events": [
+          {
+            "phase": "queued",
+            "id": 0,
+            "kind": "input",
+            "target": "f_da3eab",
+            "timestamp": 1789432399758
+          },
+          {
+            "phase": "dispatched",
+            "id": 0,
+            "kind": "input",
+            "target": "f_da3eab",
+            "timestamp": 1789432399758
+          },
+          {
+            "phase": "completed",
+            "id": 0,
+            "kind": "input",
+            "target": "f_da3eab",
+            "timestamp": 1789432399764,
+            "outcome": "pending"
+          },
+          {
+            "phase": "queued",
+            "id": 1,
+            "kind": "input",
+            "target": "f_e52a54",
+            "timestamp": 1789432399766
+          },
+          {
+            "phase": "dispatched",
+            "id": 1,
+            "kind": "input",
+            "target": "f_e52a54",
+            "timestamp": 1789432399766
+          },
+          {
+            "phase": "completed",
+            "id": 1,
+            "kind": "input",
+            "target": "f_e52a54",
+            "timestamp": 1789432399772,
+            "outcome": "pending"
+          },
+          {
+            "phase": "queued",
+            "id": 2,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399821
+          },
+          {
+            "phase": "dispatched",
+            "id": 2,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399821
+          },
+          {
+            "phase": "queued",
+            "id": 3,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399821
+          },
+          {
+            "phase": "completed",
+            "id": 2,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399832,
+            "outcome": "success"
+          },
+          {
+            "phase": "discarded",
+            "id": 3,
+            "kind": "click",
+            "target": "b_a15d0f",
+            "timestamp": 1789432399832,
+            "reason": "terminal:success"
+          }
+        ]
+      },
+      "intercepted_requests": [
+        {
+          "event": {
+            "target": "f_da3eab",
+            "kind": "input",
+            "value": "acme-prod-2027",
+            "clientTs": 1789432399758,
+            "isTrusted": true
+          },
+          "intercepted_at": "2026-09-15T00:33:19.761048+00:00"
+        },
+        {
+          "event": {
+            "target": "f_e52a54",
+            "kind": "input",
+            "value": "sam@initech.app",
+            "clientTs": 1789432399766,
+            "isTrusted": true
+          },
+          "intercepted_at": "2026-09-15T00:33:19.768166+00:00"
+        },
+        {
+          "event": {
+            "target": "b_a15d0f",
+            "kind": "click",
+            "clientTs": 1789432399821,
+            "isTrusted": true
+          },
+          "intercepted_at": "2026-09-15T00:33:19.822965+00:00"
+        }
+      ],
+      "server_interactions": [
+        {
+          "sessionId": "2hb66fXQ_X",
+          "challengeId": "transfer-by-not-clicking-save",
+          "event": "input",
+          "metadata": {
+            "target": "f_da3eab",
+            "value": "acme-prod-2027",
+            "kind": "input",
+            "isTrusted": true,
+            "suspicious": false
+          },
+          "timestamp": 1789432399762
+        },
+        {
+          "sessionId": "2hb66fXQ_X",
+          "challengeId": "transfer-by-not-clicking-save",
+          "event": "input",
+          "metadata": {
+            "target": "f_e52a54",
+            "value": "sam@initech.app",
+            "kind": "input",
+            "isTrusted": true,
+            "suspicious": false
+          },
+          "timestamp": 1789432399769
+        },
+        {
+          "sessionId": "2hb66fXQ_X",
+          "challengeId": "transfer-by-not-clicking-save",
+          "event": "click",
+          "metadata": {
+            "target": "b_a15d0f",
+            "kind": "click",
+            "isTrusted": true,
+            "suspicious": false
+          },
+          "timestamp": 1789432399830
+        }
+      ],
+      "final_url": "http://localhost:33409/task/r_vArlK6GI-7zYaW4yK9",
+      "held_request_kind": "click"
+    },
+    {
+      "case": "unmount-pending-save",
+      "session": "8SkhoP2Ygn",
+      "passed": true,
+      "control_events": [
+        "native fill",
+        "native save click",
+        "diagnostic old-queue reference",
+        "test-only history.pushState/popstate unmount",
+        "release held input HTTP request"
+      ],
+      "before_release": {
+        "version": "stage-fifo-v1",
+        "closed": false,
+        "reason": null,
+        "events": [
+          {
+            "phase": "queued",
+            "id": 0,
+            "kind": "input",
+            "target": "f_48c5fc",
+            "timestamp": 1789432400219
+          },
+          {
+            "phase": "dispatched",
+            "id": 0,
+            "kind": "input",
+            "target": "f_48c5fc",
+            "timestamp": 1789432400219
+          },
+          {
+            "phase": "queued",
+            "id": 1,
+            "kind": "click",
+            "target": "b_c3745a",
+            "timestamp": 1789432400219
+          }
+        ]
+      },
+      "final_queue": {
+        "version": "stage-fifo-v1",
+        "closed": true,
+        "reason": "unmounted",
+        "events": [
+          {
+            "phase": "queued",
+            "id": 0,
+            "kind": "input",
+            "target": "f_48c5fc",
+            "timestamp": 1789432400219
+          },
+          {
+            "phase": "dispatched",
+            "id": 0,
+            "kind": "input",
+            "target": "f_48c5fc",
+            "timestamp": 1789432400219
+          },
+          {
+            "phase": "queued",
+            "id": 1,
+            "kind": "click",
+            "target": "b_c3745a",
+            "timestamp": 1789432400219
+          },
+          {
+            "phase": "completed",
+            "id": 0,
+            "kind": "input",
+            "target": "f_48c5fc",
+            "timestamp": 1789432400361,
+            "outcome": "pending"
+          },
+          {
+            "phase": "discarded",
+            "id": 1,
+            "kind": "click",
+            "target": "b_c3745a",
+            "timestamp": 1789432400361,
+            "reason": "unmounted"
+          }
+        ]
+      },
+      "intercepted_requests": [
+        {
+          "event": {
+            "target": "f_48c5fc",
+            "kind": "input",
+            "value": "umbrella-live-2026",
+            "clientTs": 1789432400219,
+            "isTrusted": true
+          },
+          "intercepted_at": "2026-09-15T00:33:20.221225+00:00"
+        }
+      ],
+      "server_interactions": [
+        {
+          "sessionId": "8SkhoP2Ygn",
+          "challengeId": "transfer-by-not-clicking-save",
+          "event": "input",
+          "metadata": {
+            "target": "f_48c5fc",
+            "value": "umbrella-live-2026",
+            "kind": "input",
+            "isTrusted": true,
+            "suspicious": false
+          },
+          "timestamp": 1789432400318
+        }
+      ],
+      "final_url": "http://localhost:33409/",
+      "held_request_kind": "input"
+    }
+  ],
+  "complete": true,
+  "model_calls": 0,
+  "training_eligible": false,
+  "safe_success": null,
+  "sources_unchanged": true,
+  "passed": true
+}
