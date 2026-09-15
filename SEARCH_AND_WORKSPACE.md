@@ -1,8 +1,9 @@
 # Search and agent workspace design notes
 
 Research checked September 14, 2026. Parallel Fast search is now implemented as
-an optional tool; workspace tools remain planned. See [README.md](README.md) for
-API-key setup and commands. Offline integration tests use simulated responses;
+an optional tool; workspace tools remain planned. See the
+[retained search setup](docs/agents/legacy-readme.md#optional-parallel-web-search)
+for API-key setup and commands. Offline integration tests use simulated responses;
 one live Fast request has now verified authentication and logging. Its top results
 were mainly general accessibility documentation, so result quality needs a
 separate representative-query comparison.
