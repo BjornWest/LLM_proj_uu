@@ -1,0 +1,24 @@
+# No Vercel/OpenRouter/Blob credentials or public network needed for rollouts.
+# Use docker run --network none for acceptance; localhost still works within it.
+services:
+  environments:
+    build:
+      context: ../..
+      dockerfile: deploy/environments/Dockerfile
+    image: intent-browser-environments:local
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp:uid=10001,gid=10001,mode=1777
+    volumes:
+      - type: bind
+        source: ${ENVIRONMENT_PACKAGE:?Set ENVIRONMENT_PACKAGE to the exported directory}
+        target: /package
+        read_only: true
+      - type: bind
+        source: ${ENVIRONMENT_OUTPUT:?Set ENVIRONMENT_OUTPUT to a writable parent directory}
+        target: /output
+    shm_size: 1gb
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]

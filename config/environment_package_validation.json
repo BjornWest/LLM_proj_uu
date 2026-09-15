@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "scope": "Portable existing environment fixtures; scripted and load-only validation, no inference or Vercel rollout",
+  "package": ".local/environment-packages/portable-v2",
+  "package_manifest_sha256": "fd9bbd6656133354cea05b8c76cee9edf21d85a81137e5c5ef678755f1f0ee1b",
+  "package_files": 3286,
+  "package_bytes": 45731878,
+  "image": "sha256:2fa969a4de4021e50599b4b05d0fea05bb218297e42b2337d35244f0c7b9b020",
+  "image_tag": "intent-browser-environments:local",
+  "base_image": "sha256:6884c2834fc5e294507ef8bd294768a9b982f3badecc75f2824a3e1cff33caff",
+  "evidence_directory": ".local/environment-validation/portable-v2",
+  "audit_sha256": "70812c4692fb60cf67612171b5e83698a612a17c9f07e72180e0a7de47d204d6",
+  "report_sha256": {
+    "positive": "e592bd6b22d9fb7de96e5907c68ccddd4f34a13c1b147e1fcab45c495e6c3153",
+    "negative": "be0166a66a6f6833f3f16224e2739f7d30699aa3be934c82377683874fe0dea6",
+    "miniwob-load": "79d3483a8ca45b7a62e8ce57be1827196d1cda36870049cb803d0ebb51719616",
+    "local-positive": "31678d3ef8ecf36ad128d9507beb72954eaa9cebf03be865a39ac33c3ece2b67"
+  },
+  "source_sha256": {
+    "intent_browser/environment_package.py": "dd781e3a2dc02c8161a231ec13043c406f38b63d1c74288b8a3f8bb3c5b9fbb8",
+    "intent_browser/environment_runtime.py": "33680e55ad98c8d385e6bdf3653bf15d47fe3eae270037582a12144f10c75fad",
+    "scripts/verify_environment_package.py": "1eb6acbaf1edbb2faf176554ac0779658c0c4f8cec103d6ea927fe5c6055e5d8",
+    "scripts/audit_environment_package.py": "3c514ce208931f3f1bd4e18d995318000a47b54d0db8976470894e4413ae14d3",
+    "scripts/prepare_environment_resources.py": "c4cff176962b2233ae0995f353db376f264926874bd76ed0d95b18cb27fdc7dc",
+    "environments/portable-resources/inter.json": "981f91d799686aa86c229cf81f1ea5061d00bfdd66f54978b0ed3f69a5e640b9",
+    "deploy/environments/Dockerfile": "60f9bac1e93bc3b376265414e9b91e48909e299d65590c6a6701032217d73f31",
+    "deploy/environments/compose.yaml": "567455a115491867254497bfe5eda14624188ade3621b42844b04dd5ce98f1e4",
+    "tests/test_environment_package.py": "60d1ec008c15d027b693237c4753afb31d658b5b02034a8a4e80a4cea35d3b9b"
+  },
+  "validation": {
+    "unit_and_hosted_regressions": 21,
+    "container_positive_cases": 20,
+    "container_negative_cases": 14,
+    "miniwob_load_only_cases": 125,
+    "local_positive_parity_cases": 20,
+    "artifact_hashes": 4428,
+    "recorded_checks": 1128,
+    "local_container_full_evaluation_parity": true,
+    "os_network": "none",
+    "read_only_package": true,
+    "unprivileged_uid": 10001
+  },
+  "paid_calls": 0,
+  "runtime_downloads": 0,
+  "preparation_font_download_bytes": 4930333,
+  "historical_evidence_modified": false,
+  "training_readiness_changed": false,
+  "vercel_site_interactivity_changed": false,
+  "limitations": [
+    "Full SusBench and DoomArena are not implemented; IKEA remains diagnostic-only.",
+    "MiniWoB loading is not full task completion coverage or authorization verification.",
+    "Compiled fixtures/Chrome/runtime image and local model must be prepared before offline execution.",
+    "Fonts are now bundled; do not claim pixel parity with earlier fallback-font traces."
+  ],
+  "development_attempts": [
+    ".local/environment-validation/dev-v1",
+    ".local/environment-validation/dev-v2",
+    ".local/environment-validation/container-v4",
+    ".local/environment-validation/portable-v1"
+  ],
+  "transfer_archive": {
+    "file": ".local/environment-packages/portable-v2.tar.gz",
+    "bytes": 28353939,
+    "sha256": "8e076ec7659ba4a984b6a12565d6ebc91e8e38fde03cfb1a1b4d7576e78b4d9c",
+    "exact_file_set_and_bytes": true
+  }
+}
