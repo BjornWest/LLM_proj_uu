@@ -32,7 +32,13 @@ const server = createServer(async (req,res) => {
   const url = new URL(req.url,'http://localhost');
   const send = (status,value,type='application/json') => {res.writeHead(status,{'content-type':type,'cache-control':'no-store'});res.end(type==='application/json'?JSON.stringify(value):value);};
   try {
-    if (url.pathname === '/' || url.pathname === '/harness') return send(200,(await readFile(path.join(here,'../client/harness.html'),'utf8')).replace('<body>','<body>'+banner),'text/html');
+    if (['/','/workspace','/workspace/replays'].includes(url.pathname)) return send(200,await readFile(path.join(here,'workspace.html')),'text/html');
+    if (/^\/preview\/workspace\.(css|js)$/.test(url.pathname)) return send(200,await readFile(path.join(here,path.basename(url.pathname))),url.pathname.endsWith('css')?'text/css':'text/javascript');
+    if (/^\/preview\/images\/(campus|sample-bookshop)-[0-3]\.png$/.test(url.pathname)) return send(200,await readFile(path.join(images,path.basename(url.pathname))),'image/png');
+    if (/^\/assets\/(world\.js|observation\.js|fixture\.json)$/.test(url.pathname)) return send(200,await readFile(path.join(here,'../client',path.basename(url.pathname))),url.pathname.endsWith('json')?'application/json; charset=utf-8':'text/javascript');
+    if (/^\/assets\/(style\.css|rooms\.js|site\.js)$/.test(url.pathname)) return send(200,await readFile(path.join(here,'../private-assets',path.basename(url.pathname))),url.pathname.endsWith('css')?'text/css':'text/javascript');
+    if (/^\/world\/preview-campus\/(shop|booking|preferences)$/.test(url.pathname)) return send(200,await readFile(path.join(here,'../private-assets/site.html')),'text/html');
+    if (url.pathname === '/harness') return send(200,(await readFile(path.join(here,'../client/harness.html'),'utf8')).replace('<body>','<body>'+banner),'text/html');
     if (url.pathname === '/preview/site') return send(200,await readFile(path.join(here,'site.html')),'text/html');
     if (/^\/assets\/harness\.(css|js)$/.test(url.pathname)) return send(200,await readFile(path.join(here,'../client',path.basename(url.pathname))),url.pathname.endsWith('css')?'text/css':'text/javascript');
     if (url.pathname === '/api/harness/config') return send(200,{enabled:true,worker:{online:true,mode:'live',updated_at:new Date().toISOString()},tasks});
@@ -63,4 +69,4 @@ const server = createServer(async (req,res) => {
     send(404,{error:'Local preview route not found'});
   } catch(error) {send(500,{error:'Preview error: '+error.message});}
 });
-server.listen(Number(process.env.UX_PREVIEW_PORT||8892),'127.0.0.1',()=>console.log('Local UX preview: http://localhost:'+server.address().port+'/harness'));
+server.listen(Number(process.env.UX_PREVIEW_PORT||8892),'127.0.0.1',()=>console.log('Local UX preview: http://localhost:'+server.address().port+'/workspace'));
