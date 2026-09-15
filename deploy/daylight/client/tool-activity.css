@@ -22,3 +22,6 @@
 .chat-working::before{content:'';width:5px;height:5px;flex:none;border-radius:50%;background:currentColor;animation:tool-pulse 1.4s ease-in-out infinite}
 @keyframes tool-pulse{50%{opacity:.4}}
 @media(prefers-reduced-motion:reduce){.tool-activity .tool-activity-icon,.chat-working::before{animation:none!important}}
+
+/* Reply bubbles in the original demo, which shares this chat stylesheet. */
+.chat-message.assistant{background:#f3f4f7;border:1px solid #e1e4eb;padding:11px 13px;border-radius:12px 12px 12px 3px;margin-right:20px}

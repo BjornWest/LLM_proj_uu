@@ -11,7 +11,7 @@ let html=await readFile(path.join(source,'index.html'),'utf8');
 html=html.replace('Local browser demo','Private team demo').replace('Fictional local website','Fictional website')
   .replace('http://localhost:8878','#').replace('<option value="rehearsal">Scripted rehearsal</option><option value="live" disabled>Live agent</option>','<option value="live">Live agent</option>')
   .replace('<span>Daylight demo</span>','<a href="/harness">Test research harness</a> · <a href="/logout">Sign out</a>')
-  .replace('</head>','<link rel="stylesheet" href="/assets/tool-activity.css"></head>')
+  .replace('<link rel="stylesheet" href="/assets/style.css">','<link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/tool-activity.css">')
   .replace('<script src="/assets/dashboard.js"></script>','<script type="module" src="/assets/dashboard.js"></script>');
 await writeFile('private-assets/index.html',html);
 let site=await readFile(path.join(source,'site.js'),'utf8');
