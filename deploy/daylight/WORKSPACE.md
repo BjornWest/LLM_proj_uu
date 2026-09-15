@@ -49,7 +49,14 @@ start separate agent runs with fresh state.
 
 Frontend contract validation: `.venv/bin/python scripts/smoke_manual_workspace.py`
 uses mocked manual API responses and screenshots. It does not validate actual
-BrowserGym execution; combined backend checks are required before publication.
+BrowserGym execution.
+
+Actual integration validation: `.venv/bin/python scripts/smoke_manual_workspace_live.py`
+starts the isolated `tests/manual-server.mjs` fixture with its real package and
+BrowserGym driver. It checks the workspace's Music membership Buy click,
+Electronics shop scroll/keyboard controls, session isolation, read-only history
+and original ZIP. This is scripted validation with no model inference. The
+backend owns the full variant/container acceptance and coordinated publication.
 
 ## Chat activity
 
