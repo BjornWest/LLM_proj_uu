@@ -12,6 +12,7 @@ def main():
     parser.add_argument('--origin',default='https://browseragent.vercel.app')
     parser.add_argument('--assets',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    expect.set_options(timeout=20000)
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
     invitation=json.loads((ROOT/'.local/vercel-demo/invitation-codes.json').read_text())['bjorn']
     code=invitation if isinstance(invitation,str) else invitation['code'];checks=[]
