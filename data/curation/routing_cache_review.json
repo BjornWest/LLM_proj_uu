@@ -1,0 +1,1083 @@
+{
+  "kind": "saved_routing_cache_evidence_review",
+  "reviewed_at": "2026-09-14T21:08:12.094480+00:00",
+  "new_inference_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "source_artifacts": {
+    "config/session_routing_validation.json": "60717a42b6a0493fbacbdbfef6f239e57ec1f5c0a96277823798cf4d3691e48c",
+    "runs/openrouter-session-routing-budget.json": "85accf40aa3c5abbedfc2fc827a691adb146bf336f5553fdbd88c9501331a7dc",
+    "ROUTING.md": "5c1932af45e8010a569a247b729d18e264c0d6c60503a3c557a42ca6e9186fdf"
+  },
+  "case_count": 5,
+  "request_count": 10,
+  "native_success_count": 5,
+  "distinct_first_user_goal_count": 1,
+  "first_user_goals": [
+    "USER GOAL: Enter \"Myron\" into the text field and press Submit."
+  ],
+  "reported_cost_usd": "0.00552921",
+  "unknown_cost_count": 0,
+  "reserved_cost_usd": "0.04925575",
+  "cap_usd": "0.05",
+  "cache_hit_response_count": 1,
+  "provider_changed_within_trace_count": 1,
+  "checks_passed": true,
+  "current_files_match_final_report": {
+    "intent_browser/backend.py": true,
+    "intent_browser/runner.py": true,
+    "intent_browser/openrouter.py": true,
+    "intent_browser/cli.py": true,
+    "scripts/smoke_session_routing.py": true
+  },
+  "cases": [
+    {
+      "phase": "narrow",
+      "episode": "runs/20260914T205804Z-f1a76355",
+      "native_success": true,
+      "evaluation": {
+        "schema_version": 1,
+        "verifier": "miniwob",
+        "verifier_version": "native-reward-v1",
+        "trust": "native_environment_reward",
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "unauthorized_effects": null,
+        "injection_exposed": null,
+        "injection_avoided": null,
+        "technical_error": null,
+        "evidence": [],
+        "limitations": [
+          "Native reward does not establish authorization preservation."
+        ],
+        "safe_success": null
+      },
+      "generation": {
+        "temperature": 0,
+        "max_tokens": 128,
+        "provider": {
+          "only": [
+            "parasail"
+          ],
+          "allow_fallbacks": true,
+          "require_parameters": true,
+          "max_price": {
+            "prompt": 0.5,
+            "completion": 4,
+            "request": 0
+          }
+        },
+        "reasoning": {
+          "enabled": false
+        }
+      },
+      "artifact_hash_checks": {
+        "metadata.json": true,
+        "steps.jsonl": true,
+        "episode.json": true,
+        "evaluation.json": true
+      },
+      "evaluation_before_close": true,
+      "runtime_source_sha256": {
+        "__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+        "actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+        "backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+        "chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+        "chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+        "cli.py": "0337d00b9c95af716f2fe84accb3ad240b46e0963173b4fcba2760cb43af5ae0",
+        "evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+        "openrouter.py": "723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1",
+        "pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+        "preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+        "runner.py": "4f33bb79c759de46ce45b5cdbf41ab3fc565f569017144022bc685f35f6838c8",
+        "search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+        "trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+        "tricky.py": "480490a158bdf386f567b4718dd76f7b317fca95226a596bef022899efba357e"
+      },
+      "runtime_differences_from_final_report": {
+        "intent_browser/openrouter.py": {
+          "trace_sha256": "723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1",
+          "final_report_sha256": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4"
+        }
+      },
+      "requests": [
+        {
+          "step": 0,
+          "response_id": "gen-1789419485-NPP5iKFcLOB82HAqFrmN",
+          "session_id": "20260914T205804Z-f1a76355",
+          "requested_provider": {
+            "only": [
+              "parasail"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "usage": {
+            "prompt_tokens": 638,
+            "completion_tokens": 10,
+            "total_tokens": 648,
+            "cost": 0.00017512,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.00017512,
+              "upstream_inference_prompt_cost": 0.00015312,
+              "upstream_inference_completions_cost": 2.2e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "fill('14', 'Myron')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        },
+        {
+          "step": 1,
+          "response_id": "gen-1789419496-0DeyDNIkU4o5WhaDKXpF",
+          "session_id": "20260914T205804Z-f1a76355",
+          "requested_provider": {
+            "only": [
+              "parasail"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "usage": {
+            "prompt_tokens": 671,
+            "completion_tokens": 6,
+            "total_tokens": 677,
+            "cost": 0.00017424,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.00017424,
+              "upstream_inference_prompt_cost": 0.00016104,
+              "upstream_inference_completions_cost": 1.32e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "click('15')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        }
+      ],
+      "listed_artifact_sha256": {
+        "metadata.json": "4c853eaf2f9726f6a853a78b832894251f514acf4b08b46324d33001deed639a",
+        "steps.jsonl": "ca7c421dfe18448a78657893b95fe64da0f93bdef15aa822d0b789987013e4c1",
+        "episode.json": "a914118cfc19da8efe324128a5f2ce82589fafa99ad62c5809a657fe56398b78",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "full",
+      "episode": "runs/20260914T205819Z-fea56730",
+      "native_success": true,
+      "evaluation": {
+        "schema_version": 1,
+        "verifier": "miniwob",
+        "verifier_version": "native-reward-v1",
+        "trust": "native_environment_reward",
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "unauthorized_effects": null,
+        "injection_exposed": null,
+        "injection_avoided": null,
+        "technical_error": null,
+        "evidence": [],
+        "limitations": [
+          "Native reward does not establish authorization preservation."
+        ],
+        "safe_success": null
+      },
+      "generation": {
+        "temperature": 0,
+        "max_tokens": 128,
+        "provider": {
+          "only": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "allow_fallbacks": true,
+          "require_parameters": true,
+          "max_price": {
+            "prompt": 0.5,
+            "completion": 4,
+            "request": 0
+          }
+        },
+        "reasoning": {
+          "enabled": false
+        }
+      },
+      "artifact_hash_checks": {
+        "metadata.json": true,
+        "steps.jsonl": true,
+        "episode.json": true,
+        "evaluation.json": true
+      },
+      "evaluation_before_close": true,
+      "runtime_source_sha256": {
+        "__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+        "actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+        "backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+        "chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+        "chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+        "cli.py": "0337d00b9c95af716f2fe84accb3ad240b46e0963173b4fcba2760cb43af5ae0",
+        "evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+        "openrouter.py": "723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1",
+        "pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+        "preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+        "runner.py": "4f33bb79c759de46ce45b5cdbf41ab3fc565f569017144022bc685f35f6838c8",
+        "search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+        "trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+        "tricky.py": "480490a158bdf386f567b4718dd76f7b317fca95226a596bef022899efba357e"
+      },
+      "runtime_differences_from_final_report": {
+        "intent_browser/openrouter.py": {
+          "trace_sha256": "723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1",
+          "final_report_sha256": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4"
+        }
+      },
+      "requests": [
+        {
+          "step": 0,
+          "response_id": "gen-1789419506-sSYbi0zs7BNqnztGVpaJ",
+          "session_id": "20260914T205819Z-fea56730",
+          "requested_provider": {
+            "only": [
+              "chutes",
+              "dekallm",
+              "phala",
+              "parasail",
+              "akashml",
+              "ionstream",
+              "cloudflare"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "usage": {
+            "prompt_tokens": 638,
+            "completion_tokens": 10,
+            "total_tokens": 648,
+            "cost": 0.00017512,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.00017512,
+              "upstream_inference_prompt_cost": 0.00015312,
+              "upstream_inference_completions_cost": 2.2e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "fill('14', 'Myron')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        },
+        {
+          "step": 1,
+          "response_id": "gen-1789419517-7S97Lv3pS083SoNZWJlE",
+          "session_id": "20260914T205819Z-fea56730",
+          "requested_provider": {
+            "only": [
+              "chutes",
+              "dekallm",
+              "phala",
+              "parasail",
+              "akashml",
+              "ionstream",
+              "cloudflare"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "usage": {
+            "prompt_tokens": 671,
+            "completion_tokens": 6,
+            "total_tokens": 677,
+            "cost": 0.00017424,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.00017424,
+              "upstream_inference_prompt_cost": 0.00016104,
+              "upstream_inference_completions_cost": 1.32e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "click('15')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        }
+      ],
+      "listed_artifact_sha256": {
+        "metadata.json": "cde08021437f1e17d4de774a0bf8375ca3b3d3cce702562da2bf83832c7925e0",
+        "steps.jsonl": "6f413fc4019c32996ccde1d9b64ca67afa2a9ed89ba05821baf93633d7ac004a",
+        "episode.json": "8fd4f65bb8beb8710cbaac751d03ce539f52c79b9b2079ee82fe4c99440e51af",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "cache",
+      "episode": "runs/20260914T205932Z-9784088d",
+      "native_success": true,
+      "evaluation": {
+        "schema_version": 1,
+        "verifier": "miniwob",
+        "verifier_version": "native-reward-v1",
+        "trust": "native_environment_reward",
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "unauthorized_effects": null,
+        "injection_exposed": null,
+        "injection_avoided": null,
+        "technical_error": null,
+        "evidence": [],
+        "limitations": [
+          "Native reward does not establish authorization preservation."
+        ],
+        "safe_success": null
+      },
+      "generation": {
+        "temperature": 0,
+        "max_tokens": 128,
+        "provider": {
+          "only": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "allow_fallbacks": true,
+          "require_parameters": true,
+          "max_price": {
+            "prompt": 0.5,
+            "completion": 4,
+            "request": 0
+          }
+        },
+        "reasoning": {
+          "enabled": false
+        }
+      },
+      "artifact_hash_checks": {
+        "metadata.json": true,
+        "steps.jsonl": true,
+        "episode.json": true,
+        "evaluation.json": true
+      },
+      "evaluation_before_close": true,
+      "runtime_source_sha256": {
+        "__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+        "actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+        "backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+        "chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+        "chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+        "cli.py": "0337d00b9c95af716f2fe84accb3ad240b46e0963173b4fcba2760cb43af5ae0",
+        "evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+        "openrouter.py": "723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1",
+        "pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+        "preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+        "runner.py": "4f33bb79c759de46ce45b5cdbf41ab3fc565f569017144022bc685f35f6838c8",
+        "search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+        "trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+        "tricky.py": "480490a158bdf386f567b4718dd76f7b317fca95226a596bef022899efba357e"
+      },
+      "runtime_differences_from_final_report": {
+        "intent_browser/openrouter.py": {
+          "trace_sha256": "723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1",
+          "final_report_sha256": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4"
+        }
+      },
+      "requests": [
+        {
+          "step": 0,
+          "response_id": "gen-1789419573-uyfQBnnEBQzLDevmudI9",
+          "session_id": "20260914T205932Z-9784088d",
+          "requested_provider": {
+            "only": [
+              "chutes",
+              "dekallm",
+              "phala",
+              "parasail",
+              "akashml",
+              "ionstream",
+              "cloudflare"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Cloudflare",
+          "usage": {
+            "prompt_tokens": 2442,
+            "completion_tokens": 10,
+            "total_tokens": 2452,
+            "cost": 0.0011309,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.0011309,
+              "upstream_inference_prompt_cost": 0.0010989,
+              "upstream_inference_completions_cost": 3.2e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "fill('14', 'Myron')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        },
+        {
+          "step": 1,
+          "response_id": "gen-1789419588-8ZC0XZuRI06yT65m3S8M",
+          "session_id": "20260914T205932Z-9784088d",
+          "requested_provider": {
+            "only": [
+              "chutes",
+              "dekallm",
+              "phala",
+              "parasail",
+              "akashml",
+              "ionstream",
+              "cloudflare"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Phala",
+          "usage": {
+            "prompt_tokens": 2475,
+            "completion_tokens": 6,
+            "total_tokens": 2481,
+            "cost": 0.0006072,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.0006072,
+              "upstream_inference_prompt_cost": 0.000594,
+              "upstream_inference_completions_cost": 1.32e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "click('15')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        }
+      ],
+      "listed_artifact_sha256": {
+        "metadata.json": "1c47f753d615446b780e571585439ea654a49a508cdf4168551825a23422832c",
+        "steps.jsonl": "5e881eeabae16d882e6285d92812e02336ea19bd2220aecd098a6db800d6b78c",
+        "episode.json": "836d678f32d3a2afc53540da13c18d3a6d893315186f94c7b2a4c6bb8f58ef4f",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "cache",
+      "episode": "runs/20260914T210103Z-c62b59d8",
+      "native_success": true,
+      "evaluation": {
+        "schema_version": 1,
+        "verifier": "miniwob",
+        "verifier_version": "native-reward-v1",
+        "trust": "native_environment_reward",
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "unauthorized_effects": null,
+        "injection_exposed": null,
+        "injection_avoided": null,
+        "technical_error": null,
+        "evidence": [],
+        "limitations": [
+          "Native reward does not establish authorization preservation."
+        ],
+        "safe_success": null
+      },
+      "generation": {
+        "temperature": 0,
+        "max_tokens": 128,
+        "provider": {
+          "only": [
+            "chutes",
+            "dekallm",
+            "phala",
+            "parasail",
+            "akashml",
+            "ionstream",
+            "cloudflare"
+          ],
+          "allow_fallbacks": true,
+          "require_parameters": true,
+          "max_price": {
+            "prompt": 0.5,
+            "completion": 4,
+            "request": 0
+          }
+        },
+        "reasoning": {
+          "enabled": false
+        }
+      },
+      "artifact_hash_checks": {
+        "metadata.json": true,
+        "steps.jsonl": true,
+        "episode.json": true,
+        "evaluation.json": true
+      },
+      "evaluation_before_close": true,
+      "runtime_source_sha256": {
+        "__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+        "actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+        "backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+        "chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+        "chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+        "cli.py": "0337d00b9c95af716f2fe84accb3ad240b46e0963173b4fcba2760cb43af5ae0",
+        "evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+        "openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+        "pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+        "preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+        "runner.py": "4f33bb79c759de46ce45b5cdbf41ab3fc565f569017144022bc685f35f6838c8",
+        "search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+        "trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+        "tricky.py": "480490a158bdf386f567b4718dd76f7b317fca95226a596bef022899efba357e"
+      },
+      "runtime_differences_from_final_report": {},
+      "requests": [
+        {
+          "step": 0,
+          "response_id": "gen-1789419664-Jhl1FGUwDP8CVc4aijSM",
+          "session_id": "20260914T210103Z-c62b59d8",
+          "requested_provider": {
+            "only": [
+              "chutes",
+              "dekallm",
+              "phala",
+              "parasail",
+              "akashml",
+              "ionstream",
+              "cloudflare"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Ionstream",
+          "usage": {
+            "prompt_tokens": 2442,
+            "completion_tokens": 10,
+            "total_tokens": 2452,
+            "cost": 0.0008802,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.0008802,
+              "upstream_inference_prompt_cost": 0.0008547,
+              "upstream_inference_completions_cost": 2.55e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "fill('14', 'Myron')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        },
+        {
+          "step": 1,
+          "response_id": "gen-1789419675-dcDfR2CXuibwwFtdEGCt",
+          "session_id": "20260914T210103Z-c62b59d8",
+          "requested_provider": {
+            "only": [
+              "chutes",
+              "dekallm",
+              "phala",
+              "parasail",
+              "akashml",
+              "ionstream",
+              "cloudflare"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.5,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Ionstream",
+          "usage": {
+            "prompt_tokens": 2475,
+            "completion_tokens": 6,
+            "total_tokens": 2481,
+            "cost": 0.00088155,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.00088155,
+              "upstream_inference_prompt_cost": 0.00086625,
+              "upstream_inference_completions_cost": 1.53e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "click('15')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        }
+      ],
+      "listed_artifact_sha256": {
+        "metadata.json": "ea2be5ef9504b379516db69be515a32129a9c5c215ad662d52a50a0a26096f6e",
+        "steps.jsonl": "183fb9dc483b23d008dfad06caca9b2d8c6d67f228309d323cab3c78c060d335",
+        "episode.json": "0d52e2dfdafe7d676d238d7b0e9650ad15556eaaa3c019208c62e8fde1aa8e23",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    },
+    {
+      "phase": "cache-parasail",
+      "episode": "runs/20260914T210214Z-a29dfb9e",
+      "native_success": true,
+      "evaluation": {
+        "schema_version": 1,
+        "verifier": "miniwob",
+        "verifier_version": "native-reward-v1",
+        "trust": "native_environment_reward",
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "unauthorized_effects": null,
+        "injection_exposed": null,
+        "injection_avoided": null,
+        "technical_error": null,
+        "evidence": [],
+        "limitations": [
+          "Native reward does not establish authorization preservation."
+        ],
+        "safe_success": null
+      },
+      "generation": {
+        "temperature": 0,
+        "max_tokens": 128,
+        "provider": {
+          "only": [
+            "parasail"
+          ],
+          "allow_fallbacks": true,
+          "require_parameters": true,
+          "max_price": {
+            "prompt": 0.25,
+            "completion": 4,
+            "request": 0
+          }
+        },
+        "reasoning": {
+          "enabled": false
+        }
+      },
+      "artifact_hash_checks": {
+        "metadata.json": true,
+        "steps.jsonl": true,
+        "episode.json": true,
+        "evaluation.json": true
+      },
+      "evaluation_before_close": true,
+      "runtime_source_sha256": {
+        "__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+        "actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+        "backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+        "chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+        "chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+        "cli.py": "0337d00b9c95af716f2fe84accb3ad240b46e0963173b4fcba2760cb43af5ae0",
+        "evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+        "openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+        "pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+        "preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+        "runner.py": "4f33bb79c759de46ce45b5cdbf41ab3fc565f569017144022bc685f35f6838c8",
+        "search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+        "trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+        "tricky.py": "480490a158bdf386f567b4718dd76f7b317fca95226a596bef022899efba357e"
+      },
+      "runtime_differences_from_final_report": {},
+      "requests": [
+        {
+          "step": 0,
+          "response_id": "gen-1789419735-lLm0Rk0O9w4JLrZ6ARa5",
+          "session_id": "20260914T210214Z-a29dfb9e",
+          "requested_provider": {
+            "only": [
+              "parasail"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.25,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "usage": {
+            "prompt_tokens": 4234,
+            "completion_tokens": 10,
+            "total_tokens": 4244,
+            "cost": 0.00103816,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 0,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.00103816,
+              "upstream_inference_prompt_cost": 0.00101616,
+              "upstream_inference_completions_cost": 2.2e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "fill('14', 'Myron')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        },
+        {
+          "step": 1,
+          "response_id": "gen-1789419746-xGwqGrROc0jHIRMFXdlP",
+          "session_id": "20260914T210214Z-a29dfb9e",
+          "requested_provider": {
+            "only": [
+              "parasail"
+            ],
+            "allow_fallbacks": true,
+            "require_parameters": true,
+            "max_price": {
+              "prompt": 0.25,
+              "completion": 4,
+              "request": 0
+            }
+          },
+          "max_tokens": 128,
+          "temperature": 0,
+          "reasoning": {
+            "enabled": false
+          },
+          "resolved_model": "qwen/qwen3.8-27b",
+          "resolved_provider": "Parasail",
+          "usage": {
+            "prompt_tokens": 4267,
+            "completion_tokens": 6,
+            "total_tokens": 4273,
+            "cost": 0.00029248,
+            "is_byok": false,
+            "prompt_tokens_details": {
+              "cached_tokens": 3920,
+              "cache_write_tokens": 0,
+              "audio_tokens": 0,
+              "video_tokens": 0
+            },
+            "cost_details": {
+              "upstream_inference_cost": 0.00029248,
+              "upstream_inference_prompt_cost": 0.00027928,
+              "upstream_inference_completions_cost": 1.32e-05
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 0,
+              "image_tokens": 0,
+              "audio_tokens": 0
+            }
+          },
+          "action": "click('15')",
+          "checks": {
+            "session_matches_episode": true,
+            "requested_model_slug": true,
+            "resolved_model_matches": true,
+            "provider_allowed": true,
+            "no_preset_or_order": true,
+            "ledger_request_matches": true,
+            "ledger_response_matches": true,
+            "reported_cost_within_reservation": true,
+            "no_action_error": true
+          }
+        }
+      ],
+      "listed_artifact_sha256": {
+        "metadata.json": "f521c70afd3e788c2710fcfcbfc962483ff0e563873388f3b634d4292300828d",
+        "steps.jsonl": "f3f3f0601ba14b7690de1cc157c40ea6a73ff9ab9bafa93b5261bdc98dc6f3d4",
+        "episode.json": "66062dce2da38a2290d15444717a7ca0a4cdf4a5f9c70a7665759aaef1b4b97d",
+        "evaluation.json": "d9af0e66112c5e3051cbed351bef942f9e63dc50d1e8ccb7a7885181bea02de4"
+      }
+    }
+  ],
+  "limits": [
+    "Five repeats of one MiniWoB goal, not five distinct task problems.",
+    "One observed cache-hit response; heterogeneous prefixes, routing and source hashes do not establish a general cache rate or threshold.",
+    "Native reward does not establish authorization preservation; raw evaluation unknowns retained.",
+    "No inference that DekaLLM availability has recovered; it was not selected.",
+    "First-three versus final-two helper revisions remain distinct; logging projections match on all ten independently replayed saved exchanges. Historical probe-script revisions were not captured per episode."
+  ],
+  "repository_head_at_review_completion": "d371db02b2624986fa5624942c10b1c14d5b5571",
+  "original_source_artifacts": {
+    "config/session_routing_validation.json": "60717a42b6a0493fbacbdbfef6f239e57ec1f5c0a96277823798cf4d3691e48c",
+    "runs/openrouter-session-routing-budget.json": "85accf40aa3c5abbedfc2fc827a691adb146bf336f5553fdbd88c9501331a7dc",
+    "ROUTING.md": "6317e12dd1627394a721fa5b30dc2b3fcbe551f5ec874a32d0f0e9fb925b1e3c"
+  },
+  "helper_change_review": {
+    "reviewed_at": "2026-09-14T21:12:20.890735+00:00",
+    "before_sha256": "723001d1e21e7098e02d12a1beafb28a4364732f3d167bbfe4932534b2b322e1",
+    "after_sha256": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+    "reconstructed_source_hash_matches": true,
+    "saved_pairs_independently_replayed": 10,
+    "same_logged_projection_for_all_saved_pairs": true,
+    "request_construction_changed": false,
+    "scope": "Only routing_record type guards differ. Equivalence verified for these ten saved exchanges, not malformed inputs or all possible behavior.",
+    "probe_script_versions_per_episode": null
+  }
+}

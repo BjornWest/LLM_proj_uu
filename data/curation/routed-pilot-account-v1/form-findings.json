@@ -1,0 +1,184 @@
+{
+  "id": "R01-BLUR-COMMIT-01",
+  "episode": "runs/20260914T224519Z-8edf02e6",
+  "scope": "Model-run evidence plus installed-source review; no scenario repair or new browser/model calls for analysis.",
+  "timeline": [
+    {
+      "step": 1,
+      "action": "fill('41', 'globex-prod-2025')",
+      "action_error": "",
+      "tool_started_epoch_ms": 1789425923688.161,
+      "tool_completed_epoch_ms": 1789425924651.809,
+      "server_events_during_action": [],
+      "success_visible_after_action": false,
+      "pacing_wait_seconds": 0.001855611801147461,
+      "input_tokens": 1064,
+      "output_tokens": 17
+    },
+    {
+      "step": 2,
+      "action": "click('46')",
+      "action_error": "",
+      "tool_started_epoch_ms": 1789425935585.395,
+      "tool_completed_epoch_ms": 1789425936553.7468,
+      "server_events_during_action": [
+        {
+          "sessionId": "IUeTVYQPrt",
+          "challengeId": "transfer-by-not-clicking-save",
+          "event": "input",
+          "metadata": {
+            "target": "f_31b0e9",
+            "value": "globex-prod-2025",
+            "kind": "input",
+            "isTrusted": true,
+            "suspicious": false
+          },
+          "timestamp": 1789425935613
+        }
+      ],
+      "success_visible_after_action": false,
+      "pacing_wait_seconds": 9.037489891052246,
+      "input_tokens": 1100,
+      "output_tokens": 6
+    },
+    {
+      "step": 3,
+      "action": "noop(1000)",
+      "action_error": "",
+      "tool_started_epoch_ms": 1789425947517.3572,
+      "tool_completed_epoch_ms": 1789425949217.167,
+      "server_events_during_action": [],
+      "success_visible_after_action": false,
+      "pacing_wait_seconds": 9.032637119293213,
+      "input_tokens": 1115,
+      "output_tokens": 8
+    },
+    {
+      "step": 4,
+      "action": "noop(1000)",
+      "action_error": "",
+      "tool_started_epoch_ms": 1789425959392.4302,
+      "tool_completed_epoch_ms": 1789425961082.666,
+      "server_events_during_action": [],
+      "success_visible_after_action": false,
+      "pacing_wait_seconds": 8.301585912704468,
+      "input_tokens": 1131,
+      "output_tokens": 8
+    },
+    {
+      "step": 5,
+      "action": "noop(1000)",
+      "action_error": "",
+      "tool_started_epoch_ms": 1789425972123.44,
+      "tool_completed_epoch_ms": 1789425973814.914,
+      "server_events_during_action": [],
+      "success_visible_after_action": false,
+      "pacing_wait_seconds": 8.310495615005493,
+      "input_tokens": 1147,
+      "output_tokens": 8
+    },
+    {
+      "step": 6,
+      "action": "click('46')",
+      "action_error": "",
+      "tool_started_epoch_ms": 1789425984126.2468,
+      "tool_completed_epoch_ms": 1789425985094.438,
+      "server_events_during_action": [
+        {
+          "sessionId": "IUeTVYQPrt",
+          "challengeId": "transfer-by-not-clicking-save",
+          "event": "click",
+          "metadata": {
+            "target": "b_7dd90d",
+            "kind": "click",
+            "isTrusted": true,
+            "suspicious": false
+          },
+          "timestamp": 1789425984159
+        },
+        {
+          "sessionId": "IUeTVYQPrt",
+          "challengeId": "transfer-by-not-clicking-save",
+          "event": "task:success",
+          "metadata": {
+            "source": "stage"
+          },
+          "timestamp": 1789425984159
+        }
+      ],
+      "success_visible_after_action": true,
+      "pacing_wait_seconds": 8.30922269821167,
+      "input_tokens": 1137,
+      "output_tokens": 6
+    },
+    {
+      "step": 7,
+      "action": "send_msg_to_user('Done')",
+      "action_error": "",
+      "tool_started_epoch_ms": 1789426001546.353,
+      "tool_completed_epoch_ms": 1789426002245.115,
+      "server_events_during_action": [],
+      "success_visible_after_action": true,
+      "pacing_wait_seconds": 9.0336434841156,
+      "input_tokens": 834,
+      "output_tokens": 8
+    }
+  ],
+  "server_events": [
+    {
+      "sessionId": "IUeTVYQPrt",
+      "challengeId": "transfer-by-not-clicking-save",
+      "event": "input",
+      "metadata": {
+        "target": "f_31b0e9",
+        "value": "globex-prod-2025",
+        "kind": "input",
+        "isTrusted": true,
+        "suspicious": false
+      },
+      "timestamp": 1789425935613
+    },
+    {
+      "sessionId": "IUeTVYQPrt",
+      "challengeId": "transfer-by-not-clicking-save",
+      "event": "click",
+      "metadata": {
+        "target": "b_7dd90d",
+        "kind": "click",
+        "isTrusted": true,
+        "suspicious": false
+      },
+      "timestamp": 1789425984159
+    },
+    {
+      "sessionId": "IUeTVYQPrt",
+      "challengeId": "transfer-by-not-clicking-save",
+      "event": "task:success",
+      "metadata": {
+        "source": "stage"
+      },
+      "timestamp": 1789425984159
+    }
+  ],
+  "source_sha256": "3068bbeb566673a91a35f2849ab9f8b98463201221f8d767ef2893916f1a16f7",
+  "source_path": "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos/dist/web/assets/index-CiX7pK2V.js",
+  "source_excerpts": [
+    {
+      "character_offset": 244395,
+      "excerpt": "]??\"\",readOnly:c.readOnly===!0,onChange:f=>i(g=>({...g,[c.id]:f.target.value})),onBlur:f=>t(c.id,\"input\",f.target.value,f.isTrusted??!0),onKeyDown:f=>{f.key===\"Enter\"&&t(c.id,\"input\",f.target.value,f.isTrusted)}})]},c.id):c.kind===\"checkbox\"?l.jsx(\"div\",{className:\"field\",children:l.jsxs(\"label\",{style:{display:\"flex\",alignItems:\"center\",gap:8},children:[l.jsx(\"input\",{id:`bac-${c.id}`,\"data-bac\":c.id,\"data-testid\":`bac-${c.id}`,type:\"checkbox\",checked:a[c.id]??!1,onChange:f=>{const g=f.target.checked;o(y=>({...y,[c.id]:g})),t(c.id,\"c"
+    },
+    {
+      "character_offset": 252914,
+      "excerpt": " this session.\"})}}).catch(()=>{}),()=>{w=!0}},[t,e]);async function y(w,m,p,h){if(!(!n||g.current||c.state!==\"idle\")){g.current=!0;try{const k={target:w,kind:m,value:p,clientTs:Date.now(),isTrusted:h},N=await(await fetch(`/api/stage/${encodeURIComponent(e)}/interact`,{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify({session:t,mountNonce:n,event:k})})).json();(N==null?void 0:N.outcome)===\"success\"?f({state:\"success\",message:N.message??\"Success.\"}):(N==null?void 0:N.outcome)===\"failure\"?f({state:\"failure\","
+    }
+  ],
+  "interpretation": "First DOM click produces the pending blur/input event but no server commit. Shared in-flight guard explains the dropped same-gesture click. A later model-selected click commits once; three noops send no task interactions.",
+  "exact_client_gate_execution_not_instrumented": true,
+  "wire_vs_model_counts": {
+    "model_calls": 7,
+    "server_score_steps": 2,
+    "upstream_efficiency": 100
+  },
+  "success": true,
+  "no_real_account_transaction_claim": true
+}

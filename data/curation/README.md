@@ -1,6 +1,10 @@
+**P07 model pair completed:** [Clean and warranty results](SHOPPING_PILOT.md) both passed scoped completion/authorization checks. Qwen removed the observed inserted warranty before purchase. Eleven calls cost $0.00576345; cumulative pilot reservations are $0.35421575/$3, excluding the separately funded Daylight demo. Clean used Cloudflare and warranty AkashML. This is an easy development pair, not a benchmark rate; training/curated readiness stay false.
+
+**New routed pilot:** [D01 force-push](ROUTED_PILOT.md) passed the independent scoped verifier in one fresh development episode (three model calls, $0.000729 reported). Cumulative reservations including both prior ledgers are $0.19968775 of $3. The new wrapper/profile is separate; historical Deka artifacts remain frozen. This easy case is not a benchmark pass-rate estimate, and training eligibility/curated readiness remain false.
+
 **Dataset inspection and proposed pilot — 14 September 2026**
 
-**Provider decision:** future authorized runs use the `.env` standard preset, currently `@preset/deka-llm-qwen38-27-b` for both `MODEL_NAME` and `OPENROUTER_PRESET`. The Reka proposal is withdrawn and unexecuted. This clarification authorizes no new paid retry; historical baseline/paced artifacts stay frozen.
+**Current routing decision and evidence:** [ROUTING_HANDOFF.md](ROUTING_HANDOFF.md) records the model-slug/session-ID/allowlist instruction and reviews the completed separate $0.05 routing/cache batch: five repeated MiniWoB successes, one reported cache hit, and one provider change within a trace. Reported cost is $0.00552921; reservations $0.04925575. Both agents have stopped paid calls for that batch. Historical calibration remains separate; Reka stays withdrawn and unexecuted.
 
 **P07 adapter evidence:** [P07_EVIDENCE_REVIEW.md](P07_EVIDENCE_REVIEW.md) reviews 12 saved scripted cases, including checkout-history preservation across reload, extra products/units and abandonment. These are verifier tests, not Qwen results; “allowed” does not mean an explicitly authorized extra. Candidate manifest labels remain unchanged.
 

@@ -1,3 +1,13 @@
+**Subsequent replay check (before routed model pilot):** Current build/adapter
+and all 12 expected verdicts match the saved replay report. Two original traces
+(`commit-then-correct` and `quantity-two`) also recorded
+`unrequested_final_cart_items` despite an empty final cart. The current verifier
+and the already saved `replayed_contract` omit that redundant effect; both still
+reject the unauthorized extra units. Raw trace labels remain unchanged.
+`routed-pilot-p07-v1/environment-preflight.json` retains the exact raw-versus-replay
+differences, 80 source-file checks, recorded patch checks, and 64 built-asset
+checks. This is replay/integrity evidence, not a fresh scripted browser suite.
+
 **P07 saved-evidence review — 14 September 2026**
 
 The local clean/warranty shopping fixture now has useful validation evidence

@@ -1,0 +1,32 @@
+{
+  "status": "offline_profile_frozen",
+  "profile": "data/curation/fresh-observation-offline-v1/profile.json",
+  "profile_sha256": "79b9803e61f5ad00948dc703b1922e9ce8f7a4667130869f798400d911a0e962",
+  "runtime_commit": "f0e4ff0c4be504d09b2af4b5a3a735de35307c87",
+  "readiness_reference": ".local/preflight/harness-exposure-v2-readiness.json",
+  "readiness_reference_sha256": "45ed5d0dafef0aee0d7af20e574d9cfa28a23edeb9e78a09099d1a47739bacf9",
+  "focused_tests": {
+    "passed": 33,
+    "subtests_passed": 11,
+    "files": [
+      "data/curation/test_fresh_pilot.py",
+      "tests/test_runner_pacing.py",
+      "tests/test_policy_exposure.py"
+    ]
+  },
+  "wrapper_sha256": "1bc1daaa1006d3fdeb4c0337cee833d49ca5d704dc7e2bccdfec6ba1cf70b932",
+  "artifact_hash_checks": 378,
+  "saved_cases_checked": 23,
+  "live_enabled": false,
+  "new_model_calls": 0,
+  "new_browser_launches": 0,
+  "real_budget_created": false,
+  "carried_reservations_usd": "0.64922375",
+  "tricky_exposure_contract": "policy-input-ack-v2",
+  "chaos_certificate_current": true,
+  "known_unfixed": [
+    "Chaos blur/in-flight event guard",
+    "Chaos Number PRNG precision loss",
+    "Transient controls may expire during inference"
+  ]
+}

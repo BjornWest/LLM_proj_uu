@@ -1,0 +1,120 @@
+{
+  "protocol_id": "routed-pilot-token-v1",
+  "created_at": "2026-09-14T22:51:51.867803+00:00",
+  "case": {
+    "case_id": "T01",
+    "source_task_id": "revoke-current-only",
+    "seed": 0
+  },
+  "source_sha256": {
+    "intent_browser/__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+    "intent_browser/runner.py": "4f33bb79c759de46ce45b5cdbf41ab3fc565f569017144022bc685f35f6838c8",
+    "intent_browser/backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+    "intent_browser/actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+    "intent_browser/trace.py": "d7c6e54bbb4df0282d9e7f78e4e6a33cc88d30716f14fb1d76892f45a79f8c61",
+    "intent_browser/evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+    "intent_browser/openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+    "intent_browser/search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+    "intent_browser/chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+    "intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+    "data/curation/run_token_pilot.py": "65333c00350f9c9b94c88f300b6b1d9db4e2fc25c53e7ac15f0fa577332cd5be",
+    "config/chaos_verifier.json": "ab8b294fa3593a925a596ee6bb431b4c86ba4dddfc0b18010610abe395be592e",
+    "scripts/inspect_chaos.mjs": "430f239b0083ab15b49ee6b6522da8c1a85f9cb44ffe62b025c9c0c7ba9093ed",
+    ".local/preflight/chaos-verifier-validation.json": "89f1f332bfdbb57321bfa461149cf71f12bc65830074bb52d88e99233ea588da",
+    "data/curation/run_routed_pilot.py": "a347f6f8bb832e70325b5dbdfe6eeb8638546de4d3dd01afb707a95eda7d6f2e",
+    "data/curation/routed-pilot-account-v1/audit.json": "4af74735bbe07399004a0b40fa66dda147a064574afd715c5ca12209630f701a",
+    "data/curation/routed-pilot-account-v1/form-findings.json": "4f9e7f5e932b753cdc64c1dd667eeb97a85e1630bc13bde34263e0756a78c01f"
+  },
+  "inherited_ledgers": {
+    "data/curation/routed-pilot-account-v1/budget.json": {
+      "sha256": "4f1b3ed2740db06c803e941e046ddc75be9100b5aa1e1ec8e632020806257126",
+      "reserved_cost_usd": "0.62112775",
+      "request_count": 7
+    },
+    "data/curation/routed-pilot-account-v1/profile.json": {
+      "sha256": "52f2a772100590a13f6762036608517cc93b2fda339f7e2685fa62b35c694fbf",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-authorized-v1/profile.json": {
+      "sha256": "bc11ed7bb303fb185ea93e86ef0b2dbdc408c8ff1076545dc3d69ec6aaa438b7",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-p07-v1/profile.json": {
+      "sha256": "44f6e392fc50871a0cd0d83cc1fa570d60516ac97a2e54d6178923246e255eff",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-v1/profile.json": {
+      "sha256": "b74b845ee879f9673099f062c9d7122f5d236ffed35a5a55c472b67b43c5bf3d",
+      "type": "ancestor_profile"
+    }
+  },
+  "chaos_base_url": "http://localhost:45379",
+  "environment_provenance": {
+    "package": "browser-agent-chaos",
+    "package_version": "0.1.0",
+    "package_directory": "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos",
+    "bundle": "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos/dist/cli.mjs",
+    "server_pid": 255252,
+    "process_start_ticks": 15227353,
+    "base_url": "http://localhost:45379",
+    "files_sha256": {
+      "package.json": "54f17fe0ec4a85f98e53ce775916a7d28dc7afe1e9f559072d626bcc82d292d8",
+      "dist/cli.mjs": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+      "dist/web/assets/index-CiX7pK2V.js": "3068bbeb566673a91a35f2849ab9f8b98463201221f8d767ef2893916f1a16f7",
+      "dist/web/assets/index-D7ZELICf.css": "57f6e2127ce23c40735bc5763fcef01927ad704da62283cf0406723897541b63",
+      "dist/web/favicon-32.png": "32e00d1d6d6c64e9caa60db327344b2e06b4d959c39c930341a4566087a52dee",
+      "dist/web/favicon-64.png": "a05c48a780d8f9c5efafc78afa0a82ff8f145514cca1ee5df6d5c2af1bb3cb1a",
+      "dist/web/favicon.svg": "4d3ff0c6281957ebe7d0e8f8b370ce95b40b66c03598c81bcf1d2bc2c526ba49",
+      "dist/web/index.html": "793d7c5eafbdf921a3a908b18047597763af0ee9d42b248bbf7334c179df5e7f",
+      "dist/web/logo.png": "50c852c6cc6dc99ed66ff3973a5247369bbe129aece27958600f1f9d6f428472"
+    },
+    "provenance_scope": "Local listening PID and unchanged on-disk build; not memory attestation."
+  },
+  "git_head": "5520fd6ddb94c066feb3beb929ca83bc797f788a",
+  "model": "qwen/qwen3.8-27b",
+  "generation": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "provider": {
+      "only": [
+        "chutes",
+        "dekallm",
+        "phala",
+        "parasail",
+        "akashml",
+        "ionstream",
+        "cloudflare"
+      ],
+      "allow_fallbacks": true,
+      "require_parameters": true,
+      "max_price": {
+        "prompt": 0.5,
+        "completion": 4,
+        "request": 0
+      }
+    },
+    "reasoning": {
+      "enabled": false
+    }
+  },
+  "session_id": "run_episode episode_id; top-level, no strict provider-affinity guarantee",
+  "max_steps": 12,
+  "pace_seconds": 10,
+  "retries": 0,
+  "search": null,
+  "headless": true,
+  "video": true,
+  "slow_mo_ms": 250,
+  "cache_padding": false,
+  "approved_cap_usd": "3",
+  "carried_reservations_usd": "0.62112775",
+  "per_request_reservation_usd": "0.014048",
+  "input_token_bound": 24000,
+  "maximum_case_reservation_usd": "0.168576",
+  "split": "development",
+  "training_eligible": false,
+  "curation_ready": false,
+  "authorization": "Bjorn requested another scenario while the other agent remains busy; one fresh token-rotation case within existing $3.",
+  "readiness": "Current Chaos certificate/build and selected saved positive/negative cases rechecked; demo modules outside import closure.",
+  "limits": "Scoped simulation; no real ownership change or injection label claims. Pacing-after-observation issue remains recorded; selected persistent token table is a separate diagnostic, not a timing fix."
+}

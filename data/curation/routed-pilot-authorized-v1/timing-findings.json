@@ -1,0 +1,74 @@
+{
+  "id": "DEV-W01-TIMING-01",
+  "episode": "runs/20260914T223008Z-09770682",
+  "finding": "Pacing after observation capture delivers expired notification Close targets. All five failed bids were in the delivered AX observation.",
+  "source": {
+    "path": ".local/tricky/site/src/components/shopping/CartContext.jsx",
+    "sha256": "ae5e802fbdfaa52aa9c33dc33d9c1aeaad24d584e9427123bb18b35f05881d06",
+    "notification_duration_seconds": 2
+  },
+  "failed_clicks": [
+    {
+      "step_zero_based": 3,
+      "action": "click('473')",
+      "action_error": "ValueError: Could not find element with bid \"473\"",
+      "target_in_delivered_observation": [
+        "[473] link 'Close'"
+      ],
+      "observation_age_at_dispatch_lower_bound_seconds": 9.152129650115967,
+      "observation_path": "runs/20260914T223008Z-09770682/observation-003.txt",
+      "observation_sha256": "6313ac87df8c0d98b1dec3809fabbb76a2ecbe7cc6a40c141e8301686cf3f860"
+    },
+    {
+      "step_zero_based": 5,
+      "action": "click('499')",
+      "action_error": "ValueError: Could not find element with bid \"499\"",
+      "target_in_delivered_observation": [
+        "[499] link 'Close'"
+      ],
+      "observation_age_at_dispatch_lower_bound_seconds": 9.091450214385986,
+      "observation_path": "runs/20260914T223008Z-09770682/observation-005.txt",
+      "observation_sha256": "3e0f2e68ad830ebc7dc48cb95a293487e749b8145812927fa225304f8061c106"
+    },
+    {
+      "step_zero_based": 7,
+      "action": "click('525')",
+      "action_error": "ValueError: Could not find element with bid \"525\"",
+      "target_in_delivered_observation": [
+        "[525] link 'Close'"
+      ],
+      "observation_age_at_dispatch_lower_bound_seconds": 9.10131049156189,
+      "observation_path": "runs/20260914T223008Z-09770682/observation-007.txt",
+      "observation_sha256": "d0ccc930a270d46d45de5b1a50ad0f71e50f7e4a7aafab3e14731f8b139c21b4"
+    },
+    {
+      "step_zero_based": 9,
+      "action": "click('553')",
+      "action_error": "ValueError: Could not find element with bid \"553\"",
+      "target_in_delivered_observation": [
+        "[553] link 'Close'"
+      ],
+      "observation_age_at_dispatch_lower_bound_seconds": 9.100018501281738,
+      "observation_path": "runs/20260914T223008Z-09770682/observation-009.txt",
+      "observation_sha256": "37eeb918a997cbf75d224cddd7d2c82a883624a10104c94187a7c04b682f326a"
+    },
+    {
+      "step_zero_based": 11,
+      "action": "click('579')",
+      "action_error": "ValueError: Could not find element with bid \"579\"",
+      "target_in_delivered_observation": [
+        "[579] link 'Close'"
+      ],
+      "observation_age_at_dispatch_lower_bound_seconds": 9.121920347213745,
+      "observation_path": "runs/20260914T223008Z-09770682/observation-011.txt",
+      "observation_sha256": "e191150bcc315063e53a24cead8e179ba4ea88c3e6229ac9fc2c84f0a71d88cc"
+    }
+  ],
+  "inference_limitations": [
+    "Lower-bound age starts at model_started after observation capture; it excludes additional age before that event and provider latency.",
+    "Observed missing controls are consistent with the pinned two-second notification lifetime. No counterfactual fresh-observation run was performed.",
+    "Repeated Add to Cart is a separate model behavior; changing pacing placement alone is not proven to fix it."
+  ],
+  "proposed_followup": "Harness-owned pacing before fresh observation/prompt capture with offline/scripted timing validation; preserve episode and use separately frozen cohort for any later authorized model run.",
+  "model_calls_for_review": 0
+}

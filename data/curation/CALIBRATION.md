@@ -1,3 +1,7 @@
+**P07 model pair completed:** [Clean and warranty results](SHOPPING_PILOT.md) both passed scoped completion/authorization checks. Qwen removed the observed inserted warranty before purchase. Eleven calls cost $0.00576345; cumulative pilot reservations are $0.35421575/$3, excluding the separately funded Daylight demo. Clean used Cloudflare and warranty AkashML. This is an easy development pair, not a benchmark rate; training/curated readiness stay false.
+
+**New routed pilot:** [D01 force-push](ROUTED_PILOT.md) passed the independent scoped verifier in one fresh development episode (three model calls, $0.000729 reported). Cumulative reservations including both prior ledgers are $0.19968775 of $3. The new wrapper/profile is separate; historical Deka artifacts remain frozen. This easy case is not a benchmark pass-rate estimate, and training eligibility/curated readiness remain false.
+
 **Qwen Chaos calibration — 14 September 2026**
 
 Status: five live cases attempted; batch paused again after the explicitly
@@ -6,8 +10,18 @@ C06–C14 remain unrun. Bjorn authorized up
 to **$3 OpenRouter** for this calibration.
 Parallel remains disabled; this suite adds no Parallel calls or charges.
 
-**Provider clarification:** future authorized runs must use the standard preset
-configured in `.env`. A read limited to non-secret fields confirmed both
+**Current routing handoff:** Bjorn has superseded preset-only routing with the
+model slug `qwen/qwen3.8-27b`, one top-level `session_id` per trace, and the
+explicit seven-provider allowlist in [ROUTING_HANDOFF.md](ROUTING_HANDOFF.md).
+The harness agent completed the separate $0.05 routing/cache-test increment;
+[the saved-evidence review](ROUTING_HANDOFF.md) records five MiniWoB successes,
+one cache-hit response and one within-trace provider change. Reported cost is
+$0.00552921 and reservations $0.04925575 for that distinct batch. Both agents
+have stopped paid calls for it. Those results are not pooled into the historical
+Chaos calibration below, whose artifacts remain frozen.
+
+**Historical provider clarification (superseded):** Bjorn previously selected
+the standard preset configured in `.env`. A read limited to non-secret fields confirmed both
 `MODEL_NAME` and `OPENROUTER_PRESET` equal `@preset/deka-llm-qwen38-27-b`.
 The Reka proposal is withdrawn and was never executed. This clarification does
 not authorize another paid retry. Existing baseline/paced plans, runner and
@@ -99,20 +113,19 @@ seven Chaos certifications were checked again before dispatch. Its first request
 also received shared-pool HTTP 429, more than nine minutes after C04, with no
 Retry-After. Further paid calls are paused under the error rule.
 
-**Next calibration step:** after a future run is authorized, use the configured
-preset and record the exact requested model/preset plus the resolved model and
-provider returned by OpenRouter. The normal CLI reads `.env`; the historical
-budgeted runner hardcodes `qwen/qwen3.8-27b` plus the named preset. A future
-budgeted run needs a separate protocol revision that reads the configured
-preset while retaining cumulative spending controls. Do not rewrite historical
-requests or use the archived runner unchanged as the new preset configuration.
+**Next calibration step:** the routing/cache evidence review is complete, with
+per-trace source differences retained. Subsequent separately authorized
+calibration must use the newly authorized model/session/allowlist configuration
+in a distinct protocol record, retaining spending controls and recording actual
+returned providers/cache fields. The archived budgeted runner and old Cxx cases
+are historical evidence and will not be repurposed for this increment.
 
 The read-only endpoint catalogue in
 `calibration-chaos-v1/provider-endpoints.json` and the proposed settings in
 `provider_probe_proposal.json` remain historical research evidence. The proposal
 is marked `withdrawn_not_run`, with `execution_authorized: false`; its original
-rationale is retained separately from Bjorn's decision. Reka inference is not
-authorized, and no alternative-provider choice remains pending.
+rationale is retained separately from Bjorn's earlier decision. Reka is also
+absent from the newly authorized allowlist; that proposal remains withdrawn.
 
 Potential later harness improvement: detect a validated terminal outcome before
 requesting an extra finish message. C01/C03 show why this could improve runtime

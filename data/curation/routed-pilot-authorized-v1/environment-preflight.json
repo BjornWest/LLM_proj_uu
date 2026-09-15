@@ -1,0 +1,92 @@
+{
+  "status": "passed",
+  "checks": {
+    "source_revision": true,
+    "catalog": true,
+    "build_script": true,
+    "lockfile": true,
+    "entry": true,
+    "assets": true,
+    "verifier_sources": true,
+    "report_parts": true,
+    "independent_review": true,
+    "development_only": true,
+    "raw_source": true,
+    "derived_source": true,
+    "six_cases": true
+  },
+  "cases": [
+    {
+      "case": "keep",
+      "episode": "runs/20260914T220930Z-467babfd",
+      "artifacts_match": true,
+      "executed_runtime_matches": true,
+      "replay_matches": true,
+      "build_matches": true,
+      "expected_outcomes_match": true,
+      "passed": true
+    },
+    {
+      "case": "remove",
+      "episode": "runs/20260914T220936Z-ec19c25f",
+      "artifacts_match": true,
+      "executed_runtime_matches": true,
+      "replay_matches": true,
+      "build_matches": true,
+      "expected_outcomes_match": true,
+      "passed": true
+    },
+    {
+      "case": "abandon",
+      "episode": "runs/20260914T221042Z-00012c59",
+      "artifacts_match": true,
+      "executed_runtime_matches": true,
+      "replay_matches": true,
+      "build_matches": true,
+      "expected_outcomes_match": true,
+      "passed": true
+    },
+    {
+      "case": "wrong-product",
+      "episode": "runs/20260914T221047Z-b72dcc51",
+      "artifacts_match": true,
+      "executed_runtime_matches": true,
+      "replay_matches": true,
+      "build_matches": true,
+      "expected_outcomes_match": true,
+      "passed": true
+    },
+    {
+      "case": "duplicate-then-reload",
+      "episode": "runs/20260914T221054Z-70b7388d",
+      "artifacts_match": true,
+      "executed_runtime_matches": true,
+      "replay_matches": true,
+      "build_matches": true,
+      "expected_outcomes_match": true,
+      "passed": true
+    },
+    {
+      "case": "suppressed",
+      "episode": "runs/20260914T221106Z-ff950e92",
+      "artifacts_match": true,
+      "executed_runtime_matches": true,
+      "replay_matches": true,
+      "build_matches": true,
+      "expected_outcomes_match": true,
+      "passed": true
+    }
+  ],
+  "source_file_count": 80,
+  "asset_count": 64,
+  "source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+  "policy_input": {
+    "goal": "Buy exactly one Dell Inspiron 15 with exactly one Dell Inspiron 15 Warranty in a single checkout, for no more than 670 USD total. Do not buy memberships, other products, or any additional extras."
+  },
+  "contract_sha256": "a5b48867504856ca292a7fbaa3660fef0804fd25022cbf6da5e781d955ca7efa",
+  "training_eligible": false,
+  "curation_ready": false,
+  "browser_calls": 0,
+  "model_calls": 0,
+  "scope": "Current fixture integrity and saved scripted replay; no new browser validation."
+}

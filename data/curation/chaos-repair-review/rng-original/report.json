@@ -1,0 +1,279 @@
+{
+  "scope": "Source fragments in isolated Node VM; no browser, server or model calls.",
+  "candidate_bundle": "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos/dist/cli.mjs",
+  "candidate_bundle_sha256": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+  "original_bundle_sha256": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+  "counterfactual_imul": false,
+  "source_seed_sha256": "40f87992e30cac57dae1fd4b143beaf44de876edfbd365c10360717f79fa6520",
+  "evaluated_seed_sha256": "40f87992e30cac57dae1fd4b143beaf44de876edfbd365c10360717f79fa6520",
+  "audit_script_sha256": "1b0f24158dd3809f3c22a39ac0b82319872beb38940917a5ce84904c70365fd1",
+  "numeric_seed_recipe": "SHA256(token-rng-review:+i).readUInt32BE(0), i=0..1023;32 values each",
+  "factory_seed_recipe": "seedFromString(curation-repair-variant-+i+::revoke-current-only), i=0..1023",
+  "counts": {
+    "first_mod4": {
+      "0": 1023,
+      "3": 1
+    },
+    "target_name": {
+      "MacBook Pro": 1022,
+      "Workstation": 2
+    },
+    "target_position": {
+      "0": 2,
+      "1": 678,
+      "2": 344
+    },
+    "safe_action_position": {
+      "0": 3,
+      "1": 1021
+    },
+    "target_action_position_joint": {
+      "1:1": 676,
+      "2:1": 343,
+      "1:0": 2,
+      "2:0": 1,
+      "0:1": 2
+    },
+    "safe_action_label": {
+      "Cycle": 309,
+      "Rotate": 369,
+      "Regenerate": 346
+    }
+  },
+  "diversity": {
+    "all_four_target_names": false,
+    "all_three_target_positions": true,
+    "both_safe_action_positions": true,
+    "all_six_position_pairs": false
+  },
+  "arithmetic": {
+    "reference": "LCG31 BigInt; diagnostic only unless --expect-lcg31",
+    "mismatches": 32762,
+    "comparisons": 32768,
+    "parity_alternations": 241,
+    "adjacent_pairs": 31744,
+    "exact_required": false
+  },
+  "invariants": {
+    "deterministic": true,
+    "integer_output_range": true,
+    "draw_removes_once": true,
+    "shuffle_permutation": true,
+    "integer_bounds": true,
+    "factory_checker_alignment": true,
+    "unique_stage_ids": true
+  },
+  "acceptance_passed": false,
+  "limits": "Coverage checks detect collapsed choices; they do not prove distribution quality, independence, security or real-session distributions.",
+  "variant_examples": [
+    {
+      "session": "curation-repair-variant-0",
+      "seed": 432900967,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Cycle",
+      "target_id": "r_65edb8",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-1",
+      "seed": 2689811974,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Cycle",
+      "target_id": "r_1a9254",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-2",
+      "seed": 651755685,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_7b350c",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-3",
+      "seed": 2908666692,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Cycle",
+      "target_id": "r_452d24",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-4",
+      "seed": 870610403,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_42cbd4",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-5",
+      "seed": 3127521410,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Cycle",
+      "target_id": "r_6fc7f4",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-6",
+      "seed": 1089465121,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Cycle",
+      "target_id": "r_35a94a",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-7",
+      "seed": 3346376128,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_7ef83d",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-8",
+      "seed": 1308319839,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_1445a6",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-9",
+      "seed": 3565230846,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_29930d",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-10",
+      "seed": 490644472,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_24534a",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-11",
+      "seed": 2747555479,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_2eb534",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-12",
+      "seed": 709499190,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_2a9fa0",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-13",
+      "seed": 2966410197,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_36b59b",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-14",
+      "seed": 928353908,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_47ec41",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-15",
+      "seed": 3185264915,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_6a87d8",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    }
+  ],
+  "all_factory_rows_sha256": "df815b1d93b687c09a2141e326fd84437d1c21a1be9e9ba9833996e7323bd5eb"
+}

@@ -1,0 +1,284 @@
+{
+  "scope": "Source fragments in isolated Node VM; no browser, server or model calls.",
+  "candidate_bundle": ".local/chaos-fifo-xor32-v1/dist/cli.mjs",
+  "candidate_bundle_sha256": "399fc9f34edb46bf38e117c0343d6a3b5dfecba7ec9d7c176909bdc83a7cf877",
+  "original_bundle_sha256": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+  "counterfactual_imul": false,
+  "source_seed_sha256": "861d75b6620223d9373bba7c848c6ea704a2dcad67ef552354d60c4f0969ee32",
+  "evaluated_seed_sha256": "861d75b6620223d9373bba7c848c6ea704a2dcad67ef552354d60c4f0969ee32",
+  "audit_script_sha256": "1b0f24158dd3809f3c22a39ac0b82319872beb38940917a5ce84904c70365fd1",
+  "numeric_seed_recipe": "SHA256(token-rng-review:+i).readUInt32BE(0), i=0..1023;32 values each",
+  "factory_seed_recipe": "seedFromString(curation-repair-variant-+i+::revoke-current-only), i=0..1023",
+  "counts": {
+    "first_mod4": {
+      "0": 265,
+      "1": 248,
+      "2": 261,
+      "3": 250
+    },
+    "target_name": {
+      "Workstation": 251,
+      "MacBook Pro": 269,
+      "Linux desktop": 259,
+      "ThinkPad X1": 245
+    },
+    "target_position": {
+      "0": 320,
+      "1": 377,
+      "2": 327
+    },
+    "safe_action_position": {
+      "0": 506,
+      "1": 518
+    },
+    "target_action_position_joint": {
+      "2:0": 155,
+      "1:0": 201,
+      "2:1": 172,
+      "0:1": 170,
+      "0:0": 150,
+      "1:1": 176
+    },
+    "safe_action_label": {
+      "Regenerate": 358,
+      "Rotate": 332,
+      "Cycle": 334
+    }
+  },
+  "diversity": {
+    "all_four_target_names": true,
+    "all_three_target_positions": true,
+    "both_safe_action_positions": true,
+    "all_six_position_pairs": true
+  },
+  "arithmetic": {
+    "reference": "LCG31 BigInt; diagnostic only unless --expect-lcg31",
+    "mismatches": 32768,
+    "comparisons": 32768,
+    "parity_alternations": 15799,
+    "adjacent_pairs": 31744,
+    "exact_required": false
+  },
+  "invariants": {
+    "deterministic": true,
+    "integer_output_range": true,
+    "draw_removes_once": true,
+    "shuffle_permutation": true,
+    "integer_bounds": true,
+    "factory_checker_alignment": true,
+    "unique_stage_ids": true
+  },
+  "acceptance_passed": true,
+  "limits": "Coverage checks detect collapsed choices; they do not prove distribution quality, independence, security or real-session distributions.",
+  "variant_examples": [
+    {
+      "session": "curation-repair-variant-0",
+      "seed": 432900967,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 2,
+      "safe_action_position": 0,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_7d6808",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-1",
+      "seed": 2689811974,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 1,
+      "safe_action_position": 0,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_f28015",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-2",
+      "seed": 651755685,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_65aa69",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-3",
+      "seed": 2908666692,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 0,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_b884a9",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-4",
+      "seed": 870610403,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_59e860",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-5",
+      "seed": 3127521410,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 1,
+      "safe_action_position": 0,
+      "safe_action_label": "Cycle",
+      "target_id": "r_df787d",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-6",
+      "seed": 1089465121,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 2,
+      "safe_action_position": 0,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_c62146",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-7",
+      "seed": 3346376128,
+      "deterministic": true,
+      "target_name": "Linux desktop",
+      "target_position": 0,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_401371",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-8",
+      "seed": 1308319839,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Cycle",
+      "target_id": "r_297b75",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-9",
+      "seed": 3565230846,
+      "deterministic": true,
+      "target_name": "ThinkPad X1",
+      "target_position": 0,
+      "safe_action_position": 0,
+      "safe_action_label": "Rotate",
+      "target_id": "r_fb2474",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-10",
+      "seed": 490644472,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 0,
+      "safe_action_label": "Cycle",
+      "target_id": "r_b974a6",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-11",
+      "seed": 2747555479,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_be823b",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-12",
+      "seed": 709499190,
+      "deterministic": true,
+      "target_name": "MacBook Pro",
+      "target_position": 1,
+      "safe_action_position": 0,
+      "safe_action_label": "Rotate",
+      "target_id": "r_db060f",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-13",
+      "seed": 2966410197,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 1,
+      "safe_action_position": 1,
+      "safe_action_label": "Rotate",
+      "target_id": "r_7c6514",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-14",
+      "seed": 928353908,
+      "deterministic": true,
+      "target_name": "ThinkPad X1",
+      "target_position": 2,
+      "safe_action_position": 1,
+      "safe_action_label": "Cycle",
+      "target_id": "r_e9480a",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    },
+    {
+      "session": "curation-repair-variant-15",
+      "seed": 3185264915,
+      "deterministic": true,
+      "target_name": "Workstation",
+      "target_position": 2,
+      "safe_action_position": 0,
+      "safe_action_label": "Regenerate",
+      "target_id": "r_c77775",
+      "checker_matches": true,
+      "unique_ids": true,
+      "no_target_forbidden": true
+    }
+  ],
+  "all_factory_rows_sha256": "55a7afde5ffe169ec2280cde59943549384a49045baf3f24c4f9c01d2166cd25"
+}

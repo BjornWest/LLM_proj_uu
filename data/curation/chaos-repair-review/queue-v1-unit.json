@@ -1,0 +1,63 @@
+{
+  "scope": "Independent deterministic unit acceptance of copied module only; not React/browser integration or a grader certificate.",
+  "candidate": "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-v1/dist/web/assets/intent-stage-queue.mjs",
+  "candidate_sha256": "9c90c271e1c06c756d4f2c7ffb21396b1b29d6b1f7d18959e211cf5569c52d30",
+  "audit_script_sha256": "4219cdddf9961bf1c86b84f50bcce4ad3888fedb80fbed294d199c9ccb08768c",
+  "cases": [
+    {
+      "name": "input-before-save-under-delayed-response-and-immutable-payload",
+      "passed": true,
+      "dispatches": 2,
+      "order": [
+        "input",
+        "click"
+      ]
+    },
+    {
+      "name": "two-field-blurs-and-commit-preserve-event-order",
+      "passed": true,
+      "dispatches": 3
+    },
+    {
+      "name": "success-discards-already-queued-and-later-clicks-without-hidden-retry",
+      "passed": true,
+      "dispatches": 1,
+      "discarded": 2
+    },
+    {
+      "name": "every-terminal-outcome-stops-pending-work",
+      "passed": true,
+      "terminal_outcomes": 4
+    },
+    {
+      "name": "input-transport-failure-discards-commit-without-retry",
+      "passed": true,
+      "dispatches": 1,
+      "error_callbacks": 1
+    },
+    {
+      "name": "unmount-before-dispatch-cancels-work",
+      "passed": true,
+      "dispatches": 0
+    },
+    {
+      "name": "unmount-with-request-in-flight-ignores-old-result-and-discards-pending",
+      "passed": true,
+      "dispatches": 1,
+      "stale_callbacks": 0
+    },
+    {
+      "name": "new-mount-queue-is-independent-of-old-request",
+      "passed": true,
+      "stale_callbacks": 0
+    },
+    {
+      "name": "multiple-edits-not-coalesced-or-reordered-before-save",
+      "passed": true,
+      "dispatches": 3
+    }
+  ],
+  "passed": true,
+  "model_calls": 0,
+  "browser_calls": 0
+}

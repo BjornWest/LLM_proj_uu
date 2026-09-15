@@ -1,0 +1,316 @@
+{
+  "protocol_id": "fresh-observation-offline-v1",
+  "status": "offline_wrapper_only",
+  "live_enabled": false,
+  "training_eligible": false,
+  "curation_ready": false,
+  "case": null,
+  "source_sha256": {
+    "intent_browser/__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+    "intent_browser/runner.py": "f8ba632799dd62c01612470ad0807e4ae294dd9f9e2223cdf826e0050ba8dde0",
+    "intent_browser/backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+    "intent_browser/actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+    "intent_browser/trace.py": "ac5bbf3ee9adbe2f47808614cb20a07a65c0197772e9ed039a8cc835a77c1a13",
+    "intent_browser/evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+    "intent_browser/openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+    "intent_browser/search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+    "intent_browser/observation.py": "362dd020c19b1e968d223b3ae49e1f8d376a7d3f92962487dbace1321a0cd99d",
+    "intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+    "data/curation/prepare_fresh_pilot.py": "1bc1daaa1006d3fdeb4c0337cee833d49ca5d704dc7e2bccdfec6ba1cf70b932",
+    "OBSERVATION_PACING.md": "b215b63eae3f99c1a792cdbfe3a5ca8a6cceb4d1c5377c291bee27ebd0e07673",
+    "config/observation_pacing_validation.json": "72ea7f0584c55e2969d99ee1b3a4db40df2918d02521167497ffc75a2c99b86c",
+    "config/chaos_verifier.json": "713037e9dfea2a758a620483c83ca5d7e2416ff7c0c96685bcaa69b8a690c289",
+    "config/policy_exposure_validation_v2.json": "d6c231873b9da24caabcd9a640fcf0a5bb808a76d5516fd86ed25de48cddea40",
+    ".local/preflight/harness-exposure-v2-readiness.json": "45ed5d0dafef0aee0d7af20e574d9cfa28a23edeb9e78a09099d1a47739bacf9",
+    "data/curation/test_fresh_pilot.py": "8cb88fe9d64ec85e12771f81aa5ffc70fad63e4376fd66e2dc62fb344a48720f"
+  },
+  "inherited_ledgers": {
+    "data/curation/routed-pilot-token-v1/budget.json": {
+      "sha256": "10984db364e04a8982e43bf902106289049f24022bfa2d743dc32299c9c23bef",
+      "reserved_cost_usd": "0.64922375",
+      "request_count": 2
+    },
+    "data/curation/routed-pilot-token-v1/audit.json": {
+      "sha256": "11ec4f995416bdd86e49bb92c892d20ad5092622cd6826a629e9b8b368d7f7cc"
+    },
+    "data/curation/routed-pilot-token-v1/profile.json": {
+      "sha256": "4920bdbec4bc738abfab8779a9e999e92f5b710a6be7c330f9ea968610a5275f",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-account-v1/profile.json": {
+      "sha256": "52f2a772100590a13f6762036608517cc93b2fda339f7e2685fa62b35c694fbf",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-authorized-v1/profile.json": {
+      "sha256": "bc11ed7bb303fb185ea93e86ef0b2dbdc408c8ff1076545dc3d69ec6aaa438b7",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-p07-v1/profile.json": {
+      "sha256": "44f6e392fc50871a0cd0d83cc1fa570d60516ac97a2e54d6178923246e255eff",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-v1/profile.json": {
+      "sha256": "b74b845ee879f9673099f062c9d7122f5d236ffed35a5a55c472b67b43c5bf3d",
+      "type": "ancestor_profile"
+    }
+  },
+  "dependency_versions": {
+    "browsergym-core": "0.14.3",
+    "playwright": "1.44.0",
+    "httpx": "0.28.1",
+    "gymnasium": "1.3.0",
+    "numpy": "2.5.3"
+  },
+  "readiness_evidence": {
+    "reference": ".local/preflight/harness-exposure-v2-readiness.json",
+    "reference_sha256": "45ed5d0dafef0aee0d7af20e574d9cfa28a23edeb9e78a09099d1a47739bacf9",
+    "runtime_commit": "f0e4ff0c4be504d09b2af4b5a3a735de35307c87",
+    "source_sha256": {
+      "OBSERVATION_PACING.md": "b215b63eae3f99c1a792cdbfe3a5ca8a6cceb4d1c5377c291bee27ebd0e07673",
+      "config/chaos_verifier.json": "713037e9dfea2a758a620483c83ca5d7e2416ff7c0c96685bcaa69b8a690c289",
+      "config/observation_pacing_validation.json": "72ea7f0584c55e2969d99ee1b3a4db40df2918d02521167497ffc75a2c99b86c",
+      "config/policy_exposure_validation_v2.json": "d6c231873b9da24caabcd9a640fcf0a5bb808a76d5516fd86ed25de48cddea40",
+      "intent_browser/__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+      "intent_browser/actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+      "intent_browser/backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+      "intent_browser/chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+      "intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+      "intent_browser/cli.py": "0337d00b9c95af716f2fe84accb3ad240b46e0963173b4fcba2760cb43af5ae0",
+      "intent_browser/demo.py": "a8da52942bf536a88e4a343838fabf1980d09fcbfe3cc1091dca50e889eee733",
+      "intent_browser/demo_chat.py": "bf1396781c8d0176e048e4cc958707675b2d89f0088697bb00f1809ef69d6624",
+      "intent_browser/demo_rooms.py": "45d0d1e8e068b98e9c2fed1bab6bab93e6d24c59dd55589063d8a876e114365d",
+      "intent_browser/evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+      "intent_browser/observation.py": "362dd020c19b1e968d223b3ae49e1f8d376a7d3f92962487dbace1321a0cd99d",
+      "intent_browser/openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+      "intent_browser/pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+      "intent_browser/preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+      "intent_browser/runner.py": "f8ba632799dd62c01612470ad0807e4ae294dd9f9e2223cdf826e0050ba8dde0",
+      "intent_browser/search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+      "intent_browser/trace.py": "ac5bbf3ee9adbe2f47808614cb20a07a65c0197772e9ed039a8cc835a77c1a13",
+      "intent_browser/tricky.py": "900b5da4b69d243a7350ff67d7b16853870e502f9839929c549909c66c3d9b12",
+      "intent_browser/tricky_authorized.py": "09a754d80338e2e0a45f2304d3c4c905833857183f1e82a3eee3da8fed9e8738",
+      "scripts/certify_chaos.py": "1ff86ddee89589b99cfa51042fdb0a0fb2718ed5b5582fe60fb676d76fffdb76",
+      "scripts/verify_authorized_warranty.py": "3fb5ac66c36119d1e162a043352cefacd33eb4b2e0435fb4726bbd3ebdb7d1f0",
+      "scripts/verify_chaos.py": "537e6126d92723cc6ce601c139607a87fdf2385159e7d042a830e6baf0ff4b3b",
+      "scripts/verify_policy_exposure.py": "a66cbff2f35cc99650b5bbaf92545d24a3399803a2fdc570a8d8aad325e81cbf",
+      "tests/test_policy_exposure.py": "6ef601c2b7469caae6aa1cc9997c3ad6b1fd4a2febbb7fedd3308a79ed208e68"
+    },
+    "validation_reports_sha256": {
+      "config/observation_pacing_validation.json": "72ea7f0584c55e2969d99ee1b3a4db40df2918d02521167497ffc75a2c99b86c",
+      "config/policy_exposure_validation_v2.json": "d6c231873b9da24caabcd9a640fcf0a5bb808a76d5516fd86ed25de48cddea40",
+      ".local/preflight/chaos-verifier-fresh-v2-validation.json": "9fa4488f3936138b3fc8b5ec7712d68ced794ea9588992fab738bdf48366a3ce"
+    },
+    "cases": [
+      {
+        "episode": "runs/20260914T234454Z-ed733bbb",
+        "source": "config/observation_pacing_validation.json",
+        "hashes_match": true,
+        "replay": "timing_artifact_hashes"
+      },
+      {
+        "episode": "runs/20260914T234459Z-73d9ec13",
+        "source": "config/observation_pacing_validation.json",
+        "hashes_match": true,
+        "replay": "timing_artifact_hashes"
+      },
+      {
+        "episode": "runs/20260914T234443Z-ec65ef48",
+        "source": "config/policy_exposure_validation_v2.json",
+        "hashes_match": true,
+        "replay": "exposure_and_receipts"
+      },
+      {
+        "episode": "runs/20260914T234450Z-df249059",
+        "source": "config/policy_exposure_validation_v2.json",
+        "hashes_match": true,
+        "replay": "exposure_and_receipts"
+      },
+      {
+        "episode": "runs/20260914T234458Z-89c71af0",
+        "source": "config/policy_exposure_validation_v2.json",
+        "hashes_match": true,
+        "replay": "exposure_and_receipts"
+      },
+      {
+        "episode": "runs/20260914T234505Z-ca67e581",
+        "source": "config/policy_exposure_validation_v2.json",
+        "hashes_match": true,
+        "replay": "exposure_and_receipts"
+      },
+      {
+        "episode": "runs/20260914T234512Z-bd53341c",
+        "source": "config/policy_exposure_validation_v2.json",
+        "hashes_match": true,
+        "replay": "exposure_and_receipts"
+      },
+      {
+        "episode": "runs/20260914T234453Z-5155d257",
+        "task": "confirmshaming",
+        "scenario": "positive",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234456Z-652681b9",
+        "task": "confirmshaming",
+        "scenario": "negative",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234459Z-1b9e382c",
+        "task": "confirmshaming",
+        "scenario": "email-then-decline",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234503Z-31fa52ae",
+        "task": "confirmshaming",
+        "scenario": "skip",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234506Z-8366dd9d",
+        "task": "drip-pricing",
+        "scenario": "positive",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234509Z-e6af6975",
+        "task": "drip-pricing",
+        "scenario": "negative",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234512Z-f13477e5",
+        "task": "archive-vs-delete",
+        "scenario": "positive",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234514Z-563ca816",
+        "task": "archive-vs-delete",
+        "scenario": "negative",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234517Z-a356a223",
+        "task": "revoke-current-only",
+        "scenario": "positive",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234520Z-7953f2ed",
+        "task": "revoke-current-only",
+        "scenario": "negative",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234523Z-24a082cd",
+        "task": "drop-database",
+        "scenario": "positive",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234528Z-5797f230",
+        "task": "drop-database",
+        "scenario": "negative",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234532Z-14f8930b",
+        "task": "transfer-by-not-clicking-save",
+        "scenario": "positive",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234538Z-bae387b0",
+        "task": "transfer-by-not-clicking-save",
+        "scenario": "negative",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234543Z-056c8aca",
+        "task": "force-push",
+        "scenario": "positive",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      },
+      {
+        "episode": "runs/20260914T234547Z-776555b0",
+        "task": "force-push",
+        "scenario": "negative",
+        "replay": "chaos_contract",
+        "hashes_match": true
+      }
+    ],
+    "artifact_hash_checks": 378,
+    "exposure_contract": "policy-input-ack-v2",
+    "chaos_certificate_current": true,
+    "known_unfixed": [
+      "Chaos blur/in-flight event guard",
+      "Chaos Number PRNG precision loss",
+      "Transient controls may expire during inference"
+    ],
+    "scope": "Local saved-artifact validation/replay; no new browser execution or live process attestation."
+  },
+  "extraction_source_sha256": {
+    "browsergym.core.env": "867cc6efdfead356839fef8a26b492502b8b5e3d165d1b3c17d24aaeec268d63",
+    "browsergym.utils.obs": "eb08e2c263cf78c495ed942129bf6eab7da744e75b1213ed15bf6a13d92b79d7"
+  },
+  "model": "qwen/qwen3.8-27b",
+  "generation": {
+    "temperature": 0,
+    "max_tokens": 512,
+    "provider": {
+      "only": [
+        "chutes",
+        "dekallm",
+        "phala",
+        "parasail",
+        "akashml",
+        "ionstream",
+        "cloudflare"
+      ],
+      "allow_fallbacks": true,
+      "require_parameters": true,
+      "max_price": {
+        "prompt": 0.5,
+        "completion": 4,
+        "request": 0
+      }
+    },
+    "reasoning": {
+      "enabled": false
+    }
+  },
+  "session_id": "episode_id; supplied by run_episode",
+  "observation_lifecycle": "paced-fresh-v1",
+  "max_steps": 12,
+  "pace_seconds": 10,
+  "retries": 0,
+  "search": null,
+  "cache_padding": false,
+  "approved_cap_usd": "3",
+  "carried_reservations_usd": "0.64922375",
+  "per_request_reservation_usd": "0.014048",
+  "readiness": {
+    "harness_contract": "OBSERVATION_PACING.md",
+    "chaos_certificate_current": true,
+    "tricky_exposure": "policy-input-ack-v2 / verifier v2; decision input plus completion acknowledgment before first checkout; failed/unmatched attempts preserve null",
+    "paid_cohort": "not staged or enabled"
+  },
+  "scope": "Project inference import closure plus dependency versions and extraction implementation hashes; no environment adapter selected."
+}

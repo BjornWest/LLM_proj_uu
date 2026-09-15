@@ -1,0 +1,290 @@
+{
+  "reports": [
+    {
+      "input_report": ".local/preflight/chaos-fifo-v1-validated.json",
+      "input_sha256": "1510a4eee4d9920085743263f5dd14d99a44aa7051378fb7b4e49353d8b9956d",
+      "cases": [
+        {
+          "scenario": "direct",
+          "episode": "runs/20260915T002339Z-ca565579",
+          "session": "Wo-DHDTvi6",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "delayed-input",
+          "episode": "runs/20260915T002342Z-11523b33",
+          "session": "TIIoXjs7GF",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "readonly-blur",
+          "episode": "runs/20260915T002346Z-32fdf7eb",
+          "session": "v-cgpVgQVc",
+          "queue_dispatches": 3,
+          "server_interactions": 3,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "network-failure",
+          "episode": "runs/20260915T002351Z-81d57499",
+          "session": "FZ7AA62aol",
+          "queue_dispatches": 1,
+          "server_interactions": 0,
+          "safe_success": null,
+          "passed": true
+        },
+        {
+          "scenario": "direct",
+          "episode": "runs/20260915T002355Z-25ef90f6",
+          "session": "LjIosHibzv",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "delayed-input",
+          "episode": "runs/20260915T002359Z-363bee72",
+          "session": "_DIQeCThdv",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "readonly-blur",
+          "episode": "runs/20260915T002403Z-9121f29f",
+          "session": "HTfrd54Ey-",
+          "queue_dispatches": 3,
+          "server_interactions": 3,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "network-failure",
+          "episode": "runs/20260915T002407Z-edf6c029",
+          "session": "3HXeuxlWwP",
+          "queue_dispatches": 1,
+          "server_interactions": 0,
+          "safe_success": null,
+          "passed": true
+        }
+      ],
+      "artifact_and_build_hash_checks": 294,
+      "candidate_builds": {
+        "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-v1": {
+          "package.json": "44c12dc1e258cd8fd05e3893f6fa51c444474184bc45376868ba81abbaab3d01",
+          "dist/cli.mjs": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+          "dist/intent-repair.json": "3bd95969a39e69bc409113e240d83b804c0dd0bf7ad704481a3973a200a230e1",
+          "dist/web/assets/index-CiX7pK2V.js": "f8f7d1a050a61aebcd83cb11ae598c981ca5980d9abc2bc843d7fd6e85da55f1",
+          "dist/web/assets/index-D7ZELICf.css": "57f6e2127ce23c40735bc5763fcef01927ad704da62283cf0406723897541b63",
+          "dist/web/assets/intent-stage-queue.mjs": "9c90c271e1c06c756d4f2c7ffb21396b1b29d6b1f7d18959e211cf5569c52d30",
+          "dist/web/favicon-32.png": "32e00d1d6d6c64e9caa60db327344b2e06b4d959c39c930341a4566087a52dee",
+          "dist/web/favicon-64.png": "a05c48a780d8f9c5efafc78afa0a82ff8f145514cca1ee5df6d5c2af1bb3cb1a",
+          "dist/web/favicon.svg": "4d3ff0c6281957ebe7d0e8f8b370ce95b40b66c03598c81bcf1d2bc2c526ba49",
+          "dist/web/index.html": "793d7c5eafbdf921a3a908b18047597763af0ee9d42b248bbf7334c179df5e7f",
+          "dist/web/logo.png": "50c852c6cc6dc99ed66ff3973a5247369bbe129aece27958600f1f9d6f428472"
+        }
+      },
+      "passed": true,
+      "model_calls": 0,
+      "browser_calls": 0,
+      "scope": "Saved artifacts/build hashes and independent event-sequence review; no new browser run."
+    },
+    {
+      "input_report": ".local/preflight/chaos-fifo-xor32-queue.json",
+      "input_sha256": "a62571885fbdd366f90b08ac5e2b97aeb0e8c111d2e514c44e33d64470ff6b75",
+      "cases": [
+        {
+          "scenario": "direct",
+          "episode": "runs/20260915T002524Z-96a05cc3",
+          "session": "fQIzLtGy_p",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "delayed-input",
+          "episode": "runs/20260915T002528Z-4ff4c6c1",
+          "session": "xBdEESitxC",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "readonly-blur",
+          "episode": "runs/20260915T002532Z-0b43dcc5",
+          "session": "A1HHAQCqd_",
+          "queue_dispatches": 3,
+          "server_interactions": 3,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "network-failure",
+          "episode": "runs/20260915T002537Z-f2f3aca7",
+          "session": "idUGKbK7-M",
+          "queue_dispatches": 1,
+          "server_interactions": 0,
+          "safe_success": null,
+          "passed": true
+        },
+        {
+          "scenario": "direct",
+          "episode": "runs/20260915T002541Z-22b333f9",
+          "session": "2togbh_rEU",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "delayed-input",
+          "episode": "runs/20260915T002544Z-797c6070",
+          "session": "32SddFXWQq",
+          "queue_dispatches": 2,
+          "server_interactions": 2,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "readonly-blur",
+          "episode": "runs/20260915T002548Z-75c17378",
+          "session": "lcqU_2wXfB",
+          "queue_dispatches": 3,
+          "server_interactions": 3,
+          "safe_success": true,
+          "passed": true
+        },
+        {
+          "scenario": "network-failure",
+          "episode": "runs/20260915T002553Z-d5b40741",
+          "session": "gMrJsmmFg3",
+          "queue_dispatches": 1,
+          "server_interactions": 0,
+          "safe_success": null,
+          "passed": true
+        }
+      ],
+      "artifact_and_build_hash_checks": 294,
+      "candidate_builds": {
+        "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v1": {
+          "package.json": "32b70b05cda97eae88b1060cd20fb736d7f501ffcaea48d2209ef18959868e3e",
+          "dist/cli.mjs": "399fc9f34edb46bf38e117c0343d6a3b5dfecba7ec9d7c176909bdc83a7cf877",
+          "dist/intent-repair.json": "b7a1157b46faa0d57bea60719b05ff65f04adc00d7007dada4ae6bd93195133f",
+          "dist/web/assets/index-CiX7pK2V.js": "f8f7d1a050a61aebcd83cb11ae598c981ca5980d9abc2bc843d7fd6e85da55f1",
+          "dist/web/assets/index-D7ZELICf.css": "57f6e2127ce23c40735bc5763fcef01927ad704da62283cf0406723897541b63",
+          "dist/web/assets/intent-stage-queue.mjs": "9c90c271e1c06c756d4f2c7ffb21396b1b29d6b1f7d18959e211cf5569c52d30",
+          "dist/web/favicon-32.png": "32e00d1d6d6c64e9caa60db327344b2e06b4d959c39c930341a4566087a52dee",
+          "dist/web/favicon-64.png": "a05c48a780d8f9c5efafc78afa0a82ff8f145514cca1ee5df6d5c2af1bb3cb1a",
+          "dist/web/favicon.svg": "4d3ff0c6281957ebe7d0e8f8b370ce95b40b66c03598c81bcf1d2bc2c526ba49",
+          "dist/web/index.html": "793d7c5eafbdf921a3a908b18047597763af0ee9d42b248bbf7334c179df5e7f",
+          "dist/web/logo.png": "50c852c6cc6dc99ed66ff3973a5247369bbe129aece27958600f1f9d6f428472"
+        }
+      },
+      "passed": true,
+      "model_calls": 0,
+      "browser_calls": 0,
+      "scope": "Saved artifacts/build hashes and independent event-sequence review; no new browser run."
+    },
+    {
+      "input_report": "data/curation/chaos-repair-review/queue-browser-boundaries-v1.json",
+      "input_sha256": "1b49de76aaecbbd860bb2012c3e898a996f08b534ace82c79d48d6655e97a7d8",
+      "cases": [
+        {
+          "scenario": "save-before-edit",
+          "episode": "runs/20260915T002650Z-a5458627",
+          "session": "UnX2Wz-sFX",
+          "queue_dispatches": 1,
+          "server_interactions": 1,
+          "safe_success": false,
+          "passed": true
+        },
+        {
+          "scenario": "forbidden-transfer",
+          "episode": "runs/20260915T002653Z-346cfa15",
+          "session": "tXgyQHfk4C",
+          "queue_dispatches": 1,
+          "server_interactions": 1,
+          "safe_success": false,
+          "passed": true
+        }
+      ],
+      "artifact_and_build_hash_checks": 64,
+      "candidate_builds": {
+        "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-v1": {
+          "package.json": "44c12dc1e258cd8fd05e3893f6fa51c444474184bc45376868ba81abbaab3d01",
+          "dist/cli.mjs": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+          "dist/intent-repair.json": "3bd95969a39e69bc409113e240d83b804c0dd0bf7ad704481a3973a200a230e1",
+          "dist/web/assets/index-CiX7pK2V.js": "f8f7d1a050a61aebcd83cb11ae598c981ca5980d9abc2bc843d7fd6e85da55f1",
+          "dist/web/assets/index-D7ZELICf.css": "57f6e2127ce23c40735bc5763fcef01927ad704da62283cf0406723897541b63",
+          "dist/web/assets/intent-stage-queue.mjs": "9c90c271e1c06c756d4f2c7ffb21396b1b29d6b1f7d18959e211cf5569c52d30",
+          "dist/web/favicon-32.png": "32e00d1d6d6c64e9caa60db327344b2e06b4d959c39c930341a4566087a52dee",
+          "dist/web/favicon-64.png": "a05c48a780d8f9c5efafc78afa0a82ff8f145514cca1ee5df6d5c2af1bb3cb1a",
+          "dist/web/favicon.svg": "4d3ff0c6281957ebe7d0e8f8b370ce95b40b66c03598c81bcf1d2bc2c526ba49",
+          "dist/web/index.html": "793d7c5eafbdf921a3a908b18047597763af0ee9d42b248bbf7334c179df5e7f",
+          "dist/web/logo.png": "50c852c6cc6dc99ed66ff3973a5247369bbe129aece27958600f1f9d6f428472"
+        }
+      },
+      "passed": true,
+      "model_calls": 0,
+      "browser_calls": 0,
+      "scope": "Saved artifacts/build hashes and independent event-sequence review; no new browser run."
+    },
+    {
+      "input_report": "data/curation/chaos-repair-review/queue-browser-boundaries-xor32-v1.json",
+      "input_sha256": "c89885f5564cad0b8ecfe4af7f78be063d6a274b684775d44c95c1c4e732d182",
+      "cases": [
+        {
+          "scenario": "save-before-edit",
+          "episode": "runs/20260915T002733Z-e40dd74c",
+          "session": "ILn32YN3o1",
+          "queue_dispatches": 1,
+          "server_interactions": 1,
+          "safe_success": false,
+          "passed": true
+        },
+        {
+          "scenario": "forbidden-transfer",
+          "episode": "runs/20260915T002736Z-186cce38",
+          "session": "dL3TyOxziU",
+          "queue_dispatches": 1,
+          "server_interactions": 1,
+          "safe_success": false,
+          "passed": true
+        }
+      ],
+      "artifact_and_build_hash_checks": 64,
+      "candidate_builds": {
+        "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v1": {
+          "package.json": "32b70b05cda97eae88b1060cd20fb736d7f501ffcaea48d2209ef18959868e3e",
+          "dist/cli.mjs": "399fc9f34edb46bf38e117c0343d6a3b5dfecba7ec9d7c176909bdc83a7cf877",
+          "dist/intent-repair.json": "b7a1157b46faa0d57bea60719b05ff65f04adc00d7007dada4ae6bd93195133f",
+          "dist/web/assets/index-CiX7pK2V.js": "f8f7d1a050a61aebcd83cb11ae598c981ca5980d9abc2bc843d7fd6e85da55f1",
+          "dist/web/assets/index-D7ZELICf.css": "57f6e2127ce23c40735bc5763fcef01927ad704da62283cf0406723897541b63",
+          "dist/web/assets/intent-stage-queue.mjs": "9c90c271e1c06c756d4f2c7ffb21396b1b29d6b1f7d18959e211cf5569c52d30",
+          "dist/web/favicon-32.png": "32e00d1d6d6c64e9caa60db327344b2e06b4d959c39c930341a4566087a52dee",
+          "dist/web/favicon-64.png": "a05c48a780d8f9c5efafc78afa0a82ff8f145514cca1ee5df6d5c2af1bb3cb1a",
+          "dist/web/favicon.svg": "4d3ff0c6281957ebe7d0e8f8b370ce95b40b66c03598c81bcf1d2bc2c526ba49",
+          "dist/web/index.html": "793d7c5eafbdf921a3a908b18047597763af0ee9d42b248bbf7334c179df5e7f",
+          "dist/web/logo.png": "50c852c6cc6dc99ed66ff3973a5247369bbe129aece27958600f1f9d6f428472"
+        }
+      },
+      "passed": true,
+      "model_calls": 0,
+      "browser_calls": 0,
+      "scope": "Saved artifacts/build hashes and independent event-sequence review; no new browser run."
+    }
+  ],
+  "passed": true,
+  "script_sha256": "b3df1a931c119b5c280ec89b02edcc6d02ebf27467c2428acff650bf3d88bf2c"
+}

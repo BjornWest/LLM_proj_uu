@@ -1,0 +1,97 @@
+{
+  "scope": "Pinned installed seed utility in isolated JS context; 1024 SHA256-spread seeds,32 outputs each. No browser/model calls or environment changes.",
+  "source_bundle": "/home/bjorn/.npm/_npx/bf54f9f5413aff87/node_modules/browser-agent-chaos/dist/cli.mjs",
+  "source_bundle_sha256": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+  "seedutil_sha256": "40f87992e30cac57dae1fd4b143beaf44de876edfbd365c10360717f79fa6520",
+  "review_script_sha256": "f1c0e6a28a133d5af773fc9d05b920126ee4dfaf8a3de33b7144caffc4ef127f",
+  "seed_derivation": "SHA256(\"token-rng-review:\"+i).readUInt32BE(0), i=0..1023",
+  "sample_count": 1024,
+  "original": {
+    "first_pick_four_way_index_counts": {
+      "0": 1023,
+      "3": 1
+    },
+    "even_later_values": 31620,
+    "later_values_total": 31744,
+    "first_update_differs_from_exact_integer": 1018
+  },
+  "counterfactual_imul": {
+    "first_pick_four_way_index_counts": {
+      "0": 262,
+      "1": 252,
+      "2": 243,
+      "3": 267
+    },
+    "even_later_values": 15879,
+    "later_values_total": 31744,
+    "first_update_differs_from_exact_integer": 0
+  },
+  "counterfactual_note": "In-memory diagnostic only. First updates checked against exact BigInt arithmetic. Not a deployed repair or general PRNG/distribution certification.",
+  "source_excerpt": "// packages/core/dist/seedutil.js\nfunction seedFromString(s) {\n  let h = 0;\n  for (let i = 0; i < s.length; i++)\n    h = h * 31 + s.charCodeAt(i) | 0;\n  return h >>> 0 || 1;\n}\nfunction paraphrase(rng, variants) {\n  return rng.pick(variants);\n}\nvar Seeded;\nvar init_seedutil = __esm({\n  \"packages/core/dist/seedutil.js\"() {\n    \"use strict\";\n    Seeded = class {\n      state;\n      constructor(seed) {\n        this.state = seed >>> 0 || 1;\n      }\n      next() {\n        this.state = this.state * 1103515245 + 12345 & 2147483647;\n        return this.state;\n      }\n      pick(arr) {\n        return arr[this.next() % arr.length];\n      }\n      /** Pick exactly one element from `arr` and remove it. */\n      drawn(arr) {\n        const idx = this.next() % arr.length;\n        const [v] = arr.splice(idx, 1);\n        return v;\n      }\n      intBetween(low, highInclusive) {\n        return low + this.next() % (highInclusive - low + 1);\n      }\n      /** Random 8-char hex token, e.g. for opaque element ids. */\n      hex(len = 8) {\n        let out = \"\";\n        while (out.length < len) {\n          const r = this.next().toString(16);\n          out += r;\n        }\n        return out.slice(0, len);\n      }\n      /** Shuffle array in place. */\n      shuffle(arr) {\n        for (let i = arr.length - 1; i > 0; i--) {\n          const j = this.next() % (i + 1);\n          [arr[i], arr[j]] = [arr[j], arr[i]];\n        }\n        return arr;\n      }\n    };\n  }\n});\n\n",
+  "examples": [
+    {
+      "seed": 896848399,
+      "first": 559428224,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 559428252
+    },
+    {
+      "seed": 1939125876,
+      "first": 396441344,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 396441501
+    },
+    {
+      "seed": 1147309813,
+      "first": 1812182016,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 1812182154
+    },
+    {
+      "seed": 2012677709,
+      "first": 1151816960,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 1151816962
+    },
+    {
+      "seed": 95258466,
+      "first": 1643032832,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 1643032819
+    },
+    {
+      "seed": 2053160085,
+      "first": 1155784960,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 1155785130
+    },
+    {
+      "seed": 402987417,
+      "first": 1833874560,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 1833874526
+    },
+    {
+      "seed": 3697362083,
+      "first": 1902515200,
+      "firstMod4": 0,
+      "evenAfterFirst": 31,
+      "samples": 31,
+      "exact_first": 1902515104
+    }
+  ]
+}

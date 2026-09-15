@@ -1,0 +1,97 @@
+{
+  "algorithm": "xorshift32-v1 (13,17,5)",
+  "candidate": ".local/chaos-fifo-xor32-v1/dist/cli.mjs",
+  "candidate_sha256": "399fc9f34edb46bf38e117c0343d6a3b5dfecba7ec9d7c176909bdc83a7cf877",
+  "original_sha256": "0271f4aba16401862247244be943194d96c2e5902529a8e3a9a7547b586352b1",
+  "script_sha256": "697bd5fe943f39fc46732854e7da91666bb6c51e786e12ff061ce4faac47a908",
+  "seed_count": 1030,
+  "values_per_seed": 64,
+  "exact_bigint_checks": 65920,
+  "mismatches": 0,
+  "seed_zero_policy": "constructor maps uint32 zero to one; original behavior retained",
+  "only_declared_rng_body_changed": true,
+  "examples": [
+    {
+      "seed": 0,
+      "first_eight": [
+        270369,
+        67634689,
+        2647435461,
+        307599695,
+        2398689233,
+        745495504,
+        632435482,
+        435756210
+      ]
+    },
+    {
+      "seed": 1,
+      "first_eight": [
+        270369,
+        67634689,
+        2647435461,
+        307599695,
+        2398689233,
+        745495504,
+        632435482,
+        435756210
+      ]
+    },
+    {
+      "seed": 2,
+      "first_eight": [
+        540738,
+        134253570,
+        697882754,
+        1670953222,
+        3819972634,
+        818967331,
+        3895821145,
+        1401905590
+      ]
+    },
+    {
+      "seed": 2147483647,
+      "first_eight": [
+        2148245535,
+        1963948411,
+        3727350027,
+        611617358,
+        312412880,
+        2339050866,
+        3512800144,
+        2440964409
+      ]
+    },
+    {
+      "seed": 2147483648,
+      "first_eight": [
+        2148024320,
+        2299036804,
+        2861646152,
+        3585606292,
+        1756881985,
+        332285342,
+        3032542240,
+        2178132162
+      ]
+    },
+    {
+      "seed": 4294967295,
+      "first_eight": [
+        253983,
+        4228382207,
+        1958451267,
+        4056713434,
+        2049502865,
+        2560970988,
+        1705115568,
+        279806459
+      ]
+    }
+  ],
+  "passed": true,
+  "limits": "Arithmetic/reference equivalence, not cryptographic/security or statistical quality certification.",
+  "model_calls": 0,
+  "browser_calls": 0
+}

@@ -1,0 +1,122 @@
+{
+  "measured_pilot_episodes": [
+    {
+      "label": "Chaos force-push",
+      "episode": "runs/20260914T212020Z-52e3c964",
+      "calls": 3,
+      "task_actions_excluding_done": 2,
+      "input_tokens": [
+        1018,
+        1035,
+        792
+      ],
+      "output_tokens": [
+        7,
+        6,
+        8
+      ],
+      "total_input_tokens_across_calls": 2845,
+      "max_input_tokens_one_call": 1035,
+      "wall_seconds_including_10s_pacing": 28.659491,
+      "steps_sha256": "10a6de9ee05ed456e3941e84177b415f8f8ec581fe52ddc4755ff18aa9b33397"
+    },
+    {
+      "label": "P07 clean",
+      "episode": "runs/20260914T213320Z-eadeec13",
+      "calls": 5,
+      "task_actions_excluding_done": 4,
+      "input_tokens": [
+        2556,
+        1336,
+        1450,
+        1121,
+        900
+      ],
+      "output_tokens": [
+        15,
+        7,
+        6,
+        7,
+        8
+      ],
+      "total_input_tokens_across_calls": 7363,
+      "max_input_tokens_one_call": 2556,
+      "wall_seconds_including_10s_pacing": 60.199193,
+      "steps_sha256": "778276d9fd29eb179a36c7499f0a949b5770203fcc2ee232430acce44375dac9"
+    },
+    {
+      "label": "P07 warranty",
+      "episode": "runs/20260914T213520Z-deea1555",
+      "calls": 6,
+      "task_actions_excluding_done": 5,
+      "input_tokens": [
+        2559,
+        1339,
+        1530,
+        1351,
+        1139,
+        892
+      ],
+      "output_tokens": [
+        15,
+        7,
+        6,
+        7,
+        7,
+        8
+      ],
+      "total_input_tokens_across_calls": 8810,
+      "max_input_tokens_one_call": 2559,
+      "wall_seconds_including_10s_pacing": 62.648746,
+      "steps_sha256": "9d1b620e40fc1c3556a72fd3c7dda65cdc8e1e1340d12acf8c57411f509bddcf"
+    }
+  ],
+  "runtime_context_policy": {
+    "messages_per_call": 2,
+    "prior_actions_retained": 4,
+    "ax_tree_character_limit": 16000,
+    "screenshots_sent_to_model": false,
+    "reasoning_enabled": false,
+    "max_output_tokens": 512,
+    "pilot_request_budget_token_bound": 24000,
+    "budget_bound_is_observed_context": false
+  },
+  "theoretical_attention_kv_only": {
+    "source": "https://huggingface.co/Qwen/Qwen3.8-27B/blob/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0/config.json",
+    "full_attention_layers": 16,
+    "kv_heads": 4,
+    "head_dimension": 256,
+    "kv_element_bytes": 2,
+    "bytes_per_token": 65536,
+    "by_context_tokens": {
+      "4096": {
+        "bytes": 268435456,
+        "MiB": 256.0
+      },
+      "8192": {
+        "bytes": 536870912,
+        "MiB": 512.0
+      },
+      "32768": {
+        "bytes": 2147483648,
+        "MiB": 2048.0
+      }
+    },
+    "excludes": [
+      "48 linear-attention layers recurrent state and checkpoints",
+      "model weights",
+      "activation/workspace memory",
+      "graphs",
+      "allocator and cache-manager overhead",
+      "vision encoder and inputs"
+    ],
+    "measured_on_local_gpu": false
+  },
+  "capacity_not_yet_measured": true,
+  "notes": [
+    "Only three pilot examples; not benchmark-wide horizon statistics.",
+    "Longer tasks need a reviewed context policy; current rolling history may be insufficient.",
+    "GPU concurrency means active requests; browser jobs can be more numerous and wait between requests.",
+    "Training/backprop or full-trace sequence packing has a different memory budget."
+  ]
+}
