@@ -7,7 +7,9 @@ let submitting = false, savingIssue = false, authExpired = false;
 const goalDrafts = new Map();
 const stamp = value => { const d = new Date(value); return value && !Number.isNaN(d.valueOf()) ? d.toLocaleString() : 'Time unavailable'; };
 const describe = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
-const taskTitle = id => config?.tasks?.find(t => t.id === id)?.title || id || 'Unknown task';
+const taskLabel = task => (task.title || task.id) + (task.condition ? ' · ' + task.condition : '');
+const taskTitle = id => { const task = config?.tasks?.find(t => t.id === id); return task ? taskLabel(task) : id || 'Unknown task'; };
+const sessionGoal = task => task?.goal_mode === 'resolve_after_session_prepare';
 const currentTask = () => config?.tasks?.find(t => t.id === $('task').value);
 const selectedIndex = () => selectedJob?.steps?.findIndex(s => s.step === selectedStep) ?? -1;
 function notice(message = '') { $('notice').textContent = message; $('notice').hidden = !message; }
@@ -58,11 +60,12 @@ function syncControls() {
   $('history-state').textContent = replayTimer ? 'Playing recording' : following ? 'Following latest' : 'Inspecting history';
 }
 function taskFacts(task) {
-  const facts = [['Runtime', 'BrowserGym'], ['Goal', task?.custom_goal && activity === 'ask' ? 'Custom request' : 'Fixed task']];
+  const facts = [['Runtime', 'BrowserGym'], ['Goal', sessionGoal(task) ? 'Session objective' : task?.custom_goal && activity === 'ask' ? 'Custom request' : 'Fixed task']];
   // Optional registry metadata is displayed verbatim; missing provenance is never inferred.
   for (const [key, label] of [['site', 'Source site'], ['condition', 'Condition'], ['verification_scope', 'Verification']]) {
     if (typeof task?.[key] === 'string') facts.push([label, task[key]]);
   }
+  if (task?.development_only === true) facts.push(['Use', 'Development fixture']);
   $('task-facts').replaceChildren(...facts.flatMap(([key, value]) => {
     const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = key; dd.textContent = value; return [dt, dd];
   }));
@@ -70,11 +73,12 @@ function taskFacts(task) {
 function chooseTask() {
   const task = currentTask();
   $('goal').value = goalDrafts.get(task?.id) ?? task?.goal ?? '';
-  $('fixed-goal').textContent = task?.goal || 'No task is available in this mode yet.';
+  $('fixed-goal').textContent = sessionGoal(task) ? 'Resolved when the session starts' : task?.goal || 'No task is available in this mode yet.';
   $('goal-note').textContent = !task
     ? activity === 'ask' ? 'This worker currently offers fixed tasks only. Choose Watch a task to continue.' : 'Waiting for the task registry.'
     : task.available === false ? 'This task is unavailable until the worker advertises support for it.'
     : config?.worker?.mode === 'rehearsal' ? 'Scripted rehearsal · follows a fixed script without a model call.'
+    : sessionGoal(task) ? 'The worker reads the exact objective from the new session. It will appear in the run overview when ready.'
     : activity === 'ask' ? 'Custom requests may have unknown verification results. Each request starts a new run.'
     : 'The exact goal is sent to the agent. The environment independently checks supported outcomes.';
   taskFacts(task); syncControls();
@@ -83,7 +87,7 @@ function populateTasks() {
   const previous = $('task').value, tasks = eligibleTasks();
   $('task').replaceChildren(...tasks.map(task => {
     const option = document.createElement('option'); option.value = task.id;
-    option.textContent = (task.title || task.id) + (task.available === false ? ' · unavailable' : '');
+    option.textContent = taskLabel(task) + (task.available === false ? ' · unavailable' : '');
     option.disabled = task.available === false; return option;
   }));
   if (!tasks.length) { const option = document.createElement('option'); option.value = ''; option.textContent = 'No supported tasks'; $('task').append(option); }
@@ -219,7 +223,7 @@ function renderJob(job) {
   $('run-state').textContent = job.status || 'Unknown'; $('browser-title').textContent = taskTitle(job.task);
   const mode = ['scripted','rehearsal','scripted_rehearsal'].includes(job.mode) ? 'Scripted rehearsal' : job.mode === 'live' ? 'Model run' : 'Execution mode not recorded';
   $('runtime-label').textContent = 'BrowserGym · ' + mode;
-  $('run-summary').textContent = job.goal || 'No goal recorded';
+  $('run-summary').textContent = job.goal || (job.goal_resolution === 'session_pending' ? 'Resolved when the session starts' : 'No goal recorded');
   const reported = job.cost?.reported_usd, unknown = job.cost?.unknown_attempts;
   $('run-cost').textContent = (typeof reported === 'number' && Number.isFinite(reported) ? 'Reported model cost $' + reported.toFixed(6) : 'Reported model cost unavailable')
     + (Number.isInteger(unknown) && unknown > 0 ? ' · ' + unknown + ' attempt' + (unknown === 1 ? '' : 's') + ' with unknown cost' : '');
@@ -229,7 +233,7 @@ function renderJob(job) {
   $('trace-download').hidden = !job.trace_ready;
   if (job.trace_ready) $('trace-download').href = '/api/harness/jobs/' + encodeURIComponent(job.id) + '/trace'; else $('trace-download').removeAttribute('href');
   if (!oldJob || JSON.stringify(oldJob.evaluation) !== JSON.stringify(job.evaluation)) renderEvaluation(job.evaluation);
-  $('runtime').textContent = job.runtime ? describe(job.runtime) : 'Not recorded yet.';
+  $('runtime').textContent = (job.task_revision ? 'Task revision: ' + job.task_revision + '\n\n' : '') + (job.runtime ? describe(job.runtime) : 'Not recorded yet.');
   const steps = job.steps || [], changed = JSON.stringify(oldJob?.steps) !== JSON.stringify(steps);
   if (changed) {
     const whole = document.createElement('option'); whole.value = ''; whole.textContent = 'Whole run';
@@ -335,10 +339,14 @@ $('play-replay').onclick = () => {
 $('task-form').onsubmit = async event => {
   event.preventDefault(); const task = currentTask();
   if (submitting || authExpired || activity === 'replay' || !config?.enabled || !task || task.available === false || (activity === 'ask' && !task.custom_goal)) return;
+  const dynamic = sessionGoal(task);
   const goal = activity === 'ask' ? $('goal').value.trim() : task.goal;
-  if (!goal) { notice('Enter a request before queuing a run.'); return; }
+  if (!dynamic && !goal) { notice('Enter a request before queuing a run.'); return; }
+  // A session objective belongs to the newly prepared worker session. Never
+  // submit a placeholder, draft or a prior run's resolved target as its goal.
+  const payload = {task: task.id, ...(dynamic ? {} : {goal}), ...(task.revision ? {task_revision: task.revision} : {})};
   submitting = true; syncControls(); notice();
-  try { const job = await api('/api/harness/jobs', {task: task.id, goal}); await selectJob(job.id); await poll(); }
+  try { const job = await api('/api/harness/jobs', payload); await selectJob(job.id); await poll(); }
   catch (error) { notice(error.message); }
   finally { submitting = false; syncControls(); }
 };

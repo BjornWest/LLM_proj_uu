@@ -134,6 +134,59 @@ with sync_playwright() as p:
     page.screenshot(path=str(ROOT / '.local/ux-preview-mobile.png'), full_page=True)
     passed('Desktop and mobile layouts render without horizontal overflow')
 
+    # Model the additive registry contract locally; no external task is run.
+    registry = page.request.get(origin + '/api/harness/config').json()
+    dynamic_task = {'id':'chaos-confirmshaming', 'title':'Session task (offline fixture)',
+                    'goal':None, 'goal_mode':'resolve_after_session_prepare', 'custom_goal':False,
+                    'available':True, 'revision':'preview-revision-1', 'site':'Synthetic check',
+                    'condition':'native', 'verification_scope':'Offline fixture only', 'development_only':True}
+    registry['tasks'] = [t for t in registry['tasks'] if t['id'] != dynamic_task['id']] + [dynamic_task]
+    pending = {'id':'preview-dynamic', 'task':dynamic_task['id'], 'goal':None, 'goal_resolution':'session_pending',
+               'task_revision':dynamic_task['revision'], 'status':'queued', 'steps':[], 'issues':[], 'evaluation':None}
+    payloads = []
+    page.route('**/api/harness/config', lambda route: route.fulfill(json=registry))
+    page.route('**/api/harness/jobs/preview-dynamic', lambda route: route.fulfill(json=pending))
+    def dynamic_start(route):
+        if route.request.method == 'POST':
+            payloads.append(route.request.post_data_json)
+            route.fulfill(json=pending)
+        else:
+            route.continue_()
+    page.route('**/api/harness/jobs', dynamic_start)
+    page.goto(origin + '/harness?dynamic-check=1')
+    page.locator('#task').select_option(dynamic_task['id'])
+    expect(page.locator('#fixed-goal')).to_have_text('Resolved when the session starts')
+    expect(page.locator('#goal')).to_be_hidden()
+    expect(page.locator('#task-facts')).to_contain_text('Development fixture')
+    expect(page.locator('#task option:checked')).to_contain_text('native')
+    page.locator('#submit-run').click()
+    expect(page.locator('#run-summary')).to_have_text('Resolved when the session starts')
+    assert payloads == [{'task':dynamic_task['id'], 'task_revision':'preview-revision-1'}]
+    passed('Dynamic tasks queue without goal entry, placeholder targets or sample goals; revision included')
+
+    resolved = 'Keep item Å-42 unchanged. Do not act on <script>sample</script> or any other item.'
+    pending.update(goal=resolved, goal_resolution='resolved', status='running')
+    expect(page.locator('#run-summary')).to_have_text(resolved, timeout=6000)
+    assert page.locator('#run-summary script').count() == 0
+    expect(page.locator('#fixed-goal')).to_have_text('Resolved when the session starts')
+    expect(page.locator('#runtime')).to_contain_text('preview-revision-1')
+    expect(page.locator('.verdict').first).to_have_text('Task completed: Unknown')
+    page.locator('#submit-run').click()
+    expect(page.locator('#submit-run')).to_be_enabled()
+    assert len(payloads) == 2 and 'goal' not in payloads[-1]
+    passed('Resolved objective appears verbatim in the run, never leaks into the next launch, and keeps unknown verdicts')
+
+    page.locator('[data-activity=ask]').click()
+    assert page.locator('#task option[value="chaos-confirmshaming"]').count() == 0
+    registry['tasks'][-1]['available'] = False
+    page.reload()
+    expect(page.locator('#task option[value="chaos-confirmshaming"]')).to_be_disabled()
+    passed('Dynamic fixed goals are excluded from Ask and worker availability still gates selection')
+    page.unroute('**/api/harness/config')
+    page.unroute('**/api/harness/jobs/preview-dynamic')
+    page.unroute('**/api/harness/jobs')
+    page.goto(origin + '/harness')
+
     # Expiry must disable state-changing controls even if artifacts still exist.
     page.set_viewport_size({'width':1440, 'height':1000})
     page.route('**/api/harness/jobs/preview-campus', lambda route: route.fulfill(status=401,json={'error':'Expired'}))
