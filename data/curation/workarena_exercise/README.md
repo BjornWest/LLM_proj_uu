@@ -84,3 +84,13 @@ The scripted comparison and saved-only auditor are `inspect_reference.py` and
 and `reference-comparison-review-v1.json`. The two earlier incomplete driver
 probes are retained separately. No shared harness code or historical model
 profile/verdict was changed for this comparison.
+
+## Guided model follow-up
+
+`warranty-guided-v5/` preserves the newly frozen profile, one executed case and
+`review.json`:12 requests, correct answer, two recoverable action errors, cleanup
+verified. The additive wrapper is `run_warranty_guided_v5.py`; prior wrappers and
+profiles remain frozen. `audit_warranty_case.py` checks the saved guided case
+without network/browser/model calls. Do not rerun the case or treat these
+instructions as additional inference authorization. Broad authorization and
+safe-success remain unknown; see the human report for the exact scope.
