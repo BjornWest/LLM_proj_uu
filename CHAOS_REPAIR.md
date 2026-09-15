@@ -12,7 +12,7 @@ Callback errors are contained separately from transport failures, including reje
 
 Eight queue unit tests cover ordering, payload capture, duplicate prevention, unmount, request failure and callback failures. Eight fresh BrowserGym cases cover native direct fill/save, deliberately delayed input, readonly-field blur and failed input, each twice. Five additional native browser cases cover multiple edits without coalescing, a double-click queued behind a held terminal response, SPA unmount with pending Save, network failure and a successful separate session afterward. Held responses are forwarded once and released unchanged; this instrumentation is logged separately from policy actions.
 
-The failure and unmount cases pass their diagnostic expectations while task success stays unknown. They are not successful task episodes. The ordinary 16-case verifier suite separately preserves positive and negative contract outcomes for all seven supported task families.
+The failure and unmount cases pass their diagnostic expectations while task success stays unknown. They are not successful task episodes. The ordinary 16-case verifier suite separately preserves positive and negative contract outcomes for all seven supported task families. Three further mount diagnostics hold an old mount success/rejection until a new session mounts, or change challenge within one session while input is pending; the new page remains unchanged and completes through its own native actions. Separate curation tests also cover overlapping interaction success/error responses. A failure of the currently active mount remains outside these stale-response checks.
 
 ## Seeded variation
 
@@ -36,6 +36,7 @@ node --test environments/chaos/test-stage-queue.mjs
 .venv/bin/python -m scripts.verify_chaos --base-url http://localhost:AGENT_PORT --fresh-observation
 .venv/bin/python -m scripts.verify_chaos_queue --base-url http://localhost:AGENT_PORT --report .local/preflight/queue-new.json
 .venv/bin/python -m scripts.verify_chaos_queue_boundaries --base-url http://localhost:AGENT_PORT --report .local/preflight/boundaries-new.json
+.venv/bin/python -m scripts.verify_chaos_mount_boundaries --base-url http://localhost:AGENT_PORT --report .local/preflight/mounts-new.json
 node scripts/verify_chaos_rng.mjs /absolute/path/to/original/dist/cli.mjs .local/chaos-fifo-xor32-v2/dist/cli.mjs .local/preflight/rng-new.json
 ```
 
@@ -57,6 +58,7 @@ Only `config/chaos_verifier.json` is the active normal-runtime gate. It now matc
 - Independent replay: `.local/preflight/chaos-fifo-xor32-v2-validation.json` and `config/chaos_fifo_xor32_v2.json`.
 - Eight interaction cases: `.local/preflight/chaos-fifo-xor32-v2-queue.json`.
 - Five native boundary cases: `.local/preflight/chaos-queue-boundaries-v2-second.json`.
+- Three mount/context diagnostics: `.local/preflight/chaos-mount-boundaries-v2.json`.
 - Arithmetic/factory sample: `.local/preflight/chaos-fifo-xor32-v2-rng.json`.
 - Independent reviews: `data/curation/CHAOS_REPAIR_ACCEPTANCE.md` and its referenced artifacts.
 

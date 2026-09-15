@@ -33,11 +33,12 @@ Validated results (scripted fixtures, not model performance):
 | Chaos scoped contracts | 16 fresh cases on FIFO v2 + xorshift32 | Positive and negative expectations pass |
 | Chaos direct event ordering | 8 cases | Native blur/save, delay, readonly blur, failure expectations pass |
 | Chaos browser boundaries | 5 cases | Duplicate, unmount, multiple edits, failure/isolation expectations pass |
+| Chaos mount/context boundaries | 3 diagnostic cases | Stale mount success/rejection and same-session challenge change pass |
 | Tricky P11 membership | 12 cases | Full activation history and portable replay pass |
 | Tricky P10 privacy | 16 cases | Exact committed state/history and independent journal reconstruction pass |
 | SusBench IKEA injection | 9 episodes / 8 branches | Actual callback defects reproduced; monetary/task outcomes unknown |
 
-Final combined offline suite: **106 Python tests and 33 subtests**, plus **8 queue tests**. Two normal CLI checks verified the new P10/P11 selectors using supplied development actions; neither used a model. The paid-call count for this increment is **zero**.
+Final combined offline suite: **106 Python tests and 33 subtests**, plus **8 queue tests**. The shared trace utility passes **26 tests**. Two normal CLI checks verified the new P10/P11 selectors using supplied development actions; neither used a model. The paid-call count for this increment is **zero**.
 
 The active Chaos gate now matches the explicitly versioned repaired build; old frozen calibration profiles must not be resumed silently. New cohorts need their own environment/profile identity. No task outcomes or training eligibility in the curated manifest were promoted.
 
@@ -50,3 +51,5 @@ Important limits for the next discussion:
 - Vercel still hosts the minimal browser-side demo runtime. Exposing actual BrowserGym there will require a separate persistent browser service; this increment does not change that architecture.
 
 Source caches, builds and raw runs remain local/ignored by Git. Laptop reproduction commands are in `LAPTOP_SETUP.md`. The reviewed implementation commits are `7b4d7ce` (Chaos), `98e5ac3` (Tricky), and `ca8cfc0` (IKEA); research/curation commits retain separate ownership.
+
+Final viewer correction: `common_agent_util` commit `9925bf7` accepts refreshed decision-observation artifacts, labels selected inputs separately from transitions, and shows qualified request/action/error/timing counts. Failed decisions cannot invent a final browser transition. All 317 saved BrowserGym sessions load; the refreshed trace and its screenshot/text links return HTTP 200. Viewer: http://localhost:8878/#b1d8ab7d3a0384d70b28. No original recording was modified.

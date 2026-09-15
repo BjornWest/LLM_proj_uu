@@ -39,7 +39,8 @@
     "intent_browser/tricky.py": "900b5da4b69d243a7350ff67d7b16853870e502f9839929c549909c66c3d9b12",
     "intent_browser/tricky_authorized.py": "09a754d80338e2e0a45f2304d3c4c905833857183f1e82a3eee3da8fed9e8738",
     "intent_browser/tricky_membership.py": "005b4bb2ed9e60e7cf7ec8bb64e12211366e68517eeca76130510e381bf56e5b",
-    "intent_browser/tricky_privacy.py": "5391244dc2f8445814be21f26c021f8fa189090055dad0117fd9f1904925fc99"
+    "intent_browser/tricky_privacy.py": "5391244dc2f8445814be21f26c021f8fa189090055dad0117fd9f1904925fc99",
+    "scripts/verify_chaos_mount_boundaries.py": "a46f255b400ee0f80daff295a5c46c9f3666d04d799af7e5b67b684d9f5c012a"
   },
   "report_sha256": {
     ".local/preflight/chaos-fifo-xor32-v2-validation.json": "7ffd2002c27cf16d9a2a781291e5fb35be1e5401b04f701687161dee2b353f5b",
@@ -51,9 +52,21 @@
     "config/tricky_privacy_validation.json": "ac66dd49565b8dd3ac0f516a7fc141aadfba0ae1f19150d4d60ad26b7919ae6b",
     "config/susbench_ikea_validation.json": "9fae5f0a003f1c5f86e23fd5f4ffe0bafe0f64a88d4005de70ab13027d0dd1bd",
     "runs/20260915T002724Z-f3e90de8/membership-preflight-suite.json": "750ebcf53f7c062354814ba3470bc5fadc07203732d1e56ceb174d5b7b45da90",
-    "runs/20260915T003703Z-772241c8/privacy-preflight-suite.json": "7952017524d71ef2f4294dd105c3af6a7b202326246b0440e86edad581a8d3b7"
+    "runs/20260915T003703Z-772241c8/privacy-preflight-suite.json": "7952017524d71ef2f4294dd105c3af6a7b202326246b0440e86edad581a8d3b7",
+    ".local/preflight/chaos-mount-boundaries-v2.json": "11c3a573666455fc1e99cca1e52c63aaa73fd3400f8c2326820353b75a1b3bdc"
   },
   "historical_profile_reuse": false,
   "training_eligible": false,
-  "notes": "P10 full browser suite precedes three artifact metadata additions; exact before/after delta independently reconstructed in p10-root-review.json."
+  "notes": "P10 full browser suite precedes three artifact metadata additions; exact before/after delta independently reconstructed in p10-root-review.json.",
+  "companion_utility": {
+    "repository": "BjornWest/common_agent_util",
+    "commit": "9925bf7",
+    "tests": 26,
+    "source_sha256": {
+      "agent_trace/adapters/browsergym.py": "027f0c07511d40e786e7b4310d902d2097b4ef447c1b77f534f2062d01b22c0a",
+      "tests/test_browsergym.py": "5d92f24ea5fc22d9a855ed7f16064ccd7e0cd9ddc17552f6c60200128535a149"
+    },
+    "live_viewer": "http://localhost:8878/#b1d8ab7d3a0384d70b28",
+    "catalog_sessions_at_check": 317
+  }
 }
