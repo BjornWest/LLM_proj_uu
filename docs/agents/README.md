@@ -11,6 +11,7 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 
 - [Generalization requirements](generalization-requirements.md): interface fidelity, site holdouts, messy observations and eventual real-site transfer.
 - [Portable control service](../../deploy/control/README.md): SQLite, private tunnel, Blob migration and single-writer cutover.
+- [Completed control-storage cutover](control-storage-cutover.md): exact migration evidence, production checks and current restart limitations.
 - [Agent coordination](coordination.md): sparse notifications, delivery semantics, and current steering test status.
 - [Observation text limits](observation-text-limit.md): optional larger AX prefixes, metadata, and WorkArena saved-evidence checks.
 - [Previous technical README](legacy-readme.md): a historical copy retained when the root README was rewritten for the group. Its older status notes are not current instructions.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "scope": "Portable SQLite control service; local/offline acceptance; NOT production cutover",
-  "production_cutover": false,
+  "scope": "Portable SQLite control service; local acceptance and authenticated production cutover",
+  "production_cutover": true,
   "model_calls": 0,
   "blob_mutations": 0,
   "source_sha256": {
@@ -26,7 +26,7 @@
   "container_image": "sha256:9889ea63f9d9eff552e73b2d8a06bab0ed25f74c62976680c612f171409f3d5b",
   "tunnel_test": ".local/control/tunnel-check.json",
   "limitations": [
-    "No production migration yet; token and maintenance configuration pending.",
+    "Production uses the PC service; immutable Blob source retained, currently quota-limited. No new model episode was used for migration validation.",
     "Quick tunnel requires address update after restart and PC availability.",
     "Original JSON layout and 100-job development cap retained.",
     "No Blob or inference calls in offline acceptance tests."
@@ -36,5 +36,13 @@
     ".local/control/polling-46604071/report.json": "41bcceb161a39f0bd4ccb898976973a24cbfc7719b6ae14eb5ab6b2edf619f65",
     ".local/coordination/blob-migration/container-check.json": "31479bd3a806359fa187dcf18a3ef36716ebaabf473d2447237f045588dc66fc",
     ".local/control/tunnel-check.json": "e388c84156d4ecc0510dc84934b11be83248e499c33da6d43c843dffb9411131"
+  },
+  "production_commit": "7c3bfa2",
+  "production_reports": {
+    ".local/control/production-cutover-review.json": "bd67eb4b8019c77f95c640eb3ff8e763b38b59d84ee25b9b515556f07205d562",
+    ".local/control/production-write-review.json": "06a72ba02a696fcb937e9755e75442afd751fcb82cb4e5642ff38f5aa10769a4",
+    ".local/control/after-blob-limit-review.json": "68a282f9921eb9acbfe4efa8b79db85a15b298690360bebecfdc1bf71b60cc2e",
+    ".local/control/import-tunnel-review.json": "fbd6bc424bd2b2158123d660ffaaf5a6a05b8a15307d3c16bc17eb42933962a2",
+    ".local/control/worker-cutover-check.json": "64b59a50f9a6379d73ac797674ebad17db7c3c52ae0460800c890ce42df780fd"
   }
 }
