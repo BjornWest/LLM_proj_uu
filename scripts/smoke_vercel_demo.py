@@ -62,9 +62,9 @@ def main():
             page.set_viewport_size({'width':390,'height':844})
             page.screenshot(path=str(output/'vercel-demo-mobile.png'),full_page=True)
             assert not errors,errors
-            (output/'offline-smoke.json').write_text(json.dumps({'cases':results,'chat_read_only':True,'stale_control_rejected':True,'page_errors':errors,'paid_calls':0},indent=2)+'\n')
+            (output/'offline-smoke.json').write_text(json.dumps({'cases':results,'interactive_chat_no_state_change':True,'stale_control_rejected':True,'page_errors':errors,'paid_calls':0},indent=2)+'\n')
             browser.close()
-        print('Three task flows, read-only chat, stale-control rejection, private trace downloads: passed. No paid calls.')
+        print('Three task flows, interactive chat, stale-control rejection, private trace downloads: passed. No paid calls.')
     finally:
         process.terminate()
         process.wait(timeout=10)

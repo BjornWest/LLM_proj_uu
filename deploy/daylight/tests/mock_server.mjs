@@ -14,7 +14,9 @@ const sequences={
 const fetcher=async(url,options)=>{
   const request=JSON.parse(options.body),data=JSON.parse(request.messages.at(-1).content);
   let output='The recorded page is a fictional campus demo.';
-  if(request.messages[0].content.includes('Take exactly ONE action')) {
+  if(request.messages[0].content.includes('You CAN follow')) {
+    output=JSON.stringify({action:'done',message:'The recorded page is a fictional campus demo.'});
+  } else if(request.messages[0].content.includes('Take exactly ONE action')) {
     const kind=data.goal.includes('notebook')?'shop':data.goal.includes('room')?'booking':'preferences';
     const [action,label,value]=sequences[kind][data.activity.length];
     const control=data.page.controls.find(c=>c.label===label||c.label.startsWith(label+' '));
