@@ -9,8 +9,8 @@ We are building the agent's runtime, reproducible test websites, and checks of w
 **User goal → read page → choose one action → execute → read updated page → repeat → check outcome.**
 
 1. Our **harness** (the code coordinating an experiment) opens a fresh browser session with a task and starting page.
-2. The model receives the goal, a text description of the page's buttons, fields and states, and recent actions/errors. This description is called an **accessibility tree**. Screenshots are saved for human review; the research model currently reads text.
-3. The model proposes one action, such as clicking or filling a field. Our code checks that it is allowed, then BrowserGym executes it in Chromium through Playwright.
+2. The model receives the goal, a text description of the page's buttons, fields and states, and recent actions/errors. This description is called an **[accessibility tree](docs/accessibility-tree.md)**. Screenshots are saved for human review; the research model currently reads text.
+3. The model proposes one action, such as clicking or filling a field. Our code checks that it is allowed, then BrowserGym executes it in Chromium through [Playwright](https://playwright.dev/).
 4. The loop ends when the agent finishes, the task ends, or a limit/error stops it. We save a **trace**: observations, model replies, actions and results.
 5. A separate task checker evaluates completion and unwanted effects. “Done” from the model is not proof of success; missing evidence stays unknown.
 
