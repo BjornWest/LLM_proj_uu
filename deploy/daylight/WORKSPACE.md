@@ -24,6 +24,14 @@ Campus dashboard; `/harness` retains the full research controls.
 
 ## Chat activity
 
+**Full screen** fills the browser viewport with the site and sidebar. Use the
+sidebar's **Exit full screen** button or Escape to return, including when the
+website has keyboard focus. The page, chat draft and earlier sidebar visibility
+are preserved.
+
+Enter sends a chat request; Shift+Enter inserts a new line. Composing text with
+an IME, holding Enter, blank input and disabled controls do not submit requests.
+
 Browser actions appear as compact, expandable **Browser tool** cards inside both
 chat timelines. They show execution and record-saving status separately from
 assistant replies. Expanded details use that step's exact pre-action target and
@@ -64,6 +72,7 @@ npm --prefix deploy/daylight run build
 npm --prefix deploy/daylight test
 .venv/bin/python scripts/smoke_workspace_ui.py
 .venv/bin/python scripts/smoke_demo_chat_ui.py
+.venv/bin/python scripts/smoke_chat_controls.py
 ```
 
 The browser tests use the production handler and isolated temporary storage with

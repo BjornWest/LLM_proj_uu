@@ -45,3 +45,39 @@ export function showChatWorking(log, text) {
     status.textContent = text;
   });
 }
+
+export function bindChatEnter(textarea, sendButton) {
+  textarea.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.shiftKey || event.isComposing || event.keyCode === 229 || event.ctrlKey || event.altKey || event.metaKey) return;
+    event.preventDefault();
+    if (!event.repeat && !textarea.disabled && !sendButton.disabled && textarea.value.trim()) textarea.form.requestSubmit(sendButton);
+  });
+}
+
+// Full viewport layout, preserving the live iframe and chat state.
+export function createFullScreenMode(enterButton, exitButton, onChange = () => {}) {
+  let active = false;
+  const documents = new WeakSet();
+  const escape = event => {
+    if (active && event.key === 'Escape') { event.preventDefault(); setActive(false); }
+  };
+  function setActive(value, {focus = true} = {}) {
+    if (active === value) return;
+    active = value; document.body.classList.toggle('site-fullscreen', active);
+    enterButton.setAttribute('aria-pressed', String(active)); exitButton.hidden = !active;
+    onChange(active);
+    if (focus) (active ? exitButton : enterButton).focus({preventScroll:true});
+  }
+  enterButton.addEventListener('click', () => setActive(true));
+  exitButton.addEventListener('click', () => setActive(false));
+  window.addEventListener('keydown', escape, true);
+  function bindFrame(frame) {
+    const listen = () => {
+      // Keyboard events inside an iframe do not bubble to the outer page.
+      const doc = frame.contentDocument;
+      if (doc && !documents.has(doc)) { documents.add(doc); doc.addEventListener('keydown', escape, true); }
+    };
+    frame.addEventListener('load', listen); listen();
+  }
+  return {setActive, bindFrame, get active() { return active; }};
+}

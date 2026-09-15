@@ -295,3 +295,23 @@ td,th{padding:12px 9px}
 
 .app-shell{min-height:calc(100vh - 66px)}.workspace-notice{padding:12px 15px;border:1px solid #edd3bc;background:#fff6eb;color:#815630;font-size:12px;border-radius:8px;overflow-wrap:anywhere}.remote-explore{background:#fff;border:1px solid var(--line);border-radius:12px;padding:55px 35px;text-align:center}.remote-explore p{max-width:550px;margin:10px auto;line-height:1.9;color:var(--muted)}.remote-explore h2{font-size:24px}.remote-explore .primary{width:auto;display:inline-block;margin-top:22px}.grade.pending{color:#587384;background:#f1f6fa;border-color:#d8e3e9}.run-kind.unknown{color:#858574;background:#f1f2ed}.task-card.unavailable{opacity:.7}.task-facts{font-size:11px;line-height:1.7;overflow-wrap:anywhere}.task-facts dt{color:var(--muted);margin-top:9px}.task-facts dd{margin:2px 0 0}#run-viewer{width:100%;border:0;border-radius:10px;min-height:1000px;background:#f5f6f2}.browser-trace-review{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px}.browser-trace-review h3{margin-top:0}.browser-trace-review a{font-size:12px;color:var(--green)}.browser-trace-review pre{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:700px;overflow:auto;background:#f5f7f1;border-radius:8px;padding:15px}.browser-trace-review summary{font-size:12px;cursor:pointer}.browser-trace-review details{margin-top:20px}.task-card .condition{font-size:10px;font-weight:500;color:#768a64;margin:0 0 9px}.task-empty{font-size:12px;color:var(--muted);grid-column:1/-1;padding:30px;text-align:center;border:1px solid var(--line);border-radius:10px;background:white}.header-right>a{margin-right:4px}.ask-cost{font-size:10px;color:var(--muted)}
 @media(max-width:620px){.header-right>a{font-size:9px}.header-right a[href="/demo"]{display:none}.remote-explore{padding:30px 22px}#run-viewer{min-height:1250px}}
+
+/* Focus on the interactive site and sidebar without remounting either. */
+body.site-fullscreen{overflow:hidden}
+.site-fullscreen .app-header,.site-fullscreen .site-rail,.site-fullscreen .site-heading,.site-fullscreen .site-tabs{display:none}
+.site-fullscreen #interactive-explore{position:fixed;inset:0;z-index:50;height:100dvh;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,27vw,380px);background:white}
+.site-fullscreen .browser-chrome,.site-fullscreen .browser-footnote{display:none}
+.site-fullscreen .browser-window{border:0;border-radius:0;min-height:0}
+.site-fullscreen #site-frames{min-height:0;height:100%}
+.site-fullscreen #site-frames iframe{height:100%;min-height:0}
+.site-fullscreen .agent-sidebar{min-height:0;border:0;border-left:1px solid var(--line);border-radius:0;overflow:auto}
+.site-fullscreen #conversation{min-height:80px;max-height:none}
+.site-fullscreen .agent-heading .status-dot{display:none}
+.site-fullscreen .agent-heading{gap:8px}
+.site-fullscreen #sidebar-tasks{flex-shrink:0}
+@media(max-width:620px){
+  .site-fullscreen #interactive-explore{grid-template-columns:1fr;grid-template-rows:minmax(150px,38dvh) minmax(0,1fr)}
+  .site-fullscreen .agent-sidebar{border-left:0;border-top:1px solid var(--line)}
+  .site-fullscreen .agent-context,.site-fullscreen #suggestions,.site-fullscreen #sidebar-tasks{display:none}
+  .site-fullscreen .agent-heading{padding:10px 0}
+}

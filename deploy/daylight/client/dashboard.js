@@ -1,4 +1,4 @@
-import {createToolActivity,keepChatPosition,showChatWorking} from './tool-activity.js';
+import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id),titles={shop:'Campus Supply',booking:'Campus Rooms',preferences:'Your preferences'};
@@ -131,6 +131,18 @@ $('chat-form').onsubmit=async event=> {
   event.preventDefault();const question=$('question').value.trim();if(!question||running||!config.live_available)return;
   $('question').value='';message('user',question);await runTurn('assist',question);
 };
+bindChatEnter($('question'),$('send-chat'));
+const enterFullscreen=document.createElement('button');enterFullscreen.id='enter-fullscreen';enterFullscreen.type='button';enterFullscreen.textContent='Full screen';enterFullscreen.setAttribute('aria-pressed','false');
+$('toggle-sidebar').before(enterFullscreen);
+const exitFullscreen=document.createElement('button');exitFullscreen.id='exit-fullscreen';exitFullscreen.className='exit-fullscreen';exitFullscreen.type='button';exitFullscreen.textContent='Exit full screen · Esc';exitFullscreen.hidden=true;
+document.querySelector('.extension-header').append(exitFullscreen);
+let sidebarWasClosed=false;
+const fullScreen=createFullScreenMode(enterFullscreen,exitFullscreen,active=>{
+  if(active){sidebarWasClosed=document.body.classList.contains('sidebar-closed');document.body.classList.remove('sidebar-closed');}
+  else document.body.classList.toggle('sidebar-closed',sidebarWasClosed);
+  $('toggle-sidebar').setAttribute('aria-expanded',String(!document.body.classList.contains('sidebar-closed')));
+});
+fullScreen.bindFrame($('site'));
 $('chat-tab').onclick=()=>tab('chat');$('tasks-tab').onclick=()=>tab('tasks');
 $('toggle-sidebar').onclick=()=>{$('toggle-sidebar').setAttribute('aria-expanded',String(!document.body.classList.toggle('sidebar-closed')));};
 $('reset').onclick=reset;
@@ -141,7 +153,8 @@ $('site').addEventListener('load',()=>{
   if(titles[next]) {area=next;context();}
 });
 $('mode').disabled=true;
-$('chat-hint').textContent='Can navigate and act · Private demo';
+$('chat-hint').textContent='Enter to send · Shift+Enter for a new line';
+$('chat-hint').title='Can navigate and act · Private demo';
 document.querySelector('.read-only-tag').textContent='Interactive';
 $('question').placeholder='Ask a question or give a request…';
 $('question').setAttribute('aria-label','Ask Daylight a question or give a request');

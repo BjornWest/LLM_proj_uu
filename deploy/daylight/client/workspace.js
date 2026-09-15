@@ -1,4 +1,4 @@
-import {createToolActivity,keepChatPosition,showChatWorking} from './tool-activity.js';
+import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id);
@@ -9,6 +9,11 @@ const siteNames={chaos:'Chaos scenarios','tricky-shop':'Tricky shop','tricky-hea
 let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoRows=[],siteID='campus',view='explore',globalPage=false,currentRun=null;
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
 let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
+let sidebarBeforeFullscreen=true;
+const fullScreen=createFullScreenMode($('enter-fullscreen'),$('exit-fullscreen'),active=>{
+  if(active){sidebarBeforeFullscreen=agentVisible;setAgentVisible(true);}else setAgentVisible(sidebarBeforeFullscreen);
+});
+function setAgentVisible(value){agentVisible=value;$('agent-sidebar').hidden=!value;$('interactive-explore').classList.toggle('agent-hidden',!value);$('toggle-agent').textContent=value?'Hide agent':'Show agent';$('toggle-agent').setAttribute('aria-expanded',String(value));}
 function setWorking(text){workingText=text;showChatWorking($('conversation'),text);}
 function updateTool(tool,state,error){if(tool)keepChatPosition($('conversation'),()=>tool.update(state,error));}
 const initialSearch=new URLSearchParams(location.search);
@@ -78,7 +83,7 @@ function renderSites(){
 }
 function ensureFrame(){
   if(frame||!fixture)return frame;
-  frame=document.createElement('iframe');frame.title='Campus — interactive website';frame.dataset.site='campus';frame.src='/world/'+crypto.randomUUID()+'/booking';frame.addEventListener('load',updateAddress);$('site-frames').append(frame);return frame;
+  frame=document.createElement('iframe');frame.title='Campus — interactive website';frame.dataset.site='campus';frame.src='/world/'+crypto.randomUUID()+'/booking';frame.addEventListener('load',updateAddress);$('site-frames').append(frame);fullScreen.bindFrame(frame);return frame;
 }
 function updateAddress(){let area='booking';try{area=frame?.contentWindow.location.pathname.split('/').at(-1)||area;}catch{}$('site-address').textContent='campus.demo / '+({booking:'study rooms',shop:'shop',preferences:'account'}[area]||'page');}
 async function currentPage(){const previous=pendingDocument,doc=await waitForDocument(ensureFrame(),{previousDocument:previous});if(pendingDocument===previous)pendingDocument=null;return doc;}
@@ -153,6 +158,7 @@ async function loadBrowserTrace(record){
 }
 function render(){
   const site=siteFor(siteID);if(!site)return;
+  if(globalPage||view!=='explore'||!site.interactive)fullScreen.setActive(false,{focus:false});
   document.querySelector('.site-heading').hidden=globalPage;document.querySelector('.site-tabs').hidden=globalPage;
   $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=site.description;$('site-label').textContent=site.interactive?'Interactive website':'Remote worker environment';
   $('explore-view').hidden=globalPage||view!=='explore';$('research-view').hidden=globalPage||view!=='research';$('global-view').hidden=!globalPage||view==='review';$('review-view').hidden=view!=='review';
@@ -223,12 +229,13 @@ async function askAgent(question){
   finally{setWorking('');askBusy=false;renderConversation();syncControls();await refresh(true);}
 }
 $('ask-form').onsubmit=async event=>{event.preventDefault();const question=$('question').value.trim();if(!question||askBusy||authExpired||!modelConfig?.live_available||siteID!=='campus')return;await askAgent(question);};
+bindChatEnter($('question'),$('send-question'));
 $('question').oninput=()=>{draft=$('question').value;};$('site-search').oninput=renderSites;$('replay-kind').onchange=renderTasks;
 $('explore-tab').onclick=()=>setView('explore');$('research-tab').onclick=()=>setView('research');$('sidebar-tasks').onclick=()=>setView('research');$('remote-tasks').onclick=()=>setView('research');
 for(const id of ['all-replays-link','global-library-link'])$(id).onclick=openGlobal;
 for(const id of ['global-search','global-collection','global-site','global-kind','global-grade'])$(id).addEventListener(id==='global-search'?'input':'change',renderGlobal);
 $('clear-filters').onclick=()=>{for(const id of ['global-collection','global-site','global-kind','global-grade'])$(id).value='all';$('global-search').value='';renderGlobal();};
-$('toggle-agent').onclick=()=>{agentVisible=!agentVisible;$('agent-sidebar').hidden=!agentVisible;$('interactive-explore').classList.toggle('agent-hidden',!agentVisible);$('toggle-agent').textContent=agentVisible?'Hide agent':'Show agent';$('toggle-agent').setAttribute('aria-expanded',String(agentVisible));};
+$('toggle-agent').onclick=()=>setAgentVisible(!agentVisible);
 $('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];draft='';activity=[];lastTrace=null;setWorking('');$('chat-status').textContent='';renderConversation();};
 $('back-to-research').onclick=()=>{view=globalPage?'global':'research';currentRun=null;reviewVersion++;render();syncURL();};
 async function readRoute(){const params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';if(siteFor(params.get('site')))siteID=params.get('site');const key=params.get('run');currentRun=records().find(r=>r.key===key)||null;view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();if(currentRun?.source==='demo')loadBrowserTrace(currentRun);}

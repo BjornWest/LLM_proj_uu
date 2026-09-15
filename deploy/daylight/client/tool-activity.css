@@ -25,3 +25,20 @@
 
 /* Reply bubbles in the original demo, which shares this chat stylesheet. */
 .chat-message.assistant{background:#f3f4f7;border:1px solid #e1e4eb;padding:11px 13px;border-radius:12px 12px 12px 3px;margin-right:20px}
+
+.exit-fullscreen{margin-left:auto;flex-shrink:0;padding:6px 8px;border:1px solid #dce3df;border-radius:6px;background:#f6f8f6;color:#486354;font:10px/1.4 system-ui,sans-serif;cursor:pointer}
+.exit-fullscreen[hidden]{display:none!important}
+.exit-fullscreen kbd{font:9px system-ui,sans-serif;color:#79897f;margin-left:4px}
+body.extension-demo.site-fullscreen{overflow:hidden}
+.extension-demo.site-fullscreen .browser-topbar,.extension-demo.site-fullscreen .browser-toolbar,.extension-demo.site-fullscreen .page-tabs,.extension-demo.site-fullscreen .workspace-footnote{display:none}
+.extension-demo.site-fullscreen .extension-layout{position:fixed;inset:0;z-index:50;display:grid;grid-template-columns:minmax(0,1fr) clamp(300px,27vw,380px);height:100dvh;min-height:0}
+.extension-demo.site-fullscreen .browser-panel{order:0;min-height:0}
+.extension-demo.site-fullscreen .browser-window,.extension-demo.site-fullscreen .browser-window iframe{height:100%;min-height:0}
+.extension-demo.site-fullscreen .assistant-panel{order:1;position:static;height:100%;min-height:0;overflow:auto}
+.extension-demo.site-fullscreen .connected-dot{display:none}
+.extension-demo.site-fullscreen .extension-header{gap:8px;padding:14px}
+@media(max-width:620px){
+  .extension-demo.site-fullscreen .extension-layout{grid-template-columns:1fr;grid-template-rows:minmax(150px,38dvh) minmax(0,1fr)}
+  .extension-demo.site-fullscreen .page-context,.extension-demo.site-fullscreen .chat-suggestions,.extension-demo.site-fullscreen .extension-footer{display:none}
+  .extension-demo.site-fullscreen .extension-header{padding:8px 14px}
+}
