@@ -1,7 +1,9 @@
 # Manual access to packaged environments
 
-Status: implemented and locally validated; production acceptance is recorded in
-`config/manual_environment_validation.json` after the coordinated release.
+Status: deployed as `1a449c5` on 2026-09-15. Production acceptance is recorded in
+`config/manual_environment_validation.json`: five external sites / 14 variants,
+28 read-only production checks and 15 manual open/image/close/download checks.
+No production native page actions or model calls were made by that check.
 
 ## What runs where
 

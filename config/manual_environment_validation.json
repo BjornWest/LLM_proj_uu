@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "scope": "Manual browser transport and reference diagnostics; no model evaluation or training promotion",
+  "implementation_commit": "1a449c5d9d44fa2a91aa204732d630f507fdd370",
+  "environment_package_sha256": "fd9bbd6656133354cea05b8c76cee9edf21d85a81137e5c5ef678755f1f0ee1b",
+  "control_image": "sha256:a2f14d2354bef7a55b063d32aa5e82378fe755c65cfbe35a6d2a3b93f5f00e2f",
+  "source_sha256": {
+    "deploy/daylight/lib/manual.mjs": "1586b0231904044817620c9d0ba4232017525f5ae1a0631282f4e2f01bf87107",
+    "deploy/daylight/lib/manual-client.mjs": "152b7484dc9d4ecc07a84ce595c164a5539ba159e06bec9aff35864d089e6c47",
+    "deploy/daylight/control-server.mjs": "326e7f0744f76c1afaa9d35ae36a68d422909cf4af886adf1fddead68eb962da",
+    "deploy/daylight/api/index.mjs": "6321e1cedd03146f015ec59c0f1c73849fdfae4585e9383455a8781b4ca14cdd",
+    "scripts/manual_environment.py": "873ec7e88103714eef088076b75c1630cedff137dc3fcdf0e3c716b93c8b8dff",
+    "deploy/control/Dockerfile": "03dae12795c36f671b27559c4702d853262dd7a7f258ac95c863985ef08d9da6",
+    "deploy/control/manual.override.yaml": "4f6333baf285ad34c22e7de38ade093200dbc65fa9b6ff90c91c9e29c818826d"
+  },
+  "scripted_cases": 36,
+  "saved_audit_checks": 1985,
+  "node_tests": 67,
+  "python_action_tests": 3,
+  "actual_workspace_checks": 15,
+  "production_readonly_checks": 28,
+  "production_manual_checks": 15,
+  "model_calls": 0,
+  "production": {
+    "origin": "https://browseragent.vercel.app",
+    "deployed": true,
+    "manual_sites": 5,
+    "variants": 14,
+    "runtime_host": "PC Docker control service",
+    "native_actions_in_production_check": 0,
+    "blob_required": false
+  },
+  "evidence": {
+    "host_all": {
+      "path": ".local/manual-sites/release-host-v1/report.json",
+      "sha256": "31e4ecc26a05cc613dcd5961dbf190fb0663f3e3f28d256d03435896bf7f2189"
+    },
+    "host_boundaries": {
+      "path": ".local/manual-sites/release-boundaries-v1/report.json",
+      "sha256": "090bd2e70ff0ac62d22433d043c88121ed0fc40177a3dc1fcabc69969103cb82"
+    },
+    "container_all": {
+      "path": ".local/manual-sites/container/release-v1/report.json",
+      "sha256": "586590fa0496c6752615afa835b1c8e7fee1036ee4a386aae730285a6a4e5c0f"
+    },
+    "container_boundaries": {
+      "path": ".local/manual-sites/container/release-boundaries-v1/report.json",
+      "sha256": "a1cb61325c335577eebefa836c455f3a1ad6ab976f46c37434a019926456f268"
+    },
+    "saved_audit": {
+      "path": ".local/manual-sites/release-saved-audit.json",
+      "sha256": "514c68c46496df4e496b73616e09b7c997fbe7aa3b7c5ad91a05fb0d9532388c"
+    },
+    "workspace_actual": {
+      "path": ".local/manual-sites/release-1a449c5/.local/vercel-demo/manual-workspace-live-c4611ff4/report.json",
+      "sha256": "874ed7ede6dcfd15fcae94cf8d4ba66caa4840f806196e90167e8b9c806fff81"
+    },
+    "service_switch": {
+      "path": ".local/manual-sites/service-switch-review.json",
+      "sha256": "387fb2a61543c71629f454f8d09197ef7e9211711072b25be2caece87298613e"
+    },
+    "production_readonly": {
+      "path": ".local/manual-sites/production-readonly-1a449c5/report.json",
+      "sha256": "319a44c7f98fe02e3c3c99784fa70f465769b2cba048d7076b90fd4d082b26c5"
+    },
+    "production_manual": {
+      "path": ".local/manual-sites/production-manual-1a449c5/report.json",
+      "sha256": "313abd3e2b752ac0faacbcf4819232c14831ae98e7edcd6850274dd305755789"
+    },
+    "node_tests": {
+      "path": ".local/coordination/manual-sites/release-node-tests.log",
+      "sha256": "b2717685c0353a60848d09e579493e7747a2d7fc9579d41e41fe42c1849f20b4"
+    }
+  },
+  "limitations": [
+    "Task fixtures rather than complete upstream websites; supported-route scope applies.",
+    "Manual execution is ungraded; reference evaluation is diagnostic only, with model AX exposure/avoidance null.",
+    "Frame IDs reject old captures but cannot guarantee a dynamic page has not changed since capture.",
+    "Hard crashes may leave partial traces without a finalized ZIP; no automatic action replay.",
+    "PC and temporary tunnel must remain running; no external Ask handoff from manual state.",
+    "Historical failed test attempts retained separately; full-evaluation parity is not claimed across independently generated sessions."
+  ]
+}
