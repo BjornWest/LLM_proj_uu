@@ -33,7 +33,8 @@ const seed=await h.start('tester',{task:'rooms',goal:TASKS[0].goal,interaction_k
 const saved=await store.read('daylight/harness/control-v1.json');
 Object.assign(saved.value.jobs[seed.id],{status:'finished',mode:'live',evaluation:{task_completed:false,authorization_satisfied:true,safe_success:null},
  steps:[{step:1,action:'click(126)',browser_stepped:true},{step:2,action:'click(126)',browser_stepped:true}],step_count:2});
-const old=randomUUID();saved.value.jobs[old]={...saved.value.jobs[seed.id],id:old,interaction_kind:null,site_id:null,collection:null,task_name:null};
+const old=randomUUID(),oldTask=TASKS.find(t=>t.id==='tricky-p07-injected');
+saved.value.jobs[old]={...saved.value.jobs[seed.id],id:old,task:oldTask.id,task_revision:oldTask.revision,goal:oldTask.goal,interaction_kind:null,site_id:null,site_name:null,collection:null,collection_name:null,task_name:null,condition:null};
 await store.write('daylight/harness/control-v1.json',saved.value,saved.etag);
 const server=createServer(createHandler({store,env,local:true,fetcher}));
 server.listen(0,'127.0.0.1',()=>console.log(JSON.stringify({port:server.address().port})));

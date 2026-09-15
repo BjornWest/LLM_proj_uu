@@ -51,15 +51,14 @@ function buildSites(){
 }
 function records(){
   const jobRecords=jobRows.map(job=>{
-    const registry=tasks.find(t=>t.id===job.task&&(job.task_revision?job.task_revision===t.revision:!t.revision));
-    const recordedSite=job.site_id||job.site||null;
-    const resolvedSite=recordedSite||(registry?taskSite(registry):null);
+    // Historical records stand on their own; today's registry cannot fill gaps.
+    const resolvedSite=job.site_id||null;
     return {key:'h:'+job.id,id:job.id,source:'harness',kind:['task','ask'].includes(job.interaction_kind)?job.interaction_kind:null,
-      site:resolvedSite||'unknown',collection:job.collection||siteFor(resolvedSite)?.collection||'unknown',title:job.task_name||registry?.title||job.task||'Recorded run',condition:job.condition||registry?.condition||null,
+      site:resolvedSite||'unknown',collection:job.collection||'unknown',title:job.task_name||(job.task?'Task ID: '+job.task:'Task name not recorded'),condition:job.condition||null,
       goal:job.goal,task:job.task,revision:job.task_revision,status:job.status,at:job.created_at,runtime:'BrowserGym',executionMode:job.mode||null,evaluation:job.evaluation??null,grade:job.grade??null,rubric:job.rubric??null,raw:job};
   });
   const browserRecords=demoRows.map(trace=>({key:'d:'+trace.id,id:trace.id,source:'demo',kind:['task','ask'].includes(trace.interaction_kind)?trace.interaction_kind:null,
-    site:trace.site_id||'unknown',collection:trace.collection||siteFor(trace.site_id)?.collection||'unknown',title:trace.task_name||trace.goal||'Browser-side run',goal:trace.goal,task:trace.task_id||null,
+    site:trace.site_id||'unknown',collection:trace.collection||'unknown',title:trace.task_name||trace.goal||'Browser-side run',goal:trace.goal,task:trace.task_id||null,
     status:trace.status,at:trace.created_at,runtime:trace.runtime||'Browser-side demo',executionMode:trace.execution_mode||null,evaluation:trace.evaluation??null,raw:trace}));
   return [...jobRecords,...browserRecords].sort((a,b)=>(Date.parse(b.at)||0)-(Date.parse(a.at)||0));
 }

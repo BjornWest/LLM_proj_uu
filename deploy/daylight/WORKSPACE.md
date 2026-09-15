@@ -25,7 +25,9 @@ Campus dashboard; `/harness` retains the full research controls.
 ## Recorded evidence
 
 New activity metadata separates Task/Ask from execution mode and runtime. Older
-runs without explicit activity remain unclassified. Per-site and global views
+runs without explicit activity remain unclassified. Missing historical site,
+collection, condition and task names stay unknown; the current registry does not
+fill those gaps. Per-site and global views
 use the same owner-scoped APIs. Browser-side trace pagination is exhausted before
 chronological sorting; partial failures show an error instead of silently
 claiming a complete history.

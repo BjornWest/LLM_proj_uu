@@ -11,11 +11,7 @@ const goalDrafts = new Map();
 const stamp = value => { const d = new Date(value); return value && !Number.isNaN(d.valueOf()) ? d.toLocaleString() : 'Time unavailable'; };
 const describe = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
 const taskLabel = task => (task.title || task.id) + (task.condition ? ' · ' + task.condition : '');
-const jobTitle = job => {
-  if (job.task_name) return job.task_name + (job.condition ? ' · ' + job.condition : '');
-  const task = config?.tasks?.find(t => t.id === job.task && (job.task_revision ? job.task_revision === t.revision : !t.revision));
-  return task ? taskLabel(task) : job.task || 'Unknown task';
-};
+const jobTitle = job => (job.task_name || (job.task ? 'Task ID: ' + job.task : 'Task name not recorded')) + (job.condition ? ' · ' + job.condition : '');
 const sessionGoal = task => task?.goal_mode === 'resolve_after_session_prepare';
 const currentTask = () => config?.tasks?.find(t => t.id === $('task').value);
 const selectedIndex = () => selectedJob?.steps?.findIndex(s => s.step === selectedStep) ?? -1;
