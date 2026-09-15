@@ -87,3 +87,27 @@ It retains source/script hashes, both seed recipes, all counts, structural
 failures and hashes of the complete normalized descriptor samples. Source
 fragments execute in an isolated Node VM without process/filesystem/network
 globals. No browser, server session, model or search call was made by this audit.
+
+## Follow-up: main validator gate strengthened
+
+The main `scripts/verify_chaos_rng.mjs` validator now requires exactly the four
+expected names and all six token-task joint position cells; it retains full
+counts. Independent review of validator SHA256
+`27996c66ab01f7fae5bc2001e1581e329b20a40601dcd15e15006102bcbcceb4`
+passes all four author regression tests. Feeding the gate the actual saved
+1,024-example imul corpus rejects it specifically for missing joint cells;
+the saved 1,024-example xorshift corpus passes. No generator or browser rerun
+was needed for these checks.
+
+The new `.local/preflight/chaos-rng-joint-gate-v2.json` has the same 256 original
+and derived descriptors as the historical report and consistent recalculated
+counts. Arithmetic and coverage remain separate requirements. Reproducible
+review: `audit_chaos_rng_gate.mjs`; evidence:
+`chaos-repair-review/joint-gate-review-v2.json`.
+
+One artifact-safety issue was reported at this source version: the validator's
+default output still points to the existing historical `chaos-rng-v2.json`,
+and its writer does not reject existing files. The actual new run used an
+explicit fresh path and preserved history. A fresh default plus a reject-existing
+guard before arithmetic work would prevent accidental replacement on later CLI
+invocation. This is separate from the now-correct coverage gate.

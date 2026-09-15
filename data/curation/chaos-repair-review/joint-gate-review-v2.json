@@ -1,0 +1,85 @@
+{
+  "scope": "Independent validator review on saved real factory descriptors, not new arithmetic/browser execution.",
+  "passed": true,
+  "audit_script_sha256": "8cca7070fa151698cf71257a98adb20174121b83cf37ac90a00398d8f5c7dc02",
+  "validator_sha256": "27996c66ab01f7fae5bc2001e1581e329b20a40601dcd15e15006102bcbcceb4",
+  "author_tests_sha256": "6b6b6f6353c6d7e346d6e9acd7d1a9002c160e77b3a86d6c82fe8d8976344091",
+  "fresh_report_sha256": "3d7957e8448b1fd227f40acfa641ca3a49a1181f190b57c45d7195e8c1284185",
+  "historical_report_sha256": "fd370abaf34329f50b3ec7f3e4e9d0059eb7a2221bcbb189ab78d0eb161925f2",
+  "unchanged_report_descriptors": 256,
+  "fresh_derived_joint_counts": {
+    "0:0": 17,
+    "0:1": 22,
+    "1:0": 19,
+    "1:1": 23,
+    "2:0": 26,
+    "2:1": 21
+  },
+  "saved_sample_checks": [
+    {
+      "source": "data/curation/chaos-repair-review/rng-imul/variants.json",
+      "source_sha256": "08e8a9074527d8a8657ce5e7d634dae5d77925b1e417960cc06b6a0ba127db90",
+      "variants": 1024,
+      "rejected": true,
+      "error": "Error: Token variants lack exact expected coverage: joint_position",
+      "counts": {
+        "target_index": {
+          "0": 350,
+          "1": 341,
+          "2": 333
+        },
+        "target_name": {
+          "Linux desktop": 255,
+          "MacBook Pro": 257,
+          "ThinkPad X1": 256,
+          "Workstation": 256
+        },
+        "safe_action_index": {
+          "0": 512,
+          "1": 512
+        },
+        "joint_position": {
+          "0:1": 350,
+          "1:0": 341,
+          "2:0": 171,
+          "2:1": 162
+        }
+      }
+    },
+    {
+      "source": "data/curation/chaos-repair-review/rng-xorshift32-v1/variants.json",
+      "source_sha256": "f6b0b151fe1be14ecd26ee8c91289d78addcd9255bd65c3bafcfd820cf0e3b01",
+      "variants": 1024,
+      "rejected": false,
+      "error": null,
+      "counts": {
+        "target_index": {
+          "0": 320,
+          "1": 377,
+          "2": 327
+        },
+        "target_name": {
+          "Linux desktop": 259,
+          "MacBook Pro": 269,
+          "ThinkPad X1": 245,
+          "Workstation": 251
+        },
+        "safe_action_index": {
+          "0": 506,
+          "1": 518
+        },
+        "joint_position": {
+          "0:0": 150,
+          "0:1": 170,
+          "1:0": 201,
+          "1:1": 176,
+          "2:0": 155,
+          "2:1": 172
+        }
+      }
+    }
+  ],
+  "model_calls": 0,
+  "browser_calls": 0,
+  "finding": "Gate is correct. At this reviewed source version the default output still names existing historical chaos-rng-v2.json and writeFileSync overwrites it; recommend a fresh default plus reject-existing output guard. No file was overwritten by this review."
+}
