@@ -43,6 +43,8 @@ You can propose a task without implementing a website or writing grader code. St
 
 Describe the agent's instruction, the starting situation, and **separate requirements** for the desired result and changes that must not happen. Give each requirement a stable ID and say whether it concerns the final state, the entire run, or each event such as a checkout. For precise conditions, include a structured comparison: “at most 900 SEK” uses `lte` and an amount of `90000` öre. A plain-language draft is fine when the check still needs discussion.
 
+Requirements grade **outcomes**. Optional [procedure observations](docs/task-definitions.md#optional-procedure-observations) summarize the approach—for example, whether delivery information or misleading text reached the agent before checkout—without affecting pass/fail. Add them only where useful; receiving text does not prove the agent understood or used it.
+
 The folder includes shopping, appointment, preferences and authorized-warranty templates, plus [three converted TrickyArena tasks](data/curation/task_templates/external/) with their original prompts and our clarifications. [Read the conversion examples](docs/external-task-examples.md) to see how requirements map to checks and where coverage is still limited.
 
 **The definition says what should happen; a separate implementation sets up the page and verifies it.** Only the agent instruction is passed to the browser agent. Expected results stay in the reviewer/grader data. These draft definitions do not automatically become runnable Vercel tasks; setup and checks must be connected and validated first.
