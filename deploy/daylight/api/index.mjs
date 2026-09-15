@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {config,login,authenticate,sessionCookie} from '../lib/auth.mjs';
 import {StorageError} from '../lib/store.mjs';
 import {configuredStore} from '../lib/remote-store.mjs';
+import {ManualClient} from '../lib/manual-client.mjs';
 import {Agent} from '../lib/agent.mjs';
 import {checkStorage} from '../lib/storage-check.mjs';
 import {Harness,workerAuthorized} from '../lib/harness.mjs';
@@ -59,6 +60,27 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
       if(req.method==='POST'&&env.DAYLIGHT_STORAGE_MAINTENANCE==='1')return send(503,{error:'Storage maintenance. Please try again after the migration.'});
+      if(url.pathname.startsWith('/api/manual/')){
+        if(!env.DAYLIGHT_CONTROL_URL){if(url.pathname==='/api/manual/config'&&req.method==='GET')return send(200,{enabled:false,sites:[]});return send(503,{error:'Manual environments are not configured.'});}
+        const manual=new ManualClient({env});stage='manual_browser';
+        if(url.pathname==='/api/manual/config'&&req.method==='GET')return send(200,await manual.call('config',{}));
+        if(url.pathname==='/api/manual/sessions')return send(200,req.method==='GET'?await manual.call('list',{owner}):await manual.call('start',{...(await body(req)),owner}));
+        const m=url.pathname.match(/^\/api\/manual\/sessions\/([a-f0-9-]{36})(?:\/(action|observe|close|frame|trace)(?:\/([a-f0-9-]{36}))?)?$/);
+        if(!m)return send(404,{error:'Not found'});const [,id,op,frame_id]=m;
+        if(!op&&req.method==='GET')return send(200,await manual.call('read',{owner,id}));
+        if(['action','observe','close'].includes(op)&&req.method==='POST')return send(200,await manual.call(op,{...(await body(req)),owner,id}));
+        if(['frame','trace'].includes(op)&&req.method==='GET'){
+          if(op==='frame'&&!frame_id)return send(404,{error:'Frame not found'});
+          const artifact=await manual.call('artifact',{owner,id,...(op==='frame'?{frame_id}:{})});
+          if(op==='trace'){
+            res.statusCode=200;res.setHeader('Content-Type','application/zip');res.setHeader('Content-Disposition',`attachment; filename="manual-${id}.zip"`);
+            for(let part=0;part<artifact.parts;part++)res.write(Buffer.from((await manual.call('artifact',{owner,id,part})).data,'base64'));
+            return res.end();
+          }
+          return send(200,Buffer.from(artifact.data,'base64'),'image/png');
+        }
+        return send(405,{error:'Method not allowed'});
+      }
       if(url.pathname.startsWith('/api/harness/')) {
         stage='agent_storage';const harness=new Harness(store||configuredStore(env),{env});
         if(url.pathname==='/api/harness/config'&&req.method==='GET')return send(200,await harness.config());

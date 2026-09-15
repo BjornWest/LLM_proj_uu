@@ -124,3 +124,12 @@ temporary stores and local HTTP only. A test pass is not production cutover.
 
 References: [Cloudflare quick tunnels](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/),
 [Vercel Blob usage](https://vercel.com/docs/vercel-blob/usage-and-pricing).
+
+## Optional manual browser sessions
+
+The workspace can expose the existing packaged task sites through human-operated
+BrowserGym sessions. Add `manual.override.yaml` with an absolute
+`ENVIRONMENT_PACKAGE` path to the immutable package. This adds a separate
+persistent manual-trace volume and Chromium resources; it needs no model key.
+See [manual environment hosting](../../docs/agents/manual-environment-hosting.md)
+for supported routes, lifecycle, deployment and validation details.

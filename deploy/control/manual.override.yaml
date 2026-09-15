@@ -1,0 +1,18 @@
+# Add only after preparing the exact immutable environment package.
+services:
+  control:
+    environment:
+      DAYLIGHT_MANUAL_PACKAGE: /package
+      DAYLIGHT_MANUAL_ROOT: /manual
+      DAYLIGHT_MANUAL_DRIVER: /app/scripts/manual_environment.py
+      DAYLIGHT_MANUAL_PYTHON: /usr/local/bin/python
+    volumes:
+      - ${ENVIRONMENT_PACKAGE:?Set ENVIRONMENT_PACKAGE to the verified package}:/package:ro
+      - manual-data:/manual
+    tmpfs:
+      - /tmp:size=768m,mode=1777
+    shm_size: 1gb
+    mem_limit: 3g
+    cpus: 2
+volumes:
+  manual-data:

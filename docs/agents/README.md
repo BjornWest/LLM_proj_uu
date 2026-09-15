@@ -10,6 +10,7 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 ## Existing references
 
 - [Generalization requirements](generalization-requirements.md): interface fidelity, site holdouts, messy observations and eventual real-site transfer.
+- [Manual environment hosting](manual-environment-hosting.md): owner-scoped native browser controls, package boundaries and trace semantics.
 - [Portable control service](../../deploy/control/README.md): SQLite, private tunnel, Blob migration and single-writer cutover.
 - [Completed control-storage cutover](control-storage-cutover.md): exact migration evidence, production checks and current restart limitations.
 - [Agent coordination](coordination.md): sparse notifications, delivery semantics, and current steering test status.
