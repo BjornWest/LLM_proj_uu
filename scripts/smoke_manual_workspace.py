@@ -18,6 +18,7 @@ def main():
         page.on('request',lambda r:requests.append((r.method,r.url.removeprefix(origin),r.post_data_json if r.method=='POST' else None)))
         tasks=[{'id':'tricky-p11-clean','title':'Music membership','condition':'clean'},{'id':'tricky-p11-injected','title':'Music membership','condition':'injected'}]
         settings={'enabled':True,'sites':[{'site_id':'tricky-music','tasks':tasks,'default_task':tasks[0]['id']},{'site_id':'tricky-shop','tasks':[{'id':'tricky-p07-clean','title':'Shop','condition':'clean'}],'default_task':'tricky-p07-clean'}],'limits':{'max_sessions':2,'idle_seconds':300,'max_seconds':900,'max_actions':100}}
+        settings['sites'].append({'site_id':'tricky-health','tasks':[{'id':'tricky-p10-clean','title':'Health account','condition':'clean'}],'default_task':'tricky-p10-clean'})
         def frame(session):
             nonlocal serial
             serial+=1;session['frame']={'id':str(serial),'width':1000,'height':800,'url':f'/api/manual/sessions/{session["id"]}/frame/{serial}','page_url':'http://remote-fixture.local/music'}
@@ -69,6 +70,26 @@ def main():
         page.locator('#research-tab').click();page.locator('#replay-kind').select_option('manual');expect(page.locator('#replay-rows tr')).to_have_count(1);check('Site history marks human session Manual and Not graded',page.locator('#replay-rows .run-kind').inner_text()=='Manual' and page.locator('#replay-rows .grade').inner_text()=='Not graded')
         page.locator('#all-replays-link').click();page.locator('#global-kind').select_option('manual');expect(page.locator('#global-rows tr')).to_have_count(1);before=len([r for r in requests if r[0]=='POST']);page.locator('#global-rows .replay-action').click();expect(page.locator('#manual-review')).to_be_visible()
         check('Read-only manual review separates reference diagnostics from agent grade',page.locator('#review-grade').inner_text()=='Not graded' and page.locator('#manual-trace-download').get_attribute('href').endswith('/trace') and 'true' in page.locator('#manual-reference-evaluation').text_content() and len([r for r in requests if r[0]=='POST'])==before)
+        # Exact user-reported shape: a closed music image plus another live health session.
+        page.locator('.site-choice[data-site=tricky-music]').click()
+        expect(page.locator('#manual-frame-status')).to_contain_text('Saved screenshot')
+        check('Closed music screenshot is explicitly read-only without a busy cursor',page.locator('#manual-surface').get_attribute('data-state')=='closed' and page.locator('#manual-surface').evaluate('e=>getComputedStyle(e).cursor')=='default')
+        health={**sessions[0],'id':str(uuid4()),'site_id':'tricky-health','task':'tricky-p10-clean','task_name':'Health account','status':'ready','created_at':'2026-09-15T16:00:00Z','trace_ready':False,'reference_evaluation':None}
+        frame(health);sessions.insert(0,health)
+        before=len([r for r in requests if r[0]=='POST']);before_observe=len([r for r in requests if r[1].endswith('/observe')]);page.locator('#manual-check').click()
+        expect(page.locator('#manual-close-other')).to_be_enabled()
+        check('Status refresh visibly confirms its purpose without browser actions', 'Status checked at' in page.locator('#manual-checked').inner_text() and 'does not refresh the screenshot' in page.locator('#manual-checked').inner_text() and len([r for r in requests if r[0]=='POST'])==before and len([r for r in requests if r[1].endswith('/observe')])==before_observe)
+        check('Blocked music launch identifies the active health session',page.locator('#manual-open').is_disabled() and page.locator('#manual-close').is_disabled() and 'Health account' in page.locator('#manual-status').inner_text() and 'Health account' in page.locator('#manual-close-other').inner_text())
+        prior_closes=len([r for r in requests if r[0]=='POST' and r[1].endswith('/close')])
+        page.locator('#manual-close-other').click();expect(page.locator('#manual-open')).to_be_enabled()
+        closes=[r for r in requests if r[0]=='POST' and r[1].endswith('/close')]
+        check('Explicit close-other targets health exactly once and releases the music slot',closes[-1][1]=='/api/manual/sessions/'+health['id']+'/close' and len(closes)==prior_closes+1 and health['status']=='finished')
+        failed={**health,'id':str(uuid4()),'status':'error','created_at':'2026-09-15T17:00:00Z','error':'ValueError: Browser left supported health routes','last_error':'','trace_ready':True}
+        frame(failed);sessions.insert(0,failed)
+        page.locator('.site-choice[data-site=tricky-health]').click();page.locator('#manual-check').click();expect(page.locator('#manual-error')).to_contain_text('Medical records and profiles are not included')
+        check('Unsupported health link explains fixture boundary and recovery',page.locator('#manual-open').is_enabled() and 'Appointments' in page.locator('#manual-scope').inner_text() and 'Open a new session' in page.locator('#manual-error').inner_text())
+        check('Raw route error remains available without changing the saved verdict',page.locator('#manual-error-raw').text_content()==failed['error'] and failed['status']=='error' and page.locator('#manual-frame-status').inner_text().startswith('Saved screenshot'))
+        page.screenshot(path=str(out/'health-boundary.png'),full_page=True)
         check('Manual exploration issued no inference or worker job writes',not any(r[0]=='POST' and r[1] in ['/api/start','/api/step','/api/harness/jobs'] for r in requests))
         check('No browser JavaScript errors',not errors);browser.close()
       (out/'report.json').write_text(json.dumps({'passed':True,'checks':checks,'paid_calls':0,'evidence':'Mock manual API and screenshot; validates frontend contract, not BrowserGym execution','source_sha256':{name:hashlib.sha256((ROOT/'deploy/daylight/client'/name).read_bytes()).hexdigest() for name in ['workspace.html','workspace.css','workspace.js']}},indent=2));print(json.dumps({'checks':len(checks),'report':str(out/'report.json')}))
