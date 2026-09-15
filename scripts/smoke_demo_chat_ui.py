@@ -30,6 +30,7 @@ def main():
             page.goto(origin)
             page.get_by_label('Your invitation code').fill('offline-interactive-code-'*3)
             page.get_by_role('button',name='Open demo').click()
+            page.goto(origin+'/demo')
             expect(page.locator('.read-only-tag')).to_have_text('Interactive')
             expect(page.locator('#question')).to_be_enabled()
             check('Interactive chat labels replace read-only claims',page.locator('.read-only-tag').inner_text()=='Interactive' and 'Read-only' not in page.locator('#chat-panel').inner_text())

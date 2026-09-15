@@ -1,0 +1,63 @@
+# Site workspace
+
+The authenticated `/` and `/workspace` entry points organize the reviewed task
+registry by site and collection. `/workspace/replays` lists the current invitation's
+BrowserGym jobs and original browser-side traces. `/demo` retains the original
+Campus dashboard; `/harness` retains the full research controls.
+
+## Execution
+
+- Campus supports ordinary manual browsing with the browser agent in a sidebar.
+  Ask uses the existing OpenRouter assist protocol. Each complete response and
+  action receipt is saved before the next step. Manual controls lock during the
+  turn; failed writes or changed documents stop it without automatic retry.
+- **Try this task** submits an actual worker job, explicitly classified as `task`
+  and requiring `live` execution. There is no scripted fallback. The worker uses
+  its configured OpenRouter model. Its availability, budget and request limits
+  still apply. Offline workers leave jobs queued.
+- Fixed tasks submit their exact registry goal and revision. Session-generated
+  goals are omitted from the request and display a pending objective until the
+  worker prepares the actual session.
+- External dataset sites currently expose remote tasks and recorded evidence.
+  They do not support manual remote takeover. The sample Fieldnotes bookshop and
+  all sample runs remain in the separate local design preview only.
+
+## Recorded evidence
+
+New activity metadata separates Task/Ask from execution mode and runtime. Older
+runs without explicit activity remain unclassified. Per-site and global views
+use the same owner-scoped APIs. Browser-side trace pagination is exhausted before
+chronological sorting; partial failures show an error instead of silently
+claiming a complete history.
+
+BrowserGym review embeds our existing authenticated harness renderer. Replay
+controls select recorded steps, including distinct steps whose action strings
+match. Decision observations belong to their exact pre-action step; latest
+browser images represent post-step state. Browsing a replay does not enqueue a
+job, invoke a model or recompute a verifier.
+
+The list's Succeeded/Failed labels reflect the recorded `safe_success` boolean.
+Partial requires an explicit grade and rubric. Missing safe-success remains
+Unknown even when other individual outcome flags are present. Browser-side
+requests without independent verification are Not graded. Runtime errors remain
+visible as execution status, separately from grading.
+
+Original browser-side traces expose their unchanged JSON in a text-only details
+view with an authenticated download. Portable curation bundle import remains a
+separate backend increment; this workspace does not execute uploaded HTML or
+introduce another export format.
+
+## Local validation
+
+```sh
+npm --prefix deploy/daylight run build
+npm --prefix deploy/daylight test
+.venv/bin/python scripts/smoke_workspace_ui.py
+.venv/bin/python scripts/smoke_demo_chat_ui.py
+```
+
+The browser tests use the production handler and isolated temporary storage with
+an offline model transport. Their screenshots and source fingerprints are written
+to `.local/vercel-demo/`. They validate integration, not live model reliability,
+and make no paid inference calls. `tests/workspace-server.mjs` is a test-only
+server with seeded evidence; it is never part of the deployed entry point.

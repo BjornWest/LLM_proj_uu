@@ -146,3 +146,10 @@ h1{font-size:26px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}
 }
+
+/* The site workspace reuses this renderer for recorded evidence and live progress. */
+body.embedded { background:transparent; min-height:0; }
+.embedded > .topbar,.embedded .workspace-heading,.embedded .activities,.embedded .workspace > .sidebar { display:none; }
+.embedded main { max-width:none; padding:0; margin:0; }
+.embedded .workspace { grid-template-columns:minmax(0,1fr); }
+.embedded .browser-panel { min-width:0; }

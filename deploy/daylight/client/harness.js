@@ -1,4 +1,7 @@
 const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const embedded = params.get('embed') === '1';
+if (embedded) document.body.classList.add('embedded');
 const activeStatuses = new Set(['queued', 'running', 'starting', 'claimed']);
 let config = null, jobs = [], selectedID = '', selectedJob = null, selectedStep = null;
 let activity = 'watch', following = true, replayTimer = null, groupState = new Map();
@@ -8,7 +11,11 @@ const goalDrafts = new Map();
 const stamp = value => { const d = new Date(value); return value && !Number.isNaN(d.valueOf()) ? d.toLocaleString() : 'Time unavailable'; };
 const describe = value => typeof value === 'string' ? value : JSON.stringify(value, null, 2);
 const taskLabel = task => (task.title || task.id) + (task.condition ? ' · ' + task.condition : '');
-const taskTitle = id => { const task = config?.tasks?.find(t => t.id === id); return task ? taskLabel(task) : id || 'Unknown task'; };
+const jobTitle = job => {
+  if (job.task_name) return job.task_name + (job.condition ? ' · ' + job.condition : '');
+  const task = config?.tasks?.find(t => t.id === job.task && (job.task_revision ? job.task_revision === t.revision : !t.revision));
+  return task ? taskLabel(task) : job.task || 'Unknown task';
+};
 const sessionGoal = task => task?.goal_mode === 'resolve_after_session_prepare';
 const currentTask = () => config?.tasks?.find(t => t.id === $('task').value);
 const selectedIndex = () => selectedJob?.steps?.findIndex(s => s.step === selectedStep) ?? -1;
@@ -39,7 +46,7 @@ function artifactURL(value, id) {
 function eligibleTasks() { return (config?.tasks || []).filter(t => activity !== 'ask' || t.custom_goal); }
 function syncControls() {
   const task = currentTask(), eligible = eligibleTasks();
-  $('submit-run').disabled = submitting || authExpired || activity === 'replay' || !config?.enabled || !task || task.available === false || (activity === 'ask' && !task.custom_goal);
+  $('submit-run').disabled = submitting || authExpired || embedded || activity === 'replay' || !config?.enabled || !task || task.available === false || (activity === 'ask' && !task.custom_goal);
   $('task').disabled = submitting || authExpired || !eligible.length;
   $('goal').disabled = submitting || authExpired || activity !== 'ask' || !task?.custom_goal;
   $('goal').required = activity === 'ask' && !!task?.custom_goal;
@@ -127,14 +134,14 @@ function renderConfig(next) {
 function renderJobs(next = jobs) {
   jobs = next;
   const query = $('run-search').value.trim().toLowerCase(), filter = $('run-filter').value;
-  const visible = jobs.filter(job => (!query || [job.id, job.task, taskTitle(job.task), job.goal].join(' ').toLowerCase().includes(query))
+  const visible = jobs.filter(job => (!query || [job.id, job.task, jobTitle(job), job.goal].join(' ').toLowerCase().includes(query))
     && (filter === 'all' || filter === 'active' && activeStatuses.has(job.status) || filter === 'finished' && !activeStatuses.has(job.status)
       || filter === 'errors' && ['error', 'failed', 'interrupted'].includes(job.status)));
   $('run-count').textContent = String(jobs.length);
   $('job-list').replaceChildren(...visible.map(job => {
     const li = document.createElement('li'), button = document.createElement('button'), title = document.createElement('strong'), meta = document.createElement('small');
     button.type = 'button'; button.className = 'job-button'; button.setAttribute('aria-current', String(job.id === selectedID));
-    title.textContent = taskTitle(job.task); meta.textContent = `${job.status || 'Unknown'} · ${stamp(job.created_at)}`;
+    title.textContent = jobTitle(job); meta.textContent = `${job.status || 'Unknown'} · ${stamp(job.created_at)}`;
     button.append(title, meta); button.title = job.goal || job.id; button.onclick = () => selectJob(job.id); li.append(button); return li;
   }));
   $('library-empty').hidden = visible.length > 0;
@@ -220,7 +227,7 @@ function renderJob(job) {
   const oldJob = selectedJob, oldIssueStep = $('issue-step').value;
   selectedJob = job;
   $('run-detail').hidden = false; $('issue-panel').hidden = false;
-  $('run-state').textContent = job.status || 'Unknown'; $('browser-title').textContent = taskTitle(job.task);
+  $('run-state').textContent = job.status || 'Unknown'; $('browser-title').textContent = jobTitle(job);
   const mode = ['scripted','rehearsal','scripted_rehearsal'].includes(job.mode) ? 'Scripted rehearsal' : job.mode === 'live' ? 'Model run' : 'Execution mode not recorded';
   $('runtime-label').textContent = 'BrowserGym · ' + mode;
   $('run-summary').textContent = job.goal || (job.goal_resolution === 'session_pending' ? 'Resolved when the session starts' : 'No goal recorded');
@@ -338,13 +345,13 @@ $('play-replay').onclick = () => {
 };
 $('task-form').onsubmit = async event => {
   event.preventDefault(); const task = currentTask();
-  if (submitting || authExpired || activity === 'replay' || !config?.enabled || !task || task.available === false || (activity === 'ask' && !task.custom_goal)) return;
+  if (submitting || authExpired || embedded || activity === 'replay' || !config?.enabled || !task || task.available === false || (activity === 'ask' && !task.custom_goal)) return;
   const dynamic = sessionGoal(task);
   const goal = activity === 'ask' ? $('goal').value.trim() : task.goal;
   if (!dynamic && !goal) { notice('Enter a request before queuing a run.'); return; }
   // A session objective belongs to the newly prepared worker session. Never
   // submit a placeholder, draft or a prior run's resolved target as its goal.
-  const payload = {task: task.id, ...(dynamic ? {} : {goal}), ...(task.revision ? {task_revision: task.revision} : {})};
+  const payload = {task: task.id, interaction_kind: activity === 'ask' ? 'ask' : 'task', ...(dynamic ? {} : {goal}), ...(task.revision ? {task_revision: task.revision} : {})};
   submitting = true; syncControls(); notice();
   try { const job = await api('/api/harness/jobs', payload); await selectJob(job.id); await poll(); }
   catch (error) { notice(error.message); }
@@ -367,6 +374,10 @@ $('issue-form').onsubmit = async event => {
 $('screenshot').onerror = () => { $('screenshot-caption').textContent = 'This recorded image could not be loaded. Choose another step or refresh to try again.'; };
 window.addEventListener('hashchange', () => { const id = location.hash.slice(1); if (id && id !== selectedID) selectJob(id); });
 window.addEventListener('pagehide', () => { stopReplay(); clearTimeout(pollTimer); });
+if (embedded) {
+  setActivity(params.get('activity') === 'watch' ? 'watch' : 'replay');
+  new ResizeObserver(() => parent.postMessage({type:'harness:size',height:document.body.scrollHeight}, location.origin)).observe(document.body);
+}
 const initialID = location.hash.slice(1);
 await poll();
 if (initialID) await selectJob(initialID);
