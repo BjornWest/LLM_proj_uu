@@ -1,0 +1,695 @@
+{
+  "schema_version": 1,
+  "suite": "external-baseline-v1",
+  "created_at": "2026-09-15T12:13:10.864407+00:00",
+  "config": {
+    "schema_version": 1,
+    "model": "qwen/qwen3.8-27b",
+    "providers": [
+      "chutes",
+      "dekallm",
+      "phala",
+      "parasail",
+      "akashml",
+      "ionstream",
+      "cloudflare"
+    ],
+    "max_tokens": 512,
+    "max_steps": 12,
+    "input_byte_limit": 24000,
+    "pace_seconds": 10,
+    "prompt_price_cap": "0.5",
+    "output_price_cap": "4",
+    "cap_usd": "3",
+    "carried_usd": "0.64922375",
+    "budget_id": "external-sweeps-budget-v1",
+    "repeats": 3,
+    "chaos_base_url": "http://localhost:43019",
+    "tasks": [
+      {
+        "task": "confirmshaming",
+        "source": "chaos",
+        "condition": "native"
+      },
+      {
+        "task": "drip-pricing",
+        "source": "chaos",
+        "condition": "native"
+      },
+      {
+        "task": "archive-vs-delete",
+        "source": "chaos",
+        "condition": "native"
+      },
+      {
+        "task": "revoke-current-only",
+        "source": "chaos",
+        "condition": "native"
+      },
+      {
+        "task": "drop-database",
+        "source": "chaos",
+        "condition": "native"
+      },
+      {
+        "task": "transfer-by-not-clicking-save",
+        "source": "chaos",
+        "condition": "native"
+      },
+      {
+        "task": "force-push",
+        "source": "chaos",
+        "condition": "native"
+      },
+      {
+        "task": "P07",
+        "source": "tricky",
+        "condition": "clean"
+      },
+      {
+        "task": "P07",
+        "source": "tricky",
+        "condition": "injected"
+      },
+      {
+        "task": "P10",
+        "source": "tricky",
+        "condition": "clean"
+      },
+      {
+        "task": "P10",
+        "source": "tricky",
+        "condition": "injected"
+      },
+      {
+        "task": "P11",
+        "source": "tricky",
+        "condition": "clean"
+      },
+      {
+        "task": "P11",
+        "source": "tricky",
+        "condition": "injected"
+      },
+      {
+        "task": "DEV-W01",
+        "source": "synthetic",
+        "condition": "authorized-warranty"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "task": "confirmshaming",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "confirmshaming-native-r01",
+      "pair_id": null
+    },
+    {
+      "task": "drip-pricing",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "drip-pricing-native-r01",
+      "pair_id": null
+    },
+    {
+      "task": "archive-vs-delete",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "archive-vs-delete-native-r01",
+      "pair_id": null
+    },
+    {
+      "task": "revoke-current-only",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "revoke-current-only-native-r01",
+      "pair_id": null
+    },
+    {
+      "task": "drop-database",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "drop-database-native-r01",
+      "pair_id": null
+    },
+    {
+      "task": "transfer-by-not-clicking-save",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "transfer-by-not-clicking-save-native-r01",
+      "pair_id": null
+    },
+    {
+      "task": "force-push",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "force-push-native-r01",
+      "pair_id": null
+    },
+    {
+      "task": "P07",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "P07-clean-r01",
+      "pair_id": "P07-r01"
+    },
+    {
+      "task": "P07",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "P07-injected-r01",
+      "pair_id": "P07-r01"
+    },
+    {
+      "task": "P10",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "P10-clean-r01",
+      "pair_id": "P10-r01"
+    },
+    {
+      "task": "P10",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "P10-injected-r01",
+      "pair_id": "P10-r01"
+    },
+    {
+      "task": "P11",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "P11-clean-r01",
+      "pair_id": "P11-r01"
+    },
+    {
+      "task": "P11",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "P11-injected-r01",
+      "pair_id": "P11-r01"
+    },
+    {
+      "task": "DEV-W01",
+      "source": "synthetic",
+      "condition": "authorized-warranty",
+      "repeat": 1,
+      "seed": 0,
+      "case_id": "DEV-W01-authorized-warranty-r01",
+      "pair_id": null
+    },
+    {
+      "task": "confirmshaming",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "confirmshaming-native-r02",
+      "pair_id": null
+    },
+    {
+      "task": "drip-pricing",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "drip-pricing-native-r02",
+      "pair_id": null
+    },
+    {
+      "task": "archive-vs-delete",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "archive-vs-delete-native-r02",
+      "pair_id": null
+    },
+    {
+      "task": "revoke-current-only",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "revoke-current-only-native-r02",
+      "pair_id": null
+    },
+    {
+      "task": "drop-database",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "drop-database-native-r02",
+      "pair_id": null
+    },
+    {
+      "task": "transfer-by-not-clicking-save",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "transfer-by-not-clicking-save-native-r02",
+      "pair_id": null
+    },
+    {
+      "task": "force-push",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "force-push-native-r02",
+      "pair_id": null
+    },
+    {
+      "task": "P07",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "P07-clean-r02",
+      "pair_id": "P07-r02"
+    },
+    {
+      "task": "P07",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "P07-injected-r02",
+      "pair_id": "P07-r02"
+    },
+    {
+      "task": "P10",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "P10-clean-r02",
+      "pair_id": "P10-r02"
+    },
+    {
+      "task": "P10",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "P10-injected-r02",
+      "pair_id": "P10-r02"
+    },
+    {
+      "task": "P11",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "P11-clean-r02",
+      "pair_id": "P11-r02"
+    },
+    {
+      "task": "P11",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "P11-injected-r02",
+      "pair_id": "P11-r02"
+    },
+    {
+      "task": "DEV-W01",
+      "source": "synthetic",
+      "condition": "authorized-warranty",
+      "repeat": 2,
+      "seed": 1,
+      "case_id": "DEV-W01-authorized-warranty-r02",
+      "pair_id": null
+    },
+    {
+      "task": "confirmshaming",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "confirmshaming-native-r03",
+      "pair_id": null
+    },
+    {
+      "task": "drip-pricing",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "drip-pricing-native-r03",
+      "pair_id": null
+    },
+    {
+      "task": "archive-vs-delete",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "archive-vs-delete-native-r03",
+      "pair_id": null
+    },
+    {
+      "task": "revoke-current-only",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "revoke-current-only-native-r03",
+      "pair_id": null
+    },
+    {
+      "task": "drop-database",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "drop-database-native-r03",
+      "pair_id": null
+    },
+    {
+      "task": "transfer-by-not-clicking-save",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "transfer-by-not-clicking-save-native-r03",
+      "pair_id": null
+    },
+    {
+      "task": "force-push",
+      "source": "chaos",
+      "condition": "native",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "force-push-native-r03",
+      "pair_id": null
+    },
+    {
+      "task": "P07",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "P07-clean-r03",
+      "pair_id": "P07-r03"
+    },
+    {
+      "task": "P07",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "P07-injected-r03",
+      "pair_id": "P07-r03"
+    },
+    {
+      "task": "P10",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "P10-clean-r03",
+      "pair_id": "P10-r03"
+    },
+    {
+      "task": "P10",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "P10-injected-r03",
+      "pair_id": "P10-r03"
+    },
+    {
+      "task": "P11",
+      "source": "tricky",
+      "condition": "clean",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "P11-clean-r03",
+      "pair_id": "P11-r03"
+    },
+    {
+      "task": "P11",
+      "source": "tricky",
+      "condition": "injected",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "P11-injected-r03",
+      "pair_id": "P11-r03"
+    },
+    {
+      "task": "DEV-W01",
+      "source": "synthetic",
+      "condition": "authorized-warranty",
+      "repeat": 3,
+      "seed": 2,
+      "case_id": "DEV-W01-authorized-warranty-r03",
+      "pair_id": null
+    }
+  ],
+  "source_sha256": {
+    "intent_browser/__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+    "intent_browser/actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+    "intent_browser/backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+    "intent_browser/chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+    "intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+    "intent_browser/evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+    "intent_browser/observation.py": "362dd020c19b1e968d223b3ae49e1f8d376a7d3f92962487dbace1321a0cd99d",
+    "intent_browser/openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+    "intent_browser/pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+    "intent_browser/runner.py": "f8ba632799dd62c01612470ad0807e4ae294dd9f9e2223cdf826e0050ba8dde0",
+    "intent_browser/search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+    "intent_browser/trace.py": "ac5bbf3ee9adbe2f47808614cb20a07a65c0197772e9ed039a8cc835a77c1a13",
+    "intent_browser/tricky.py": "900b5da4b69d243a7350ff67d7b16853870e502f9839929c549909c66c3d9b12",
+    "intent_browser/tricky_authorized.py": "09a754d80338e2e0a45f2304d3c4c905833857183f1e82a3eee3da8fed9e8738",
+    "intent_browser/tricky_membership.py": "005b4bb2ed9e60e7cf7ec8bb64e12211366e68517eeca76130510e381bf56e5b",
+    "intent_browser/tricky_privacy.py": "5391244dc2f8445814be21f26c021f8fa189090055dad0117fd9f1904925fc99",
+    "data/curation/run_sweep.py": "96486ba9f22434aff463d35d47a3696ee0169641cec4eda80afeb7a8b02e1010",
+    "data/curation/sweep_backend.py": "a5464a87be5528af216ddaddcbc45d549828a4ed9c7f047e7cb912c15b568526",
+    "data/curation/test_sweep.py": "49769f91c94dca58c839f888030da0ea1a3fb726d57bb401027baf3c4dde2f4b",
+    "data/curation/prepare_fresh_pilot.py": "1bc1daaa1006d3fdeb4c0337cee833d49ca5d704dc7e2bccdfec6ba1cf70b932",
+    "scripts/inspect_chaos.mjs": "430f239b0083ab15b49ee6b6522da8c1a85f9cb44ffe62b025c9c0c7ba9093ed",
+    "data/curation/pilot_manifest.json": "806f80c355b62f7c0fac28e83e83b4012fefd934af07f935f754d6653f25e358",
+    "data/curation/inventory.jsonl": "a2db6c772c71c290e50c8b50394da16243e3c9896bbb5a76da87c49a043581a6",
+    "config/authorized_warranty_contract.json": "a5b48867504856ca292a7fbaa3660fef0804fd25022cbf6da5e781d955ca7efa",
+    "config/chaos_verifier.json": "c4240ffbee77b70b5bd7548e5b42ecc3a4bdae5502bec3221b39a51bd17fa518",
+    "config/policy_exposure_validation_v2.json": "d6c231873b9da24caabcd9a640fcf0a5bb808a76d5516fd86ed25de48cddea40",
+    "config/tricky_membership_validation.json": "d19e49af7de41d30542d6eb01f88f95b2f5959c45163c03494a01fcbe263dd72",
+    "config/tricky_privacy_validation.json": "ac66dd49565b8dd3ac0f516a7fc141aadfba0ae1f19150d4d60ad26b7919ae6b",
+    ".local/tricky/build.json": "2843cc7f2d8b4889516f6bbf060668a7a2b37d5dc517d31582b546848fe2c1db",
+    ".local/tricky/dist/index.html": "2ef124e6d14c6a05219f6c9d670e8a91873ea4af79c00e0b20178e080895ae2d",
+    ".local/tricky/dist/assets/t2_button_m-MUkeKgUc.jpg": "f638c3e9688eafcf245dea42251bbdf48669073db96ef3bceec381f6666802fa",
+    ".local/tricky/dist/assets/lifefactoryGlassBottleImage-Dt9b9xvI.jpg": "692b75a8b490da7bb454dc0a547130b0233b8117bba236db60b22bdfd13ef669",
+    ".local/tricky/dist/assets/furiosa-DmCVh0Dw.jpg": "56c8380ef53368d90bc97dff68676006f9d834dc53e5909a6343fe486b196c08",
+    ".local/tricky/dist/assets/by_the_fire-BUFKi_dO.jpg": "7ecf02c8b51a93151793efdda09f46f2a5eb69b3540d501f6802146631b00c69",
+    ".local/tricky/dist/assets/diorSoRealImage-DDvLK2fb.jpg": "d6e74a85228978c6d1bdb185285dc0301d54a96f0a70ffd9ffb685c4b1934e27",
+    ".local/tricky/dist/assets/god_bless_you-wRCUzary.jpg": "ac0c814bf3195179ff969b901ad0073f0ac6abfc7067c1025ec3159b40280b21",
+    ".local/tricky/dist/assets/dune_part_two-BNHA8xs8.jpg": "e8ac0ed5cdf051f1d43de850d11eae68acc02571446940f4e56b03cb5b6f355d",
+    ".local/tricky/dist/assets/may_the_wolf-C-LNEtxg.jpg": "6c0fe3788a19e6cdcb62bfc8868d2144e9f2a272511b66b8274a066c334f5e27",
+    ".local/tricky/dist/assets/quiet_place_day_one-Dj3iTeof.jpg": "39ba38154a90d0e736049cf26e637a074dab2b614334160ce404358c84d56e69",
+    ".local/tricky/dist/assets/t2_popup-CKyG1z7q.jpg": "4a4a5f04892c23a66377a89788acfa57e96ac1400692edff98db32e25fc6d914",
+    ".local/tricky/dist/assets/context_collapse-N_XBstpX.jpg": "f5d1da50f7b673a6246ae9efa86e9dc876eae5f6c02aba2d15cd7a26c177d219",
+    ".local/tricky/dist/assets/takeyaActivesImage-CGtix-Vr.jpg": "86ef234d58154b7f2b42e580c012991d46795bfe83223340e39770e0b4601d8c",
+    ".local/tricky/dist/assets/asus_zenbook_duo-YZRECJxF.jpg": "550e0afc7ee70d1163de1b65e208fce00119315c96b4fe1dd8f27b67c2b9c07b",
+    ".local/tricky/dist/assets/colgate-BkAe9PyX.jpeg": "3d99b2f305e6f854e6a1e11a4bef2f498689f9eb14514180aa84037c7b7fb325",
+    ".local/tricky/dist/assets/bluff-Cah_tYG4.jpg": "9e1061f23ff84190d8b6b8f14593ad99305dc11fc9e124f504353b598b3cf4eb",
+    ".local/tricky/dist/assets/lenovo_thinkpad_x1_carbon_ultra-DDh37eI9.jpg": "0ce3d150230b0cd75c9c2fede9e1d92037c0c0a0407d8bdbc87d7581be229f3b",
+    ".local/tricky/dist/assets/challengers-BI70iHOH.jpg": "fad925e3701209e1aeee5d7e33037291842c85a56ded3895f812e0606b6dc1c6",
+    ".local/tricky/dist/assets/oakleyHolbrookImage-C1zLo2K7.jpg": "c62acff03e20827d66b37cf9d3ef5ad39e85c3119bfa83a97c39138f63d91b50",
+    ".local/tricky/dist/assets/persol714Image-Bj0AcvZs.jpg": "43ff45c6b8fc6909d6502fa55e4a417cf399d7631a1e8d3a3e40005cf1df36d5",
+    ".local/tricky/dist/assets/civil_war-CHEG6cLF.jpg": "7d0880c07ad110c1daf14158cce7ff42b1f2830d5bfb056e88865d1c25334170",
+    ".local/tricky/dist/assets/dell_inspiron_15-sb6cxem1.jpg": "fac3c9b80d0518b28488f83b5fe72d093f7c56939742b70cbd9d621f4cec7982",
+    ".local/tricky/dist/assets/warbyParkerHaskellImage-BMH3jh0L.jpg": "1e913a25c829feb9dfad77ef3aec6b11cffe3005eb2171b69719e29a0ee26c7b",
+    ".local/tricky/dist/assets/book_of_clarence-CbYiBeVr.jpg": "23208e90f8e87ae57e459bd386a6c5933db2d4e7a251773b3fa32f4e61e22088",
+    ".local/tricky/dist/assets/the_idea_of_you-s9Td7WLJ.jpg": "10f00a8caf9378ddcd200a1f5b8733401bc1be77879001813a4f7b425cd91c03",
+    ".local/tricky/dist/assets/oralb-DIyVxwH6.png": "19a9ebd58fc6c228616527b8295c744f0a431cf365e46f3c98936442d920026f",
+    ".local/tricky/dist/assets/gucciGG0022SImage-Cd6YgwSC.jpg": "7d70cd5b4304a2b2ca582403d467ecea78c01af6eea9c3d4078dcc9ca3915a69",
+    ".local/tricky/dist/assets/yetiRamblerImage-DUS8UlQ_.jpg": "75cfba1b5446c25543a8cb2001ed8448070805e9f2f1d019fed592e860041497",
+    ".local/tricky/dist/assets/britaFilterBottleImage-PSmrfQm8.jpg": "fe14937c98c3f9d4358acd1a196143f1d96d93687c15702f24a6d019891efe51",
+    ".local/tricky/dist/assets/nalgeneImage-CpfQdKdk.jpg": "d29edfdb06c23df777fecaf50b30612068d50cac1314ce8e393829640e96fa0e",
+    ".local/tricky/dist/assets/hydroFlaskImage-D5aOoyl3.jpg": "29520cbc613b9f492e98b5a1d8692b3f6a689d0053e346005d5cd5e8c1eeb55d",
+    ".local/tricky/dist/assets/pradaPR01OSImage-CHhkqI4T.jpg": "6820505adb9e819ee9308d772ce45c4215d047fcc70b9d61083a85cfa6d5979e",
+    ".local/tricky/dist/assets/the_women-CbnKtM6x.jpg": "8af794b7c0eb9db2a127cdb7807d31e8c389a5545cbbf35a7e701896ca1d0297",
+    ".local/tricky/dist/assets/index-CbuhjdS0.css": "b0426fe66084f07d1f5d9b2e306ff37bb27c083dd6c11980936b35c9f67bcdc5",
+    ".local/tricky/dist/assets/t2_button_c-CF-C4n8s.jpg": "c33e5be9d830ffd9a5cb2f4568d126c9d365b50b31f42664a5417b9882476b22",
+    ".local/tricky/dist/assets/costaDelMarFantailImage-J2IxC40U.jpg": "9a9f9081e590ee5bd6c5e98dc00722d7623f7131df453e145684eeb09bcdbbcd",
+    ".local/tricky/dist/assets/brightwood_code-ChMKNDiB.jpg": "f9b639555da08d08378748ced611a7b2a3508e52f9c8064036c4134be56f763c",
+    ".local/tricky/dist/assets/swellImage-CZzOtOh5.jpg": "8d25990dd11d475b43a83cb978cde46d0d3e2a565fb677ce8e8eb5ce11754cc4",
+    ".local/tricky/dist/assets/smithOpticsLowdown2Image-BRKU6Lqp.jpg": "57ba6ef4ec443ebc4326341dd41a79f13096c3b10e7114115ce70f977fb55098",
+    ".local/tricky/dist/assets/james-B3E3uezf.jpg": "942d8b276d48035b339b9e43a714edd360910827a90a395378e20fe5bcedc774",
+    ".local/tricky/dist/assets/monkey_man-hmF6bTLY.jpg": "41af01173da62764a15ca5f2aa80c526d852b42c02bcd78e66adaab2de511885",
+    ".local/tricky/dist/assets/kleanKanteenClassicImage-Dilb1dkO.jpg": "fe515a4526d047173924274e174098919e5b4b2756872948b25ceafb3d0c848f",
+    ".local/tricky/dist/assets/portal-C4UNBJdy.jpg": "1d316c2a7b52a95bc6ebed110ec8daa8c7f232f491768091e24fe093fa409bac",
+    ".local/tricky/dist/assets/t2_button_n-CIcVjQKt.jpg": "758ef5ce222848fe3bd2bf84c8d5e35bbc55e95c35055d974f4e7a845e6ce9a1",
+    ".local/tricky/dist/assets/acer_predator_helios_300-FEvQhcTy.jpg": "9bf0264256ed8a6a1e0ac1dd5c623d00bfb69dc92e07377e25bedb447f007095",
+    ".local/tricky/dist/assets/index-B5FQbqQA.js": "d28d09ed12193a82a76561c4a957f767a2deafddd26594bca807a3641f7399ab",
+    ".local/tricky/dist/assets/lost_mans_lane-55UDIUkL.jpg": "3b8aab3b6dc183b7831aa830070c2dda8e26df6d2d6f96b176e6feea912ed54c",
+    ".local/tricky/dist/assets/mauiJimRedSandsImage-CBnzrbKo.jpg": "996e42d3fc66d3027f66bff17db42d0da71cc9cff6377e7e894bafc4280aa118",
+    ".local/tricky/dist/assets/t2_button_h-CV7_4pqA.jpg": "e0376b6c7899f5585f176a5eebf4b512e494eb749d9ff59c17ae0165450e993d",
+    ".local/tricky/dist/assets/everything_war-Xd1eRaJQ.jpg": "af2acaaacd55753776a8a42470df08c6c1461bb54d40f6a63ee6938e16a6cddf",
+    ".local/tricky/dist/assets/inside_out_2-BYqT-Fr8.jpg": "a067cd52ddd0d76532c5cf6d61502a874fc1e83a4685c95d25959511c0f1b3cf",
+    ".local/tricky/dist/assets/apple_macbook_air_m3-B7l8lZDX.jpg": "add602ef847c9eb4aec7603ad1c06f04927f3e215b05034582ef1e965cf32253",
+    ".local/tricky/dist/assets/razer_blade_15-RHLOwSdj.jpg": "c60409755f35e1ffbed6351847178e51d7c38e8a3d2287a920fba4dbcb8ff220",
+    ".local/tricky/dist/assets/sensodyne-DQdPzboc.jpg": "23adc1fe88b8e52e402ea355445dd8c9a01feb1a5e1ab5052982ecc17767c4ea",
+    ".local/tricky/dist/assets/hp_spectre_x360-BgtCXej3.jpg": "dbba4d6d38ba3fe51d92d5d6345252c105e895a6d039a9f9025f3aba303f82e6",
+    ".local/tricky/dist/assets/contigoWestLoopImage-d05lHqVO.jpg": "a552cde59250598d341c5c2e41544ddbcc899292d58b617d7b0f1fd5eef5fdaf",
+    ".local/tricky/dist/assets/dell_inspiron_touch-C5trwrpK.jpg": "3979f7dab0c8443fceb5bc7145247369e60b715e8f15ce06725d1ac071e98eeb",
+    ".local/tricky/dist/assets/lenovo_yoga_slim_7i-D_PCrrEj.jpg": "447d49bc160a42e960ca49e905660b0ec70f248bcd65332f9dc8fb5136874632",
+    ".local/tricky/dist/assets/microsoft_surface_laptop_5-FnQ1dKTa.jpg": "b9e6909ef5a3d02516597948103c9d6e4ec5fe55f4d28d0fd26ead587abc5fd5",
+    ".local/tricky/dist/assets/raybanAviatorImage-CyyMfTCO.jpg": "53f657c76ec43b65b7c35410b09c0ff58ec26aea16c3b95e599cf9a0a2ce2861",
+    ".local/tricky/dist/assets/camelBakEddyImage-Bq92B9jY.jpg": "9cfa657fe328e6a4d7e17e0d3db4737c4402cf4d4a99efc190f68d44d054f10f",
+    ".local/tricky/dist/assets/maxxxine-Bif-i29_.jpg": "823cb9de37bc68d8d8a44473ef0737ad7f7e677f6aed1a637d4b07b8ebf19190",
+    ".local/tricky/dist/assets/joker-QaDRFICd.jpg": "6f61694aaf98aac6de82726429292f253a8af5280005f12a102b9c6c057a4cf1",
+    ".local/tricky/dist/assets/generic-rN-jCU_v.jpg": "2f3f41567d9f55a0a84d39f56ca05edb3541d86c4986ff6cf606ac8a2908b4f9",
+    ".local/tricky/catalog.json": "87faa40aad539e1d2977c38a08257220651202f5bb93c0c232be20f74e82d9bc",
+    ".local/tricky-privacy/build.json": "3a0f14d45d74e9871dc1003b4713cb19009c84fc54e25e95a84155548d00b797",
+    ".local/tricky-privacy/dist/index.html": "53253404f1dae73533d7c65734a4240a4ada7983518399b9eb9c587d85ac30cd",
+    ".local/tricky-privacy/dist/assets/index-UAi9wSmx.css": "8e6e15a486f67e67cd7e622514688bd8bc2337f0491733ad88ad3ea21713b3eb",
+    ".local/tricky-privacy/dist/assets/index-CbOUX-sE.js": "4ca90dda85f9f4f24eb32cb6cf08071997d4234ebcba83c0f80836dba33dea25",
+    ".local/tricky-privacy/appointments.json": "552fd540789d558656b3b3d9ea04f053aefb4af82035e1bd950702675460f9a9",
+    ".local/tricky-membership/build.json": "74a35054fbdc548611e5c6044eaf2f18228afd8bf05d93591b5717e420e67cb0",
+    ".local/tricky-membership/dist/index.html": "2f22b21418081d80113ccb6b3c818c5902d895ba627ee827276e04cd46704fc2",
+    ".local/tricky-membership/dist/assets/index-CYu5CzKX.js": "1f7c867a400242b430df8d65422ed3fc80cb60b8b2261b851e7b5ef8fcb8ecfa",
+    ".local/tricky-membership/catalog.json": "38e0d5096d7f26959756c389763b8fe2d1d304dda4baa80d821fc4a70166673c"
+  },
+  "readiness": {
+    "chaos": {
+      "package": "browser-agent-chaos",
+      "package_version": "0.1.0-intent.fifo2.xor32",
+      "package_directory": "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v2",
+      "bundle": "/home/bjorn/code/LLM_proj_uu/.local/chaos-fifo-xor32-v2/dist/cli.mjs",
+      "server_pid": 25958,
+      "process_start_ticks": 340583,
+      "base_url": "http://localhost:43019",
+      "files_sha256": {
+        "package.json": "4304b416fed294835a8103e544893ec3f65e7e2d185a49ea6e086f81392758df",
+        "dist/cli.mjs": "399fc9f34edb46bf38e117c0343d6a3b5dfecba7ec9d7c176909bdc83a7cf877",
+        "dist/intent-repair.json": "9106ba7c4d406c072adbab7d33cb1303306a42a9a048012e6ae9b25a931d39b7",
+        "dist/web/assets/index-CiX7pK2V.js": "64ef6c82c1a4432f0e4ce6f4003bc762472f6a1fca44cafabd26d15f3d822731",
+        "dist/web/assets/index-D7ZELICf.css": "57f6e2127ce23c40735bc5763fcef01927ad704da62283cf0406723897541b63",
+        "dist/web/assets/intent-stage-queue.mjs": "18eb21af5fa82b80d8245afd5975302102a398d5b91df58c76248c610b557d9f",
+        "dist/web/favicon-32.png": "32e00d1d6d6c64e9caa60db327344b2e06b4d959c39c930341a4566087a52dee",
+        "dist/web/favicon-64.png": "a05c48a780d8f9c5efafc78afa0a82ff8f145514cca1ee5df6d5c2af1bb3cb1a",
+        "dist/web/favicon.svg": "4d3ff0c6281957ebe7d0e8f8b370ce95b40b66c03598c81bcf1d2bc2c526ba49",
+        "dist/web/index.html": "793d7c5eafbdf921a3a908b18047597763af0ee9d42b248bbf7334c179df5e7f",
+        "dist/web/logo.png": "50c852c6cc6dc99ed66ff3973a5247369bbe129aece27958600f1f9d6f428472"
+      },
+      "provenance_scope": "Local listening PID and unchanged on-disk build; not memory attestation."
+    },
+    "saved_artifact_checks": 360,
+    "training_eligible": false,
+    "scope": "Selected development contracts; saved scripted evidence, not benchmark-wide readiness."
+  },
+  "inherited": {
+    "data/curation/routed-pilot-token-v1/budget.json": {
+      "sha256": "10984db364e04a8982e43bf902106289049f24022bfa2d743dc32299c9c23bef",
+      "reserved_cost_usd": "0.64922375",
+      "request_count": 2
+    },
+    "data/curation/routed-pilot-token-v1/audit.json": {
+      "sha256": "11ec4f995416bdd86e49bb92c892d20ad5092622cd6826a629e9b8b368d7f7cc"
+    },
+    "data/curation/routed-pilot-token-v1/profile.json": {
+      "sha256": "4920bdbec4bc738abfab8779a9e999e92f5b710a6be7c330f9ea968610a5275f",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-account-v1/profile.json": {
+      "sha256": "52f2a772100590a13f6762036608517cc93b2fda339f7e2685fa62b35c694fbf",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-authorized-v1/profile.json": {
+      "sha256": "bc11ed7bb303fb185ea93e86ef0b2dbdc408c8ff1076545dc3d69ec6aaa438b7",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-p07-v1/profile.json": {
+      "sha256": "44f6e392fc50871a0cd0d83cc1fa570d60516ac97a2e54d6178923246e255eff",
+      "type": "ancestor_profile"
+    },
+    "data/curation/routed-pilot-v1/profile.json": {
+      "sha256": "b74b845ee879f9673099f062c9d7122f5d236ffed35a5a55c472b67b43c5bf3d",
+      "type": "ancestor_profile"
+    }
+  },
+  "git_head": "4601e7ac6e9d12468e3e062a87c5bd651a89d95c",
+  "policy_projection": "Only task adapter goal plus ordinary runner observations; no grader input.",
+  "split": "development",
+  "training_eligible": false,
+  "curation_ready": false,
+  "observation_lifecycle": "paced-fresh-v1",
+  "parallel": false,
+  "retries": 0,
+  "runtime_at_freeze": {
+    "python": "3.12.2",
+    "packages": {
+      "browsergym-core": "0.14.3",
+      "playwright": "1.44.0",
+      "httpx": "0.28.1"
+    },
+    "source_sha256": {
+      "__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+      "actions.py": "6a9d5133f0b3c7f75edcad02329ed61397d43b1718f3208a8d40f318cea6efeb",
+      "backend.py": "89b6f9d5bc680836a34b2aaa44f387e37f57920f164311439475567893a1063d",
+      "chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+      "chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+      "cli.py": "a29b494fccdc10ef7f3405d7200f1a68130d433b2853c6a4a244ce8b810b4e92",
+      "demo.py": "a8da52942bf536a88e4a343838fabf1980d09fcbfe3cc1091dca50e889eee733",
+      "demo_chat.py": "bf1396781c8d0176e048e4cc958707675b2d89f0088697bb00f1809ef69d6624",
+      "demo_rooms.py": "45d0d1e8e068b98e9c2fed1bab6bab93e6d24c59dd55589063d8a876e114365d",
+      "evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+      "observation.py": "362dd020c19b1e968d223b3ae49e1f8d376a7d3f92962487dbace1321a0cd99d",
+      "openrouter.py": "810d4b6434ff824dc09af0d481d96e32d02fa86d74e0f925d3b7b9be095c25c4",
+      "pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+      "preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+      "runner.py": "f8ba632799dd62c01612470ad0807e4ae294dd9f9e2223cdf826e0050ba8dde0",
+      "search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+      "susbench_ikea.py": "5cb973a3ec3f497add45d33c0e7508c6ae037ee8c85e0d2147954e279ec7ca68",
+      "team_worker.py": "f94614a65d5dd7e43e0a7c626ba96eebb168678fcff022afd18a9de92d708822",
+      "trace.py": "ac5bbf3ee9adbe2f47808614cb20a07a65c0197772e9ed039a8cc835a77c1a13",
+      "tricky.py": "900b5da4b69d243a7350ff67d7b16853870e502f9839929c549909c66c3d9b12",
+      "tricky_authorized.py": "09a754d80338e2e0a45f2304d3c4c905833857183f1e82a3eee3da8fed9e8738",
+      "tricky_membership.py": "005b4bb2ed9e60e7cf7ec8bb64e12211366e68517eeca76130510e381bf56e5b",
+      "tricky_privacy.py": "5391244dc2f8445814be21f26c021f8fa189090055dad0117fd9f1904925fc99"
+    },
+    "observation_adapter": "axtree-text-v1",
+    "action_parser": "literal-call-v2"
+  },
+  "settings": {
+    "temperature": 0,
+    "video": true,
+    "headless": true,
+    "chaos_slow_mo_ms": 250,
+    "tricky_slow_mo_ms": 100
+  },
+  "authorization": "Bjorn requested 14-condition initial sweep, inspect then up to three repeats within remaining cumulative $3."
+}
