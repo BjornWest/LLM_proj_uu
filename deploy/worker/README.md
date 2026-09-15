@@ -130,6 +130,10 @@ port is opened. Keep the override on subsequent Compose commands while using
 Chaos. Never mount the original running build, the full repository, `.env`, or
 the npm cache into the worker.
 
+The bind explicitly uses `rprivate` propagation. This Docker Desktop/WSL setup
+rejected Compose's implicit propagation with a "not a shared mount" error;
+the explicit private setting starts correctly without changing host mounts.
+
 Until the exported copy passes readiness in the actual container, use the
 study-room task. Successful copying or image construction does not establish
 Chaos browser readiness. Relocation gets new process/session/runtime provenance;

@@ -10,3 +10,4 @@ services:
         target: /data/chaos
         bind:
           create_host_path: false
+          propagation: rprivate

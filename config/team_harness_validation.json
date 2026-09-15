@@ -29,8 +29,38 @@
     "deploy/daylight/client/harness.html": "91511babd75df677470053ef9614196dd95b4ebb01d527473bfa5e395985abcb",
     "deploy/daylight/client/harness.css": "063fbcc1bebc08abae733d0160988d63c09d5457063bd19ebc49218b19ee770d",
     "deploy/worker/Dockerfile": "d8c0e251b813fbf34ff5fb4ccccd691cbd9ae2a4124a5ba75776f8a2691d273c",
-    "deploy/worker/compose.yaml": "20a5700effbcbdeee42f27dbd5c0908bfc0cd9caabe75d83858c6e2b69eb368c"
+    "deploy/worker/compose.yaml": "20a5700effbcbdeee42f27dbd5c0908bfc0cd9caabe75d83858c6e2b69eb368c",
+    "deploy/worker/compose.chaos.yaml": "72a7bfd38ac08611c39b755216758b670545c10ea74a24653fb2c27c1b04e406"
   },
-  "cloud_connection": "pending production deployment check",
-  "training_eligible": false
+  "cloud_connection": {
+    "passed": true,
+    "report": ".local/team-worker/production-smoke-6566cf20/report.json",
+    "sha256": "26f58122d40d8029de8aa9af5c3873735886fdd8f3ac445e951d48a7cc05c679",
+    "checks": 19,
+    "model_calls": 0,
+    "deployed_commit": "de9d9e4",
+    "origin": "https://browseragent.vercel.app",
+    "jobs": [
+      {
+        "task": "rooms",
+        "job_id": "62613814-550e-484e-86fd-7993cd50a9bd",
+        "episode": "20260915T111704Z-37da1b35",
+        "archive_sha256": "2fa44a5cd29f1c1d21c77c9ae5fba18eb81ab080147eb1c378913858ec56e073"
+      },
+      {
+        "task": "chaos-confirmshaming",
+        "job_id": "6260e463-f401-4475-a628-b1e762d9977b",
+        "episode": "20260915T111745Z-d16f97cb",
+        "archive_sha256": "8fb1be9b997d19c03078a8c96fbbe6c579436d62d60d36e57292141e704d5dea"
+      }
+    ]
+  },
+  "training_eligible": false,
+  "operation_note": "Explicit rprivate bind propagation is required by this Docker Desktop/WSL Compose setup; image/runtime unchanged.",
+  "production_ui": {
+    "report": ".local/team-worker/production-ui.json",
+    "sha256": "9630e35c80eb58cd658f962981a3cfc8c8668bd0d0c773fffa5aeb39b0f3eb2f",
+    "live_worker_online": true,
+    "new_model_calls": 0
+  }
 }
