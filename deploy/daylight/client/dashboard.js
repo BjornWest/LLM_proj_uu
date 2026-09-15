@@ -1,10 +1,11 @@
-import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode} from './tool-activity.js';
+import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id),titles={shop:'Campus Supply',booking:'Campus Rooms',preferences:'Your preferences'};
 const fixture=await (await fetch('/assets/fixture.json')).json();
 const config=await api('/api/config');
 let area='booking',running=false,worldID,conversation=[],activity=[],lastTrace=null,pendingDocument=null;
+let activeTurn=null,interrupting=false;
 window.demoWorld=new World(fixture);
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function api(url,data) {
@@ -23,10 +24,12 @@ function message(role,text,trace) {
 function busy(value) {
   running=value;
   for(const id of ['reset','goal'])$(id).disabled=value;
-  for(const id of ['run','send-chat'])$(id).disabled=value||!config.live_available;
+  $('run').disabled=value||!config.live_available;$('send-chat').disabled=interrupting||!config.live_available;
+  $('send-chat').dataset.running=String(value);$('send-chat').setAttribute('aria-label',value?'Interrupt and send message':'Send message');
   $('question').disabled=!config.live_available;
   $('question').placeholder=value?'Draft your next message while Daylight works…':'Ask a question or give a request…';
-  $('send-chat').title=value?'You can send when the current request finishes':'Send message';
+  $('send-chat').title=value?'Interrupt the current run and send this message':'Send message';
+  $('chat-hint').textContent=value?'Enter to interrupt · Shift+Enter for a new line':'Enter to send · Shift+Enter for a new line';
   document.querySelectorAll('.example,[data-question]').forEach(b=>b.disabled=value);
   $('site').style.pointerEvents=value?'none':'';$('site').inert=value;
   $('sidebar-state').textContent=value?'● Working on your request':'● Connected to this page';
@@ -66,8 +69,9 @@ function actionDescription(action,captured) {
   return action.action==='done'?'Agent supplied an answer':
     [action.action,control?.label,action.value!==undefined?String(action.value):''].filter(Boolean).join(' · ');
 }
-async function runTurn(mode,goal) {
-  const previousActivity={last_trace:lastTrace,steps:[...activity]};
+async function runTurn(mode,goal,continuationOf=null) {
+  const turn=new InterruptibleTurn(api);activeTurn=turn;
+  const previousActivity={last_trace:lastTrace,interrupted:!!continuationOf,steps:[...activity]};
   busy(true);activity=[];showActivity();$('notice').textContent='';$('status').textContent='Working';$('outcome').hidden=true;
   if(mode==='assist'){$('chat-notice').textContent='';showChatWorking($('conversation'),'Looking at the page…');}
   let id,cost=0,unknownCosts=0,pendingTool=null,actionError=null;
@@ -76,16 +80,17 @@ async function runTurn(mode,goal) {
   const spend=()=> 'Model spend $'+cost.toFixed(4)+(unknownCosts?' · '+unknownCosts+' attempt(s) with unknown cost':'');
   try {
     // Do not start an episode against an empty or still-navigating iframe.
-    await currentPage();
-    ({id}=await api('/api/start',{mode,goal}));lastTrace=id;$('trace').href='/api/traces/'+encodeURIComponent(id);
+    await turn.wait(currentPage());
+    ({id}=await turn.start({mode,goal,...(continuationOf?{continuation_of:continuationOf}:{})}));lastTrace=id;$('trace').href='/api/traces/'+encodeURIComponent(id);turn.check();
     for(let i=0;i<12;i++) {
       if(mode==='assist')showChatWorking($('conversation'),i?'Choosing the next action…':'Looking at the page…');
-      if(i)await wait(750); // Pacing precedes the decision observation.
-      const doc=await currentPage(),captured=snapshot(doc);
+      if(i)await turn.wait(wait(750)); // Pacing precedes the decision observation.
+      const doc=await turn.wait(currentPage()),captured=snapshot(doc);turn.check();
       // A dispatched request with no delivered response has unknown cost.
       unknownCosts++;
-      const result=await api('/api/step',{id,observation:captured.observation,
-        ...(mode==='assist'?{conversation,activity:JSON.stringify(previousActivity)}:{})});
+      const result=await turn.wait(api('/api/step',{id,observation:captured.observation,
+        ...(mode==='assist'?{conversation,activity:JSON.stringify(previousActivity)}:{})}));turn.check();
+      if(result.status==='interrupted')throw new TurnInterrupted('This run was interrupted');
       if(typeof result.cost==='number'&&Number.isFinite(result.cost)){cost+=result.cost;unknownCosts--;}
       $('cost').textContent=spend();
       if(result.alerts?.length)$('notice').textContent=result.alerts.join(' ');
@@ -106,6 +111,7 @@ async function runTurn(mode,goal) {
         page_after:after,state_after:window.demoWorld.state,events:window.demoWorld.events}});
       updateTool(error?'failed':'applied',error);pendingTool=null;
       if(error)throw Error(error);
+      turn.check();if(saved.status==='interrupted')throw new TurnInterrupted('This run was interrupted');
       if(saved.status!=='ready') {
         if(!['complete','step_limit'].includes(saved.status))throw Error('The server stopped this turn ('+saved.status+').');
         const answer=saved.status==='step_limit'?'This request reached its step limit. Review the activity and current page.':
@@ -122,17 +128,28 @@ async function runTurn(mode,goal) {
     }
     throw Error('The turn reached the client step limit without a terminal receipt.');
   } catch(e) {
+    if(e instanceof TurnInterrupted){conversation.push({role:'user',content:goal});conversation=conversation.slice(-8);$('status').textContent='Interrupted';return;}
+    turn.failure=e;
     updateTool(actionError?'failed':'unrecorded',(actionError?actionError+' ':'')+'Receipt not saved: '+e.message);
     const text='The request stopped: '+e.message+' Earlier page changes may already have happened.';
     $('notice').textContent=e.message;$('status').textContent='Stopped';
     if(mode==='assist')$('chat-notice').textContent=e.message+' · '+spend();
     message('assistant',text,id);
-  } finally {showChatWorking($('conversation'),'');busy(false);}
+  } finally {showChatWorking($('conversation'),'');activeTurn=null;busy(interrupting);turn.finish();}
 }
 $('run').onclick=async()=> {if(running||!config.live_available)return;await runTurn('task',$('goal').value);};
 $('chat-form').onsubmit=async event=> {
-  event.preventDefault();const question=$('question').value.trim();if(!question||running||!config.live_available)return;
-  $('question').value='';message('user',question);await runTurn('assist',question);
+  event.preventDefault();const question=$('question').value.trim();if(!question||interrupting||!config.live_available)return;
+  const previous=activeTurn;$('question').value='';let continuationOf=null;
+  const note=previous?interruptionNotice('Interrupting the current run…'):null;
+  if(note)$('conversation').append(note);message('user',question);
+  if(previous){
+    interrupting=true;busy(true);
+    try{continuationOf=await previous.interrupt();note.textContent=(previous.interruptStatus==='interrupted'?'Previous run interrupted. ':'')+'Your new message starts from the current page.';}
+    catch(error){note.textContent='Stopped locally, but the new message was not started: '+error.message;$('chat-notice').textContent=note.textContent;return;}
+    finally{interrupting=false;busy(false);}
+  }
+  await runTurn('assist',question,continuationOf);
 };
 bindChatEnter($('question'),$('send-chat'));
 const enterFullscreen=document.createElement('button');enterFullscreen.id='enter-fullscreen';enterFullscreen.type='button';enterFullscreen.textContent='Full screen';enterFullscreen.setAttribute('aria-pressed','false');

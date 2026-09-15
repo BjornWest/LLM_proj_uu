@@ -54,6 +54,32 @@ export function bindChatEnter(textarea, sendButton) {
   });
 }
 
+export class TurnInterrupted extends Error {}
+export class InterruptibleTurn {
+  constructor(api) {
+    this.api=api;this.id=null;this.stopped=false;this.failure=null;
+    this.signal=new Promise(resolve=>{this.signalStop=resolve;});
+    this.done=new Promise(resolve=>{this.finish=resolve;});
+  }
+  check(){if(this.stopped)throw new TurnInterrupted('Interrupted by a new message');}
+  wait(operation){this.check();return Promise.race([operation,this.signal.then(()=>{throw new TurnInterrupted('Interrupted by a new message');})]);}
+  async start(body){this.check();this.starting=this.api('/api/start',body).then(value=>{this.id=value.id;return value;});return this.starting;}
+  async interrupt(){
+    this.stopped=true;this.signalStop();
+    try{
+      if(this.starting)await this.starting;
+      // Leave dispatched inference running so the backend can retain its response
+      // and cost. Its decision is suppressed, never executed by this client.
+      if(this.id)this.interruptStatus=(await this.api('/api/interrupt',{id:this.id})).status;
+    }finally{await this.done;}
+    if(this.failure)throw this.failure;
+    return this.id;
+  }
+}
+export function interruptionNotice(text='Interrupted by your new message.') {
+  const notice=element('div','run-interruption',text);notice.setAttribute('role','status');return notice;
+}
+
 // Full viewport layout, preserving the live iframe and chat state.
 export function createFullScreenMode(enterButton, exitButton, onChange = () => {}) {
   let active = false;

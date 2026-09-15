@@ -1,4 +1,4 @@
-import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode} from './tool-activity.js';
+import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id);
@@ -9,6 +9,7 @@ const siteNames={chaos:'Chaos scenarios','tricky-shop':'Tricky shop','tricky-hea
 let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoRows=[],siteID='campus',view='explore',globalPage=false,currentRun=null;
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
 let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
+let activeTurn=null,interrupting=false;
 let sidebarBeforeFullscreen=true;
 const fullScreen=createFullScreenMode($('enter-fullscreen'),$('exit-fullscreen'),active=>{
   if(active){sidebarBeforeFullscreen=agentVisible;setAgentVisible(true);}else setAgentVisible(sidebarBeforeFullscreen);
@@ -98,9 +99,11 @@ function renderConversation(){
 }
 function syncControls(){
   const canAsk=!!modelConfig?.live_available&&!authExpired&&!!fixture;
-  $('question').disabled=!canAsk;$('send-question').disabled=!canAsk||askBusy;$('reset-page').disabled=askBusy||!fixture;
+  $('question').disabled=!canAsk;$('send-question').disabled=!canAsk||interrupting;$('reset-page').disabled=askBusy||!fixture;
+  $('send-question').dataset.running=String(askBusy);$('send-question').setAttribute('aria-label',askBusy?'Interrupt and send message':'Send message');
   $('question').placeholder=askBusy?'Draft your next message while Daylight works…':'Ask about this site, or give a request…';
-  $('send-question').title=askBusy?'You can send when the current request finishes':'Send message';
+  $('send-question').title=askBusy?'Interrupt the current run and send this message':'Send message';
+  document.querySelector('.composer-footer span').textContent=askBusy?'Enter to interrupt · Shift+Enter for a new line':'Enter to send · Shift+Enter for a new line';
   if(frame){frame.inert=askBusy;frame.style.pointerEvents=askBusy?'none':'';}
   $('explore-status').textContent=askBusy?'The agent is using this page…':'You can click, type and navigate freely.';
   const canLaunch=!!config?.enabled&&config?.worker?.mode==='live'&&pendingTask?.available!==false;
@@ -200,15 +203,17 @@ $('try-task').onclick=async()=>{
   catch(error){$('task-launch-status').textContent=error.message+' No automatic retry will be made.';if(error.status===409)refresh();}
   finally{launching=false;syncControls();}
 };
-async function askAgent(question){
-  askBusy=true;syncControls();messages.push({role:'user',text:question});draft='';renderConversation();syncControls();$('chat-status').textContent='';setWorking('Looking at the page…');
-  let id,cost=0,unknown=0,pendingTool=null,actionError=null;const before=structuredClone(window.demoWorld.state),priorActivity=JSON.stringify({last_trace:lastTrace,steps:activity});activity=[];
+async function askAgent(question,continuationOf=null){
+  const turn=new InterruptibleTurn(api);activeTurn=turn;
+  askBusy=true;syncControls();renderConversation();$('chat-status').textContent='';setWorking('Looking at the page…');
+  let id,cost=0,unknown=0,pendingTool=null,actionError=null;const before=structuredClone(window.demoWorld.state),priorActivity=JSON.stringify({last_trace:lastTrace,interrupted:!!continuationOf,steps:activity});activity=[];
   const spend=()=> 'Reported model cost $'+cost.toFixed(4)+(unknown?' · '+unknown+' request(s) with unknown cost':'');
   try{
-    await currentPage();({id}=await api('/api/start',{mode:'assist',goal:question,interaction_kind:'ask',site_id:'campus'}));lastTrace=id;
+    await turn.wait(currentPage());({id}=await turn.start({mode:'assist',goal:question,interaction_kind:'ask',site_id:'campus',...(continuationOf?{continuation_of:continuationOf}:{})}));lastTrace=id;turn.check();
     for(let i=0;i<12;i++){
-      setWorking(i?'Choosing the next action…':'Looking at the page…');if(i)await wait(750);const captured=snapshot(await currentPage());unknown++;
-      const result=await api('/api/step',{id,observation:captured.observation,conversation,activity:priorActivity});
+      setWorking(i?'Choosing the next action…':'Looking at the page…');if(i)await turn.wait(wait(750));const captured=snapshot(await turn.wait(currentPage()));turn.check();unknown++;
+      const result=await turn.wait(api('/api/step',{id,observation:captured.observation,conversation,activity:priorActivity}));turn.check();
+      if(result.status==='interrupted')throw new TurnInterrupted('This run was interrupted');
       if(typeof result.cost==='number'&&Number.isFinite(result.cost)){cost+=result.cost;unknown--;}
       if(result.alerts?.length)notice(result.alerts.join(' '));if(result.error)throw Error(result.error);if(!result.action)throw Error('No complete action was returned.');
       const action=result.action,control=captured.observation.controls.find(c=>c.id===action.id),description=action.action==='done'?'Agent supplied an answer':[action.action,control?.label,action.value!==undefined?String(action.value):''].filter(Boolean).join(' · ');
@@ -221,6 +226,7 @@ async function askAgent(question){
       const saved=await api('/api/event',{id,result:{error,description,stop:boundary,stop_reason:error?'client_execution_error':boundary?'first_accepted_reservation':action.action==='done'?'model_done':null,page_after:after,state_after:window.demoWorld.state,events:window.demoWorld.events}});
       updateTool(pendingTool,error?'failed':'applied',error);pendingTool=null;
       if(error)throw Error(error);
+      turn.check();if(saved.status==='interrupted')throw new TurnInterrupted('This run was interrupted');
       if(saved.status!=='ready'){
         if(!['complete','step_limit'].includes(saved.status))throw Error('The server stopped this turn ('+saved.status+').');
         const answer=saved.status==='step_limit'?'The request reached its step limit. Review the current page and original record.':boundary?'The demo recorded a reservation and stopped at its one-reservation limit. Review it under My reservations.':result.answer||action.message||'The request finished. Review the recorded evidence.';
@@ -228,10 +234,26 @@ async function askAgent(question){
       }
     }
     throw Error('The client step limit was reached without a terminal receipt.');
-  }catch(error){updateTool(pendingTool,actionError?'failed':'unrecorded',(actionError? actionError+' ':'')+'Receipt not saved: '+error.message);messages.push({role:'assistant',text:'The request stopped: '+error.message+' Earlier page changes may already have happened.',trace:id});$('chat-status').textContent=spend();notice(error.message);}
-  finally{setWorking('');askBusy=false;renderConversation();syncControls();await refresh(true);}
+  }catch(error){
+    if(error instanceof TurnInterrupted){conversation.push({role:'user',content:question});conversation=conversation.slice(-8);}
+    else{turn.failure=error;updateTool(pendingTool,actionError?'failed':'unrecorded',(actionError? actionError+' ':'')+'Receipt not saved: '+error.message);messages.push({role:'assistant',text:'The request stopped: '+error.message+' Earlier page changes may already have happened.',trace:id});$('chat-status').textContent=spend();notice(error.message);}
+  }
+  finally{setWorking('');activeTurn=null;askBusy=interrupting;renderConversation();syncControls();turn.finish();refresh(true);}
 }
-$('ask-form').onsubmit=async event=>{event.preventDefault();const question=$('question').value.trim();if(!question||askBusy||authExpired||!modelConfig?.live_available||siteID!=='campus')return;await askAgent(question);};
+$('ask-form').onsubmit=async event=>{
+  event.preventDefault();const question=$('question').value.trim();if(!question||interrupting||authExpired||!modelConfig?.live_available||siteID!=='campus')return;
+  const previous=activeTurn;draft='';$('question').value='';
+  const note=previous?interruptionNotice('Interrupting the current run…'):null;
+  if(note)messages.push({role:'tool',element:note});messages.push({role:'user',text:question});renderConversation();
+  let continuationOf=null;
+  if(previous){
+    interrupting=true;syncControls();
+    try{continuationOf=await previous.interrupt();note.textContent=(previous.interruptStatus==='interrupted'?'Previous run interrupted. ':'')+'Your new message starts from the current page.';}
+    catch(error){note.textContent='Stopped locally, but the new message was not started: '+error.message;notice(note.textContent);return;}
+    finally{interrupting=false;askBusy=false;syncControls();}
+  }
+  await askAgent(question,continuationOf);
+};
 bindChatEnter($('question'),$('send-question'));
 $('question').oninput=()=>{draft=$('question').value;};$('site-search').oninput=renderSites;$('replay-kind').onchange=renderTasks;
 $('explore-tab').onclick=()=>setView('explore');$('research-tab').onclick=()=>setView('research');$('sidebar-tasks').onclick=()=>setView('research');$('remote-tasks').onclick=()=>setView('research');

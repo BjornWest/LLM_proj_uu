@@ -145,3 +145,19 @@ test('history HTTP endpoint requires login and ignores attempts to select a diff
   assert.deepEqual(result.traces.map(t=>t.id),[mine.id]);
   assert.equal((await fetch(origin+'/api/traces?limit=1000',{headers:{cookie}})).status,400);
 });
+
+test('interrupt HTTP endpoint retains invitation ownership and same-origin protection',async t=>{
+  const s=await store(),agent=new Agent(s,{env});
+  const mine=await agent.start('one',{mode:'assist',goal:'Mine'}),other=await agent.start('two',{mode:'assist',goal:'Other'});
+  const server=createServer(createHandler({store:s,env,local:true}));server.listen(0,'127.0.0.1');await once(server,'listening');t.after(()=>server.close());
+  const origin='http://127.0.0.1:'+server.address().port;
+  const headers={origin,'content-type':'application/json'};
+  assert.equal((await fetch(origin+'/api/interrupt',{method:'POST',headers,body:JSON.stringify(mine)})).status,401);
+  const login=await fetch(origin+'/login',{method:'POST',headers,body:JSON.stringify({code:'a'.repeat(43)}),redirect:'manual'});headers.cookie=login.headers.get('set-cookie');
+  assert.equal((await fetch(origin+'/api/interrupt',{method:'POST',headers:{...headers,origin:'https://other.example'},body:JSON.stringify(mine)})).status,403);
+  assert.equal((await fetch(origin+'/api/interrupt',{method:'POST',headers,body:JSON.stringify(other)})).status,404);
+  assert.equal((await fetch(origin+'/api/interrupt',{method:'POST',headers,body:JSON.stringify({id:'invalid'})})).status,400);
+  const response=await fetch(origin+'/api/interrupt',{method:'POST',headers,body:JSON.stringify(mine)});
+  assert.equal(response.status,200);assert.equal((await response.json()).status,'interrupted');
+  assert.equal((await agent.read('two',other.id)).value.status,'ready');
+});

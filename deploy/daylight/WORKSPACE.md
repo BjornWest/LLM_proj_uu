@@ -31,9 +31,17 @@ are preserved.
 
 Enter sends a chat request; Shift+Enter inserts a new line. Composing text with
 an IME, holding Enter, blank input and disabled controls do not submit requests.
-You can draft the next message while Daylight works. Sending stays disabled until
-the current request finishes; the draft survives tool updates and completion and
-is sent only when you submit it.
+You can draft while Daylight works. Sending a message (or pressing Enter)
+interrupts the current run and starts a new turn with the new instruction and
+the current page. A pending model response cannot execute its old action. An
+already executing browser action and its receipt settle before the new turn
+captures a fresh observation. Applied changes remain on the page.
+
+The interrupted trace keeps its original goal, requests, late response and cost;
+the new trace links back with `continuation_of`. Already dispatched inference may
+still finish and incur cost. A failed interruption write stops locally and shows
+that the replacement was not started. Sending is briefly disabled during that
+handover; typing remains available and unsent drafts survive it.
 
 Browser actions appear as compact, expandable **Browser tool** cards inside both
 chat timelines. They show execution and record-saving status separately from
@@ -76,6 +84,7 @@ npm --prefix deploy/daylight test
 .venv/bin/python scripts/smoke_workspace_ui.py
 .venv/bin/python scripts/smoke_demo_chat_ui.py
 .venv/bin/python scripts/smoke_chat_controls.py
+.venv/bin/python scripts/smoke_chat_interrupt.py
 ```
 
 The browser tests use the production handler and isolated temporary storage with

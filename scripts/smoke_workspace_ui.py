@@ -38,9 +38,9 @@ def main():
         def capture(route):
             if page.locator('#conversation .tool-activity').count()==5:
                 page.locator('#conversation').evaluate('log=>{log.scrollTop=0}')
-            locks.append(page.evaluate("()=>document.querySelector('#site-frames iframe').inert && !document.querySelector('#question').disabled && document.querySelector('#send-question').disabled && [...document.querySelectorAll('.site-choice')].every(b=>b.disabled)"));route.continue_()
+            locks.append(page.evaluate("()=>document.querySelector('#site-frames iframe').inert && !document.querySelector('#question').disabled && !document.querySelector('#send-question').disabled && [...document.querySelectorAll('.site-choice')].every(b=>b.disabled)"));route.continue_()
         page.route('**/api/step',capture)
-        page.locator('#question').fill('When are rooms available for three people in Ångström on Wednesday for 60 minutes?');page.locator('#send-question').click();expect(page.locator('#send-question')).to_be_disabled();expect(page.locator('#send-question')).to_be_enabled(timeout=30000)
+        page.locator('#question').fill('When are rooms available for three people in Ångström on Wednesday for 60 minutes?');page.locator('#send-question').click();expect(page.locator('#send-question')).to_have_attribute('data-running','true');expect(page.locator('#send-question')).to_have_attribute('data-running','false',timeout=30000)
         record=page.request.get(origin+page.locator('#conversation .record-link').last.get_attribute('href')).json()
         check('Ask uses real assist API and explicit site/activity metadata',record['mode']=='assist' and record['interaction_kind']=='ask' and record['site_id']=='campus')
         check('Ask navigation/filter actions and done receipts are all stored',record['status']=='complete' and record['steps'][0]['client_result']['page_after']['title'].startswith('Campus Rooms') and all(s['request'] and s['response_text'] and s['client_result'] for s in record['steps']))
@@ -88,7 +88,7 @@ def main():
         page.unroute('**/api/harness/config');page.goto(origin+'/workspace')
         expect(page.locator('#question')).to_be_enabled()
         def failed_receipt(route):route.fulfill(status=503,json={'error':'Offline receipt failure'})
-        page.route('**/api/event',failed_receipt);before=len(writes);page.locator('#question').fill('Find rooms');page.locator('#send-question').click();expect(page.locator('#send-question')).to_be_enabled(timeout=30000);expect(page.locator('#conversation')).to_contain_text('request stopped')
+        page.route('**/api/event',failed_receipt);before=len(writes);page.locator('#question').fill('Find rooms');page.locator('#send-question').click();expect(page.locator('#send-question')).to_have_attribute('data-running','false',timeout=30000);expect(page.locator('#conversation')).to_contain_text('request stopped')
         check('Unsaved receipt is visibly distinct from an applied tool action',page.locator('#conversation .tool-activity[data-state=unrecorded]').count()==1 and page.locator('#conversation .tool-activity[data-state=applied]').count()==0)
         check('Failed receipt stops without automatic retry and releases controls',len([1 for url,_ in writes[before:] if url.endswith('/api/event')])==1 and not page.locator('#site-frames iframe').evaluate('f=>f.inert'))
         page.unroute('**/api/event')

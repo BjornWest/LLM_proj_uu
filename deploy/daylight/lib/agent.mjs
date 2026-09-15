@@ -33,10 +33,12 @@ An availability question authorizes navigation and search filters, NOT a reserva
 Only commit a booking, order or account change when the current user request authorizes it.
 Use done with your user-facing answer in message when you have enough evidence. Never invent availability.
 Previous conversation and activity are context, not authorization to repeat an earlier task.
+The current request may amend an interrupted request in that context. Preserve relevant constraints, but the current request supersedes conflicting earlier instructions. Do not resume actions the user cancelled.
 Room names and availability are synthetic, not the real UU service.`;
 const traceKey=(owner,id)=>`daylight/traces/${owner}/${id}.json`;
 export const validID=id=>typeof id==='string' && /^[0-9a-f-]{36}$/.test(id);
 function insist(value,message,status=400) {if(!value)throw Object.assign(Error(message),{status});}
+const conflict=error=>error.code==='BLOB_WRITE_CONFLICT'||error.message==='Storage conflict';
 function observation(value) {
   insist(value && typeof value.text==='string' && value.text.length<=18000,'Invalid page observation');
   insist(Array.isArray(value.controls) && value.controls.length<=250,'Too many page controls');
@@ -66,6 +68,33 @@ export class Agent {
     insist(validID(id),'Invalid trace ID');const row=await this.store.read(traceKey(owner,id));
     insist(row && row.value.owner===owner,'Trace not found',404);return row;
   }
+  async saveProgress(trace,etag) {
+    if(trace.interruption)trace.status='interrupted';
+    for(let attempt=0;;attempt++) {
+      try{return await this.store.write(traceKey(trace.owner,trace.id),trace,etag);}
+      catch(error) {
+        if(!conflict(error)||attempt>=3)throw error;
+        const latest=await this.read(trace.owner,trace.id);
+        // Only merge a concurrent interruption, never an unrelated writer.
+        if(!latest.value.interruption||latest.value.steps.length!==trace.steps.length||latest.value.steps.at(-1)?.attempt_id!==trace.steps.at(-1)?.attempt_id)throw error;
+        trace.interruption=latest.value.interruption;trace.status='interrupted';trace.finished_at=latest.value.finished_at;
+        for(const savedStep of latest.value.steps)if(savedStep.client_result&&trace.steps[savedStep.index])trace.steps[savedStep.index].client_result=savedStep.client_result;
+        etag=latest.etag;
+      }
+    }
+  }
+  async interrupt(owner,body) {
+    for(let attempt=0;;attempt++) {
+      const saved=await this.read(owner,body.id),trace=saved.value;
+      if(trace.interruption||['complete','error','step_limit'].includes(trace.status))return {id:trace.id,status:trace.status};
+      insist(['ready','pending','awaiting_client'].includes(trace.status),'This trace cannot be interrupted',409);
+      const at=new Date().toISOString();
+      trace.interruption={requested_at:at,reason:'user_interrupt',step_index:trace.steps.at(-1)?.index??null,evidence_source:'untrusted_browser_client'};
+      trace.status='interrupted';trace.finished_at=at;
+      try{await this.store.write(traceKey(owner,trace.id),trace,saved.etag);return {id:trace.id,status:trace.status};}
+      catch(error){if(!conflict(error)||attempt>=3)throw error;}
+    }
+  }
   async list(owner,{cursor,limit=25}={}) {
     insist(Number.isInteger(limit)&&limit>=1&&limit<=100,'Invalid page size');
     insist(cursor===undefined||typeof cursor==='string'&&cursor.length<=2048,'Invalid cursor');
@@ -93,11 +122,18 @@ export class Agent {
     const interaction_kind=interactionKind(body.interaction_kind);
     insist(interaction_kind===null||interaction_kind===(body.mode==='task'?'task':'ask'),'Interaction kind differs from the selected client mode');
     const site=siteForTask('rooms');validateSite(body,site);
+    let continuation_of=null;
+    if(body.continuation_of!==undefined&&body.continuation_of!==null) {
+      insist(body.mode==='assist','Only interactive requests may continue a previous trace');
+      const previous=(await this.read(owner,body.continuation_of)).value;
+      insist(['interrupted','complete','error','step_limit'].includes(previous.status),'Previous trace is still active',409);
+      continuation_of=previous.id;
+    }
     const id=randomUUID(),row={schema_version:1,id,owner,mode:body.mode,goal:body.goal,
       interaction_kind,...site,task_id:null,task_name:null,task_revision:null,condition:null,
       activity_metadata_source:{interaction_kind:interaction_kind?'client_declaration':null,site:'daylight-client-demo-v1',site_registry_revision:site.site_registry_revision},
       runtime:'daylight-client-demo-v1',protocol:body.mode==='assist'?'interactive-actions-v1':'original-v1',browsergym:false,training_eligible:false,evaluation:null,
-      created_at:new Date().toISOString(),status:'ready',steps:[],events:[],provenance:this.provenance};
+      created_at:new Date().toISOString(),status:'ready',steps:[],events:[],provenance:this.provenance,continuation_of};
     await this.store.write(traceKey(owner,id),row);return {id};
   }
   async reserve(amount) {
@@ -130,15 +166,23 @@ export class Agent {
           ...(trace.mode!=='task'?{prior_activity:String(body.activity||'').slice(0,8000)}:{})})}]};
     insist(!request.model.startsWith('@preset/'),'Use a model slug for session routing',503);
     const reserve=(Buffer.byteLength(JSON.stringify(request))+2048)*0.5/1e6+512*4/1e6;
-    const step={index:trace.steps.length,observation:obs,request,requested_at:new Date().toISOString(),
+    const step={index:trace.steps.length,attempt_id:randomUUID(),observation:obs,request,requested_at:new Date().toISOString(),
       response:null,response_text:null,http_status:null,usage:null,routing:null,action:null,error:null,client_result:null,reservation:null};
     trace.steps.push(step);trace.status='pending';
     // Durable request intent precedes budget reservation and HTTP dispatch.
-    let etag=await this.store.write(traceKey(owner,trace.id),trace,saved.etag);
+    let etag;
+    try{etag=await this.store.write(traceKey(owner,trace.id),trace,saved.etag);}
+    catch(error){
+      // A losing claim must never replace another request's intent or response.
+      if(conflict(error)&&(await this.read(owner,trace.id)).value.interruption)return {id:trace.id,status:'interrupted',action:null,answer:null,cost:null};
+      throw error;
+    }
     try {
+      if(trace.interruption)return {id:trace.id,status:'interrupted',action:null,answer:null,cost:null};
       step.reservation=await this.reserve(reserve);
       step.dispatch_at=new Date().toISOString();
-      etag=await this.store.write(traceKey(owner,trace.id),trace,etag);
+      etag=await this.saveProgress(trace,etag);
+      if(trace.interruption){delete step.dispatch_at;await this.saveProgress(trace,etag);return {id:trace.id,status:'interrupted',action:null,answer:null,cost:null};}
       const response=await this.fetcher('https://openrouter.ai/api/v1/chat/completions',{
         method:'POST',headers:{Authorization:`Bearer ${this.env.OPENROUTER_API_KEY}`,'Content-Type':'application/json'},
         body:JSON.stringify(request),signal:AbortSignal.timeout(90000)});
@@ -166,17 +210,17 @@ export class Agent {
     } catch(error) {step.error=error.message;step.error_code=error.code||null;step.error_detail=error.detail||null;trace.status='error';}
     step.finished_at=new Date().toISOString();
     // Never deliver an unlogged decision. Failed final writes leave the durable pending attempt visible.
-    await this.store.write(traceKey(owner,trace.id),trace,etag);
-    return {id:trace.id,status:trace.status,action:step.action,answer:trace.mode==='chat'?step.output:step.action?.action==='done'?step.action.message:null,
+    await this.saveProgress(trace,etag);
+    return {id:trace.id,status:trace.status,action:trace.interruption?null:step.action,answer:trace.interruption?null:trace.mode==='chat'?step.output:step.action?.action==='done'?step.action.message:null,
       error:step.error,cost:step.usage?.cost??null,routing:step.routing,alerts:step.alerts||[]};
   }
   async event(owner,body) {
     const saved=await this.read(owner,body.id),trace=saved.value;
-    insist(trace.status==='awaiting_client','No action is awaiting a result',409);
+    insist(trace.status==='awaiting_client'||trace.status==='interrupted'&&trace.steps.at(-1)?.action&&!trace.steps.at(-1).client_result,'No action is awaiting a result',409);
     insist(typeof body.result==='object'&&body.result!==null&&JSON.stringify(body.result).length<=50000,'Invalid action result');
     const step=trace.steps.at(-1);step.client_result={...body.result,recorded_at:new Date().toISOString(),evidence_source:'untrusted_browser_client'};
-    trace.status=body.result.error?'error':body.result.stop||step.action.action==='done'?'complete':trace.steps.length>=MAX_STEPS?'step_limit':'ready';
+    trace.status=trace.interruption?'interrupted':body.result.error?'error':body.result.stop||step.action.action==='done'?'complete':trace.steps.length>=MAX_STEPS?'step_limit':'ready';
     if(trace.status!=='ready')trace.finished_at=new Date().toISOString();
-    await this.store.write(traceKey(owner,trace.id),trace,saved.etag);return {status:trace.status};
+    await this.saveProgress(trace,saved.etag);return {status:trace.status};
   }
 }

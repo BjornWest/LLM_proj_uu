@@ -45,6 +45,36 @@ client receipts are saved. A failed final server write must not deliver an
 unlogged action. Closing a tab before posting a receipt leaves an incomplete
 record; it must not be presented as success.
 
+## Interrupt and redirect
+
+`POST /api/interrupt` with `{ id }` durably marks an owned active trace
+`interrupted`. Repeated interruptions are idempotent; a completed/error/step-limit
+trace keeps its existing terminal evidence. The original goal is never rewritten.
+Authentication, owner isolation and same-origin POST checks apply as usual.
+
+The client invalidates the current loop immediately on Send, before waiting for
+this write. It must never execute a decision from the interrupted loop, including
+a response already on the wire. Dispatched inference is not guaranteed to cancel
+at the provider: its eventual response, cost and errors stay on the original
+trace. Conditional writes merge the interruption into that same attempt without
+restoring an active status; an interrupted step response exposes no action or
+answer. An attempt which loses the initial request claim never overwrites the
+accepted request or dispatches another model call.
+
+If a browser action is already executing, allow it to settle and save its exact
+receipt through `/api/event`, which accepts one outstanding receipt after an
+interruption and preserves `interrupted`. Do not start a replacement until this
+settles. Capture a fresh page and `POST /api/start` with mode `assist`, the new
+exact goal, and optional `continuation_of: previous_trace_id`. The predecessor
+must belong to this owner and be terminal. Prior user messages and actual
+activity are context, while the new instruction takes precedence. The original
+goal, receipt evidence and ungraded status stay separate from the new turn.
+
+An interruption storage failure stops the local loop, displays the failure and
+does not automatically start or retry the replacement. Closing the tab can still
+leave incomplete client evidence; do not claim unrecorded actions were applied.
+This protocol is for the browser-side demo; remote BrowserGym jobs are unchanged.
+
 ## History
 
 `GET /api/traces?limit=25&cursor=...` discovers existing and new browser-side

@@ -90,7 +90,7 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         const agent=new Agent(activeStore,{env,fetcher,provenance});
         if(url.pathname==='/api/config'&&req.method==='GET')return send(200,{owner,live_available:!!env.OPENROUTER_API_KEY,
           daily_budget_usd:Number(env.DEMO_DAILY_BUDGET_USD||1),runtime:'daylight-client-demo-v1',
-          capabilities:{interactive_actions:'assist',trace_list:'/api/traces',max_steps:12}});
+          capabilities:{interactive_actions:'assist',interrupt:'/api/interrupt',trace_list:'/api/traces',max_steps:12}});
         if(url.pathname==='/api/traces'&&req.method==='GET') {
           operation='trace_list';
           return send(200,await agent.list(owner,{cursor:url.searchParams.get('cursor')||undefined,
@@ -108,6 +108,7 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         if(url.pathname==='/api/start') {operation='start';return send(200,await agent.start(owner,value));}
         if(url.pathname==='/api/step') {operation='step';return send(200,await agent.step(owner,value));}
         if(url.pathname==='/api/event') {operation='event';return send(200,await agent.event(owner,value));}
+        if(url.pathname==='/api/interrupt') {operation='interrupt';return send(200,await agent.interrupt(owner,value));}
         return send(404,{error:'Not found'});
       }
       if(req.method!=='GET')return send(405,{error:'Method not allowed'});

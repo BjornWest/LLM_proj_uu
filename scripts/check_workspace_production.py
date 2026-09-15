@@ -31,7 +31,9 @@ def main():
         check('Fifteen reviewed tasks available on live worker',len(config['tasks'])==15 and all(t['available'] for t in config['tasks']) and config['worker']['mode']=='live' and config['worker']['online'])
         check('All tasks have explicit server site metadata',all(t.get('site_id') and t.get('collection') for t in config['tasks']))
         check('Generated goals remain null',all(t['goal'] is None for t in config['tasks'] if t.get('goal_mode')=='resolve_after_session_prepare'))
-        check('Original browser agent configured',client.get('/api/config').json()['live_available'])
+        agent_config=client.get('/api/config').json()
+        check('Original browser agent configured',agent_config['live_available'])
+        check('Chat interruption API advertised',agent_config['capabilities'].get('interrupt')=='/api/interrupt')
         os.environ['LD_LIBRARY_PATH']=str(ROOT/'.local/system-libs/usr/lib/x86_64-linux-gnu')+':'+os.environ.get('LD_LIBRARY_PATH','')
         with sync_playwright() as p:
             browser=p.chromium.launch(headless=True);context=browser.new_context(viewport={'width':1512,'height':1040})

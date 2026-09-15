@@ -20,6 +20,7 @@
 .tool-activity-details .tool-activity-note{margin-bottom:0}
 .chat-working{display:flex;align-items:center;gap:7px;margin:6px 0 14px;font-size:11px;color:#718177}
 .chat-working::before{content:'';width:5px;height:5px;flex:none;border-radius:50%;background:currentColor;animation:tool-pulse 1.4s ease-in-out infinite}
+.run-interruption{margin:10px 0;padding:8px 10px;border-left:2px solid #b7a477;background:#faf7ef;color:#776640;font:11px/1.5 system-ui,sans-serif;white-space:normal}
 @keyframes tool-pulse{50%{opacity:.4}}
 @media(prefers-reduced-motion:reduce){.tool-activity .tool-activity-icon,.chat-working::before{animation:none!important}}
 
