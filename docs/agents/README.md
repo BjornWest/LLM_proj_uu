@@ -10,6 +10,7 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 ## Existing references
 
 - [Agent coordination](coordination.md): sparse notifications, delivery semantics, and current steering test status.
+- [Observation text limits](observation-text-limit.md): optional larger AX prefixes, metadata, and WorkArena saved-evidence checks.
 - [Previous technical README](legacy-readme.md): a historical copy retained when the root README was rewritten for the group. Its older status notes are not current instructions.
 - [Team harness](../../TEAM_HARNESS.md) and [hosted worker extension](../../HOSTED_WORKER.md).
 - [Vercel setup](../../deploy/VERCEL_SETUP.md) and [worker setup](../../deploy/worker/README.md).

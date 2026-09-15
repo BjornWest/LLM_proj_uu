@@ -21,9 +21,8 @@ def messages_digest(messages):
                                      separators=(',', ':')).encode('utf-8')).hexdigest()
 
 
-def observation_text(obs):
+def observation_text(obs, limit=16000):
     tree = flatten_axtree_to_str(obs["axtree_object"])
-    limit = 16000
     if len(tree) > limit:
         tree = tree[:limit] + "\n[Accessibility tree truncated]"
     return f"URL: {obs['url']}\nLast action error: {obs['last_action_error']}\nAccessibility tree:\n{tree}"
@@ -31,17 +30,27 @@ def observation_text(obs):
 
 def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, seed=0,
                 record_video=False, hold_seconds=0, search_backend=None, episode_task=None,
-                before_observation=None, *, terminal_response_instruction=None):
-    """Run an episode; optional terminal wording is trusted caller configuration.
+                before_observation=None, *, terminal_response_instruction=None,
+                observation_text_limit=16000):
+    """Run an episode with trusted caller-selected prompt options.
 
-    This changes only the completion instruction in the policy prompt, never
-    model output, action parsing, termination, or verification behavior.
+    Terminal wording changes only the completion instruction. The observation
+    limit counts flattened AX characters, excluding the URL/error envelope and
+    truncation marker; callers must budget the actual serialized request bytes.
+    Neither option repairs model output or changes parsing or verification.
     """
     terminal_instruction = (DEFAULT_TERMINAL_RESPONSE_INSTRUCTION
                             if terminal_response_instruction is None else terminal_response_instruction)
     if not isinstance(terminal_instruction, str) or not terminal_instruction.strip():
         raise ValueError("terminal_response_instruction must be a nonempty string or None")
+    if type(observation_text_limit) is not int or observation_text_limit <= 0:
+        raise ValueError("observation_text_limit must be a positive integer")
+    # Preserve the historical one-argument adapter call for default users.
+    render_observation = (observation_text if observation_text_limit == 16000 else
+                          lambda obs: observation_text(obs, limit=observation_text_limit))
     trace = Trace(output, {**metadata, "seed": seed, "max_steps": max_steps,
+                           "observation_text_limit": observation_text_limit,
+                           "observation_text_limit_scope": "flattened_axtree_characters_before_truncation_marker",
                            "terminal_response_instruction": terminal_instruction,
                            "terminal_response_instruction_source": "default" if terminal_response_instruction is None else "caller",
                            "search": {"provider": "parallel", "mode": "fast", "max_calls": search_backend.max_calls,
@@ -107,7 +116,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         )
         if search_backend:
             system += SEARCH_DESCRIPTION
-        final_ref = trace.observation(0, obs, observation_text(obs))
+        final_ref = trace.observation(0, obs, render_observation(obs))
         for index in range(max_steps):
             event = {"step": index, "observation": None, "transition_observation": final_ref, "messages": None,
                      "model_output": None, "model_request": None, "model_response": None,
@@ -137,12 +146,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     finally:
                         captured_at = time.monotonic()
                         event['observation_capture_seconds'] = captured_at - started
-                    text = observation_text(obs)
+                    text = render_observation(obs)
                     final_ref = trace.observation(index, obs, text, phase="decision")
                     trace.event("decision_observation_completed", step=index, observation=final_ref,
                                 seconds=event['observation_capture_seconds'])
                 else:
-                    text = observation_text(obs)
+                    text = render_observation(obs)
                 phase = "prompt"
                 event['observation'] = final_ref
                 event['observation_text_sha256'] = hashlib.sha256(text.encode('utf-8')).hexdigest()
@@ -197,7 +206,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     browser_steps += 1
                     action_errors += bool(obs["last_action_error"])
                     history.append({"action": action, "error": obs["last_action_error"]})
-                    final_ref = trace.observation(index + 1, obs, observation_text(obs))
+                    final_ref = trace.observation(index + 1, obs, render_observation(obs))
                     if episode_task and hasattr(episode_task, 'after_step'):
                         event['privileged_task_state'] = episode_task.after_step(env, trace, index + 1)
                     event.update(kind="browser", reward=reward, terminated=terminated, truncated=truncated, info=info,
