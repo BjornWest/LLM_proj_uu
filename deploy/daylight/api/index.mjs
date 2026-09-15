@@ -9,7 +9,7 @@ import {Harness,workerAuthorized} from '../lib/harness.mjs';
 // Resolve beside this module, including when the function starts at the monorepo root.
 const assets=fileURLToPath(new URL('../private-assets/',import.meta.url));
 const TYPES={html:'text/html; charset=utf-8',css:'text/css',js:'text/javascript',json:'application/json; charset=utf-8'};
-const allowed=new Set(['style.css','site.html','site.js','rooms.js','dashboard.js','world.js','observation.js','fixture.json','harness.js','harness.css','workspace.js','workspace.css']);
+const allowed=new Set(['style.css','site.html','site.js','rooms.js','dashboard.js','world.js','observation.js','fixture.json','harness.js','harness.css','workspace.js','workspace.css','tool-activity.js','tool-activity.css']);
 const loginHTML=`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Daylight · Private demo</title><body style="font:17px system-ui;background:#f3f1f8;color:#292638;max-width:420px;margin:15vh auto;padding:24px"><h1>✳ Daylight</h1><p>A private demo for our project team.</p><form method="post" action="/login"><label for="code">Your invitation code</label><input id="code" name="code" type="password" required autocomplete="current-password" maxlength="200" style="display:block;width:100%;box-sizing:border-box;padding:14px;margin:12px 0"><button style="padding:12px 24px">Open demo</button></form><p style="font-size:14px">Ask Bjorn for your code. No model account needed.</p></body></html>`;
 async function body(req,limit=75000) {
   if(req.body && typeof req.body==='object') {

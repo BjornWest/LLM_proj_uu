@@ -22,7 +22,7 @@ def main():
     with httpx.Client(base_url=args.origin,headers={'Origin':args.origin},trust_env=False,timeout=45) as client:
         check('Anonymous workspace requires invitation',client.get('/workspace').status_code==303)
         check('Invitation accepted',client.post('/login',data={'code':code}).status_code==303)
-        paths={'workspace.html':'/','workspace.js':'/assets/workspace.js','workspace.css':'/assets/workspace.css','harness.html':'/harness','harness.js':'/assets/harness.js','harness.css':'/assets/harness.css','index.html':'/demo','dashboard.js':'/assets/dashboard.js','observation.js':'/assets/observation.js'}
+        paths={'workspace.html':'/','workspace.js':'/assets/workspace.js','workspace.css':'/assets/workspace.css','tool-activity.js':'/assets/tool-activity.js','tool-activity.css':'/assets/tool-activity.css','harness.html':'/harness','harness.js':'/assets/harness.js','harness.css':'/assets/harness.css','index.html':'/demo','dashboard.js':'/assets/dashboard.js','observation.js':'/assets/observation.js'}
         hashes={}
         for name,path in paths.items():
             response=client.get(path);check('Exact committed asset '+name,response.status_code==200 and response.content==(args.assets/name).read_bytes())

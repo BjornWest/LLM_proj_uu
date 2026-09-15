@@ -1,3 +1,4 @@
+import {createToolActivity,keepChatPosition,showChatWorking} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id),titles={shop:'Campus Supply',booking:'Campus Rooms',preferences:'Your preferences'};
@@ -65,8 +66,9 @@ function actionDescription(action,captured) {
 async function runTurn(mode,goal) {
   const previousActivity={last_trace:lastTrace,steps:[...activity]};
   busy(true);activity=[];showActivity();$('notice').textContent='';$('status').textContent='Working';$('outcome').hidden=true;
-  if(mode==='assist')$('chat-notice').textContent='Looking at the page…';
-  let id,cost=0,unknownCosts=0;
+  if(mode==='assist'){$('chat-notice').textContent='';showChatWorking($('conversation'),'Looking at the page…');}
+  let id,cost=0,unknownCosts=0,pendingTool=null,actionError=null;
+  const updateTool=(state,error)=>{if(pendingTool)keepChatPosition($('conversation'),()=>pendingTool.update(state,error));};
   const before=structuredClone(window.demoWorld.state);
   const spend=()=> 'Model spend $'+cost.toFixed(4)+(unknownCosts?' · '+unknownCosts+' attempt(s) with unknown cost':'');
   try {
@@ -74,6 +76,7 @@ async function runTurn(mode,goal) {
     await currentPage();
     ({id}=await api('/api/start',{mode,goal}));lastTrace=id;$('trace').href='/api/traces/'+encodeURIComponent(id);
     for(let i=0;i<12;i++) {
+      if(mode==='assist')showChatWorking($('conversation'),i?'Choosing the next action…':'Looking at the page…');
       if(i)await wait(750); // Pacing precedes the decision observation.
       const doc=await currentPage(),captured=snapshot(doc);
       // A dispatched request with no delivered response has unknown cost.
@@ -86,9 +89,11 @@ async function runTurn(mode,goal) {
       if(result.error)throw Error(result.error);
       if(!result.action)throw Error('No complete action was returned.');
       const a=result.action,description=actionDescription(a,captured);
-      if(mode==='assist')$('chat-notice').textContent='Step '+(i+1)+' · '+description;
+      showChatWorking($('conversation'),'');actionError=null;
+      if(mode==='assist'&&a.action!=='done'){pendingTool=createToolActivity(a,captured,i+1);keepChatPosition($('conversation'),()=>$('conversation').append(pendingTool.element));}
       let error=null,after=null;
       try {after=snapshot(await executeAndWait(a,captured,$('site'))).observation;}catch(e){error=e.message;}
+      actionError=error;updateTool(error?'failed':'saving',error);
       activity.push((error?'Failed: ':'')+description);showActivity();
       const bookingBoundary=window.demoWorld.state.bookings.length>before.bookings.length;
       // A failed navigation/action still gets a receipt. Never snapshot a stale
@@ -96,6 +101,7 @@ async function runTurn(mode,goal) {
       const saved=await api('/api/event',{id,result:{error,description,stop:bookingBoundary,
         stop_reason:error?'client_execution_error':bookingBoundary?'first_accepted_reservation':a.action==='done'?'model_done':null,
         page_after:after,state_after:window.demoWorld.state,events:window.demoWorld.events}});
+      updateTool(error?'failed':'applied',error);pendingTool=null;
       if(error)throw Error(error);
       if(saved.status!=='ready') {
         if(!['complete','step_limit'].includes(saved.status))throw Error('The server stopped this turn ('+saved.status+').');
@@ -113,11 +119,12 @@ async function runTurn(mode,goal) {
     }
     throw Error('The turn reached the client step limit without a terminal receipt.');
   } catch(e) {
+    updateTool(actionError?'failed':'unrecorded',(actionError?actionError+' ':'')+'Receipt not saved: '+e.message);
     const text='The request stopped: '+e.message+' Earlier page changes may already have happened.';
     $('notice').textContent=e.message;$('status').textContent='Stopped';
     if(mode==='assist')$('chat-notice').textContent=e.message+' · '+spend();
     message('assistant',text,id);
-  } finally {busy(false);}
+  } finally {showChatWorking($('conversation'),'');busy(false);}
 }
 $('run').onclick=async()=> {if(running||!config.live_available)return;await runTurn('task',$('goal').value);};
 $('chat-form').onsubmit=async event=> {

@@ -22,6 +22,14 @@ Campus dashboard; `/harness` retains the full research controls.
   They do not support manual remote takeover. The sample Fieldnotes bookshop and
   all sample runs remain in the separate local design preview only.
 
+## Chat activity
+
+Browser actions appear as compact, expandable **Browser tool** cards inside both
+chat timelines. They show execution and record-saving status separately from
+assistant replies. Expanded details use that step's exact pre-action target and
+recorded action. Tool display entries never enter the model's chat history.
+Browsing earlier activity preserves the workspace chat's scroll position.
+
 ## Recorded evidence
 
 New activity metadata separates Task/Ask from execution mode and runtime. Older

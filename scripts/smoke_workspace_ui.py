@@ -26,8 +26,18 @@ def main():
         check('No sample bookshop or sample runs in production','Fieldnotes' not in page.locator('body').inner_text())
         frame=page.frame_locator('#site-frames iframe');frame.get_by_role('link',name='Shop',exact=True).click();frame.get_by_role('heading',name='Ready for your next idea.').wait_for()
         check('Manual Campus navigation works before asking',True)
-        locks=[]
+        locks=[];running_tools=[];saving_tools=[]
+        def navigation(route):
+            running_tools.append(page.locator('#conversation .tool-activity[data-state=running]').count()==1);route.continue_()
+        page.route('**/world/*/booking',navigation)
+        def receipts(route):
+            if route.request.post_data_json['result']['description']!='Agent supplied an answer':
+                saving_tools.append(page.locator('#conversation .tool-activity[data-state=saving]').count()==1)
+            route.continue_()
+        page.route('**/api/event',receipts)
         def capture(route):
+            if page.locator('#conversation .tool-activity').count()==5:
+                page.locator('#conversation').evaluate('log=>{log.scrollTop=0}')
             locks.append(page.evaluate("()=>document.querySelector('#site-frames iframe').inert && document.querySelector('#question').disabled && document.querySelector('#send-question').disabled && [...document.querySelectorAll('.site-choice')].every(b=>b.disabled)"));route.continue_()
         page.route('**/api/step',capture)
         page.locator('#question').fill('When are rooms available for three people in Ångström on Wednesday for 60 minutes?');page.locator('#send-question').click();expect(page.locator('#send-question')).to_be_disabled();expect(page.locator('#send-question')).to_be_enabled(timeout=30000)
@@ -36,7 +46,12 @@ def main():
         check('Ask navigation/filter actions and done receipts are all stored',record['status']=='complete' and record['steps'][0]['client_result']['page_after']['title'].startswith('Campus Rooms') and all(s['request'] and s['response_text'] and s['client_result'] for s in record['steps']))
         check('Informational Ask makes no booking and claims no independent grade',page.evaluate('window.demoWorld.state.bookings.length')==0 and record['evaluation'] is None)
         check('Conflicting manual controls remain locked throughout Ask',locks and all(locks))
-        page.screenshot(path=str(output/'explore.png'),full_page=True)
+        check('Reading earlier tool activity preserves chat scroll position on reply',page.locator('#conversation').evaluate('log=>log.scrollTop')<2)
+        tools=page.locator('#conversation .tool-activity');check('Tool events appear inside chat between user and final reply',tools.count()==len(record['steps'])-1 and page.locator('#conversation').evaluate("log=>log.firstElementChild.classList.contains('user') && log.lastElementChild.classList.contains('assistant')"))
+        check('Tool status distinguishes navigation, receipt persistence and applied action',running_tools and all(running_tools) and saving_tools and all(saving_tools) and page.locator('#conversation .tool-activity[data-state=applied]').count()==tools.count())
+        tools.first.locator('summary').click();check('Expanded tool details retain exact pre-action target and action',json.loads(tools.first.locator('pre').text_content())==record['steps'][0]['action'] and 'Campus Supply' in tools.first.locator('.tool-activity-context').inner_text())
+        check('Display tool entries stay out of model conversation messages',all(all(m['role'] in ['user','assistant'] for m in body.get('conversation',[])) for url,body in writes if url.endswith('/api/step')))
+        page.unroute('**/world/*/booking');page.unroute('**/api/event');page.screenshot(path=str(output/'explore.png'),full_page=True)
         page.locator('#research-tab').click()
         expect(page.locator('#replay-rows tr[data-kind=ask]')).to_have_count(1)
         check('Per-site history includes actual Ask and excludes historical unknown sites',page.locator('#replay-rows tr[data-kind=unknown]').count()==0)
@@ -74,6 +89,7 @@ def main():
         expect(page.locator('#question')).to_be_enabled()
         def failed_receipt(route):route.fulfill(status=503,json={'error':'Offline receipt failure'})
         page.route('**/api/event',failed_receipt);before=len(writes);page.locator('#question').fill('Find rooms');page.locator('#send-question').click();expect(page.locator('#send-question')).to_be_enabled(timeout=30000);expect(page.locator('#conversation')).to_contain_text('request stopped')
+        check('Unsaved receipt is visibly distinct from an applied tool action',page.locator('#conversation .tool-activity[data-state=unrecorded]').count()==1 and page.locator('#conversation .tool-activity[data-state=applied]').count()==0)
         check('Failed receipt stops without automatic retry and releases controls',len([1 for url,_ in writes[before:] if url.endswith('/api/event')])==1 and not page.locator('#site-frames iframe').evaluate('f=>f.inert'))
         page.unroute('**/api/event')
         pages=[]
@@ -94,7 +110,7 @@ def main():
         check('Expired invitation disables further model submissions',page.locator('#question').is_disabled())
         check('No browser JavaScript errors',not errors)
         browser.close()
-      report={'passed':True,'checks':checks,'paid_calls':0,'policy':'Real production handler with offline model transport; no reliability claim','sources':{str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for f in [ROOT/'deploy/daylight/client'/n for n in ['workspace.js','workspace.html','workspace.css','harness.js','harness.css']]}}
+      report={'passed':True,'checks':checks,'paid_calls':0,'policy':'Real production handler with offline model transport; no reliability claim','sources':{str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for f in [ROOT/'deploy/daylight/client'/n for n in ['workspace.js','workspace.html','workspace.css','harness.js','harness.css','tool-activity.js','tool-activity.css']]}}
       (output/'report.json').write_text(json.dumps(report,indent=2));print(json.dumps({'checks':len(checks),'report':str(output/'report.json'),'paid_calls':0}))
     finally:process.terminate();process.wait(timeout=10)
 if __name__=='__main__':main()

@@ -68,6 +68,7 @@ def main():
             check('Reply shown only from final recorded response',record['steps'][-1]['action']['message'] in page.locator('#conversation').inner_text())
             check('Chat locks conflicting manual, task and chat inputs',locks and all(all(sample.values()) for sample in locks))
             check('Every response and receipt preserved without independent verdict',all(s['request'] and s['response_text'] and s['client_result'] for s in record['steps']) and record['evaluation'] is None)
+            check('Original demo also puts browser tools between chat messages',page.locator('#conversation .tool-activity[data-state=applied]').count()==len(record['steps'])-1 and page.locator('#conversation .assistant .message-label').last.text_content()=='Daylight')
             (output/'availability.json').write_text(json.dumps(record,indent=2))
 
             # A second real chat turn explicitly requests a booking.
@@ -102,6 +103,7 @@ def main():
                 route.fulfill(response=response)
             page.route('**/api/step',navigate_during_decision)
             record=send('When are study rooms available?')
+            check('Failed browser action remains visibly failed in the chat timeline',page.locator('#conversation .tool-activity[data-state=failed]').count()==1)
             check('Navigation during inference rejects stale document and saves failure receipt',record['status']=='error' and len(record['steps'])==1 and 'navigated while' in record['steps'][0]['client_result']['error'] and record['steps'][0]['client_result']['page_after'] is None)
             page.unroute('**/api/step')
 
@@ -117,7 +119,7 @@ def main():
             check('No browser JavaScript errors',not errors)
             page.screenshot(path=str(output/'desktop.png'),full_page=True)
             browser.close()
-        sources=['deploy/daylight/client/dashboard.js','deploy/daylight/client/observation.js','scripts/smoke_demo_chat_ui.py']
+        sources=['deploy/daylight/client/dashboard.js','deploy/daylight/client/observation.js','scripts/smoke_demo_chat_ui.py','deploy/daylight/client/tool-activity.js','deploy/daylight/client/tool-activity.css']
         report={'passed':True,'checks':checks,'paid_calls':0,'policy':'Offline scripted responses; no model-reliability claim',
                 'source_sha256':{name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in sources}}
         (output/'report.json').write_text(json.dumps(report,indent=2))

@@ -1,3 +1,4 @@
+import {createToolActivity,keepChatPosition,showChatWorking} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id);
@@ -7,7 +8,9 @@ const collectionNames={demo:'Campus demos','browser-agent-chaos':'Browser Agent 
 const siteNames={chaos:'Chaos scenarios','tricky-shop':'Tricky shop','tricky-health':'Tricky health','tricky-music':'Tricky music','authorized-warranty':'Warranty example','browser-agent-chaos':'Browser Agent Chaos',trickyarena:'TrickyArena','synthetic-development':'Authorized extras'};
 let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoRows=[],siteID='campus',view='explore',globalPage=false,currentRun=null;
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
-let messages=[],conversation=[],draft='',activity=[],lastTrace=null;
+let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
+function setWorking(text){workingText=text;showChatWorking($('conversation'),text);}
+function updateTool(tool,state,error){if(tool)keepChatPosition($('conversation'),()=>tool.update(state,error));}
 const initialSearch=new URLSearchParams(location.search);
 let requestedSite=initialSearch.get('site');
 const folderState=new Map();
@@ -80,10 +83,11 @@ function ensureFrame(){
 function updateAddress(){let area='booking';try{area=frame?.contentWindow.location.pathname.split('/').at(-1)||area;}catch{}$('site-address').textContent='campus.demo / '+({booking:'study rooms',shop:'shop',preferences:'account'}[area]||'page');}
 async function currentPage(){const previous=pendingDocument,doc=await waitForDocument(ensureFrame(),{previousDocument:previous});if(pendingDocument===previous)pendingDocument=null;return doc;}
 function renderConversation(){
-  $('conversation').replaceChildren();
+  const log=$('conversation'),follow=log.scrollHeight-log.scrollTop-log.clientHeight<64,top=log.scrollTop;
+  log.replaceChildren();
   if(!messages.length){const welcome=node('div',undefined,'chat-welcome');welcome.append(node('span','✳'),node('h3','Explore first. Ask whenever you need.'),node('p','Click around the site, or ask the agent to find something. Tasks and previous runs are one tab away.'));$('conversation').append(welcome);}
-  for(const message of messages){const div=node('div',undefined,'message '+message.role);div.append(node('strong',message.role==='user'?'You':'Daylight'),document.createTextNode(message.text));if(message.trace){const a=node('a','Download original turn record ↗','record-link');a.href='/api/traces/'+encodeURIComponent(message.trace);div.append(a);}$('conversation').append(div);}
-  $('question').value=draft;$('conversation').scrollTop=$('conversation').scrollHeight;
+  for(const message of messages){if(message.role==='tool'){log.append(message.element);continue;}const div=node('div',undefined,'message '+message.role);div.append(node('strong',message.role==='user'?'You':'Daylight'),document.createTextNode(message.text));if(message.trace){const a=node('a','Download original turn record ↗','record-link');a.href='/api/traces/'+encodeURIComponent(message.trace);div.append(a);}$('conversation').append(div);}
+  $('question').value=draft;showChatWorking(log,workingText);log.scrollTop=follow?log.scrollHeight:top;
   $('suggestions').replaceChildren(...['Find a room for three people','What can I do on this page?'].map(text=>{const button=node('button',text);button.type='button';button.disabled=askBusy||authExpired;button.onclick=()=>{draft=text;$('question').value=text;$('question').focus();};return button;}));
 }
 function syncControls(){
@@ -188,21 +192,25 @@ $('try-task').onclick=async()=>{
   finally{launching=false;syncControls();}
 };
 async function askAgent(question){
-  askBusy=true;syncControls();messages.push({role:'user',text:question});draft='';renderConversation();syncControls();$('chat-status').textContent='Looking at the page…';
-  let id,cost=0,unknown=0;const before=structuredClone(window.demoWorld.state),priorActivity=JSON.stringify({last_trace:lastTrace,steps:activity});activity=[];
+  askBusy=true;syncControls();messages.push({role:'user',text:question});draft='';renderConversation();syncControls();$('chat-status').textContent='';setWorking('Looking at the page…');
+  let id,cost=0,unknown=0,pendingTool=null,actionError=null;const before=structuredClone(window.demoWorld.state),priorActivity=JSON.stringify({last_trace:lastTrace,steps:activity});activity=[];
   const spend=()=> 'Reported model cost $'+cost.toFixed(4)+(unknown?' · '+unknown+' request(s) with unknown cost':'');
   try{
     await currentPage();({id}=await api('/api/start',{mode:'assist',goal:question,interaction_kind:'ask',site_id:'campus'}));lastTrace=id;
     for(let i=0;i<12;i++){
-      if(i)await wait(750);const captured=snapshot(await currentPage());unknown++;
+      setWorking(i?'Choosing the next action…':'Looking at the page…');if(i)await wait(750);const captured=snapshot(await currentPage());unknown++;
       const result=await api('/api/step',{id,observation:captured.observation,conversation,activity:priorActivity});
       if(typeof result.cost==='number'&&Number.isFinite(result.cost)){cost+=result.cost;unknown--;}
       if(result.alerts?.length)notice(result.alerts.join(' '));if(result.error)throw Error(result.error);if(!result.action)throw Error('No complete action was returned.');
       const action=result.action,control=captured.observation.controls.find(c=>c.id===action.id),description=action.action==='done'?'Agent supplied an answer':[action.action,control?.label,action.value!==undefined?String(action.value):''].filter(Boolean).join(' · ');
-      $('chat-status').textContent='Step '+(i+1)+' · '+description;let error=null,after=null;
+      setWorking('');actionError=null;
+      if(action.action!=='done'){pendingTool=createToolActivity(action,captured,i+1);messages.push({role:'tool',element:pendingTool.element});renderConversation();}
+      let error=null,after=null;
       try{after=snapshot(await executeAndWait(action,captured,frame)).observation;}catch(e){error=e.message;}
+      actionError=error;updateTool(pendingTool,error?'failed':'saving',error);
       activity.push((error?'Failed: ':'')+description);const boundary=window.demoWorld.state.bookings.length>before.bookings.length;
       const saved=await api('/api/event',{id,result:{error,description,stop:boundary,stop_reason:error?'client_execution_error':boundary?'first_accepted_reservation':action.action==='done'?'model_done':null,page_after:after,state_after:window.demoWorld.state,events:window.demoWorld.events}});
+      updateTool(pendingTool,error?'failed':'applied',error);pendingTool=null;
       if(error)throw Error(error);
       if(saved.status!=='ready'){
         if(!['complete','step_limit'].includes(saved.status))throw Error('The server stopped this turn ('+saved.status+').');
@@ -211,8 +219,8 @@ async function askAgent(question){
       }
     }
     throw Error('The client step limit was reached without a terminal receipt.');
-  }catch(error){messages.push({role:'assistant',text:'The request stopped: '+error.message+' Earlier page changes may already have happened.',trace:id});$('chat-status').textContent=spend();notice(error.message);}
-  finally{askBusy=false;renderConversation();syncControls();await refresh(true);}
+  }catch(error){updateTool(pendingTool,actionError?'failed':'unrecorded',(actionError? actionError+' ':'')+'Receipt not saved: '+error.message);messages.push({role:'assistant',text:'The request stopped: '+error.message+' Earlier page changes may already have happened.',trace:id});$('chat-status').textContent=spend();notice(error.message);}
+  finally{setWorking('');askBusy=false;renderConversation();syncControls();await refresh(true);}
 }
 $('ask-form').onsubmit=async event=>{event.preventDefault();const question=$('question').value.trim();if(!question||askBusy||authExpired||!modelConfig?.live_available||siteID!=='campus')return;await askAgent(question);};
 $('question').oninput=()=>{draft=$('question').value;};$('site-search').oninput=renderSites;$('replay-kind').onchange=renderTasks;
@@ -221,7 +229,7 @@ for(const id of ['all-replays-link','global-library-link'])$(id).onclick=openGlo
 for(const id of ['global-search','global-collection','global-site','global-kind','global-grade'])$(id).addEventListener(id==='global-search'?'input':'change',renderGlobal);
 $('clear-filters').onclick=()=>{for(const id of ['global-collection','global-site','global-kind','global-grade'])$(id).value='all';$('global-search').value='';renderGlobal();};
 $('toggle-agent').onclick=()=>{agentVisible=!agentVisible;$('agent-sidebar').hidden=!agentVisible;$('interactive-explore').classList.toggle('agent-hidden',!agentVisible);$('toggle-agent').textContent=agentVisible?'Hide agent':'Show agent';$('toggle-agent').setAttribute('aria-expanded',String(agentVisible));};
-$('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];draft='';activity=[];lastTrace=null;$('chat-status').textContent='';renderConversation();};
+$('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];draft='';activity=[];lastTrace=null;setWorking('');$('chat-status').textContent='';renderConversation();};
 $('back-to-research').onclick=()=>{view=globalPage?'global':'research';currentRun=null;reviewVersion++;render();syncURL();};
 async function readRoute(){const params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';if(siteFor(params.get('site')))siteID=params.get('site');const key=params.get('run');currentRun=records().find(r=>r.key===key)||null;view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();if(currentRun?.source==='demo')loadBrowserTrace(currentRun);}
 window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>clearTimeout(pollTimer));

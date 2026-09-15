@@ -1,0 +1,24 @@
+/* A compact event in the conversation, visually separate from a speaker reply. */
+.tool-activity{margin:0 0 10px;border:1px solid #dce4df;border-radius:8px;background:#f6f8f6;color:#40554d;font:11px/1.5 system-ui,sans-serif;overflow:hidden;white-space:normal}
+.tool-activity-summary{list-style:none;display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px;cursor:pointer}
+.tool-activity-summary::-webkit-details-marker{display:none}
+.tool-activity-summary:focus-visible{outline:2px solid #698c7b;outline-offset:-2px}
+.tool-activity-icon{display:grid;place-items:center;align-self:start;width:20px;height:20px;background:#e5ece7;border-radius:5px;color:#557566;font-size:15px}
+.tool-activity-heading{display:block;min-width:0}
+.tool-activity-label{display:block;color:#748379;font-size:8px;font-weight:600;letter-spacing:.7px;text-transform:uppercase}
+.tool-activity-label::after{content:' ›';display:inline-block;margin-left:3px}
+.tool-activity[open] .tool-activity-label::after{transform:rotate(90deg)}
+.tool-activity-title{display:block;margin-top:3px;overflow-wrap:anywhere;font-size:11px;font-weight:500}
+.tool-activity-status{font-size:9px;color:#63776a;white-space:nowrap;align-self:start;padding-top:2px}
+.tool-activity[data-state=running],.tool-activity[data-state=saving]{border-color:#b9cdc0;background:#f0f6f1}
+.tool-activity[data-state=running] .tool-activity-icon,.tool-activity[data-state=saving] .tool-activity-icon{animation:tool-pulse 1.4s ease-in-out infinite}
+.tool-activity[data-state=failed],.tool-activity[data-state=unrecorded]{border-color:#e4c9bc;background:#fcf5f0}
+.tool-activity[data-state=failed] .tool-activity-status,.tool-activity[data-state=unrecorded] .tool-activity-status{color:#985739}
+.tool-activity-details{border-top:1px solid #e0e7e2;padding:9px 11px}
+.tool-activity-details p{margin:0 0 7px;font-size:10px;line-height:1.6;overflow-wrap:anywhere;color:#6a786f}
+.tool-activity-action{margin:8px 0;padding:8px;background:#fff;border:1px solid #e4e9e5;border-radius:5px;font:10px/1.5 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.tool-activity-details .tool-activity-note{margin-bottom:0}
+.chat-working{display:flex;align-items:center;gap:7px;margin:6px 0 14px;font-size:11px;color:#718177}
+.chat-working::before{content:'';width:5px;height:5px;flex:none;border-radius:50%;background:currentColor;animation:tool-pulse 1.4s ease-in-out infinite}
+@keyframes tool-pulse{50%{opacity:.4}}
+@media(prefers-reduced-motion:reduce){.tool-activity .tool-activity-icon,.chat-working::before{animation:none!important}}
