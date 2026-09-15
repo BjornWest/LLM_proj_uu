@@ -19,9 +19,18 @@ site=site.replace(/async function action\(type,data=\{\}\)\{[^\n]+\}/,
   "async function action(type,data={}){try{state=window.parent.demoWorld.action({type,...data});render()}catch(e){alert(e.message)}}")
   .replace("fetch(endpoint).then(r=>r.json()).then(s=>{state=s;render()});",'state=window.parent.demoWorld.public();render();');
 await writeFile('private-assets/site.js',site);
-for(const file of ['dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css']) await copyFile('client/'+file,'private-assets/'+file);
-const files=['index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css'];
+for(const file of ['dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css']) await copyFile('client/'+file,'private-assets/'+file);
+const inspectionRoot=path.resolve('../../environments/inspection_shop');
+const inspectionManifest=JSON.parse(await readFile(path.join(inspectionRoot,'manifest.json'),'utf8'));
+for(const [file,expected] of Object.entries(inspectionManifest.files)){
+  if(!/^(index\.html|assets\/[a-zA-Z0-9_.-]+)$/.test(file))throw Error('Invalid inspection asset path');
+  const raw=await readFile(path.join(inspectionRoot,'dist',file));
+  if(createHash('sha256').update(raw).digest('hex')!==expected)throw Error('Inspection source hash mismatch: '+file);
+  const dest=path.join('private-assets/inspection-shop/dist',file);await mkdir(path.dirname(dest),{recursive:true});await writeFile(dest,raw);
+}
+await copyFile(path.join(inspectionRoot,'manifest.json'),'private-assets/inspection-shop/manifest.json');
+const files=['index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css','inspection-shop/manifest.json'];
 const hashes={};for(const file of files)hashes[file]=createHash('sha256').update(await readFile('private-assets/'+file)).digest('hex');
-const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','../../config/team_tasks.json','../../config/team_sites.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
+const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','../../config/team_tasks.json','../../config/team_sites.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
 await writeFile('private-assets/provenance.json',JSON.stringify({runtime:'daylight-client-demo-v1',commit:process.env.VERCEL_GIT_COMMIT_SHA||null,assets:hashes,server},null,2));
 console.log('Built private assets; public/ contains only robots.txt.');

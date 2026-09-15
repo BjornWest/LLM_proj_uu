@@ -221,6 +221,8 @@ function rememberManual(session){
   manualSessions=[session,...manualSessions.filter(row=>row.id!==session.id)];
 }
 function renderManual(){
+  $('local-shop-launch').hidden=!['tricky-shop','authorized-warranty'].includes(siteID);
+  $('local-shop-clean').hidden=siteID==='authorized-warranty';
   const site=manualSite(),session=manualCurrent(),live=manualOwnerLive(),ready=session?.status==='ready';
   const pending=manualBusy||!!manualLoading;
   const selected=(manualLive(session)?session.task:null)||manualChoices.get(siteID)||site?.default_task||site?.tasks?.[0]?.id||'';

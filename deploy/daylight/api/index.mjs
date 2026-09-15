@@ -5,13 +5,15 @@ import {config,login,authenticate,sessionCookie} from '../lib/auth.mjs';
 import {StorageError} from '../lib/store.mjs';
 import {configuredStore} from '../lib/remote-store.mjs';
 import {ManualClient} from '../lib/manual-client.mjs';
+import {inspectionAsset,inspectionHTML,inspectionCSP} from '../lib/inspection.mjs';
+import {createHash} from 'node:crypto';
 import {Agent} from '../lib/agent.mjs';
 import {checkStorage} from '../lib/storage-check.mjs';
 import {Harness,workerAuthorized} from '../lib/harness.mjs';
 // Resolve beside this module, including when the function starts at the monorepo root.
 const assets=fileURLToPath(new URL('../private-assets/',import.meta.url));
 const TYPES={html:'text/html; charset=utf-8',css:'text/css',js:'text/javascript',json:'application/json; charset=utf-8'};
-const allowed=new Set(['style.css','site.html','site.js','rooms.js','dashboard.js','world.js','observation.js','fixture.json','harness.js','harness.css','workspace.js','workspace.css','tool-activity.js','tool-activity.css']);
+const allowed=new Set(['style.css','site.html','site.js','rooms.js','dashboard.js','world.js','observation.js','fixture.json','harness.js','harness.css','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css']);
 const loginHTML=`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Daylight · Private demo</title><body style="font:17px system-ui;background:#f3f1f8;color:#292638;max-width:420px;margin:15vh auto;padding:24px"><h1>✳ Daylight</h1><p>A private demo for our project team.</p><form method="post" action="/login"><label for="code">Your invitation code</label><input id="code" name="code" type="password" required autocomplete="current-password" maxlength="200" style="display:block;width:100%;box-sizing:border-box;padding:14px;margin:12px 0"><button style="padding:12px 24px">Open demo</button></form><p style="font-size:14px">Ask Bjorn for your code. No model account needed.</p></body></html>`;
 async function body(req,limit=75000) {
   if(req.body && typeof req.body==='object') {
@@ -59,6 +61,21 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
+      if(req.method==='GET'&&(url.pathname==='/shop'||url.pathname.startsWith('/shop/'))){
+        if(url.searchParams.getAll('dp').some(v=>v!=='w'))return send(400,{error:'Unsupported shop condition'});
+        stage='private_assets';res.setHeader('Content-Security-Policy',inspectionCSP);res.setHeader('X-Frame-Options','DENY');
+        return send(200,await inspectionHTML(assetRoot),'text/html; charset=utf-8');
+      }
+      if(req.method==='GET'&&url.pathname.startsWith('/assets/')&&!allowed.has(url.pathname.slice(8))){
+        stage='private_assets';const asset=await inspectionAsset(assetRoot,url.pathname);
+        if(!asset)return send(404,{error:'Not found'});
+        // Auth is checked above even for conditional requests. Browser-private
+        // cache only: no CDN-shared personalized/cookie-bearing responses.
+        res.setHeader('Cache-Control','private, max-age=86400, immutable');res.setHeader('ETag',asset.etag);
+        res.setHeader('Vercel-CDN-Cache-Control','no-store');
+        if(req.headers['if-none-match']===asset.etag){res.statusCode=304;return res.end();}
+        return send(200,asset.raw,asset.type);
+      }
       if(req.method==='POST'&&env.DAYLIGHT_STORAGE_MAINTENANCE==='1')return send(503,{error:'Storage maintenance. Please try again after the migration.'});
       if(url.pathname.startsWith('/api/manual/')){
         if(!env.DAYLIGHT_CONTROL_URL){if(url.pathname==='/api/manual/config'&&req.method==='GET')return send(200,{enabled:false,sites:[]});return send(503,{error:'Manual environments are not configured.'});}
@@ -141,6 +158,12 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       if(/^\/world\/[a-z0-9-]+\/(shop|booking|preferences)$/.test(url.pathname))file='site.html';
       if(!['index.html','harness.html','workspace.html'].includes(file)&&!allowed.has(file))return send(404,{error:'Not found'});
       stage='private_assets';
+      if(file==='inspection.js'||file==='inspection.css'){
+        const raw=await readFile(path.join(assetRoot,file)),etag='"'+createHash('sha256').update(raw).digest('hex')+'"';
+        res.setHeader('Cache-Control','private, no-cache');res.setHeader('ETag',etag);
+        if(req.headers['if-none-match']===etag){res.statusCode=304;return res.end();}
+        return send(200,raw,TYPES[file.split('.').at(-1)]);
+      }
       return send(200,await readFile(path.join(assetRoot,file)),TYPES[file.split('.').at(-1)]);
     } catch(error) {
       if(res.headersSent){res.destroy();return;}
