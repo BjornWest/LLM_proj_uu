@@ -108,8 +108,33 @@ python3 data/curation/check_preflight.py --fetch
 .venv/bin/python scripts/preflight_pilot.py
 ```
 
-MiniWoB setup is optional and documented in [README.md](README.md). Finish the
-plain smoke test first; it does not require the MiniWoB source checkout.
+## Optional MiniWoB setup
+
+Finish the plain smoke test first; it does not require the MiniWoB source
+checkout. From the repository root, fetch the pinned task pages once:
+
+```bash
+mkdir -p .local
+git init .local/miniwob-plusplus
+git -C .local/miniwob-plusplus remote add origin https://github.com/Farama-Foundation/miniwob-plusplus.git
+git -C .local/miniwob-plusplus fetch --depth 1 origin 7fd85d71a4b60325c6585396ec4f48377d049838
+git -C .local/miniwob-plusplus checkout --detach FETCH_HEAD
+```
+
+If that checkout already exists at the pinned revision, skip the fetch/setup
+commands. In each new terminal, set its location and start an interactive task:
+
+```bash
+export MINIWOB_URL="file://$PWD/.local/miniwob-plusplus/miniwob/html/miniwob/"
+.venv/bin/intent-browser development --task miniwob.enter-text --max-steps 6 --video
+```
+
+Read the observation and type one action at a time. This mode makes no model
+calls. MiniWoB supplies the task goal and its own success check.
+
+The [previous technical README](docs/agents/legacy-readme.md) retains the
+additional model/search commands and workstation-specific setup notes as a
+historical reference.
 
 ## Optional saved-trace viewer
 
