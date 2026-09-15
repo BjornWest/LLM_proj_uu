@@ -21,6 +21,6 @@ await writeFile('private-assets/site.js',site);
 for(const file of ['dashboard.js','world.js','observation.js','fixture.json']) await copyFile('client/'+file,'private-assets/'+file);
 const files=['index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json'];
 const hashes={};for(const file of files)hashes[file]=createHash('sha256').update(await readFile('private-assets/'+file)).digest('hex');
-const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
+const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/storage-check.mjs','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
 await writeFile('private-assets/provenance.json',JSON.stringify({runtime:'daylight-client-demo-v1',commit:process.env.VERCEL_GIT_COMMIT_SHA||null,assets:hashes,server},null,2));
 console.log('Built private assets; public/ contains only robots.txt.');

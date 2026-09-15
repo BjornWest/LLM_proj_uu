@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 import {config,login,authenticate,sessionCookie} from '../lib/auth.mjs';
 import {BlobStore,StorageError} from '../lib/store.mjs';
 import {Agent} from '../lib/agent.mjs';
+import {checkStorage} from '../lib/storage-check.mjs';
 // Resolve beside this module, including when the function starts at the monorepo root.
 const assets=fileURLToPath(new URL('../private-assets/',import.meta.url));
 const TYPES={html:'text/html; charset=utf-8',css:'text/css',js:'text/javascript',json:'application/json; charset=utf-8'};
@@ -45,6 +46,10 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
+      if(url.pathname==='/storage-check') {
+        if(req.method==='GET')return send(200,'<!doctype html><meta charset="utf-8"><title>Daylight storage check</title><h1>Check private storage</h1><p>Creates one isolated diagnostic object. No model calls or trace/budget changes.</p><form method="post"><button>Run storage check</button></form>','text/html; charset=utf-8');
+        return send(200,await checkStorage(store||new BlobStore({env}),owner));
+      }
       if(url.pathname==='/logout') {res.setHeader('Set-Cookie',sessionCookie('',local));return redirect('/login');}
       if(url.pathname.startsWith('/api/')) {
         const activeStore=store||new BlobStore({env});

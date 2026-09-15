@@ -84,6 +84,8 @@ Unexpected failures return a safe diagnostic code and a matching entry in Vercel
 - `BLOB_WRITE_CONFLICT`, `BLOB_RATE_LIMITED`, or `BLOB_SERVICE_UNAVAILABLE`: a conditional write conflict or storage service issue. No automatic application retry is added.
 - `BLOB_OPERATION_FAILED`: an unclassified storage error. The log identifies read/write and API start/step/event without exposing arbitrary SDK error messages.
 
+For a repeatable conflict during a single-user run, sign in and open `/storage-check`, then click **Run storage check**. It creates one isolated `daylight/diagnostics/<owner>/<id>.json` object and tests create → read → conditional write using the read ETag → conditional write using the put ETag → read. The report contains only stage names, equality/format flags and ETag hashes. It performs no model calls, touches no trace/budget objects, and does not remove concurrency checks or retry failed writes. A failed check is diagnostic evidence, not a repair.
+
 An empty store is expected before the first successful `/api/start`: the app creates `daylight/traces/...` on demand, then `daylight/budgets/...` before inference. A dashboard sample such as “hello world” is not app data and does not prove the deployment can write. After connecting storage, **redeploy and open the new deployment**; an older deployment URL retains its earlier environment.
 
 Logs contain only fixed stage/code/operation labels and a missing-file flag, not credentials or request bodies. Explicit application errors, such as a budget limit or invalid action, retain their own messages.

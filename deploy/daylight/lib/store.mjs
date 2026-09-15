@@ -10,7 +10,7 @@ const storageMessages={
   BLOB_STORE_NOT_FOUND:'The configured Blob store does not exist. Reconnect private storage and redeploy.',
   BLOB_STORE_SUSPENDED:'The Blob store is suspended. Check its status and usage in Vercel Storage.',
   BLOB_ACCESS_MODE_MISMATCH:'The Blob store access mode does not match this app. Connect a Private store and redeploy.',
-  BLOB_WRITE_CONFLICT:'The trace or budget changed concurrently. No automatic retry was made.',
+  BLOB_WRITE_CONFLICT:'Private storage rejected a conditional write. The agent stopped to preserve the trace and budget.',
   BLOB_RATE_LIMITED:'Private trace storage is rate limited. Check its usage in Vercel Storage.',
   BLOB_SERVICE_UNAVAILABLE:'Private trace storage is temporarily unavailable.',
   BLOB_TOKEN_INVALID:'The Blob token could not be read. Check BLOB_READ_WRITE_TOKEN in this deployment’s environment.',

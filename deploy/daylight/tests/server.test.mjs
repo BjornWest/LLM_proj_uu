@@ -75,12 +75,15 @@ test('all UI/assets/API paths require login; POST origin is checked; no secret o
   const s=await store(),server=createServer(createHandler({store:s,env,local:true}));
   server.listen(0,'127.0.0.1');await once(server,'listening');t.after(()=>server.close());
   const origin='http://127.0.0.1:'+server.address().port;
-  for(const route of ['/','/assets/site.js','/assets/fixture.json','/private-assets/index.html','/world/test/booking'])
+  for(const route of ['/','/assets/site.js','/assets/fixture.json','/private-assets/index.html','/world/test/booking','/storage-check'])
     assert.equal((await fetch(origin+route,{redirect:'manual'})).status,303);
   assert.equal((await fetch(origin+'/api/config')).status,401);
   assert.equal((await fetch(origin+'/login',{method:'POST',body:'{}',headers:{'content-type':'application/json',origin:'https://evil.example'}})).status,403);
   const logged=await fetch(origin+'/login',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify({code}),redirect:'manual'});
   assert.equal(logged.status,303);const cookie=logged.headers.get('set-cookie');assert.ok(cookie.includes('HttpOnly'));assert.ok(cookie.includes('SameSite=Strict'));
+  const diagnostic=await fetch(origin+'/storage-check',{method:'POST',headers:{cookie,origin}});
+  assert.equal(diagnostic.status,200);assert.equal((await diagnostic.json()).passed,true);
+  assert.equal((await fetch(origin+'/storage-check',{method:'POST',headers:{cookie,origin:'https://evil.example'}})).status,403);
   const fixture=await fetch(origin+'/assets/fixture.json',{headers:{cookie}});assert.ok((await fixture.json()).rooms.length);
   for(const route of ['/private-assets/index.html','/.env','/assets/../package.json','/api/traces/bad'])assert.ok((await fetch(origin+route,{headers:{cookie}})).status>=400);
   const status=await (await fetch(origin+'/api/config',{headers:{cookie}})).json();assert.equal(status.owner,'one');assert.ok(!JSON.stringify(status).includes(env.OPENROUTER_API_KEY));
