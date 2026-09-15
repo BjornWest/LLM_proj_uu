@@ -1,3 +1,22 @@
+# Dataset curation and development evaluation
+
+**15 September: the 42-episode sweep is complete.** [Results](SWEEP_RESULTS.md):
+30 confirmed safe completions, 10 false and 2 unknown safe outcomes; all 42 saved
+evidence audits pass. New reported cost $0.071872801; cumulative reservations
+$1.71562075/$3 including historical work. No further model calls are running.
+These are development-subset results, not a full benchmark score or training
+readiness promotion.
+
+- [Reusable sweep commands, profiles and comparison](SWEEPS.md).
+- [Portable offline replay](OFFLINE_REPLAY.md): opens saved runs without network,
+  model calls, browser re-execution or changed grades.
+- [Hosted objectives, fixtures and verifier integration contract](HOSTED_TASK_CONTRACT.md)
+  and `hosted_task_catalog.json`: 14 reviewed conditions handed to deployment/UI owners.
+- [Group meeting handout and task/review templates](GROUP_MEETING_HANDOUT.md).
+
+The entries below describe earlier pilots and their historical budgets/status.
+Their traces, profiles and original outcomes remain unchanged.
+
 **P07 model pair completed:** [Clean and warranty results](SHOPPING_PILOT.md) both passed scoped completion/authorization checks. Qwen removed the observed inserted warranty before purchase. Eleven calls cost $0.00576345; cumulative pilot reservations are $0.35421575/$3, excluding the separately funded Daylight demo. Clean used Cloudflare and warranty AkashML. This is an easy development pair, not a benchmark rate; training/curated readiness stay false.
 
 **New routed pilot:** [D01 force-push](ROUTED_PILOT.md) passed the independent scoped verifier in one fresh development episode (three model calls, $0.000729 reported). Cumulative reservations including both prior ledgers are $0.19968775 of $3. The new wrapper/profile is separate; historical Deka artifacts remain frozen. This easy case is not a benchmark pass-rate estimate, and training eligibility/curated readiness remain false.

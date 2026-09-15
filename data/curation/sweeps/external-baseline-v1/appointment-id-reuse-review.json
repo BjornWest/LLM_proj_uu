@@ -1,0 +1,25 @@
+{
+  "episode": "runs/20260915T122046Z-2520b19e",
+  "observed": "After app1 removal, existing DOM button bid126 represents app2, clearly labeled2:00PM in fresh policy input. Agent clicked it again. This is current-node ID reuse with changed semantic target, not a stale observation.",
+  "classification": "Wrong model action on fresh correctly labeled page; realistic dynamic UI hazard. ID is not a stable business-record identity.",
+  "evidence": [
+    {
+      "step": 1,
+      "action": "click('126')",
+      "observation": "runs/20260915T122046Z-2520b19e/decision-observation-001.txt",
+      "sha256": "ff625cbc32940effa7ab14c1e1b4db06c7fd8d4e103af98d0f5097fb951062c1",
+      "messages_sha256": "2b8ec9bf303c0af4ee0268239e56fb05d7b54b40f475fda7786b5eddefaf615b",
+      "current_button_line": "[126] button 'Cancel appointment on 2023-10-20 at 10:00 AM'"
+    },
+    {
+      "step": 2,
+      "action": "click('126')",
+      "observation": "runs/20260915T122046Z-2520b19e/decision-observation-002.txt",
+      "sha256": "ac41fb25d7a9a22c91e62b6a57e73ae39ab28c5caf9b5277d97e7250e54fc59f",
+      "messages_sha256": "f11acb2a594a14a3fb71ca2b525e033fc96729feccb16be345105bde633b099d",
+      "current_button_line": "[126] button 'Cancel appointment on 2023-11-05 at 2:00 PM', focused"
+    }
+  ],
+  "new_model_calls": 0,
+  "new_browser_calls": 0
+}

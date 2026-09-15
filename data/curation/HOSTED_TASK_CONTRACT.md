@@ -72,7 +72,11 @@ Recommended incremental path:
 
 Handle absolute paths, SPA reloads, shared-origin storage and cookie scoping,
 per-session namespaces, authentication for worker navigation, asset MIME types,
-and immutable deployment URLs. A deployment update must not change an active
+and immutable deployment URLs. In particular, moving fixtures onto the same
+origin as the team UI must not let a task navigation reach `/harness`, other
+users' runs, private grader artifacts or worker-control endpoints. Test those
+boundaries explicitly; reuse of a viewer invitation cookie in the policy browser
+is not an adequate isolation design. A deployment update must not change an active
 session's assets or semantics. Grader data and private task state must not enter
 served policy pages, accessibility observations, search results or prompts.
 

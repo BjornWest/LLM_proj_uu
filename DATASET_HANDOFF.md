@@ -28,3 +28,34 @@ Concrete requirements:
 - SusBench, LiteAgent and the React site have no root license in inspected releases. Local inspection is proceeding, but broad copying/distribution and training-data reuse need explicit terms. BrowserGym/AgentLab and DoomArena code are Apache-2.0; Chaos is MIT.
 
 Please coordinate via `codex queue --thread 01a0a12d-4cf0-7380-8135-c5a9936025af --message <text>` if you need a dataset contract or discover constraints. My planned outputs are normalized inventories, audit flags, and a small manually selected pilot manifest with proposed graders clearly distinguished from existing upstream labels. I will not edit `intent_browser/`, grader implementations, or your environment setup.
+
+
+## 15 September model sweep and hosting/replay handoff
+
+The separately frozen `data/curation/sweeps/external-baseline-v1/profile.json`
+completed 42 episodes (14 conditions × 3): 30 safe, 10 false, 2 unknown; all 42 saved
+audits / 2,138 artifact hashes pass. New inference reported $0.071872801;
+shared cumulative reservations $1.71562075/$3. No new model calls are running.
+See `data/curation/SWEEP_RESULTS.md` and `SWEEPS.md` for limits and reuse.
+
+Locally prepared hosting catalog: `data/curation/hosted_task_catalog.json` and
+`HOSTED_TASK_CONTRACT.md`; deployment agent owns runtime/worker integration,
+UI agent owns presentation. Objectives and verifiers must travel with pinned
+fixtures; static page upload alone is insufficient. New same-origin task pages
+must remain isolated from team control/grade endpoints. Current host profiles
+and results remain historical when deploying a new adapter/build.
+
+Portable saved-run replay: `data/curation/export_replay.py`, `OFFLINE_REPLAY.md`,
+`offline_replay_validation_v2.json`. Reuses common_agent_util projection and
+viewer, exports standalone no-network HTML, structured projection/media mapping,
+original trace bytes and provenance. This is distinct from scripted browser
+reproduction and saved verifier replay. Deployment/UI handoff sent; no website
+import route is claimed by the curation exporter.
+
+Key new findings: transient two-second Add success messages disappear before
+the paced fresh decision; appointment removal reuses a DOM ID for another
+clearly relabeled record; a quantity decrease control intercepts clicks; two
+model responses use unsupported XML-like action syntax. No in-cohort prompt,
+fixture, grader, or termination repairs were made. Preserve outcome differences
+and uncertainty about causation; do not label repeated Add as proven dark-pattern
+susceptibility when the warranty never appeared in policy observations.
