@@ -1,0 +1,30 @@
+{
+  "scope": "Independent source and targeted-test review of exclusive report output; saved-report comparison only, no arithmetic/browser/model rerun.",
+  "passed": true,
+  "validator_sha256": "2eeb2335418ad78fd3b1190adcab840561d99a972e8e6370670e72987aa77408",
+  "tests_sha256": "e499c45983abbccc04539c4d20d5a8c07eec1446cc3791173bb47617d9e0f34f",
+  "tests_run_command": "node --test scripts/test_chaos_rng_coverage.mjs",
+  "targeted_tests_passed": 9,
+  "prework_lstat_check": true,
+  "dangling_symlink_rejected": true,
+  "exclusive_write_flag": "wx",
+  "competing_file_preserved": true,
+  "new_default": ".local/preflight/chaos-rng-joint-coverage-v2.json",
+  "historical_hashes_verified": {
+    ".local/preflight/chaos-rng-v2.json": "fd370abaf34329f50b3ec7f3e4e9d0059eb7a2221bcbb189ab78d0eb161925f2",
+    ".local/preflight/chaos-rng-joint-gate-v2.json": "3d7957e8448b1fd227f40acfa641ca3a49a1181f190b57c45d7195e8c1284185",
+    ".local/preflight/chaos-fifo-xor32-v2-rng.json": "977b9a55fb65d625b3911a68dae2c7857c89318b61f9c0bd400bba17057298bc"
+  },
+  "two_historical_hashes_match_prior_independent_review": true,
+  "new_report": ".local/preflight/chaos-rng-exclusive-output-v2.json",
+  "new_report_sha256": "72945ba08e9ce4832b847a1c2fb78362844110961971aeea426f413246383307",
+  "original_and_derived_results_equal_previous_gated_report": true,
+  "descriptors_unchanged": 256,
+  "source_finding_status": "closed",
+  "model_calls": 0,
+  "browser_calls": 0,
+  "scope_limits": [
+    "Exclusive creation prevents overwrite; not a crash-atomic report-writing claim.",
+    "Targeted output tests use temporary files; no saved validation paths were used as test outputs."
+  ]
+}

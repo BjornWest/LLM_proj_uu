@@ -111,3 +111,20 @@ and its writer does not reject existing files. The actual new run used an
 explicit fresh path and preserved history. A fresh default plus a reject-existing
 guard before arithmetic work would prevent accidental replacement on later CLI
 invocation. This is separate from the now-correct coverage gate.
+
+That artifact-safety finding is **closed** in validator SHA256
+`2eeb2335418ad78fd3b1190adcab840561d99a972e8e6370670e72987aa77408`.
+The default is now `chaos-rng-joint-coverage-v2.json`; an `lstat` check rejects
+existing paths, including dangling symlinks, before bundle reads and arithmetic.
+Final exclusive creation (`wx`) also rejects a path created by a competing
+writer after the early check. All nine targeted Node tests pass, including
+prework rejection, default-path protection, dangling paths, competing-file
+preservation and fresh writes.
+
+Independent saved-report comparison verifies the three retained historical
+hashes; two also match the earlier independent review's pins. The new exclusive
+output report preserves both full original/derived result objects, including all
+256 descriptor records. Evidence:
+`chaos-repair-review/exclusive-output-review-v2.json`. No arithmetic/browser/model
+rerun was performed by this review. Exclusive creation prevents overwriting an
+existing artifact; it is not a claim of crash-atomic report output.
