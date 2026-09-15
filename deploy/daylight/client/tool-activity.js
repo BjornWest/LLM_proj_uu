@@ -120,6 +120,83 @@ export function renderTraceConversation(container,traces){
     if(trace.interruption)container.append(element('p','transcript-turn','This turn was interrupted. Recorded model output is not evidence that an action was applied.'));
     else if(!(trace.steps||[]).some(step=>step.output||step.action||step.response))container.append(element('p','transcript-turn','No model response was recorded for this turn.'));
   }
+  renderToolReview(container,traceToolEvidence(traces));
+}
+
+// Evidence-derived display data; never infer the available set from actions taken.
+export function traceToolEvidence(traces){
+  return traces.flatMap((trace,turn)=> (trace.steps||[]).map((step,index)=>{
+    const request=step.request||{},schema=request.response_format?.json_schema?.schema;
+    const enums=schema?.properties?.action?.enum;
+    let available=null,source=null;
+    if(Array.isArray(request.tools)){
+      available=request.tools.map(tool=>({name:tool.function?.name||tool.name,description:tool.function?.description||tool.description||'',definition:tool})).filter(tool=>typeof tool.name==='string');
+      source='Recorded request.tools';
+    }else if(Array.isArray(enums)){
+      available=enums.filter(name=>typeof name==='string').map(name=>({name,description:name==='done'?'Return an answer; no browser action.':'',definition:schema}));
+      source='Recorded structured action schema';
+    }
+    const action=step.action,receipt=step.client_result;
+    const control=step.observation?.controls?.find(row=>row.id===action?.id);
+    const calls=action&&action.action!=='done'?[{name:action.action,title:[action.action,control?.label||action.id,action.value!=null?String(action.value):''].filter(Boolean).join(' · '),action,receipt,observation:step.observation,status:receipt?receipt.error?'failed':'recorded':'unconfirmed'}]:[];
+    if(!action)for(const call of step.response?.choices?.[0]?.message?.tool_calls||[]){
+      const name=call.function?.name||call.name;
+      if(typeof name==='string')calls.push({name,title:name,action:call,receipt:null,status:'unconfirmed'});
+    }
+    return {key:trace.id+':'+index,label:'Turn '+(turn+1)+' · Step '+(index+1),at:step.requested_at||null,available,source,selected:action?.action||calls[0]?.name||null,calls};
+  }));
+}
+export function renderJobToolReview(container,job){
+  const decisions=(job.steps||[]).map(step=>({key:job.id+':'+step.step,label:'Step '+step.step,at:null,available:null,source:null,
+    calls:step.action?[{name:null,title:typeof step.action==='string'?step.action:JSON.stringify(step.action),action:step.action,receipt:{browser_stepped:step.browser_stepped??null,error:step.error??null},status:step.error?'failed':step.browser_stepped?'recorded':'unconfirmed'}]:[]}));
+  renderToolReview(container,decisions);
+}
+export function renderToolReview(container,decisions){
+  const old=container.parentElement?.querySelector('.trace-tools-panel');
+  const previousMode=old?.dataset.mode||'conversation',previousSelection=old?.querySelector('select')?.value,wasOpen=old?.querySelector('.trace-toolbox')?.open||false;
+  const panel=element('section','trace-tools-panel'),toolbar=element('div','trace-view-toolbar');panel.dataset.mode=previousMode;
+  const toggle=element('div','trace-view-toggle');toggle.setAttribute('role','group');toggle.setAttribute('aria-label','Trace display');
+  const conversation=element('button','','Conversation'),toolsOnly=element('button','','Tools only');conversation.type=toolsOnly.type='button';toggle.append(conversation,toolsOnly);toolbar.append(toggle);
+  const toolbox=element('details','trace-toolbox'),summary=element('summary','','Available tools');toolbox.open=wasOpen;toolbox.append(summary);
+  const inventory=element('div','trace-tool-inventory'),select=element('select','trace-tool-decision');select.setAttribute('aria-label','Available tools at recorded step');
+  for(const decision of decisions){const option=element('option','',decision.label);option.value=decision.key;select.append(option);}
+  if(decisions.some(decision=>decision.key===previousSelection))select.value=previousSelection;
+  const source=element('p','transcript-note'),cards=element('div','trace-tool-cards');inventory.append(select,source,cards);toolbox.append(inventory);toolbar.append(toolbox);panel.append(toolbar);
+  const timeline=element('div','trace-tool-timeline'),events=decisions.flatMap(decision=>decision.calls.map(call=>({decision,call})));
+  timeline.append(element('p','transcript-note',events.length+' recorded tool event'+(events.length===1?'':'s')+' · chronological order. Missing execution evidence is marked unconfirmed.'));
+  const list=element('ol','trace-tool-events');list.setAttribute('aria-label','Chronological tool activity');
+  for(const [index,{decision,call}] of events.entries()){
+    const item=element('li','trace-tool-event');item.dataset.state=call.status;
+    item.append(element('span','trace-tool-number',String(index+1)));
+    const body=element('div','trace-tool-event-body');
+    const stepButton=element('button','trace-tool-event-step',decision.label+(decision.at?' · '+new Date(decision.at).toLocaleTimeString():''));stepButton.type='button';stepButton.title='Show tools available at this step';stepButton.onclick=()=>{select.value=decision.key;toolbox.open=true;showAvailable();select.focus({preventScroll:true});};
+    body.append(stepButton,element('strong','',call.title));
+    body.append(element('p','trace-tool-state',call.status==='failed'?'Failed':call.status==='recorded'?'Execution recorded':'Execution unconfirmed'));
+    if(call.receipt?.description)body.append(element('p','transcript-note',call.receipt.description));
+    if(call.receipt?.error)body.append(element('p','transcript-note',String(call.receipt.error)));
+    if(call.observation)transcriptDetail(body,'Page before this decision',call.observation.text||'No page text recorded.');
+    if(call.receipt?.page_after)transcriptDetail(body,'Page after action · transition feedback',call.receipt.page_after.text||'No page text recorded.');
+    transcriptDetail(body,'Exact recorded action and execution evidence',JSON.stringify({action:call.action,receipt:call.receipt??null},null,2));
+    item.append(body);list.append(item);
+  }
+  if(!events.length)timeline.append(element('p','trace-tools-empty','No tool calls are recorded in this conversation.'));
+  timeline.append(list);panel.append(timeline);
+  function showMode(mode){panel.dataset.mode=mode;const onlyTools=mode==='tools';container.hidden=onlyTools;timeline.hidden=!onlyTools;conversation.setAttribute('aria-pressed',String(!onlyTools));toolsOnly.setAttribute('aria-pressed',String(onlyTools));}
+  conversation.onclick=()=>showMode('conversation');toolsOnly.onclick=()=>showMode('tools');
+  function showAvailable(){
+    const decision=decisions.find(row=>row.key===select.value);cards.replaceChildren();select.hidden=!decisions.length;
+    const available=decision?.available;summary.textContent='Available tools · '+(available===null||available===undefined?'not recorded':available.length);
+    source.textContent=available==null?'Tool definitions are not present in the published request data for this step. Actions taken do not establish which other tools were available.':decision.source+'. Definitions offered at this step; usable targets depend on the page.';
+    for(const tool of available||[]){
+      const selected=decision.selected===tool.name||decision.calls.some(call=>call.name===tool.name),card=element('div','trace-tool-card');card.dataset.selected=String(selected);
+      card.append(element('strong','',tool.name),element('span','trace-tool-card-state',selected?'Selected at this step':'Available'));
+      if(tool.description)card.append(element('p','transcript-note',String(tool.description)));
+      transcriptDetail(card,'Recorded definition',JSON.stringify(tool.definition,null,2));cards.append(card);
+    }
+    if(available?.length===0)cards.append(element('p','trace-tools-empty','This request explicitly lists no tools.'));
+  }
+  select.onchange=showAvailable;showAvailable();showMode(previousMode);
+  if(old)old.replaceWith(panel);else container.before(panel);
 }
 
 export function groupTraceSessions(rows){

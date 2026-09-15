@@ -1,4 +1,4 @@
-import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice,transcriptBubble,transcriptDetail,renderTraceConversation,groupTraceSessions} from './tool-activity.js';
+import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice,transcriptBubble,transcriptDetail,renderTraceConversation,groupTraceSessions,renderJobToolReview} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id);
@@ -180,9 +180,10 @@ function renderJobConversation(record){
     const receipt=transcriptBubble('tool','Browser tool · Step '+step.step,step.error?'Failed: '+String(step.error):step.browser_stepped?'Browser action recorded.':'Browser execution is not confirmed.');
     transcriptDetail(receipt,'Exact action',action);log.append(receipt);
   }
+  renderJobToolReview(log,job);
 }
 async function loadBrowserTrace(record){
-  const version=++reviewVersion,log=$('trace-conversation');delete log.dataset.job;log.replaceChildren(node('p','Loading the recorded conversation…','muted'));
+  const version=++reviewVersion,log=$('trace-conversation');log.parentElement.querySelector('.trace-tools-panel')?.remove();log.hidden=false;delete log.dataset.job;log.replaceChildren(node('p','Loading the recorded conversation…','muted'));
   $('browser-trace-json').textContent='Loading original evidence…';$('browser-record-summary').textContent='Loading recorded turns…';$('browser-trace-download').href='/api/traces/'+encodeURIComponent(record.id);
   const turns=record.turns||[record.raw];
   try{

@@ -122,6 +122,15 @@ output and missing receipts are visible without implying execution. Exact JSON
 stays behind collapsed evidence details, with authenticated original downloads
 for every turn. Old per-turn deep links open their containing conversation.
 
+The **Tools only** switch replaces conversation bubbles with a numbered,
+chronological timeline of recorded actions. Replies (`done`) are excluded;
+failed and unconfirmed execution remain explicitly labelled. Each step links
+to its available-tool inventory. Inventory cards come from that exact request's
+`tools` definitions or structured action enum, including unused capabilities;
+changing the selected step preserves changing definitions. Page controls are
+not treated as tools. Missing definitions remain unknown, distinct from an
+explicit empty tools list. All definitions and arguments render as text.
+
 BrowserGym jobs also show their published objective and recorded actions as
 bubbles above the existing screenshot replay. The current job API does not
 publish full model messages; this view does not invent dialogue or rationale. Portable curation bundle import remains a
@@ -133,6 +142,7 @@ introduce another export format.
 ```sh
 npm --prefix deploy/daylight run build
 npm --prefix deploy/daylight test
+.venv/bin/python scripts/smoke_trace_tools.py
 .venv/bin/python scripts/smoke_conversation_replays.py
 .venv/bin/python scripts/smoke_workspace_ui.py
 .venv/bin/python scripts/smoke_demo_chat_ui.py
@@ -154,3 +164,11 @@ calls. Evidence under `.local/vercel-demo/`:
 `chat-interrupt-96a29f55/report.json`, and `chat-ui-7321b7e7/report.json`.
 The conversation test also creates a standalone local design preview from the
 trusted rendered test DOM; it is not a saved-run export or production evidence.
+
+Tool timeline increment (local, pending coordinated publication): 76 combined
+Node checks, 19 tool-review browser checks and 20 conversation regression
+checks passed with no paid calls. Evidence:
+`.local/vercel-demo/trace-tools-d0f61c26/report.json` and
+`.local/vercel-demo/conversation-replays-949a2ff6/report.json`.
+The BrowserGym published-job inventory remains unknown until exact request
+definitions are exposed; its existing recorded actions still form a timeline.
