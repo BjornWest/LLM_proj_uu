@@ -1,5 +1,7 @@
 # Intent-preserving browser agent — first vertical slice
 
+The overnight environment increment adds a [versioned Chaos repair](CHAOS_REPAIR.md), [membership](TRICKY_MEMBERSHIP.md) and [privacy](TRICKY_PRIVACY.md) fixtures, and [SusBench IKEA checker reproductions](SUSBench_IKEA.md). See [OVERNIGHT_WORK.md](OVERNIGHT_WORK.md) for validation and remaining limits. These use scripted local tests; the working Vercel demo and historical model episodes are unchanged.
+
 A small BrowserGym loop for the Uppsala University group project. It reads the
 accessibility tree, asks a model for one action, executes that action in Chromium,
 and saves the transition. The default uses a **localhost live view** without

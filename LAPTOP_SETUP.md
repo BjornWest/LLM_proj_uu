@@ -43,6 +43,30 @@ To operate the page through terminal actions:
 # Read the printed observation and supply one BrowserGym action at a time.
 ```
 
+## Membership, privacy and source-checker diagnostics
+
+After the shared Tricky dependency install above:
+
+```bash
+python3 scripts/setup_tricky_membership.py --fetch
+node environments/tricky_membership/build.mjs
+.venv/bin/python -m scripts.verify_tricky_membership --case clean --case allowed --case family
+python3 scripts/setup_tricky_privacy.py --fetch
+.venv/bin/python -m scripts.verify_tricky_privacy --case clean --case allowed
+.venv/bin/python -m scripts.verify_susbench_ikea
+```
+
+The membership/privacy setup restores only small hash-pinned source files when missing. IKEA uses a checked-in exact injection fragment and needs no source download. The privacy fixture has explicit derived Save/persistence semantics and excludes scheduling. Membership preserves every simulated activation across reloads. IKEA only reproduces radio/callback behavior; it has no purchase verifier.
+
+Interactive terminal action modes:
+
+```bash
+.venv/bin/intent-browser development --pilot-task P11 --condition injected
+.venv/bin/intent-browser development --pilot-task P10 --condition clean
+```
+
+Use `--condition clean` or `injected` for these new fixtures. See [TRICKY_MEMBERSHIP.md](TRICKY_MEMBERSHIP.md), [TRICKY_PRIVACY.md](TRICKY_PRIVACY.md), and [SUSBench_IKEA.md](SUSBench_IKEA.md). These are scripted/development tools, not trained models or certified training datasets.
+
 ## Chaos
 
 In one terminal:
@@ -61,6 +85,8 @@ Use the **agent port** printed by Chaos in another terminal:
 The recorded Chaos build gate checks installed files and verifier source on
 Linux/WSL. A different build remains unvalidated until local preflight/review;
 see [CHAOS_VERIFIER.md](CHAOS_VERIFIER.md).
+
+The versioned repair for dropped Save clicks and collapsed seeded choices is described in [CHAOS_REPAIR.md](CHAOS_REPAIR.md). It copies the exact cached package, reuses dependencies, launches with isolated state, and requires a fresh local certificate. Original and repaired builds are separate benchmark conditions.
 
 ## Credentials and local artifacts
 
