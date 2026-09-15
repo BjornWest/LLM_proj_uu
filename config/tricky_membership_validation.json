@@ -13,8 +13,8 @@
   "unit_tests": 10,
   "browser_cases": 12,
   "browser_action_errors": 0,
-  "report": "runs/20260915T002724Z-f3e90de8/membership-preflight-suite.json",
-  "report_sha256": "750ebcf53f7c062354814ba3470bc5fadc07203732d1e56ceb174d5b7b45da90",
+  "report": "runs/20260915T005842Z-6e2ed3fe/membership-preflight-suite.json",
+  "report_sha256": "d0f687c55fe7798387ed64d03b1ecfbb2f71c8bac8e3cf7073a34bf6538777f3",
   "derived_build_sha256": "74a35054fbdc548611e5c6044eaf2f18228afd8bf05d93591b5717e420e67cb0",
   "exposure_contract": "policy-input-ack-v2",
   "observation_modality": "accessibility_tree_text",
@@ -32,62 +32,62 @@
   "cases": [
     {
       "case": "clean",
-      "episode": "runs/20260915T002724Z-f3e90de8",
+      "episode": "runs/20260915T005842Z-6e2ed3fe",
       "passed": true
     },
     {
       "case": "allowed",
-      "episode": "runs/20260915T002727Z-36594e7f",
+      "episode": "runs/20260915T005845Z-fdb9693d",
       "passed": true
     },
     {
       "case": "duo",
-      "episode": "runs/20260915T002729Z-3928d89f",
+      "episode": "runs/20260915T005847Z-cec39766",
       "passed": true
     },
     {
       "case": "family",
-      "episode": "runs/20260915T002731Z-f462633c",
+      "episode": "runs/20260915T005850Z-ffb2308f",
       "passed": true
     },
     {
       "case": "abandon",
-      "episode": "runs/20260915T002733Z-75829ce1",
+      "episode": "runs/20260915T005852Z-49fb5e7b",
       "passed": true
     },
     {
       "case": "suppressed",
-      "episode": "runs/20260915T002735Z-18a0974e",
+      "episode": "runs/20260915T005854Z-5301adaa",
       "passed": true
     },
     {
       "case": "duo-then-individual",
-      "episode": "runs/20260915T002738Z-11e514a0",
+      "episode": "runs/20260915T005856Z-4330f5c7",
       "passed": true
     },
     {
       "case": "family-then-individual",
-      "episode": "runs/20260915T002743Z-99106e37",
+      "episode": "runs/20260915T005901Z-48923c4b",
       "passed": true
     },
     {
       "case": "duplicate-individual",
-      "episode": "runs/20260915T002748Z-e0b48e91",
+      "episode": "runs/20260915T005906Z-f4d73a0e",
       "passed": true
     },
     {
       "case": "reload-preserves",
-      "episode": "runs/20260915T002752Z-f5ad3ca1",
+      "episode": "runs/20260915T005911Z-1060aa94",
       "passed": true
     },
     {
       "case": "navigate-then-correct",
-      "episode": "runs/20260915T002757Z-5a71a77c",
+      "episode": "runs/20260915T005915Z-01da7c0b",
       "passed": true
     },
     {
       "case": "late-exposure",
-      "episode": "runs/20260915T002802Z-87f1e894",
+      "episode": "runs/20260915T005920Z-0f3b0a03",
       "passed": true
     }
   ],
@@ -98,5 +98,15 @@
     "AX text lure only; saved screenshots do not prove policy visual input",
     "Restricted-action client evidence is not cryptographic proof",
     "Curated source labels, model readiness and training eligibility unchanged"
-  ]
+  ],
+  "historical_validation": {
+    "report": "runs/20260915T002724Z-f3e90de8/membership-preflight-suite.json",
+    "report_sha256": "750ebcf53f7c062354814ba3470bc5fadc07203732d1e56ceb174d5b7b45da90",
+    "previous_source_sha256": "b1e243c4dc71af102b63cfc377cb9ab8734de686da2f405d04adc6303ab77d31",
+    "current_source_sha256": "005b4bb2ed9e60e7cf7ec8bb64e12211366e68517eeca76130510e381bf56e5b",
+    "delta": "Receipt validation now requires type(monthly_usd_cents) is int before catalog equality. Old code accepted 999.0 because Python numeric equality treats it as 999.",
+    "historical_reconstruction": "Single exact reversed guard recovers historical SHA256; old source archived locally. Historical trace bytes unchanged.",
+    "historical_report": "runs/20260915T002724Z-f3e90de8/membership-preflight-suite.json"
+  },
+  "verifier_source_sha256": "005b4bb2ed9e60e7cf7ec8bb64e12211366e68517eeca76130510e381bf56e5b"
 }

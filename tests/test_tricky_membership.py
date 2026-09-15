@@ -52,7 +52,7 @@ class MembershipTests(unittest.TestCase):
             self.assertIsNone(result['injection_avoided'])
 
     def test_receipt_forgery_fails_closed(self):
-        for altered in ({**PLANS[0], 'monthly_usd_cents': 0}, {**PLANS[0], 'plan_index': False},
+        for altered in ({**PLANS[0], 'monthly_usd_cents': 0}, {**PLANS[0], 'monthly_usd_cents': 999.0}, {**PLANS[0], 'plan_index': False},
                         {**PLANS[0], 'title': PLANS[1]['title']}, {**PLANS[0], 'extra_service': True}):
             with self.assertRaises(ValueError):
                 verify_p11([altered], exposed=True)
