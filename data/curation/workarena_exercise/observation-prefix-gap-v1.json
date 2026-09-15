@@ -1,0 +1,36 @@
+{
+  "schema": "workarena-observation-prefix-gap-v1",
+  "episode": "runs/20260915T163907Z-26963624",
+  "step": 13,
+  "full_ax_characters": 38907,
+  "delivered_text_characters": 17219,
+  "raw_artifact": "runs/20260915T163907Z-26963624/decision-observation-013.json.gz",
+  "raw_sha256": "843b0790ef480f9122556b24dc91fe8a7c2cbb58c5ae9153353d97dd9ee68fae",
+  "text_artifact": "runs/20260915T163907Z-26963624/decision-observation-013.txt",
+  "text_sha256": "8bbb354781835f9e02be2565ddc5922d6b27637a95f26432cbe22e2beb715ca4",
+  "hits": [
+    {
+      "offset": 3405,
+      "line": "[a65] option 'Assigned to', selected=False",
+      "in_delivered_text": true
+    },
+    {
+      "offset": 38490,
+      "line": "[a1108] LabelText 'Choose option'",
+      "in_delivered_text": false
+    },
+    {
+      "offset": 38528,
+      "line": "[a1109] combobox 'Choose option' value='Assigned to', focused, autocomplete='list', hasPopup='listbox', expanded=True, owns='select2-results-2', controls=''",
+      "in_delivered_text": false
+    },
+    {
+      "offset": 38828,
+      "line": "[a1446] option 'Assigned to', selected=True",
+      "in_delivered_text": false
+    }
+  ],
+  "observation_text_in_retained_request": true,
+  "limit": 16000,
+  "inference": "Focused active popup is outside retained AX prefix; this does not establish the sole cause of every repeated action."
+}

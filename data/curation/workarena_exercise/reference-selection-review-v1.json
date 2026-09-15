@@ -1,0 +1,39 @@
+{
+  "schema": "workarena-reference-selection-observation-v1",
+  "episode": "runs/20260915T165640Z-46fff017",
+  "evidence": [
+    {
+      "step": 8,
+      "action": "fill('a1226', 'Jose-Bruce Garcia-Mitchell')",
+      "action_error": "",
+      "observation": "runs/20260915T165640Z-46fff017/decision-observation-008.txt",
+      "sha256": "5059e205bd90a55a5a2432bcc79b701d00e7c0a329075d99b966dedc4f635fff"
+    },
+    {
+      "step": 9,
+      "action": "click('a1036')",
+      "action_error": "",
+      "observation": "runs/20260915T165640Z-46fff017/decision-observation-009.txt",
+      "sha256": "d2df0e646b7a9c97cd3b844431c1aab8b665dfd23a6962b9e76bdde1d72249d9"
+    },
+    {
+      "step": 10,
+      "action": "click('a179')",
+      "action_error": "",
+      "observation": "runs/20260915T165640Z-46fff017/decision-observation-010.txt",
+      "sha256": "3598699ae18e9976fc573c5cebaccd7b587b5b9142751e861373f67ff406b39a"
+    }
+  ],
+  "observations": [
+    "Model used fill without enable_autocomplete_menu=True on the Assigned to reference textbox.",
+    "Before Run, the displayed value was the requested person and the autocomplete combobox was not expanded.",
+    "After Run, the delivered breadcrumb read Assigned to = (empty).",
+    "The model then repeated a click on that breadcrumb; no response answer was supplied."
+  ],
+  "mechanism_hypothesis": "The displayed text was not resolved/selected as a reference record. BrowserGym default fill only sends input, while the upstream helper types a final character, waits for resolution and clicks an exact autocomplete option. A matched browser comparison is still needed to isolate the cause.",
+  "source_helpers": {
+    "browsergym_fill": ".venv/lib/python3.12/site-packages/browsergym/core/action/functions.py",
+    "workarena_fill_text": ".local/workarena-exercise/vendor/browsergym/workarena/tasks/utils/form.py"
+  },
+  "reproduction_performed": false
+}

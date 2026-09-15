@@ -1,0 +1,236 @@
+{
+  "schema": "workarena-exercise-preparation-v1",
+  "source_revision": "a772230a94cf1caf4166b8ead3983f3b3786455b",
+  "scope": "Exact upstream validator bodies executed on synthetic objects; no native page or model execution.",
+  "service_access": "user_requested_pending_review",
+  "runnable_ready": false,
+  "training_eligible": false,
+  "wheel": {
+    "path": ".research/workarena-use-case-review/browsergym_workarena-0.5.3-py3-none-any.whl",
+    "sha256": "eb0bdb58598f5e8aeb8b9f01ac3a68dc26d477e3067f01bb56f640a1016e81a5",
+    "bytes": 6786780,
+    "version": "0.5.3"
+  },
+  "matched_source_files": {
+    "browsergym/workarena/__init__.py": "79368d66aeca3e7d13fdf147d4ab9a3ff36ec02382e11d15a898d5701ea4329a",
+    "browsergym/workarena/api/requests.py": "cf6bd04d3926d47474e3f77fa5c7ba8e8a6e37ef8e874814693f9886b55af7ef",
+    "browsergym/workarena/instance.py": "9cf0cc0a37657902e589da64c9118d9bd5414b3b40b33edb8de1802fd44ed0cd",
+    "browsergym/workarena/tasks/base.py": "22487f03923dffd69c1c540272754c127941837bb7407403d88fcd6c6bc3e921",
+    "browsergym/workarena/tasks/compositional/base.py": "7886617e904ebd9beb942d97ecf49b63fec9ac82ee7b361ef8d4730d31021e29",
+    "browsergym/workarena/tasks/compositional/edit_knowledge_base.py": "6ca95ca5f04d0ac472b7e92d05072f8e7f10a5cc7d63c91a48f7f515eab1b0f1",
+    "browsergym/workarena/tasks/compositional/find_and_order_item.py": "e1be18989429dbd38dd52ad077daf39c46de40fb70a965d00097c6ad9ac7e55c",
+    "browsergym/workarena/tasks/compositional/manage_change_request_schedule.py": "534a3f95ef7b9b38e0beae70dcf508ec8e07ac5a2c80485d6f0bcc003b96d726",
+    "browsergym/workarena/tasks/compositional/navigate_and_do_infeasible.py": "c35ae061a5a24a1be9492997d7c4b77d9732107855975c4b2a1822f9f39f2ef7",
+    "browsergym/workarena/tasks/compositional/utils/infeasible_configs.py": "881c8ede4723e531ab1325fe43ad19a05436b59348e1669260d8ef6c2558fb2d",
+    "browsergym/workarena/tasks/compositional/warranty_check.py": "d044e5d7aeb33ea3993ef8b8a3553d9ef2c649bf6b7f6cd0268596b8ced95299",
+    "browsergym/workarena/tasks/dashboard.py": "ea88690b8d33a4ad4d2e57d833b448a9e7a79ae12ea082fdc0e054746dc94c52",
+    "browsergym/workarena/tasks/form.py": "c0c19b4feebefca4d469a3c3c5833494c6ac09cf23678703f58ed814390b12af",
+    "browsergym/workarena/tasks/knowledge.py": "cdff91c7a0bc3a125c50b11e59ee0857337f49e0cd810d234862a2d7a1882579",
+    "browsergym/workarena/tasks/list.py": "f321e9a0ea0f6481b909c04d2c40148040264c9f7593590d4f7a945dcf7d3d3d",
+    "browsergym/workarena/tasks/service_catalog.py": "dce0f71271d3f385bee5af3952fff645feb72b397d9c05ebae872cad7f62bb21"
+  },
+  "catalog_file_sha256": "a9287c94cd7746043268a033348c0033407ce2266f48e818d4540400679ac1a0",
+  "catalog_config_index_zero_based": 70,
+  "catalog_config": {
+    "configuration": {
+      "Additional software requirements": [
+        "textarea",
+        "Slack"
+      ],
+      "Adobe Acrobat": [
+        "checkbox",
+        false
+      ],
+      "Adobe Photoshop": [
+        "checkbox",
+        false
+      ]
+    },
+    "description": "Lenovo - Carbon x1",
+    "item": "Standard Laptop",
+    "quantity": 1
+  },
+  "answer_checks": [
+    {
+      "id": "generic_done",
+      "synthetic_answer": "Done",
+      "raw_upstream_result": [
+        0,
+        false,
+        "",
+        {
+          "message": "Incorrect value."
+        }
+      ]
+    },
+    {
+      "id": "correct_iso_date",
+      "synthetic_answer": "2027-09-15",
+      "raw_upstream_result": [
+        1,
+        true,
+        "Nice work, thank you!",
+        {
+          "message": "Correct information extracted."
+        }
+      ]
+    },
+    {
+      "id": "incorrect_date",
+      "synthetic_answer": "2027-09-16",
+      "raw_upstream_result": [
+        0,
+        false,
+        "",
+        {
+          "message": "Incorrect value."
+        }
+      ]
+    },
+    {
+      "id": "negated_correct_date",
+      "synthetic_answer": "The expiry is NOT 2027-09-15; it is 2027-09-16.",
+      "raw_upstream_result": [
+        1,
+        true,
+        "Nice work, thank you!",
+        {
+          "message": "Correct information extracted."
+        }
+      ]
+    },
+    {
+      "id": "two_conflicting_dates",
+      "synthetic_answer": "2027-09-15 or 2027-09-16",
+      "raw_upstream_result": [
+        1,
+        true,
+        "Nice work, thank you!",
+        {
+          "message": "Correct information extracted."
+        }
+      ]
+    },
+    {
+      "id": "equivalent_human_date",
+      "synthetic_answer": "15 September 2027",
+      "raw_upstream_result": [
+        0,
+        false,
+        "",
+        {
+          "message": "Incorrect value."
+        }
+      ]
+    }
+  ],
+  "catalog_checks": [
+    {
+      "id": "requested_configuration",
+      "synthetic_request": {
+        "items": [
+          {
+            "short_description": "Lenovo - Carbon x1",
+            "quantity": "1",
+            "options": {
+              "Adobe Acrobat": "false",
+              "Adobe Photoshop": "false",
+              "Additional software requirements": "Slack"
+            }
+          }
+        ]
+      },
+      "raw_upstream_result": [
+        1,
+        true,
+        "Nice work, thank you!",
+        {
+          "message": "Task completed successfully."
+        }
+      ]
+    },
+    {
+      "id": "unwanted_acrobat",
+      "synthetic_request": {
+        "items": [
+          {
+            "short_description": "Lenovo - Carbon x1",
+            "quantity": "1",
+            "options": {
+              "Adobe Acrobat": "true",
+              "Adobe Photoshop": "false",
+              "Additional software requirements": "Slack"
+            }
+          }
+        ]
+      },
+      "raw_upstream_result": [
+        0,
+        true,
+        "The requested Adobe Acrobat is incorrect, expected False but got true.",
+        {
+          "message": "The requested Adobe Acrobat is incorrect, expected False but got true."
+        }
+      ]
+    },
+    {
+      "id": "unrequested_textarea_extra",
+      "synthetic_request": {
+        "items": [
+          {
+            "short_description": "Lenovo - Carbon x1",
+            "quantity": "1",
+            "options": {
+              "Adobe Acrobat": "false",
+              "Adobe Photoshop": "false",
+              "Additional software requirements": "Slack, unrequested software"
+            }
+          }
+        ]
+      },
+      "raw_upstream_result": [
+        1,
+        true,
+        "Nice work, thank you!",
+        {
+          "message": "Task completed successfully."
+        }
+      ]
+    },
+    {
+      "id": "duplicate_quantity",
+      "synthetic_request": {
+        "items": [
+          {
+            "short_description": "Lenovo - Carbon x1",
+            "quantity": "2",
+            "options": {
+              "Adobe Acrobat": "false",
+              "Adobe Photoshop": "false",
+              "Additional software requirements": "Slack"
+            }
+          }
+        ]
+      },
+      "raw_upstream_result": [
+        0,
+        true,
+        "The requested quantity is incorrect.",
+        {
+          "message": "The requested quantity is incorrect."
+        }
+      ]
+    }
+  ],
+  "runner": {
+    "sha256": "f8ba632799dd62c01612470ad0807e4ae294dd9f9e2223cdf826e0050ba8dde0",
+    "generic_done_instruction_present": true
+  },
+  "limitations": [
+    "Source-method isolation does not check imports, real instance schema, UI, setup or cleanup.",
+    "Upstream answer scoring is substring-based; contradictory answers can receive reward.",
+    "Upstream textarea scoring permits additional software text.",
+    "Upstream catalog check follows current URL request; entire-run order coverage is not established.",
+    "No credentials, expected real task answers, browser requests, or paid calls are included."
+  ]
+}
