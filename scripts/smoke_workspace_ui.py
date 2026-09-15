@@ -75,6 +75,7 @@ def main():
         page.locator('#back-to-research').click();page.locator('#clear-filters').click();page.locator('#global-grade').select_option('unknown');expect(page.locator('#global-rows tr')).to_have_count(2)
         count=len(writes);page.locator('#global-rows .run-title').first.click();viewer=page.frame_locator('#run-viewer');expect(viewer.locator('#step-position')).to_have_text('1 / 2');viewer.locator('#next-step').click();expect(viewer.locator('#step-position')).to_have_text('2 / 2')
         check('Replay retains distinct identical action strings with no model/job writes',len(writes)==count and viewer.locator('#observation-title').inner_text().startswith('Step 2'))
+        check('BrowserGym conversation retains both identical recorded actions without inventing model dialogue',page.locator('#trace-conversation .assistant .transcript-text').all_text_contents()==['click(126)','click(126)'] and 'Full model messages are not published' in page.locator('#browser-record-summary').inner_text())
         check('Null safe-success is Unknown despite other outcome flags',page.locator('#review-grade').inner_text()=='Unknown')
         page.screenshot(path=str(output/'replay.png'),full_page=True)
         page.locator('#all-replays-link').click();page.locator('#clear-filters').click();page.locator('#global-site').select_option('chaos');expect(page.locator('#global-rows tr')).to_have_count(1)

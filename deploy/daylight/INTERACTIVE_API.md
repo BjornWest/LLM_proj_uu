@@ -7,10 +7,18 @@ authentication and same-origin POST checks.
 ## Interactive turns
 
 `POST /api/start` with `{ "mode": "assist", "goal": "the current user message" }`
-creates one turn and returns its trace `id`. Use `assist` for questions which
+creates one turn and returns `{ id, conversation_id }`. Use `assist` for questions which
 may require navigation or filters, as well as explicit action requests.
 The older `chat` mode remains a one-request, read-only compatibility endpoint;
 merely changing its prompt cannot make the old client execute tools.
+
+Clients may supply an optional UUID `conversation_id` on later turns in the
+same conversation. Omission creates a new ID unless an owned `continuation_of`
+trace already has one; a conflicting continuation conversation ID is rejected.
+Identity is an owner-scoped grouping declaration, not authorization or verified
+activity classification. It does not change per-turn budgets, limits, immutable
+goals, interrupt/CAS behavior, or the per-trace provider `session_id`. Start fresh
+and page reload start a new browser conversation.
 
 For up to 12 decisions:
 
@@ -87,7 +95,14 @@ Rows include goal, mode, status, runtime, timestamps, steps, dispatched model
 attempts, reported cost sum, unknown-cost attempts and the original download
 `url`. Zero reported cost differs from no reported cost (`null`). Ready,
 pending, error and interrupted-client traces are retained as recorded.
-`GET /api/traces/{id}` returns the original full JSON.
+New rows also include `conversation_id` and `conversation_source`
+(`server_generated`, `client_declaration`, or `owned_continuation`). Historical
+absence remains null. `previous_trace_id` and `previous_trace_source` expose
+only explicit recorded `continuation_of` or first-request
+`recorded_prior_activity.last_trace` links after checking the predecessor exists
+under the same owner. Listing does not rewrite historical records. Clients may
+group linked rows after exhausting pagination; never infer a session from text
+or goal equality. `GET /api/traces/{id}` returns the original full JSON.
 
 This increment is **owner-scoped** and covers the browser-side demo. Existing
 BrowserGym jobs remain at `/api/harness/jobs`. A unified team library and

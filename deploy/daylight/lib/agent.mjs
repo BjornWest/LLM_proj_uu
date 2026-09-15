@@ -39,6 +39,17 @@ const traceKey=(owner,id)=>`daylight/traces/${owner}/${id}.json`;
 export const validID=id=>typeof id==='string' && /^[0-9a-f-]{36}$/.test(id);
 function insist(value,message,status=400) {if(!value)throw Object.assign(Error(message),{status});}
 const conflict=error=>error.code==='BLOB_WRITE_CONFLICT'||error.message==='Storage conflict';
+function recordedPrevious(trace){
+  if(validID(trace.continuation_of))return {id:trace.continuation_of,source:'continuation_of'};
+  // Historical clients recorded this exact link with their first decision.
+  // Neither repeated goals nor repeated message text establishes a session.
+  try{
+    const payload=JSON.parse(trace.steps?.[0]?.request?.messages?.at(-1)?.content);
+    const activity=JSON.parse(payload.prior_activity);
+    if(validID(activity.last_trace))return {id:activity.last_trace,source:'recorded_prior_activity.last_trace'};
+  }catch{}
+  return null;
+}
 function observation(value) {
   insist(value && typeof value.text==='string' && value.text.length<=18000,'Invalid page observation');
   insist(Array.isArray(value.controls) && value.controls.length<=250,'Too many page controls');
@@ -106,8 +117,12 @@ export class Agent {
       if(!validID(id))continue;
       const row=await this.store.read(key),trace=row?.value;
       if(!trace||trace.owner!==owner||trace.id!==id)continue;
+      let previous=recordedPrevious(trace);
+      if(previous){const linked=await this.store.read(traceKey(owner,previous.id));if(previous.id===id||linked?.value.owner!==owner||linked?.value.id!==previous.id)previous=null;}
       const steps=trace.steps||[],costs=steps.map(s=>s.usage?.cost).filter(c=>typeof c==='number'&&Number.isFinite(c));
       traces.push({id,goal:trace.goal,mode:trace.mode,runtime:trace.runtime,browsergym:trace.browsergym,...recordedActivity(trace),
+        conversation_id:trace.conversation_id??null,conversation_source:trace.conversation_source??null,
+        previous_trace_id:previous?.id??null,previous_trace_source:previous?.source??null,
         created_at:trace.created_at,finished_at:trace.finished_at||null,status:trace.status,steps:steps.length,
         model_attempts:steps.filter(s=>s.dispatch_at).length,
         reported_cost_usd:costs.length?costs.reduce((a,b)=>a+b,0):null,
@@ -122,19 +137,24 @@ export class Agent {
     const interaction_kind=interactionKind(body.interaction_kind);
     insist(interaction_kind===null||interaction_kind===(body.mode==='task'?'task':'ask'),'Interaction kind differs from the selected client mode');
     const site=siteForTask('rooms');validateSite(body,site);
-    let continuation_of=null;
+    let continuation_of=null,previousConversation=null;
     if(body.continuation_of!==undefined&&body.continuation_of!==null) {
       insist(body.mode==='assist','Only interactive requests may continue a previous trace');
       const previous=(await this.read(owner,body.continuation_of)).value;
       insist(['interrupted','complete','error','step_limit'].includes(previous.status),'Previous trace is still active',409);
       continuation_of=previous.id;
+      previousConversation=previous.conversation_id||null;
     }
+    insist(body.conversation_id==null||validID(body.conversation_id),'Invalid conversation ID');
+    insist(!previousConversation||!body.conversation_id||previousConversation===body.conversation_id,'Conversation differs from the continued trace');
+    const conversation_id=body.conversation_id||previousConversation||randomUUID();
     const id=randomUUID(),row={schema_version:1,id,owner,mode:body.mode,goal:body.goal,
       interaction_kind,...site,task_id:null,task_name:null,task_revision:null,condition:null,
       activity_metadata_source:{interaction_kind:interaction_kind?'client_declaration':null,site:'daylight-client-demo-v1',site_registry_revision:site.site_registry_revision},
       runtime:'daylight-client-demo-v1',protocol:body.mode==='assist'?'interactive-actions-v1':'original-v1',browsergym:false,training_eligible:false,evaluation:null,
-      created_at:new Date().toISOString(),status:'ready',steps:[],events:[],provenance:this.provenance,continuation_of};
-    await this.store.write(traceKey(owner,id),row);return {id};
+      created_at:new Date().toISOString(),status:'ready',steps:[],events:[],provenance:this.provenance,continuation_of,
+      conversation_id,conversation_source:body.conversation_id?'client_declaration':previousConversation?'owned_continuation':'server_generated'};
+    await this.store.write(traceKey(owner,id),row);return {id,conversation_id};
   }
   async reserve(amount) {
     const date=new Date().toISOString().slice(0,10),key=`daylight/budgets/${date}.json`;

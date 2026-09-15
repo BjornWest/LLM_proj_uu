@@ -107,8 +107,24 @@ Unknown even when other individual outcome flags are present. Browser-side
 requests without independent verification are Not graded. Runtime errors remain
 visible as execution status, separately from grading.
 
-Original browser-side traces expose their unchanged JSON in a text-only details
-view with an authenticated download. Portable curation bundle import remains a
+Browser-side history groups turns by an explicit conversation ID. The workspace
+and original demo keep that ID until Start fresh or a page reload. Interrupting
+with a new message stays in the same conversation; each turn still has its own
+immutable goal and original trace ID. Legacy turns are grouped only when their
+recorded continuation/prior-activity link names another owned trace. Unlinked
+historical turns remain separate; equal goals are not evidence of a session.
+Mixed or missing recorded activity/site metadata stays unknown for the group.
+
+Opening a conversation shows model bubbles on the left and user/tool bubbles on
+the right, in turn order. Browser action labels use that step's pre-action
+observation; transition feedback is a separately labelled detail. Interrupted
+output and missing receipts are visible without implying execution. Exact JSON
+stays behind collapsed evidence details, with authenticated original downloads
+for every turn. Old per-turn deep links open their containing conversation.
+
+BrowserGym jobs also show their published objective and recorded actions as
+bubbles above the existing screenshot replay. The current job API does not
+publish full model messages; this view does not invent dialogue or rationale. Portable curation bundle import remains a
 separate backend increment; this workspace does not execute uploaded HTML or
 introduce another export format.
 
@@ -117,6 +133,7 @@ introduce another export format.
 ```sh
 npm --prefix deploy/daylight run build
 npm --prefix deploy/daylight test
+.venv/bin/python scripts/smoke_conversation_replays.py
 .venv/bin/python scripts/smoke_workspace_ui.py
 .venv/bin/python scripts/smoke_demo_chat_ui.py
 .venv/bin/python scripts/smoke_chat_controls.py
@@ -128,3 +145,12 @@ an offline model transport. Their screenshots and source fingerprints are writte
 to `.local/vercel-demo/`. They validate integration, not live model reliability,
 and make no paid inference calls. `tests/workspace-server.mjs` is a test-only
 server with seeded evidence; it is never part of the deployed entry point.
+
+Conversation replay increment (local, pending coordinated publication): 71 Node
+checks, 20 conversation browser checks, 31 workspace checks, 37 interruption
+checks and 17 original-chat checks passed with offline transport and no paid
+calls. Evidence under `.local/vercel-demo/`:
+`conversation-replays-1cabbfd5/report.json`, `workspace-0d074d33/report.json`,
+`chat-interrupt-96a29f55/report.json`, and `chat-ui-7321b7e7/report.json`.
+The conversation test also creates a standalone local design preview from the
+trusted rendered test DOM; it is not a saved-run export or production evidence.

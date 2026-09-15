@@ -21,7 +21,7 @@ async def main():
         raise AssertionError('Timed out waiting for controlled browser state')
     try:
       async with async_playwright() as p:
-        browser=await p.chromium.launch();page=await browser.new_page(viewport={'width':1512,'height':1040});errors=[];starts=[]
+        browser=await p.chromium.launch();context=await browser.new_context(viewport={'width':1512,'height':1040});page=await context.new_page();errors=[];starts=[]
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.on('request',lambda r:starts.append(r.post_data_json) if r.method=='POST' and r.url.endswith('/api/start') else None)
         await page.goto(origin);await page.get_by_label('Your invitation code').fill('offline-interactive-code-'*3);await page.get_by_role('button',name='Open demo').click()
@@ -43,6 +43,7 @@ async def main():
             state=await get('/__test/state');new=state['calls'][-1]['id'];trace=await read(new)
             check(name+' new message interrupts without waiting for old inference',old in state['pending'] and trace['status']=='complete' and len(starts)==before+2)
             check(name+' new turn records exact goal, interrupted context and predecessor',trace['continuation_of']==old and trace['goal']==starts[-1]['goal'] and any(m.get('content')=='Wait for old inference' for m in trace['steps'][0]['request']['messages']))
+            check(name+' interrupt retains the same conversation session',trace['conversation_id']==(await read(old))['conversation_id'])
             check(name+' old request is durably interrupted before its response exists',(await read(old))['status']=='interrupted' and (await read(old))['steps'][0]['response'] is None)
             await page.request.post(origin+'/__test/release')
             async def late():
@@ -52,6 +53,13 @@ async def main():
             check(name+' late response and cost retained without executing stale action',saved['status']=='interrupted' and saved['steps'][0]['usage']['cost']==.0001 and saved['steps'][0]['client_result'] is None and await page.frame_locator(frame_selector).locator('#room-people').input_value()=='1')
             check(name+' late response cannot overwrite new answer or reactivate UI',await button.get_attribute('data-running')=='false' and await page.locator('#conversation .run-interruption').count()==1 and len(starts)==before+2)
             await page.screenshot(path=str(out/(name+'-interrupted.png')),full_page=True)
+            review=await page.context.new_page();before_review=len(starts)
+            await review.goto(origin+'/workspace/replays?run=d:'+old)
+            await expect(review.locator('#trace-conversation .user')).to_have_count(2)
+            check(name+' saved interrupted turns open as one read-only conversation',len(starts)==before_review and '2 recorded turns' in await review.locator('#browser-record-summary').inner_text())
+            check(name+' saved late action is labelled interrupted without receipt','interrupted output' in await review.locator('#trace-conversation .assistant .transcript-label').first.inner_text() and 'No execution receipt' in await review.locator('#trace-conversation .tool .transcript-label').inner_text())
+            await review.close()
+
 
             # Hold a real iframe navigation already triggered by the old action.
             await open_page();await page.frame_locator(frame_selector).get_by_role('link',name='Shop',exact=True).click()

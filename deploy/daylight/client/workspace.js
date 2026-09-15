@@ -1,4 +1,4 @@
-import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice} from './tool-activity.js';
+import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice,transcriptBubble,transcriptDetail,renderTraceConversation,groupTraceSessions} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id);
@@ -9,7 +9,7 @@ const siteNames={chaos:'Chaos scenarios','tricky-shop':'Tricky shop','tricky-hea
 let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoRows=[],siteID='campus',view='explore',globalPage=false,currentRun=null;
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
 let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
-let activeTurn=null,interrupting=false;
+let activeTurn=null,interrupting=false,conversationID=null;
 let manualConfig=null,manualSessions=[],manualBusy=false,manualUncertain=false,manualError='',manualFrameKey='',manualFrameLoaded=false;
 const manualChoices=new Map(),manualLive=session=>session&&['starting','ready','busy'].includes(session.status);
 const manualSite=()=>manualConfig?.sites?.find(site=>site.site_id===siteID);
@@ -72,9 +72,12 @@ function records(){
       site:resolvedSite||'unknown',collection:job.collection||'unknown',title:job.task_name||(job.task?'Task ID: '+job.task:'Task name not recorded'),condition:job.condition||null,
       goal:job.goal,task:job.task,revision:job.task_revision,status:job.status,at:job.created_at,runtime:'BrowserGym',executionMode:job.mode||null,evaluation:job.evaluation??null,grade:job.grade??null,rubric:job.rubric??null,raw:job};
   });
-  const browserRecords=demoRows.map(trace=>({key:'d:'+trace.id,id:trace.id,source:'demo',kind:['task','ask'].includes(trace.interaction_kind)?trace.interaction_kind:null,
-    site:trace.site_id||'unknown',collection:trace.collection||'unknown',title:trace.task_name||trace.goal||'Browser-side run',goal:trace.goal,task:trace.task_id||null,
-    status:trace.status,at:trace.created_at,runtime:trace.runtime||'Browser-side demo',executionMode:trace.execution_mode||null,evaluation:trace.evaluation??null,raw:trace}));
+  const browserRecords=groupTraceSessions(demoRows).map(turns=>{
+    const first=turns[0],last=turns.at(-1),same=key=>turns.every(turn=>(turn[key]??null)===(first[key]??null))?first[key]??null:null;
+    return {key:'d:'+first.id,id:first.id,source:'demo',turns,kind:['task','ask'].includes(same('interaction_kind'))?same('interaction_kind'):null,
+      site:same('site_id')||'unknown',collection:same('collection')||'unknown',title:first.task_name||first.goal||'Browser conversation',goal:first.goal,task:same('task_id'),condition:same('condition'),
+      status:last.status,at:last.created_at,runtime:same('runtime')||'Browser-side demo',executionMode:same('execution_mode'),evaluation:turns.length===1?first.evaluation??null:null,raw:first};
+  });
   const manualRecords=manualSessions.map(session=>({key:'m:'+session.id,id:session.id,source:'manual',kind:'manual',site:session.site_id||'unknown',collection:session.collection||'unknown',title:session.task_name||session.task||'Manual session',condition:session.condition||null,goal:session.reference_goal,task:session.task,status:session.status,at:session.created_at,runtime:session.runtime||'BrowserGym',executionMode:'Human controlled',evaluation:null,raw:session}));
   return [...jobRecords,...browserRecords,...manualRecords].sort((a,b)=>(Date.parse(b.at)||0)-(Date.parse(a.at)||0));
 }
@@ -121,10 +124,10 @@ function syncControls(){
 function recordRow(record,all){
   const row=node('tr');row.dataset.run=record.key;row.dataset.site=record.site;row.dataset.kind=record.kind||'unknown';
   const cell=node('td'),button=node('button',undefined,'run-title');button.type='button';button.append(node('span',record.kind==='task'?'Task':record.kind==='ask'?'Ask':record.kind==='manual'?'Manual':'Activity unknown','run-kind '+(record.kind||'unknown')),document.createTextNode(' '+(record.kind==='ask'?record.goal||record.title:record.title)));button.onclick=()=>openRecord(record,all);
-  cell.append(button,node('span',[record.runtime,record.executionMode,record.condition,record.status].filter(Boolean).join(' · '),'run-meta'));row.append(cell);
+  cell.append(button,node('span',[record.runtime,record.turns?record.turns.length+' turn'+(record.turns.length===1?'':'s'):null,record.executionMode,record.condition,record.status].filter(Boolean).join(' · '),'run-meta'));row.append(cell);
   if(all){const siteCell=node('td',undefined,'site-cell');siteCell.textContent=siteFor(record.site)?.name||(record.site==='unknown'?'Not recorded':record.site);siteCell.append(node('small',record.collection==='unknown'?'Collection not recorded':collectionNames[record.collection]||record.collection));row.append(siteCell);}
   const grade=node('td');grade.append(gradeBadge(record));row.append(grade,node('td',dateLabel(record.at),'when'));
-  const action=node('td'),open=node('button',activeStatuses.has(record.status)&&record.source==='harness'?'Watch →':record.source==='harness'?'Replay ↗':'Inspect ↗','replay-action');open.type='button';open.setAttribute('aria-label','Open '+record.title);open.onclick=()=>openRecord(record,all);action.append(open);row.append(action);return row;
+  const action=node('td'),open=node('button',activeStatuses.has(record.status)&&record.source==='harness'?'Watch →':record.source==='harness'?'Replay ↗':record.source==='demo'?'Conversation ↗':'Inspect ↗','replay-action');open.type='button';open.setAttribute('aria-label','Open '+record.title);open.onclick=()=>openRecord(record,all);action.append(open);row.append(action);return row;
 }
 function renderTasks(){
   $('task-list-heading').textContent='Tasks for '+siteFor(siteID).name;
@@ -137,8 +140,8 @@ function renderTasks(){
 }
 function renderGlobal(){
   const query=$('global-search').value.trim().toLowerCase(),collection=$('global-collection').value,site=$('global-site').value,kind=$('global-kind').value,grade=$('global-grade').value,all=records();
-  const matches=all.filter(r=>(site==='all'||r.site===site)&&(kind==='all'||(r.kind||'unknown')===kind)&&(grade==='all'||gradeOf(r)===grade)&&(collection==='all'||r.collection===collection)&&(!query||[r.title,r.goal,r.id,siteFor(r.site)?.name].join(' ').toLowerCase().includes(query)));
-  $('global-rows').replaceChildren(...matches.map(r=>recordRow(r,true)));$('global-count').textContent=matches.length+' of '+all.length+' recorded runs';$('global-empty').hidden=!!matches.length;
+  const matches=all.filter(r=>(site==='all'||r.site===site)&&(kind==='all'||(r.kind||'unknown')===kind)&&(grade==='all'||gradeOf(r)===grade)&&(collection==='all'||r.collection===collection)&&(!query||[r.title,r.goal,r.id,siteFor(r.site)?.name,...(r.turns||[]).flatMap(turn=>[turn.goal,turn.id])].join(' ').toLowerCase().includes(query)));
+  $('global-rows').replaceChildren(...matches.map(r=>recordRow(r,true)));$('global-count').textContent=matches.length+' of '+all.length+' conversations & runs';$('global-empty').hidden=!!matches.length;
 }
 function showTask(task){
   pendingTask=task;$('dialog-site').textContent=siteFor(taskSite(task))?.name+' / Task';$('dialog-task-name').textContent=task.title||task.id;$('dialog-goal').textContent=sessionGoal(task)?'Resolved when the session starts':task.goal||'No goal recorded';
@@ -162,14 +165,37 @@ function renderReview(){
   $('back-to-research').textContent=globalPage?'← All traces & replays':'← Tasks & replays';$('recording-status').textContent=activeStatuses.has(record.status)?'In progress · recorded evidence':'Recorded evidence · view only';
   $('review-kind').textContent=[record.kind==='task'?'Task attempt':record.kind==='ask'?'Ask the agent':record.kind==='manual'?'Manual exploration':'Activity not recorded',siteFor(record.site)?.name||record.site,record.runtime].join(' · ');
   $('review-title').textContent=record.kind==='ask'?record.goal||record.title:record.title;$('review-grade').replaceChildren(gradeBadge(record));
-  const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isJob||isManual;$('manual-review').hidden=!isManual;
+  const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isManual;$('browser-trace-download').hidden=isJob;$('trace-raw-details').hidden=isJob;$('manual-review').hidden=!isManual;
   if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded human actions',session.condition].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
-  if(isJob){const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
+  if(isJob){renderJobConversation(record);const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
+}
+function recordForKey(key){return records().find(record=>record.key===key||record.turns?.some(turn=>'d:'+turn.id===key))||null;}
+function renderJobConversation(record){
+  const log=$('trace-conversation'),job=record.raw,key=JSON.stringify([record.key,job.goal,job.steps]);if(log.dataset.job===key)return;log.dataset.job=key;log.replaceChildren();
+  $('browser-record-summary').textContent='Recorded goal and browser actions. Full model messages are not published for this run. Screenshots and exact step observations are below.';
+  log.append(transcriptBubble('user',record.kind==='task'?'Task objective':'Recorded goal',job.goal||'Goal not recorded yet.'));
+  for(const step of job.steps||[]){
+    const action=typeof step.action==='string'?step.action:JSON.stringify(step.action??'No action recorded');
+    log.append(transcriptBubble('assistant',job.mode==='live'?'Model · recorded decision '+step.step:job.mode==='rehearsal'?'Scripted decision '+step.step:'Recorded decision '+step.step,action));
+    const receipt=transcriptBubble('tool','Browser tool · Step '+step.step,step.error?'Failed: '+String(step.error):step.browser_stepped?'Browser action recorded.':'Browser execution is not confirmed.');
+    transcriptDetail(receipt,'Exact action',action);log.append(receipt);
+  }
 }
 async function loadBrowserTrace(record){
-  const version=++reviewVersion;$('browser-trace-json').textContent='Loading original evidence…';$('browser-record-summary').textContent='Loading recorded run…';$('browser-trace-download').href='/api/traces/'+encodeURIComponent(record.id);
-  try{const value=await api('/api/traces/'+encodeURIComponent(record.id));if(currentRun?.key!==record.key||version!==reviewVersion)return;$('browser-record-summary').textContent=(value.steps?.length||0)+' recorded model attempts · '+(value.status||'Status not recorded')+' · '+(value.goal||'No goal recorded');$('browser-trace-json').textContent=JSON.stringify(value,null,2);}catch(error){if(currentRun?.key===record.key&&version===reviewVersion)$('browser-trace-json').textContent=error.message;}
+  const version=++reviewVersion,log=$('trace-conversation');delete log.dataset.job;log.replaceChildren(node('p','Loading the recorded conversation…','muted'));
+  $('browser-trace-json').textContent='Loading original evidence…';$('browser-record-summary').textContent='Loading recorded turns…';$('browser-trace-download').href='/api/traces/'+encodeURIComponent(record.id);
+  const turns=record.turns||[record.raw];
+  try{
+    const values=[];
+    // Bounded parallel reads; never download every conversation to list history.
+    for(let offset=0;offset<turns.length;offset+=4){if(currentRun?.key!==record.key||version!==reviewVersion)return;values.push(...await Promise.all(turns.slice(offset,offset+4).map(turn=>api('/api/traces/'+encodeURIComponent(turn.id)))));}
+    if(currentRun?.key!==record.key||version!==reviewVersion)return;
+    $('browser-record-summary').textContent=values.length+' recorded turn'+(values.length===1?'':'s')+' · '+values.reduce((sum,value)=>sum+(value.steps?.length||0),0)+' recorded steps · read-only';
+    renderTraceConversation(log,values);$('browser-trace-json').textContent=JSON.stringify(values.length===1?values[0]:values,null,2);
+    $('browser-trace-download').textContent=values.length===1?'Download original JSON ↓':'Download first turn JSON ↓';
+  }catch(error){if(currentRun?.key===record.key&&version===reviewVersion){log.replaceChildren(node('p','The conversation could not be loaded: '+error.message,'muted'));$('browser-trace-json').textContent=error.message;}}
 }
+
 function render(){
   const site=siteFor(siteID);if(!site)return;
   if(globalPage||view!=='explore'||!site.interactive)fullScreen.setActive(false,{focus:false});
@@ -296,7 +322,7 @@ async function askAgent(question,continuationOf=null){
   let id,cost=0,unknown=0,pendingTool=null,actionError=null;const before=structuredClone(window.demoWorld.state),priorActivity=JSON.stringify({last_trace:lastTrace,interrupted:!!continuationOf,steps:activity});activity=[];
   const spend=()=> 'Reported model cost $'+cost.toFixed(4)+(unknown?' · '+unknown+' request(s) with unknown cost':'');
   try{
-    await turn.wait(currentPage());({id}=await turn.start({mode:'assist',goal:question,interaction_kind:'ask',site_id:'campus',...(continuationOf?{continuation_of:continuationOf}:{})}));lastTrace=id;turn.check();
+    await turn.wait(currentPage());({id,conversation_id:conversationID}=await turn.start({mode:'assist',goal:question,interaction_kind:'ask',site_id:'campus',...(conversationID?{conversation_id:conversationID}:{}),...(continuationOf?{continuation_of:continuationOf}:{})}));lastTrace=id;turn.check();
     for(let i=0;i<12;i++){
       setWorking(i?'Choosing the next action…':'Looking at the page…');if(i)await turn.wait(wait(750));const captured=snapshot(await turn.wait(currentPage()));turn.check();unknown++;
       const result=await turn.wait(api('/api/step',{id,observation:captured.observation,conversation,activity:priorActivity}));turn.check();
@@ -348,9 +374,9 @@ for(const id of ['all-replays-link','global-library-link'])$(id).onclick=openGlo
 for(const id of ['global-search','global-collection','global-site','global-kind','global-grade'])$(id).addEventListener(id==='global-search'?'input':'change',renderGlobal);
 $('clear-filters').onclick=()=>{for(const id of ['global-collection','global-site','global-kind','global-grade'])$(id).value='all';$('global-search').value='';renderGlobal();};
 $('toggle-agent').onclick=()=>setAgentVisible(!agentVisible);
-$('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];draft='';activity=[];lastTrace=null;setWorking('');$('chat-status').textContent='';renderConversation();};
+$('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];conversationID=null;draft='';activity=[];lastTrace=null;setWorking('');$('chat-status').textContent='';renderConversation();};
 $('back-to-research').onclick=()=>{view=globalPage?'global':'research';currentRun=null;reviewVersion++;render();syncURL();};
-async function readRoute(){const params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';if(siteFor(params.get('site')))siteID=params.get('site');const key=params.get('run');currentRun=records().find(r=>r.key===key)||null;view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();if(currentRun?.source==='demo')loadBrowserTrace(currentRun);}
+async function readRoute(){const params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';if(siteFor(params.get('site')))siteID=params.get('site');const key=params.get('run');currentRun=recordForKey(key);view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();if(currentRun?.source==='demo')loadBrowserTrace(currentRun);}
 document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden)refresh();});
 window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>clearTimeout(pollTimer));
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('run-viewer').contentWindow||event.data?.type!=='harness:size')return;const height=Number(event.data.height);if(Number.isFinite(height))$('run-viewer').style.height=Math.min(8000,Math.max(650,height))+'px';});

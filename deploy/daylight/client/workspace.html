@@ -32,9 +32,10 @@
       <section id="review-view" hidden aria-label="Recorded run">
         <div class="review-top"><button type="button" id="back-to-research" class="text-button">← Tasks &amp; replays</button><span class="subtle-badge" id="recording-status">Recorded evidence · view only</span></div>
         <div class="review-heading"><div><p class="eyebrow" id="review-kind"></p><h2 id="review-title"></h2></div><span id="review-grade"></span></div>
+        <section id="browser-trace-review" class="browser-trace-review conversation-review" hidden><h3>Recorded conversation</h3><p id="browser-record-summary" class="muted"></p><div id="trace-conversation" class="trace-conversation" aria-label="Recorded conversation"></div><a id="browser-trace-download">Download original JSON ↓</a><details id="trace-raw-details"><summary>Exact recorded evidence</summary><pre id="browser-trace-json"></pre></details></section>
         <section id="manual-review" class="browser-trace-review" hidden><h3>Manual session · recorded evidence</h3><p id="manual-review-summary"></p><p>You controlled this browser. No model ran, and no user-goal grade is attached.</p><p id="manual-review-goal"></p><a id="manual-trace-download" hidden>Download original manual trace ZIP ↗</a><details><summary>Reference evaluation · diagnostic only</summary><p>This recorded fixture check is separate from agent performance and safe fulfillment of a user goal. Missing results remain unknown.</p><pre id="manual-reference-evaluation"></pre></details></section>
         <iframe id="run-viewer" title="BrowserGym recorded run and evidence" hidden></iframe>
-        <section id="browser-trace-review" class="browser-trace-review" hidden><h3>Original browser-side trace</h3><p id="browser-record-summary" class="muted"></p><a id="browser-trace-download">Download original JSON ↓</a><p class="muted">This runtime records model requests, complete responses and client action receipts. It does not publish BrowserGym screenshots or an independent grade.</p><details><summary>Exact recorded evidence</summary><pre id="browser-trace-json"></pre></details></section>
+
       </section>
     </main>
   </div>

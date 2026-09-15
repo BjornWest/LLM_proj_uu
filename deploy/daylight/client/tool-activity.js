@@ -80,6 +80,62 @@ export function interruptionNotice(text='Interrupted by your new message.') {
   const notice=element('div','run-interruption',text);notice.setAttribute('role','status');return notice;
 }
 
+// Saved conversation presentation only. All content is text, never uploaded HTML.
+export function transcriptBubble(role,label,text){
+  const bubble=element('article','transcript-bubble '+role);
+  bubble.append(element('strong','transcript-label',label),element('div','transcript-text',text));return bubble;
+}
+export function transcriptDetail(parent,label,text){
+  const detail=element('details','transcript-detail');detail.append(element('summary','',label),element('pre','',text));parent.append(detail);return detail;
+}
+export function renderTraceConversation(container,traces){
+  container.replaceChildren();
+  for(const trace of traces){
+    const separator=element('div','transcript-turn');separator.dataset.trace=trace.id;
+    separator.append(element('span','',new Date(trace.created_at).toLocaleString()+' · '+(trace.status||'Status unknown')));
+    const link=element('a','','Original turn record ↗');link.href='/api/traces/'+encodeURIComponent(trace.id);separator.append(link);container.append(separator);
+    container.append(transcriptBubble('user',trace.mode==='task'?'Task objective':'You',trace.goal||'No request recorded.'));
+    for(const [index,step] of (trace.steps||[]).entries()){
+      const action=step.action,receipt=step.client_result;
+      const control=step.observation?.controls?.find(row=>row.id===action?.id);
+      const description=action?[action.action,control?.label||action.id,action.value!==undefined&&action.value!==null?String(action.value):''].filter(Boolean).join(' · '):'';
+      const rawOutput=step.output||step.response?.choices?.[0]?.message?.content;
+      const output=action?.action==='done'?action.message:action?description:rawOutput;
+      if(output){
+        const label=step.error?'Daylight · output rejected':trace.interruption&&!receipt?'Daylight · interrupted output':action?.action==='done'&&!receipt?'Daylight · answer receipt missing':action?.action==='done'||trace.mode==='chat'?'Daylight':'Daylight · decision '+(index+1);
+        const bubble=transcriptBubble('assistant',label,typeof output==='string'?output:JSON.stringify(output,null,2));
+        if(action&&rawOutput)transcriptDetail(bubble,'Exact model output',typeof rawOutput==='string'?rawOutput:JSON.stringify(rawOutput,null,2));
+        if(step.error)bubble.append(element('p','transcript-note',step.error));container.append(bubble);
+      }
+      if(action&&action.action!=='done'){
+        const status=receipt?receipt.error?'Failed':'Applied · receipt saved':'No execution receipt';
+        const bubble=transcriptBubble('tool','Browser tool · Step '+(index+1)+' · '+status,description);
+        if(receipt?.description&&receipt.description!==description)bubble.append(element('p','transcript-note',receipt.description));if(receipt?.error)bubble.append(element('p','transcript-note',receipt.error));
+        if(step.observation)transcriptDetail(bubble,'Page before this decision',step.observation.text||'No text observation recorded.');
+        if(receipt?.page_after)transcriptDetail(bubble,'Page after this action · transition feedback',receipt.page_after.text||'No text observation recorded.');
+        transcriptDetail(bubble,'Exact action and receipt',JSON.stringify({action,receipt:receipt??null},null,2));container.append(bubble);
+      }
+      if(step.error&&!output)container.append(element('p','transcript-turn','Step '+(index+1)+' stopped: '+step.error));
+    }
+    if(trace.interruption)container.append(element('p','transcript-turn','This turn was interrupted. Recorded model output is not evidence that an action was applied.'));
+    else if(!(trace.steps||[]).some(step=>step.output||step.action||step.response))container.append(element('p','transcript-turn','No model response was recorded for this turn.'));
+  }
+}
+
+export function groupTraceSessions(rows){
+  const byID=new Map(rows.map(row=>[row.id,row])),parent=new Map(rows.map(row=>[row.id,row.id]));
+  const root=id=>{while(parent.get(id)!==id)id=parent.get(id);return id;};
+  const join=(a,b)=>{a=root(a);b=root(b);if(a!==b)parent.set(b,a);};
+  const sessions=new Map();
+  for(const row of rows){
+    if(row.conversation_id){const earlier=sessions.get(row.conversation_id);if(earlier)join(earlier,row.id);else sessions.set(row.conversation_id,row.id);}
+    const previous=row.previous_trace_id;
+    if(previous&&byID.has(previous))join(previous,row.id);
+  }
+  const groups=new Map();for(const row of rows){const key=root(row.id);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);}
+  return [...groups.values()].map(group=>group.sort((a,b)=>(Date.parse(a.created_at)||0)-(Date.parse(b.created_at)||0)||a.id.localeCompare(b.id)));
+}
+
 // Full viewport layout, preserving the live iframe and chat state.
 export function createFullScreenMode(enterButton, exitButton, onChange = () => {}) {
   let active = false;

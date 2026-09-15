@@ -55,7 +55,7 @@ def main():
             check('Chaos task review preserves pending objective without starting',True)
             page.locator('.site-choice[data-site=tricky-shop]').click();page.locator('#remote-tasks').click();expect(page.locator('#task-cards .condition')).to_have_count(2)
             check('Clean and injected task conditions visible',{'clean','injected'}==set(page.locator('#task-cards .condition').all_text_contents()))
-            page.locator('#all-replays-link').click();expect(page.locator('#global-view')).to_be_visible();page.locator('#global-count').filter(has_text='recorded runs').wait_for()
+            page.locator('#all-replays-link').click();expect(page.locator('#global-view')).to_be_visible();page.locator('#global-count').filter(has_text='conversations & runs').wait_for()
             page.screenshot(path=str(args.output/'library.png'),full_page=True)
             completed=next((j for j in before if j.get('steps') and j['status'] in ['finished','error','interrupted']),None)
             if completed:

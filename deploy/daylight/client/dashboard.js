@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id),titles={shop:'Campus Supply',booking:'Ca
 const fixture=await (await fetch('/assets/fixture.json')).json();
 const config=await api('/api/config');
 let area='booking',running=false,worldID,conversation=[],activity=[],lastTrace=null,pendingDocument=null;
-let activeTurn=null,interrupting=false;
+let activeTurn=null,interrupting=false,conversationID=null;
 window.demoWorld=new World(fixture);
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function api(url,data) {
@@ -59,7 +59,7 @@ async function currentPage() {
 }
 function reset() {
   if(running)return;
-  window.demoWorld=new World(fixture);worldID=crypto.randomUUID();conversation=[];activity=[];lastTrace=null;
+  window.demoWorld=new World(fixture);worldID=crypto.randomUUID();conversation=[];conversationID=null;activity=[];lastTrace=null;
   $('conversation').replaceChildren();message('assistant','Ask me to explore this page, find an option, or carry out a request.');
   $('notice').textContent='';$('chat-notice').textContent='';$('outcome').hidden=true;$('trace').removeAttribute('href');$('cost').textContent='';$('status').textContent='Ready';
   showActivity();choose(area);
@@ -81,7 +81,7 @@ async function runTurn(mode,goal,continuationOf=null) {
   try {
     // Do not start an episode against an empty or still-navigating iframe.
     await turn.wait(currentPage());
-    ({id}=await turn.start({mode,goal,...(continuationOf?{continuation_of:continuationOf}:{})}));lastTrace=id;$('trace').href='/api/traces/'+encodeURIComponent(id);turn.check();
+    ({id,conversation_id:conversationID}=await turn.start({mode,goal,...(conversationID?{conversation_id:conversationID}:{}),...(continuationOf?{continuation_of:continuationOf}:{})}));lastTrace=id;$('trace').href='/api/traces/'+encodeURIComponent(id);turn.check();
     for(let i=0;i<12;i++) {
       if(mode==='assist')showChatWorking($('conversation'),i?'Choosing the next action…':'Looking at the page…');
       if(i)await turn.wait(wait(750)); // Pacing precedes the decision observation.
