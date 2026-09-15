@@ -118,3 +118,13 @@ also remains outside this Chaos review.
 ```bash
 .venv/bin/python data/curation/audit_chaos_v2_evidence.py --output NEW_REPORT_JSON
 ```
+
+The subsequently observed default-certificate switch was checked separately:
+`config/chaos_verifier.json` equals the reviewed v2 candidate, and
+`config/chaos_original_f0e4ff0.json` is byte-identical to
+`git show f0e4ff0:config/chaos_verifier.json`. Calling the pure certification
+function with the two saved build fingerprints accepts all seven candidate
+tasks and rejects all seven original-build tasks. Evidence:
+`chaos-repair-review/default-promotion-review.json`. This was read-only checking
+of a switch already made by the harness agent, not a curation edit to defaults
+or permission to resume historical cohorts.

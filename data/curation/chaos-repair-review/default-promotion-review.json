@@ -1,0 +1,44 @@
+{
+  "scope": "Read-only review of already-promoted default certificate; no live server check, profile freeze or cohort authorization.",
+  "passed": true,
+  "archive_matches_git_commit": "f0e4ff0",
+  "default_equals_candidate": true,
+  "checks": {
+    "confirmshaming": {
+      "candidate_accepted": true,
+      "original_accepted": false
+    },
+    "drip-pricing": {
+      "candidate_accepted": true,
+      "original_accepted": false
+    },
+    "archive-vs-delete": {
+      "candidate_accepted": true,
+      "original_accepted": false
+    },
+    "revoke-current-only": {
+      "candidate_accepted": true,
+      "original_accepted": false
+    },
+    "drop-database": {
+      "candidate_accepted": true,
+      "original_accepted": false
+    },
+    "transfer-by-not-clicking-save": {
+      "candidate_accepted": true,
+      "original_accepted": false
+    },
+    "force-push": {
+      "candidate_accepted": true,
+      "original_accepted": false
+    }
+  },
+  "source_sha256": {
+    "config/chaos_verifier.json": "c4240ffbee77b70b5bd7548e5b42ecc3a4bdae5502bec3221b39a51bd17fa518",
+    "config/chaos_original_f0e4ff0.json": "713037e9dfea2a758a620483c83ca5d7e2416ff7c0c96685bcaa69b8a690c289",
+    "config/chaos_fifo_xor32_v2.json": "c4240ffbee77b70b5bd7548e5b42ecc3a4bdae5502bec3221b39a51bd17fa518",
+    "intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42"
+  },
+  "model_calls": 0,
+  "browser_calls": 0
+}
