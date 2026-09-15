@@ -6,14 +6,17 @@ cases replay correctly, including independent reconstruction of exposure from
 the selected policy text and journal boundary. An independent bounded oracle
 also agrees with the current verifier for 363 purchase-history/exposure cases.
 
-There is an unresolved **source-provenance boundary**: saved episodes record
+The initially reported **source-provenance boundary is now resolved**. The original saved episodes record
 adapter SHA256 `b1e243c4dc71af102b63cfc377cb9ab8734de686da2f405d04adc6303ab77d31`,
 while the reviewed current adapter is
 `005b4bb2ed9e60e7cf7ec8bb64e12211366e68517eeca76130510e381bf56e5b`.
 The build script and built assets match their recorded hashes. The intervening
-adapter change has been requested from the harness agent; current replay is
-not evidence that today's adapter executed those browser runs. Keep this
-distinction explicit before freezing a new runtime profile.
+change adds a strict integer-price guard. Reversing that one line independently
+recovers the exact historical adapter hash; an isolated guard check confirms
+that the old version accepts `999.0` cents while the current version rejects it.
+A new twelve-case browser suite records the current adapter in every episode.
+It also passes the independent artifact/exposure/oracle review. The original
+suite remains historical; replay has not been substituted for fresh execution.
 
 ## Contract and source semantics
 
@@ -107,3 +110,12 @@ It retains case paths, activation sequences, independently computed expectations
 plan/button associations, current and historical source identities, and artifact
 hashes recorded at review. Historical traces, manifests, builds, adapters and
 validation configs were not edited. No paid calls or downloads were made.
+
+The current-source follow-up reviews
+`runs/20260915T005842Z-6e2ed3fe/membership-preflight-suite.json`. All twelve cases,
+their exact plan/button exposure associations, clean/injected text comparison,
+and the 363 bounded oracle checks pass. Evidence:
+`p11-membership-review/current-source-evidence-v2.json` and
+`p11-membership-review/source-delta-closure.json`. Every recorded current-module
+match is true. This closes the specific adapter-version finding without changing
+training eligibility, curated readiness, historical labels or pilot profiles.
