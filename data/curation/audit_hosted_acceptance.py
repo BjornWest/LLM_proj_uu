@@ -23,7 +23,7 @@ def read(path):
     return json.loads(path.read_text())
 
 
-def audit(folder):
+def audit(folder, episode_root=None):
     report = read(folder / 'report.json')
     registry_path = ROOT / 'config/team_tasks.json'
     registry = read(registry_path)
@@ -37,7 +37,8 @@ def audit(folder):
     }
     rows = []
     for row in report['cases']:
-        directory = Path(row['episode'])
+        recorded_directory = Path(row['episode'])
+        directory = episode_root / recorded_directory.name if episode_root else recorded_directory
         job = jobs[row['job']]
         task = tasks[row['task']]
         initial = read(directory / 'initial-state.json')
@@ -95,6 +96,7 @@ def audit(folder):
                      'original_file_sha256': {name: sha(p.read_bytes()) for name, p in original_files.items()}})
     return {'schema_version': 1, 'scope': 'Saved local transport evidence only; no browser/model calls, no grader recomputation, no deployment certification.',
             'input_report': str(folder / 'report.json'), 'input_report_sha256': sha((folder / 'report.json').read_bytes()),
+            'episode_root_remap': str(episode_root) if episode_root else None,
             'control_sha256': sha(control_path.read_bytes()), 'audit_source_sha256': sha(Path(__file__).read_bytes()),
             'reported_sources_match_current': {name: sha((ROOT / name).read_bytes()) == expected for name, expected in report['source_sha256'].items()},
             'checks': checks, 'cases': rows, 'passed': all(checks.values()) and all(r['passed'] for r in rows),
@@ -107,10 +109,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--suite', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--episode-root', type=Path, help='Explicit root for copied container episodes; match by recorded episode ID')
     args = parser.parse_args()
     if args.output.exists() or args.output.is_symlink():
         parser.error('Output already exists')
-    result = audit(args.suite.resolve())
+    result = audit(args.suite.resolve(), args.episode_root.resolve() if args.episode_root else None)
     with args.output.open('x') as stream:
         json.dump(result, stream, indent=2)
         stream.write('\n')

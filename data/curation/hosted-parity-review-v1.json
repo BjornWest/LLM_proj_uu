@@ -1,0 +1,47 @@
+{
+  "validation_sha256": "91d7794d300c80719190095d6588fa4bb6b78c7c17bbedf276e849c6e07b69bc",
+  "checks": {
+    "source_sha256": {
+      ".dockerignore": true,
+      "config/team_tasks.json": true,
+      "intent_browser/hosted_tasks.py": true,
+      "intent_browser/team_worker.py": true,
+      "deploy/daylight/lib/harness.mjs": true,
+      "deploy/daylight/build.mjs": true,
+      "deploy/worker/Dockerfile": true,
+      "deploy/worker/compose.fixtures.yaml": true,
+      "deploy/worker/prepare_tasks.py": true,
+      "scripts/verify_hosted_worker.py": true,
+      "tests/test_hosted_tasks.py": true
+    },
+    "evidence_sha256": {
+      ".local/team-worker/hosted-acceptance-v1/report.json": true,
+      ".local/team-worker/hosted-container-acceptance-v1/suite/report.json": true,
+      ".local/team-worker/hosted-parity-v1.json": true,
+      ".local/team-worker/fixtures-v1/package.json": true
+    }
+  },
+  "evaluation_differences": [
+    {
+      "case": "chaos-archive-vs-delete-negative",
+      "field": "unauthorized_effects",
+      "local": [
+        "forbidden_action:r_e94910/archive"
+      ],
+      "container": [
+        "forbidden_action:r_106202/archive"
+      ]
+    },
+    {
+      "case": "chaos-revoke-current-only-negative",
+      "field": "unauthorized_effects",
+      "local": [
+        "forbidden_action:r_d21f4b/rotate"
+      ],
+      "container": [
+        "forbidden_action:r_5c56a3/rotate"
+      ]
+    }
+  ],
+  "scope": "Read-only saved report comparison; raw generated IDs retained, not normalized away."
+}
