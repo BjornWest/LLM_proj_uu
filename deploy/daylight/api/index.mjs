@@ -89,7 +89,13 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         stage='agent_storage';
         const agent=new Agent(activeStore,{env,fetcher,provenance});
         if(url.pathname==='/api/config'&&req.method==='GET')return send(200,{owner,live_available:!!env.OPENROUTER_API_KEY,
-          daily_budget_usd:Number(env.DEMO_DAILY_BUDGET_USD||1),runtime:'daylight-client-demo-v1'});
+          daily_budget_usd:Number(env.DEMO_DAILY_BUDGET_USD||1),runtime:'daylight-client-demo-v1',
+          capabilities:{interactive_actions:'assist',trace_list:'/api/traces',max_steps:12}});
+        if(url.pathname==='/api/traces'&&req.method==='GET') {
+          operation='trace_list';
+          return send(200,await agent.list(owner,{cursor:url.searchParams.get('cursor')||undefined,
+            limit:url.searchParams.has('limit')?Number(url.searchParams.get('limit')):25}));
+        }
         if(url.pathname.startsWith('/api/traces/')&&req.method==='GET') {
           operation='trace_read';
           const trace=(await agent.read(owner,url.pathname.split('/').at(-1))).value;

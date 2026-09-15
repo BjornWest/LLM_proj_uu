@@ -1,6 +1,6 @@
 import * as blob from '@vercel/blob';
 import {createHash} from 'node:crypto';
-import {mkdir,readFile,writeFile,rename} from 'node:fs/promises';
+import {mkdir,readFile,writeFile,rename,readdir} from 'node:fs/promises';
 import path from 'node:path';
 
 const storageMessages={
@@ -43,6 +43,13 @@ export class BlobStore {
     if(this.env.BLOB_STORE_ID?.trim())return {storeId:this.env.BLOB_STORE_ID};
     throw new StorageError('BLOB_TOKEN_MISSING',operation);
   }
+  async listKeys(prefix,{cursor,limit=25}={}) {
+    const auth=this.auth('list');
+    try {
+      const result=await this.sdk.list({prefix,limit,...(cursor?{cursor}:{}),...auth});
+      return {keys:result.blobs.map(row=>row.pathname),cursor:result.hasMore?result.cursor:null,has_more:result.hasMore};
+    } catch(error) {throw classify(error,'list');}
+  }
   async read(key) {
     const auth=this.auth('read');
     try {
@@ -69,6 +76,15 @@ export class FileStore {
   async read(key) {
     try {const raw=await readFile(path.join(this.root,key),'utf8');return {value:JSON.parse(raw),etag:createHash('sha256').update(raw).digest('hex')};}
     catch(e) {if(e.code==='ENOENT')return null;throw e;}
+  }
+  async listKeys(prefix,{cursor,limit=25}={}) {
+    // Development adapter: only direct children of the requested key directory.
+    let entries;
+    try {entries=await readdir(path.join(this.root,prefix),{withFileTypes:true});}
+    catch(error) {if(error.code==='ENOENT')return {keys:[],cursor:null,has_more:false};throw error;}
+    const keys=entries.filter(e=>e.isFile()).map(e=>prefix+e.name).sort().filter(key=>!cursor||key>cursor);
+    const page=keys.slice(0,limit),more=keys.length>limit;
+    return {keys:page,cursor:more?page.at(-1):null,has_more:more};
   }
   async write(key,value,etag=null) {
     const operation=this.tail.then(async()=>{
