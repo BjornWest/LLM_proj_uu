@@ -1,0 +1,116 @@
+{
+  "schema": "workarena-reference-saved-audit-v1",
+  "report": ".local/workarena-exercise/reference-comparison-v3/report.json",
+  "report_sha256": "5fe32c1ab1a574784aefb95497f24677b5c79e05bc9f6ac49e7e9665f647ba69",
+  "artifact_hashes_checked": 77,
+  "source_hashes_checked": 4,
+  "trials": [
+    {
+      "round": 1,
+      "method": "plain_fill",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": false,
+      "hidden_reference_empty_before_run": true,
+      "menu_expanded_before_run": "false",
+      "query": "assigned_to=",
+      "correct_target_filter": false,
+      "expected_date_in_result_ax": false,
+      "browser_action_count": 2
+    },
+    {
+      "round": 1,
+      "method": "autocomplete_only",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": false,
+      "hidden_reference_empty_before_run": true,
+      "menu_expanded_before_run": "true",
+      "query": "assigned_to=c2c597d6939347d04b8af09a0903d6b9",
+      "correct_target_filter": true,
+      "expected_date_in_result_ax": true,
+      "browser_action_count": 2
+    },
+    {
+      "round": 1,
+      "method": "autocomplete_select",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": true,
+      "hidden_reference_empty_before_run": false,
+      "menu_expanded_before_run": "false",
+      "query": "assigned_to=c2c597d6939347d04b8af09a0903d6b9",
+      "correct_target_filter": true,
+      "expected_date_in_result_ax": true,
+      "browser_action_count": 3
+    },
+    {
+      "round": 1,
+      "method": "upstream_select",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": true,
+      "hidden_reference_empty_before_run": false,
+      "menu_expanded_before_run": "false",
+      "query": "assigned_to=c2c597d6939347d04b8af09a0903d6b9",
+      "correct_target_filter": true,
+      "expected_date_in_result_ax": true,
+      "browser_action_count": 1
+    },
+    {
+      "round": 2,
+      "method": "upstream_select",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": true,
+      "hidden_reference_empty_before_run": false,
+      "menu_expanded_before_run": "false",
+      "query": "assigned_to=c2c597d6939347d04b8af09a0903d6b9",
+      "correct_target_filter": true,
+      "expected_date_in_result_ax": true,
+      "browser_action_count": 1
+    },
+    {
+      "round": 2,
+      "method": "autocomplete_select",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": true,
+      "hidden_reference_empty_before_run": false,
+      "menu_expanded_before_run": "false",
+      "query": "assigned_to=c2c597d6939347d04b8af09a0903d6b9",
+      "correct_target_filter": true,
+      "expected_date_in_result_ax": true,
+      "browser_action_count": 3
+    },
+    {
+      "round": 2,
+      "method": "autocomplete_only",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": false,
+      "hidden_reference_empty_before_run": true,
+      "menu_expanded_before_run": "true",
+      "query": "assigned_to=c2c597d6939347d04b8af09a0903d6b9",
+      "correct_target_filter": true,
+      "expected_date_in_result_ax": true,
+      "browser_action_count": 2
+    },
+    {
+      "round": 2,
+      "method": "plain_fill",
+      "display_text_is_target": true,
+      "hidden_reference_is_target_before_run": false,
+      "hidden_reference_empty_before_run": true,
+      "menu_expanded_before_run": "false",
+      "query": "assigned_to=",
+      "correct_target_filter": false,
+      "expected_date_in_result_ax": false,
+      "browser_action_count": 2
+    }
+  ],
+  "scoped_records_unchanged": true,
+  "cleanup_verified": true,
+  "model_calls": 0,
+  "model_task_success": null,
+  "training_eligible": false,
+  "limitations": [
+    "Same synthetic target and session; fresh list document per trial, not independent sessions.",
+    "Diagnostic reads include hidden reference state; not evidence delivered to a model.",
+    "No broad authorization or model task-success claim."
+  ],
+  "audit_source_sha256": "328f28e39b13c1265768d9933136ef5096edb6ddcdc4964cca0d975fd8caa5e1"
+}

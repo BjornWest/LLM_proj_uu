@@ -24,9 +24,30 @@ Five distinctly labeled model development cases are retained:
 
 The shared runner now has explicit terminal-answer wording and observation-limit options; their defaults remain unchanged. The omitted popup was around character 38,500 in the saved full accessibility tree. Increasing the request byte bound alone could not fix a separately truncated observation.
 
-The final run's field displayed the requested person before submission, but that text did not become a selected reference record. BrowserGym's default `fill` sends an input event; its `enable_autocomplete_menu=True` mode types the last character to trigger autocomplete. WorkArena's own scripted helper then waits for resolution and selects an exact option. This supports a missing-selection hypothesis; a matched browser comparison is still needed to isolate the cause. The subsequent empty filter and repeated clicks are directly recorded facts.
+The final run's field displayed the requested person before submission, but that text did not become a selected reference record. BrowserGym's default `fill` sends an input event; its `enable_autocomplete_menu=True` mode types the last character to trigger autocomplete. WorkArena's own scripted helper then waits for resolution and selects an exact option. That was initially a reference-resolution hypothesis. The follow-up scripted comparison below now reproduces it. The subsequent empty filter and repeated clicks remain directly recorded facts.
 
 No output was silently repaired and no HTTP retry was added. Provider routing and generated task data differed between cases, so this is a development sequence, **not a controlled pass-rate comparison**. The final run had 20 browser actions and two action errors. [Inspect its recorded trace](http://localhost:8878/#c3f21bdb303df12b2160).
+
+### Follow-up: reference-field issue reproduced without model calls
+
+Eight matched scripted trials compared the same target person, reopening the
+native list for each trial and reversing method order for the second round.
+Ordinary fill produced an empty-person filter twice. Autocomplete fill produced
+the correct filter twice, as did autocomplete plus an explicit option click and
+WorkArena's own helper. All paths displayed the correct name before submission;
+the visible text alone did not establish a selected record.
+
+**Our existing browser controls can handle this field.** Using
+`fill(..., enable_autocomplete_menu=True)` triggered the required native behavior.
+For this exact-name case, clicking Run then resolved the reference without an
+explicit option click. Both successful procedures should pass the same outcome
+check; the chosen procedure can be recorded separately.
+
+The original model saw a plain textbox before fill and an autocomplete combobox
+afterward. Its tools already described the autocomplete option. This points to a
+tool-use/rechecking problem, while two earlier observation/format issues remain
+separate. The scripted result does not turn any historical model failure into a
+success. [Technical protocol and evidence](agents/workarena-reference-comparison.md).
 
 ## 2. Order a laptop without unwanted software
 
@@ -62,7 +83,7 @@ Keep the measurements separate: native task reward, stricter outcome checks, par
 
 The five warranty cases used **47 model requests, $0.107092846 reported cost**. They added $0.825645 in conservative reservations to the existing ledger, bringing cumulative reservations to **$2.54126575 of $3**. No Parallel calls or catalog model calls were made. All 208 pre-existing ledger entries are unchanged.
 
-The next useful work is a scripted plain-fill versus autocomplete-selection comparison, followed by a separately authorized/profiled model experiment if appropriate. Broad authorization auditing, abrupt-kill/partial-setup cleanup, and explicit bounds around upstream instance API calls remain unfinished. The native Table API helper has no request timeout; successful session cleanup is not proof of recovery from every interruption.
+The scripted plain-fill versus autocomplete comparison is complete. The next model experiment could test clearer reference-field guidance and result rechecking under a new profile and budget review; no additional model calls were made for the comparison. Broad authorization auditing, abrupt-kill/partial-setup cleanup, and explicit bounds around upstream instance API calls remain unfinished. The native Table API helper has no request timeout; successful session cleanup is not proof of recovery from every interruption.
 
 The catalog factory is reusable through the same BrowserGym runner. Its upstream reward and the independent scripted receipt check are available; a normal model-run adapter that continuously journals orders and establishes acknowledged exposure is still separate work. Neither example is certified for curated safe-success scoring or training.
 

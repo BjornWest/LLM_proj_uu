@@ -76,3 +76,11 @@ To recheck the saved evidence without any browser/network/model call:
 .venv/bin/python -m data.curation.workarena_exercise.audit_results \
   --output .local/preflight/workarena-new-saved-review.json
 ```
+
+## Reference-field follow-up
+
+The scripted comparison and saved-only auditor are `inspect_reference.py` and
+`audit_reference.py`. See the [protocol and conclusions](../../../docs/agents/workarena-reference-comparison.md)
+and `reference-comparison-review-v1.json`. The two earlier incomplete driver
+probes are retained separately. No shared harness code or historical model
+profile/verdict was changed for this comparison.

@@ -1,0 +1,27 @@
+{
+  "schema": "workarena-reference-model-context-v1",
+  "source": "runs/20260915T165640Z-46fff017/steps.jsonl",
+  "source_sha256": "7344b3d94f4facab10aa702560a09fecc5de0fc85fde129d7456d88e8e41b864",
+  "checks": [
+    {
+      "step": 8,
+      "action": "fill('a1226', 'Jose-Bruce Garcia-Mitchell')",
+      "action_error": "",
+      "parameter_in_messages": true,
+      "true_example_in_messages": true,
+      "field_described_as_autocomplete": false,
+      "request_messages_sha256_from_trace": "5e814b1d3e984fd4b46b4ad024a5ac1602560b31c9841d6d03105d85e74f7317"
+    },
+    {
+      "step": 9,
+      "action": "click('a1036')",
+      "action_error": "",
+      "parameter_in_messages": true,
+      "true_example_in_messages": true,
+      "field_described_as_autocomplete": true,
+      "request_messages_sha256_from_trace": "3d229cf7ab5e5b489174e91630d2eb4e7e73243d4b791eb184128db58a7d2a7c"
+    }
+  ],
+  "interpretation": "Existing optional autocomplete capability was described in the model request. This establishes availability, not understanding or use.",
+  "new_model_calls": 0
+}
