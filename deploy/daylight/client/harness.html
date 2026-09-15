@@ -2,34 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daylight · Browser harness</title>
+  <meta name="color-scheme" content="light">
+  <title>Daylight · Research workspace</title>
   <link rel="stylesheet" href="/assets/harness.css">
   <script type="module" src="/assets/harness.js"></script>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="/harness">Daylight <span>Browser harness</span></a><nav aria-label="Account"><a href="/">Page demo</a><a href="/logout">Sign out</a></nav></header>
-  <main class="workspace">
-    <section class="browser-panel" aria-label="Remote browser and recorded steps">
-      <div class="browser-toolbar"><span class="browser-dot" aria-hidden="true"></span><strong id="browser-title">Remote browser</strong><span id="run-state" class="pill">No run selected</span></div>
-      <div id="browser-empty" class="empty"><h1>Watch the real browser agent</h1><p>Choose a task in the sidebar. The worker runs BrowserGym and shares a screenshot after each step.</p><p>This view does not accept browser clicks.</p></div>
-      <div id="screenshot-wrap" hidden><img id="screenshot" alt="Latest recorded remote browser screenshot"><p id="screenshot-caption" class="muted"></p></div>
-      <section id="run-detail" class="run-detail" hidden>
-        <div class="section-heading"><h2>Recorded activity</h2><a id="trace-download" hidden>Download original trace</a></div>
-        <p id="run-summary" class="muted"></p><p id="run-cost" class="muted"></p><p id="cost-alerts" class="notice" hidden></p><p id="run-error" class="error" hidden></p>
-        <div id="evaluation" class="evaluation" aria-label="Independent verification"></div>
-        <p id="evaluation-note" class="muted"></p>
-        <div class="activity-grid"><ol id="steps" aria-label="Select a recorded step"></ol><div class="observation"><h3 id="observation-title">Step details</h3><pre id="observation-text">Select a step to inspect its recorded observation.</pre></div></div>
-        <details><summary>Runtime and provenance</summary><pre id="runtime">Not recorded yet.</pre></details>
+  <header class="topbar"><a class="brand" href="/harness"><span class="brand-mark" aria-hidden="true">D</span>Daylight <span class="brand-caption">Research workspace</span></a><nav aria-label="Account"><a href="/">Page demo ↗</a><a href="/logout">Sign out</a></nav></header>
+  <main>
+    <div class="workspace-heading"><div><p class="eyebrow">Browser agent lab</p><h1>A closer look at the agent.</h1><p class="intro">Try a request, watch a task, or explore what happened.</p></div><p id="worker-status" class="worker-status" role="status">Checking worker…</p></div>
+    <nav class="activities" aria-label="Choose an activity">
+      <button type="button" data-activity="ask" aria-pressed="false"><span class="activity-number">01</span><span><strong>Ask the agent</strong><small>Try your own request</small></span></button>
+      <button type="button" data-activity="watch" aria-pressed="true"><span class="activity-number">02</span><span><strong>Watch a task</strong><small>Follow a fixed goal</small></span></button>
+      <button type="button" data-activity="replay" aria-pressed="false"><span class="activity-number">03</span><span><strong>Replay a trace</strong><small>Explore a recorded run</small></span></button>
+    </nav>
+    <p id="notice" class="notice" role="alert" hidden></p>
+    <div class="workspace">
+      <aside class="sidebar" aria-label="Task selection and trace library">
+        <form id="task-form">
+          <p class="eyebrow" id="activity-kicker">Watch a task</p><h2 id="task-heading">Choose the setting</h2>
+          <label for="task">Website &amp; task</label><select id="task" disabled><option>Loading tasks…</option></select>
+          <dl id="task-facts" class="facts"></dl>
+          <div id="fixed-goal-wrap"><h3>The agent’s goal</h3><p id="fixed-goal" class="goal-card">Loading the reviewed goal…</p></div>
+          <div id="custom-goal-wrap" hidden><label for="goal">What would you like it to do?</label><textarea id="goal" rows="5" maxlength="2000" disabled placeholder="Describe your request and any constraints…"></textarea></div>
+          <p id="goal-note" class="muted"></p><button id="submit-run" type="submit" disabled>Watch task <span aria-hidden="true">→</span></button>
+          <p id="queue-note" class="muted">One run at a time. You can leave this page while the worker runs.</p>
+        </form>
+        <section class="history" aria-labelledby="library-heading"><div class="section-heading"><h2 id="library-heading">Trace library</h2><span id="run-count" class="count">0</span></div><p id="library-note" class="muted">BrowserGym runs visible to your invitation.</p><label for="run-search" class="sr-only">Search traces</label><input id="run-search" type="search" placeholder="Search task, goal or run ID"><label for="run-filter" class="sr-only">Filter traces by state</label><select id="run-filter"><option value="all">All runs</option><option value="active">In progress</option><option value="finished">Finished</option><option value="errors">Errors &amp; interruptions</option></select><ul id="job-list" class="job-list" aria-label="Available traces"></ul><p id="library-empty" class="muted">No runs yet. Start with a fixed task.</p></section>
+      </aside>
+      <section class="browser-panel" aria-label="Remote browser and recorded activity">
+        <div class="browser-toolbar"><span class="browser-dot" aria-hidden="true"></span><strong id="browser-title">Browser view</strong><span id="run-state" class="pill">No run selected</span></div>
+        <div id="browser-empty" class="empty"><div class="empty-symbol" aria-hidden="true">↗</div><h2>A front-row seat to each step</h2><p>Choose a task and watch the agent work through it. Screenshots and recorded activity appear here.</p><p class="muted">The browser view is read-only.</p></div>
+        <div id="screenshot-wrap" hidden><div class="image-stage"><img id="screenshot" alt="Recorded browser screenshot"></div><p id="screenshot-caption" class="muted"></p></div>
+        <div id="viewer-controls" class="viewer-controls" hidden><div class="playback-buttons"><button id="previous-step" class="icon-button" type="button" aria-label="Previous recorded step">←</button><button id="play-replay" class="secondary" type="button">Play replay</button><button id="next-step" class="icon-button" type="button" aria-label="Next recorded step">→</button></div><label for="step-scrubber" class="sr-only">Recorded step</label><input id="step-scrubber" type="range" min="0" max="0" value="0"><span id="step-position" class="muted">No steps</span><button id="follow-live" class="secondary" type="button" aria-pressed="true">Following latest</button></div>
+        <section id="run-detail" class="run-detail" hidden>
+          <div class="section-heading"><div><p class="eyebrow" id="runtime-label">BrowserGym</p><h2>Run overview</h2></div><a id="trace-download" hidden>Download original trace ↓</a></div>
+          <p id="run-summary" class="run-summary"></p><p id="run-cost" class="muted"></p><p id="cost-alerts" class="notice" hidden></p><p id="run-error" class="error" hidden></p>
+          <h3>Independent verification</h3><div id="evaluation" class="evaluation" aria-label="Independent verification"></div><p id="evaluation-note" class="muted"></p>
+          <div class="activity-grid"><section aria-labelledby="activity-heading"><div class="section-heading"><h2 id="activity-heading">Activity</h2><span id="history-state" class="muted">Following latest</span></div><ol id="steps" aria-label="Recorded activity"></ol></section><div class="observation"><h3 id="observation-title">Step details</h3><p id="step-description" class="muted">Select a step to inspect its evidence.</p><details id="raw-step"><summary>Raw action &amp; observation</summary><pre id="observation-text">Select a recorded step.</pre></details><section id="issue-panel" hidden><h3>Leave feedback</h3><p class="muted">Review notes stay separate from the agent and verifier results.</p><form id="issue-form"><label for="issue-step">Relevant step</label><select id="issue-step"><option value="">Whole run</option></select><label for="issue-comment">What did you notice?</label><textarea id="issue-comment" rows="3" required maxlength="4000" placeholder="What happened, and what did you expect?"></textarea><button id="submit-issue" type="submit" class="secondary">Save feedback</button><p id="issue-status" role="status" class="muted"></p></form><ul id="issues" class="issues" aria-label="Saved feedback"></ul></section></div></div>
+          <details><summary>Runtime &amp; provenance</summary><pre id="runtime">Not recorded yet.</pre></details>
+        </section>
       </section>
-    </section>
-    <aside class="sidebar" aria-label="Agent controls and review">
-      <div class="sidebar-heading"><span class="agent-icon" aria-hidden="true">D</span><div><h1>Daylight agent</h1><p>Shared BrowserGym harness</p></div></div>
-      <p id="worker-status" class="worker-status" role="status">Checking worker…</p>
-      <p id="notice" class="notice" role="alert" hidden></p>
-      <form id="task-form"><h2>Give the agent a task</h2><label for="task">Environment</label><select id="task" disabled><option>Loading tasks…</option></select><label for="goal">Your request</label><textarea id="goal" rows="5" required maxlength="2000" disabled></textarea><p id="goal-note" class="muted"></p><button id="submit-run" type="submit" disabled>Queue run</button><p class="muted">One run executes at a time. Your PC must be awake with its worker running.</p></form>
-      <section class="history"><h2>Your runs</h2><label for="job-select" class="sr-only">Choose a run</label><select id="job-select"><option value="">No runs yet</option></select></section>
-      <section id="issue-panel" hidden><h2>Flag an issue</h2><p class="muted">Feedback is saved with this trace. It is not sent to the agent or used as a success label.</p><form id="issue-form"><label for="issue-step">Relevant step</label><select id="issue-step"><option value="">Whole run</option></select><label for="issue-comment">What did you notice?</label><textarea id="issue-comment" rows="3" required maxlength="4000" placeholder="What happened, and what did you expect?"></textarea><button id="submit-issue" type="submit" class="secondary">Save issue</button><p id="issue-status" role="status" class="muted"></p></form><ul id="issues" class="issues" aria-label="Saved issues"></ul></section>
-    </aside>
+    </div>
   </main>
 </body>
 </html>
