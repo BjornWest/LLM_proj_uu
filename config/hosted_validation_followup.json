@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "scope": "Stronger saved-archive validation and one fresh local scripted backend failure with successful publication",
+  "saved_archives": 56,
+  "original_members": 2376,
+  "fresh_local_browser_cases": 1,
+  "fresh_container_cases": 0,
+  "fresh_production_cases": 0,
+  "boundary_checks": 19,
+  "focused_tests": 20,
+  "inference_calls": 0,
+  "training_eligible": false,
+  "source_sha256": {
+    "scripts/verify_hosted_worker.py": "58629f7d2721c6d85d58fcbb8113f82d5f01f90751a9c9c3bcd58061ff51dbfa",
+    "tests/test_hosted_archive_validation.py": "92d03cb580c4a2c1fb87ace6dd4a7e393f65e9d0f7dc8458dbd8db21b0bad5ea",
+    "intent_browser/team_worker.py": "8ddbea0ef604c7ece83454ca70eccdb76e810db8db6a7885d18ea639341f7ddd",
+    "intent_browser/hosted_tasks.py": "e8ee9d9f4d8a667e7d4295fa8fb800bc8fb15b83baf1d9bd024132bca55d0c9c",
+    "config/team_tasks.json": "4c358cddcaf3f7c054ebb8ac10a1f2dcbfbb75c4bd608897f77a28e99605ecb0",
+    "deploy/daylight/lib/harness.mjs": "b5c9b4922e950935e6dfc14726034bdb600978e5f9de16fc6537d84a7492a0f5"
+  },
+  "evidence_sha256": {
+    ".local/team-worker/hosted-archive-validation-v2.json": "b27c4394d9684636cf183ad1b4db918c678acad3062da77dad647269d82e573f",
+    ".local/team-worker/hosted-error-boundary-v1/report.json": "623b04f2641926b5787c00cf764ed85d1bc541644061b19e20f1b2cf011a8347"
+  },
+  "historical_reports_modified": false
+}

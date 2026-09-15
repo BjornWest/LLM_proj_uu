@@ -21,6 +21,29 @@ import httpx
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def original_zip_exact(archive, original):
+    """Require every original file exactly once, with no extra archive members."""
+    paths = list(original.rglob('*'))
+    if any(path.is_symlink() for path in paths):
+        return False
+    expected = {str(Path(original.name)/path.relative_to(original)): path
+                for path in paths if path.is_file()}
+    names = archive.namelist()
+    return (bool(expected) and len(names) == len(set(names)) and set(names) == set(expected)
+            and all(archive.read(name) == path.read_bytes() for name, path in expected.items()))
+
+
+class FailingBackend:
+    """One intentional local failure; never constructs an inference client."""
+    model = 'scripted-backend-failure'
+
+    def complete(self, messages):
+        raise RuntimeError('Intentional scripted backend failure before HTTP dispatch')
+
+    def close(self):
+        pass
+
+
 def driver(task, environment, kind, positive):
     if kind == 'chaos':
         from scripts.verify_chaos import FixtureDriver
@@ -53,6 +76,8 @@ def main():
     parser.add_argument('--chaos-build', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--task', action='append', help='Restrict to a registered task ID; otherwise all fourteen')
+    parser.add_argument('--case', action='append', choices=['positive', 'negative', 'backend-failure'],
+                        help='Defaults to positive and negative; backend-failure is a separate diagnostic')
     args = parser.parse_args()
     folder = args.output.resolve();folder.mkdir(parents=True, exist_ok=False)
     os.environ['LD_LIBRARY_PATH'] = str(ROOT/'.local/system-libs/usr/lib/x86_64-linux-gnu')+':'+os.getenv('LD_LIBRARY_PATH', '')
@@ -60,8 +85,11 @@ def main():
     from intent_browser.hosted_tasks import registry, check_package
     check_package(args.fixtures)
     selected = [t for t in registry()['tasks'] if not args.task or t['id'] in args.task]
+    variants = list(dict.fromkeys(args.case or ['positive', 'negative']))
     if not selected or args.task and len(selected) != len(set(args.task)):
         raise ValueError('Unknown task selector')
+    if 'backend-failure' in variants and [t['id'] for t in selected] != ['tricky-p07-clean']:
+        raise ValueError('The backend-failure diagnostic requires --task tricky-p07-clean')
     if any(t['kind'] == 'chaos' for t in selected) and not args.chaos_build:
         raise ValueError('Pass an isolated exported Chaos build')
     code = secrets.token_urlsafe(36);token = secrets.token_urlsafe(48)
@@ -98,23 +126,38 @@ def main():
         # advertises its installed non-privileged example policies.
         broker.post('poll', {'worker_id': worker_id, 'mode': 'rehearsal', 'tasks': tasks})
         for task in selected:
-            for positive in (True, False):
-                case = task['id']+('-positive' if positive else '-negative')
+            for variant in variants:
+                positive = variant == 'positive'
+                failing = variant == 'backend-failure'
+                case = task['id']+'-'+variant
                 created = client.post('/api/harness/jobs', json={'task': task['id'], 'task_revision': task['revision']})
                 created.raise_for_status()
                 job = broker.post('poll', {'worker_id': worker_id, 'mode': 'rehearsal', 'tasks': tasks})['job']
                 execute_job(broker, job, folder/'worker', env, chaos_url,
-                            backend_factory=lambda adapter, environment: driver(adapter, environment, task['kind'], positive))
+                            backend_factory=lambda adapter, environment: FailingBackend() if failing else driver(adapter, environment, task['kind'], positive))
                 response = client.get('/api/harness/jobs/'+job['id']);response.raise_for_status();result = response.json()
                 original = folder/'worker/runs'/result.get('episode', 'missing')
-                checks = {'terminal': result['status'] == 'finished', 'evaluation_present': isinstance(result.get('evaluation'), dict),
+                checks = {'terminal': result['status'] == ('error' if failing else 'finished'), 'evaluation_present': isinstance(result.get('evaluation'), dict),
+                          'original_present': original.is_dir(),
                           'revision': result.get('task_revision') == task['revision'], 'scripted': result.get('mode') == 'rehearsal'}
                 if checks['evaluation_present']:
-                    checks['expected_safe_success'] = result['evaluation']['safe_success'] is positive
+                    checks['expected_safe_success'] = result['evaluation']['safe_success'] is (None if failing else positive)
                 if original.is_dir():
                     steps = [json.loads(x) for x in (original/'steps.jsonl').read_text().splitlines()]
                     events = [json.loads(x)['event'] for x in (original/'events.jsonl').read_text().splitlines()]
                     checks['no_model_requests'] = all(s.get('model_request') is None for s in steps)
+                    state = json.loads((folder/'store/daylight/harness/control-v1.json').read_text())
+                    checks['no_reservations'] = state['jobs'][job['id']]['reservations'] == []
+                    evaluation = json.loads((original/'evaluation.json').read_text())
+                    checks['full_evaluation_preserved'] = (result['evaluation'] == evaluation ==
+                        json.loads((original/'episode.json').read_text())['evaluation'])
+                    if failing:
+                        checks['one_failure_no_action'] = (len(steps) == 1 and steps[0]['action'] is None and
+                            steps[0].get('failure_phase') == 'model' and 'tool_started' not in events)
+                        checks['technical_error_preserved'] = (result['error'] == evaluation['technical_error'] ==
+                            'RuntimeError: Intentional scripted backend failure before HTTP dispatch')
+                        checks['failure_snapshot_components_known'] = (evaluation['task_completed'] is False and
+                            evaluation['authorization_satisfied'] is True)
                     checks['evaluate_before_close'] = events.index('evaluation_completed') < events.index('environment_close_started')
                     goal = json.loads((original/'initial-state.json').read_text())['resolved_goal']
                     checks['same_policy_and_display_goal'] = result['goal'] == goal
@@ -122,7 +165,7 @@ def main():
                     checks['registry_provenance'] = json.loads((original/'task.json').read_text())['team_task']['revision'] == task['revision']
                     response = client.get('/api/harness/jobs/'+job['id']+'/trace');response.raise_for_status()
                     with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
-                        checks['original_zip_exact'] = all(archive.read(name) == (original.parent/name).read_bytes() for name in archive.namelist())
+                        checks['original_zip_exact'] = original_zip_exact(archive, original)
                     checks['screenshot_available'] = bool(result.get('image')) and client.get(result['image']).status_code == 200
                     checks['decision_text_available'] = bool(result['steps']) and client.get('/api/harness/jobs/'+job['id']+'/artifacts/'+result['steps'][0]['artifact']['text']).status_code == 200
                 row = {'case': case, 'task': task['id'], 'job': job['id'], 'episode': str(original),
@@ -134,7 +177,7 @@ def main():
                 if not row['passed']:
                     raise AssertionError(case)
     finally:
-        (folder/'report.json').write_text(json.dumps({'passed': bool(rows) and len(rows) == 2*len(selected) and all(r['passed'] for r in rows),
+        (folder/'report.json').write_text(json.dumps({'passed': bool(rows) and len(rows) == len(variants)*len(selected) and all(r['passed'] for r in rows),
             'cases': rows, 'paid_calls': 0, 'scope': 'Scripted worker + local private HTTP broker; not production or model evidence',
             'source_sha256': {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in
                 ['intent_browser/team_worker.py', 'intent_browser/hosted_tasks.py', 'config/team_tasks.json', 'deploy/daylight/lib/harness.mjs', 'scripts/verify_hosted_worker.py']}}, ensure_ascii=False, indent=2))
