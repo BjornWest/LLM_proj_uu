@@ -1,0 +1,23 @@
+services:
+  control:
+    build:
+      context: ../..
+      dockerfile: deploy/control/Dockerfile
+    image: intent-browser-control:local
+    env_file: ../../.local/control/control.env
+    ports:
+      - "127.0.0.1:8894:8894"
+    volumes:
+      - control-data:/state
+    init: true
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    cpus: 1
+    logging:
+      driver: json-file
+      options: {max-size: 5m, max-file: "3"}
+volumes:
+  control-data:

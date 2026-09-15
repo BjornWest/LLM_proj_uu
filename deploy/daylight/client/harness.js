@@ -301,7 +301,7 @@ async function selectJob(id) {
   catch (error) { if (version === selectionVersion) { notice(error.message); $('run-state').textContent = 'Unavailable'; showImage(null, '', 'Run could not be loaded', error.message); } }
 }
 async function poll() {
-  if (polling || authExpired) return;
+  if (polling || authExpired || document.hidden) return;
   polling = true; const version = selectionVersion, id = selectedID;
   try {
     const results = await Promise.allSettled([api('/api/harness/config'), api('/api/harness/jobs'), ...(id ? [api('/api/harness/jobs/' + encodeURIComponent(id))] : [])]);
@@ -311,7 +311,7 @@ async function poll() {
     if (results[2]?.status === 'fulfilled' && version === selectionVersion) renderJob(results[2].value);
   } finally {
     polling = false;
-    if (!authExpired) { clearTimeout(pollTimer); pollTimer = setTimeout(poll, activeStatuses.has(selectedJob?.status) ? 3000 : 10000); }
+    if (!authExpired) { clearTimeout(pollTimer); pollTimer = setTimeout(poll, activeStatuses.has(selectedJob?.status) ? 3000 : 60000); }
   }
 }
 document.querySelectorAll('[data-activity]').forEach(button => button.onclick = () => setActivity(button.dataset.activity));
@@ -369,6 +369,7 @@ $('issue-form').onsubmit = async event => {
 };
 $('screenshot').onerror = () => { $('screenshot-caption').textContent = 'This recorded image could not be loaded. Choose another step or refresh to try again.'; };
 window.addEventListener('hashchange', () => { const id = location.hash.slice(1); if (id && id !== selectedID) selectJob(id); });
+document.addEventListener('visibilitychange', () => { clearTimeout(pollTimer); if (!document.hidden) poll(); });
 window.addEventListener('pagehide', () => { stopReplay(); clearTimeout(pollTimer); });
 if (embedded) {
   setActivity(params.get('activity') === 'watch' ? 'watch' : 'replay');

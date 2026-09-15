@@ -4,6 +4,8 @@ import {mkdir,readFile,writeFile,rename,readdir} from 'node:fs/promises';
 import path from 'node:path';
 
 const storageMessages={
+  CONTROL_CONFIGURATION:'The PC backend connection is not configured correctly. Check DAYLIGHT_CONTROL_URL and DAYLIGHT_CONTROL_TOKEN.',
+  CONTROL_UNAVAILABLE:'The PC backend is unavailable. Check that the PC, control service and tunnel are running. No automatic retry was made.',
   BLOB_TOKEN_MISSING:'Private trace storage is not configured. Connect a Private Blob store (BLOB_STORE_ID) or add BLOB_READ_WRITE_TOKEN to this deployment’s environment, then redeploy.',
   BLOB_OIDC_ENVIRONMENT_DENIED:'Blob access is not enabled for this deployment environment. Update the store’s project connection to include Production or Preview as appropriate, then redeploy.',
   BLOB_ACCESS_DENIED:'Private trace storage rejected access. Check that the connected Blob token belongs to the intended store.',

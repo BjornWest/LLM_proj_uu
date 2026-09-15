@@ -39,6 +39,24 @@ The daemon is local and uses the existing Codex installation. These commands do 
 
 Do not append `--yolo` to the remote-resume command in this CLI version. The UX thread now has the requested permissions stored server-side. Other threads need their effective permissions checked after a coordinated transition.
 
+### Everyday session commands
+
+Ensure the local daemon is running (starting an already running daemon is harmless):
+
+```bash
+codex app-server daemon start
+```
+
+For a **new** session, permission flags are supported at creation. To use the user's requested YOLO settings in this repository:
+
+```bash
+codex --remote unix:///home/bjorn/.codex/app-server-control/app-server-control.sock --yolo --cd /home/bjorn/code/LLM_proj_uu
+```
+
+For an **existing** session, finish active work and close its independent CLI first, then run the `codex resume --remote ... THREAD_ID` command above without permission override flags. This retains its conversation; it is not a new task. Check `/permissions` after connecting because legacy session migration did not reliably restore the original sandbox during the first UX test. Use the server-side permission setting only as authorized by the user. The new-session versus resume flag distinction was checked against Codex 0.154.0's TUI startup and thread-parameter source.
+
+Keep the CLI connected while expecting active-turn steering. No PC reboot is needed. After a daemon stop or workstation restart, start the daemon again and reconnect the relevant sessions. Recheck status; `notLoaded` is not evidence that an independent agent has stopped working.
+
 ## Sending a necessary coordination message
 
 Use workstation `python3`, which already has `websockets`; this helper is separate from the project inference runtime.

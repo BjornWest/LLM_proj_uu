@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "scope": "Portable SQLite control service; local/offline acceptance; NOT production cutover",
+  "production_cutover": false,
+  "model_calls": 0,
+  "blob_mutations": 0,
+  "source_sha256": {
+    "deploy/daylight/api/index.mjs": "c41374a9f9e53df4d86006e049b519b1a3515d90c1587af9d3bf0233a30dce15",
+    "deploy/daylight/lib/store.mjs": "75e35061a6e0d469b1638b532b32f6c59b1301364c5877f68b4d12569dcf0ed2",
+    "deploy/daylight/lib/remote-store.mjs": "0353ed34420e5ca27df436b72530190afe83619beb627d7b528401009e84b830",
+    "deploy/daylight/lib/sqlite-store.mjs": "b56efe6f434d589bf758c1d1e88d043e9f24cc891dbc712f3dd02dd92d81bbb7",
+    "deploy/daylight/lib/harness.mjs": "10e7a3a4077c7ff2b3e601a16606eba0926901ae2c4aa18bfad7992977c5d0e2",
+    "deploy/daylight/lib/agent.mjs": "d5cc9cdc94200438ddcc5ec670d2b8abd2f8a8c59a35aa7f9c884a8b4a18e084",
+    "deploy/daylight/control-server.mjs": "58ae87716fd15720d6d647e71c58976de0b93b2071755302e0a2425577e8072e",
+    "deploy/daylight/migrate-storage.mjs": "70efe2942948ca565c4d8e697eae620f5ec52d6212c7f3cd838146cd58be5cd3",
+    "deploy/daylight/client/workspace.js": "875c74dbd41ede36caf6d5cef3de456fe344a6894f41f59718dedb74df9c95b1",
+    "deploy/daylight/client/harness.js": "b05f0f860e293070dc19bf621766c6d92339a4a9ccf2012b6b6e4f8f5945bbbc",
+    "deploy/control/Dockerfile": "27c366c138434491da20ea36028aa9c3e261cdfe4583ac4fc24327f520cb0d11"
+  },
+  "node_tests": 58,
+  "workspace_browser_checks": 30,
+  "workspace_report": ".local/vercel-demo/workspace-b66f7e39/report.json",
+  "polling_report": ".local/control/polling-46604071/report.json",
+  "container_report": ".local/coordination/blob-migration/container-check.json",
+  "container_network": "none",
+  "container_image": "sha256:9889ea63f9d9eff552e73b2d8a06bab0ed25f74c62976680c612f171409f3d5b",
+  "tunnel_test": ".local/control/tunnel-check.json",
+  "limitations": [
+    "No production migration yet; token and maintenance configuration pending.",
+    "Quick tunnel requires address update after restart and PC availability.",
+    "Original JSON layout and 100-job development cap retained.",
+    "No Blob or inference calls in offline acceptance tests."
+  ],
+  "artifact_sha256": {
+    ".local/vercel-demo/workspace-b66f7e39/report.json": "3adf4456eed4ba447fea5158ed5a6969c7e6c047966f11ed1ebe0604ef0bc49b",
+    ".local/control/polling-46604071/report.json": "41bcceb161a39f0bd4ccb898976973a24cbfc7719b6ae14eb5ab6b2edf619f65",
+    ".local/coordination/blob-migration/container-check.json": "31479bd3a806359fa187dcf18a3ef36716ebaabf473d2447237f045588dc66fc",
+    ".local/control/tunnel-check.json": "e388c84156d4ecc0510dc84934b11be83248e499c33da6d43c843dffb9411131"
+  }
+}

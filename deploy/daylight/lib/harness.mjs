@@ -65,12 +65,12 @@ export class Harness {
   }
   async list(owner) {
     const state=await this.state();
-    if(this.expire(state))return this.mutate(state=>{this.expire(state);return {jobs:Object.values(state.jobs).filter(j=>j.owner===owner).map(publicJob).reverse()};});
+    if(this.env.DAYLIGHT_STORAGE_MAINTENANCE!=='1'&&this.expire(state))return this.mutate(state=>{this.expire(state);return {jobs:Object.values(state.jobs).filter(j=>j.owner===owner).map(publicJob).reverse()};});
     return {jobs:Object.values(state.jobs).filter(j=>j.owner===owner).map(publicJob).reverse()};
   }
   async read(owner,id) {
     const state=await this.state();this.own(state,owner,id);
-    if(this.expire(state))return this.mutate(state=>{this.expire(state);return publicJob(this.own(state,owner,id));});
+    if(this.env.DAYLIGHT_STORAGE_MAINTENANCE!=='1'&&this.expire(state))return this.mutate(state=>{this.expire(state);return publicJob(this.own(state,owner,id));});
     return publicJob(this.own(state,owner,id));
   }
   async start(owner,value) {

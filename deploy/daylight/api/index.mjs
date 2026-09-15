@@ -2,7 +2,8 @@ import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {config,login,authenticate,sessionCookie} from '../lib/auth.mjs';
-import {BlobStore,StorageError} from '../lib/store.mjs';
+import {StorageError} from '../lib/store.mjs';
+import {configuredStore} from '../lib/remote-store.mjs';
 import {Agent} from '../lib/agent.mjs';
 import {checkStorage} from '../lib/storage-check.mjs';
 import {Harness,workerAuthorized} from '../lib/harness.mjs';
@@ -40,8 +41,9 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         if(req.method!=='POST'||!workerAuthorized(req.headers.authorization,env))return send(401,{error:'Worker authentication required'});
         operation=url.pathname.split('/').at(-1);
         if(!['poll','checkpoint','reserve','artifact','update'].includes(operation))return send(404,{error:'Not found'});
+        if(env.DAYLIGHT_STORAGE_MAINTENANCE==='1')return send(503,{error:'Storage maintenance; worker paused.'});
         stage='agent_storage';
-        const harness=new Harness(store||new BlobStore({env}),{env});
+        const harness=new Harness(store||configuredStore(env),{env});
         return send(200,await harness[operation](await body(req,1600000)));
       }
       if(req.method==='POST') {
@@ -56,8 +58,9 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
+      if(req.method==='POST'&&env.DAYLIGHT_STORAGE_MAINTENANCE==='1')return send(503,{error:'Storage maintenance. Please try again after the migration.'});
       if(url.pathname.startsWith('/api/harness/')) {
-        stage='agent_storage';const harness=new Harness(store||new BlobStore({env}),{env});
+        stage='agent_storage';const harness=new Harness(store||configuredStore(env),{env});
         if(url.pathname==='/api/harness/config'&&req.method==='GET')return send(200,await harness.config());
         if(url.pathname==='/api/harness/jobs')return send(200,req.method==='GET'?await harness.list(owner):await harness.start(owner,await body(req)));
         const match=url.pathname.match(/^\/api\/harness\/jobs\/([a-f0-9-]{36})(?:\/(issues|trace|artifacts)(?:\/([^/]+))?)?$/);
@@ -79,11 +82,11 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       if(url.pathname==='/storage-check') {
         if(req.method==='GET')return send(200,'<!doctype html><meta charset="utf-8"><title>Daylight storage check</title><h1>Check private storage</h1><p>Creates one isolated diagnostic object. No model calls or trace/budget changes.</p><form method="post"><button>Run storage check</button></form>','text/html; charset=utf-8');
-        return send(200,await checkStorage(store||new BlobStore({env}),owner));
+        return send(200,await checkStorage(store||configuredStore(env),owner));
       }
       if(url.pathname==='/logout') {res.setHeader('Set-Cookie',sessionCookie('',local));return redirect('/login');}
       if(url.pathname.startsWith('/api/')) {
-        const activeStore=store||new BlobStore({env});
+        const activeStore=store||configuredStore(env);
         stage='private_assets';
         const provenance=JSON.parse(await readFile(path.join(assetRoot,'provenance.json'),'utf8'));
         stage='agent_storage';

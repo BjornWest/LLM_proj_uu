@@ -181,7 +181,7 @@ async function fetchDemoRows(){
   throw Error('Trace history exceeds this viewer’s listing limit.');
 }
 async function refresh(forceTraces=false){
-  if(authExpired)return;if(refreshing){refreshTracesPending ||= forceTraces;return;}refreshing=true;const includeDemo=forceTraces||Date.now()-lastDemoRefresh>60000;
+  if(authExpired||document.hidden)return;if(refreshing){refreshTracesPending ||= forceTraces;return;}refreshing=true;const includeDemo=forceTraces||lastDemoRefresh===0;
   try{
     const results=await Promise.allSettled([api('/api/harness/config'),api('/api/harness/jobs'),...(includeDemo?[fetchDemoRows()]:[])]);
     if(results[0].status==='fulfilled'){config=results[0].value;buildSites();$('worker-status').textContent=config.worker?.online?'● Worker online · '+(config.worker.mode==='live'?'live agent':'rehearsal'):'○ Worker offline';}
@@ -192,7 +192,7 @@ async function refresh(forceTraces=false){
     if(pendingTask){const latest=tasks.find(t=>t.id===pendingTask.id);if(latest&&latest.revision===pendingTask.revision)pendingTask=latest;}
     // Do not rebuild the conversation/composer during periodic updates.
     renderSites();if(view==='research')renderTasks();if(globalPage&&view!=='review')renderGlobal();if(view==='review')renderReview();syncControls();
-  }finally{refreshing=false;clearTimeout(pollTimer);if(!authExpired){if(refreshTracesPending){refreshTracesPending=false;pollTimer=setTimeout(()=>refresh(true),0);}else pollTimer=setTimeout(()=>refresh(),jobRows.some(j=>activeStatuses.has(j.status))?4000:15000);}}
+  }finally{refreshing=false;clearTimeout(pollTimer);if(!authExpired){if(refreshTracesPending){refreshTracesPending=false;pollTimer=setTimeout(()=>refresh(true),0);}else pollTimer=setTimeout(()=>refresh(),jobRows.some(j=>activeStatuses.has(j.status))?4000:60000);}}
 }
 $('try-task').onclick=async()=>{
   const task=pendingTask;if(!task||launching||authExpired||!config?.enabled||config.worker?.mode!=='live'||task.available===false)return;
@@ -264,6 +264,7 @@ $('toggle-agent').onclick=()=>setAgentVisible(!agentVisible);
 $('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];draft='';activity=[];lastTrace=null;setWorking('');$('chat-status').textContent='';renderConversation();};
 $('back-to-research').onclick=()=>{view=globalPage?'global':'research';currentRun=null;reviewVersion++;render();syncURL();};
 async function readRoute(){const params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';if(siteFor(params.get('site')))siteID=params.get('site');const key=params.get('run');currentRun=records().find(r=>r.key===key)||null;view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();if(currentRun?.source==='demo')loadBrowserTrace(currentRun);}
+document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden)refresh();});
 window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>clearTimeout(pollTimer));
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('run-viewer').contentWindow||event.data?.type!=='harness:size')return;const height=Number(event.data.height);if(Number.isFinite(height))$('run-viewer').style.height=Math.min(8000,Math.max(650,height))+'px';});
 try{const results=await Promise.allSettled([api('/assets/fixture.json'),api('/api/config')]);if(results[0].status==='fulfilled'){fixture=results[0].value;window.demoWorld=new World(fixture);}if(results[1].status==='fulfilled')modelConfig=results[1].value;for(const result of results)if(result.status==='rejected')notice(result.reason.message);await refresh(true);buildSites();await readRoute();if(!modelConfig?.live_available)$('chat-status').textContent='OpenRouter is not configured for this deployment.';}catch(error){notice(error.message);syncControls();}

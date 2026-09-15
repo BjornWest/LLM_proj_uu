@@ -1,0 +1,9 @@
+# Combine after deploy/worker/compose.yaml AND deploy/control/compose.yaml.
+# Run with --project-directory deploy/worker so original env/volume paths survive.
+services:
+  worker:
+    network_mode: service:control
+    environment:
+      HARNESS_URL: http://127.0.0.1:8894
+      HARNESS_POLL_SECONDS: "5"
+    depends_on: [control]
