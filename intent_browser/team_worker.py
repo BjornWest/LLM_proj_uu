@@ -124,7 +124,9 @@ class Publisher:
             if provider and previous_provider and provider != previous_provider:
                 alerts.append('Provider changed within this episode; caching continuity is not guaranteed.')
             if provider: previous_provider = provider
-        return {'episode': directory.name, 'cost': {'reported_usd': sum(known) if known else
+        initial_path = directory / 'initial-state.json'
+        resolved_goal = json.loads(initial_path.read_text()).get('resolved_goal') if initial_path.exists() else None
+        return {'episode': directory.name, 'resolved_goal': resolved_goal, 'cost': {'reported_usd': sum(known) if known else
                     (0 if metadata.get('driver') == 'scripted-rehearsal' else None),
                     'unknown_attempts': unknown, 'alerts': sorted(set(alerts))},
                 'runtime': {'worker': 'team-browsergym-v1',
@@ -291,11 +293,22 @@ class PublishedTask:
     def prepare(self, trace):
         self.publisher.attach(trace)
         record = self.task.prepare(trace)
-        if self.publisher.job['task'] == 'chaos-confirmshaming' and not self.task.verifier_ready:
+        if self.publisher.job['task'].startswith('chaos-') and not self.task.verifier_ready:
             raise RuntimeError('Chaos build lacks current contract certification')
+        if self.publisher.job['task'] != 'rooms':
+            from .hosted_tasks import entry, digest, REGISTRY
+            registered = entry(self.publisher.job['task'])
+            if registered['goal'] is not None and self.task.policy_goal != registered['goal']:
+                raise ValueError('Resolved task goal differs from fixed registry goal')
+            record['team_task'] = {'id': registered['id'], 'revision': registered['revision'],
+                                   'catalog_id': registered['catalog_id'], 'registry_sha256': digest(REGISTRY)}
         return record
     def capture_initial(self, env, obs, info):
         # The allowlisted synthetic site is the only browser network destination.
+        # Reviewed Tricky adapters install their own stricter origin/query
+        # routes during environment setup. Do not shadow those routes here.
+        if hasattr(self.task, 'route'):
+            return self.task.capture_initial(env, obs, info)
         origin = self.origin or self.task.client.base_url
         def route(request):
             url = request.request.url
@@ -305,7 +318,7 @@ class PublishedTask:
         return self.task.capture_initial(env, obs, info)
 
 
-def execute_job(broker, job, data_dir, env, chaos_url=None):
+def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=None):
     from .runner import run_episode
     from .actions import make_action_set
     import browsergym.core  # noqa: F401
@@ -314,6 +327,7 @@ def execute_job(broker, job, data_dir, env, chaos_url=None):
     write_json(folder / 'job.json', {k: v for k, v in job.items() if k != 'lease'})
     publisher = Publisher(broker, job, folder);publisher.thread.start()
     site = backend = task = None
+    environment = {}
     error = None
     try:
         actions = make_action_set()
@@ -331,30 +345,47 @@ def execute_job(broker, job, data_dir, env, chaos_url=None):
                     viewport={'width': 1000, 'height': 850}, wait_for_user_message=False)
             if job['mode'] == 'rehearsal' and job['goal'] != EXAMPLES['booking']['goal']:
                 raise ValueError('Rehearsal only supports the exact study-room example; use Live for custom goals')
-            backend = TeamBackend(publisher, env) if job['mode'] == 'live' else RehearsalBackend('booking')
-        elif job['task'] == 'chaos-confirmshaming' and chaos_url:
-            from .chaos import ChaosTask, ChaosClient
-            task = ChaosTask(ChaosClient(chaos_url), 'confirmshaming')
+            default_backend = lambda: TeamBackend(publisher, env) if job['mode'] == 'live' else RehearsalBackend('booking')
+        elif job['task'] != 'rooms':
+            from .hosted_tasks import make_task, entry
+            registered = entry(job['task'])
+            task = make_task(job['task'], fixture_dir=env.get('HARNESS_FIXTURES_DIR'), chaos_url=chaos_url,
+                             revision=job.get('task_revision'))
             wrapped = PublishedTask(task, publisher, None)
             def factory(video):
+                if hasattr(task, 'make_env'):
+                    return task.make_env(video, action_mapping=actions.to_python_code, headless=True)
                 return gym.make('browsergym/openended', task_kwargs={'start_url': task.start_url, 'goal': task.policy_goal},
-                    headless=True, action_mapping=actions.to_python_code, viewport={'width': 1000, 'height': 850}, wait_for_user_message=False)
-            backend = TeamBackend(publisher, env) if job['mode'] == 'live' else ConfirmRehearsal()
-        else:
-            raise ValueError('Task is not available on this worker')
+                    headless=True, action_mapping=actions.to_python_code, viewport={'width': 1000, 'height': 850}, wait_for_user_message=False,
+                    record_video_dir=video)
+            def default_backend():
+                if job['mode'] == 'live': return TeamBackend(publisher, env)
+                if job['task'] == 'chaos-confirmshaming': return ConfirmRehearsal()
+                raise ValueError('This task needs a live worker; no general scripted policy is installed')
+        # A callable test backend can only be supplied by trusted local Python,
+        # never by the queue, browser, env vars or another serialized request.
+        backend = backend_factory(task, environment) if backend_factory else default_backend()
+        original_factory = factory
+        def factory(video):
+            instance = original_factory(video)
+            environment['env'] = instance
+            return instance
         hook = backend.before_observation if isinstance(backend, TeamBackend) else publisher.checkpoint
         run_episode(factory, backend, {'task': job['task'], 'goal': job['goal'], 'team_job': job['id'],
                     'episode_boundary': 'first_accepted_reservation' if job['task'] == 'rooms' else 'agent_finished',
                     'driver': 'llm' if job['mode'] == 'live' else 'scripted-rehearsal',
                     'model': getattr(backend, 'model', 'scripted-rehearsal'), 'training_eligible': False,
+                    'task_revision': job.get('task_revision'),
                     'generation': {'max_tokens': 512, **backend.request_options} if isinstance(backend, TeamBackend) else None},
-                    output=data_dir / 'runs', max_steps=12, before_observation=hook, episode_task=wrapped)
+                    output=data_dir / 'runs', max_steps=12, before_observation=hook, episode_task=wrapped,
+                    record_video=True)
     except Exception as exc:
         error = f'{type(exc).__name__}: {exc}'
         write_json(folder / 'worker-error.json', {'error': error})
     finally:
         if backend: backend.close()
         if task and hasattr(task, 'close'): task.close()
+        elif task and hasattr(task, 'client'): task.client.close()
         if site: site.close()
         try: publisher.finish(error)
         except Exception as exc:
@@ -393,7 +424,8 @@ def main():
     lock = (data_dir/'worker.lock').open('a');fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
     broker = Broker(env.get('HARNESS_URL', ''), env.get('HARNESS_WORKER_TOKEN'))
     identity = str(uuid4());chaos_url = start_chaos(Path(env['HARNESS_CHAOS_BUILD']).resolve()) if env.get('HARNESS_CHAOS_BUILD') else None
-    tasks = ['rooms'] + (['chaos-confirmshaming'] if chaos_url else [])
+    from .hosted_tasks import capabilities
+    tasks = ['rooms'] + capabilities(mode, env.get('HARNESS_FIXTURES_DIR'), chaos_url)
     while True:
         try:
             result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks})

@@ -1,0 +1,14 @@
+# Reviewed Tricky packages, separate from the frozen host fixtures. Read-only:
+# adapters keep per-episode journals in the worker data volume.
+services:
+  worker:
+    environment:
+      HARNESS_FIXTURES_DIR: /fixtures
+    volumes:
+      - type: bind
+        source: ../../.local/team-worker/fixtures-v1
+        target: /fixtures
+        read_only: true
+        bind:
+          create_host_path: false
+          propagation: rprivate

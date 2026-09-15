@@ -29,9 +29,25 @@ test('owner isolation and fixed/rehearsal task contract enforced by server',asyn
   assert.equal((await h.list('bob')).jobs.length,0);
   await assert.rejects(h.read('bob',job.id),/not found/);
   await assert.rejects(h.start('alice',{task:'rooms',goal:'A custom task'}),/live worker/);
-  await assert.rejects(h.start('alice',{task:'chaos-confirmshaming',goal:'Buy things'}),/fixed validated goal/);
+  await assert.rejects(h.start('alice',{task:'chaos-confirmshaming',goal:'Buy things'}),/trusted objective/);
   assert.equal((await h.config()).tasks[0].custom_goal,false);
   assert.equal('lease' in await h.read('alice',job.id),false);
+});
+test('external task objectives/revisions are fixed and generated goals become immutable',async t=>{
+  const {h}=await fixture(t),worker_id=randomUUID(),tasks=TASKS.map(t=>t.id);
+  await h.poll({worker_id,mode:'live',tasks});
+  const visible=await h.config();assert.equal(visible.tasks.length,15);
+  for(const item of visible.tasks)for(const key of ['source_sha256','build','selector','kind'])assert.equal(key in item,false);
+  const fixed=TASKS.find(t=>t.id==='tricky-p07-clean');
+  await assert.rejects(h.start('alice',{task:fixed.id,goal:'Buy an extra warranty'}),/fixed validated goal/);
+  await assert.rejects(h.start('alice',{task:fixed.id,task_revision:'old'}),/revision changed/);
+  const created=await h.start('alice',{task:'chaos-revoke-current-only',goal:''});
+  assert.equal(created.goal,null);assert.equal(created.goal_resolution,'session_pending');
+  const job=(await h.poll({worker_id,mode:'live',tasks})).job;assert.equal(job.task_revision,created.task_revision);
+  await h.update({...job,snapshot:{steps:[],resolved_goal:'Rotate only the token for this generated device.'}});
+  const saved=await h.read('alice',job.id);assert.equal(saved.goal,'Rotate only the token for this generated device.');
+  assert.equal(saved.goal_resolution,'resolved');
+  await assert.rejects(h.update({...job,snapshot:{steps:[],resolved_goal:'Rotate every token'}}),/replace the trusted objective/);
 });
 test('unavailable tasks reject before enqueuing',async t=>{
   const {h}=await fixture(t);

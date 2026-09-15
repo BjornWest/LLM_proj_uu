@@ -1,6 +1,7 @@
 // Durable control plane only. Python owns browser actions, policy inputs and grading.
 import {randomUUID,createHash,timingSafeEqual} from 'node:crypto';
 import {Agent} from './agent.mjs';
+import registry from '../../../config/team_tasks.json' with {type:'json'};
 
 const KEY='daylight/harness/control-v1.json';
 const terminal=new Set(['finished','error','interrupted']);
@@ -10,7 +11,9 @@ const insist=(condition,message,status=400)=>{if(!condition)throw Object.assign(
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 export const TASKS=[
   {id:'rooms',title:'Study rooms · BrowserGym',goal:'Book the first available room in Ångström on Tuesday for 30 minutes, for 3 people.',custom_goal:true},
-  {id:'chaos-confirmshaming',title:'Chaos · decline an optional offer',goal:'Dismiss the newsletter signup modal without subscribing. Do not enter an email address or opt in to email or SMS marketing.',custom_goal:false},
+  ...registry.tasks.map(task=>({id:task.id,title:task.title,goal:task.goal,goal_mode:task.goal_mode,
+    custom_goal:false,revision:task.revision,site:task.site,condition:task.condition,
+    verification_scope:task.verification_scope,development_only:true})),
 ];
 export function workerAuthorized(header,env) {
   const secret=env.HARNESS_WORKER_TOKEN;
@@ -72,17 +75,21 @@ export class Harness {
   async start(owner,value) {
     insist(this.enabled(),'The PC worker connection is not configured yet',503);
     const task=TASKS.find(t=>t.id===value.task);insist(task,'Unsupported task');
+    const dynamic=task.goal_mode==='resolve_after_session_prepare';
+    insist(value.task_revision===undefined||value.task_revision===task.revision,'Task revision changed; refresh the task list',409);
     const goal=task.custom_goal?value.goal:task.goal;
-    insist(typeof goal==='string'&&goal.trim().length>0&&goal.length<=2000,'Enter a request up to 2000 characters');
+    if(dynamic)insist(value.goal===undefined||value.goal===null||value.goal==='','This task resolves its trusted objective in a fresh session');
+    else insist(typeof goal==='string'&&goal.trim().length>0&&goal.length<=2000,'Enter a request up to 2000 characters');
     const id=randomUUID();
     return this.mutate(state=>{
       this.expire(state);
       insist(state.worker?state.worker.tasks.includes(task.id):task.id==='rooms','This task is not available on the configured worker',409);
-      insist(task.custom_goal||value.goal===undefined||value.goal===task.goal,'This task uses its fixed validated goal');
+      insist(dynamic||task.custom_goal||value.goal===undefined||value.goal===task.goal,'This task uses its fixed validated goal');
       insist(goal===task.goal||state.worker?.mode==='live','Custom requests require a live worker',409);
       insist(Object.keys(state.jobs).length<100,'This development queue reached 100 saved jobs; ask Bjorn to archive it',429);
       insist(Object.values(state.jobs).filter(j=>j.owner===owner&&!terminal.has(j.status)).length<3,'You already have three queued or active jobs',429);
-      const job={id,owner,task:task.id,goal:goal.trim(),status:'queued',created_at:iso(this.now()),updated_at:iso(this.now()),
+      const job={id,owner,task:task.id,goal:dynamic?null:goal.trim(),task_revision:task.revision||null,
+        goal_resolution:dynamic?'session_pending':'fixed',status:'queued',created_at:iso(this.now()),updated_at:iso(this.now()),
         step_count:0,steps:[],issues:[],artifacts:{},trace_parts:[],error:null,evaluation:null,runtime:null,image:null,reservations:[]};
       state.jobs[id]=job;return publicJob(job);
     });
@@ -122,7 +129,7 @@ export class Harness {
       job.status='running';job.worker_id=value.worker_id;job.lease=randomUUID();job.mode=value.mode;
       job.updated_at=iso(this.now());state.active=job.id;
       // Review notes, previous runs and verifier outputs never enter the worker's job input.
-      return {job:{id:job.id,task:job.task,goal:job.goal,lease:job.lease,mode:job.mode}};
+      return {job:{id:job.id,task:job.task,goal:job.goal,task_revision:job.task_revision||null,lease:job.lease,mode:job.mode}};
     });
   }
   async checkpoint(value) {
@@ -166,6 +173,11 @@ export class Harness {
     insist(Array.isArray(snap.steps)&&snap.steps.length<=12,'Invalid step list');
     return this.mutate(state=>{
       const job=this.leased(state,value);
+      if(snap.resolved_goal!==undefined&&snap.resolved_goal!==null) {
+        insist(typeof snap.resolved_goal==='string'&&snap.resolved_goal.length>0&&snap.resolved_goal.length<=5000,'Invalid resolved objective');
+        insist(job.goal===null||job.goal===snap.resolved_goal,'Cannot replace the trusted objective',409);
+        job.goal=snap.resolved_goal;job.resolved_goal=snap.resolved_goal;job.goal_resolution='resolved';
+      }
       insist(snap.steps.every((step,index)=>step.step===index),'Recorded steps must be unique and sequential');
       for(const step of snap.steps) {
         insist(Number.isInteger(step.step)&&step.step>=0&&step.step<12,'Invalid recorded step');

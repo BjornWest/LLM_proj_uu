@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "scope": "Candidate worker integration, scripted local and container HTTP transport; not production or model evidence",
+  "task_conditions": 14,
+  "local_cases": 28,
+  "container_cases": 28,
+  "checks_per_suite": 364,
+  "python_tests": 119,
+  "python_subtests": 33,
+  "node_tests": 34,
+  "paid_calls": 0,
+  "training_eligible": false,
+  "production_verified": false,
+  "candidate_image": "sha256:6884c2834fc5e294507ef8bd294768a9b982f3badecc75f2824a3e1cff33caff",
+  "source_sha256": {
+    ".dockerignore": "0e541c4e9fdc446565d413615a2bbf6b7a837d92fbf8c6890a2d4d099c0017ce",
+    "config/team_tasks.json": "4c358cddcaf3f7c054ebb8ac10a1f2dcbfbb75c4bd608897f77a28e99605ecb0",
+    "intent_browser/hosted_tasks.py": "e8ee9d9f4d8a667e7d4295fa8fb800bc8fb15b83baf1d9bd024132bca55d0c9c",
+    "intent_browser/team_worker.py": "8ddbea0ef604c7ece83454ca70eccdb76e810db8db6a7885d18ea639341f7ddd",
+    "deploy/daylight/lib/harness.mjs": "b5c9b4922e950935e6dfc14726034bdb600978e5f9de16fc6537d84a7492a0f5",
+    "deploy/daylight/build.mjs": "2dc8a345bff2680cf738036f0f0c6528fcf2d6759ba1876349e56f00a94441eb",
+    "deploy/worker/Dockerfile": "af23cda83c46d898db973024b37ee04edbdf5fe3d1032a44d4e6b0c61a90bb72",
+    "deploy/worker/compose.fixtures.yaml": "ef00fa4f24ee113736d07f3df7bd0330c2d84b2df55ebc5b2efa79e86a94cdee",
+    "deploy/worker/prepare_tasks.py": "11142c285a9f1e9611f3a7e1099371640437fdee9b0a38727ac2593637de8b8f",
+    "scripts/verify_hosted_worker.py": "95371914e81ebc966cb932f534d23796d1b2cd622833723ae5d1d760b16a87dc",
+    "tests/test_hosted_tasks.py": "9c3057e595b4fc5bc7e2345d0137e4a6ec9bdd086c38ec75a833f69f35a559a1"
+  },
+  "evidence_sha256": {
+    ".local/team-worker/hosted-acceptance-v1/report.json": "94042df5aea48839ac0a2a5510f658499e8b9a05b5668b2a682c3506fa2cb021",
+    ".local/team-worker/hosted-container-acceptance-v1/suite/report.json": "02690d3e2b19a3e45f3f1599cdb2ed1da9c17644f72c03da5ce1dc2da389501b",
+    ".local/team-worker/hosted-parity-v1.json": "7b48c2d4b9e4dedf6b862ff2614cd62dbc860a7206ea9c75ba2ed7bad856481a",
+    ".local/team-worker/fixtures-v1/package.json": "162a7faa7a3209647783a6926f4e83a3c90fc529167e9f6fabae4c1b6a8a21e6"
+  },
+  "limitations": [
+    "Scripted privileged drivers, no model-performance claim.",
+    "Fresh Chaos variants differ; two negative forbidden-action IDs differ, while completion/authorization/safe/exposure outcomes match.",
+    "Initial positive/negative pairs are not exhaustive historical-effect or duplicate-extra regression coverage.",
+    "Private fixture packages are worker-hosted; Vercel hosts the authenticated control/viewing interface."
+  ]
+}

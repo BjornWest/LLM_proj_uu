@@ -23,7 +23,7 @@ RUN python -m pip install --no-cache-dir -r /tmp/worker-requirements.txt \
 COPY pyproject.toml /app/pyproject.toml
 COPY intent_browser /app/intent_browser
 COPY environments/demo /app/environments/demo
-COPY config/chaos_verifier.json /app/config/chaos_verifier.json
+COPY config/chaos_verifier.json config/team_tasks.json /app/config/
 COPY scripts/start_chaos_repair.py scripts/inspect_chaos.mjs /app/scripts/
 RUN python -m pip install --no-cache-dir --no-deps -e /app \
     && useradd --create-home --uid 10001 --shell /usr/sbin/nologin worker \
