@@ -46,7 +46,9 @@ export class BlobStore {
   async read(key) {
     const auth=this.auth('read');
     try {
-      const result=await this.sdk.get(key,{access:'private',useCache:false,...auth});
+      // Request original bytes so CDN compression cannot substitute a representation ETag.
+      // Keep the returned ETag intact; never strip weak validators or bypass ifMatch.
+      const result=await this.sdk.get(key,{access:'private',useCache:false,headers:{'accept-encoding':'identity'},...auth});
       if (!result) return null;
       if (result.statusCode !== 200) throw Error('Unexpected trace storage response');
       return {value:JSON.parse(await new Response(result.stream).text()),etag:result.blob.etag};

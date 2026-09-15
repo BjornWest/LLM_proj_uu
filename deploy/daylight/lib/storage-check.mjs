@@ -8,9 +8,12 @@ const etagInfo=value=>({present:typeof value==='string'&&value.length>0,
 export async function checkStorage(store,owner) {
   const id=randomUUID(),key=`daylight/diagnostics/${owner}/${id}.json`;
   const report={id,model_calls:0,scope:'Isolated scratch object; no trace or budget changes',checks:[]};
+  // Larger than typical compression thresholds, unlike the original tiny probe.
+  const padding='Synthetic study-room availability. '.repeat(512);
+  report.payload_bytes=Buffer.byteLength(padding);
   let stage='create';
   try {
-    const initial={diagnostic:id,revision:0};
+    const initial={diagnostic:id,revision:0,padding};
     const created=await store.write(key,initial);
     report.checks.push({stage,passed:true,etag:etagInfo(created)});
     stage='read_after_create';
@@ -20,10 +23,10 @@ export async function checkStorage(store,owner) {
       etag:etagInfo(read.etag),equals_create_etag:read.etag===created});
     if(!report.checks.at(-1).passed)throw Error('read_mismatch');
     stage='conditional_write_using_read_etag';
-    const updated=await store.write(key,{diagnostic:id,revision:1},read.etag);
+    const updated=await store.write(key,{diagnostic:id,revision:1,padding},read.etag);
     report.checks.push({stage,passed:true,etag:etagInfo(updated)});
     stage='conditional_write_using_put_etag';
-    const finished=await store.write(key,{diagnostic:id,revision:2},updated);
+    const finished=await store.write(key,{diagnostic:id,revision:2,padding},updated);
     report.checks.push({stage,passed:true,etag:etagInfo(finished)});
     stage='read_after_updates';
     const final=await store.read(key);
