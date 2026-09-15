@@ -2,7 +2,7 @@ import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {config,login,authenticate,sessionCookie} from '../lib/auth.mjs';
-import {BlobStore} from '../lib/store.mjs';
+import {BlobStore,StorageError} from '../lib/store.mjs';
 import {Agent} from '../lib/agent.mjs';
 // Resolve beside this module, including when the function starts at the monorepo root.
 const assets=fileURLToPath(new URL('../private-assets/',import.meta.url));
@@ -27,7 +27,7 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
     res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'none'");
     const send=(status,value,type='application/json')=>{res.statusCode=status;res.setHeader('Content-Type',type);res.end(type==='application/json'?JSON.stringify(value):value);};
     const redirect=url=>{res.statusCode=303;res.setHeader('Location',url);res.end();};
-    let stage='access_configuration';
+    let stage='access_configuration',operation=null;
     try {
       const settings=config(env);
       stage='request';
@@ -47,7 +47,7 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
       if(url.pathname==='/logout') {res.setHeader('Set-Cookie',sessionCookie('',local));return redirect('/login');}
       if(url.pathname.startsWith('/api/')) {
-        const activeStore=store||new BlobStore();
+        const activeStore=store||new BlobStore({env});
         stage='private_assets';
         const provenance=JSON.parse(await readFile(path.join(assetRoot,'provenance.json'),'utf8'));
         stage='agent_storage';
@@ -55,14 +55,17 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         if(url.pathname==='/api/config'&&req.method==='GET')return send(200,{owner,live_available:!!env.OPENROUTER_API_KEY,
           daily_budget_usd:Number(env.DEMO_DAILY_BUDGET_USD||1),runtime:'daylight-client-demo-v1'});
         if(url.pathname.startsWith('/api/traces/')&&req.method==='GET') {
+          operation='trace_read';
           const trace=(await agent.read(owner,url.pathname.split('/').at(-1))).value;
           res.setHeader('Content-Disposition',`attachment; filename="daylight-${trace.id}.json"`);return send(200,trace);
         }
         if(req.method!=='POST')return send(405,{error:'Method not allowed'});
+        stage='request';
         const value=await body(req);
-        if(url.pathname==='/api/start')return send(200,await agent.start(owner,value));
-        if(url.pathname==='/api/step')return send(200,await agent.step(owner,value));
-        if(url.pathname==='/api/event')return send(200,await agent.event(owner,value));
+        stage='agent_storage';
+        if(url.pathname==='/api/start') {operation='start';return send(200,await agent.start(owner,value));}
+        if(url.pathname==='/api/step') {operation='step';return send(200,await agent.step(owner,value));}
+        if(url.pathname==='/api/event') {operation='event';return send(200,await agent.event(owner,value));}
         return send(404,{error:'Not found'});
       }
       if(req.method!=='GET')return send(405,{error:'Method not allowed'});
@@ -72,13 +75,18 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       stage='private_assets';
       return send(200,await readFile(path.join(assetRoot,file)),TYPES[file.split('.').at(-1)]);
     } catch(error) {
+      if(error instanceof StorageError) {
+        console.error(JSON.stringify({event:'daylight_request_failed',code:error.code,stage,
+          operation,storage_operation:error.operation}));
+        return send(error.code==='BLOB_WRITE_CONFLICT'?409:503,{error:error.message,code:error.code});
+      }
       if(error.status)return send(error.status,{error:error.message});
       const code=({access_configuration:'ACCESS_CONFIGURATION',private_assets:'PRIVATE_ASSETS_UNAVAILABLE',
         agent_storage:'AGENT_STORAGE_UNAVAILABLE'})[stage]||'REQUEST_FAILED';
       // Fixed labels only: never log request headers, bodies, secrets or arbitrary exception messages.
-      console.error(JSON.stringify({event:'daylight_request_failed',code,stage,
+      console.error(JSON.stringify({event:'daylight_request_failed',code,stage,...(operation?{operation}:{}),
         missing_file:error.code==='ENOENT'}));
-      send(503,{error:'Demo unavailable. Check the deployment logs for '+code+'.',code});
+      send(503,{error:'Demo unavailable. Check Vercel Runtime Logs for '+code+'.',code});
     }
   };
 }

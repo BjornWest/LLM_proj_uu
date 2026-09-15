@@ -48,7 +48,7 @@ Do not upload your entire repository `.env`. HF, Verda, Parallel and calibration
 
 From the Vercel project’s **Storage** tab, create/connect a **Vercel Blob** store with **Private** access. Prefer Stockholm (`arn1`) when available. Connect it to the same Production/Preview environments as above.
 
-The connection should create `BLOB_READ_WRITE_TOKEN`. Keep it server-only and Sensitive where the dashboard permits. The application explicitly uses this token and `access: private`; a public Blob store is not supported. No client-upload token or public trace URL is created.
+The connection can provide `BLOB_STORE_ID` with Vercel-managed OIDC authentication, or a `BLOB_READ_WRITE_TOKEN`. The application supports both: an explicit read-write token takes precedence; otherwise the SDK manages OIDC token refresh for the connected store. Keep credentials server-only and Sensitive where the dashboard permits. Every operation uses `access: private`; a public Blob store is not supported. No client-upload token or public trace URL is created.
 
 If your first deployment happened before the store connection or secrets were added, **redeploy** so the function receives them. Neither a local `.env` edit nor adding variables updates already-built deployments automatically.
 
@@ -78,9 +78,15 @@ Unexpected failures return a safe diagnostic code and a matching entry in Vercel
 
 - `PRIVATE_ASSETS_UNAVAILABLE`: missing/unreadable built assets or provenance. Confirm the build ran and `private-assets/**` is included in the function. Never move those files into `public`.
 - `ACCESS_CONFIGURATION`: check the invitation JSON and session secret in this deployment’s environment.
-- `AGENT_STORAGE_UNAVAILABLE`: an agent/storage operation failed; check the private Blob connection and its environment scope.
+- `AGENT_STORAGE_UNAVAILABLE`: an unexpected agent/API operation failed. Open **project → Logs (Runtime Logs)**, not Build Logs, and reproduce it. The matching `daylight_request_failed` entry records the API operation.
+- `BLOB_TOKEN_MISSING`: this deployment has no usable Blob configuration. Check `BLOB_READ_WRITE_TOKEN`, or the connected store’s `BLOB_STORE_ID` and Vercel-managed OIDC configuration.
+- `BLOB_ACCESS_DENIED`, `BLOB_OIDC_ENVIRONMENT_DENIED`, or `BLOB_ACCESS_MODE_MISMATCH`: check the intended store, its Private access, and its project connection’s Production/Preview selection.
+- `BLOB_WRITE_CONFLICT`, `BLOB_RATE_LIMITED`, or `BLOB_SERVICE_UNAVAILABLE`: a conditional write conflict or storage service issue. No automatic application retry is added.
+- `BLOB_OPERATION_FAILED`: an unclassified storage error. The log identifies read/write and API start/step/event without exposing arbitrary SDK error messages.
 
-Logs contain only fixed stage/code labels and a missing-file flag, not credentials or request bodies. Explicit application errors, such as a budget limit or invalid action, retain their own messages.
+An empty store is expected before the first successful `/api/start`: the app creates `daylight/traces/...` on demand, then `daylight/budgets/...` before inference. A dashboard sample such as “hello world” is not app data and does not prove the deployment can write. After connecting storage, **redeploy and open the new deployment**; an older deployment URL retains its earlier environment.
+
+Logs contain only fixed stage/code/operation labels and a missing-file flag, not credentials or request bodies. Explicit application errors, such as a budget limit or invalid action, retain their own messages.
 
 ## Usage and trace behavior
 
