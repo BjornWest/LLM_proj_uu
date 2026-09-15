@@ -10,5 +10,6 @@ services:
         read_only: true
         bind:
           create_host_path: false
+          propagation: rprivate
   control:
     image: intent-browser-control:full-sites-v2

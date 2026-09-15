@@ -86,7 +86,7 @@ def main():
         check('Explicit close-other targets health exactly once and releases the music slot',closes[-1][1]=='/api/manual/sessions/'+health['id']+'/close' and len(closes)==prior_closes+1 and health['status']=='finished')
         failed={**health,'id':str(uuid4()),'status':'error','created_at':'2026-09-15T17:00:00Z','error':'ValueError: Browser left supported health routes','last_error':'','trace_ready':True}
         frame(failed);sessions.insert(0,failed)
-        page.locator('.site-choice[data-site=tricky-health]').click();page.locator('#manual-check').click();expect(page.locator('#manual-error')).to_contain_text('Medical records and profiles are not included')
+        page.locator('.site-choice[data-site=tricky-health]').click();page.locator('#manual-check').click();expect(page.locator('#manual-error')).to_contain_text('Medical records and profiles were not included')
         check('Unsupported health link explains fixture boundary and recovery',page.locator('#manual-open').is_enabled() and 'Appointments' in page.locator('#manual-scope').inner_text() and 'Open a new session' in page.locator('#manual-error').inner_text())
         check('Raw route error remains available without changing the saved verdict',page.locator('#manual-error-raw').text_content()==failed['error'] and failed['status']=='error' and page.locator('#manual-frame-status').inner_text().startswith('Saved screenshot'))
         page.screenshot(path=str(out/'health-boundary.png'),full_page=True)

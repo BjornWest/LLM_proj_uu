@@ -1,5 +1,7 @@
 # Remote manual session recovery
 
+Historical recovery release: its reduced-page scope is superseded by [complete-site restoration](full-site-restoration.md). The old errors/traces remain preserved; new sessions use the complete shared build.
+
 The September 15 user report described a frozen Medical records navigation,
 an apparently ineffective Check sessions button, and a stuck music screenshot.
 Read-only production inspection found:

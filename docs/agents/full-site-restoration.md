@@ -45,14 +45,13 @@ second version of task state. Native bindings record privileged journals.
 Three PDF links refer to files absent from the complete original repository:
 `/downloads/lab_results.pdf`, `/downloads/blood_test.pdf`, `/downloads/xray.pdf`.
 Their controls remain and the requests fail honestly. The original Health logout
-link has no implemented route. Some music URLs are placeholders or unavailable.
+link has no implemented route. All eight referenced audio URLs failed at snapshot time (seven returned 403; the example.com placeholder returned 404), so audio playback remains unavailable despite the restored player controls.
 Of 54 media URLs, 43 resources (9,751,613 bytes) were snapshotted; 11 failures are
 retained as local failed-resource paths, with their original URLs/status in the
 manifest. No made-up documents, audio or replacement images are supplied.
 Snapshotting avatars freezes the original service's random-color result.
 
-Playback availability is therefore resource-specific; restored controls do not
-mean all upstream downloads/audio work. Other unreviewed original routes and
+Restored controls therefore do not mean upstream PDF downloads or music audio work. Other unreviewed original routes and
 patterns remain navigable but cause authorization to stay unknown unless an
 observed forbidden effect already establishes failure. New task definitions
 still need their own objective and verifier review.
@@ -117,3 +116,29 @@ This removes screenshot polling from client inspection; it uses neither Blob
 nor model tokens. Initial downloads are larger than the cut-down fixtures, and
 Vercel function requests/transfer still count toward plan usage. No new cloud
 service or paid storage tier is introduced.
+
+
+## Deployment and restart
+
+The complete site is deployed at `https://browseragent.vercel.app/sites/tricky/`.
+The active PC images are `intent-browser-worker:full-sites-v2` and
+`intent-browser-control:full-sites-v2`, with the exclusive
+`.local/environment-packages/portable-full-v2` package and
+`.local/team-worker/fixtures-full-v2` fixture export. These share site revision
+`9fc287a252ddee32e579575bec50e33568070272de2e81ef5c9033bde19eb90e`.
+
+For future compose operations include `deploy/control/full-sites.override.yaml`
+AFTER the existing worker, Chaos, fixture, control, worker-network and manual
+compose files; set `ENVIRONMENT_PACKAGE` and `FULL_SITE_FIXTURES` from
+`.local/control/active-environment.env`. The explicit `rprivate` bind propagation
+is necessary for this WSL/Docker Desktop setup. Do not use the old default
+fixture bind or restart only one member of the shared network namespace.
+Check that no jobs/manual sessions are active before any recreation. Preserve
+`worker_worker-data`, `worker_control-data` and `worker_manual-data` volumes.
+
+Read-only production checks are recorded in
+`.local/tricky-full-v1/production-core/report.json` and
+`.local/tricky-full-v1/production-sites/report.json`. The switch preserved all
+109 storage keys and all 108 non-heartbeat record hashes. No active tasks were
+interrupted. Rollback images (`*:reasoning-v1`) and `portable-v2` remain locally;
+rolling back one side alone intentionally fails the new-version launch checks.
