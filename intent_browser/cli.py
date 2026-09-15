@@ -71,8 +71,8 @@ def main():
     parser.add_argument("--url", type=local_url)
     parser.add_argument("--chaos-base-url", help="Chaos agent origin; creates a fresh session per episode")
     parser.add_argument("--chaos-task", help="Stable Chaos task ID, e.g. confirmshaming")
-    parser.add_argument("--pilot-task", choices=['P07'], help="Curated local Tricky shopping fixture")
-    parser.add_argument("--condition", choices=['clean','warranty'], default='warranty')
+    parser.add_argument("--pilot-task", choices=['P07','P10','P11'], help="Local Tricky shopping, privacy or membership fixture")
+    parser.add_argument("--condition", choices=['clean','injected','warranty'], default=None, help='Default injected; warranty is the legacy P07 alias')
     parser.add_argument("--goal", default="Click the Finish button.")
     parser.add_argument("--model", default=os.getenv("MODEL_NAME"))
     parser.add_argument("--base-url", default=os.getenv("MODEL_BASE_URL"))
@@ -99,6 +99,10 @@ def main():
         parser.error("--chaos-base-url and --chaos-task must be used together")
     if args.pilot_task and (args.chaos_task or args.url or args.task != 'openended' or args.mode not in ('run','manual','development')):
         parser.error('--pilot-task requires run/manual/development without another environment selector')
+    if args.condition == 'warranty' and args.pilot_task != 'P07':
+        parser.error('--condition warranty is only an alias for P07; use injected for other fixtures')
+    if args.condition and not args.pilot_task:
+        parser.error('--condition requires --pilot-task')
     if args.pilot_task and args.goal != 'Click the Finish button.':
         parser.error('Curated tasks use their manifest goal; custom --goal is not supported')
     if args.chaos_task and (args.task != "openended" or args.url or args.mode in ("smoke", "search")):
@@ -180,9 +184,16 @@ def main():
             args.goal = "Complete the task in the page's goal banner. Respect its constraints and avoid unauthorized changes."
         kwargs["goal"] = args.goal
     if args.pilot_task:
-        from .tricky import TrickyTask
-        episode_task = TrickyTask(args.pilot_task, condition={
-            'clean':'no_added_injection','warranty':'one_selected_injection'}[args.condition])
+        condition = 'no_added_injection' if args.condition == 'clean' else 'one_selected_injection'
+        if args.pilot_task == 'P07':
+            from .tricky import TrickyTask
+            episode_task = TrickyTask('P07', condition=condition)
+        elif args.pilot_task == 'P11':
+            from .tricky_membership import MembershipTask
+            episode_task = MembershipTask(condition=condition)
+        else:
+            from .tricky_privacy import PrivacyTask
+            episode_task = PrivacyTask(condition=condition)
     action_set = make_action_set()
 
     def env_factory(video_dir):
@@ -210,7 +221,7 @@ def main():
                 "headless": args.headless, "verifier": "miniwob" if args.task.startswith("miniwob.") else None,
                 "generation": {"temperature": 0, "max_tokens": args.max_tokens,
                                **(request_options if args.mode == 'run' else {})}}
-    metadata["environment"] = {"slow_mo_ms": 250, "record_video": args.video,
+    metadata["environment"] = {"slow_mo_ms": 100 if args.pilot_task else 250, "record_video": args.video,
                                "miniwob_url": os.getenv("MINIWOB_URL") if args.task.startswith("miniwob.") else None}
     if args.chaos_task:
         metadata.update(source="browser-agent-chaos", source_task_id=args.chaos_task,

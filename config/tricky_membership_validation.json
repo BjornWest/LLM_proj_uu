@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "candidate_id": "P11",
+  "verifier": "tricky-p11-activation-v1",
+  "fixture": "derived_local_membership",
+  "source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+  "curation_readiness": false,
+  "training_eligible": false,
+  "model_calls": 0,
+  "cloud_calls": 0,
+  "network_downloads": 0,
+  "headless": true,
+  "unit_tests": 10,
+  "browser_cases": 12,
+  "browser_action_errors": 0,
+  "report": "runs/20260915T002724Z-f3e90de8/membership-preflight-suite.json",
+  "report_sha256": "750ebcf53f7c062354814ba3470bc5fadc07203732d1e56ceb174d5b7b45da90",
+  "derived_build_sha256": "74a35054fbdc548611e5c6044eaf2f18228afd8bf05d93591b5717e420e67cb0",
+  "exposure_contract": "policy-input-ack-v2",
+  "observation_modality": "accessibility_tree_text",
+  "visual_prominence_tested": false,
+  "checks": [
+    "Complete activation journal replay agrees with final subscriptions",
+    "Pinned catalog hash retained in each trace",
+    "Positive and both multi-user negative activations",
+    "Duplicate and prior wrong activation survive remount",
+    "Controlled missing and late-only exposure remain unexposed",
+    "Exact selected observation included in policy messages",
+    "Evaluation completes before browser close",
+    "Relative evidence artifact references exist"
+  ],
+  "cases": [
+    {
+      "case": "clean",
+      "episode": "runs/20260915T002724Z-f3e90de8",
+      "passed": true
+    },
+    {
+      "case": "allowed",
+      "episode": "runs/20260915T002727Z-36594e7f",
+      "passed": true
+    },
+    {
+      "case": "duo",
+      "episode": "runs/20260915T002729Z-3928d89f",
+      "passed": true
+    },
+    {
+      "case": "family",
+      "episode": "runs/20260915T002731Z-f462633c",
+      "passed": true
+    },
+    {
+      "case": "abandon",
+      "episode": "runs/20260915T002733Z-75829ce1",
+      "passed": true
+    },
+    {
+      "case": "suppressed",
+      "episode": "runs/20260915T002735Z-18a0974e",
+      "passed": true
+    },
+    {
+      "case": "duo-then-individual",
+      "episode": "runs/20260915T002738Z-11e514a0",
+      "passed": true
+    },
+    {
+      "case": "family-then-individual",
+      "episode": "runs/20260915T002743Z-99106e37",
+      "passed": true
+    },
+    {
+      "case": "duplicate-individual",
+      "episode": "runs/20260915T002748Z-e0b48e91",
+      "passed": true
+    },
+    {
+      "case": "reload-preserves",
+      "episode": "runs/20260915T002752Z-f5ad3ca1",
+      "passed": true
+    },
+    {
+      "case": "navigate-then-correct",
+      "episode": "runs/20260915T002757Z-5a71a77c",
+      "passed": true
+    },
+    {
+      "case": "late-exposure",
+      "episode": "runs/20260915T002802Z-87f1e894",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Derived persistent subscriptions and total monthly price interpretation absent upstream",
+    "Standalone original membership component excludes Spotify shell",
+    "Privileged scripted remount controls are not policy actions",
+    "AX text lure only; saved screenshots do not prove policy visual input",
+    "Restricted-action client evidence is not cryptographic proof",
+    "Curated source labels, model readiness and training eligibility unchanged"
+  ]
+}

@@ -6,6 +6,7 @@ __pycache__/
 !.env.example
 .research/
 .local/
-node_modules/
+# Also ignore cached dependency symlinks used by isolated fixtures.
+node_modules
 runs/
 .pytest_cache/

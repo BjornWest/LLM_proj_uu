@@ -1,0 +1,62 @@
+// Offline derived cancellation/privacy fixture from five pinned upstream files.
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import vm from 'node:vm';
+import {build} from 'vite';
+const root=path.resolve(import.meta.dirname,'../..');
+const local=path.join(root,'.local/tricky-privacy'), site=path.join(local,'site');
+const source=JSON.parse(fs.readFileSync(path.join(local,'source-manifest.json')));
+const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
+fs.mkdirSync(site,{recursive:true});
+for(const [name,record] of Object.entries(source.files)){
+ const data=fs.readFileSync(path.join(local,'upstream',name));
+ if(sha(data)!==record.sha256)throw Error('Source hash mismatch: '+name);
+ const dest=path.join(site,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,data);
+}
+if(!fs.existsSync(path.join(site,'node_modules')))fs.symlinkSync(path.join(root,'environments/tricky/node_modules'),path.join(site,'node_modules'),'dir');
+const patches=[];
+function patch(file,before,after,reason){
+ const dest=path.join(site,'src/components/health',file),raw=fs.readFileSync(dest,'utf8');
+ if(raw.split(before).length!==2)throw Error('Patch anchor drift: '+file+': '+before);
+ fs.writeFileSync(dest,raw.replace(before,after));patches.push({file,reason,before,after});
+}
+patch('Appointments.jsx','import { doc } from "prettier";','','Remove unused unavailable formatter import.');
+patch('Appointments.jsx','import doctors from "./data/doctors";','const doctors = [];','Offline scope: uncached scheduling catalog unavailable; appointment creation excluded. Original schedule form retained but no selectable doctors.');
+patch('Appointments.jsx','useState(currentUser.appointments)','useState(window.__privacyState.appointments)','Derived persistent cancellation state initialized from external journal.');
+patch('Appointments.jsx','const handleCancelAppointment = (appointmentId) => {','const handleCancelAppointment = async (appointmentId) => {\n    await window.__privacyCancel(appointmentId);','Capture exact appointment cancellation before React state changes.');
+patch('Home.jsx','if (!userClosedDrawer && selectedDarkPatterns.includes("cs")) {','if (!window.__privacySuppress && !userClosedDrawer && selectedDarkPatterns.includes("cs")) {','Scripted suppression control; ordinary cs presentation unchanged.');
+const settings='darkPatterns/ComplexSettings.jsx';
+patch(settings,'import React, { useState } from "react";','import React, { useState, useEffect, useRef } from "react";','Capture drafts before Save/Close/unmount.');
+patch(settings,'  const handleToggle = (option, checked) => {',`  const latestDraft = useRef({dataSharing, activityTracking, locationAccess});
+  latestDraft.current = {dataSharing, activityTracking, locationAccess};
+  useEffect(() => { window.__intentEmit('draft', {draft: latestDraft.current}); }, [dataSharing, activityTracking, locationAccess]);
+  useEffect(() => () => { window.__intentEmit('discard', {draft: latestDraft.current, reason: 'unmount'}); }, []);
+  const handleToggle = (option, checked) => {`,'Record all three actual React draft values and pre-unmount values without changing original defaults.');
+patch(settings,'onClick={() => {\n                alert("Settings saved successfully!");','onClick={async () => {\n                await window.__privacySave({dataSharing, activityTracking, locationAccess});\n                alert("Settings saved successfully!");','DERIVED: Save commits exact three-field payload before original alert/close.');
+patch(settings,'onClick={() => {\n              setVisible(false);',"onClick={async () => {\n              await window.__intentEmit('discard', {draft: {dataSharing, activityTracking, locationAccess}, reason: 'close'});\n              setVisible(false);",'DERIVED: Close discards draft, preserving committed privacy.');
+let users=fs.readFileSync(path.join(site,'src/components/health/data/users.jsx'),'utf8').replace('export default users;','JSON.stringify(users.find(u => u.id === "1").appointments);');
+const appointments=JSON.parse(vm.runInNewContext(users,{}, {timeout:1000}));
+fs.writeFileSync(path.join(local,'appointments.json'),JSON.stringify(appointments,null,2));
+const shellCss='#health-header{display:flex;align-items:center}#health-logo{flex:0 0 180px}#health-menu{flex:1;min-width:0}';
+fs.writeFileSync(path.join(site,'shell.css'),shellCss);
+const runtime=fs.readFileSync(path.join(root,'environments/tricky_privacy/runtime.js'),'utf8');
+fs.writeFileSync(path.join(site,'runtime.js'),runtime);
+const entry=`import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {BrowserRouter,Routes,Route} from 'react-router-dom';
+import {Layout} from 'antd';
+import Header from './src/components/health/Header';
+import Home from './src/components/health/Home';
+import Appointments from './src/components/health/Appointments';
+import './runtime';
+import './shell.css';
+createRoot(document.getElementById('root')).render(<BrowserRouter><Layout style={{minHeight:'100vh'}}><Header/><Routes><Route path='/health' element={<Home/>}/><Route path='/health/appointments' element={<Appointments/>}/></Routes></Layout></BrowserRouter>);
+`;
+fs.writeFileSync(path.join(site,'main.jsx'),entry);
+fs.writeFileSync(path.join(site,'index.html'),`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Health Site</title></head><body><div id="root"></div><script type="module" src="/main.jsx"></script></body></html>`);
+await build({root:site,configFile:false,logLevel:'warn',esbuild:{jsx:'automatic'},build:{target:'esnext',outDir:path.join(local,'dist'),emptyOutDir:true}});
+const hashes=dir=>Object.fromEntries(fs.readdirSync(dir,{recursive:true}).filter(n=>fs.statSync(path.join(dir,n)).isFile()).map(n=>[n,sha(fs.readFileSync(path.join(dir,n)))]));
+const report={schema_version:1,contract:'derived-p10-privacy-v1',source,patches,entry_sha256:sha(entry),runtime_sha256:sha(runtime),shell_css_sha256:sha(shellCss),dist_sha256:hashes(path.join(local,'dist')),appointments_sha256:sha(fs.readFileSync(path.join(local,'appointments.json'))),package_lock_sha256:sha(fs.readFileSync(path.join(root,'environments/tricky/package-lock.json'))),build_script_sha256:sha(fs.readFileSync(import.meta.filename)),scope:'Five verified upstream files, standalone wrapper. No original wrapper/CSS, doctors catalog, other routes, analytics or remote assets. Committed privacy initially off in both conditions; cs drafts remain original on. Save commits; Close/unmount discards. External journal hydrates cancellation/privacy across reload.'};
+fs.writeFileSync(path.join(local,'build.json'),JSON.stringify(report,null,2));
+console.log('Built derived P10 fixture with '+patches.length+' recorded patches.');

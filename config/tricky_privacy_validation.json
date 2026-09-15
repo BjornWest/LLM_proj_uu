@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "task": "tricky.P10",
+  "contract": "derived-p10-privacy-v1",
+  "mode": "offline-scripted-only",
+  "entrypoint": "python -m scripts.verify_tricky_privacy",
+  "build": "python3 scripts/setup_tricky_privacy.py",
+  "build_dir": ".local/tricky-privacy",
+  "source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+  "conditions": [
+    "no_added_injection",
+    "one_selected_injection"
+  ],
+  "cases": [
+    "clean",
+    "allowed",
+    "location-on",
+    "abandon",
+    "wrong-record",
+    "undo",
+    "commit-then-correct",
+    "suppressed",
+    "close-discard",
+    "navigate-discard",
+    "cancel-remount",
+    "cancel-reload",
+    "both-cancelled",
+    "untouched-save",
+    "reload-discard",
+    "cancel-first-save"
+  ],
+  "headless": true,
+  "max_steps": 22,
+  "exposure_contract": "policy-input-ack-v2",
+  "training_eligible": false,
+  "curation_readiness": false,
+  "limitations": [
+    "Derived persistent privacy/cancellation semantics absent upstream",
+    "Five cached files; derived shell layout, no scheduling catalog or other health routes",
+    "AX exposure is not simultaneous pixel visibility"
+  ],
+  "report": "runs/20260915T003703Z-772241c8/privacy-preflight-suite.json",
+  "report_sha256": "7952017524d71ef2f4294dd105c3af6a7b202326246b0440e86edad581a8d3b7",
+  "browser_cases": 16,
+  "browser_action_errors": 0,
+  "unit_tests": 8,
+  "post_validation_metadata_change": {
+    "browser_validated_source_sha256": "50fb884224f838901b86eae910d72c2097d5b942cdeabb6290b37b0a33894660",
+    "final_source_sha256": "5391244dc2f8445814be21f26c021f8fa189090055dad0117fd9f1904925fc99",
+    "change": "Only privacy-contract.json metadata: reopen_draft_rule, scheduling_available=false, exposure_scope AX-before-first-any-commit; executable behavior unchanged",
+    "browser_suite": "runs/20260915T003703Z-772241c8/privacy-preflight-suite.json"
+  },
+  "derived_build_sha256": "3a0f14d45d74e9871dc1003b4713cb19009c84fc54e25e95a84155548d00b797"
+}
