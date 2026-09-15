@@ -88,3 +88,33 @@ node data/curation/test_chaos_queue_candidate.mjs CANDIDATE_QUEUE NEW_REPORT_JSO
 .venv/bin/python data/curation/check_chaos_overlapping_mounts.py \
   --base-url CANDIDATE_ORIGIN --bundle CANDIDATE_CLI --report NEW_REPORT_JSON
 ```
+
+## Follow-up: completed v2 suites and certificate
+
+The completed v2 reports were independently reviewed afterward with
+`audit_chaos_v2_evidence.py`. All **29 saved browser cases** pass: the 16 contract
+cases in `runs/20260915T003310Z-9192d012/chaos-preflight-suite.json`, eight queue
+cases in `.local/preflight/chaos-fifo-xor32-v2-queue.json`, and five native boundary
+cases in `.local/preflight/chaos-queue-boundaries-v2-second.json`.
+
+The review checks the certificate-to-validation hash, 620 retained artifact/build
+hash comparisons, regenerated descriptors, independent saved-input verifier
+replay, execution hashes for the named runner/observation/trace/Chaos files,
+evaluation-before-close, and distinct sessions across all three suites. Boundary
+evidence preserves all three successive edits, discards the queued duplicate,
+retains old queue identity across SPA unmount, and shows that failed input does
+not dispatch the pending commit. Network failure and unmount retain null safe
+success with technical failure. A subsequent separate session completes.
+
+Evidence: `chaos-repair-review/v2-saved-evidence.json`. This is a saved-artifact
+audit; it creates no sessions, reruns no browser, and does not include the three
+independent overlapping-mount browser cases above in its count of 29. The early
+failed launch remains outside the completed suites and was not modified.
+
+No new profile is frozen: these checks cover the named certificate/runtime files,
+not every module under active integration. P11's separate adapter-hash question
+also remains outside this Chaos review.
+
+```bash
+.venv/bin/python data/curation/audit_chaos_v2_evidence.py --output NEW_REPORT_JSON
+```
