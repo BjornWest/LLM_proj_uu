@@ -178,3 +178,92 @@ partial action JSON must not be rendered as a reply. A tool's explanation
 does not prove a purchase: display an attempt until independent environment
 evidence establishes a commit. Polling live browser progress and streaming
 model reply tokens are separate capabilities.
+
+## Planned trace index and site-first navigation
+
+The requested default is an interactive website with an extension-style agent
+sidebar. Sites are grouped in collections. Each site has Tasks & replays;
+a separate global All traces & replays page filters the same authorized index
+by site, collection, interaction kind and recorded grade. The `/workspace`
+prototype is local-only pending user feedback; it does not change production
+routes or make static preview sites supported harness tasks.
+
+The future index must retain these independent fields (not implemented API):
+
+| Field | Meaning and historical handling |
+| --- | --- |
+| `site_id`, `collection` | Explicit stable site/collection identifiers, with their registry or source revision; null if unavailable. |
+| `interaction_kind` | Recorded `task` or `ask`; null when the source did not record the distinction. Never infer from goal text or equality. |
+| `task_id`, `task_name`, `task_revision` | Recorded task identity/display name/revision; keep the original goal separately. Any registry enrichment must name the matching source/revision. |
+| `execution_status` | Recorded queued/running/finished/error/interrupted state, separate from evaluation. Finished does not imply successful or authorized. |
+| `execution_mode`, `runtime` | Recorded live/scripted mode, harness/runtime/model provenance. Existing worker `mode` means live/rehearsal, not task/ask. |
+| `raw_evaluation` | Unmodified recorded verifier output, including false, null, technical errors and evidence scope. |
+| `grade`, `rubric` | Only an explicit recorded verifier grade and its rubric/scale/evidence. Null otherwise; never manufacture partial credit from missing requirements. |
+| `artifact_refs` | Immutable original/projection/observation/media references and hashes resolved through authenticated access checks. |
+
+Saved-run replay reads existing evidence. Scripted browser reproduction and
+verifier re-execution are separate operations with new provenance; selecting a
+saved run must never implicitly enqueue either operation or call a model.
+The imported projection is `common_agent_util` BrowserGym `session.json`, with
+`assets.json` and `manifest.json` from the curation export. Use the v2 local
+presentation examples documented in `data/curation/OFFLINE_REPLAY.md`; their
+manifest format remains `browsergym-saved-replay-v1`, schema version 1.
+Never execute uploaded HTML in the authenticated application. Render captured
+text as data; keep privileged evaluation distinguishable from policy input.
+Historical originals and unknown fields remain intact. Human review notes are
+separate records rather than edits to grades or original evidence.
+
+This is a shared data contract for the next backend/library increment, not a
+claim that global import/listing, partial grading or the site-first production
+layout is already available. Existing invitation-scoped access remains in
+force until a separate explicit sharing policy is implemented.
+
+## Site-first workspace candidate (implementation pending coordinated release)
+
+This increment implements the routing and explicit metadata subset above;
+it does not implement local/external ZIP imports or a new trace parser.
+Authenticated `/`, `/workspace` and `/workspace/replays` serve Workspace.
+`/demo` preserves the original interactive demo and `/harness` preserves the
+research review UI. Workspace JS/CSS remain protected function assets.
+
+New harness launches accept `interaction_kind: "task" | "ask"`; omitted/null
+stays null for compatibility. Ask requires a custom-goal-capable task. The
+server stores `task_id`, `task_name`, existing `task_revision`, `condition`, `site_id`,
+`site_name`, `collection`, `collection_name`, `site_registry_revision` and
+`activity_metadata_source` from its task/site registries. Client task names
+cannot override these values; supplied site/collection IDs must match.
+Execution `mode` is still assigned separately by the claiming worker. The
+worker interface and its original episode ZIP remain unchanged; these new
+fields are broker job metadata, not retroactive changes to episode files.
+
+`config/team_sites.json` fixes site and collection identities separately from
+fixture/verifier contracts. Sites are campus (demo), chaos
+(browser-agent-chaos), tricky-shop/health/music (trickyarena), and
+authorized-warranty (synthetic-development). Human display names are separate
+from IDs; filters must use the IDs. Registry revisions in activity metadata
+are SHA-256 of `JSON.stringify` on the imported registry values. Exact source
+file hashes are separately retained in build provenance.
+
+New `/api/start` requests may pass `interaction_kind` and `site_id: "campus"`.
+Assist/chat accept Ask; task mode accepts Task; omitted kind remains null.
+The known fictional Campus runtime supplies the site/collection on the
+server. Arbitrary demo requests receive no reviewed task ID/name/revision and
+no fabricated evaluation. `/api/traces` projects stored metadata with null
+for historically missing fields. Original trace downloads remain unmodified.
+
+Existing `/api/harness/jobs` and paginated `/api/traces` remain separate,
+invitation-scoped sources for the combined library. Do not classify an old
+record from its goal, execution mode or current registry alone. A null
+safe-success must retain known completion/authorization fields independently.
+Neither this metadata nor an agent's done message establishes a verifier grade.
+
+### Execution-mode requirement at claim time
+
+Workspace task launches send `required_execution_mode: "live"`. The broker
+persists this independently of the eventual worker `mode`; omitted/null
+retains legacy unrestricted behavior. Other required-mode values are rejected
+in this API version. A rehearsal poll leaves live-required jobs queued and
+unmodified, and can still claim an eligible unrestricted job behind them. A
+later live poll may claim the waiting job. This check occurs within the same
+control-state mutation as assigning the lease, not only in frontend config.
+No worker-code change is required: the existing poll mode supplies the match.

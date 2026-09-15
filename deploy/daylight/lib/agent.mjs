@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto';
+import {interactionKind,siteForTask,recordedActivity,validateSite} from './activity.mjs';
 const PROVIDERS=['chutes','dekallm','phala','parasail','akashml','ionstream','cloudflare'];
 export const MAX_STEPS=12;
 const instruction=`You are Daylight, a browser assistant acting only on a fictional campus demo page.
@@ -62,7 +63,7 @@ export class Agent {
       const row=await this.store.read(key),trace=row?.value;
       if(!trace||trace.owner!==owner||trace.id!==id)continue;
       const steps=trace.steps||[],costs=steps.map(s=>s.usage?.cost).filter(c=>typeof c==='number'&&Number.isFinite(c));
-      traces.push({id,goal:trace.goal,mode:trace.mode,runtime:trace.runtime,browsergym:trace.browsergym,
+      traces.push({id,goal:trace.goal,mode:trace.mode,runtime:trace.runtime,browsergym:trace.browsergym,...recordedActivity(trace),
         created_at:trace.created_at,finished_at:trace.finished_at||null,status:trace.status,steps:steps.length,
         model_attempts:steps.filter(s=>s.dispatch_at).length,
         reported_cost_usd:costs.length?costs.reduce((a,b)=>a+b,0):null,
@@ -74,7 +75,12 @@ export class Agent {
   async start(owner,body) {
     insist(['task','chat','assist'].includes(body.mode),'Invalid mode');
     insist(typeof body.goal==='string' && body.goal.trim().length>0 && body.goal.length<=2000,'Provide a goal up to 2000 characters');
+    const interaction_kind=interactionKind(body.interaction_kind);
+    insist(interaction_kind===null||interaction_kind===(body.mode==='task'?'task':'ask'),'Interaction kind differs from the selected client mode');
+    const site=siteForTask('rooms');validateSite(body,site);
     const id=randomUUID(),row={schema_version:1,id,owner,mode:body.mode,goal:body.goal,
+      interaction_kind,...site,task_id:null,task_name:null,task_revision:null,condition:null,
+      activity_metadata_source:{interaction_kind:interaction_kind?'client_declaration':null,site:'daylight-client-demo-v1',site_registry_revision:site.site_registry_revision},
       runtime:'daylight-client-demo-v1',protocol:body.mode==='assist'?'interactive-actions-v1':'original-v1',browsergym:false,training_eligible:false,evaluation:null,
       created_at:new Date().toISOString(),status:'ready',steps:[],events:[],provenance:this.provenance};
     await this.store.write(traceKey(owner,id),row);return {id};

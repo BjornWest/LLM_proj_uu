@@ -2,6 +2,7 @@
 import {randomUUID,createHash,timingSafeEqual} from 'node:crypto';
 import {Agent} from './agent.mjs';
 import registry from '../../../config/team_tasks.json' with {type:'json'};
+import {interactionKind,siteForTask,recordedActivity,validateSite} from './activity.mjs';
 
 const KEY='daylight/harness/control-v1.json';
 const terminal=new Set(['finished','error','interrupted']);
@@ -14,7 +15,7 @@ export const TASKS=[
   ...registry.tasks.map(task=>({id:task.id,title:task.title,goal:task.goal,goal_mode:task.goal_mode,
     custom_goal:false,revision:task.revision,site:task.site,condition:task.condition,
     verification_scope:task.verification_scope,development_only:true})),
-];
+].map(task=>({...task,...siteForTask(task.id)}));
 export function workerAuthorized(header,env) {
   const secret=env.HARNESS_WORKER_TOKEN;
   if(typeof secret!=='string'||secret.length<43||typeof header!=='string')return false;
@@ -25,7 +26,7 @@ const initial=()=>({version:1,worker:null,active:null,jobs:{}});
 const iso=ms=>new Date(ms).toISOString();
 const publicJob=job=>{
   const {lease,worker_id,reservations,owner,artifacts,...value}=job;
-  return {...value,trace_ready:!!job.trace_parts?.length};
+  return {...recordedActivity(job),required_execution_mode:job.required_execution_mode??null,...value,trace_ready:!!job.trace_parts?.length};
 };
 export class Harness {
   constructor(store,{env=process.env,now=()=>Date.now()}={}) {this.store=store;this.env=env;this.now=now;}
@@ -75,6 +76,11 @@ export class Harness {
   async start(owner,value) {
     insist(this.enabled(),'The PC worker connection is not configured yet',503);
     const task=TASKS.find(t=>t.id===value.task);insist(task,'Unsupported task');
+    const interaction_kind=interactionKind(value.interaction_kind);
+    const required_execution_mode=value.required_execution_mode??null;
+    insist(required_execution_mode===null||required_execution_mode==='live','Invalid required execution mode');
+    insist(interaction_kind!=='ask'||task.custom_goal,'This reviewed task does not support custom Ask requests');
+    const site=siteForTask(task.id);validateSite(value,site);
     const dynamic=task.goal_mode==='resolve_after_session_prepare';
     insist(value.task_revision===undefined||value.task_revision===task.revision,'Task revision changed; refresh the task list',409);
     const goal=task.custom_goal?value.goal:task.goal;
@@ -89,6 +95,9 @@ export class Harness {
       insist(Object.keys(state.jobs).length<100,'This development queue reached 100 saved jobs; ask Bjorn to archive it',429);
       insist(Object.values(state.jobs).filter(j=>j.owner===owner&&!terminal.has(j.status)).length<3,'You already have three queued or active jobs',429);
       const job={id,owner,task:task.id,goal:dynamic?null:goal.trim(),task_revision:task.revision||null,
+        interaction_kind,required_execution_mode,...site,task_id:task.id,task_name:task.title,condition:task.condition||null,
+        activity_metadata_source:{interaction_kind:interaction_kind?'client_declaration':null,
+          task_registry_revision:sha(Buffer.from(JSON.stringify(registry))),site_registry_revision:site.site_registry_revision},
         goal_resolution:dynamic?'session_pending':'fixed',status:'queued',created_at:iso(this.now()),updated_at:iso(this.now()),
         step_count:0,steps:[],issues:[],artifacts:{},trace_parts:[],error:null,evaluation:null,runtime:null,image:null,reservations:[]};
       state.jobs[id]=job;return publicJob(job);
@@ -110,8 +119,10 @@ export class Harness {
     insist(typeof value.worker_id==='string'&&ID.test(value.worker_id),'Invalid worker identity');
     insist(['live','rehearsal'].includes(value.mode),'Invalid worker mode');
     insist(Array.isArray(value.tasks)&&value.tasks.every(id=>TASKS.some(t=>t.id===id)),'Invalid worker capabilities');
+    const eligible=job=>job.status==='queued'&&value.tasks.includes(job.task)&&
+      (!job.required_execution_mode||job.required_execution_mode===value.mode);
     const observed=await this.state();
-    if(!observed.active&&!Object.values(observed.jobs).some(j=>j.status==='queued'&&value.tasks.includes(j.task))&&
+    if(!observed.active&&!Object.values(observed.jobs).some(eligible)&&
         observed.worker?.id===value.worker_id&&observed.worker.mode===value.mode&&
         JSON.stringify(observed.worker.tasks)===JSON.stringify(value.tasks)&&this.now()-Date.parse(observed.worker.updated_at)<30000)
       return {job:null}; // Idle polling does not write a fresh control object every time.
@@ -124,7 +135,7 @@ export class Harness {
         return {job:null,active:active.id};
       }
       state.worker={id:value.worker_id,mode:value.mode,tasks:value.tasks,updated_at:iso(this.now())};
-      const job=Object.values(state.jobs).find(j=>j.status==='queued'&&value.tasks.includes(j.task));
+      const job=Object.values(state.jobs).find(eligible);
       if(!job)return {job:null};
       job.status='running';job.worker_id=value.worker_id;job.lease=randomUUID();job.mode=value.mode;
       job.updated_at=iso(this.now());state.active=job.id;
