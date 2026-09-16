@@ -25,9 +25,11 @@ DEMO_DAILY_CALL_LIMIT=<same value as Vercel>
 DAYLIGHT_CONTROL_READ_ONLY=1
 ```
 
-Do not put model/API keys in this service. It only stores state and grants
-existing budget reservations. The worker retains its dedicated model key.
-Vercel's client-demo inference key stays in Vercel.
+The base control configuration only stores state and grants existing budget
+reservations. The optional [shared browser Ask](../../docs/agents/shared-browser-ask.md)
+override supplies the dedicated demo model key through a separate private
+`ask.env`; it is not passed to imported browser processes. The worker retains
+its dedicated model key. Vercel's client-demo inference key stays in Vercel.
 
 The Docker image reuses the installed worker runtime (Node 22.23.2, including
 experimental `node:sqlite`); building it needs no new packages or image pulls.
@@ -46,6 +48,10 @@ weakening its HTTPS-origin validation. Preserve the existing `worker_worker-data
 volume and exact read-only fixture mounts when switching the worker.
 
 ## Test tunnel and Vercel configuration
+
+For a stable address without an owned domain, use the optional
+[Tailscale Funnel connector](../../docs/agents/tailscale-backend.md).
+The Quick Tunnel below remains a temporary development option.
 
 A Cloudflare quick tunnel needs no domain/account, but has a temporary URL that
 can change after restart. It is a development connection, not durable hosting.

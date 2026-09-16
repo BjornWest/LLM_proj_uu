@@ -1,0 +1,5 @@
+# Add after shared-browser.override.yaml. Deploy control before the Vercel client
+# that uses the trace-list endpoint; preserve the existing persistent volumes.
+services:
+  control:
+    image: intent-browser-control:history-v1

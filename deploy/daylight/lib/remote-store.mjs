@@ -28,6 +28,7 @@ export class RemoteStore {
   read(key) {return this.request('read',{key});}
   write(key,value,etag=null) {return this.request('write',{key,value,etag});}
   listKeys(prefix,{cursor,limit=25}={}) {return this.request('list',{prefix,cursor,limit});}
+  listTraces(owner,{cursor,limit=25}={}) {return this.request('trace-list',{owner,cursor,limit});}
 }
 
 export function configuredStore(env=process.env) {

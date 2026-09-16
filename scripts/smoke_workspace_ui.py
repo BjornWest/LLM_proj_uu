@@ -98,8 +98,10 @@ def main():
             second='cursor=' in route.request.url;pages.append(second)
             item={'id':str(uuid4()),'interaction_kind':'ask','site_id':'campus','collection':'demo','goal':'Older request' if second else 'Newer request','status':'complete','created_at':'2026-01-01T00:00:00Z' if second else '2026-02-01T00:00:00Z','evaluation':None}
             route.fulfill(json={'traces':[item],'has_more':not second,'cursor':None if second else 'opaque-next'})
-        page.route('**/api/traces?*',paginated);page.goto(origin+'/workspace/replays');page.locator('#global-kind').select_option('ask');expect(page.locator('#global-rows tr')).to_have_count(2)
-        check('Global history follows opaque pagination and sorts recorded timestamps',pages==[False,True] and 'Newer request' in page.locator('#global-rows tr').first.inner_text())
+        page.route('**/api/traces?*',paginated);page.goto(origin+'/workspace/replays');page.locator('#global-kind').select_option('ask');expect(page.locator('#global-rows tr')).to_have_count(1)
+        check('Global history loads one page and labels partial filters',pages==[False] and 'loaded history only' in page.locator('#global-history-status').inner_text())
+        page.locator('#global-history-more').click();expect(page.locator('#global-rows tr')).to_have_count(2)
+        check('Explicit Load more follows opaque pagination and sorts recorded timestamps',pages==[False,True] and 'Newer request' in page.locator('#global-rows tr').first.inner_text())
         page.unroute('**/api/traces?*');page.goto(origin+'/workspace?site=campus&view=research');page.locator('#task-cards button').first.click()
         rejected=[]
         def reject_task(route):rejected.append(route.request.post_data_json);route.fulfill(status=503,json={'error':'Offline broker unavailable'})

@@ -90,3 +90,35 @@ test('maintenance blocks authenticated mutations and GET does not expire/write o
   assert.equal((await call('/api/harness/jobs/'+job.id)).status,200);
   assert.deepEqual(await store.read('daylight/harness/control-v1.json'),old);
 });
+test('trace summaries use one remote request per page and preserve local projection/owner isolation',async t=>{
+  const {store,env,origin}=await setup(t),local=new Agent(store,{env});
+  const first=await local.start('alice',{mode:'assist',goal:'First question'});
+  const row=await local.read('alice',first.id);row.value.status='complete';row.value.evaluation={task_completed:true,authorization_satisfied:false,safe_success:null};
+  row.value.steps=[{dispatch_at:'2026-01-01T00:00:00Z',request:{private_payload:'large observation '.repeat(1000)},usage:{cost:.01}},{dispatch_at:'2026-01-01T00:00:01Z',usage:null}];
+  await store.write('daylight/traces/alice/'+first.id+'.json',row.value,row.etag);
+  await local.start('alice',{mode:'assist',goal:'Follow up',continuation_of:first.id});
+  const foreign=await local.start('bob',{mode:'assist',goal:'Private other owner'});
+  let calls=0;const remote=new RemoteStore({env:{...env,DAYLIGHT_CONTROL_URL:origin},fetcher:(...args)=>{calls++;return fetch(...args);}}),front=new Agent(remote,{env});
+  const before=await store.read('daylight/traces/alice/'+first.id+'.json');
+  let cursor,pages=0,seen=[];
+  do{
+    const options={limit:1,...(cursor?{cursor}:{})},actual=await front.list('alice',options);
+    assert.deepEqual(actual,await local.list('alice',options));assert.equal(calls,++pages);
+    assert.ok(!JSON.stringify(actual).includes('large observation'));assert.ok(!JSON.stringify(actual).includes(foreign.id));
+    seen.push(...actual.traces);cursor=actual.has_more?actual.cursor:null;
+  }while(cursor);
+  assert.equal(seen.length,2);assert.equal(seen.find(x=>x.id===first.id).unknown_cost_attempts,1);
+  assert.equal(seen.find(x=>x.id===first.id).evaluation.safe_success,null);
+  assert.equal(seen.find(x=>x.id!==first.id).previous_trace_id,first.id);
+  assert.deepEqual(await store.read('daylight/traces/alice/'+first.id+'.json'),before);
+});
+test('trace summary endpoint rejects bad owners and foreign/broken conversation links',async t=>{
+  const {store,origin,env,remote}=await setup(t),local=new Agent(store,{env});
+  const foreign=await local.start('bob',{mode:'assist',goal:'Secret'}),own=await local.start('alice',{mode:'assist',goal:'Public to Alice'});
+  const saved=await local.read('alice',own.id);saved.value.continuation_of=foreign.id;await store.write('daylight/traces/alice/'+own.id+'.json',saved.value,saved.etag);
+  assert.equal((await new Agent(remote).list('alice')).traces[0].previous_trace_id,null);
+  for(const body of [{owner:'../bob'},{owner:'alice',limit:101},{owner:'alice',cursor:42}]){
+    const r=await fetch(origin+'/internal/store/trace-list',{method:'POST',headers:{authorization:'Bearer '+secret},body:JSON.stringify(body)});assert.equal(r.status,400);
+  }
+  const r=await fetch(origin+'/internal/store/trace-list',{method:'POST',headers:{authorization:'Bearer '+worker},body:'{"owner":"alice"}'});assert.equal(r.status,401);
+});

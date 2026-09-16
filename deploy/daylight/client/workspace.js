@@ -26,7 +26,10 @@ function updateTool(tool,state,error){if(tool)keepChatPosition($('conversation')
 const initialSearch=new URLSearchParams(location.search);
 let requestedSite=initialSearch.get('site');
 const folderState=new Map();
-let refreshTracesPending=false;
+let refreshTracesPending=false,refreshRequested=false;
+let historyLoading=null,historyLoaded=false,historyMore=false,historyCursor=null,historyError='',historyStale=false;
+const historyCursors=new Set();
+const historyWanted=()=>globalPage||view==='research'||view==='review';
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
 const siteFor=id=>sites.find(s=>s.id===id);
@@ -142,7 +145,7 @@ function renderTasks(){
 function renderGlobal(){
   const query=$('global-search').value.trim().toLowerCase(),collection=$('global-collection').value,site=$('global-site').value,kind=$('global-kind').value,grade=$('global-grade').value,all=records();
   const matches=all.filter(r=>(site==='all'||r.site===site)&&(kind==='all'||(r.kind||'unknown')===kind)&&(grade==='all'||gradeOf(r)===grade)&&(collection==='all'||r.collection===collection)&&(!query||[r.title,r.goal,r.id,siteFor(r.site)?.name,...(r.turns||[]).flatMap(turn=>[turn.goal,turn.id])].join(' ').toLowerCase().includes(query)));
-  $('global-rows').replaceChildren(...matches.map(r=>recordRow(r,true)));$('global-count').textContent=matches.length+' of '+all.length+' conversations & runs';$('global-empty').hidden=!!matches.length;
+  $('global-rows').replaceChildren(...matches.map(r=>recordRow(r,true)));$('global-count').textContent=matches.length+' of '+all.length+' loaded conversations & runs';$('global-empty').hidden=!!matches.length;
 }
 function showTask(task){
   pendingTask=task;$('dialog-site').textContent=siteFor(taskSite(task))?.name+' / Task';$('dialog-task-name').textContent=task.title||task.id;$('dialog-goal').textContent=sessionGoal(task)?'Resolved when the session starts':task.goal||'No goal recorded';
@@ -154,8 +157,8 @@ function showTask(task){
 function pathFor(){return globalPage?'/workspace/replays'+(currentRun&&view==='review'?'?run='+encodeURIComponent(currentRun.key):''):'/workspace?site='+encodeURIComponent(siteID)+(view!=='explore'?'&view='+view:'')+(view==='review'&&currentRun?'&run='+encodeURIComponent(currentRun.key):'');}
 function syncURL(replace=false){history[replace?'replaceState':'pushState'](null,'',pathFor());}
 function selectSite(id){if(askBusy||manualBusy)return;draft=$('question').value;if(!manualUncertain)manualError='';siteID=id;globalPage=false;view='explore';currentRun=null;render();syncURL();}
-function setView(next){draft=$('question').value;globalPage=false;view=next;currentRun=null;render();syncURL();if(next==='research'){refresh(true);loadManual();}}
-function openGlobal(event){event?.preventDefault();draft=$('question').value;globalPage=true;view='global';currentRun=null;render();syncURL();refresh(true);loadManual();}
+function setView(next){draft=$('question').value;globalPage=false;view=next;currentRun=null;render();syncURL();if(next==='research'){refresh();loadHistory();loadManual();}}
+function openGlobal(event){event?.preventDefault();draft=$('question').value;globalPage=true;view='global';currentRun=null;render();syncURL();refresh();loadHistory();loadManual();}
 async function openRecord(record,fromGlobal=globalPage){
   $('run-viewer').dataset.run='';
   currentRun=record;globalPage=fromGlobal;view='review';if(!fromGlobal&&siteFor(record.site))siteID=record.site;render();syncURL();
@@ -192,7 +195,7 @@ async function loadBrowserTrace(record){
     // Bounded parallel reads; never download every conversation to list history.
     for(let offset=0;offset<turns.length;offset+=4){if(currentRun?.key!==record.key||version!==reviewVersion)return;values.push(...await Promise.all(turns.slice(offset,offset+4).map(turn=>api('/api/traces/'+encodeURIComponent(turn.id)))));}
     if(currentRun?.key!==record.key||version!==reviewVersion)return;
-    $('browser-record-summary').textContent=values.length+' recorded turn'+(values.length===1?'':'s')+' · '+values.reduce((sum,value)=>sum+(value.steps?.length||0),0)+' recorded steps · read-only';
+    $('browser-record-summary').textContent=values.length+' loaded turn'+(values.length===1?'':'s')+' · '+values.reduce((sum,value)=>sum+(value.steps?.length||0),0)+' recorded steps · read-only';
     renderTraceConversation(log,values);$('browser-trace-json').textContent=JSON.stringify(values.length===1?values[0]:values,null,2);
     $('browser-trace-download').textContent=values.length===1?'Download original JSON ↓':'Download first turn JSON ↓';
   }catch(error){if(currentRun?.key===record.key&&version===reviewVersion){log.replaceChildren(node('p','The conversation could not be loaded: '+error.message,'muted'));$('browser-trace-json').textContent=error.message;}}
@@ -204,7 +207,7 @@ function render(){
   document.querySelector('.site-heading').hidden=globalPage;document.querySelector('.site-tabs').hidden=globalPage;
   $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Browse yourself or ask the agent to use this same remote session.':site.description;$('site-label').textContent=site.interactive?'Interactive website':'Remote worker environment';
   $('explore-view').hidden=globalPage||view!=='explore';$('research-view').hidden=globalPage||view!=='research';$('global-view').hidden=!globalPage||view==='review';$('review-view').hidden=view!=='review';
-  $('explore-tab').setAttribute('aria-pressed',String(view==='explore'));$('research-tab').setAttribute('aria-pressed',String(view!=='explore'));$('replay-count').textContent=String(records().filter(r=>r.site===siteID).length);
+  $('explore-tab').setAttribute('aria-pressed',String(view==='explore'));$('research-tab').setAttribute('aria-pressed',String(view!=='explore'));$('replay-count').textContent=historyLoaded?String(records().filter(r=>r.site===siteID).length)+(historyMore?'+':''):'…';
   $('tab-note').textContent=view==='explore'?'Browse the site or open a reviewed task.':'Tasks and recorded attempts for this site.';
   renderSites();
   $('remote-explore').hidden=site.interactive;$('interactive-explore').hidden=!site.interactive;
@@ -216,7 +219,7 @@ function updateManualViews(){
   renderManual();renderSites();syncControls();
   if(currentRun?.source==='manual')currentRun=records().find(record=>record.key===currentRun.key)||currentRun;
   if(view==='research')renderTasks();if(globalPage&&view!=='review')renderGlobal();if(view==='review')renderReview();
-  $('replay-count').textContent=String(records().filter(record=>record.site===siteID).length);
+  $('replay-count').textContent=historyLoaded?String(records().filter(record=>record.site===siteID).length)+(historyMore?'+':''):'…';
 }
 function rememberManual(session){
   if(!session?.id)throw Error('The manual browser returned no session. Check sessions before continuing.');
@@ -322,7 +325,7 @@ let manualLoading=null;
 async function loadManual(){
   if(manualBusy||authExpired)return;if(manualLoading)return manualLoading;
   manualLoading=(async()=>{
-    try{const settings=await api('/api/manual/config');manualConfig=settings;const result=await api('/api/manual/sessions');manualSessions=(result.sessions||[]).sort((a,b)=>(Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0));manualUncertain=manualSessions.some(session=>['starting','busy'].includes(session.status));manualError='';remotePollFailed=false;manualCheckedAt=Date.now();}
+    try{const [settings,result]=await Promise.all([api('/api/manual/config'),api('/api/manual/sessions')]);manualConfig=settings;manualSessions=(result.sessions||[]).sort((a,b)=>(Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0));manualUncertain=manualSessions.some(session=>['starting','busy'].includes(session.status));manualError='';remotePollFailed=false;manualCheckedAt=Date.now();}
     catch(error){if(error.status===404){manualConfig={enabled:false,sites:[]};manualError='';}else{manualError=error.message;manualUncertain=true;}}
     finally{manualLoading=null;updateManualViews();}
   })();renderManual();return manualLoading;
@@ -363,24 +366,57 @@ $('manual-leave').onclick=()=>$('manual-text').focus();
 $('manual-scroll-up').onclick=()=>manualCommand('action',{type:'scroll',dx:0,dy:-500});$('manual-scroll-down').onclick=()=>manualCommand('action',{type:'scroll',dx:0,dy:500});
 $('manual-press').onclick=()=>manualCommand('action',{type:'press',key:$('manual-key').value});
 $('manual-text-form').onsubmit=async event=>{event.preventDefault();const field=$('manual-text'),text=field.value;if(!text||$('manual-send-text').disabled)return;field.value='';await manualCommand('action',{type:'type',text});};
-async function fetchDemoRows(){
-  let cursor;const rows=[],seen=new Set();
-  do{const page=await api('/api/traces?limit=100'+(cursor?'&cursor='+encodeURIComponent(cursor):''));rows.push(...(Array.isArray(page.traces)?page.traces:[]));if(!page.has_more)return rows;if(!page.cursor||seen.has(page.cursor))throw Error('Trace history pagination did not advance.');seen.add(page.cursor);cursor=page.cursor;}while(rows.length<10000);
-  throw Error('Trace history exceeds this viewer’s listing limit.');
+function renderHistoryState(){
+  const partial=historyMore||!historyLoaded;
+  for(const prefix of ['global','site']){
+    const status=$(prefix+'-history-status'),button=$(prefix+'-history-more');
+    status.textContent=historyError?'History could not be loaded: '+historyError:historyLoading?'Loading history…':partial?'Showing loaded history only. Filters and conversations cover loaded turns; load more for additional activity.':'All browser-side history loaded.';
+    button.hidden=historyLoaded&&!historyMore&&!historyError;button.disabled=!!historyLoading||authExpired;
+    button.textContent=historyError?'Retry history':historyLoaded?'Load more history':'Load history';
+  }
 }
+function renderHistory(){
+  if(view==='research')renderTasks();if(globalPage&&view!=='review')renderGlobal();renderHistoryState();
+}
+async function loadHistory({more=false,reset=false}={}){
+  if(authExpired)return;if(historyLoading)return historyLoading;
+  reset ||= historyStale;
+  if(historyLoaded&&!reset&&!more)return;
+  if(more&&!historyMore&&!reset)return;
+  const cursor=reset?null:historyCursor;
+  historyError='';
+  historyLoading=(async()=>{
+    try{
+      const page=await api('/api/traces?limit=25'+(cursor?'&cursor='+encodeURIComponent(cursor):''));
+      if(!Array.isArray(page.traces)||typeof page.has_more!=='boolean')throw Error('Invalid history response.');
+      if(page.has_more&&(!page.cursor||page.cursor===cursor||(!reset&&historyCursors.has(page.cursor))))throw Error('Trace history pagination did not advance.');
+      const merged=new Map((reset?[]:demoRows).map(row=>[row.id,row]));for(const row of page.traces)merged.set(row.id,row);
+      demoRows=[...merged.values()];if(reset)historyCursors.clear();if(page.cursor)historyCursors.add(page.cursor);
+      historyCursor=page.cursor;historyMore=page.has_more;historyLoaded=true;historyStale=false;lastDemoRefresh=Date.now();
+    }catch(error){historyError=error.message;}
+    finally{historyLoading=null;renderHistory();renderSites();}
+  })();renderHistoryState();return historyLoading;
+}
+for(const prefix of ['global','site'])$(prefix+'-history-more').onclick=()=>loadHistory({more:historyLoaded});
 async function refresh(forceTraces=false){
-  if(authExpired||document.hidden)return;if(refreshing){refreshTracesPending ||= forceTraces;return;}refreshing=true;const includeDemo=forceTraces||lastDemoRefresh===0;
-  try{
-    const results=await Promise.allSettled([api('/api/harness/config'),api('/api/harness/jobs'),...(includeDemo?[fetchDemoRows()]:[])]);
-    if(results[0].status==='fulfilled'){config=results[0].value;buildSites();$('worker-status').textContent=config.worker?.online?'● Worker online · '+(config.worker.mode==='live'?'live agent':'rehearsal'):'○ Worker offline';}
-    if(results[1].status==='fulfilled')jobRows=results[1].value.jobs||[];
-    if(results[2]?.status==='fulfilled'){demoRows=results[2].value;lastDemoRefresh=Date.now();}
-    for(const result of results)if(result.status==='rejected')notice(result.reason.message);
-    if(currentRun){const updated=records().find(r=>r.key===currentRun.key);if(updated)currentRun=updated;}
+  if(forceTraces)historyStale=true;
+  if(authExpired||document.hidden)return;if(refreshing){refreshRequested=true;refreshTracesPending ||= forceTraces;return;}refreshing=true;
+  // The registry can display sites independently of slow jobs/history reads.
+  const work=[(async()=>{try{
+    const first=!config,oldSite=siteID;config=await api('/api/harness/config');buildSites();
+    $('worker-status').textContent=config.worker?.online?'● Worker online · '+(config.worker.mode==='live'?'live agent':'rehearsal'):'○ Worker offline';
+    if(first||oldSite!==siteID)render();else{renderSites();if(view==='research')renderTasks();syncControls();}
+  }catch(error){notice(error.message);}})()];
+  if(historyWanted()||jobRows.some(j=>activeStatuses.has(j.status)))work.push((async()=>{try{
+    jobRows=(await api('/api/harness/jobs')).jobs||[];
+    if(currentRun?.source==='harness')currentRun=recordForKey(currentRun.key)||currentRun;
+    renderHistory();if(view==='review'&&currentRun?.source==='harness')renderReview();
+  }catch(error){notice(error.message);}})());
+  if(historyWanted())loadHistory();
+  try{await Promise.allSettled(work);
     if(pendingTask){const latest=tasks.find(t=>t.id===pendingTask.id);if(latest&&latest.revision===pendingTask.revision)pendingTask=latest;}
-    // Do not rebuild the conversation/composer during periodic updates.
-    renderSites();if(view==='research')renderTasks();if(globalPage&&view!=='review')renderGlobal();if(view==='review')renderReview();syncControls();
-  }finally{refreshing=false;clearTimeout(pollTimer);if(!authExpired){if(refreshTracesPending){refreshTracesPending=false;pollTimer=setTimeout(()=>refresh(true),0);}else pollTimer=setTimeout(()=>refresh(),jobRows.some(j=>activeStatuses.has(j.status))?4000:60000);}}
+    syncControls();
+  }finally{refreshing=false;clearTimeout(pollTimer);if(!authExpired){if(refreshRequested){const force=refreshTracesPending;refreshRequested=false;refreshTracesPending=false;pollTimer=setTimeout(()=>refresh(force),0);}else pollTimer=setTimeout(()=>refresh(),jobRows.some(j=>activeStatuses.has(j.status))?4000:60000);}}
 }
 $('try-task').onclick=async()=>{
   const task=pendingTask;if(!task||launching||authExpired||!config?.enabled||config.worker?.mode!=='live'||task.available===false)return;
@@ -451,8 +487,27 @@ $('clear-filters').onclick=()=>{for(const id of ['global-collection','global-sit
 $('toggle-agent').onclick=()=>setAgentVisible(!agentVisible);
 $('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];conversationID=null;draft='';activity=[];lastTrace=null;setWorking('');$('chat-status').textContent='';renderConversation();};
 $('back-to-research').onclick=()=>{view=globalPage?'global':'research';currentRun=null;reviewVersion++;render();syncURL();};
-async function readRoute(){const params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';if(siteFor(params.get('site')))siteID=params.get('site');const key=params.get('run');currentRun=recordForKey(key);view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();if(currentRun?.source==='demo')loadBrowserTrace(currentRun);}
+async function readRoute(){
+  const route=location.href,params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';
+  if(siteFor(params.get('site')))siteID=params.get('site');
+  const key=params.get('run');currentRun=recordForKey(key);view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();
+  if(key&&!currentRun&&/^[dhm]:[a-f0-9-]{36}$/.test(key)){
+    try{
+      const kind=key[0],id=key.slice(2),row=await api(kind==='d'?'/api/traces/'+id:kind==='h'?'/api/harness/jobs/'+id:'/api/manual/sessions/'+id);
+      if(location.href!==route)return;
+      if(kind==='d')demoRows=[...demoRows.filter(item=>item.id!==id),{...row,steps:row.steps?.length??0}];
+      else if(kind==='h')jobRows=[...jobRows.filter(item=>item.id!==id),row];else rememberManual(row);
+      currentRun=recordForKey(key);if(currentRun)view='review';render();
+    }catch(error){if(location.href===route)notice('The requested trace could not be loaded: '+error.message);}
+  }
+  if(historyWanted()){loadHistory();refresh();loadManual();}
+  if(currentRun?.source==='demo')loadBrowserTrace(currentRun);
+}
 document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden){refresh();loadManual();}else clearTimeout(remotePollTimer);});
 window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>{clearTimeout(pollTimer);clearTimeout(remotePollTimer);});
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('run-viewer').contentWindow||event.data?.type!=='harness:size')return;const height=Number(event.data.height);if(Number.isFinite(height))$('run-viewer').style.height=Math.min(8000,Math.max(650,height))+'px';});
-try{const results=await Promise.allSettled([api('/assets/fixture.json'),api('/api/config')]);if(results[0].status==='fulfilled'){fixture=results[0].value;window.demoWorld=new World(fixture);}if(results[1].status==='fulfilled')modelConfig=results[1].value;for(const result of results)if(result.status==='rejected')notice(result.reason.message);await refresh(true);buildSites();await loadManual();await readRoute();if(!modelConfig?.live_available)$('chat-status').textContent='OpenRouter is not configured for this deployment.';}catch(error){notice(error.message);syncControls();}
+// Render the workspace immediately; network dependencies settle independently.
+buildSites();readRoute();
+api('/assets/fixture.json').then(value=>{fixture=value;window.demoWorld=new World(fixture);render();}).catch(error=>notice(error.message));
+api('/api/config').then(value=>{modelConfig=value;syncControls();if(!value.live_available)$('chat-status').textContent='OpenRouter is not configured for this deployment.';}).catch(error=>notice(error.message));
+refresh();loadManual();

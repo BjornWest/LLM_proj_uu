@@ -1,0 +1,28 @@
+# Optional stable public connector. Add last to the control/worker Compose stack.
+# Keep this volume: deleting it loses the registered device identity and hostname.
+services:
+  tailscale:
+    image: tailscale/tailscale@sha256:51fec4863144d6ba0a22504cfb455d020ee0307d0c04eb48f5afee63390bdba0
+    network_mode: service:control
+    depends_on: [control]
+    entrypoint: [tailscaled]
+    command:
+      - --tun=userspace-networking
+      - --state=/var/lib/tailscale/tailscaled.state
+      - --socket=/tmp/tailscaled.sock
+      - --port=0
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 1
+    logging:
+      driver: json-file
+      options: {max-size: 5m, max-file: "3"}
+volumes:
+  tailscale-state:

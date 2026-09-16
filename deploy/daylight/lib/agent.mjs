@@ -113,8 +113,12 @@ export class Agent {
     }
   }
   async list(owner,{cursor,limit=25}={}) {
+    insist(typeof owner==='string'&&/^[a-z0-9-]{1,40}$/.test(owner),'Invalid trace owner');
     insist(Number.isInteger(limit)&&limit>=1&&limit<=100,'Invalid page size');
     insist(cursor===undefined||typeof cursor==='string'&&cursor.length<=2048,'Invalid cursor');
+    // Execute the existing owner checks and projection next to SQLite. One
+    // network round trip per page, never one transfer per full trace.
+    if(typeof this.store.listTraces==='function')return this.store.listTraces(owner,{cursor,limit});
     const prefix=`daylight/traces/${owner}/`,page=await this.store.listKeys(prefix,{cursor,limit});
     const traces=[];
     for(const key of page.keys) {

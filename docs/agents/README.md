@@ -9,6 +9,11 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 
 ## Existing references
 
+- [Independent startup and trace pagination](history-loading.md): local summary projection, lazy history and release evidence.
+- [Screenshot retention proposal](trace-retention-proposal.md): exact deduplication, rarity/coverage selection and protected evidence; not implemented.
+
+- [Stable PC backend address](tailscale-backend.md): Tailscale Funnel, persistent device identity, restart and Vercel cutover checks.
+
 - [Shared browser Ask](shared-browser-ask.md): same-session human/agent handover, interruption, ungraded requests and trace evidence.
 
 - [Complete hosted sites](full-site-restoration.md): full-source restoration, shared native/client versions, known upstream gaps and validation.
