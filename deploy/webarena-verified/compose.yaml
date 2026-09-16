@@ -1,0 +1,23 @@
+# Complete upstream applications. Local development only; no production secrets.
+# See docs/agents/webarena-verified.md for reset and evidence boundaries.
+name: intent-webarena-verified
+services:
+  shopping:
+    image: am1n3e/webarena-verified-shopping@sha256:3e8cb9b945ea9b1c94ab26dba53e8d12dd0406abbf4bf686fd3bb2b6a5908feb
+    ports:
+      - "127.0.0.1:7770:80"
+      - "127.0.0.1:7771:8877"
+    environment:
+      WA_ENV_CTRL_EXTERNAL_SITE_URL: http://localhost:7770
+    mem_limit: 4g
+    cpus: 2
+    shm_size: 256m
+  reddit:
+    image: am1n3e/webarena-verified-reddit@sha256:0594908059a03e5f610005689440a95c05e776e734006197c7b1eba12734cb46
+    ports:
+      - "127.0.0.1:9999:80"
+      - "127.0.0.1:9998:8877"
+    environment:
+      WA_ENV_CTRL_EXTERNAL_SITE_URL: http://localhost:9999
+    mem_limit: 2g
+    cpus: 2

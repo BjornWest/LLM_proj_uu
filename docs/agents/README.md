@@ -9,6 +9,7 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 
 ## Existing references
 
+- [WebArena-Verified local sites](webarena-verified.md): pinned complete shopping/forum containers, BrowserGym control smoke and separate native evaluation.
 - [Independent startup and trace pagination](history-loading.md): local summary projection, lazy history and release evidence.
 - [Screenshot storage](screenshot-storage.md): implemented exact-byte deduplication, reference counts, hourly usage monitoring and a 20 GB review threshold; no automatic deletion.
 - [Future retention considerations](trace-retention-proposal.md): deferred rarity/coverage selection and protected evidence.
