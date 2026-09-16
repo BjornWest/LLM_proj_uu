@@ -10,9 +10,9 @@ const authorized=(header,token)=>{
   const a=Buffer.from(header),b=Buffer.from('Bearer '+token);
   return a.length===b.length&&timingSafeEqual(a,b);
 };
-export function controlHandler({store,env=process.env}={}) {
+export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
   if(!env.DAYLIGHT_CONTROL_TOKEN||env.DAYLIGHT_CONTROL_TOKEN.length<43)throw Error('Control token required');
-  const manual=new Manual(store,{env});
+  const manual=new Manual(store,{env,fetcher});
   const handler=async(req,res)=>{
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json');
     const send=(status,value)=>{res.statusCode=status;res.end(JSON.stringify(value));};
@@ -24,7 +24,7 @@ export function controlHandler({store,env=process.env}={}) {
       const operation=route.split('/').at(-1);
       const isManual=route.startsWith('/internal/manual/');
       if(worker?!['poll','checkpoint','reserve','artifact','update'].includes(operation):
-        isManual?!['config','start','list','read','action','observe','close','artifact'].includes(operation):
+        isManual?!['config','start','list','read','action','observe','close','artifact','ask','interrupt'].includes(operation):
         !['/internal/store/read','/internal/store/write','/internal/store/list'].includes(route))return send(404,{error:'Not found'});
       const chunks=[];let size=0;
       for await(const chunk of req){size+=chunk.length;if(size>16*1024*1024)return send(413,{error:'Request too large'});chunks.push(chunk);}
@@ -34,6 +34,7 @@ export function controlHandler({store,env=process.env}={}) {
       if(worker)return send(200,await new Harness(store,{env})[operation](value));
       if(isManual){
         if(operation==='config')return send(200,await manual.config());
+        if(operation==='ask'||operation==='interrupt')return send(200,await manual[operation](value.owner,value.id,value));
         if(operation==='start')return send(200,await manual.start(value.owner,value));
         if(operation==='list')return send(200,await manual.list(value.owner));
         if(operation==='read')return send(200,await manual.read(value.owner,value.id));

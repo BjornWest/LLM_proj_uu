@@ -10,6 +10,7 @@ let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoR
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
 let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
 let activeTurn=null,interrupting=false,conversationID=null;
+let remotePollTimer=null,remoteSending=false,remoteRendered='',remotePollFailed=false;
 let manualConfig=null,manualSessions=[],manualBusy=false,manualUncertain=false,manualError='',manualFrameKey='',manualFrameLoaded=false,manualImageError='',manualCheckedAt=null;
 const manualChoices=new Map(),manualLive=session=>session&&['starting','ready','busy'].includes(session.status);
 const manualSite=()=>manualConfig?.sites?.find(site=>site.site_id===siteID);
@@ -50,7 +51,7 @@ function gradeOf(record){
   if(record.source==='demo'&&evaluation==null)return 'ungraded';
   return 'unknown';
 }
-function gradeBadge(record){const grade=gradeOf(record),span=node('span',gradeNames[grade],'grade '+grade);span.title=record.source==='manual'?'Human-controlled session; reference fixture checks are diagnostic, not an agent grade.':grade==='success'||grade==='failed'?'Recorded verifier safe_success: '+String(record.evaluation.safe_success):grade==='partial'?'Explicit recorded grade with rubric':grade==='ungraded'?'No independent verifier result is attached':'No supported final safe-success result recorded';return span;}
+function gradeBadge(record){const grade=gradeOf(record),span=node('span',gradeNames[grade],'grade '+grade);span.title=record.source==='manual'?'Shared or human-controlled browser; reference checks are diagnostic, not an Ask grade.':grade==='success'||grade==='failed'?'Recorded verifier safe_success: '+String(record.evaluation.safe_success):grade==='partial'?'Explicit recorded grade with rubric':grade==='ungraded'?'No independent verifier result is attached':'No supported final safe-success result recorded';return span;}
 function buildSites(){
   tasks=Array.isArray(config?.tasks)?config.tasks:[];
   for(const task of tasks)if(task.collection&&task.collection_name)collectionNames[task.collection]=task.collection_name;
@@ -163,10 +164,10 @@ async function openRecord(record,fromGlobal=globalPage){
 function renderReview(){
   const record=currentRun;if(!record)return;
   $('back-to-research').textContent=globalPage?'← All traces & replays':'← Tasks & replays';$('recording-status').textContent=activeStatuses.has(record.status)?'In progress · recorded evidence':'Recorded evidence · view only';
-  $('review-kind').textContent=[record.kind==='task'?'Task attempt':record.kind==='ask'?'Ask the agent':record.kind==='manual'?'Manual exploration':'Activity not recorded',siteFor(record.site)?.name||record.site,record.runtime].join(' · ');
+  $('review-kind').textContent=[record.kind==='task'?'Task attempt':record.kind==='ask'?'Ask the agent':record.kind==='manual'?(record.raw?.asks?.length?'Shared browser session':'Manual exploration'):'Activity not recorded',siteFor(record.site)?.name||record.site,record.runtime].join(' · ');
   $('review-title').textContent=record.kind==='ask'?record.goal||record.title:record.title;$('review-grade').replaceChildren(gradeBadge(record));
   const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isManual;$('browser-trace-download').hidden=isJob;$('trace-raw-details').hidden=isJob;$('manual-review').hidden=!isManual;
-  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded human actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
+  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded browser actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
   if(isJob){renderJobConversation(record);const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
 }
 function recordForKey(key){return records().find(record=>record.key===key||record.turns?.some(turn=>'d:'+turn.id===key))||null;}
@@ -201,7 +202,7 @@ function render(){
   const site=siteFor(siteID);if(!site)return;
   if(globalPage||view!=='explore'||!site.interactive)fullScreen.setActive(false,{focus:false});
   document.querySelector('.site-heading').hidden=globalPage;document.querySelector('.site-tabs').hidden=globalPage;
-  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Explore a remote browser yourself, or start a separate agent task.':site.description;$('site-label').textContent=site.interactive?'Interactive website':'Remote worker environment';
+  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Browse yourself or ask the agent to use this same remote session.':site.description;$('site-label').textContent=site.interactive?'Interactive website':'Remote worker environment';
   $('explore-view').hidden=globalPage||view!=='explore';$('research-view').hidden=globalPage||view!=='research';$('global-view').hidden=!globalPage||view==='review';$('review-view').hidden=view!=='review';
   $('explore-tab').setAttribute('aria-pressed',String(view==='explore'));$('research-tab').setAttribute('aria-pressed',String(view!=='explore'));$('replay-count').textContent=String(records().filter(r=>r.site===siteID).length);
   $('tab-note').textContent=view==='explore'?'Browse the site or open a reviewed task.':'Tasks and recorded attempts for this site.';
@@ -227,6 +228,7 @@ function renderManual(){
   $('local-music-launch').hidden=siteID!=='tricky-music';
   $('local-health-launch').hidden=siteID!=='tricky-health';
   const site=manualSite(),session=manualCurrent(),live=manualOwnerLive(),ready=session?.status==='ready';
+  renderRemoteAsk(session);
   const pending=manualBusy||!!manualLoading;
   const elsewhere=live&&live.site_id!==siteID,otherName=elsewhere?(siteFor(live.site_id)?.name||live.site_id):'';
   const ended=!!session&&!manualLive(session);
@@ -244,7 +246,7 @@ function renderManual(){
   $('manual-error').hidden=!error;$('manual-error').textContent=unsupported?'That older session hit a route restriction. Medical records and profiles were not included in that fixture. Its saved image and trace remain available. Open a new session to use the restored site.':String(error);
   $('manual-error-details').hidden=!unsupported;$('manual-error-raw').textContent=unsupported?String(error):'';
   $('manual-scope').hidden=siteID!=='tricky-health';$('manual-scope').textContent='The current site includes Home, privacy settings, Appointments, scheduling, medical records, doctor profiles, messages and lab results. Three PDF downloads are missing upstream. Older traces retain their original site version.';
-  $('manual-status').textContent=manualBusy?'Waiting for the remote browser…':manualLoading?'Checking session status…':manualUncertain?'Command outcome needs checking. Refresh session status before another action.':elsewhere?'Your '+otherName+' session is '+live.status+' and occupies your one remote-browser slot. Close it or return to it before opening this site.':session?'Session '+session.status+' · '+(session.action_count??0)+' human actions'+(ended?' · '+(session.stop_reason==='manual_session_timeout'?'Expired after inactivity. ':'')+'This browser is closed; open a new session to continue.':''):manualConfig?.enabled&&site?'Open a private browser session. It may take up to 25 seconds.':manualConfig===null?'Checking manual browser availability…':'Manual exploration is unavailable for this site right now. Agent tasks remain separate.';
+  $('manual-status').textContent=manualBusy?'Waiting for the remote browser…':manualLoading?'Checking session status…':manualUncertain?'Command outcome needs checking. Refresh session status before another action.':elsewhere?'Your '+otherName+' session is '+live.status+' and occupies your one remote-browser slot. Close it or return to it before opening this site.':session?'Session '+session.status+' · '+(session.action_count??0)+' browser actions'+(ended?' · '+(session.stop_reason==='manual_session_timeout'?'Expired after inactivity. ':'')+'This browser is closed; open a new session to continue.':''):manualConfig?.enabled&&site?'Open a private browser session. It may take up to 25 seconds.':manualConfig===null?'Checking manual browser availability…':'Manual exploration is unavailable for this site right now. Agent tasks remain separate.';
   $('manual-check').textContent=manualLoading?'Checking…':'Refresh session status';
   $('manual-checked').textContent=manualCheckedAt?'Status checked at '+new Date(manualCheckedAt).toLocaleTimeString()+'. This checks for completed, failed or expired sessions; it does not refresh the screenshot or repeat actions.':'Session status and screenshot refresh are separate.';
   $('manual-browser').hidden=!session?.frame;
@@ -258,15 +260,69 @@ function renderManual(){
   $('manual-text').disabled=authExpired||!ready;
   $('manual-refresh').disabled=pending||manualUncertain||authExpired||!ready;
   $('manual-page-url').textContent=f?.page_url||'Remote browser';
-  $('manual-session-facts').textContent=session?[session.task_name||session.task,session.condition,'Human controlled · BrowserGym'].filter(Boolean).join(' · '):'';
+  $('manual-session-facts').textContent=session?[session.task_name||session.task,session.condition,session.controller==='agent'?'Agent controlled · BrowserGym':'Human controlled · BrowserGym'].filter(Boolean).join(' · '):'';
   if(session?.site_revision&&!manualBusy&&!manualLoading)$('manual-status').textContent+=' · Site version '+session.site_revision.slice(0,12);
   $('manual-reference-goal').textContent=session?.reference_goal||'Resolved when the session starts.';
 }
+function renderRemoteAsk(session){
+  const active=session?.controller==='agent',ask=session?.asks?.at(-1);
+  const canAsk=manualConfig?.ask_enabled&&session?.status==='ready'&&!session?.environment_finished;
+  $('remote-question').disabled=authExpired||remoteSending||!(canAsk||active);
+  $('remote-send').disabled=$('remote-question').disabled;
+  $('remote-send').textContent=active?'Interrupt and send':'Send';
+  $('remote-stop').disabled=authExpired||remoteSending||!active;
+  $('remote-agent-status').textContent=active?'Agent is using this browser. You can interrupt with a new message or Stop.':!session?'Open a remote session to ask the agent.':!manualConfig?.ask_enabled?'Remote inference is not configured.':session.environment_finished?'This environment ended. Open a new session to continue.':session.status==='ready'?'You control this browser. Ask requests are recorded and are not automatically graded.':'This session is not ready for Ask.';
+  const content=JSON.stringify([session?.id,session?.asks]);
+  if(content!==remoteRendered){remoteRendered=content;const log=$('remote-conversation');log.replaceChildren();
+    for(const turn of session?.asks||[]){
+      const user=node('div',undefined,'message user');user.append(node('strong','You'),document.createTextNode(turn.goal));log.append(user);
+      for(const step of turn.steps||[]){if(!step.action||/^\s*send_msg_to_user\s*\(/.test(step.action))continue;const entry=node('details',undefined,'tool-activity');entry.append(node('summary',step.action+(step.executed===true?' · Applied':step.error?' · Failed':' · Recorded')));entry.append(node('pre',JSON.stringify(step,null,2)));log.append(entry);}
+      if(turn.answer||turn.error||!['running','stopping'].includes(turn.status)){const response=node('div',undefined,'message assistant');response.append(node('strong','Daylight'),document.createTextNode(turn.answer||turn.error||'Request '+turn.status+'. Review the current page.'));log.append(response);}
+      for(const alert of turn.alerts||[])log.append(node('p',alert,'notice'));
+      log.append(node('small',turn.status+' · '+(typeof turn.reported_cost_usd==='number'?'Reported $'+turn.reported_cost_usd.toFixed(5):'Cost not reported')+(turn.unknown_cost_attempts?' · '+turn.unknown_cost_attempts+' unknown-cost attempts':'')));
+    }log.scrollTop=log.scrollHeight;
+  }
+  clearTimeout(remotePollTimer);
+  if(active&&!document.hidden&&!remotePollFailed)remotePollTimer=setTimeout(()=>pollRemoteSession(session.id),1500);
+}
+async function pollRemoteSession(id){
+  try{const result=await api('/api/manual/sessions/'+id);rememberManual(result);manualUncertain=['starting','busy'].includes(result.status);}
+  catch(error){remotePollFailed=true;manualError=error.message+' Use Refresh session status to reconnect.';}
+  updateManualViews();
+}
+async function remoteInterrupt(session){
+  const ask=session?.asks?.at(-1);if(!ask||session.controller!=='agent')return session;
+  await api('/api/manual/sessions/'+session.id+'/interrupt',{ask_id:ask.id});
+  for(let i=0;i<70;i++){
+    const current=await api('/api/manual/sessions/'+session.id);rememberManual(current);updateManualViews();
+    if(current.controller!=='agent')return current;
+    await wait(500);
+  }
+  throw Error('Control handover is still pending. Check sessions before another request.');
+}
+$('remote-ask-form').onsubmit=async event=>{
+  event.preventDefault();const goal=$('remote-question').value.trim(),session=manualCurrent();
+  if(!goal||!session||remoteSending||authExpired)return;
+  remoteSending=true;renderRemoteAsk(session);
+  try{
+    const current=await remoteInterrupt(session);
+    if(current.status!=='ready')throw Error('Browser is not ready for a new request');
+    const result=await api('/api/manual/sessions/'+session.id+'/ask',{request_id:crypto.randomUUID(),goal});
+    $('remote-question').value='';rememberManual(result);manualUncertain=false;
+  }catch(error){manualError=error.message+' No request was automatically retried.';}
+  finally{remoteSending=false;updateManualViews();}
+};
+$('remote-stop').onclick=async()=>{
+  if(remoteSending)return;remoteSending=true;
+  try{await remoteInterrupt(manualCurrent());}catch(error){manualError=error.message;}
+  finally{remoteSending=false;updateManualViews();}
+};
+bindChatEnter($('remote-question'),$('remote-send'));
 let manualLoading=null;
 async function loadManual(){
   if(manualBusy||authExpired)return;if(manualLoading)return manualLoading;
   manualLoading=(async()=>{
-    try{const settings=await api('/api/manual/config');manualConfig=settings;const result=await api('/api/manual/sessions');manualSessions=(result.sessions||[]).sort((a,b)=>(Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0));manualUncertain=manualSessions.some(session=>['starting','busy'].includes(session.status));manualError='';manualCheckedAt=Date.now();}
+    try{const settings=await api('/api/manual/config');manualConfig=settings;const result=await api('/api/manual/sessions');manualSessions=(result.sessions||[]).sort((a,b)=>(Date.parse(b.created_at)||0)-(Date.parse(a.created_at)||0));manualUncertain=manualSessions.some(session=>['starting','busy'].includes(session.status));manualError='';remotePollFailed=false;manualCheckedAt=Date.now();}
     catch(error){if(error.status===404){manualConfig={enabled:false,sites:[]};manualError='';}else{manualError=error.message;manualUncertain=true;}}
     finally{manualLoading=null;updateManualViews();}
   })();renderManual();return manualLoading;
@@ -396,7 +452,7 @@ $('toggle-agent').onclick=()=>setAgentVisible(!agentVisible);
 $('reset-page').onclick=()=>{if(askBusy||!frame)return;window.demoWorld=new World(fixture);pendingDocument=frame.contentDocument;frame.src='/world/'+crypto.randomUUID()+'/booking';messages=[];conversation=[];conversationID=null;draft='';activity=[];lastTrace=null;setWorking('');$('chat-status').textContent='';renderConversation();};
 $('back-to-research').onclick=()=>{view=globalPage?'global':'research';currentRun=null;reviewVersion++;render();syncURL();};
 async function readRoute(){const params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';if(siteFor(params.get('site')))siteID=params.get('site');const key=params.get('run');currentRun=recordForKey(key);view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();if(currentRun?.source==='demo')loadBrowserTrace(currentRun);}
-document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden)refresh();});
-window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>clearTimeout(pollTimer));
+document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden){refresh();loadManual();}else clearTimeout(remotePollTimer);});
+window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>{clearTimeout(pollTimer);clearTimeout(remotePollTimer);});
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('run-viewer').contentWindow||event.data?.type!=='harness:size')return;const height=Number(event.data.height);if(Number.isFinite(height))$('run-viewer').style.height=Math.min(8000,Math.max(650,height))+'px';});
 try{const results=await Promise.allSettled([api('/assets/fixture.json'),api('/api/config')]);if(results[0].status==='fulfilled'){fixture=results[0].value;window.demoWorld=new World(fixture);}if(results[1].status==='fulfilled')modelConfig=results[1].value;for(const result of results)if(result.status==='rejected')notice(result.reason.message);await refresh(true);buildSites();await loadManual();await readRoute();if(!modelConfig?.live_available)$('chat-status').textContent='OpenRouter is not configured for this deployment.';}catch(error){notice(error.message);syncControls();}

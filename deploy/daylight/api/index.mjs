@@ -91,10 +91,10 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
             return send(409,{error:'The client and worker site versions differ. Please wait for deployment to finish and refresh.'});
           return send(200,await manual.call('start',{...input,owner,site_revision:inspectionRevision}));
         }
-        const m=url.pathname.match(/^\/api\/manual\/sessions\/([a-f0-9-]{36})(?:\/(action|observe|close|frame|trace)(?:\/([a-f0-9-]{36}))?)?$/);
+        const m=url.pathname.match(/^\/api\/manual\/sessions\/([a-f0-9-]{36})(?:\/(action|observe|close|frame|trace|ask|interrupt)(?:\/([a-f0-9-]{36}))?)?$/);
         if(!m)return send(404,{error:'Not found'});const [,id,op,frame_id]=m;
         if(!op&&req.method==='GET')return send(200,await manual.call('read',{owner,id}));
-        if(['action','observe','close'].includes(op)&&req.method==='POST')return send(200,await manual.call(op,{...(await body(req)),owner,id}));
+        if(['action','observe','close','ask','interrupt'].includes(op)&&req.method==='POST')return send(200,await manual.call(op,{...(await body(req)),owner,id}));
         if(['frame','trace'].includes(op)&&req.method==='GET'){
           if(op==='frame'&&!frame_id)return send(404,{error:'Frame not found'});
           const artifact=await manual.call('artifact',{owner,id,...(op==='frame'?{frame_id}:{})});

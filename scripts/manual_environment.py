@@ -1,4 +1,4 @@
-"""Human-only BrowserGym driver over a private pipe; no model backend.
+"""Shared BrowserGym driver over a private pipe; inference remains outside the browser process.
 
 Load the immutable package's runtime via PYTHONPATH. The controller supplies a
 reviewed task ID, never a URL or Python action. Stdout/stderr are diagnostics;
@@ -48,6 +48,7 @@ def run(args):
     from intent_browser.runner import observation_text
     from intent_browser.observation import refresh_observation
     from intent_browser.evaluation import Evaluation
+    from shared_browser_policy import messages_for, parse_reply
 
     output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -66,6 +67,10 @@ def run(args):
     stop_reason = 'controller_disconnected'
     last_command = None
     reference_goal = None
+    history = []
+    pending_decision = None
+    active_ask = None
+    agent_turns = 0
     def capture(observation):
         nonlocal frame_index, frame
         if frame_index >= 300:
@@ -93,6 +98,7 @@ def run(args):
                 'model': None, 'training_eligible': False, 'seed': args.seed,
                 'package_sha256': runtime.manifest_hash,
                 'manual_driver_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                'policy_helper_sha256': hashlib.sha256(Path(__file__).with_name('shared_browser_policy.py').read_bytes()).hexdigest(),
                 'authorization_scope': 'Manual exploration; reference task is not a user intent contract',
                 'observation_lifecycle': 'manual-pixel-v1'})
             trace.event('task_prepare_started')
@@ -111,7 +117,7 @@ def run(args):
             capture(obs)
             emit({'kind': 'ready', **state()})
             for line in commands:
-                if len(line.encode()) > 16000:
+                if len(line.encode()) > 2_000_000:
                     raise ValueError('Manual command too large')
                 command = json.loads(line)
                 last_command = command['request_id']
@@ -120,21 +126,71 @@ def run(args):
                 if operation == 'close':
                     stop_reason = command.get('reason', 'user_close')
                     break
-                if operation == 'observe':
+                if operation == 'agent_observe':
+                    goal = command.get('goal')
+                    ask_id = command.get('ask_id')
+                    if not isinstance(goal, str) or not 0 < len(goal) <= 2000 or not isinstance(ask_id, str):
+                        raise ValueError('Invalid agent request')
+                    if ask_id != active_ask:
+                        active_ask = ask_id; agent_turns += 1
+                        trace.metadata.update(interaction_kind='shared', driver='shared-browser', policy_protocol='browsergym-json-action-v1')
+                        write_json(trace.directory/'metadata.json', trace.metadata)
+                        history.append({'actor': 'human', 'request': goal})
+                        trace.event('shared_agent_turn_started', ask_id=ask_id, goal=goal)
+                    obs = refresh_observation(env); capture(obs)
+                    messages = messages_for(obs, goal, history)
+                    pending_decision = {'id': str(uuid4()), 'ask_id': ask_id,
+                        'observation': frame['artifact'], 'messages': messages, 'frame_id': frame['id']}
+                    trace.event('shared_decision_captured', **pending_decision)
+                    emit({'kind': 'result', 'request_id': last_command, 'decision': pending_decision, **state()})
+                    continue
+                if operation in ('action', 'agent_action') and (terminated or truncated):
+                    emit({'kind': 'rejected', 'request_id': last_command, 'error': 'Environment already ended; no action executed.'})
+                    continue
+                if operation == 'agent_action':
+                    if (not pending_decision or command.get('decision_id') != pending_decision['id']
+                            or command.get('ask_id') != pending_decision['ask_id']):
+                        emit({'kind': 'rejected', 'request_id': last_command, 'error': 'Agent observation is no longer current.'})
+                        continue
+                    evidence = command.get('evidence', {})
+                    trace.event('shared_model_result', ask_id=active_ask, decision=pending_decision, evidence=evidence)
+                    before = frame
+                    decision_record = pending_decision; pending_decision = None
+                    try:
+                        decision = parse_reply(evidence.get('output', ''))
+                    except Exception as error:
+                        trace.event('shared_action_rejected', ask_id=active_ask, error=str(error))
+                        emit({'kind': 'result', 'request_id': last_command, 'agent_error': str(error), **state()})
+                        continue
+                    if decision.name == 'send_msg_to_user':
+                        answer = decision.arguments['text']
+                        history.append({'actor': 'agent', 'answer': answer})
+                        trace.event('shared_agent_answer', ask_id=active_ask, answer=answer)
+                        emit({'kind': 'result', 'request_id': last_command, 'answer': answer, **state()})
+                        continue
+                    code = decision.code
+                    actor = 'agent'
+                elif operation == 'observe':
                     obs = refresh_observation(env);capture(obs)
                     emit({'kind': 'result', 'request_id': last_command, **state()})
                     continue
-                if operation != 'action' or command.get('frame_id') != frame['id']:
-                    emit({'kind': 'rejected', 'request_id': last_command, 'error': 'The displayed frame changed; refresh before acting.'})
+                elif operation == 'action':
+                    if command.get('frame_id') != frame['id']:
+                        emit({'kind': 'rejected', 'request_id': last_command, 'error': 'The displayed frame changed; refresh before acting.'})
+                        continue
+                    pending_decision = None
+                    try:
+                        code = action_code(command.get('action'), frame['width'], frame['height'])
+                    except ValueError as error:
+                        trace.event('manual_action_rejected', request_id=last_command, error=str(error))
+                        emit({'kind': 'rejected', 'request_id': last_command, 'error': str(error)})
+                        continue
+                    actor = args.actor
+                else:
+                    emit({'kind': 'rejected', 'request_id': last_command, 'error': 'Unsupported operation'})
                     continue
                 if steps >= 100:
                     stop_reason = 'manual_action_limit';break
-                try:
-                    code = action_code(command.get('action'), frame['width'], frame['height'])
-                except ValueError as error:
-                    trace.event('manual_action_rejected', request_id=last_command, error=str(error))
-                    emit({'kind': 'rejected', 'request_id': last_command, 'error': str(error)})
-                    continue
                 before = frame
                 trace.event('browser_action_started', step=steps, action=code, manual_request_id=last_command,
                             presented_frame_id=before['id'], frame_age_seconds=time.time()-before['captured_at'])
@@ -147,18 +203,25 @@ def run(args):
                     detail = type(error).__name__+': '+str(error)
                     trace.append({'step': steps, 'observation': before['artifact'], 'next_observation': None,
                         'action': code, 'reward': None, 'error': detail, 'execution_confirmed': None,
-                        'model_request': None, 'model_response': None, 'model_output': None, 'messages': None,
-                        'actor': args.actor, 'manual_request': command, 'presented_frame_id': before['id']})
+                        'model_request': evidence.get('request') if actor == 'agent' else None,
+                        'model_response': evidence.get('response') if actor == 'agent' else None,
+                        'model_output': evidence.get('output') if actor == 'agent' else None,
+                        'messages': decision_record['messages'] if actor == 'agent' else None,
+                        'actor': actor, 'manual_request': command, 'presented_frame_id': before['id']})
                     trace.event('browser_action_completed', step=steps, error=detail, execution_confirmed=None)
                     steps += 1; errors += 1
                     raise
                 action_error = obs.get('last_action_error') or None
                 trace.append({'step': steps, 'observation': before['artifact'], 'next_observation': frame['artifact'],
                     'action': code, 'reward': reward, 'error': action_error,
-                    'model_request': None, 'model_response': None, 'model_output': None, 'messages': None,
-                    'actor': args.actor, 'manual_request': command, 'presented_frame_id': before['id']})
+                    'model_request': evidence.get('request') if actor == 'agent' else None,
+                        'model_response': evidence.get('response') if actor == 'agent' else None,
+                        'model_output': evidence.get('output') if actor == 'agent' else None,
+                        'messages': decision_record['messages'] if actor == 'agent' else None,
+                    'actor': actor, 'manual_request': command, 'presented_frame_id': before['id']})
                 trace.event('browser_action_completed', step=steps, error=action_error)
                 steps += 1;errors += bool(action_error)
+                history.append({'actor': actor, 'action': code, 'error': action_error})
                 # A later privileged state-capture failure must not erase the
                 # browser action that already completed.
                 if session.task and hasattr(session.task, 'after_step'):
@@ -167,7 +230,7 @@ def run(args):
                 if action_error:
                     # Preserve native failure; never replay a mutating action automatically.
                     emit({'kind': 'result', 'request_id': last_command, **state()})
-                elif terminated or truncated:
+                elif (terminated or truncated) and actor != 'agent':
                     stop_reason = 'environment_terminated' if terminated else 'environment_truncated'
                     break
                 else:
@@ -187,7 +250,7 @@ def run(args):
                         # Existing AX policy-delivery hooks are never called for a human.
                         assessment.injection_exposed = None;assessment.injection_avoided = None
                         if technical_error: assessment.technical_error = technical_error
-                        assessment.limitations.append('Manual screenshot exploration; this is only a reference-task diagnostic, not user-intent or model success. No model AX exposure/avoidance claim.')
+                        assessment.limitations.append('Shared browser or manual exploration; this is only a reference-task diagnostic, not user-intent or model success. Exposure/avoidance is not graded for arbitrary requests.')
                         reference_evaluation = assessment.to_dict()
                     except Exception as error:
                         reference_evaluation = Evaluation('manual-reference-unavailable', '1', technical_error=type(error).__name__).to_dict()
@@ -199,10 +262,14 @@ def run(args):
                     except Exception as error:
                         technical_error = technical_error or type(error).__name__+': close failed'
                     trace.event('environment_closed')
-                summary = {'driver': args.actor, 'model': None, 'reference_goal': reference_goal,
+                ask_records = [json.loads(p.read_text()) for p in sorted(trace.directory.glob('ask-*.json'))]
+                model_attempts = [step for ask in ask_records for step in ask.get('steps', []) if step.get('dispatch_at')]
+                models = sorted({step['request']['model'] for step in model_attempts})
+                summary = {'driver': 'shared-browser' if agent_turns else args.actor, 'model': models[0] if len(models) == 1 else None,
+                    'models': models, 'model_attempt_count': len(model_attempts), 'ask_records': [p.name for p in sorted(trace.directory.glob('ask-*.json'))], 'reference_goal': reference_goal,
                     'evaluation': None, 'reference_evaluation': reference_evaluation,
                     'stop_reason': stop_reason, 'error': technical_error, 'step_count': steps,
-                    'browser_step_count': steps, 'action_error_count': errors, 'final_reward': reward,
+                    'browser_step_count': steps, 'agent_turn_count': agent_turns, 'action_error_count': errors, 'final_reward': reward,
                     'success': None, 'terminated': terminated, 'truncated': truncated,
                     'final_observation': frame['artifact'] if frame else None}
                 trace.finish(summary)

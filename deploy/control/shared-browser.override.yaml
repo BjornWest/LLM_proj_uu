@@ -1,0 +1,8 @@
+# Add after full-sites.override.yaml. Dedicated demo inference credential only;
+# never pass it to the BrowserGym child or imported site processes.
+services:
+  control:
+    image: intent-browser-control:shared-browser-v1
+    env_file:
+      - ../../.local/control/control.env
+      - ../../.local/control/ask.env

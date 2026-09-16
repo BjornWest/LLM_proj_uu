@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "scope": "Shared-browser scripted integration; no new model performance or benchmark certification",
+  "model_calls": 0,
+  "paid_calls": 0,
+  "source_sha256": {
+    "deploy/daylight/lib/manual.mjs": "7efd7ef8ef27f84e2240394e738d5e6709350835d27f4c4d9bbe462a2caaf1d4",
+    "deploy/daylight/lib/manual-agent.mjs": "d8a61a29e778b0dfb78da6276bf1ce2c7326c62547edb4bd8ccb01bf070b13d9",
+    "deploy/daylight/control-server.mjs": "02405ba1e44faf3cba6d643686f683deef8879643197f6da27d0453910616200",
+    "scripts/manual_environment.py": "27396b2e0b5bba00a9a71c941d48648ac85321a337737f13e56597f8a5bf50bc",
+    "scripts/shared_browser_policy.py": "26a73d0b17f83957d54c65636fd073921afb359cf1be455332a4fc7e32fa10dd",
+    "deploy/daylight/client/workspace.js": "b0199e2251a559c12efb9d9c5e42f4589c42e8ec97d54b941c6cb283e3d1b5e9",
+    "deploy/daylight/client/workspace.html": "3ee6f32c50be3403cb2e6547d4313f864a2d0a7a0ee6c2289070b0eb027bd652",
+    "deploy/daylight/client/workspace.css": "7fbb24573f0132835c391696914e5317713eb0bf97efc0588b443c41835ad92b",
+    "deploy/daylight/api/index.mjs": "56dd5b231e48f5799ceb1ef457c84a845c458749db8ee4d80a9df616211c3e2c",
+    "config/team_sites.json": "dda4d333883714287f5afe4397fec79a0d4818a80dad7d6ce46022d51cb7bdea"
+  },
+  "control_image": "sha256:bdbd5f3feb2a0ac0ab18e24f9774ee852c7ee57ee9abd86673970112e932869a",
+  "package_sha256": "fe825b232bf709087d2b755d20e76d061b510e5117afee1862ab6ed50745a696",
+  "container_cases": 14,
+  "container_checks": 98,
+  "node_tests": 97,
+  "python_policy_tests": 3,
+  "workspace_regression_checks": 31,
+  "shared_ui_checks": 14,
+  "evidence": {
+    ".local/shared-browser/container/release/report.json": "8889c8eb0f002d4eca14a73084cf21de9d8e05a2e719ac5abc3dfd92eeb9bf7f",
+    ".local/shared-browser/archive-audit.json": "a8d1b1beb8d56867a3243527e1b0d4be6ba6a4992b922c0c0dcf68eef358c881",
+    ".local/shared-browser/acceptance-843f6ca2/report.json": "9da71a9ef70775f9270578748d125db3837dbfde7892445ebf439ad47c6838ff",
+    ".local/vercel-demo/workspace-dc5477c0/report.json": "24f39bbf90c26283f855e99c5543e5003b5c6f96b3825082bfaa1af1ad98f9f5",
+    ".local/shared-browser-node.log": "77f6ab67c17a8711fa1db1bb7ccfbffb1ae6f6cb57f20f3e9bc41d00a4ded6e3"
+  },
+  "limits": [
+    "Arbitrary requests ungraded",
+    "No paid inference validation",
+    "No token streaming",
+    "Restarted browsers are not resumable"
+  ]
+}

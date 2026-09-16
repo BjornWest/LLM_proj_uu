@@ -22,7 +22,7 @@ test('new harness activity is explicit and classification comes from the registr
   const saved=await h.start('one',{task:task.id,interaction_kind:'task',task_name:'spoofed',task_revision:task.revision});
   assert.equal(saved.interaction_kind,'task');assert.equal(saved.site_id,'tricky-shop');assert.equal(saved.collection,'trickyarena');
   assert.equal(saved.task_name,task.title);assert.equal(saved.task_id,task.id);assert.equal(saved.task_revision,task.revision);
-  assert.equal(saved.condition,task.condition);assert.equal(saved.site_name,'Electronics shop');
+  assert.equal(saved.condition,task.condition);assert.equal(saved.site_name,'Shop');
   assert.equal(saved.evaluation,null);assert.equal(saved.mode,undefined);
   assert.equal((await h.list('one')).jobs[0].interaction_kind,'task');
   for(const body of [{interaction_kind:'ask'},{interaction_kind:'replay'},{site_id:'campus'},{collection:'demo'}])await assert.rejects(h.start('one',{task:task.id,...body}));

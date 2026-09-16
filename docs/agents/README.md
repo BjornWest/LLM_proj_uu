@@ -9,6 +9,8 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 
 ## Existing references
 
+- [Shared browser Ask](shared-browser-ask.md): same-session human/agent handover, interruption, ungraded requests and trace evidence.
+
 - [Complete hosted sites](full-site-restoration.md): full-source restoration, shared native/client versions, known upstream gaps and validation.
 
 - [Generalization requirements](generalization-requirements.md): interface fidelity, site holdouts, messy observations and eventual real-site transfer.
