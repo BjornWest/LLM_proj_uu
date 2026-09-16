@@ -9,4 +9,10 @@ __pycache__/
 # Also ignore cached dependency symlinks used by isolated fixtures.
 node_modules
 runs/
+# Generated raw trace copies for the offline review example; retain reports/hashes.
+/data/curation/trace-review-example-v1/evidence/
+# Historical compiled sites superseded by inspection_full; manifests stay tracked.
+/environments/inspection_shop/dist/
+/environments/inspection_health/dist/
+/environments/inspection_music/dist/
 .pytest_cache/

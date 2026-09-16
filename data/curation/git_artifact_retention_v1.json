@@ -1,0 +1,681 @@
+{
+  "schema_version": 1,
+  "source_commit": "585fa07bb7a0e812110e957ab87b854c0e57d860",
+  "scope": "Raw local budget ledgers, generated RNG corpora, runtime locks and obsolete compiled website bundles; current inspection_full and historical manifests retained",
+  "local_archive": ".local/git-artifact-cleanup-v1",
+  "recovery": "Exact bytes remain in source_commit:path; local originals and archive retained. Do not overwrite a newer budget ledger or treat the snapshot as a fresh spending allowance.",
+  "files": [
+    {
+      "path": "data/curation/chaos-repair-review/rng-imul/variants.json",
+      "bytes": 355497,
+      "sha256": "08e8a9074527d8a8657ce5e7d634dae5d77925b1e417960cc06b6a0ba127db90",
+      "git_blob": "fc3d356427939354e595bef626d4b758712d1a22",
+      "kind": "generated_rng_corpus"
+    },
+    {
+      "path": "data/curation/chaos-repair-review/rng-original/variants.json",
+      "bytes": 355038,
+      "sha256": "3044640a85a9ae82bb832bd55560e0037ca8a477c6b174ac7b1477dae25043a0",
+      "git_blob": "d652dbdad9e514299b3e5e6742536be914b903cf",
+      "kind": "generated_rng_corpus"
+    },
+    {
+      "path": "data/curation/chaos-repair-review/rng-xorshift32-v1/variants.json",
+      "bytes": 355579,
+      "sha256": "f6b0b151fe1be14ecd26ee8c91289d78addcd9255bd65c3bafcfd820cf0e3b01",
+      "git_blob": "6437dcc8b918f127c5401bf438b32d87e9b5bef0",
+      "kind": "generated_rng_corpus"
+    },
+    {
+      "path": "data/curation/routed-pilot-account-v1/budget.json",
+      "bytes": 50096,
+      "sha256": "4f1b3ed2740db06c803e941e046ddc75be9100b5aa1e1ec8e632020806257126",
+      "git_blob": "26cec4d04345c4f9ec8ea8b5a52a13f41c74fd9a",
+      "kind": "budget_ledger",
+      "accounting": {
+        "protocol_id": "routed-pilot-account-v1",
+        "approved_cap_usd": "3",
+        "carried_reservations_usd": "0.52279175",
+        "new_reserved_cost_usd": "0.098336",
+        "reserved_cost_usd": "0.62112775",
+        "request_count": 7
+      }
+    },
+    {
+      "path": "data/curation/routed-pilot-account-v1/budget.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-account-v1/suite.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-authorized-v1/budget.json",
+      "bytes": 101689,
+      "sha256": "7065f9acac942bce2462c12e408cd68e8e8e15023206477d5470e05685bdb0ad",
+      "git_blob": "a812dcecee810575d20b4ef71348498debefe869",
+      "kind": "budget_ledger",
+      "accounting": {
+        "protocol_id": "routed-pilot-authorized-v1",
+        "approved_cap_usd": "3",
+        "carried_reservations_usd": "0.35421575",
+        "new_reserved_cost_usd": "0.168576",
+        "reserved_cost_usd": "0.52279175",
+        "request_count": 12
+      }
+    },
+    {
+      "path": "data/curation/routed-pilot-authorized-v1/budget.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-authorized-v1/suite.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-p07-v1/budget.json",
+      "bytes": 88717,
+      "sha256": "806a3c1a328eff750d62512cfe8134cdae796674d44160a5ba5324c5401fe6f7",
+      "git_blob": "e26180717352a1c8144b2d1f310a79fdb0e26011",
+      "kind": "budget_ledger",
+      "accounting": {
+        "protocol_id": "routed-pilot-p07-v1",
+        "approved_cap_usd": "3",
+        "carried_reservations_usd": "0.19968775",
+        "new_reserved_cost_usd": "0.154528",
+        "reserved_cost_usd": "0.35421575",
+        "request_count": 11
+      }
+    },
+    {
+      "path": "data/curation/routed-pilot-p07-v1/budget.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-p07-v1/suite.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-token-v1/budget.json",
+      "bytes": 13400,
+      "sha256": "10984db364e04a8982e43bf902106289049f24022bfa2d743dc32299c9c23bef",
+      "git_blob": "de12094c41cadf0712428c698b1982a546c888e7",
+      "kind": "budget_ledger",
+      "accounting": {
+        "protocol_id": "routed-pilot-token-v1",
+        "approved_cap_usd": "3",
+        "carried_reservations_usd": "0.62112775",
+        "new_reserved_cost_usd": "0.028096",
+        "reserved_cost_usd": "0.64922375",
+        "request_count": 2
+      }
+    },
+    {
+      "path": "data/curation/routed-pilot-token-v1/budget.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-token-v1/suite.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-v1/budget.json",
+      "bytes": 20420,
+      "sha256": "7bd749894c7b452adc186f6a73a971ba7d1687532219ee6200c9d9504ab76e41",
+      "git_blob": "22c1c8e112ef0ee5cd6d7a95b97731e2dab1932f",
+      "kind": "budget_ledger",
+      "accounting": {
+        "protocol_id": "routed-pilot-v1",
+        "approved_cap_usd": "3",
+        "carried_reservations_usd": "0.15754375",
+        "new_reserved_cost_usd": "0.042144",
+        "reserved_cost_usd": "0.19968775",
+        "request_count": 3
+      }
+    },
+    {
+      "path": "data/curation/routed-pilot-v1/budget.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/routed-pilot-v1/suite.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "kind": "runtime_lock"
+    },
+    {
+      "path": "data/curation/sweeps/budget.json",
+      "bytes": 3753278,
+      "sha256": "128769dc7d8e98b20e6e3d36db37ae2dfdf2368fd5e04170939f3aa6bbc0cd87",
+      "git_blob": "20a16894bd096eec165b71d1ff7abc08697b25a7",
+      "kind": "budget_ledger",
+      "accounting": {
+        "protocol_id": "external-sweeps-budget-v1",
+        "approved_cap_usd": "3",
+        "carried_reservations_usd": "0.64922375",
+        "new_reserved_cost_usd": "2.1631620",
+        "reserved_cost_usd": "2.81238575",
+        "request_count": 267
+      }
+    },
+    {
+      "path": "environments/inspection_health/dist/assets/index-CbOUX-sE.js",
+      "bytes": 845664,
+      "sha256": "4ca90dda85f9f4f24eb32cb6cf08071997d4234ebcba83c0f80836dba33dea25",
+      "git_blob": "bfbe91130493f317efb883f07953f69b5c52f549",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_health/dist/assets/index-UAi9wSmx.css",
+      "bytes": 108,
+      "sha256": "8e6e15a486f67e67cd7e622514688bd8bc2337f0491733ad88ad3ea21713b3eb",
+      "git_blob": "955e574e9e8224d9d75fc2fd81f3499b9377598a",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_health/dist/index.html",
+      "bytes": 350,
+      "sha256": "53253404f1dae73533d7c65734a4240a4ada7983518399b9eb9c587d85ac30cd",
+      "git_blob": "36d369668e9d95fa06b77fe0573d3eb93cf405d7",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_music/dist/assets/index-CYu5CzKX.js",
+      "bytes": 576972,
+      "sha256": "1f7c867a400242b430df8d65422ed3fc80cb60b8b2261b851e7b5ef8fcb8ecfa",
+      "git_blob": "f0ca218bba5f5b46b2ea802cef8e504252d0765e",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_music/dist/index.html",
+      "bytes": 305,
+      "sha256": "2f22b21418081d80113ccb6b3c818c5902d895ba627ee827276e04cd46704fc2",
+      "git_blob": "038760002e5ccc6644d83ad1b24023bf36b8c1e2",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/acer_predator_helios_300-FEvQhcTy.jpg",
+      "bytes": 194671,
+      "sha256": "9bf0264256ed8a6a1e0ac1dd5c623d00bfb69dc92e07377e25bedb447f007095",
+      "git_blob": "0fee153dce4e0b1f98eac65e94d0a987a7e9e91e",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/apple_macbook_air_m3-B7l8lZDX.jpg",
+      "bytes": 210902,
+      "sha256": "add602ef847c9eb4aec7603ad1c06f04927f3e215b05034582ef1e965cf32253",
+      "git_blob": "92a57f49cec219bd99bb3836f089d87cdc151cfd",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/asus_zenbook_duo-YZRECJxF.jpg",
+      "bytes": 165847,
+      "sha256": "550e0afc7ee70d1163de1b65e208fce00119315c96b4fe1dd8f27b67c2b9c07b",
+      "git_blob": "b08851547d526477f6dc1ec181cebbcf955b25fa",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/bluff-Cah_tYG4.jpg",
+      "bytes": 100788,
+      "sha256": "9e1061f23ff84190d8b6b8f14593ad99305dc11fc9e124f504353b598b3cf4eb",
+      "git_blob": "74652f91969ad92c404b162366fc7d87893eacdd",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/book_of_clarence-CbYiBeVr.jpg",
+      "bytes": 802895,
+      "sha256": "23208e90f8e87ae57e459bd386a6c5933db2d4e7a251773b3fa32f4e61e22088",
+      "git_blob": "9bca43eab06182286ed6d8eee55185f76a054482",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/brightwood_code-ChMKNDiB.jpg",
+      "bytes": 177447,
+      "sha256": "f9b639555da08d08378748ced611a7b2a3508e52f9c8064036c4134be56f763c",
+      "git_blob": "58b3af313516857ae1c021f704ae41c3f76dae6e",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/britaFilterBottleImage-PSmrfQm8.jpg",
+      "bytes": 97210,
+      "sha256": "fe14937c98c3f9d4358acd1a196143f1d96d93687c15702f24a6d019891efe51",
+      "git_blob": "a88bca22bae0db791f7fcbc31fe9738003f4d04b",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/by_the_fire-BUFKi_dO.jpg",
+      "bytes": 458522,
+      "sha256": "7ecf02c8b51a93151793efdda09f46f2a5eb69b3540d501f6802146631b00c69",
+      "git_blob": "1564fd06c3e44436af6cf2c1c733446406c501fa",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/camelBakEddyImage-Bq92B9jY.jpg",
+      "bytes": 78561,
+      "sha256": "9cfa657fe328e6a4d7e17e0d3db4737c4402cf4d4a99efc190f68d44d054f10f",
+      "git_blob": "78ca0e9d03ba81acbb5ad8b6f6210fec45e8267f",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/challengers-BI70iHOH.jpg",
+      "bytes": 2638263,
+      "sha256": "fad925e3701209e1aeee5d7e33037291842c85a56ded3895f812e0606b6dc1c6",
+      "git_blob": "19d211f32026327856cfb126cea53c3caa08a137",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/civil_war-CHEG6cLF.jpg",
+      "bytes": 287570,
+      "sha256": "7d0880c07ad110c1daf14158cce7ff42b1f2830d5bfb056e88865d1c25334170",
+      "git_blob": "81e8cb955a1a8c1efd5ab3ba90f7532c864817b0",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/colgate-BkAe9PyX.jpeg",
+      "bytes": 422493,
+      "sha256": "3d99b2f305e6f854e6a1e11a4bef2f498689f9eb14514180aa84037c7b7fb325",
+      "git_blob": "886c653289ce41c6c744a534c6d2932d753386e2",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/context_collapse-N_XBstpX.jpg",
+      "bytes": 330550,
+      "sha256": "f5d1da50f7b673a6246ae9efa86e9dc876eae5f6c02aba2d15cd7a26c177d219",
+      "git_blob": "34e2a0bf0f28838857bd91b244ef1c8b4d817e83",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/contigoWestLoopImage-d05lHqVO.jpg",
+      "bytes": 109132,
+      "sha256": "a552cde59250598d341c5c2e41544ddbcc899292d58b617d7b0f1fd5eef5fdaf",
+      "git_blob": "cce0adfa052a4807567385313113391e0928b1bc",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/costaDelMarFantailImage-J2IxC40U.jpg",
+      "bytes": 93873,
+      "sha256": "9a9f9081e590ee5bd6c5e98dc00722d7623f7131df453e145684eeb09bcdbbcd",
+      "git_blob": "3fb50b31ff1f2fbaa186a4a0be0ba2c279ae2d98",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/dell_inspiron_15-sb6cxem1.jpg",
+      "bytes": 225843,
+      "sha256": "fac3c9b80d0518b28488f83b5fe72d093f7c56939742b70cbd9d621f4cec7982",
+      "git_blob": "69caf5e9aa06e3809aad80e170d0d927ba28dfc6",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/dell_inspiron_touch-C5trwrpK.jpg",
+      "bytes": 167932,
+      "sha256": "3979f7dab0c8443fceb5bc7145247369e60b715e8f15ce06725d1ac071e98eeb",
+      "git_blob": "44b167dc0373d8a2331bff681cf7c609120607b8",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/diorSoRealImage-DDvLK2fb.jpg",
+      "bytes": 81392,
+      "sha256": "d6e74a85228978c6d1bdb185285dc0301d54a96f0a70ffd9ffb685c4b1934e27",
+      "git_blob": "a5928a40e93901b8878db3a9852673a13c3fcfc5",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/dune_part_two-BNHA8xs8.jpg",
+      "bytes": 1784668,
+      "sha256": "e8ac0ed5cdf051f1d43de850d11eae68acc02571446940f4e56b03cb5b6f355d",
+      "git_blob": "ad0cd087f0c082d0d9e0fd8b3e12ecc23b53999f",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/everything_war-Xd1eRaJQ.jpg",
+      "bytes": 129321,
+      "sha256": "af2acaaacd55753776a8a42470df08c6c1461bb54d40f6a63ee6938e16a6cddf",
+      "git_blob": "0412f4bc68b1933cc7657ae20a8265b325658887",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/furiosa-DmCVh0Dw.jpg",
+      "bytes": 359219,
+      "sha256": "56c8380ef53368d90bc97dff68676006f9d834dc53e5909a6343fe486b196c08",
+      "git_blob": "210bd214f1067f21a7b3e8546bb5bcb330b36970",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/generic-rN-jCU_v.jpg",
+      "bytes": 772824,
+      "sha256": "2f3f41567d9f55a0a84d39f56ca05edb3541d86c4986ff6cf606ac8a2908b4f9",
+      "git_blob": "3314e148e85c5fe6775deb4f9270ddc9d0c85120",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/god_bless_you-wRCUzary.jpg",
+      "bytes": 515928,
+      "sha256": "ac0c814bf3195179ff969b901ad0073f0ac6abfc7067c1025ec3159b40280b21",
+      "git_blob": "da960d3d12eb4ce2508d0eb8ce32fe7140f32972",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/gucciGG0022SImage-Cd6YgwSC.jpg",
+      "bytes": 81067,
+      "sha256": "7d70cd5b4304a2b2ca582403d467ecea78c01af6eea9c3d4078dcc9ca3915a69",
+      "git_blob": "8ea74efe06bf1cec4d812e317f54b292deebfea8",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/hp_spectre_x360-BgtCXej3.jpg",
+      "bytes": 171631,
+      "sha256": "dbba4d6d38ba3fe51d92d5d6345252c105e895a6d039a9f9025f3aba303f82e6",
+      "git_blob": "a2a2e5c3e473e0090597f2f3212592d3316283a8",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/hydroFlaskImage-D5aOoyl3.jpg",
+      "bytes": 122043,
+      "sha256": "29520cbc613b9f492e98b5a1d8692b3f6a689d0053e346005d5cd5e8c1eeb55d",
+      "git_blob": "8d44e69130fb4399f50f0b7924511c976a1b1927",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/index-B5FQbqQA.js",
+      "bytes": 1273941,
+      "sha256": "d28d09ed12193a82a76561c4a957f767a2deafddd26594bca807a3641f7399ab",
+      "git_blob": "ba9c1df8c99e43fa756ec375d0cc16081face874",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/index-CbuhjdS0.css",
+      "bytes": 101,
+      "sha256": "b0426fe66084f07d1f5d9b2e306ff37bb27c083dd6c11980936b35c9f67bcdc5",
+      "git_blob": "16b6869b36031d61c2fbe42596e13369bd0c01e8",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/inside_out_2-BYqT-Fr8.jpg",
+      "bytes": 318563,
+      "sha256": "a067cd52ddd0d76532c5cf6d61502a874fc1e83a4685c95d25959511c0f1b3cf",
+      "git_blob": "1ebffdd9c61c057422a000e8a4fdb605c570861e",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/james-B3E3uezf.jpg",
+      "bytes": 102541,
+      "sha256": "942d8b276d48035b339b9e43a714edd360910827a90a395378e20fe5bcedc774",
+      "git_blob": "dc1d086af28dfb59cfbdfce3d823ef847b41ca94",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/joker-QaDRFICd.jpg",
+      "bytes": 200583,
+      "sha256": "6f61694aaf98aac6de82726429292f253a8af5280005f12a102b9c6c057a4cf1",
+      "git_blob": "3cbd0eb6b087f41464bf87bbae0346c5766c7082",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/kleanKanteenClassicImage-Dilb1dkO.jpg",
+      "bytes": 128967,
+      "sha256": "fe515a4526d047173924274e174098919e5b4b2756872948b25ceafb3d0c848f",
+      "git_blob": "e0afaaf1beba0ec5a369565ae230c38fa63b096f",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/lenovo_thinkpad_x1_carbon_ultra-DDh37eI9.jpg",
+      "bytes": 271473,
+      "sha256": "0ce3d150230b0cd75c9c2fede9e1d92037c0c0a0407d8bdbc87d7581be229f3b",
+      "git_blob": "e9b539cd7c2e67aa003faf9322a6dd2b6d6cabd4",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/lenovo_yoga_slim_7i-D_PCrrEj.jpg",
+      "bytes": 179381,
+      "sha256": "447d49bc160a42e960ca49e905660b0ec70f248bcd65332f9dc8fb5136874632",
+      "git_blob": "46f1ac8fc2bc8349de80a6d2ff9cc5e3a179a745",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/lifefactoryGlassBottleImage-Dt9b9xvI.jpg",
+      "bytes": 101009,
+      "sha256": "692b75a8b490da7bb454dc0a547130b0233b8117bba236db60b22bdfd13ef669",
+      "git_blob": "466ca7dcb5e974b01031ebd3ba842601e57b34b8",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/lost_mans_lane-55UDIUkL.jpg",
+      "bytes": 286872,
+      "sha256": "3b8aab3b6dc183b7831aa830070c2dda8e26df6d2d6f96b176e6feea912ed54c",
+      "git_blob": "a93e3af4191a4755cdfaf7cf4bef78c376e6eca4",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/mauiJimRedSandsImage-CBnzrbKo.jpg",
+      "bytes": 88239,
+      "sha256": "996e42d3fc66d3027f66bff17db42d0da71cc9cff6377e7e894bafc4280aa118",
+      "git_blob": "f4e00b0a8a1e6d74174e1978ffb1211bb14b4a0c",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/maxxxine-Bif-i29_.jpg",
+      "bytes": 163226,
+      "sha256": "823cb9de37bc68d8d8a44473ef0737ad7f7e677f6aed1a637d4b07b8ebf19190",
+      "git_blob": "d97683fcc538bd99cb767a85f1dc36a3289887cc",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/may_the_wolf-C-LNEtxg.jpg",
+      "bytes": 438501,
+      "sha256": "6c0fe3788a19e6cdcb62bfc8868d2144e9f2a272511b66b8274a066c334f5e27",
+      "git_blob": "33b6d9ad068c4f6f7b2b50a06f37c89232151b61",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/microsoft_surface_laptop_5-FnQ1dKTa.jpg",
+      "bytes": 117453,
+      "sha256": "b9e6909ef5a3d02516597948103c9d6e4ec5fe55f4d28d0fd26ead587abc5fd5",
+      "git_blob": "2cd453015d3dbbf20392efcb138c3d349665e8ec",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/monkey_man-hmF6bTLY.jpg",
+      "bytes": 98358,
+      "sha256": "41af01173da62764a15ca5f2aa80c526d852b42c02bcd78e66adaab2de511885",
+      "git_blob": "06fc6d7f0e3071dfcd147f988fcf88fe95193d0f",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/nalgeneImage-CpfQdKdk.jpg",
+      "bytes": 112873,
+      "sha256": "d29edfdb06c23df777fecaf50b30612068d50cac1314ce8e393829640e96fa0e",
+      "git_blob": "a17e8b75f7d3a1795f6ed463099074534ebb77e9",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/oakleyHolbrookImage-C1zLo2K7.jpg",
+      "bytes": 74394,
+      "sha256": "c62acff03e20827d66b37cf9d3ef5ad39e85c3119bfa83a97c39138f63d91b50",
+      "git_blob": "7cf138d72e2b22082372929a12b2abf802e35589",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/oralb-DIyVxwH6.png",
+      "bytes": 174845,
+      "sha256": "19a9ebd58fc6c228616527b8295c744f0a431cf365e46f3c98936442d920026f",
+      "git_blob": "f7351ee012fcf30888b24bcc39d61d4cca6df7c8",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/persol714Image-Bj0AcvZs.jpg",
+      "bytes": 82210,
+      "sha256": "43ff45c6b8fc6909d6502fa55e4a417cf399d7631a1e8d3a3e40005cf1df36d5",
+      "git_blob": "9ecfe895e48808f7a03e1feb0a7cc8cefd1ceb98",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/portal-C4UNBJdy.jpg",
+      "bytes": 188725,
+      "sha256": "1d316c2a7b52a95bc6ebed110ec8daa8c7f232f491768091e24fe093fa409bac",
+      "git_blob": "1e79813dd8675ea4cdb9c32e2f8142692f7f9b52",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/pradaPR01OSImage-CHhkqI4T.jpg",
+      "bytes": 86202,
+      "sha256": "6820505adb9e819ee9308d772ce45c4215d047fcc70b9d61083a85cfa6d5979e",
+      "git_blob": "f526f7773da05a7aba46c661c40d7219f3398d8e",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/quiet_place_day_one-Dj3iTeof.jpg",
+      "bytes": 642919,
+      "sha256": "39ba38154a90d0e736049cf26e637a074dab2b614334160ce404358c84d56e69",
+      "git_blob": "ac3f52a3a17c25f309849eec85231933b52b4843",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/raybanAviatorImage-CyyMfTCO.jpg",
+      "bytes": 112026,
+      "sha256": "53f657c76ec43b65b7c35410b09c0ff58ec26aea16c3b95e599cf9a0a2ce2861",
+      "git_blob": "d61dbb2d413a28872b25dac50795335c273d2c46",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/razer_blade_15-RHLOwSdj.jpg",
+      "bytes": 211272,
+      "sha256": "c60409755f35e1ffbed6351847178e51d7c38e8a3d2287a920fba4dbcb8ff220",
+      "git_blob": "d46314fa76fcc327e3e0172406b72edc7f2b7e41",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/sensodyne-DQdPzboc.jpg",
+      "bytes": 109951,
+      "sha256": "23adc1fe88b8e52e402ea355445dd8c9a01feb1a5e1ab5052982ecc17767c4ea",
+      "git_blob": "37e09a8908c8030f2c775df3c660be5a85821561",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/smithOpticsLowdown2Image-BRKU6Lqp.jpg",
+      "bytes": 73274,
+      "sha256": "57ba6ef4ec443ebc4326341dd41a79f13096c3b10e7114115ce70f977fb55098",
+      "git_blob": "04f25ea5d387a07ecf21272bec3faf6519447acc",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/swellImage-CZzOtOh5.jpg",
+      "bytes": 74557,
+      "sha256": "8d25990dd11d475b43a83cb978cde46d0d3e2a565fb677ce8e8eb5ce11754cc4",
+      "git_blob": "4c473f5b5ff99771aad9c1b5311d1fa056ba543b",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/t2_button_c-CF-C4n8s.jpg",
+      "bytes": 9679,
+      "sha256": "c33e5be9d830ffd9a5cb2f4568d126c9d365b50b31f42664a5417b9882476b22",
+      "git_blob": "2a6dffe1a41bec1761dbc69c4116c0b720d1c5a7",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/t2_button_h-CV7_4pqA.jpg",
+      "bytes": 5085,
+      "sha256": "e0376b6c7899f5585f176a5eebf4b512e494eb749d9ff59c17ae0165450e993d",
+      "git_blob": "1d4ea81ab5816486a1a910e84e3524d4b22d3457",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/t2_button_m-MUkeKgUc.jpg",
+      "bytes": 6651,
+      "sha256": "f638c3e9688eafcf245dea42251bbdf48669073db96ef3bceec381f6666802fa",
+      "git_blob": "c1b166e653d4ffedda7673d93bf246dc5be3e697",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/t2_button_n-CIcVjQKt.jpg",
+      "bytes": 9056,
+      "sha256": "758ef5ce222848fe3bd2bf84c8d5e35bbc55e95c35055d974f4e7a845e6ce9a1",
+      "git_blob": "6eb4c860a91de1c642400ee83de93f5bbb7b4065",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/t2_popup-CKyG1z7q.jpg",
+      "bytes": 25317,
+      "sha256": "4a4a5f04892c23a66377a89788acfa57e96ac1400692edff98db32e25fc6d914",
+      "git_blob": "7394d84eb23f4f6b7bfed15ec29f2157f7388b7e",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/takeyaActivesImage-CGtix-Vr.jpg",
+      "bytes": 198333,
+      "sha256": "86ef234d58154b7f2b42e580c012991d46795bfe83223340e39770e0b4601d8c",
+      "git_blob": "c61e6afe69d87b05ff19833ff09d1ee55f7b5514",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/the_idea_of_you-s9Td7WLJ.jpg",
+      "bytes": 903290,
+      "sha256": "10f00a8caf9378ddcd200a1f5b8733401bc1be77879001813a4f7b425cd91c03",
+      "git_blob": "b3147404ca8a96ff60d57801ab049076449b324c",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/the_women-CbnKtM6x.jpg",
+      "bytes": 514914,
+      "sha256": "8af794b7c0eb9db2a127cdb7807d31e8c389a5545cbbf35a7e701896ca1d0297",
+      "git_blob": "659ce6dd0f1251a9e58bddefdaea6d4461b4abe1",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/warbyParkerHaskellImage-BMH3jh0L.jpg",
+      "bytes": 85360,
+      "sha256": "1e913a25c829feb9dfad77ef3aec6b11cffe3005eb2171b69719e29a0ee26c7b",
+      "git_blob": "ad36003dcfd3603d22c311ee0f049233cb9a7d92",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/assets/yetiRamblerImage-DUS8UlQ_.jpg",
+      "bytes": 103691,
+      "sha256": "75cfba1b5446c25543a8cb2001ed8448070805e9f2f1d019fed592e860041497",
+      "git_blob": "e6f28d4abe631c857293813bcf6787d4bac7deb3",
+      "kind": "legacy_website_bundle"
+    },
+    {
+      "path": "environments/inspection_shop/dist/index.html",
+      "bytes": 375,
+      "sha256": "2ef124e6d14c6a05219f6c9d670e8a91873ea4af79c00e0b20178e080895ae2d",
+      "git_blob": "72ab2ad76d4c2e8cde8f535c8a317e1843f9a16e",
+      "kind": "legacy_website_bundle"
+    }
+  ],
+  "deployment_check": {
+    "command": "node build.mjs",
+    "source_commit": "585fa07bb7a0e812110e957ab87b854c0e57d860",
+    "isolated_directory": ".local/git-artifact-cleanup-v1/deployment-check",
+    "legacy_bundles_present": false,
+    "exit_code": 0,
+    "scope": "Local build only; no deployment or model calls"
+  }
+}
