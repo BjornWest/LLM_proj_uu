@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "scope": "Actual Python endpoint, simulated engine; no GPU/cache allocation",
+  "original_sha256": "1c9edb5bb1ed3127cf022bb9675fc859dce7d75fc67ba6f24afd1dbb64280c64",
+  "patched_sha256": "cb0adc53ea38b9fc7506194f8aa61997abb4517fe3e57970ef1843db4d8f9085",
+  "cases": [
+    {
+      "patched": false,
+      "engine_behavior": "True",
+      "engine_remove_calls": 0,
+      "name_retained": false
+    },
+    {
+      "patched": true,
+      "engine_behavior": "True",
+      "engine_remove_calls": 1,
+      "name_retained": false
+    },
+    {
+      "patched": true,
+      "engine_behavior": "False",
+      "engine_remove_calls": 1,
+      "name_retained": false
+    },
+    {
+      "patched": true,
+      "engine_behavior": "engine unavailable",
+      "engine_remove_calls": 1,
+      "name_retained": true
+    }
+  ]
+}

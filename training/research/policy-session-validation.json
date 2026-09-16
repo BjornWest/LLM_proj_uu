@@ -1,0 +1,683 @@
+{
+  "status": "PASS",
+  "scenarios": [
+    {
+      "mode": "pinning",
+      "status": "PASS",
+      "seconds": 12.260441141002957,
+      "requests": [
+        {
+          "model": "trl-policy-v1",
+          "turn": 0
+        },
+        {
+          "model": "trl-policy-v1",
+          "turn": 0
+        },
+        {
+          "model": "trl-policy-v1",
+          "turn": 1
+        }
+      ],
+      "samples": [
+        {
+          "group_id": 0,
+          "policy_version": 1,
+          "reward": 0.0,
+          "advantage": -0.9999999800000003
+        },
+        {
+          "group_id": 0,
+          "policy_version": 1,
+          "reward": 1.0,
+          "advantage": 0.9999999800000003
+        }
+      ],
+      "adapter_retained_during_inference": true,
+      "child_exitcode": 0,
+      "transport_events": [
+        [
+          "/pause"
+        ],
+        [
+          "load",
+          "trl-policy-v1"
+        ],
+        [
+          "/resume"
+        ],
+        [
+          "/pause"
+        ],
+        [
+          "load",
+          "trl-policy-v2"
+        ],
+        [
+          "/resume"
+        ]
+      ],
+      "final_registry": {
+        "current": 2,
+        "versions": {
+          "1": "available",
+          "2": "available"
+        },
+        "groups": {},
+        "episodes": {},
+        "fault": null,
+        "events": [
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 1,
+            "time": 1789483256.4940126,
+            "event": "publish",
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 2,
+            "time": 1789483263.424581,
+            "event": "group_start",
+            "group_id": 0,
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 3,
+            "time": 1789483263.4248955,
+            "event": "episode_start",
+            "episode_id": "2d52744f6176463589ec1d1a1a13507f",
+            "group_id": 0,
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 4,
+            "time": 1789483263.424994,
+            "event": "episode_start",
+            "episode_id": "af9c866e9e3c4915bf126661a488e987",
+            "group_id": 0,
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 5,
+            "time": 1789483264.0617938,
+            "event": "request_start",
+            "episode_id": "2d52744f6176463589ec1d1a1a13507f",
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 6,
+            "time": 1789483264.4877474,
+            "event": "request_start",
+            "episode_id": "af9c866e9e3c4915bf126661a488e987",
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 7,
+            "time": 1789483264.4990036,
+            "event": "publish",
+            "version": 2
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 8,
+            "time": 1789483264.5002003,
+            "event": "request_end",
+            "episode_id": "2d52744f6176463589ec1d1a1a13507f",
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 9,
+            "time": 1789483264.5003874,
+            "event": "request_end",
+            "episode_id": "af9c866e9e3c4915bf126661a488e987",
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 10,
+            "time": 1789483265.1759005,
+            "event": "request_start",
+            "episode_id": "2d52744f6176463589ec1d1a1a13507f",
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 11,
+            "time": 1789483265.177315,
+            "event": "request_end",
+            "episode_id": "2d52744f6176463589ec1d1a1a13507f",
+            "version": 1
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 12,
+            "time": 1789483265.8414721,
+            "event": "episode_end",
+            "episode_id": "af9c866e9e3c4915bf126661a488e987",
+            "group_id": 0,
+            "version": 1,
+            "requests": 0
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 13,
+            "time": 1789483265.8417637,
+            "event": "group_start",
+            "group_id": 1,
+            "version": 2
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 14,
+            "time": 1789483265.841912,
+            "event": "episode_start",
+            "episode_id": "67854ad5b4e14ec4b46a0cd7b868e0a6",
+            "group_id": 1,
+            "version": 2
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 15,
+            "time": 1789483266.5007508,
+            "event": "episode_end",
+            "episode_id": "2d52744f6176463589ec1d1a1a13507f",
+            "group_id": 0,
+            "version": 1,
+            "requests": 0
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 16,
+            "time": 1789483266.5010402,
+            "event": "group_end",
+            "group_id": 0,
+            "version": 1,
+            "cancelled": null
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 17,
+            "time": 1789483266.5021684,
+            "event": "episode_start",
+            "episode_id": "7feb40d9d15e49baa329a58366882014",
+            "group_id": 1,
+            "version": 2
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 18,
+            "time": 1789483267.0159924,
+            "event": "group_cancel",
+            "group_id": 1,
+            "version": 2,
+            "reason": "empty_or_failed_episode"
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 19,
+            "time": 1789483267.016122,
+            "event": "episode_end",
+            "episode_id": "67854ad5b4e14ec4b46a0cd7b868e0a6",
+            "group_id": 1,
+            "version": 2,
+            "requests": 0
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 20,
+            "time": 1789483267.4358664,
+            "event": "episode_end",
+            "episode_id": "7feb40d9d15e49baa329a58366882014",
+            "group_id": 1,
+            "version": 2,
+            "requests": 0
+          },
+          {
+            "run_id": "339a4f3f97a64a6a85f008a2869d0b54",
+            "seq": 21,
+            "time": 1789483267.4360316,
+            "event": "group_end",
+            "group_id": 1,
+            "version": 2,
+            "cancelled": "empty_or_failed_episode"
+          }
+        ]
+      },
+      "observations_masked": true,
+      "logprobs_aligned": true,
+      "native_lora_sync": true
+    },
+    {
+      "mode": "staleness",
+      "status": "PASS",
+      "seconds": 14.319496418000199,
+      "requests": [
+        {
+          "model": "trl-policy-v1",
+          "turn": 0
+        },
+        {
+          "model": "trl-policy-v1",
+          "turn": 0
+        },
+        {
+          "model": "trl-policy-v4",
+          "turn": 0
+        },
+        {
+          "model": "trl-policy-v4",
+          "turn": 0
+        },
+        {
+          "model": "trl-policy-v4",
+          "turn": 1
+        }
+      ],
+      "samples": [
+        {
+          "group_id": 1,
+          "policy_version": 4,
+          "reward": 0.0,
+          "advantage": -0.9999999800000003
+        },
+        {
+          "group_id": 1,
+          "policy_version": 4,
+          "reward": 1.0,
+          "advantage": 0.9999999800000003
+        }
+      ],
+      "adapter_retained_during_inference": true,
+      "child_exitcode": 0,
+      "transport_events": [
+        [
+          "/pause"
+        ],
+        [
+          "load",
+          "trl-policy-v1"
+        ],
+        [
+          "/resume"
+        ],
+        [
+          "/pause"
+        ],
+        [
+          "load",
+          "trl-policy-v2"
+        ],
+        [
+          "/resume"
+        ],
+        [
+          "/pause"
+        ],
+        [
+          "load",
+          "trl-policy-v3"
+        ],
+        [
+          "/resume"
+        ],
+        [
+          "/pause"
+        ],
+        [
+          "load",
+          "trl-policy-v4"
+        ],
+        [
+          "/resume"
+        ],
+        [
+          "unload",
+          "trl-policy-v1"
+        ]
+      ],
+      "final_registry": {
+        "current": 4,
+        "versions": {
+          "2": "available",
+          "3": "available",
+          "4": "available"
+        },
+        "groups": {},
+        "episodes": {},
+        "fault": null,
+        "events": [
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 1,
+            "time": 1789483269.2313688,
+            "event": "publish",
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 2,
+            "time": 1789483275.9332485,
+            "event": "group_start",
+            "group_id": 0,
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 3,
+            "time": 1789483275.9334826,
+            "event": "episode_start",
+            "episode_id": "7643638a1dc340e59f5fa9738f83f012",
+            "group_id": 0,
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 4,
+            "time": 1789483275.9335692,
+            "event": "episode_start",
+            "episode_id": "2724d18745ea41829800df6b39b132e9",
+            "group_id": 0,
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 5,
+            "time": 1789483276.405191,
+            "event": "request_start",
+            "episode_id": "2724d18745ea41829800df6b39b132e9",
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 6,
+            "time": 1789483276.8544025,
+            "event": "request_start",
+            "episode_id": "7643638a1dc340e59f5fa9738f83f012",
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 7,
+            "time": 1789483276.8656452,
+            "event": "publish",
+            "version": 2
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 8,
+            "time": 1789483276.8754115,
+            "event": "publish",
+            "version": 3
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 9,
+            "time": 1789483276.884706,
+            "event": "group_cancel",
+            "group_id": 0,
+            "version": 1,
+            "reason": "staleness"
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 10,
+            "time": 1789483276.884719,
+            "event": "publish",
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 11,
+            "time": 1789483276.8857768,
+            "event": "request_end",
+            "episode_id": "2724d18745ea41829800df6b39b132e9",
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 12,
+            "time": 1789483276.885947,
+            "event": "request_end",
+            "episode_id": "7643638a1dc340e59f5fa9738f83f012",
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 13,
+            "time": 1789483277.5663939,
+            "event": "episode_end",
+            "episode_id": "2724d18745ea41829800df6b39b132e9",
+            "group_id": 0,
+            "version": 1,
+            "requests": 0
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 14,
+            "time": 1789483277.5666418,
+            "event": "group_start",
+            "group_id": 1,
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 15,
+            "time": 1789483277.5667708,
+            "event": "episode_start",
+            "episode_id": "49be1f870f9348a1b0386f6371028d88",
+            "group_id": 1,
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 16,
+            "time": 1789483278.2200458,
+            "event": "episode_end",
+            "episode_id": "7643638a1dc340e59f5fa9738f83f012",
+            "group_id": 0,
+            "version": 1,
+            "requests": 0
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 17,
+            "time": 1789483278.2202904,
+            "event": "group_end",
+            "group_id": 0,
+            "version": 1,
+            "cancelled": "staleness"
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 18,
+            "time": 1789483278.2205865,
+            "event": "episode_start",
+            "episode_id": "95ab92190dfc453ebcc8bcd7204e5828",
+            "group_id": 1,
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 19,
+            "time": 1789483278.7735505,
+            "event": "request_start",
+            "episode_id": "49be1f870f9348a1b0386f6371028d88",
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 20,
+            "time": 1789483278.7748988,
+            "event": "request_end",
+            "episode_id": "49be1f870f9348a1b0386f6371028d88",
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 21,
+            "time": 1789483279.2263856,
+            "event": "request_start",
+            "episode_id": "95ab92190dfc453ebcc8bcd7204e5828",
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 22,
+            "time": 1789483279.2275028,
+            "event": "request_end",
+            "episode_id": "95ab92190dfc453ebcc8bcd7204e5828",
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 23,
+            "time": 1789483279.9591436,
+            "event": "request_start",
+            "episode_id": "49be1f870f9348a1b0386f6371028d88",
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 24,
+            "time": 1789483279.9604142,
+            "event": "request_end",
+            "episode_id": "49be1f870f9348a1b0386f6371028d88",
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 25,
+            "time": 1789483280.6243553,
+            "event": "episode_end",
+            "episode_id": "95ab92190dfc453ebcc8bcd7204e5828",
+            "group_id": 1,
+            "version": 4,
+            "requests": 0
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 26,
+            "time": 1789483280.6246297,
+            "event": "group_start",
+            "group_id": 2,
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 27,
+            "time": 1789483280.6247563,
+            "event": "episode_start",
+            "episode_id": "19d2ca45460043c8a0f7dd751ef037a8",
+            "group_id": 2,
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 28,
+            "time": 1789483281.2843904,
+            "event": "episode_end",
+            "episode_id": "49be1f870f9348a1b0386f6371028d88",
+            "group_id": 1,
+            "version": 4,
+            "requests": 0
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 29,
+            "time": 1789483281.284571,
+            "event": "group_end",
+            "group_id": 1,
+            "version": 4,
+            "cancelled": null
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 30,
+            "time": 1789483281.2854927,
+            "event": "episode_start",
+            "episode_id": "baac9e7bfefd4b74947b2fac54498771",
+            "group_id": 2,
+            "version": 4
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 31,
+            "time": 1789483281.783315,
+            "event": "group_cancel",
+            "group_id": 2,
+            "version": 4,
+            "reason": "empty_or_failed_episode"
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 32,
+            "time": 1789483281.7833865,
+            "event": "episode_end",
+            "episode_id": "19d2ca45460043c8a0f7dd751ef037a8",
+            "group_id": 2,
+            "version": 4,
+            "requests": 0
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 33,
+            "time": 1789483282.201531,
+            "event": "episode_end",
+            "episode_id": "baac9e7bfefd4b74947b2fac54498771",
+            "group_id": 2,
+            "version": 4,
+            "requests": 0
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 34,
+            "time": 1789483282.2017083,
+            "event": "group_end",
+            "group_id": 2,
+            "version": 4,
+            "cancelled": "empty_or_failed_episode"
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 35,
+            "time": 1789483283.5373363,
+            "event": "eviction_claim",
+            "version": 1
+          },
+          {
+            "run_id": "20f9509196784d699debdb7df1a15e7a",
+            "seq": 36,
+            "time": 1789483283.5393226,
+            "event": "evicted",
+            "version": 1
+          }
+        ]
+      },
+      "observations_masked": true,
+      "logprobs_aligned": true,
+      "native_lora_sync": true
+    }
+  ],
+  "installed_sources": {
+    "async_rollout_worker.py": "39b5dd3cde6f55e794bf721aecc4e7d2aa6a23d99d5ec2fa7de4be1b4a5faec2",
+    "openenv_harness.py": "8b745cc0cb30977a7ad41458f1c85981b98fab0a5de01b80a41b7a88f656cc5f",
+    "async_grpo_trainer.py": "8eb2b73d19015a674dfa5850ce94aea947cdf592805999577c7cdd45642f1e3b"
+  },
+  "implementation_sources": {
+    "policy_sessions.py": "6050905a8106a8206816c1c42ce7f42b076236a088412cc8581d8caf41b7b81a",
+    "policy_compat.py": "cd090b26d244889746b3986cddb7753e1f397c271cc84cdfc2a3ecee8165b185"
+  },
+  "scope": "Installed patched TRL, real spawn/IPC, native PEFT save and HTTP sync, real BrowserGym/OpenEnv, real Qwen tokenizer, scripted inference",
+  "gpu_used": false,
+  "model_weights_downloaded": false,
+  "gradients_executed": false,
+  "vllm_engine_executed": false,
+  "rl_ready": false
+}

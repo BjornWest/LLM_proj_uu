@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "gpu_used": false,
+  "buffer_count": 12,
+  "native_plain_and_gdn_packing": true,
+  "detects_corrupted_weights": true,
+  "detects_wrong_slot_and_duplicate_token_rows": true,
+  "detects_slot_reassignment": true,
+  "missing_kernel_coverage_reported": true,
+  "original_functions_restored": true,
+  "untargeted_conv_buffers_verified_without_requiring_execution": true,
+  "scope": "CPU native vLLM packing and diagnostic wrappers; GPU kernels mocked"
+}

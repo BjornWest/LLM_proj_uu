@@ -1,0 +1,105 @@
+{
+  "status": "PASS",
+  "date": "2026-09-16",
+  "run_id": "l40s-sft-learning-20260916-123908-dbbb7ea3",
+  "app_id": "ap-uq5BepmM8yhoHkdGRkQuzS",
+  "scope": "One formatting rule; heldout combinations of familiar words; NF4 Transformers generation, no FP8 vLLM, browser, or cold base reload",
+  "gpu": "L40S",
+  "gpu_count": 1,
+  "function_seconds": 271.316623210907,
+  "gpu_function_minutes": 4.521943720181783,
+  "billing_duration_not_measured": true,
+  "steps": 32,
+  "training_examples": 64,
+  "effective_batch": 2,
+  "epochs": 1,
+  "rank": 16,
+  "alpha": 32,
+  "learning_rate": 0.0001,
+  "seed": 42,
+  "evaluations": {
+    "heldout": {
+      "before": {
+        "n": 16,
+        "exact_match": 0.0,
+        "apple_placement": 0.0,
+        "word_preservation": 0.0
+      },
+      "after": {
+        "n": 16,
+        "exact_match": 1.0,
+        "apple_placement": 1.0,
+        "word_preservation": 1.0
+      }
+    },
+    "train_eval": {
+      "before": {
+        "n": 8,
+        "exact_match": 0.0,
+        "apple_placement": 0.0,
+        "word_preservation": 0.0
+      },
+      "after": {
+        "n": 8,
+        "exact_match": 1.0,
+        "apple_placement": 1.0,
+        "word_preservation": 1.0
+      }
+    }
+  },
+  "audit": {
+    "dtypes": {
+      "base_parameter_elements": {
+        "torch.float32": 462574064,
+        "torch.bfloat16": 2543598336,
+        "torch.uint8": 12175278080
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 108789760
+      },
+      "gradient_tensors_checked": 0
+    },
+    "nf4": {
+      "quantized_linears": 496,
+      "compute_dtype": "bfloat16",
+      "double_quant": true,
+      "vision_head_mtp_unquantized": true
+    },
+    "optimizer_moment_tensors": 1600,
+    "checkpoint": {
+      "file": "/__modal/volumes/vo-B2dABuw99BekJAHN1u5Iym/l40s-sft-learning-20260916-123908-dbbb7ea3/learning/checkpoint-32/adapter_model.safetensors",
+      "adapter_tensors": 800,
+      "dtype": "BF16"
+    },
+    "reloaded_adapter_tensors_exact": 800,
+    "after_reload_dtypes": {
+      "base_parameter_elements": {
+        "torch.float32": 462574064,
+        "torch.bfloat16": 2543598336,
+        "torch.uint8": 12175278080
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 108789760
+      },
+      "gradient_tensors_checked": 0
+    }
+  },
+  "first_training_loss": 6.051194190979004,
+  "last_training_loss": 3.957735316362232e-06,
+  "peak_device_memory_mib": 27951.0,
+  "peak_logged_allocated_gib": 19.63,
+  "all_post_training_generations_ended_with_eos": true,
+  "metric_note": "word_preservation checks original words in the expected alternating output positions; baseline plain repetition therefore scores zero on that metric despite preserving the input words",
+  "local_validation": "65 passed, 2 skipped; real local and Modal CPU Axolotl dataset preparation passed",
+  "checkpoint_volume": "browser-training-results",
+  "checkpoint_path": "l40s-sft-learning-20260916-123908-dbbb7ea3/learning/checkpoint-32",
+  "local_evidence": "training/outputs/modal/l40s-sft-learning-20260916-123908-dbbb7ea3",
+  "final_containers": [],
+  "initial_submission": {
+    "run_id": "l40s-sft-learning-20260916-123836-e166c146",
+    "app_id": "ap-hu4X6toVk4JRkgel4ZHqlX",
+    "status": "APP_INITIALIZATION_FAILED",
+    "gpu_submitted": false,
+    "reason": "Modal image.env after runtime mounts; fixed by passing offline environment to subprocesses"
+  }
+}

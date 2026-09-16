@@ -1,0 +1,1759 @@
+{
+  "scope": "Independent L40S inference/trainer tests; not end-to-end RL",
+  "runs": [
+    {
+      "run_id": "l40s-inference-20260915-224421-ffb64f54",
+      "report": {
+        "status": "FAIL",
+        "run_id": "l40s-inference-20260915-224421-ffb64f54",
+        "error": "Traceback (most recent call last):\n  File \"/opt/training/scripts/modal_inference.py\", line 111, in gpu_probe\n    if code: raise RuntimeError(f'Lifecycle exited {code}')\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: Lifecycle exited 1\n",
+        "elapsed_seconds": 184.39316511154175
+      },
+      "app": {
+        "app_id": "ap-9r8gyfjbOngFqJrobuXz2o",
+        "url": "https://modal.com/id/ap-9r8gyfjbOngFqJrobuXz2o"
+      },
+      "containers_after": []
+    },
+    {
+      "run_id": "l40s-grpo-20260915-224453-0600f35a",
+      "report": {
+        "status": "PASS",
+        "run_id": "l40s-grpo-20260915-224453-0600f35a",
+        "grpo": {
+          "installed_sha256": "8eb2b73d19015a674dfa5850ce94aea947cdf592805999577c7cdd45642f1e3b",
+          "candidate_sha256": "6ca603fe74836335591a69f15c1325655292c39052970d2a5649a1cca5b7dca1",
+          "installed_package_modified": false,
+          "edits": [
+            [
+              "        if self._is_vlm:\n",
+              "        if self._is_vlm and not getattr(model, 'is_loaded_in_4bit', False):\n"
+            ],
+            [
+              "            model = get_peft_model(model, peft_config)",
+              "            if getattr(model, 'is_loaded_in_4bit', False):\n                from peft import prepare_model_for_kbit_training\n                model = prepare_model_for_kbit_training(\n                    model, use_gradient_checkpointing=args.gradient_checkpointing,\n                    gradient_checkpointing_kwargs=args.gradient_checkpointing_kwargs)\n            model = get_peft_model(model, peft_config, autocast_adapter_dtype=False)"
+            ]
+          ],
+          "dtypes_before_explicit_cast": {
+            "base_parameter_elements": {
+              "torch.float32": 3006172400,
+              "torch.uint8": 12175278080
+            },
+            "adapter_parameter_elements": {
+              "torch.bfloat16": 108789760
+            },
+            "gradient_tensors_checked": 0
+          },
+          "nf4": {
+            "quantized_linears": 496,
+            "compute_dtype": "bfloat16",
+            "double_quant": true,
+            "vision_head_mtp_unquantized": true
+          },
+          "gradients": {
+            "base_parameter_elements": {
+              "torch.float32": 3006172400,
+              "torch.uint8": 12175278080
+            },
+            "adapter_parameter_elements": {
+              "torch.bfloat16": 108789760
+            },
+            "gradient_tensors_checked": 800
+          },
+          "fp32_moment_tensors": 1600,
+          "checkpoint": {
+            "file": "/results/l40s-grpo-20260915-224453-0600f35a/grpo/checkpoint-2/adapter_model.safetensors",
+            "adapter_tensors": 800,
+            "dtype": "BF16"
+          },
+          "status": "PASS",
+          "losses": [
+            -1.0,
+            -1.160994291305542
+          ],
+          "step_seconds": [
+            57.41147170400001,
+            1.038066716000003
+          ],
+          "sequence_length": 353,
+          "peak_allocated_gib": 25.788095474243164,
+          "peak_reserved_gib": 29.56640625,
+          "adapter_max_change": 0.00010013580322265625,
+          "checked_tensor": "base_model.model.model.language_model.layers.0.linear_attn.out_proj.lora_B.default.weight",
+          "frozen_parameter_samples_unchanged": true,
+          "optimizer_reload": true,
+          "elapsed_seconds": 135.67102619500002,
+          "gpu": "NVIDIA L40S",
+          "attention": "SDPA; single trajectory; packed inputs rejected",
+          "scope": "native AsyncGRPO constructor/compute_loss + two optimizer steps; synthetic old logprobs/advantages; no Trainer.train, vLLM or rollout worker"
+        },
+        "elapsed_seconds": 151.29575967788696
+      },
+      "app": {
+        "app_id": "ap-8QjjlWHjvbThP4QG8dyxN6",
+        "url": "https://modal.com/id/ap-8QjjlWHjvbThP4QG8dyxN6"
+      },
+      "containers_after": []
+    },
+    {
+      "run_id": "l40s-inference-20260915-225017-1f8ab0e0",
+      "report": {
+        "status": "LIFECYCLE_PASS_LOGPROBS_NEED_REVIEW",
+        "run_id": "l40s-inference-20260915-225017-1f8ab0e0",
+        "startup_seconds": 147.98662328720093,
+        "inference": {
+          "status": "LIFECYCLE_PASS_LOGPROBS_NEED_REVIEW",
+          "lifecycle_pass": true,
+          "repeatability_ok": false,
+          "same_text": true,
+          "versions_loaded": 10,
+          "ranks": [
+            16,
+            32
+          ],
+          "adapter_dtype": "bfloat16",
+          "rank32": "zero-padded rank16; loading/layout qualification only",
+          "session_policy_stable": true,
+          "staleness_cancels_next_call": true,
+          "response_drained_before_release": true,
+          "engine_removal_verified": true,
+          "shutdown_registered_adapters": 0,
+          "same_policy_logprob_max_difference": 0.019603729248046875,
+          "before_update_logprob_max_difference": 0.0,
+          "distinct_trained_policy_weights": true,
+          "scope": "real FP8 inference + native load/unload + production registry; no TRL optimizer or MTP",
+          "final_registry": {
+            "current": 10,
+            "versions": {
+              "8": "available",
+              "9": "available",
+              "10": "available"
+            },
+            "groups": {},
+            "episodes": {},
+            "fault": null,
+            "events": [
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 1,
+                "time": 1789505601.0314474,
+                "event": "publish",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 2,
+                "time": 1789505601.0324044,
+                "event": "group_start",
+                "group_id": "slow",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 3,
+                "time": 1789505601.0328436,
+                "event": "episode_start",
+                "episode_id": "episode",
+                "group_id": "slow",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 4,
+                "time": 1789505601.0332665,
+                "event": "request_start",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 5,
+                "time": 1789505612.4414783,
+                "event": "request_end",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 6,
+                "time": 1789505612.4427726,
+                "event": "request_start",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 7,
+                "time": 1789505614.0997467,
+                "event": "request_end",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 8,
+                "time": 1789505615.5640519,
+                "event": "publish",
+                "version": 2
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 9,
+                "time": 1789505616.3365543,
+                "event": "publish",
+                "version": 3
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 10,
+                "time": 1789505616.3423765,
+                "event": "request_start",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 11,
+                "time": 1789505617.9935834,
+                "event": "request_end",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 12,
+                "time": 1789505617.9961107,
+                "event": "request_start",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 13,
+                "time": 1789505619.5650752,
+                "event": "group_cancel",
+                "group_id": "slow",
+                "version": 1,
+                "reason": "staleness"
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 14,
+                "time": 1789505619.5661006,
+                "event": "publish",
+                "version": 4
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 15,
+                "time": 1789505622.7601488,
+                "event": "request_end",
+                "episode_id": "episode",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 16,
+                "time": 1789505622.7609901,
+                "event": "episode_end",
+                "episode_id": "episode",
+                "group_id": "slow",
+                "version": 1,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 17,
+                "time": 1789505622.7616045,
+                "event": "group_end",
+                "group_id": "slow",
+                "version": 1,
+                "cancelled": "staleness"
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 18,
+                "time": 1789505622.7621136,
+                "event": "eviction_claim",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 19,
+                "time": 1789505622.7755544,
+                "event": "evicted",
+                "version": 1
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 20,
+                "time": 1789505622.7759476,
+                "event": "group_start",
+                "group_id": "error",
+                "version": 4
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 21,
+                "time": 1789505622.7764525,
+                "event": "episode_start",
+                "episode_id": "failed",
+                "group_id": "error",
+                "version": 4
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 22,
+                "time": 1789505622.7768853,
+                "event": "group_cancel",
+                "group_id": "error",
+                "version": 4,
+                "reason": "mock_environment_error"
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 23,
+                "time": 1789505622.7772882,
+                "event": "episode_end",
+                "episode_id": "failed",
+                "group_id": "error",
+                "version": 4,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 24,
+                "time": 1789505622.7776604,
+                "event": "group_end",
+                "group_id": "error",
+                "version": 4,
+                "cancelled": "mock_environment_error"
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 25,
+                "time": 1789505623.3755467,
+                "event": "publish",
+                "version": 5
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 26,
+                "time": 1789505623.3760462,
+                "event": "eviction_claim",
+                "version": 2
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 27,
+                "time": 1789505623.3866644,
+                "event": "evicted",
+                "version": 2
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 28,
+                "time": 1789505623.3874178,
+                "event": "group_start",
+                "group_id": "g5",
+                "version": 5
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 29,
+                "time": 1789505623.3880026,
+                "event": "episode_start",
+                "episode_id": "g5",
+                "group_id": "g5",
+                "version": 5
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 30,
+                "time": 1789505623.3884592,
+                "event": "request_start",
+                "episode_id": "g5",
+                "version": 5
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 31,
+                "time": 1789505625.049127,
+                "event": "request_end",
+                "episode_id": "g5",
+                "version": 5
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 32,
+                "time": 1789505625.0496852,
+                "event": "episode_end",
+                "episode_id": "g5",
+                "group_id": "g5",
+                "version": 5,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 33,
+                "time": 1789505625.0501885,
+                "event": "group_end",
+                "group_id": "g5",
+                "version": 5,
+                "cancelled": null
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 34,
+                "time": 1789505626.0943468,
+                "event": "publish",
+                "version": 6
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 35,
+                "time": 1789505626.0947354,
+                "event": "eviction_claim",
+                "version": 3
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 36,
+                "time": 1789505626.1053493,
+                "event": "evicted",
+                "version": 3
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 37,
+                "time": 1789505626.1057088,
+                "event": "group_start",
+                "group_id": "g6",
+                "version": 6
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 38,
+                "time": 1789505626.1060457,
+                "event": "episode_start",
+                "episode_id": "g6",
+                "group_id": "g6",
+                "version": 6
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 39,
+                "time": 1789505626.1063955,
+                "event": "request_start",
+                "episode_id": "g6",
+                "version": 6
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 40,
+                "time": 1789505627.7659948,
+                "event": "request_end",
+                "episode_id": "g6",
+                "version": 6
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 41,
+                "time": 1789505627.767229,
+                "event": "episode_end",
+                "episode_id": "g6",
+                "group_id": "g6",
+                "version": 6,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 42,
+                "time": 1789505627.767772,
+                "event": "group_end",
+                "group_id": "g6",
+                "version": 6,
+                "cancelled": null
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 43,
+                "time": 1789505628.346281,
+                "event": "publish",
+                "version": 7
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 44,
+                "time": 1789505628.3468068,
+                "event": "eviction_claim",
+                "version": 4
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 45,
+                "time": 1789505628.3585956,
+                "event": "evicted",
+                "version": 4
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 46,
+                "time": 1789505628.3589463,
+                "event": "group_start",
+                "group_id": "g7",
+                "version": 7
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 47,
+                "time": 1789505628.3592823,
+                "event": "episode_start",
+                "episode_id": "g7",
+                "group_id": "g7",
+                "version": 7
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 48,
+                "time": 1789505628.3596437,
+                "event": "request_start",
+                "episode_id": "g7",
+                "version": 7
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 49,
+                "time": 1789505630.0433083,
+                "event": "request_end",
+                "episode_id": "g7",
+                "version": 7
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 50,
+                "time": 1789505630.043964,
+                "event": "episode_end",
+                "episode_id": "g7",
+                "group_id": "g7",
+                "version": 7,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 51,
+                "time": 1789505630.0444238,
+                "event": "group_end",
+                "group_id": "g7",
+                "version": 7,
+                "cancelled": null
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 52,
+                "time": 1789505631.4439487,
+                "event": "publish",
+                "version": 8
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 53,
+                "time": 1789505631.444525,
+                "event": "eviction_claim",
+                "version": 5
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 54,
+                "time": 1789505631.4570334,
+                "event": "evicted",
+                "version": 5
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 55,
+                "time": 1789505631.4574509,
+                "event": "group_start",
+                "group_id": "g8",
+                "version": 8
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 56,
+                "time": 1789505631.4578733,
+                "event": "episode_start",
+                "episode_id": "g8",
+                "group_id": "g8",
+                "version": 8
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 57,
+                "time": 1789505631.4582634,
+                "event": "request_start",
+                "episode_id": "g8",
+                "version": 8
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 58,
+                "time": 1789505633.1222203,
+                "event": "request_end",
+                "episode_id": "g8",
+                "version": 8
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 59,
+                "time": 1789505633.1228833,
+                "event": "episode_end",
+                "episode_id": "g8",
+                "group_id": "g8",
+                "version": 8,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 60,
+                "time": 1789505633.1233563,
+                "event": "group_end",
+                "group_id": "g8",
+                "version": 8,
+                "cancelled": null
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 61,
+                "time": 1789505633.7338068,
+                "event": "publish",
+                "version": 9
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 62,
+                "time": 1789505633.7342296,
+                "event": "eviction_claim",
+                "version": 6
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 63,
+                "time": 1789505633.7463408,
+                "event": "evicted",
+                "version": 6
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 64,
+                "time": 1789505633.746686,
+                "event": "group_start",
+                "group_id": "g9",
+                "version": 9
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 65,
+                "time": 1789505633.747057,
+                "event": "episode_start",
+                "episode_id": "g9",
+                "group_id": "g9",
+                "version": 9
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 66,
+                "time": 1789505633.747424,
+                "event": "request_start",
+                "episode_id": "g9",
+                "version": 9
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 67,
+                "time": 1789505635.4174633,
+                "event": "request_end",
+                "episode_id": "g9",
+                "version": 9
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 68,
+                "time": 1789505635.4181473,
+                "event": "episode_end",
+                "episode_id": "g9",
+                "group_id": "g9",
+                "version": 9,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 69,
+                "time": 1789505635.4185975,
+                "event": "group_end",
+                "group_id": "g9",
+                "version": 9,
+                "cancelled": null
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 70,
+                "time": 1789505636.4619353,
+                "event": "publish",
+                "version": 10
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 71,
+                "time": 1789505636.4624667,
+                "event": "eviction_claim",
+                "version": 7
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 72,
+                "time": 1789505636.4745662,
+                "event": "evicted",
+                "version": 7
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 73,
+                "time": 1789505636.4749656,
+                "event": "group_start",
+                "group_id": "g10",
+                "version": 10
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 74,
+                "time": 1789505636.4753966,
+                "event": "episode_start",
+                "episode_id": "g10",
+                "group_id": "g10",
+                "version": 10
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 75,
+                "time": 1789505636.4757335,
+                "event": "request_start",
+                "episode_id": "g10",
+                "version": 10
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 76,
+                "time": 1789505638.1730745,
+                "event": "request_end",
+                "episode_id": "g10",
+                "version": 10
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 77,
+                "time": 1789505638.1736856,
+                "event": "episode_end",
+                "episode_id": "g10",
+                "group_id": "g10",
+                "version": 10,
+                "requests": 0
+              },
+              {
+                "run_id": "ecac7112744b49c3aa9b1abce7813277",
+                "seq": 78,
+                "time": 1789505638.1741784,
+                "event": "group_end",
+                "group_id": "g10",
+                "version": 10,
+                "cancelled": null
+              }
+            ]
+          },
+          "states": [
+            {
+              "registered": [],
+              "active": [],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955391488,
+              "reserved": 40038825984,
+              "rss": 6897762304,
+              "label": "empty",
+              "time": 1789505596.3419578,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8"
+              ]
+            },
+            {
+              "registered": [],
+              "active": [],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955391488,
+              "reserved": 40038825984,
+              "rss": 6897762304,
+              "label": "before:probe-v1",
+              "time": 1789505600.7233734,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8"
+              ]
+            },
+            {
+              "registered": [
+                1
+              ],
+              "active": [
+                1
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955391488,
+              "reserved": 40038825984,
+              "rss": 7216529408,
+              "label": "loaded:probe-v1",
+              "time": 1789505601.028745,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1"
+              ]
+            },
+            {
+              "registered": [
+                1
+              ],
+              "active": [
+                1
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955789312,
+              "reserved": 40040923136,
+              "rss": 7393984512,
+              "label": "before:probe-v2",
+              "time": 1789505615.081894,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1"
+              ]
+            },
+            {
+              "registered": [
+                1,
+                2
+              ],
+              "active": [
+                1,
+                2
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955789312,
+              "reserved": 40040923136,
+              "rss": 8067170304,
+              "label": "loaded:probe-v2",
+              "time": 1789505615.561132,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1",
+                "probe-v2"
+              ]
+            },
+            {
+              "registered": [
+                1,
+                2
+              ],
+              "active": [
+                1,
+                2
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955789312,
+              "reserved": 40040923136,
+              "rss": 8067170304,
+              "label": "before:probe-v3",
+              "time": 1789505616.0179355,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1",
+                "probe-v2"
+              ]
+            },
+            {
+              "registered": [
+                1,
+                2,
+                3
+              ],
+              "active": [
+                1,
+                2,
+                3
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955789312,
+              "reserved": 40040923136,
+              "rss": 8438824960,
+              "label": "loaded:probe-v3",
+              "time": 1789505616.3336122,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1",
+                "probe-v2",
+                "probe-v3"
+              ]
+            },
+            {
+              "registered": [
+                1,
+                2,
+                3
+              ],
+              "active": [
+                1,
+                2,
+                3
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955789312,
+              "reserved": 40040923136,
+              "rss": 8438824960,
+              "label": "v1-between-turns",
+              "time": 1789505616.340006,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1",
+                "probe-v2",
+                "probe-v3"
+              ]
+            },
+            {
+              "registered": [
+                1,
+                2,
+                3
+              ],
+              "active": [
+                1,
+                2,
+                3
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955785216,
+              "reserved": 40040923136,
+              "rss": 8438824960,
+              "label": "before:probe-v4",
+              "time": 1789505618.859651,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1",
+                "probe-v2",
+                "probe-v3"
+              ]
+            },
+            {
+              "registered": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "active": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955785216,
+              "reserved": 40040923136,
+              "rss": 8810369024,
+              "label": "loaded:probe-v4",
+              "time": 1789505619.5618396,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1",
+                "probe-v2",
+                "probe-v3",
+                "probe-v4"
+              ]
+            },
+            {
+              "registered": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "active": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955785216,
+              "reserved": 40040923136,
+              "rss": 8810369024,
+              "label": "stale-but-response-undrained",
+              "time": 1789505619.6999543,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v1",
+                "probe-v2",
+                "probe-v3",
+                "probe-v4"
+              ]
+            },
+            {
+              "registered": [
+                2,
+                3,
+                4
+              ],
+              "active": [
+                2,
+                3,
+                4
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955785216,
+              "reserved": 40040923136,
+              "rss": 8810369024,
+              "label": "unloaded:probe-v1",
+              "time": 1789505622.7717388,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v2",
+                "probe-v3",
+                "probe-v4"
+              ]
+            },
+            {
+              "registered": [
+                2,
+                3,
+                4
+              ],
+              "active": [
+                2,
+                3,
+                4
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955785216,
+              "reserved": 40040923136,
+              "rss": 8810369024,
+              "label": "before:probe-v5",
+              "time": 1789505623.245097,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v2",
+                "probe-v3",
+                "probe-v4"
+              ]
+            },
+            {
+              "registered": [
+                2,
+                3,
+                4,
+                5
+              ],
+              "active": [
+                2,
+                3,
+                4,
+                5
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955785216,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "loaded:probe-v5",
+              "time": 1789505623.3726583,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v2",
+                "probe-v3",
+                "probe-v4",
+                "probe-v5"
+              ]
+            },
+            {
+              "registered": [
+                3,
+                4,
+                5
+              ],
+              "active": [
+                3,
+                4,
+                5
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955785216,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "unloaded:probe-v2",
+              "time": 1789505623.3835368,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v3",
+                "probe-v4",
+                "probe-v5"
+              ]
+            },
+            {
+              "registered": [
+                3,
+                4,
+                5
+              ],
+              "active": [
+                3,
+                4,
+                5
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955783168,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "churn-5",
+              "time": 1789505625.053817,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v3",
+                "probe-v4",
+                "probe-v5"
+              ]
+            },
+            {
+              "registered": [
+                3,
+                4,
+                5
+              ],
+              "active": [
+                3,
+                4,
+                5
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955783168,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "before:probe-v6",
+              "time": 1789505625.9123394,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v3",
+                "probe-v4",
+                "probe-v5"
+              ]
+            },
+            {
+              "registered": [
+                3,
+                4,
+                5,
+                6
+              ],
+              "active": [
+                3,
+                4,
+                5,
+                6
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955783168,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "loaded:probe-v6",
+              "time": 1789505626.0917077,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v3",
+                "probe-v4",
+                "probe-v5",
+                "probe-v6"
+              ]
+            },
+            {
+              "registered": [
+                4,
+                5,
+                6
+              ],
+              "active": [
+                4,
+                5,
+                6
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955783168,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "unloaded:probe-v3",
+              "time": 1789505626.1023602,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v4",
+                "probe-v5",
+                "probe-v6"
+              ]
+            },
+            {
+              "registered": [
+                4,
+                5,
+                6
+              ],
+              "active": [
+                4,
+                5,
+                6
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955781120,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "churn-6",
+              "time": 1789505627.7718108,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v4",
+                "probe-v5",
+                "probe-v6"
+              ]
+            },
+            {
+              "registered": [
+                4,
+                5,
+                6
+              ],
+              "active": [
+                4,
+                5,
+                6
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955781120,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "before:probe-v7",
+              "time": 1789505628.2176116,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v4",
+                "probe-v5",
+                "probe-v6"
+              ]
+            },
+            {
+              "registered": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "active": [
+                4,
+                5,
+                6,
+                7
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955781120,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "loaded:probe-v7",
+              "time": 1789505628.3437877,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v4",
+                "probe-v5",
+                "probe-v6",
+                "probe-v7"
+              ]
+            },
+            {
+              "registered": [
+                5,
+                6,
+                7
+              ],
+              "active": [
+                5,
+                6,
+                7
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955781120,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "unloaded:probe-v4",
+              "time": 1789505628.355533,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v5",
+                "probe-v6",
+                "probe-v7"
+              ]
+            },
+            {
+              "registered": [
+                5,
+                6,
+                7
+              ],
+              "active": [
+                5,
+                6,
+                7
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955779072,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "churn-7",
+              "time": 1789505630.0480766,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v5",
+                "probe-v6",
+                "probe-v7"
+              ]
+            },
+            {
+              "registered": [
+                5,
+                6,
+                7
+              ],
+              "active": [
+                5,
+                6,
+                7
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955779072,
+              "reserved": 40040923136,
+              "rss": 8810504192,
+              "label": "before:probe-v8",
+              "time": 1789505630.9124959,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v5",
+                "probe-v6",
+                "probe-v7"
+              ]
+            },
+            {
+              "registered": [
+                5,
+                6,
+                7,
+                8
+              ],
+              "active": [
+                5,
+                6,
+                7,
+                8
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955779072,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "loaded:probe-v8",
+              "time": 1789505631.4407382,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v5",
+                "probe-v6",
+                "probe-v7",
+                "probe-v8"
+              ]
+            },
+            {
+              "registered": [
+                6,
+                7,
+                8
+              ],
+              "active": [
+                6,
+                7,
+                8
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955779072,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "unloaded:probe-v5",
+              "time": 1789505631.4536662,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v6",
+                "probe-v7",
+                "probe-v8"
+              ]
+            },
+            {
+              "registered": [
+                6,
+                7,
+                8
+              ],
+              "active": [
+                6,
+                7,
+                8
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "churn-8",
+              "time": 1789505633.1275501,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v6",
+                "probe-v7",
+                "probe-v8"
+              ]
+            },
+            {
+              "registered": [
+                6,
+                7,
+                8
+              ],
+              "active": [
+                6,
+                7,
+                8
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "before:probe-v9",
+              "time": 1789505633.59864,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v6",
+                "probe-v7",
+                "probe-v8"
+              ]
+            },
+            {
+              "registered": [
+                6,
+                7,
+                8,
+                9
+              ],
+              "active": [
+                6,
+                7,
+                8,
+                9
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "loaded:probe-v9",
+              "time": 1789505633.730934,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v6",
+                "probe-v7",
+                "probe-v8",
+                "probe-v9"
+              ]
+            },
+            {
+              "registered": [
+                7,
+                8,
+                9
+              ],
+              "active": [
+                7,
+                8,
+                9
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "unloaded:probe-v6",
+              "time": 1789505633.7429779,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v7",
+                "probe-v8",
+                "probe-v9"
+              ]
+            },
+            {
+              "registered": [
+                7,
+                8,
+                9
+              ],
+              "active": [
+                7,
+                8,
+                9
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "churn-9",
+              "time": 1789505635.4225724,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v7",
+                "probe-v8",
+                "probe-v9"
+              ]
+            },
+            {
+              "registered": [
+                7,
+                8,
+                9
+              ],
+              "active": [
+                7,
+                8,
+                9
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "before:probe-v10",
+              "time": 1789505636.2952876,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v7",
+                "probe-v8",
+                "probe-v9"
+              ]
+            },
+            {
+              "registered": [
+                7,
+                8,
+                9,
+                10
+              ],
+              "active": [
+                7,
+                8,
+                9,
+                10
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "loaded:probe-v10",
+              "time": 1789505636.4586952,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v7",
+                "probe-v8",
+                "probe-v9",
+                "probe-v10"
+              ]
+            },
+            {
+              "registered": [
+                8,
+                9,
+                10
+              ],
+              "active": [
+                8,
+                9,
+                10
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "unloaded:probe-v7",
+              "time": 1789505636.4709501,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v8",
+                "probe-v9",
+                "probe-v10"
+              ]
+            },
+            {
+              "registered": [
+                8,
+                9,
+                10
+              ],
+              "active": [
+                8,
+                9,
+                10
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "churn-10",
+              "time": 1789505638.1780214,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v8",
+                "probe-v9",
+                "probe-v10"
+              ]
+            },
+            {
+              "registered": [
+                9,
+                10
+              ],
+              "active": [
+                9,
+                10
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "unloaded:probe-v8",
+              "time": 1789505638.190056,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v9",
+                "probe-v10"
+              ]
+            },
+            {
+              "registered": [
+                10
+              ],
+              "active": [
+                10
+              ],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "unloaded:probe-v9",
+              "time": 1789505638.2006185,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8",
+                "probe-v10"
+              ]
+            },
+            {
+              "registered": [],
+              "active": [],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "unloaded:probe-v10",
+              "time": 1789505638.2270913,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8"
+              ]
+            },
+            {
+              "registered": [],
+              "active": [],
+              "capacity": 4,
+              "slots": 4,
+              "allocated": 39955777024,
+              "reserved": 40040923136,
+              "rss": 9450135552,
+              "label": "shutdown-empty",
+              "time": 1789505638.2629514,
+              "names": [
+                "Qwen/Qwen3.8-27B-FP8"
+              ]
+            }
+          ]
+        },
+        "elapsed_seconds": 191.37345147132874
+      },
+      "app": {
+        "app_id": "ap-BqxaOCCFEACBhs2IeJTt7x",
+        "url": "https://modal.com/id/ap-BqxaOCCFEACBhs2IeJTt7x"
+      },
+      "containers_after": []
+    },
+    {
+      "run_id": "l40s-inference-20260915-225630-cf46ab66",
+      "report": {
+        "status": "FAIL",
+        "run_id": "l40s-inference-20260915-225630-cf46ab66",
+        "error": "Traceback (most recent call last):\n  File \"/opt/training/scripts/modal_inference.py\", line 104, in gpu_probe\n    if time.time()>deadline-75: raise TimeoutError('Server startup exhausted test budget')\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTimeoutError: Server startup exhausted test budget\n",
+        "elapsed_seconds": 125.51804256439209
+      },
+      "app": {
+        "app_id": "ap-URuTeZqg04lAPjp3n9pBYj",
+        "url": "https://modal.com/id/ap-URuTeZqg04lAPjp3n9pBYj"
+      },
+      "containers_after": []
+    }
+  ],
+  "result": {
+    "native_grpo_loss_backward": "PASS",
+    "adapter_lifecycle": "PASS",
+    "mixed_rank_repeatability": "REVIEW",
+    "uniform_rank_control": "STARTUP_BUDGET_EXHAUSTED",
+    "end_to_end_rl": "NOT_RUN",
+    "gpu_functions_elapsed_seconds": 652.5804188251495
+  }
+}

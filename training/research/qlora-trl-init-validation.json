@@ -1,0 +1,103 @@
+{
+  "installed_sha256": "8eb2b73d19015a674dfa5850ce94aea947cdf592805999577c7cdd45642f1e3b",
+  "candidate_sha256": "6ca603fe74836335591a69f15c1325655292c39052970d2a5649a1cca5b7dca1",
+  "installed_package_modified": false,
+  "edits": [
+    [
+      "        if self._is_vlm:\n",
+      "        if self._is_vlm and not getattr(model, 'is_loaded_in_4bit', False):\n"
+    ],
+    [
+      "            model = get_peft_model(model, peft_config)",
+      "            if getattr(model, 'is_loaded_in_4bit', False):\n                from peft import prepare_model_for_kbit_training\n                model = prepare_model_for_kbit_training(\n                    model, use_gradient_checkpointing=args.gradient_checkpointing,\n                    gradient_checkpointing_kwargs=args.gradient_checkpointing_kwargs)\n            model = get_peft_model(model, peft_config, autocast_adapter_dtype=False)"
+    ]
+  ],
+  "unmodified_constructor_failure": "only Tensors of floating point dtype can require gradients",
+  "dtypes_before_explicit_cast": {
+    "base_parameter_elements": {
+      "torch.float32": 92152,
+      "torch.uint8": 41216
+    },
+    "adapter_parameter_elements": {
+      "torch.bfloat16": 8448
+    },
+    "gradient_tensors_checked": 0
+  },
+  "nf4": {
+    "quantized_linears": 15,
+    "compute_dtype": "bfloat16",
+    "double_quant": true,
+    "vision_head_mtp_unquantized": true
+  },
+  "saved_adapter": {
+    "file": "/tmp/trl-nf4-init-g_1a5j20/adapter/adapter_model.safetensors",
+    "adapter_tensors": 26,
+    "dtype": "BF16"
+  },
+  "training_arguments_serialize": true,
+  "hybrid_cpu_reference_grpo_loss": {
+    "losses": [
+      -1.0,
+      -1.0034635066986084
+    ],
+    "gradients": {
+      "base_parameter_elements": {
+        "torch.float32": 92152,
+        "torch.uint8": 41216
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 8448
+      },
+      "gradient_tensors_checked": 26
+    },
+    "nf4": {
+      "quantized_linears": 15,
+      "compute_dtype": "bfloat16",
+      "double_quant": true,
+      "vision_head_mtp_unquantized": true
+    },
+    "frozen_base_unchanged": true,
+    "scope": "native compute_loss + two AdamW32bit steps; synthetic tokens/advantages, no rollout engine",
+    "selected_reference_functions": [
+      "torch_chunk_gated_delta_rule",
+      "torch_recurrent_gated_delta_rule",
+      "causal_conv1d_fn",
+      "causal_conv1d_update"
+    ]
+  },
+  "ordinary_qwen_native_grpo_loss": {
+    "losses": [
+      -1.0,
+      -1.0043445825576782
+    ],
+    "gradients": {
+      "base_parameter_elements": {
+        "torch.float32": 8576,
+        "torch.uint8": 36864
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 8192
+      },
+      "gradient_tensors_checked": 28
+    },
+    "nf4": {
+      "quantized_linears": 14,
+      "compute_dtype": "bfloat16",
+      "double_quant": true,
+      "vision_head_mtp_unquantized": true
+    },
+    "frozen_base_unchanged": true,
+    "scope": "native compute_loss + two AdamW32bit steps; synthetic tokens/advantages, no rollout engine"
+  },
+  "status": "PASS",
+  "gpu_used": false,
+  "model_loader_substituted": false,
+  "real_trainer_constructor": true,
+  "model": "tiny random hybrid Qwen3.5/3.8 architecture",
+  "attention_implementation": "eager, explicit PyTorch reference DeltaNet functions",
+  "rollout_server": "injected inactive stubs",
+  "hybrid_reference_backward_tested": true,
+  "hybrid_gpu_backward_tested": false,
+  "production_qlora_enabled": false,
+  "probe_sha256": "d0b4e9c86b1e0e6710771661cb1bfa0943783db32852043fbbe4ead99f7edbce"
+}

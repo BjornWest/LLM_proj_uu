@@ -1,0 +1,49 @@
+{
+  "status": "IDENTITY_AND_LIFECYCLE_PASS_NUMERICS_UNRESOLVED",
+  "run_id": "l40s-inference-20260915-235431-53cc5a53",
+  "model": "Qwen/Qwen3.8-27B-FP8",
+  "vllm": "0.28.0",
+  "gpu": "L40S",
+  "adapter_rank": 16,
+  "adapter_dtype": "bfloat16",
+  "diagnostic_adapters": "A=unchanged SFT checkpoint 2; B=LoRA-B multiplied by 128, not a trained policy",
+  "all_slot_buffer_count": 1280,
+  "required_kernel_call_sites_per_trace": 512,
+  "traced_requests": 5,
+  "kernel_calls_checked": 36480,
+  "kernel_token_rows_checked": 60800,
+  "missing_required_calls": 0,
+  "weights_retained": true,
+  "behaviorally_distinct": true,
+  "versions_loaded": 10,
+  "shutdown_registered_adapters": 0,
+  "ordinary_repeat_before_audit_max_logprob_difference": 0.0,
+  "ordinary_repeat_after_publications_max_logprob_difference": 0.08328258991241455,
+  "instrumentation_controls": {
+    "a_before": {
+      "same_tokens": true,
+      "max_logprob_difference": 0.08328258991241455
+    },
+    "a_after": {
+      "same_tokens": true,
+      "max_logprob_difference": 0.07573580741882324
+    },
+    "b": {
+      "same_tokens": true,
+      "max_logprob_difference": 0.11168920993804932
+    }
+  },
+  "prepublication_instrumented_matches_postpublication_normal": true,
+  "same_a_text": true,
+  "runtime_seconds": 199.6936981678009,
+  "initial_diagnostic_failure_runtime_seconds": 199.09768891334534,
+  "total_observed_gpu_function_seconds": 398.79138708114624,
+  "containers_after": [],
+  "limits": [
+    "Eager TP1 sequential requests, one short prompt; not full RL or trainer/rollout parity",
+    "Kernel input metadata/pointers audited, not Triton device instructions or internal pointer tables",
+    "Hooks and fingerprints perturb execution; no clean causal isolation of publication or numerical mechanism",
+    "Finite ten-version churn does not prove absence of all long-run leaks"
+  ],
+  "evidence_directory": "outputs/modal/l40s-inference-20260915-235431-53cc5a53"
+}

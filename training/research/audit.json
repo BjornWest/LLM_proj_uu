@@ -1,0 +1,26 @@
+{
+  "commit": "a04ffd337108285002df29d9ae73ef7e855e03f1",
+  "worker_source": "https://raw.githubusercontent.com/huggingface/trl/a04ffd337108285002df29d9ae73ef7e855e03f1/trl/experimental/async_grpo/async_rollout_worker.py",
+  "worker_sha256": "70222b24533ce8cc56061cc355b0358eaea7cbda4461a7df75e75f5fbec6b5d1",
+  "release_1_13_has_peft_config": false,
+  "pinned_commit_has_peft_config": true,
+  "successive_turn_model_names_during_sync": [
+    "trl-policy-v1",
+    "trl-policy-v2"
+  ],
+  "episode_policy_is_immutable": false,
+  "trainer_hardcodes_flash_attn3": true,
+  "vllm_argument_source": "https://raw.githubusercontent.com/vllm-project/vllm/v0.28.0/vllm/engine/arg_utils.py",
+  "vllm_flags_present_in_pinned_source": {
+    "enable-lora": true,
+    "lora-dtype": true,
+    "max-lora-rank": true,
+    "max-loras": true,
+    "weight-transfer-config": true,
+    "logprobs-mode": true,
+    "language-model-only": true,
+    "speculative-config": true,
+    "max-num-seqs": true,
+    "generation-config": true
+  }
+}

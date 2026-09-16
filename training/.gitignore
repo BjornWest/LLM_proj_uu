@@ -1,0 +1,21 @@
+.venv*/
+**/.venv/
+__pycache__/
+.pytest_cache/
+outputs/
+data/
+*.egg-info/
+reports/
+
+.cache/
+
+# Keep reviewed JSON evidence, not raw transcripts or generated command help.
+*.log
+research/*-help.txt
+
+# Binary artifacts belong in persistent storage even outside outputs/.cache.
+*.safetensors
+*.pt
+*.pth
+*.bin
+*.whl

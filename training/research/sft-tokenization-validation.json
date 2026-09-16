@@ -1,0 +1,74 @@
+{
+  "model": "Qwen/Qwen3.8-27B",
+  "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+  "tokenizer_assets": {
+    "config.json": "191e0af232104ed8b65258cf3fb2b842e288008baca7633c11b82a1ac7203aab",
+    "tokenizer.json": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+    "tokenizer_config.json": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+    "chat_template.jinja": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+  },
+  "scope": "real tokenizer and installed Axolotl labeling classes; no import substitutions or trainer",
+  "cases": [
+    {
+      "target": "action",
+      "layout": "trajectory",
+      "row": 0,
+      "tokens": 89,
+      "supervised_tokens": 13,
+      "supervised_text": "click('1')<|im_end|>fill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "action",
+      "layout": "state-action",
+      "row": 0,
+      "tokens": 60,
+      "supervised_tokens": 5,
+      "supervised_text": "click('1')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "action",
+      "layout": "state-action",
+      "row": 1,
+      "tokens": 63,
+      "supervised_tokens": 8,
+      "supervised_text": "fill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "reasoning-action",
+      "layout": "trajectory",
+      "row": 0,
+      "tokens": 143,
+      "supervised_tokens": 33,
+      "supervised_text": "REASONING_ONE_SENTINEL\n</think>\n\nclick('1')<|im_end|>REASONING_TWO_SENTINEL\n</think>\n\nfill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "reasoning-action",
+      "layout": "state-action",
+      "row": 0,
+      "tokens": 106,
+      "supervised_tokens": 15,
+      "supervised_text": "REASONING_ONE_SENTINEL\n</think>\n\nclick('1')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "reasoning-action",
+      "layout": "state-action",
+      "row": 1,
+      "tokens": 109,
+      "supervised_tokens": 18,
+      "supervised_text": "REASONING_TWO_SENTINEL\n</think>\n\nfill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    }
+  ],
+  "gpu_used": false
+}

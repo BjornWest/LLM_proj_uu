@@ -1,0 +1,204 @@
+{
+  "status": "PASS",
+  "date": "2026-09-15",
+  "scope": "Actual 27B NF4 Axolotl SFT on one Modal L40S; no RL/vLLM qualification",
+  "authorized_gpu_seconds": 1200,
+  "runs": [
+    {
+      "run_id": "l40s-20260915-212004-9690ddfc",
+      "status": "PASS",
+      "actual_tokens": 395,
+      "max_logged_allocated_gib": 20.73,
+      "max_sampled_device_memory_gib": 27.3359375,
+      "telemetry_span_seconds": 154.275,
+      "stages": [
+        {
+          "stage": "hardware",
+          "returncode": 0,
+          "elapsed": 3.7718677520751953
+        },
+        {
+          "stage": "sft",
+          "returncode": 0,
+          "elapsed": 144.8526747226715
+        }
+      ],
+      "resume": {
+        "step": 3,
+        "dtypes": {
+          "base_parameter_elements": {
+            "torch.float32": 462574064,
+            "torch.bfloat16": 2543598336,
+            "torch.uint8": 12175278080
+          },
+          "adapter_parameter_elements": {
+            "torch.bfloat16": 108789760
+          },
+          "gradient_tensors_checked": 0
+        },
+        "fp32_moment_tensors": 1600,
+        "checkpoint": {
+          "file": "/__modal/volumes/vo-B2dABuw99BekJAHN1u5Iym/l40s-20260915-212004-9690ddfc/sft/checkpoint-3/adapter_model.safetensors",
+          "adapter_tensors": 800,
+          "dtype": "BF16"
+        },
+        "history": [
+          {
+            "epoch": 0.125,
+            "grad_norm": 86.0,
+            "learning_rate": 0.0001,
+            "loss": 5.663559436798096,
+            "memory/device_reserved (GiB)": 26.89,
+            "memory/max_active (GiB)": 19.91,
+            "memory/max_allocated (GiB)": 19.91,
+            "ppl": 288.17255,
+            "step": 1,
+            "tokens/total": 448,
+            "tokens/trainable": 5
+          },
+          {
+            "epoch": 0.25,
+            "grad_norm": 47.5,
+            "learning_rate": 5e-05,
+            "loss": 1.8625593185424805,
+            "memory/device_reserved (GiB)": 22.79,
+            "memory/max_active (GiB)": 20.72,
+            "memory/max_allocated (GiB)": 20.72,
+            "ppl": 6.4402,
+            "step": 2,
+            "tokens/total": 896,
+            "tokens/train_per_sec_per_gpu": 1.08,
+            "tokens/trainable": 10
+          },
+          {
+            "loss": 0.9964181780815125,
+            "grad_norm": 21.875,
+            "learning_rate": 0.0,
+            "ppl": 2.70856,
+            "memory/max_active (GiB)": 20.73,
+            "memory/max_allocated (GiB)": 20.73,
+            "memory/device_reserved (GiB)": 23.01,
+            "tokens/train_per_sec_per_gpu": -0.61,
+            "tokens/trainable": 5,
+            "tokens/total": 448,
+            "epoch": 0.375,
+            "step": 3
+          },
+          {
+            "train_runtime": 4.9342,
+            "train_samples_per_second": 0.608,
+            "train_steps_per_second": 0.608,
+            "total_flos": 211207979501568.0,
+            "train_loss": 0.33213939269383747,
+            "memory/max_active (GiB)": 19.19,
+            "memory/max_allocated (GiB)": 19.19,
+            "memory/device_reserved (GiB)": 23.01,
+            "epoch": 0.375,
+            "step": 3
+          }
+        ]
+      },
+      "containers_after": [],
+      "raw_report": "training/outputs/modal/l40s-20260915-212004-9690ddfc/report.json",
+      "report_sha256": "d40c6e4e9f66a9c77e3418fb99f598ea01052538b11746e3d58fbdde78fd37a8",
+      "resume_verified_nonzero_adapter_update": false
+    },
+    {
+      "run_id": "l40s-20260915-213026-226491b8",
+      "status": "PASS",
+      "actual_tokens": 1907,
+      "max_logged_allocated_gib": 25.74,
+      "max_sampled_device_memory_gib": 27.392578125,
+      "telemetry_span_seconds": 163.444,
+      "stages": [
+        {
+          "stage": "hardware",
+          "returncode": 0,
+          "elapsed": 5.2493836879730225
+        },
+        {
+          "stage": "sft",
+          "returncode": 0,
+          "elapsed": 149.12946581840515
+        }
+      ],
+      "resume": {
+        "step": 2,
+        "from_checkpoint": 1,
+        "adapter_max_abs_change": 5.0067901611328125e-05,
+        "checked_adapter_tensor": "base_model.model.model.language_model.layers.0.linear_attn.in_proj_qkv.lora_B.weight",
+        "dtypes": {
+          "base_parameter_elements": {
+            "torch.float32": 462574064,
+            "torch.bfloat16": 2543598336,
+            "torch.uint8": 12175278080
+          },
+          "adapter_parameter_elements": {
+            "torch.bfloat16": 108789760
+          },
+          "gradient_tensors_checked": 0
+        },
+        "fp32_moment_tensors": 1600,
+        "checkpoint": {
+          "file": "/__modal/volumes/vo-B2dABuw99BekJAHN1u5Iym/l40s-20260915-213026-226491b8/sft/checkpoint-2/adapter_model.safetensors",
+          "adapter_tensors": 800,
+          "dtype": "BF16"
+        },
+        "history": [
+          {
+            "epoch": 0.125,
+            "grad_norm": 96.5,
+            "learning_rate": 0.0001,
+            "loss": 5.1051435470581055,
+            "memory/device_reserved (GiB)": 26.89,
+            "memory/max_active (GiB)": 24.91,
+            "memory/max_allocated (GiB)": 24.91,
+            "ppl": 164.86774,
+            "step": 1,
+            "tokens/total": 1920,
+            "tokens/trainable": 5
+          },
+          {
+            "loss": 1.5865490436553955,
+            "grad_norm": 25.75,
+            "learning_rate": 5e-05,
+            "ppl": 4.88686,
+            "memory/max_active (GiB)": 25.73,
+            "memory/max_allocated (GiB)": 25.73,
+            "memory/device_reserved (GiB)": 26.56,
+            "tokens/train_per_sec_per_gpu": -0.47,
+            "tokens/trainable": 5,
+            "tokens/total": 1920,
+            "epoch": 0.25,
+            "step": 2
+          },
+          {
+            "train_runtime": 7.1511,
+            "train_samples_per_second": 0.28,
+            "train_steps_per_second": 0.28,
+            "total_flos": 603451370004480.0,
+            "train_loss": 0.7932745218276978,
+            "memory/max_active (GiB)": 19.19,
+            "memory/max_allocated (GiB)": 19.19,
+            "memory/device_reserved (GiB)": 26.56,
+            "epoch": 0.25,
+            "step": 2
+          }
+        ]
+      },
+      "containers_after": [],
+      "raw_report": "training/outputs/modal/l40s-20260915-213026-226491b8/report.json",
+      "report_sha256": "8226fa68e32fb172be155e5ef145f3249449666621658c45997887ae9714ae2a",
+      "resume_verified_nonzero_adapter_update": true
+    }
+  ],
+  "limitations": [
+    "Synthetic browser trajectories; no task-quality evidence",
+    "Rank 16, microbatch 1, gradient accumulation 1, unpacked SDPA",
+    "No SM120/FA2/RL synchronization or NF4-versus-FP8 logprob test",
+    "One-second device-memory sampling is not a guaranteed instantaneous maximum"
+  ],
+  "telemetry_span_total_seconds": 317.719,
+  "gpu_only_price_estimate_usd": 0.172203698,
+  "cost_note": "Approximation from telemetry, not an invoice; excludes startup/teardown outside sampling, CPU, RAM, build/download and storage."
+}

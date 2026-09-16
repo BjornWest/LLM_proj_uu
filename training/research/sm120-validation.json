@@ -1,0 +1,44 @@
+{
+  "sources": {
+    "trainer": {
+      "url": "https://raw.githubusercontent.com/huggingface/trl/a04ffd337108285002df29d9ae73ef7e855e03f1/trl/experimental/async_grpo/async_grpo_trainer.py",
+      "sha256": "15951bb122c4477ba82aeeb24ad85b35dd46fd8489f244364837dc958919af99"
+    },
+    "fa3_dispatch": {
+      "url": "https://raw.githubusercontent.com/huggingface/kernels-community/555c2e89f4afb8b03c65ec619251db7b6806c287/flash-attn3/flash-attn/static_switch.h",
+      "sha256": "b06397c795df2241ff4aa06d788d340523fa9d500ea3cd32e1623d2897788aa6"
+    },
+    "fa3_build": {
+      "url": "https://raw.githubusercontent.com/huggingface/kernels-community/555c2e89f4afb8b03c65ec619251db7b6806c287/flash-attn3/build.toml",
+      "sha256": "81c5737de47d21828e4b5ef603a5483923a1daff1ab1a2a283b36f4c3e86cf00"
+    },
+    "fa2_build": {
+      "url": "https://raw.githubusercontent.com/Dao-AILab/flash-attention/v2.8.3/setup.py",
+      "sha256": "d089d876c34366979708a87abe051bf3e30f81ee4ee685e4bb446c11f0940a73"
+    }
+  },
+  "artifact_metadata_url": "https://huggingface.co/kernels-community/flash-attn3/raw/e29f138fc363b396e5d2706c8a5f6fa7d36f41e0/build/torch-stable-abi210-cu130-x86_64-linux/metadata.json",
+  "artifact_metadata": {
+    "name": "flash-attn3",
+    "id": "_flash_attn3_cuda_477ab85",
+    "version": 1,
+    "license": "BSD-3-Clause",
+    "python-depends": [],
+    "backend": {
+      "type": "cuda",
+      "archs": [
+        "8.0",
+        "9.0a"
+      ]
+    }
+  },
+  "original_override_error": "__main__.loader_call.<locals>.<lambda>() got multiple values for keyword argument 'attn_implementation'",
+  "patched_loader_override_preserves_other_kwargs": true,
+  "patch_idempotent": true,
+  "unknown_source_rejected": true,
+  "patched_trainer_sha256": "aa7d104a32b8bb9b87bd8de27a2da0e44ea8fc7c4201947e6fdf18022a629451",
+  "fa3_dispatch_sm100_sm103_sm120": "ARCH >= 90 selects the Hopper Arch=90 path",
+  "fa2_setup_has_native_sm120_target": true,
+  "gpu_kernel_execution_tested": false,
+  "sm120_training_qualified": false
+}

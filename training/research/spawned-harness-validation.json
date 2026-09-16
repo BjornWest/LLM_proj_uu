@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "installed_trl_harness_sha256": "35393ad97d321143dd187f38e48a63bf614e3e2a0a42f4c4aaade960ec186550",
+  "start_method": "spawn",
+  "child_exitcode": 0,
+  "samples": [
+    {
+      "reward": 0.0,
+      "policy_version": 1,
+      "group_id": 0,
+      "advantage": -0.9999999800000003,
+      "generated_tokens": 26
+    },
+    {
+      "reward": 1.0,
+      "policy_version": 1,
+      "group_id": 0,
+      "advantage": 0.9999999800000003,
+      "generated_tokens": 63
+    }
+  ],
+  "requests": [
+    {
+      "model": "trl-policy-v1",
+      "turn": 0,
+      "tokens": 26
+    },
+    {
+      "model": "trl-policy-v1",
+      "turn": 0,
+      "tokens": 26
+    },
+    {
+      "model": "trl-policy-v1",
+      "turn": 1,
+      "tokens": 37
+    },
+    {
+      "model": "trl-policy-v1",
+      "turn": 0,
+      "tokens": 26
+    },
+    {
+      "model": "trl-policy-v1",
+      "turn": 0,
+      "tokens": 26
+    },
+    {
+      "model": "trl-policy-v1",
+      "turn": 1,
+      "tokens": 37
+    }
+  ],
+  "seconds": 14.546787825000138,
+  "stop_seconds": 4.421722400998988,
+  "tokenizer": "Qwen3.8 official",
+  "parser": "installed TRL",
+  "import_substitutions": false,
+  "observations_masked": true,
+  "logprobs_aligned": true,
+  "gpu_used": false,
+  "trainer_executed": false,
+  "rl_ready": false,
+  "note": "Fixed policy; scripted success/subscription failure; native scoring but no trainer update"
+}

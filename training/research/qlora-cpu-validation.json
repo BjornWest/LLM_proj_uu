@@ -1,0 +1,89 @@
+{
+  "gpu_used": false,
+  "model_weights_downloaded": false,
+  "async_grpo_qualified": false,
+  "packages": {
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "peft": "0.20.0",
+    "bitsandbytes": "0.50.2",
+    "trl": "1.14.0.dev0"
+  },
+  "probe_sha256": "5f3b39ba2ae6eacf65ab3f5add30b4c1e595d5e51afd85147a14a73cf3fee9c6",
+  "ordinary_qwen": {
+    "status": "PASS",
+    "quantized_linears": 14,
+    "packed_dtype": "uint8",
+    "compute_dtype": "bfloat16",
+    "losses": [
+      4.168529987335205,
+      4.143619060516357
+    ],
+    "adapter_dtype": "bfloat16",
+    "gradient_dtype": "bfloat16",
+    "optimizer_moments": "float32",
+    "frozen_base_unchanged": true,
+    "adapter_reload_verified": true,
+    "base_parameter_bytes_before_kbit_prepare": {
+      "torch.bfloat16": 17152,
+      "torch.uint8": 36864
+    },
+    "base_parameter_bytes_after_kbit_prepare": {
+      "torch.float32": 34304,
+      "torch.uint8": 36864
+    }
+  },
+  "hybrid_qwen": {
+    "status": "EXPECTED_TRL_INIT_BLOCKER_REPRODUCED",
+    "quantized_modules": [
+      "model.language_model.layers.0.linear_attn.out_proj",
+      "model.language_model.layers.0.linear_attn.in_proj_qkv",
+      "model.language_model.layers.0.linear_attn.in_proj_z",
+      "model.language_model.layers.0.mlp.gate_proj",
+      "model.language_model.layers.0.mlp.up_proj",
+      "model.language_model.layers.0.mlp.down_proj",
+      "model.language_model.layers.1.self_attn.q_proj",
+      "model.language_model.layers.1.self_attn.k_proj",
+      "model.language_model.layers.1.self_attn.v_proj",
+      "model.language_model.layers.1.self_attn.o_proj",
+      "model.language_model.layers.1.mlp.gate_proj",
+      "model.language_model.layers.1.mlp.up_proj",
+      "model.language_model.layers.1.mlp.down_proj"
+    ],
+    "trl_vlm_unfreeze_error": "only Tensors of floating point dtype can require gradients",
+    "manual_kbit_prepare_and_lora_wrap": "PASS",
+    "native_trainer_constructor_executed": true,
+    "trainer_model_loader_substituted": true,
+    "dtypes": {
+      "base_parameter_elements": {
+        "torch.float32": 92664,
+        "torch.uint8": 40960
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 8448
+      },
+      "gradient_tensors_checked": 0
+    },
+    "hybrid_forward": {
+      "status": "BLOCKED",
+      "error": "RuntimeError: 0 active drivers ([]). There should only be one."
+    },
+    "text_only_loading": {
+      "status": "PASS",
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "vision_allocated": false,
+      "note": "Avoids VLM branch; AsyncGRPO construction and vLLM adapter name mapping not qualified"
+    }
+  },
+  "storage": {
+    "scope": "metadata-only storage estimate; excludes activations, workspaces and allocator overhead",
+    "base_elements": 27356728560,
+    "quantized_elements": 24326963200,
+    "unquantized_elements": 3029765360,
+    "frozen_nf4_with_bf16_exceptions_gib": 17.33103796839714,
+    "frozen_nf4_after_standard_kbit_fp32_upcast_gib": 22.974415719509125,
+    "rank16_adapter_grad_fp32_moments_gib": 1.2158203125,
+    "rank32_adapter_grad_fp32_moments_gib": 2.431640625
+  }
+}

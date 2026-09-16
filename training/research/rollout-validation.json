@@ -1,0 +1,134 @@
+{
+  "source": "https://raw.githubusercontent.com/huggingface/trl/a04ffd337108285002df29d9ae73ef7e855e03f1/trl/experimental/async_grpo/async_rollout_worker.py",
+  "source_sha256": "70222b24533ce8cc56061cc355b0358eaea7cbda4461a7df75e75f5fbec6b5d1",
+  "scope": "unchanged full worker class; scripted tokenizer; local HTTP inference; no trainer/GPU",
+  "stable_policy": {
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 2
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 2
+      }
+    ],
+    "group_version": 1,
+    "sample_versions": [
+      1,
+      1
+    ],
+    "reward": 1.0,
+    "rows": 2,
+    "generated_tokens": 656,
+    "observation_tokens_masked": true,
+    "logprobs_aligned": true,
+    "environment_resources_closed": true,
+    "policy_immutable": true
+  },
+  "failed_task": {
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      }
+    ],
+    "group_version": 1,
+    "sample_versions": [
+      1,
+      1
+    ],
+    "reward": 0.0,
+    "rows": 2,
+    "generated_tokens": 362,
+    "observation_tokens_masked": true,
+    "logprobs_aligned": true,
+    "environment_resources_closed": true,
+    "policy_immutable": true
+  },
+  "forced_policy_update": {
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v2",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v2",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v2",
+        "turn": 2
+      },
+      {
+        "model": "trl-policy-v2",
+        "turn": 2
+      }
+    ],
+    "group_version": 1,
+    "sample_versions": [
+      1,
+      1
+    ],
+    "reward": 1.0,
+    "rows": 2,
+    "generated_tokens": 656,
+    "observation_tokens_masked": true,
+    "logprobs_aligned": true,
+    "environment_resources_closed": true,
+    "policy_immutable": false
+  },
+  "retention_and_staleness": {
+    "scope": "unchanged sync/queue methods; mock vLLM client; no weights/GPU",
+    "max_staleness": 2,
+    "published_version": 4,
+    "unloaded": [
+      "trl-policy-v1"
+    ],
+    "remaining_adapters": [
+      "trl-policy-v2",
+      "trl-policy-v3",
+      "trl-policy-v4"
+    ],
+    "queue_drops_lag_3": true,
+    "queue_accepts_lag_2": true,
+    "active_episode_retention": "Sync has no active-episode reference check; a future v1-pinned turn would name an unloaded adapter"
+  },
+  "rl_ready": false
+}

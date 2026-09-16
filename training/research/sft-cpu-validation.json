@@ -1,0 +1,83 @@
+{
+  "role": "sft",
+  "gpu_used": false,
+  "model_weights_downloaded": false,
+  "torch_cuda_build": "13.0",
+  "torch_compiled_architectures": "sm_75 sm_80 sm_86 sm_90 sm_100 sm_120",
+  "packages": {
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "peft": "0.20.0",
+    "accelerate": "1.13.0",
+    "bitsandbytes": "0.50.2",
+    "flash-linear-attention": "0.5.2",
+    "axolotl": "0.19.0"
+  },
+  "configs": {
+    "schema_validated": [
+      "configs/sft_qwen38_27b_bf16_lora.yml",
+      "configs/sft_qwen38_27b_fp8_lora.yml",
+      "configs/sft_qwen38_27b_nf4_qlora.yml",
+      "configs/sft_smoke.yml"
+    ],
+    "device_normalization": "requires remote GPU"
+  },
+  "peft": {
+    "model": "random tiny Qwen3; not Qwen3.8 hybrid qualification",
+    "parameters": 23648,
+    "losses": [
+      4.20306921005249,
+      4.194593906402588
+    ],
+    "dtype_before_explicit_cast": [
+      "torch.bfloat16"
+    ],
+    "dtypes": {
+      "base_parameter_elements": {
+        "torch.bfloat16": 22752
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 896
+      },
+      "gradient_tensors_checked": 8
+    },
+    "saved": {
+      "file": "/tmp/browser-peft-cpu-qimifuax/adapter_model.safetensors",
+      "adapter_tensors": 8,
+      "dtype": "BF16"
+    },
+    "reloaded": {
+      "base_parameter_elements": {
+        "torch.bfloat16": 22752
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 896
+      },
+      "gradient_tensors_checked": 0
+    },
+    "optimizer": "bitsandbytes AdamW32bit CPU; CUDA kernel remains untested",
+    "fp32_moment_tensors": 16
+  },
+  "hybrid_structure": {
+    "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "all_parameters_meta": true,
+    "forward_executed": false,
+    "base_parameter_elements": 27356728560,
+    "rank16_adapter_elements": 108789760,
+    "rank32_adapter_elements": 217579520,
+    "adapter_tensors": 800,
+    "rank16_elements_by_target": {
+      "linear_attn.out_proj": 8650752,
+      "linear_attn.in_proj_qkv": 11796480,
+      "linear_attn.in_proj_z": 8650752,
+      "mlp.gate_proj": 23068672,
+      "mlp.up_proj": 23068672,
+      "mlp.down_proj": 23068672,
+      "self_attn.q_proj": 4456448,
+      "self_attn.k_proj": 1572864,
+      "self_attn.v_proj": 1572864,
+      "self_attn.o_proj": 2883584
+    },
+    "vision_and_mtp_frozen": true
+  }
+}

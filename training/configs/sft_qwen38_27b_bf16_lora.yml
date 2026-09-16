@@ -1,0 +1,65 @@
+# Conservative fallback: BF16 frozen base + BF16 adapters, FP32 Adam moments.
+base_model: Qwen/Qwen3.8-27B
+revision_of_model: 1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0
+plugins:
+  - browser_training.axolotl_plugin.PrecisionPlugin
+strict: false
+chat_template: tokenizer_default
+chat_template_kwargs:
+  enable_thinking: false
+  preserve_thinking: true
+datasets:
+  - path: data/sft.jsonl
+    type: chat_template
+    field_messages: messages
+    roles_to_train: [assistant]
+    train_on_eos: turn
+val_set_size: 0.0
+output_dir: outputs/sft-qwen38-bf16
+dataset_prepared_path: data/prepared-qwen38
+sequence_len: 2048
+# FLA + Axolotl's boundary-reset patch is required; start unpacked for preflight.
+sample_packing: false
+adapter: lora
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.0
+peft_autocast_adapter_dtype: false
+# Qualified suffixes exclude vision, embeddings, lm_head and MTP.
+# DeltaNet a/b, convolution, decay and norms remain frozen.
+lora_target_modules:
+  - self_attn.q_proj
+  - self_attn.k_proj
+  - self_attn.v_proj
+  - self_attn.o_proj
+  - mlp.gate_proj
+  - mlp.up_proj
+  - mlp.down_proj
+  - linear_attn.in_proj_qkv
+  - linear_attn.in_proj_z
+  - linear_attn.out_proj
+lora_mlp_kernel: false
+lora_qkv_kernel: false
+lora_o_kernel: false
+train_on_inputs: false
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+num_epochs: 1
+learning_rate: 0.0001
+weight_decay: 0.0
+lr_scheduler: cosine
+warmup_ratio: 0.03
+optimizer: adamw_torch
+# Plugin supplies bitsandbytes AdamW32bit with FP32 moments.
+bf16: true
+fp8: false
+tf32: true
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+attn_implementation: sdpa
+logging_steps: 1
+save_steps: 50
+save_total_limit: 3
+seed: 42
+resume_from_checkpoint:

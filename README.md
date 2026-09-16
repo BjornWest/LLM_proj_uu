@@ -2,7 +2,7 @@
 
 Our Uppsala University group project explores **how a browser agent can complete a user's task without making unwanted changes**. For example: buy the requested laptop and remove an automatically added warranty. If the user explicitly requests a warranty, keeping it is correct.
 
-We are building the agent's runtime, reproducible test websites, and checks of what actually happened. Current experiments use existing models; the separate training work is still preparation.
+We are building the agent's runtime, reproducible test websites, and checks of what actually happened. Current browser experiments use existing models. The training infrastructure has passed small SFT and RL learning tests; training on our browser tasks remains future work.
 
 ## How the agent works
 
@@ -67,7 +67,7 @@ The site's `/` page also offers a simpler demo that acts inside the visitor's br
 | [Data curation](data/curation/) / [configuration](config/) | Task inventories, source evidence, experiment definitions and validation records. |
 | [Scripts](scripts/) / [tests](tests/) | Setup helpers, reproducible checks and automated tests. |
 | `runs/` | Local recordings and evidence; not included in a fresh clone. |
-| Training (in progress) | Separate preparation for learning from traces and task rewards. The local `training/` work is awaiting publication. |
+| [Training](training/README.md#how-we-plan-to-train-our-browser-agent) | How teacher traces feed SFT and verified task outcomes feed RLVR; [tested results and next steps](docs/training-findings.md). |
 
 **Next reading:** [Group guide: contributions and a real trace](data/curation/GROUP_MEETING_HANDOUT.md) · [Local setup](LAPTOP_SETUP.md) · [Vercel setup](deploy/VERCEL_SETUP.md) · [Worker setup](deploy/worker/README.md).
 

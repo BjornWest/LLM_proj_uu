@@ -1,0 +1,20 @@
+{
+  "status": "BLOCKED_PACKED_HYBRID_TRAINING",
+  "gpu_used": false,
+  "reference_functions": true,
+  "modified_prefix_changes_next_sequence": 0.20272260904312134,
+  "packed_vs_independent_max_error": 0.2548087239265442,
+  "kernel_calls": [
+    {
+      "cu_seqlens": null
+    },
+    {
+      "cu_seqlens": null
+    },
+    {
+      "cu_seqlens": null
+    }
+  ],
+  "scope": "actual Transformers text model; one linear-attention layer; CPU reference kernels",
+  "conclusion": "TRL position_ids resets alone do not supply DeltaNet/conv boundaries. FA2 only fixes full attention."
+}

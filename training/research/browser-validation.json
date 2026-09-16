@@ -1,0 +1,108 @@
+{
+  "status": "PASS",
+  "openenv_source_commit": "da5929566e99c8eb376a47042b316cb13c0aae29",
+  "upstream_files": {
+    "models.py": "c7377cf904f3e1030db1f42e8cdf77a7a81ca231fbd1818a1d5d5bba5d1883ba",
+    "client.py": "2a70f7f72d54a3447dbcce1aec549dc7d18e19d9b832fbcd1f171b7b8bd97e96",
+    "server/browsergym_environment.py": "6f0a9f1f9fc67a832a10daba1f40ec2f907b8146a138073877bc37e9dabf2fe3",
+    "harness.py": "09ef921c2881d5e3108720bf8579fa15785d86e2a0152fa92db7091e43b0553b"
+  },
+  "packages": {
+    "openenv": "0.4.2",
+    "browsergym-core": "0.14.3",
+    "playwright": "1.44.0"
+  },
+  "fixture": "local HTML, two browser actions, no external data",
+  "transport": "real OpenEnv WebSocket + upstream BrowserGym client/server",
+  "worker": "full upstream class; scripted HTTP inference and tokenizer",
+  "concurrent_episodes": 2,
+  "stable_policy": {
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 2
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 2
+      }
+    ],
+    "group_version": 1,
+    "sample_versions": [
+      1,
+      1
+    ],
+    "reward": 1.0,
+    "rows": 2,
+    "generated_tokens": 656,
+    "observation_tokens_masked": true,
+    "logprobs_aligned": true,
+    "environment_resources_closed": true,
+    "policy_immutable": true
+  },
+  "unauthorized_subscription": {
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1
+      }
+    ],
+    "group_version": 1,
+    "sample_versions": [
+      1,
+      1
+    ],
+    "reward": 0.0,
+    "rows": 2,
+    "generated_tokens": 360,
+    "observation_tokens_masked": true,
+    "logprobs_aligned": true,
+    "environment_resources_closed": true,
+    "policy_immutable": true
+  },
+  "native_openenv_harness": [
+    {
+      "reward": 1.0,
+      "model_calls": 2,
+      "done": true,
+      "task": "mock"
+    },
+    {
+      "reward": 0.0,
+      "model_calls": 1,
+      "done": true,
+      "task": "mock"
+    }
+  ],
+  "seconds": 9.330112738000025,
+  "gpu_used": false,
+  "rl_ready": false
+}

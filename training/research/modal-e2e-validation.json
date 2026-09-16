@@ -1,0 +1,203 @@
+{
+  "status": "PASS",
+  "scope": "Core two-GPU AsyncGRPO learning smoke; single prompt, no browser",
+  "run_id": "l40s-e2e-20260916-120628-0cf5f142",
+  "app_id": "ap-cHCbJh36CUemOmQlgEnsSd",
+  "gpu_count": 2,
+  "gpu": "L40S",
+  "function_seconds": 392.91413140296936,
+  "aggregate_gpu_function_minutes": 13.097137713432312,
+  "aggregate_recorded_e2e_gpu_function_minutes": 26.646635564168292,
+  "billing_duration_not_measured": true,
+  "steps": 8,
+  "baseline": {
+    "n": 64,
+    "successes": 34,
+    "reward_mean": 0.53125,
+    "wilson95": [
+      0.41071875000475133,
+      0.6482421235595515
+    ],
+    "invalid": 0
+  },
+  "after": {
+    "n": 64,
+    "successes": 64,
+    "reward_mean": 1.0,
+    "wilson95": [
+      0.9433739770288436,
+      1.0
+    ],
+    "invalid": 0
+  },
+  "reward_change": 0.46875,
+  "clear_improvement": true,
+  "final_served_policy": "trl-policy-v9",
+  "peak_device_memory_mib": {
+    "0": 38767,
+    "1": 31975
+  },
+  "trainer_peak_allocated_gib": 25.27961492538452,
+  "native_train_seconds": 197.8664,
+  "policy_audit": {
+    "status": "PASS",
+    "scope": "Replay of recorded short single-turn policy events; no active group/episode at eviction; request policy matches episode policy; all sessions drained",
+    "event_counts": {
+      "publish": 9,
+      "group_start": 57,
+      "episode_start": 228,
+      "request_start": 228,
+      "request_end": 228,
+      "episode_end": 228,
+      "group_end": 57,
+      "eviction_claim": 6,
+      "evicted": 6
+    },
+    "evicted_versions": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "published_versions": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "active_groups_at_end": 0,
+    "active_episodes_at_end": 0,
+    "active_requests_at_end": 0
+  },
+  "dropped_stale_samples": 119,
+  "checkpoint": {
+    "remote_volume": "browser-training-results",
+    "path": "l40s-e2e-20260916-120628-0cf5f142/learning/checkpoint-8",
+    "adapter_tensors": 800,
+    "adapter_dtype": "BF16",
+    "optimizer_moment_tensors": 1600,
+    "optimizer_moment_dtype": "FP32",
+    "optimizer_state_written": true,
+    "rollout_state_written": true,
+    "resume_tested": false
+  },
+  "adapter_max_change": 0.00070953369140625,
+  "limitations": [
+    "One-prompt choice task; no model-driven BrowserGym or multiturn training",
+    "No generalization or sustained training claim",
+    "No numerical parity, SM120, MTP or separate-host qualification",
+    "AsyncGRPO checkpoint resume not executed"
+  ],
+  "local_validation": "63 passed, 2 skipped before this run; event replay audit passed after run",
+  "evidence": "training/outputs/modal/l40s-e2e-20260916-120628-0cf5f142",
+  "final_containers": [],
+  "previous_attempts": [
+    {
+      "status": "STOPPED_BEFORE_TRAINING",
+      "run_id": "l40s-e2e-20260916-100055-1b0d7b07",
+      "app_id": "ap-GDPd05Wrb3xXjsVkJtXfFs",
+      "gpu_count": 2,
+      "gpu": "L40S",
+      "function_seconds": 262.7633957862854,
+      "aggregate_gpu_function_minutes": 8.758779859542846,
+      "aggregate_recorded_e2e_gpu_function_minutes": 13.549497850735982,
+      "billing_duration_not_measured": true,
+      "peak_device_memory_mib": {
+        "0": 38765.0,
+        "1": 29305.0
+      },
+      "completed": [
+        "FP8 vLLM and NF4 trainer load",
+        "BF16/NF4 checks and initial adapter save/load/unload",
+        "32 real calibration generations",
+        "64 independent pre-training evaluation generations"
+      ],
+      "calibration": {
+        "A": 23,
+        "B": 9,
+        "selected_reward_target": "B"
+      },
+      "baseline": {
+        "A": 30,
+        "B": 34,
+        "reward_mean": 0.53125
+      },
+      "not_reached": [
+        "AsyncGRPO.train",
+        "Optimizer update",
+        "Native scheduled policy publication",
+        "Training checkpoint",
+        "Post-training evaluation"
+      ],
+      "failure": "Provenance logger assumed /opt/training/envs exists; image installs locked environment in /opt/rl",
+      "fix": "Discover existing locks and active environment via sys.prefix; execute actual capture in CPU image before GPU submission",
+      "local_validation": "63 passed, 2 skipped, including new partial-layout provenance tests",
+      "final_containers": [],
+      "gpu_retry_started_after_this_failure": false,
+      "previous_attempts": [
+        {
+          "status": "STOPPED_BEFORE_CALIBRATION",
+          "run_id": "l40s-e2e-20260916-003126-4dfaa455",
+          "app_id": "ap-FBz0QZDhvr9gpFfqObA7FE",
+          "gpu_count": 2,
+          "gpu": "L40S",
+          "function_seconds": 143.72153973579407,
+          "aggregate_gpu_function_minutes": 4.7907179911931355,
+          "billing_duration_not_measured": true,
+          "peak_device_memory_mib": {
+            "0": 38755.0,
+            "1": 29328.0
+          },
+          "completed": [
+            "FP8 vLLM model load and health",
+            "NF4 trainer construction and BF16 adapter checks",
+            "Trainer negotiated native adapter-only sync mode",
+            "Initial BF16 adapter saved, loaded into vLLM, then unloaded"
+          ],
+          "not_reached": [
+            "Calibration HTTP inference",
+            "AsyncGRPO.train",
+            "Optimizer update",
+            "Native scheduled policy publication",
+            "Training checkpoint",
+            "Learning evaluation"
+          ],
+          "failure": "Evaluation passed Transformers 5.16 BatchEncoding to requests JSON; TypeError before any completion request",
+          "fix": "Explicit return_dict=False, flat integer token validation, CPU request serialization checks for both cached tokenizers",
+          "local_validation": "30 tests passed; actual cached tokenizer + 32 HTTP requests to local stub passed",
+          "gpu_retry_started": false,
+          "final_containers": [],
+          "earlier_cpu_only_failure": "l40s-e2e-20260916-002725-92d7ebe9: 160s timeout before GPU submission; offline streamed preparation passed next time",
+          "corrected_shorter_attempt": {
+            "status": "CANCELLED_WHILE_QUEUED",
+            "run_id": "l40s-e2e-20260916-093959-9984fa35",
+            "gpu_call_started": false,
+            "gpu_function_seconds": 0,
+            "reason": "Ten-minute queue allowance expired; all call graph entries PENDING with empty task_id",
+            "cpu_preparation": "PASS including both tokenizer HTTP serialization and token-ID agreement",
+            "retry_started": false,
+            "app_id": "ap-agnPvQAHbnG89K8ufHIYiM",
+            "final_containers": [],
+            "authorization": "Explicitly approved 8 updates, 6 minutes/GPU, within original combined budget",
+            "evidence": "training/outputs/modal/l40s-e2e-20260916-093959-9984fa35/queue-cutoff.json"
+          }
+        }
+      ],
+      "provenance_fix_remote_cpu_validation": {
+        "run_id": "l40s-e2e-20260916-100911-b691d270",
+        "app_id": "ap-4vE7Ne5ghd1rr2GdfNISFt",
+        "status": "CPU_PREPARATION_PASS",
+        "scope": "Actual Modal image: patched trainer import, both cached tokenizer HTTP payloads, identical prompt IDs, provenance capture including /opt/rl/pyproject.toml and /opt/rl/uv.lock",
+        "gpu_call_submitted": false,
+        "final_containers": []
+      }
+    }
+  ]
+}

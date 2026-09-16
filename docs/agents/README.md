@@ -32,7 +32,8 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 - [Local installation and MiniWoB setup](../../LAPTOP_SETUP.md).
 - [Hosted archive/error-boundary acceptance follow-up](hosted-acceptance-followup.md).
 - [Daylight action-response format correction](daylight-action-format.md).
-- [Dataset curation](../../data/curation/README.md). Training preparation currently lives in the uncommitted local `training/` directory; add a link after it is published.
+- [Dataset curation](../../data/curation/README.md).
+- [Training validation and remote deployment](training-modal-preflight.md): bounded SFT/RL learning evidence, compatibility fixes and SSH reproduction commands. Start with the [consolidated findings](../training-findings.md) for the project overview.
 
 Existing documents remain at their original paths while other agents are
 working. Update them there when needed; do not move them or create parallel

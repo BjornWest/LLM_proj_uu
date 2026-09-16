@@ -1,0 +1,191 @@
+{
+  "model": "Qwen/Qwen3.8-27B",
+  "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+  "tokenizer_assets": {
+    "config.json": "191e0af232104ed8b65258cf3fb2b842e288008baca7633c11b82a1ac7203aab",
+    "tokenizer.json": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+    "tokenizer_config.json": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+    "chat_template.jinja": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041"
+  },
+  "axolotl_sources": {
+    "prompt_tokenizers.py": "5b2e4f7d0bced3bf6593dac8b6b6e47578a8ce0ec5239ad827ac63ee69cc95ee",
+    "prompters.py": "adad98f7a9fcb8f51a8abc1ad098163ae6fac708746361c2cf31c1c7bb829d7b",
+    "prompt_strategies/jinja_template_analyzer.py": "d6919ec977ba44910640aa37833ca79c0a28fb9b17e761a272b9d38caa16fabd",
+    "prompt_strategies/chat_template.py": "6a14e9e92898974f02d40b7ad199ae94b3010609c0378adc0956a00a9d9057d5",
+    "utils/dict.py": "acfa976f04fd3cd8c8672e19c5ebe055ff07bf766171eb0f9e3f4748b60f118c",
+    "utils/chat_templates/templates/qwen3_5.jinja": "070c6460faeaed2b96a4842c6a6c1ad7d0c108924a0b117dc13c35ff6992f8ae"
+  },
+  "scope": "real tokenizer; unchanged upstream Axolotl prompter/label classes; no trainer",
+  "cases": [
+    {
+      "target": "action",
+      "layout": "trajectory",
+      "row": 0,
+      "tokens": 89,
+      "supervised_tokens": 13,
+      "supervised_text": "click('1')<|im_end|>fill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "action",
+      "layout": "state-action",
+      "row": 0,
+      "tokens": 60,
+      "supervised_tokens": 5,
+      "supervised_text": "click('1')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "action",
+      "layout": "state-action",
+      "row": 1,
+      "tokens": 63,
+      "supervised_tokens": 8,
+      "supervised_text": "fill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "reasoning-action",
+      "layout": "trajectory",
+      "row": 0,
+      "tokens": 143,
+      "supervised_tokens": 33,
+      "supervised_text": "REASONING_ONE_SENTINEL\n</think>\n\nclick('1')<|im_end|>REASONING_TWO_SENTINEL\n</think>\n\nfill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "reasoning-action",
+      "layout": "state-action",
+      "row": 0,
+      "tokens": 106,
+      "supervised_tokens": 15,
+      "supervised_text": "REASONING_ONE_SENTINEL\n</think>\n\nclick('1')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    },
+    {
+      "target": "reasoning-action",
+      "layout": "state-action",
+      "row": 1,
+      "tokens": 109,
+      "supervised_tokens": 18,
+      "supervised_text": "REASONING_TWO_SENTINEL\n</think>\n\nfill('2', 'yes')<|im_end|>",
+      "observations_masked": true,
+      "all_actions_trained": true
+    }
+  ],
+  "legacy_inline_reasoning_duplicates_think_blocks": true,
+  "axolotl_qwen3_5_override_drops_earlier_reasoning": true,
+  "trl_parser_cases": [
+    {
+      "thinking": false,
+      "parsed": {
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "browser_action",
+              "arguments": {
+                "action": "click('1')"
+              }
+            }
+          }
+        ],
+        "content": ""
+      }
+    },
+    {
+      "thinking": true,
+      "parsed": {
+        "role": "assistant",
+        "reasoning_content": "PARSER_REASONING_SENTINEL",
+        "tool_calls": [
+          {
+            "type": "function",
+            "function": {
+              "name": "browser_action",
+              "arguments": {
+                "action": "click('1')"
+              }
+            }
+          }
+        ],
+        "content": ""
+      }
+    }
+  ],
+  "trl_chat_source_sha256": {
+    "chat_template_utils.py": "0152999b59e2210fc125703f85d33f459f74fbb72ba61494d5f38d6cb04455e2",
+    "cohere.jinja": "90c33aee14aa2a226127516d48ee9184c9b90745d4a04c484621ec2e82fb712c",
+    "cohere2.jinja": "2147c474f41b522b7296f74692b9f31e45f49a31465960576a9d321339c5915a",
+    "cohere2_training.jinja": "7e5836a74c01d22504306273f8a7b49f944f6b960efee67609c07eef0a9ba295",
+    "cohere_training.jinja": "5f9718bfe3a1945366ea792b9714e42aa5849f1d41a1093c2ce4da4a77383996",
+    "deepseek_r1_distill.jinja": "56a1447ad31926fdc21fb07e56e5642bd9c850c4f52d8c8af7bbe5f079a84f5f",
+    "deepseek_r1_distill_training.jinja": "439ca50e037bdf26b9e654e3eaa559fdd19d41e602307bcb133451070eb2ee3e",
+    "deepseekv3.jinja": "563b1ce7d61d50a9b4c7439a912a1116f095b712df5b5e4d3e1116049874eb64",
+    "deepseekv3_training.jinja": "aadb4942004c186f9ba97d28f653d7f2e0dc20e4275352a486f7cafbe4dd7b51",
+    "diffusion_gemma.jinja": "9aeb7eac68ad87bba7567e9d4597ff203e5609f1b427d9e823437d0142cc61bf",
+    "diffusion_gemma_training.jinja": "cf1664f301605c2fa7e361a18b5b60aaf3896b3f8e2626b96869a99c8e8a71f9",
+    "gemma.jinja": "ecd6ae513fe103f0eb62e8ab5bfa8d0fe45c1074fa398b089c93a7e70c15cfd6",
+    "gemma3.jinja": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+    "gemma3_training.jinja": "959b257e7fc1603f8cae9c9890e62f43d6ded6c0f72b9b73c4106a4ceaa096fc",
+    "gemma4.jinja": "33204f1acb5bd0002713e16a593847f24ceeafe711ed88bda2a352dc996a3373",
+    "gemma_training.jinja": "f825de9ae80eac8a89fa5f9e6e80adf7b79ab8602564907e7c41dc15315d04ab",
+    "glm4moe.jinja": "44f815868bf02fa458dd2f741a338046f4bf45f398eb6d067766726b9d96cce3",
+    "glm4moe_training.jinja": "79c2386fbe44c9881be09b2dd086e0799b15447f8d530c45041152b6da9f3704",
+    "gptoss.jinja": "a4c9919cbbd4acdd51ccffe22da049264b1b73e59055fa58811a99efbd7c8146",
+    "gptoss_training.jinja": "6adda7cea0f63ef14918be7f26100b324525b6185a8f06932914388ffaa52e32",
+    "idefics3.jinja": "0d7e56ca41705b79932de707b22bc855c3cfcefae62f1ac5e458560654883d2e",
+    "idefics3_training.jinja": "b3d230222aae242eeda373f36f08c7170557dcbd4a93dfb2d2d3c718ee777654",
+    "lfm2.jinja": "cef187400d62a59507aab3a642ea9a8d2a2ef263562bc3430560e116945273cf",
+    "lfm2_2_5.jinja": "6d65c8804847ad74eea912dd7eca3dc1cf7a457b53a77f47d841a14121910963",
+    "lfm2_2_5_vl.jinja": "86f4770449a4797c9b4212d110b0cc70fb993c1ce960095bcfb12eea22f61cca",
+    "lfm2_training.jinja": "fc29163f52185634af234b57c358b231f22e9a266f8ecba90627e47a03626103",
+    "llama3.jinja": "ba03a121d097859c7b5b9cd03af99aafe95275210d2876f642ad9929a150f122",
+    "llama3_1.jinja": "e10ca381b1ccc5cf9db52e371f3b6651576caee0a630b452e2816b2d404d4b65",
+    "llama3_2.jinja": "5816fce10444e03c2e9ee1ef8a4a1ea61ae7e69e438613f3b17b69d0426223a4",
+    "llama3_training.jinja": "9dce981e2954cf77d4d0ad2dbacf8006a5fda34a0bdf4923075a933d08b69470",
+    "llava_next.jinja": "2c17243a977fd0643fb549a509a8e2684f45517df0f9f608d5893b719f16569f",
+    "llava_next_training.jinja": "ae0ba79488f7c225ae69dc33d7d3ba3c23b1973c04d82cdd5f3f4cd165109742",
+    "muse_glimmer.jinja": "cfc67e5f349f37690dfd31ed1f18bc4442a9dd32fe39a648f993cb4eb3cae678",
+    "muse_glimmer_training.jinja": "6eec84ccc527ef03efdcad19e64e5a4347d22c13c5d80fadcaf289ca3457ced9",
+    "nemotron_3_5_lightning.jinja": "58933db77d3099b4f78c55a38347a72e1ea05b97d6bd8f38775303dc0194e0a9",
+    "nemotron_3_5_lightning_training.jinja": "a44efc49cf02e3dee4421bd34925ba7e2081f1652b16648efbec4a6e8a203ea8",
+    "nemotron_3_nano.jinja": "ab7813c3abdd9cb655905a410728b26c7884eca45ddfab8d9f931553485a7862",
+    "nemotron_3_nano_training.jinja": "f52a4a70292b98db4d1b9f69a59546a43fc5e8603a6794781973a3e5821bd475",
+    "nemotron_3_super.jinja": "575fb74f54ed264df9047d0ecce3c98938aae953fb4f50356675706264cbb68a",
+    "nemotron_3_super_training.jinja": "d3859585444574090259d403ca65f71a496b77b0b50f31106aa99a25f5caa692",
+    "nemotron_3_ultra.jinja": "82753bef5cedc4932c1ed509b5c9a12be680fd86d1adb65bc3f7398d11c8eebc",
+    "nemotron_3_ultra_training.jinja": "d61cca230ac4f8137e74e88d73d8a649e4c3a71bb79b82925a19cf6dc52a6c7e",
+    "phi3.jinja": "dcaee66df77bfbb789ec541fe713218da30225a526f1db97138fc39ee6dc56aa",
+    "phi3_5.jinja": "78d976a442bcde2f0be15aafbb8e3050e1104f86732266f68403251b89982a90",
+    "phi3_5_training.jinja": "a76a9651a9785afe269c6b91598d55f03ab8adf3d8489a4a9c8ef432128b7c08",
+    "phi3_training.jinja": "f00b774c5933129ee0a72bed355d9947cb09f8063d6cf23b7db71b33b5ea2162",
+    "qwen2_5.jinja": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "qwen2_5_training.jinja": "0cd86fb80f520885e35040a8df321540e729d3358da41f27cf74d33103d94f62",
+    "qwen2_5_vl.jinja": "a0bc6f6fc7a29a80017a433e8f03a1cc1236e838a944a2d034295a60c4f2fddb",
+    "qwen2_5_vl_training.jinja": "31c85932a6d8826f0fe8d52b81767eba6b869128b0a7c7503d1e7baaad4e8043",
+    "qwen3.jinja": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+    "qwen3_5_nothink.jinja": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80",
+    "qwen3_5_nothink_training.jinja": "f32fe3e21c20f59d193244181c8b4c324c73a8cd313ddf825633a9ecfd2afad2",
+    "qwen3_5_think.jinja": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715",
+    "qwen3_5_think_training.jinja": "ccf356d8f238e287c047b1ef589850fd6b2b44e6cb29079e26c635fb9b8111ef",
+    "qwen3_6.jinja": "e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259",
+    "qwen3_6_training.jinja": "c5a26eaf3aab77fdc4ec696540ff896713ff0764f552ce9f597ede99fc673034",
+    "qwen3_8.jinja": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+    "qwen3_8_training.jinja": "320c2f734288f91c341c1c3c9690e4e6aba07a27852bf88d7c8481c880168288",
+    "qwen3_instruct_2507.jinja": "64f85b198065d0fba2a81f37e10ed68161ce2c19a754c7100e67e0ca2ee9c326",
+    "qwen3_instruct_2507_training.jinja": "48e17aa3caf5bf20075b6e7366864ee943e00b6f0752aadfe8b670c2ab0291a5",
+    "qwen3_training.jinja": "1d944ff8f268b611abb296cdd24d0f51981eef1c8647ac321c3a0258f61eb6c9",
+    "qwen3_vl.jinja": "3636d0f0bd6bef02654cdffdc447b79cb2cef8ab02cc75267345946291a489e4",
+    "qwen3_vl_training.jinja": "66bd81986bf7f8abe6d7fb4a50341c8d8ae14b16637e8fb876bca7e7ef0b9c6f"
+  },
+  "openenv_string_tool_arguments_rejected": true,
+  "normalized_tool_arguments_render": true,
+  "gpu_used": false
+}

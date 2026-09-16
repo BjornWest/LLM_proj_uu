@@ -1,0 +1,219 @@
+{
+  "status": "PASS",
+  "gpu_used": false,
+  "model": "Qwen/Qwen3-0.6B",
+  "revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "hybrid_27b_qualified": false,
+  "run_dir": "/home/bjorn/code/LLM_proj_uu/training/outputs/qlora-cpu-mebuuxix",
+  "scope": "actual Axolotl dataset/model/trainer/save/resume; CPU NF4",
+  "packages": {
+    "axolotl": "0.19.0",
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "peft": "0.20.0",
+    "bitsandbytes": "0.50.2"
+  },
+  "probe_sha256": "517a9ede2848029424fb332d60ad49ed07faeb6dca73d8e5372a0384557511f4",
+  "dtypes": {
+    "base_parameter_elements": {
+      "torch.bfloat16": 155648000,
+      "torch.uint8": 220200960
+    },
+    "adapter_parameter_elements": {
+      "torch.bfloat16": 10092544
+    },
+    "gradient_tensors_checked": 0
+  },
+  "nf4": {
+    "quantized_linears": 196,
+    "compute_dtype": "bfloat16",
+    "double_quant": true,
+    "vision_head_mtp_unquantized": true
+  },
+  "fp32_moment_tensors": 784,
+  "initial_history": [
+    {
+      "loss": 5.143004417419434,
+      "grad_norm": 51.5,
+      "learning_rate": 0.0001,
+      "ppl": 171.22944,
+      "memory/max_active (GiB)": 0.0,
+      "memory/max_allocated (GiB)": 0.0,
+      "memory/device_reserved (GiB)": 0.0,
+      "tokens/trainable": 5,
+      "tokens/total": 64,
+      "epoch": 0.25,
+      "step": 1
+    },
+    {
+      "loss": 3.1753134727478027,
+      "grad_norm": 34.0,
+      "learning_rate": 5e-05,
+      "ppl": 23.93432,
+      "memory/max_active (GiB)": 0.0,
+      "memory/max_allocated (GiB)": 0.0,
+      "memory/device_reserved (GiB)": 0.0,
+      "tokens/train_per_sec_per_gpu": 1.59,
+      "tokens/trainable": 10,
+      "tokens/total": 128,
+      "epoch": 0.5,
+      "step": 2
+    },
+    {
+      "train_runtime": 12.2311,
+      "train_samples_per_second": 0.164,
+      "train_steps_per_second": 0.164,
+      "total_flos": 346030080000.0,
+      "train_loss": 4.159158945083618,
+      "memory/max_active (GiB)": 0.0,
+      "memory/max_allocated (GiB)": 0.0,
+      "memory/device_reserved (GiB)": 0.0,
+      "epoch": 0.5,
+      "step": 2
+    }
+  ],
+  "supervised_examples": 4,
+  "initial_checkpoint": {
+    "file": "/home/bjorn/code/LLM_proj_uu/training/outputs/qlora-cpu-mebuuxix/checkpoint-2/adapter_model.safetensors",
+    "adapter_tensors": 392,
+    "dtype": "BF16"
+  },
+  "resume_step": 3,
+  "final_checkpoint": {
+    "file": "/home/bjorn/code/LLM_proj_uu/training/outputs/qlora-cpu-mebuuxix/checkpoint-3/adapter_model.safetensors",
+    "adapter_tensors": 392,
+    "dtype": "BF16"
+  },
+  "final_history": [
+    {
+      "epoch": 0.25,
+      "grad_norm": 51.5,
+      "learning_rate": 0.0001,
+      "loss": 5.143004417419434,
+      "memory/device_reserved (GiB)": 0.0,
+      "memory/max_active (GiB)": 0.0,
+      "memory/max_allocated (GiB)": 0.0,
+      "ppl": 171.22944,
+      "step": 1,
+      "tokens/total": 64,
+      "tokens/trainable": 5
+    },
+    {
+      "epoch": 0.5,
+      "grad_norm": 34.0,
+      "learning_rate": 5e-05,
+      "loss": 3.1753134727478027,
+      "memory/device_reserved (GiB)": 0.0,
+      "memory/max_active (GiB)": 0.0,
+      "memory/max_allocated (GiB)": 0.0,
+      "ppl": 23.93432,
+      "step": 2,
+      "tokens/total": 128,
+      "tokens/train_per_sec_per_gpu": 1.59,
+      "tokens/trainable": 10
+    },
+    {
+      "loss": 1.9381382465362549,
+      "grad_norm": 28.0,
+      "learning_rate": 0.0,
+      "ppl": 6.94581,
+      "memory/max_active (GiB)": 0.0,
+      "memory/max_allocated (GiB)": 0.0,
+      "memory/device_reserved (GiB)": 0.0,
+      "tokens/trainable": 15,
+      "tokens/total": 192,
+      "epoch": 0.75,
+      "step": 3
+    },
+    {
+      "train_runtime": 1.7537,
+      "train_samples_per_second": 1.711,
+      "train_steps_per_second": 1.711,
+      "total_flos": 519045120000.0,
+      "train_loss": 0.6460460821787516,
+      "memory/max_active (GiB)": 0.0,
+      "memory/max_allocated (GiB)": 0.0,
+      "memory/device_reserved (GiB)": 0.0,
+      "epoch": 0.75,
+      "step": 3
+    }
+  ],
+  "prequantized_reload": {
+    "nf4": {
+      "quantized_linears": 196,
+      "compute_dtype": "bfloat16",
+      "double_quant": true,
+      "vision_head_mtp_unquantized": true
+    },
+    "dtypes": {
+      "base_parameter_elements": {
+        "torch.bfloat16": 155648000,
+        "torch.uint8": 220200960
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 10092544
+      },
+      "gradient_tensors_checked": 0
+    },
+    "checkpoint": {
+      "file": "/home/bjorn/code/LLM_proj_uu/training/outputs/qlora-cpu-mebuuxix/prequantized-run/checkpoint-1/adapter_model.safetensors",
+      "adapter_tensors": 392,
+      "dtype": "BF16"
+    },
+    "history": [
+      {
+        "loss": 5.143004417419434,
+        "grad_norm": 50.0,
+        "learning_rate": 0.0001,
+        "ppl": 171.22944,
+        "memory/max_active (GiB)": 0.0,
+        "memory/max_allocated (GiB)": 0.0,
+        "memory/device_reserved (GiB)": 0.0,
+        "tokens/trainable": 5,
+        "tokens/total": 64,
+        "epoch": 0.25,
+        "step": 1
+      },
+      {
+        "train_runtime": 2.3115,
+        "train_samples_per_second": 0.433,
+        "train_steps_per_second": 0.433,
+        "total_flos": 173015040000.0,
+        "train_loss": 5.143004417419434,
+        "memory/max_active (GiB)": 0.0,
+        "memory/max_allocated (GiB)": 0.0,
+        "memory/device_reserved (GiB)": 0.0,
+        "epoch": 0.25,
+        "step": 1
+      }
+    ],
+    "fp32_moment_tensors": 784
+  },
+  "hybrid_axolotl_loader": {
+    "status": "PASS",
+    "nf4": {
+      "quantized_linears": 15,
+      "compute_dtype": "bfloat16",
+      "double_quant": true,
+      "vision_head_mtp_unquantized": true
+    },
+    "dtypes": {
+      "base_parameter_elements": {
+        "torch.float32": 83400,
+        "torch.bfloat16": 31754416,
+        "torch.uint8": 41216
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 33792
+      },
+      "gradient_tensors_checked": 0
+    },
+    "scope": "random tiny hybrid checkpoint through Axolotl ModelLoader; no forward/backward",
+    "adapter": {
+      "file": "/home/bjorn/code/LLM_proj_uu/training/outputs/qlora-cpu-mebuuxix/hybrid-loader/adapter/adapter_model.safetensors",
+      "adapter_tensors": 26,
+      "dtype": "BF16"
+    }
+  },
+  "elapsed_seconds": 82.00016301800133
+}
