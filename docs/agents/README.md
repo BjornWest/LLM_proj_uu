@@ -10,7 +10,8 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 ## Existing references
 
 - [Independent startup and trace pagination](history-loading.md): local summary projection, lazy history and release evidence.
-- [Screenshot retention proposal](trace-retention-proposal.md): exact deduplication, rarity/coverage selection and protected evidence; not implemented.
+- [Screenshot storage](screenshot-storage.md): implemented exact-byte deduplication, reference counts, hourly usage monitoring and a 20 GB review threshold; no automatic deletion.
+- [Future retention considerations](trace-retention-proposal.md): deferred rarity/coverage selection and protected evidence.
 
 - [Stable PC backend address](tailscale-backend.md): Tailscale Funnel, persistent device identity, restart and Vercel cutover checks.
 

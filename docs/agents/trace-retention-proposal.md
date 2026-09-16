@@ -1,4 +1,9 @@
-# Screenshot retention proposal (not implemented)
+# Future screenshot retention considerations (deferred)
+
+Current user decision: implement exact-byte deduplication and monitor usage;
+revisit retention only if monitored storage exceeds 20 GB. No age-based expiry
+or image deletion is enabled. See [implemented screenshot storage](screenshot-storage.md).
+The selection ideas below are retained as future considerations, not an active plan.
 
 User requested a policy that favors informative and unique runs and avoids
 duplicating screenshots. No existing artifacts may be deleted by this proposal.
@@ -31,9 +36,9 @@ Evaluation denominators and failure rates must not change when media is pruned.
 Training selection is separate from storage selection.
 
 Protect active work, report/demo examples, certified regressions, held-out
-evaluation cohorts, explicit user pins and committed training datasets. Initially
-retain all screenshots for a recent window (a proposed 30 days, adjustable to a
-measured disk budget), then prioritize representative examples by:
+evaluation cohorts, explicit user pins and committed training datasets. If retention later becomes necessary, choose any recent-time window at that
+point (the earlier 30-day suggestion is not adopted). Prioritize representative
+examples by:
 
 - Site/task/condition and environment/grader version.
 - Model/checkpoint/provider/prompt and observation modality.

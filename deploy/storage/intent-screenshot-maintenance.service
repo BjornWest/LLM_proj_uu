@@ -1,0 +1,9 @@
+[Unit]
+Description=Deduplicate completed screenshots and monitor storage (no deletion)
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/code/LLM_proj_uu
+ExecStart=/usr/bin/python3 scripts/maintain_screenshots.py --apply
+Nice=10
+TimeoutStartSec=30min

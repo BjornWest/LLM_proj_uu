@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly completed screenshot storage maintenance
+
+[Timer]
+OnStartupSec=10min
+OnUnitInactiveSec=1h
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target
