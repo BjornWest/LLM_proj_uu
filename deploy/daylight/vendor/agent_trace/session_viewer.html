@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent · Session traces</title>
+<style>
+:root{font:15px/1.55 system-ui,sans-serif;color:#dfe6ef;background:#10151e;color-scheme:dark}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit;color:inherit;background:#202a39;border:1px solid #42516a;border-radius:7px;padding:8px 11px}button{cursor:pointer}button:hover{background:#2a3850}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #71b8ff}header{padding:20px 28px;border-bottom:1px solid #303e51;display:flex;gap:20px;align-items:center;justify-content:space-between}h1{font-size:22px;margin:0}h2{font-size:20px;margin:0}p{margin:6px 0}.muted{color:#a4b1c5;font-size:13px}.layout{display:grid;grid-template-columns:305px minmax(0,1fr);height:calc(100vh - 93px)}aside{padding:20px;border-right:1px solid #303e51;overflow:auto}main{overflow:auto;padding:24px 32px}#sessions{display:grid;gap:10px;margin-top:16px}.session{text-align:left;background:#18212e;padding:14px}.session.selected{border-color:#86c1ff;background:#20344c}.session b,.session span{display:block}.session span{font-size:12px;color:#a4b1c5;margin-top:5px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.toolbar input[type=search]{flex:1;min-width:180px}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;margin:12px 0}.legend span:before{content:'●';margin-right:6px;color:var(--accent)}.notice{background:#282a23;border:1px solid #5b563b;padding:10px 14px;border-radius:8px;font-size:13px;margin:10px 0}.chat{max-width:1050px;display:flex;flex-direction:column;gap:15px;padding-bottom:30px}.bubble{background:#1a2636;border:1px solid #36475d;border-left:4px solid var(--accent);border-radius:10px;padding:14px 18px;min-width:0}.user{--accent:#77b9ff;background:#192b40}.agent{--accent:#b4a0ff;background:#28233e}.prompt{--accent:#b4a0ff;background:#28233e}.decision{--accent:#ffc665;background:#302a1d;border-color:#94743d;border-left:6px solid #ffc665;padding:18px 20px;box-shadow:0 0 0 1px #59462b}.tool{--accent:#5bd4da}.result{--accent:#73ce96;background:#1b2c27}.note{--accent:#aeb9ca}.failed{--accent:#ff8d8d;background:#382426}.bubble.incoming{align-self:flex-start;width:90%}.bubble.outgoing{align-self:flex-end;width:90%}.flow-key{display:flex;justify-content:space-between;color:#a4b1c5;font-size:13px;max-width:1050px;padding:8px 0 15px}.bubble-head{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.badge{font-weight:700;font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}.stamp{color:#acb8c9;font-size:12px}.content{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:10px}.rationale{border-top:1px solid #625337;padding-top:10px;margin-top:14px}.rationale b{color:#ffc665}pre{font:12px/1.6 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;margin:10px 0 0}details summary{cursor:pointer;color:#c0d1e7;font-size:13px;margin-top:8px}.source{font:11px ui-monospace,monospace;color:#a4b1c5;margin-top:10px;overflow-wrap:anywhere}#connection{min-height:20px}a{color:#8ec7ff}#count{margin-bottom:14px}@media(max-width:800px){.layout{display:block;height:auto}aside{border-right:0;border-bottom:1px solid #303e51;max-height:320px}main{padding:20px}header{padding:16px}.bubble.incoming,.bubble.outgoing{width:96%}}
+.ax-outline{max-height:600px;overflow:auto;padding:10px;background:#121d2b;border-radius:6px}.ax-node{font:12px/1.7 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.ax-children{margin-left:14px;border-left:1px solid #42516a;padding-left:8px}.ax-header{tab-size:2}.json-leaf pre{tab-size:2}.json-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.json-toolbar button{font-size:12px;padding:5px 9px}.json-toolbar button[aria-pressed=true]{background:#324c68;border-color:#86c1ff}.json-children{border-left:1px solid #42516a;padding-left:12px;margin:5px 0 5px 4px;min-width:0}.json-key{font:12px ui-monospace,monospace;color:#9ec8f2;overflow-wrap:anywhere}.json-leaf{margin:8px 0;min-width:0}.json-text{margin-top:3px;tab-size:2;white-space:pre-wrap;max-height:420px}.json-group>summary{overflow-wrap:anywhere}.json-nested{margin:8px 0}.json-more{font-size:12px;margin:8px 0}
+</style>
+<style>
+.toolbar{position:sticky;top:-24px;z-index:10;background:#10151e;padding:12px 0;border-bottom:1px solid #303e51}
+#decisions-only{border-color:#94743d}#decisions-only[aria-pressed=true]{background:#49391c;color:#ffd58a;border-color:#ffc665}
+main{overflow-anchor:none}
+.action-facts{display:flex;flex-wrap:wrap;gap:8px 20px;margin:12px 0 0}.action-facts div{min-width:0;max-width:100%}.action-facts dt{font-size:12px;color:#cdb990}.action-facts dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.timeline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%}.timeline input{flex:1;min-width:100px}.timeline button{padding:4px 10px}.timeline select{max-width:160px}.timeline span{font-size:12px}.timeline button:disabled{opacity:.4;cursor:default}
+@media(max-width:800px){main{overflow:visible}.toolbar{top:0}}
+</style>
+<header><div><h1>Agent / Session traces</h1><p class="muted">Prompts, decisions and execution · local workspace</p></div><a href="#latest" id="latest">Latest session ↗</a></header>
+<div class="layout"><aside><label for="order">Sessions</label> <select id="order"><option value="newest">Recently updated</option><option value="oldest">Oldest first</option></select><div id="sessions"></div></aside>
+<main id="main"><h2 id="title">Loading sessions…</h2><p id="meta" class="muted"></p><div id="notices"></div>
+<div class="legend"><span class="user">User</span><span class="prompt">Model input</span><span class="agent">Agent reply</span><span class="decision">Action + reason</span><span class="tool">Tool call</span><span class="result">Result</span><span class="note">Note</span></div>
+<div class="toolbar"><label>Parsing <select id="parser" aria-label="Parsing mode"><option value="auto">Auto</option><option value="civ5">Civ5</option><option value="generic">Generic</option><option value="browsergym">BrowserGym</option></select></label><button id="decisions-only" aria-pressed="false" aria-controls="chat">Decisions only</button><input id="search" type="search" placeholder="Search messages, code and results" aria-label="Search trace"><select id="filter" aria-label="Filter messages"><option value="all">All messages</option><option value="decision">Decisions only</option><option value="agent">Agent replies</option><option value="prompt">Model inputs</option><option value="tools">Tools and results</option><option value="problems">Errors / uncertain</option></select><button id="reload">Refresh</button><label><input id="live" type="checkbox" checked> Live refresh</label><button id="bottom">Jump to latest event</button>
+<div class="timeline" aria-label="Navigate matching events"><button id="previous" aria-label="Previous 100 events">← Earlier</button><input id="position" type="range" min="0" max="0" value="0" aria-label="Position in matching events"><button id="next" aria-label="Next 100 events">Later →</button><select id="turn" aria-label="Jump to game turn"><option value="">Jump to turn…</option></select><span id="page-info" aria-live="polite"></span></div></div>
+<p id="connection" class="muted" role="status"></p><p id="count" class="muted"></p><div class="flow-key"><span>← Inputs · you, environment, tool results</span><span>Agent · replies, actions, tool calls →</span></div><div id="chat" class="chat"></div></main></div>
+<script>
+'use strict';
+const el=id=>document.getElementById(id), problem=m=>['error','timeout','pending','unknown','unverified'].includes(m.status);
+let sessions=[], current=null, loaded='', generation=0;
+const initialParser=new URLSearchParams(location.search).get('parser')||'auto';
+el('parser').value=['auto','civ5','generic','browsergym'].includes(initialParser)?initialParser:'auto';
+const PAGE_SIZE=100, detailState=new Map(), searchText=new WeakMap();
+let pageStart=0, filtered=[], indexedMessages=null, messageOrder=new Map(), refreshing=false;
+function rememberDetails(){
+  for(const detail of el('chat').querySelectorAll('details'))detailState.set(detail.dataset.key,detail.open);
+}
+function indexMessages(){
+  if(indexedMessages===current.messages)return;
+  indexedMessages=current.messages;
+  messageOrder=new Map(current.messages.map((message,index)=>[message.id,index]));
+  const turns=new Map();
+  for(const message of current.messages)if(message.turn!=null&&!turns.has(message.turn))turns.set(message.turn,message.id);
+  el('turn').replaceChildren(node('option','','Jump to turn…'));
+  el('turn').firstChild.value='';
+  for(const [turn,id] of turns){const option=node('option','',(current.environment==='browsergym'?'Step ':'Turn ')+turn);option.value=id;el('turn').append(option)}
+  el('turn').disabled=!turns.size;
+}
+function matchingMessages(){
+  const query=el('search').value.toLowerCase(),filter=el('filter').value;
+  return current.messages.filter(message=>{
+    if(!(filter==='all'||(filter==='tools'?['tool','result'].includes(message.kind):filter==='problems'?problem(message):message.kind===filter)))return false;
+    if(!query)return true;
+    if(!searchText.has(message))searchText.set(message,[message.text,message.rationale,message.stderr,message.title,message.provenance,JSON.stringify(message.action),JSON.stringify(message.action_labels)].join('\n').toLowerCase());
+    return searchText.get(message).includes(query);
+  });
+}
+function nearestIndex(id){
+  const origin=messageOrder.get(id);
+  let best=0,distance=Infinity;
+  filtered.forEach((message,index)=>{const delta=Math.abs(messageOrder.get(message.id)-origin);if(delta<distance){best=index;distance=delta}});
+  return best;
+}
+function movePage(start){
+  if(!current)return;
+  pageStart=Math.max(0,Math.min(Number(start),Math.max(0,filtered.length-PAGE_SIZE)));
+  render();
+  const box=el('chat').querySelector('.bubble');
+  if(box){const view=traceViewport();view.scroller.scrollBy({top:box.getBoundingClientRect().top-view.top-10,behavior:'instant'})}
+}
+
+function node(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n}
+// Presentation only: never rewrite trace data or interpret page text as HTML.
+const jsonViewState=new Map();
+function axParts(text){
+  if(typeof text!=='string')return null;
+  const marker='Accessibility tree:\n',start=text.indexOf(marker);
+  if(start<0)return null;
+  const lines=text.slice(start+marker.length).split('\n');
+  if(lines.length<3||lines.length>5000||!lines.some(line=>/^\t+\S/.test(line)))return null;
+  return {header:text.slice(0,start+marker.length),lines};
+}
+function textView(text){
+  const ax=axParts(text);
+  if(!ax)return node('pre','',text);
+  const wrapper=node('div','ax-view'),bar=node('div','json-toolbar');
+  const treeButton=node('button','','Tree view'),textButton=node('button','','Exact text');
+  const expand=node('button','','Expand all'),collapse=node('button','','Collapse all');
+  for(const button of [treeButton,textButton,expand,collapse])button.type='button';
+  bar.append(treeButton,textButton,expand,collapse,node('span','muted','Recorded AX hierarchy · not the rendered webpage'));
+  const tree=node('div','ax-outline'),roots=[],stack=[];
+  for(const line of ax.lines){
+    const match=line.match(/^(\t*)(.*)$/),depth=match[1].length,entry={text:match[2],depth,children:[]};
+    while(stack.length&&stack.at(-1).depth>=depth)stack.pop();
+    (stack.length?stack.at(-1).children:roots).push(entry);stack.push(entry);
+  }
+  // Iterative construction also handles unusually deep recorded trees.
+  const pending=roots.map(entry=>({entry,parent:tree})).reverse();
+  while(pending.length){
+    const {entry,parent}=pending.pop();
+    if(!entry.children.length){parent.append(node('div','ax-node',entry.text));continue}
+    const group=node('details','ax-branch');group.open=entry.depth<2;
+    group.append(node('summary','ax-node',entry.text));const children=node('div','ax-children');group.append(children);parent.append(group);
+    for(const child of [...entry.children].reverse())pending.push({entry:child,parent:children});
+  }
+  const panel=node('div');
+  function show(asTree){
+    treeButton.setAttribute('aria-pressed',String(asTree));textButton.setAttribute('aria-pressed',String(!asTree));
+    expand.hidden=collapse.hidden=!asTree;
+    panel.replaceChildren(...(asTree?[node('pre','ax-header',ax.header),tree]:[node('pre','ax-exact',text)]));
+  }
+  treeButton.onclick=()=>show(true);textButton.onclick=()=>show(false);
+  expand.onclick=()=>tree.querySelectorAll('details').forEach(d=>d.open=true);
+  collapse.onclick=()=>tree.querySelectorAll('details').forEach(d=>d.open=false);
+  wrapper.append(bar,panel);show(true);return wrapper;
+}
+function largeJSON(text,minLength=1024){
+  if(typeof text!=='string'||text.length<minLength||text.length>2000000)return null;
+  const trimmed=text.trim();
+  if(!trimmed.startsWith('{')&&!trimmed.startsWith('['))return null;
+  try{const value=JSON.parse(trimmed);return value&&typeof value==='object'?value:null}catch{return null}
+}
+function jsonTree(value,label,depth=0){
+  if(typeof value==='string'){
+    const nested=depth<12?largeJSON(value,512):null;
+    if(nested){
+      const wrapper=node('div','json-nested');wrapper.append(node('div','muted','Decoded JSON string · presentation only'),jsonTree(nested,label,depth+1));return wrapper;
+    }
+    const leaf=node('div','json-leaf');leaf.append(node('div','json-key',label),textView(value));return leaf;
+  }
+  if(value===null||typeof value!=='object'){
+    const leaf=node('div','json-leaf');leaf.append(node('span','json-key',label+': '),node('code','',JSON.stringify(value)));return leaf;
+  }
+  if(depth>=12){const leaf=node('div');leaf.append(node('div','muted',label+' · nesting limit; see Raw text'),node('pre','',JSON.stringify(value,null,2)));return leaf}
+  const entries=Object.entries(value),details=node('details','json-group');
+  const hint=!Array.isArray(value)&&typeof value.role==='string'?' · '+value.role:'';
+  details.append(node('summary','',label+hint+' · '+entries.length+(Array.isArray(value)?' items':' fields')));
+  const children=node('div','json-children');let shown=0;
+  const more=node('button','json-more','Show next 100 items');more.type='button';
+  function appendChunk(){
+    more.remove();const end=Math.min(shown+100,entries.length);
+    for(;shown<end;shown++){const [key,item]=entries[shown];children.append(jsonTree(item,Array.isArray(value)?'['+key+']':key,depth+1))}
+    if(shown<entries.length)children.append(more);
+  }
+  more.onclick=appendChunk;
+  details.addEventListener('toggle',()=>{if(details.open&&!shown)appendChunk()});
+  details.append(children);details.open=depth===0;
+  if(details.open)appendChunk();return details;
+}
+function contentView(text,key){
+  const parsed=largeJSON(text);
+  if(parsed===null)return textView(text);
+  const wrapper=node('div','json-view'),bar=node('div','json-toolbar');
+  const readable=node('button','','Readable JSON'),raw=node('button','','Raw text');
+  readable.type=raw.type='button';
+  bar.append(readable,raw,node('span','muted','Display only · raw capture unchanged'));
+  const panel=node('div');let tree=null;
+  function show(mode){
+    jsonViewState.set(key,mode);readable.setAttribute('aria-pressed',String(mode==='readable'));raw.setAttribute('aria-pressed',String(mode==='raw'));
+    if(mode==='readable'){tree??=jsonTree(parsed,'JSON');panel.replaceChildren(tree)}
+    else panel.replaceChildren(node('pre','json-raw',text));
+  }
+  readable.onclick=()=>show('readable');raw.onclick=()=>show('raw');
+  wrapper.append(bar,panel);show(jsonViewState.get(key)||'readable');return wrapper;
+}
+function traceValue(text){
+  if(text==null)return null;
+  try{return JSON.parse(text)}catch{return text}
+}
+function toolJSON(message){
+  const value={tool:message.title??null};
+  if(message.kind==='tool'){
+    value.arguments=traceValue(message.text);
+    if(message.text==null)value.note='Request was not recorded for this historical call.';
+  }else{
+    value.output=traceValue(message.text);
+    if(message.stderr)value.stderr=traceValue(message.stderr);
+  }
+  return JSON.stringify(value,null,2);
+}
+function readableLabel(value){
+  return value.replace(/([a-z0-9])([A-Z])/g,'$1 $2').replaceAll('_',' ').toLowerCase().replace(/\b\w/g,letter=>letter.toUpperCase());
+}
+function actionFacts(action,labels={}){
+  const facts=node('dl','action-facts');
+  for(const [key,value] of Object.entries(action)){
+    if(key==='type')continue;
+    const row=node('div'), label=node('dt','',readableLabel(key));
+    const text=value==null?'Not recorded':typeof value==='object'?JSON.stringify(value,null,2):String(value);
+    const formatted=labels[key]??(typeof value==='string'&&/^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/.test(value)?readableLabel(value):text);
+    const detail=node('dd','',formatted);detail.title=text;
+    row.append(label,detail);facts.append(row);
+  }
+  return facts;
+}
+function date(value){return value?new Date(value).toLocaleString():'Timestamp unknown'}
+function list(){el('sessions').replaceChildren();const items=[...sessions];if(el('order').value==='oldest')items.reverse();for(const s of items){const b=node('button','session'+(current?.id===s.id?' selected':''));b.append(node('b','',s.title),node('span','',date(s.started_at)+' · '+s.state),node('span','',s.message_count+' events · '+s.decision_count+' decisions'),node('span','','Updated '+date(s.updated_at)));b.onclick=()=>{location.hash=s.id};el('sessions').append(b)}}
+// Anchor filter changes to a message, not a pixel position in the old list.
+function traceViewport(){
+  const main=el('main'), rect=main.getBoundingClientRect();
+  const scrolls=getComputedStyle(main).overflowY!=='visible';
+  const top=Math.max(0,scrolls?rect.top:0,document.querySelector('.toolbar').getBoundingClientRect().bottom);
+  const bottom=Math.min(innerHeight,scrolls?rect.bottom:innerHeight);
+  return {scroller:scrolls?main:window,top,bottom,center:(top+bottom)/2};
+}
+function captureTracePosition(){
+  const view=traceViewport();
+  if(view.bottom<=view.top)return null;
+  let best=null;
+  for(const box of el('chat').querySelectorAll('.bubble')){
+    const rect=box.getBoundingClientRect();
+    if(rect.bottom<=view.top||rect.top>=view.bottom)continue;
+    const offset=Math.max(0,Math.min(rect.height,view.center-rect.top));
+    const distance=Math.abs(rect.top+offset-view.center);
+    if(!best||distance<best.distance)best={id:box.dataset.id,offset,y:rect.top+offset,distance};
+  }
+  return best;
+}
+function renderFilter(){
+  const anchor=captureTracePosition();
+  render(anchor);
+  restoreTracePosition(anchor);
+}
+function restoreTracePosition(anchor){
+  if(!anchor)return;
+  const boxes=[...el('chat').querySelectorAll('.bubble')];
+  let box=boxes.find(box=>box.dataset.id===anchor.id), offset=anchor.offset;
+  if(!box){
+    // If the centered message was filtered out, stay near its place in the trace.
+    const order=new Map(current.messages.map((message,index)=>[message.id,index]));
+    const origin=order.get(anchor.id);
+    box=boxes.reduce((best,candidate)=>!best||Math.abs(order.get(candidate.dataset.id)-origin)<Math.abs(order.get(best.dataset.id)-origin)?candidate:best,null);
+    if(!box)return;
+    offset=box.getBoundingClientRect().height/2;
+  }
+  const rect=box.getBoundingClientRect();
+  traceViewport().scroller.scrollBy({top:rect.top+Math.min(offset,rect.height)-anchor.y,behavior:'instant'});
+}
+function render(anchor=null){if(!current)return;indexMessages();el('title').textContent=current.title;el('meta').textContent='Started '+date(current.started_at)+' · Updated '+date(current.updated_at)+' · '+current.timestamp_source;el('notices').replaceChildren(...current.notices.map(t=>node('p','notice',t)));list();const query=el('search').value.toLowerCase(),filter=el('filter').value;
+el('decisions-only').setAttribute('aria-pressed',String(filter==='decision'));
+filtered=matchingMessages();
+if(anchor)pageStart=Math.max(0,nearestIndex(anchor.id)-Math.floor(PAGE_SIZE/2));
+pageStart=Math.min(pageStart,Math.max(0,filtered.length-PAGE_SIZE));
+const messages=filtered.slice(pageStart,pageStart+PAGE_SIZE);
+el('position').max=Math.max(0,filtered.length-PAGE_SIZE);el('position').value=pageStart;
+el('position').disabled=filtered.length<=PAGE_SIZE;
+el('previous').disabled=pageStart===0;el('next').disabled=pageStart+PAGE_SIZE>=filtered.length;
+el('page-info').textContent=filtered.length?`${pageStart+1}–${pageStart+messages.length} of ${filtered.length.toLocaleString()} matches`: 'No matches';
+el('count').textContent=filtered.length.toLocaleString()+' of '+current.messages.length.toLocaleString()+' events · search and filters cover the whole session';
+rememberDetails();el('chat').replaceChildren();
+for(const m of messages){const box=node('article','bubble '+m.kind+(['agent','decision','tool'].includes(m.kind)?' outgoing':' incoming')+(problem(m)?' failed':''));box.dataset.id=m.id;const head=node('div','bubble-head');let label={user:'You → agent',prompt:'Context → agent',agent:'Agent',decision:'Agent · action',tool:'Agent / controller · tool call',result:'Tool → agent',note:'Session note'}[m.kind]||m.kind;
+if(m.title)label+=' · '+m.title;if(m.status)label+=' · '+m.status;head.append(node('span','badge',label));const stamp=node('time','stamp',date(m.at)+(m.turn!=null?' · '+(current.environment==='browsergym'?'Step ':'Turn ')+m.turn:''));if(m.at){stamp.dateTime=m.at;stamp.title=m.at}head.append(stamp);box.append(head);
+if(m.kind==='tool'||m.kind==='result'){
+  const d=node('details');d.dataset.key=m.id;
+  d.open=detailState.get(m.id)??(m.kind==='tool');
+  d.append(node('summary','',m.kind==='tool'?'Submitted tool / arguments · JSON':'Tool output · JSON · '+new TextEncoder().encode(m.text||'').length.toLocaleString()+' captured bytes'),contentView(toolJSON(m),m.id+':tool-json'));
+  box.append(d);
+  if(m.text!=null||m.stderr){
+    const raw=node('details');raw.dataset.key=m.id+':raw';raw.open=detailState.get(raw.dataset.key)??false;
+    raw.append(node('summary','','Original captured text'));
+    if(m.text!=null)raw.append(node('pre','',m.text));
+    if(m.stderr)raw.append(node('div','muted','Error output'),node('pre','',m.stderr));
+    box.append(raw);
+  }
+}else if(m.collapsed){const d=node('details');d.dataset.key=m.id;d.open=detailState.get(m.id)??false;d.append(node('summary','',m.title||'Recorded content'),contentView(m.text,m.id+':content'));box.append(d)}else box.append(largeJSON(m.text)||axParts(m.text)?contentView(m.text,m.id+':content'):node('div','content',m.text));
+for(const asset of m.attachments||[]){
+  if(!asset.url.startsWith('/artifacts/'))continue;
+  const a=node('a','',asset.label);a.href=asset.url;a.target='_blank';a.rel='noopener';
+  if(asset.image){const img=node('img');img.src=asset.url;img.alt=asset.label;img.loading='lazy';img.style.cssText='display:block;max-width:100%;max-height:500px;object-fit:contain;margin-top:12px';a.replaceChildren(img)}
+  const line=node('div');line.append(a);box.append(line);
+}
+if(m.kind==='decision'){if(m.action)box.append(actionFacts(m.action,m.action_labels));const reason=node('div','rationale');reason.append(node('b','','Why: '),document.createTextNode(m.rationale||'Not recorded'));box.append(reason);if(m.action){const action=node('details');action.dataset.key=m.id+':action';action.open=detailState.get(action.dataset.key)??false;action.append(node('summary','','Proposed action · execution is reported separately'),node('pre','',JSON.stringify(m.action,null,2)));box.append(action)}}
+let provenance=m.provenance||'unknown';if(m.kind==='prompt')provenance=m.provenance==='actual_outbound_input'?'Captured outbound model input':'Selected context only — not the full model prompt';box.append(node('div','source',provenance+' · '+m.source+(m.duration_ms!=null?' · '+Math.round(m.duration_ms)+' ms':'')));el('chat').append(box)}
+if(!messages.length)el('chat').append(node('p','muted','No recorded events match this filter. Missing model inputs and decisions are not inferred.'));
+}
+async function refresh(){
+  const own=++generation,parser=el('parser').value,query=parser==='auto'?'':'?parser='+encodeURIComponent(parser);
+  try{
+    const response=await fetch('/api/sessions'+query);
+    if(!response.ok)throw Error('Session catalog unavailable');
+    const items=await response.json();if(own!==generation)return;
+    sessions=items;
+    const desired=location.hash.slice(1),chosen=sessions.find(s=>s.id===desired)||(desired===''||desired==='latest'?sessions.find(s=>s.state==='active')||sessions[0]:null);
+    if(!chosen){current=null;loaded='';pageStart=0;list();el('title').textContent=desired&&desired!=='latest'?'Session not found':'No traces recorded yet';el('chat').replaceChildren();el('count').textContent='';return}
+    if(current?.id!==chosen.id||!chosen.revision||loaded!==chosen.revision){
+      const r=await fetch('/api/sessions/'+chosen.id+query);
+      if(!r.ok)throw Error('Trace is being updated; retry shortly');
+      const data=await r.json();if(own!==generation)return;
+      const same=current?.id===data.id,anchor=same?captureTracePosition():null;
+      if(!same){pageStart=0;detailState.clear();el('chat').replaceChildren()}
+      current=data;loaded=chosen.revision||'';
+      render(anchor);
+      restoreTracePosition(anchor);
+    }else list();
+    el('connection').textContent='Connected · checked '+new Date().toLocaleTimeString()+' · timestamps shown in your local timezone';
+  }catch(error){if(own===generation)el('connection').textContent='Disconnected / unavailable: '+error.message+' · existing view retained'}
+}
+el('parser').onchange=()=>{const url=new URL(location.href);url.searchParams.set('parser',el('parser').value);history.replaceState(null,'',url);return refresh()};
+el('decisions-only').onclick=()=>{el('filter').value=el('filter').value==='decision'?'all':'decision';renderFilter()};
+el('search').oninput=renderFilter;el('filter').onchange=renderFilter;el('order').onchange=list;el('reload').onclick=refresh;
+el('latest').onclick=()=>{if(location.hash==='#latest')refresh()};
+el('previous').onclick=()=>movePage(pageStart-PAGE_SIZE);el('next').onclick=()=>movePage(pageStart+PAGE_SIZE);
+el('position').oninput=()=>movePage(el('position').value);
+el('turn').onchange=()=>{if(el('turn').value)movePage(nearestIndex(el('turn').value));el('turn').value=''};
+el('bottom').onclick=()=>{movePage(filtered.length-PAGE_SIZE);el('chat').lastElementChild?.scrollIntoView({behavior:'instant',block:'end'})};
+window.onhashchange=()=>{refresh()};
+setInterval(async()=>{if(el('live').checked&&!refreshing){refreshing=true;try{await refresh()}finally{refreshing=false}}},3000);refresh();
+</script></html>

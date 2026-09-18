@@ -29,6 +29,8 @@ const folderState=new Map();
 let refreshTracesPending=false,refreshRequested=false;
 let historyLoading=null,historyLoaded=false,historyMore=false,historyCursor=null,historyError='',historyStale=false;
 const historyCursors=new Set();
+let libraryRows=[],libraryLoading=false,libraryLoaded=false,libraryAttempted=false,libraryMore=false,libraryCursor=null,libraryError='',libraryEnabled=true;
+const libraryCursors=new Set();
 const historyWanted=()=>globalPage||view==='research'||view==='review';
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const node=(tag,text,className)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;};
@@ -83,7 +85,8 @@ function records(){
       status:last.status,at:last.created_at,runtime:same('runtime')||'Browser-side demo',executionMode:same('execution_mode'),evaluation:turns.length===1?first.evaluation??null:null,raw:first};
   });
   const manualRecords=manualSessions.map(session=>({key:'m:'+session.id,id:session.id,source:'manual',kind:'manual',site:session.site_id||'unknown',collection:session.collection||'unknown',title:session.task_name||session.task||'Manual session',condition:session.condition||null,goal:session.reference_goal,task:session.task,status:session.status,at:session.created_at,runtime:session.runtime||'BrowserGym',executionMode:'Human controlled',evaluation:null,raw:session}));
-  return [...jobRecords,...browserRecords,...manualRecords].sort((a,b)=>(Date.parse(b.at)||0)-(Date.parse(a.at)||0));
+  const savedRecords=libraryRows.map(row=>({key:'l:'+row.id,id:row.id,source:'library',kind:['task','ask'].includes(row.interaction_kind)?row.interaction_kind:null,site:row.site_id||'unknown',collection:row.collection||'unknown',title:row.task_name||row.title||'Saved run',goal:row.goal||null,task:row.task_id||null,condition:row.condition||null,status:row.execution_status||row.state,at:row.started_at||row.created_at,runtime:row.environment||'Saved trace',executionMode:row.execution_mode||null,evaluation:row.evaluation??null,grade:row.grade??null,rubric:row.rubric??null,raw:row}));
+  return [...jobRecords,...browserRecords,...manualRecords,...savedRecords].sort((a,b)=>(Date.parse(b.at)||0)-(Date.parse(a.at)||0));
 }
 function renderSites(){
   const query=$('site-search').value.trim().toLowerCase();$('site-folders').replaceChildren();
@@ -131,7 +134,7 @@ function recordRow(record,all){
   cell.append(button,node('span',[record.runtime,record.turns?record.turns.length+' turn'+(record.turns.length===1?'':'s'):null,record.executionMode,record.condition,record.status].filter(Boolean).join(' · '),'run-meta'));row.append(cell);
   if(all){const siteCell=node('td',undefined,'site-cell');siteCell.textContent=siteFor(record.site)?.name||(record.site==='unknown'?'Not recorded':record.site);siteCell.append(node('small',record.collection==='unknown'?'Collection not recorded':collectionNames[record.collection]||record.collection));row.append(siteCell);}
   const grade=node('td');grade.append(gradeBadge(record));row.append(grade,node('td',dateLabel(record.at),'when'));
-  const action=node('td'),open=node('button',activeStatuses.has(record.status)&&record.source==='harness'?'Watch →':record.source==='harness'?'Replay ↗':record.source==='demo'?'Conversation ↗':'Inspect ↗','replay-action');open.type='button';open.setAttribute('aria-label','Open '+record.title);open.onclick=()=>openRecord(record,all);action.append(open);row.append(action);return row;
+  const action=node('td'),open=node('button',activeStatuses.has(record.status)&&record.source==='harness'?'Watch →':['harness','library'].includes(record.source)?'Replay ↗':record.source==='demo'?'Conversation ↗':'Inspect ↗','replay-action');open.type='button';open.setAttribute('aria-label','Open '+record.title);open.onclick=()=>openRecord(record,all);action.append(open);row.append(action);return row;
 }
 function renderTasks(){
   $('task-list-heading').textContent='Tasks for '+siteFor(siteID).name;
@@ -169,6 +172,9 @@ function renderReview(){
   $('back-to-research').textContent=globalPage?'← All traces & replays':'← Tasks & replays';$('recording-status').textContent=activeStatuses.has(record.status)?'In progress · recorded evidence':'Recorded evidence · view only';
   $('review-kind').textContent=[record.kind==='task'?'Task attempt':record.kind==='ask'?'Ask the agent':record.kind==='manual'?(record.raw?.asks?.length?'Shared browser session':'Manual exploration'):'Activity not recorded',siteFor(record.site)?.name||record.site,record.runtime].join(' · ');
   $('review-title').textContent=record.kind==='ask'?record.goal||record.title:record.title;$('review-grade').replaceChildren(gradeBadge(record));
+  const isLibrary=record.source==='library',shared=$('shared-trace-viewer');shared.hidden=!isLibrary;
+  if(isLibrary){$('run-viewer').hidden=true;$('browser-trace-review').hidden=true;$('manual-review').hidden=true;if(shared.dataset.session!==record.id){shared.dataset.session=record.id;shared.src='/trace-viewer?embed=1#'+encodeURIComponent(record.id);}return;}
+  if(shared.hasAttribute('src')){shared.removeAttribute('src');delete shared.dataset.session;}
   const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isManual;$('browser-trace-download').hidden=isJob;$('trace-raw-details').hidden=isJob;$('manual-review').hidden=!isManual;
   if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded browser actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
   if(isJob){renderJobConversation(record);const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
@@ -202,6 +208,7 @@ async function loadBrowserTrace(record){
 }
 
 function render(){
+  if(view!=='review'&&$('shared-trace-viewer').hasAttribute('src')){$('shared-trace-viewer').removeAttribute('src');delete $('shared-trace-viewer').dataset.session;}
   const site=siteFor(siteID);if(!site)return;
   if(globalPage||view!=='explore'||!site.interactive)fullScreen.setActive(false,{focus:false});
   document.querySelector('.site-heading').hidden=globalPage;document.querySelector('.site-tabs').hidden=globalPage;
@@ -373,6 +380,8 @@ function renderHistoryState(){
     status.textContent=historyError?'History could not be loaded: '+historyError:historyLoading?'Loading history…':partial?'Showing loaded history only. Filters and conversations cover loaded turns; load more for additional activity.':'All browser-side history loaded.';
     button.hidden=historyLoaded&&!historyMore&&!historyError;button.disabled=!!historyLoading||authExpired;
     button.textContent=historyError?'Retry history':historyLoaded?'Load more history':'Load history';
+    if(libraryEnabled)status.textContent+=' Saved library: '+(libraryError?'unavailable — '+libraryError:libraryLoading?'loading…':libraryMore?'more saved runs available.':libraryLoaded?'all published runs loaded.':'not loaded.');
+    const savedButton=$(prefix+'-library-more');savedButton.hidden=!libraryEnabled;savedButton.disabled=libraryLoading||authExpired;savedButton.textContent=libraryError?'Retry saved library':libraryMore?'Load more saved runs':libraryLoaded?'Refresh saved library':'Load saved library';
   }
 }
 function renderHistory(){
@@ -398,6 +407,20 @@ async function loadHistory({more=false,reset=false}={}){
   })();renderHistoryState();return historyLoading;
 }
 for(const prefix of ['global','site'])$(prefix+'-history-more').onclick=()=>loadHistory({more:historyLoaded});
+async function loadLibrary({more=false,reset=false}={}){
+  if(authExpired||libraryLoading||!libraryEnabled||(libraryAttempted&&!more&&!reset))return;
+  libraryLoading=true;libraryAttempted=true;libraryError='';if(reset){libraryCursor=null;libraryCursors.clear();}renderHistoryState();
+  try{
+    const page=await api('/api/library/sessions'+(libraryCursor?'?cursor='+encodeURIComponent(libraryCursor):''));
+    if(!Array.isArray(page.sessions)||typeof page.has_more!=='boolean')throw Error('Invalid saved library response');
+    if(page.has_more&&(!page.cursor||libraryCursors.has(page.cursor)))throw Error('Saved library pagination did not advance');
+    const merged=new Map((reset?[]:libraryRows).map(row=>[row.id,row]));for(const row of page.sessions)merged.set(row.id,row);libraryRows=[...merged.values()];
+    libraryLoaded=true;libraryMore=page.has_more;libraryCursor=page.cursor;if(page.cursor)libraryCursors.add(page.cursor);
+  }catch(error){if(error.status===404)libraryEnabled=false;else libraryError=error.message;}
+  finally{libraryLoading=false;renderHistory();renderSites();}
+}
+for(const prefix of ['global','site'])$(prefix+'-library-more').onclick=()=>loadLibrary({more:libraryMore,reset:!libraryMore});
+
 async function refresh(forceTraces=false){
   if(forceTraces)historyStale=true;
   if(authExpired||document.hidden)return;if(refreshing){refreshRequested=true;refreshTracesPending ||= forceTraces;return;}refreshing=true;
@@ -412,7 +435,7 @@ async function refresh(forceTraces=false){
     if(currentRun?.source==='harness')currentRun=recordForKey(currentRun.key)||currentRun;
     renderHistory();if(view==='review'&&currentRun?.source==='harness')renderReview();
   }catch(error){notice(error.message);}})());
-  if(historyWanted())loadHistory();
+  if(historyWanted()){loadHistory();loadLibrary();}
   try{await Promise.allSettled(work);
     if(pendingTask){const latest=tasks.find(t=>t.id===pendingTask.id);if(latest&&latest.revision===pendingTask.revision)pendingTask=latest;}
     syncControls();
@@ -491,6 +514,9 @@ async function readRoute(){
   const route=location.href,params=new URLSearchParams(location.search);globalPage=location.pathname==='/workspace/replays';
   if(siteFor(params.get('site')))siteID=params.get('site');
   const key=params.get('run');currentRun=recordForKey(key);view=currentRun?'review':globalPage?'global':params.get('view')==='research'?'research':'explore';render();
+  if(key&&!currentRun&&/^l:[A-Za-z0-9_-]{1,160}$/.test(key)){
+    try{const value=await api('/api/library/sessions/'+encodeURIComponent(key.slice(2)));if(location.href!==route)return;const {messages,...summary}=value;libraryRows=[...libraryRows.filter(row=>row.id!==value.id),{...summary,...summary.library_metadata}];currentRun=recordForKey(key);if(currentRun)view='review';render();}catch(error){if(location.href===route)notice('The saved trace could not be loaded: '+error.message);}
+  }
   if(key&&!currentRun&&/^[dhm]:[a-f0-9-]{36}$/.test(key)){
     try{
       const kind=key[0],id=key.slice(2),row=await api(kind==='d'?'/api/traces/'+id:kind==='h'?'/api/harness/jobs/'+id:'/api/manual/sessions/'+id);
@@ -500,12 +526,13 @@ async function readRoute(){
       currentRun=recordForKey(key);if(currentRun)view='review';render();
     }catch(error){if(location.href===route)notice('The requested trace could not be loaded: '+error.message);}
   }
-  if(historyWanted()){loadHistory();refresh();loadManual();}
+  if(historyWanted()){loadHistory();loadLibrary();refresh();loadManual();}
   if(currentRun?.source==='demo')loadBrowserTrace(currentRun);
 }
 document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden){refresh();loadManual();}else clearTimeout(remotePollTimer);});
 window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>{clearTimeout(pollTimer);clearTimeout(remotePollTimer);});
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('run-viewer').contentWindow||event.data?.type!=='harness:size')return;const height=Number(event.data.height);if(Number.isFinite(height))$('run-viewer').style.height=Math.min(8000,Math.max(650,height))+'px';});
+window.addEventListener('message',event=>{const frame=$('shared-trace-viewer');if(event.origin!==location.origin||event.source!==frame.contentWindow||event.data?.type!=='trace-viewer:size')return;const height=Number(event.data.height);if(Number.isFinite(height))frame.style.height=Math.min(14000,Math.max(800,height))+'px';});
 // Render the workspace immediately; network dependencies settle independently.
 buildSites();readRoute();
 api('/assets/fixture.json').then(value=>{fixture=value;window.demoWorld=new World(fixture);render();}).catch(error=>notice(error.message));

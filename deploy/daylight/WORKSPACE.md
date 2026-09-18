@@ -1,5 +1,12 @@
 # Site workspace
 
+The shared saved-session viewer is a separate local-review increment; see
+[integration and validation notes](../../docs/agents/shared-trace-viewer.md).
+It preserves the workspace's existing views and adds the shared readable renderer
+with browser-specific tools-only, available tools and screenshot replay controls
+for published library sessions. PC API/build integration remains a coordinated
+backend dependency before deployment.
+
 The authenticated `/` and `/workspace` entry points organize the reviewed task
 registry by site and collection. `/workspace/replays` lists the current invitation's
 BrowserGym jobs and original browser-side traces. `/demo` retains the original

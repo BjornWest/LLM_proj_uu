@@ -332,3 +332,5 @@ body.site-fullscreen{overflow:hidden}
 
 .remote-shared-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}.remote-browser-pane{min-width:0}.remote-agent{position:sticky;top:16px;max-height:80vh;text-align:left}.remote-agent .composer-footer{flex-wrap:wrap;gap:8px}.remote-agent .message{overflow-wrap:anywhere}.remote-agent pre{white-space:pre-wrap;overflow-wrap:anywhere}.remote-agent #remote-question{min-height:90px}.remote-agent .agent-heading h2{font-size:18px}
 @media(max-width:1150px){.remote-shared-layout{grid-template-columns:1fr}.remote-agent{position:static;max-height:600px}}
+
+#shared-trace-viewer{display:block;width:100%;min-height:800px;border:1px solid var(--line);border-radius:12px;background:#f6f8f3}#shared-trace-viewer[hidden]{display:none}#global-library-more,#site-library-more{margin:8px 0 8px 10px}
