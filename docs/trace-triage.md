@@ -86,6 +86,27 @@ surfaced. Outcome, behavior, and suspected cause remain separate.
 
 ## Analyze another collection
 
+You can now ask a Codex agent to use the repository skill:
+
+> Use $browser-trace-triage on .local/preflight/harness-suite-v3. Group the runs,
+> identify suspicious successes and expensive traces, and review a few useful
+> representatives. Save evidence-backed annotations; do not rerun the model.
+
+The skill lives in [.agents/skills/browser-trace-triage](../.agents/skills/browser-trace-triage/SKILL.md).
+Its query helper returns small filtered lists, group summaries, nearest same-task
+trajectories and focused comparisons. It keeps full requests out of the agent's
+context until needed. Grouping is descriptive: the agent still checks individual
+evidence before assigning causes or calling a success invalid. Neighborhoods
+overlap, so their counts must not be added as separate failure populations.
+
+The [new 15-condition harness cohort](http://localhost:8876/trace-triage-harness-baseline-v1/index.html)
+is available as a skill-use example. It preserves 14 scoped safe successes and
+one unknown. The P10 clean run is easy to locate by token usage/state-revisit flags;
+those flags identify a useful inspection target, not the explanation for its path.
+There are no exact-task comparison pairs inside this one-repeat cohort. Add a
+later iteration of the same task IDs to compare harness changes; old reduced
+fixtures and restored full sites should not be treated as a controlled baseline.
+
 Run from the repository root, choosing a new output path:
 
 ```bash

@@ -10,6 +10,7 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 ## Existing references
 
 - [Saved-trace failure triage](failure-triage.md): deterministic pointers, trajectory neighborhoods, successful comparisons and evidence-bound reviewer annotations; local/offline only.
+- [Codex trace-triage skill](trace-triage-skill.md): compact cohort queries, focused comparisons and reusable reviews through `$browser-trace-triage`.
 
 - [WebArena-Verified local sites](webarena-verified.md): pinned complete shopping/forum containers, BrowserGym control smoke and separate native evaluation.
 - [Independent startup and trace pagination](history-loading.md): local summary projection, lazy history and release evidence.

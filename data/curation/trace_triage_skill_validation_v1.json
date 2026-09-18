@@ -1,0 +1,66 @@
+{
+  "schema": "trace-triage-skill-validation-v1",
+  "skill_path": ".agents/skills/browser-trace-triage",
+  "structural_validation_passed": true,
+  "query_tests_passed": 4,
+  "discovery": {
+    "method": "local shared Codex server skills/list with forceReload",
+    "name": "browser-trace-triage",
+    "enabled": true,
+    "scope": "repo",
+    "matches": 1
+  },
+  "skill_sha256": {
+    ".agents/skills/browser-trace-triage/SKILL.md": "96a2ae3d486b727372f2616e7d610aa11794bc1578c0446cf98c0a73154e7779",
+    ".agents/skills/browser-trace-triage/agents/openai.yaml": "42d8eab8c5d0a703344c449ca14590ae110eeeea1248d00b222c70c38d7c89b0",
+    ".agents/skills/browser-trace-triage/references/commands.md": "064107fcfb5fcb79c3c9e925649ba440f10506f906f80b29fef12b4aa04035cf",
+    ".agents/skills/browser-trace-triage/references/reviewing.md": "c5cf5967457d267d58e0903d4b9c350e7dd7fc08ee95133e7f7d835a6f089799",
+    ".agents/skills/browser-trace-triage/scripts/query_traces.py": "f5e1a442fe62cb0393d8c32bcf1c93c348d38947b357ab7336e7ed331b0bcd7e",
+    ".agents/skills/browser-trace-triage/scripts/test_query_traces.py": "5ef761601a4b2af3a5dcbce907909bc8e5b0102c9f5186c7c3e9d97a26dcadb1"
+  },
+  "saved_queries": {
+    "old_report_sha256": "def8742e1c3f689dd97e6c672ada3c760f146626d28618770953358d7d6a4d8b",
+    "same_task_success_candidates": 3,
+    "first_pair_common_action_prefix": 3,
+    "new_report_sha256": "189a6dccef8fea1b7cffaafb16c84e4e4ff6015c65bdd4e8b3086a7a2f13a4a2",
+    "new_outcomes": {
+      "success": 14,
+      "unknown": 1
+    },
+    "p10_token_sort_first": "20260918T151049Z-bd86d113",
+    "p10_known_tokens": 151789
+  },
+  "new_export_validation": {
+    "schema": "trace-triage-mvp-validation-v1",
+    "report": ".local/review/trace-triage-harness-baseline-v1",
+    "report_sha256": "189a6dccef8fea1b7cffaafb16c84e4e4ff6015c65bdd4e8b3086a7a2f13a4a2",
+    "manifest_sha256": "225f44ebbeb099ebd5b3f708e4cd4cdd22fef206476cd532d5137d5c27d702df",
+    "episodes": 15,
+    "outcomes": {
+      "success": 14,
+      "unknown": 1
+    },
+    "source_files_checked": 255,
+    "step_projections_checked": 65,
+    "export_hashes_checked": 352,
+    "raw_usage_totals_independently_checked": true,
+    "model_calls": 0,
+    "task_browser_runs": 0,
+    "ui": {
+      "filters": true,
+      "token_sort": true,
+      "control_sample": true,
+      "success_comparisons": false,
+      "step_links": true,
+      "mobile_no_overflow": true,
+      "javascript_errors": [],
+      "http_requests": 0
+    }
+  },
+  "model_calls": 0,
+  "agent_delegation_tests": 0,
+  "limitations": [
+    "Script/format/discovery checks, not independent Codex behavior validation.",
+    "Single-repeat new cohort has no exact-task comparison pairs."
+  ]
+}
