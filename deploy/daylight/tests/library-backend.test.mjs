@@ -1,0 +1,90 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,writeFile,readFile,mkdir,rm,symlink,readdir} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {createHash} from 'node:crypto';
+import {createServer} from 'node:http';
+import {TraceLibrary} from '../lib/library.mjs';
+import {SqliteStore} from '../lib/sqlite-store.mjs';
+import {controlHandler} from '../control-server.mjs';
+import {createHandler} from '../api/index.mjs';
+import {config,digest,login} from '../lib/auth.mjs';
+const hash=v=>createHash('sha256').update(v).digest('hex');
+async function fixture(t){
+ const root=await mkdtemp(tmpdir()+'/trace-library-test-');t.after(()=>rm(root,{recursive:true,force:true}));
+ const store=new SqliteStore(root+'/state.sqlite');t.after(()=>store.close());
+ const library=new TraceLibrary(store,{root:root+'/library'}),bundle=root+'/bundle';await mkdir(bundle);
+ const session={id:'recorded-id',title:'Example',environment:'browsergym',state:'recorded',message_count:1,messages:[{kind:'observation',text:'<script>unsafe</script>',attachments:[{url:'/artifacts/test.png',image:true}]}]};
+ const raw=Buffer.from('retained bytes'),info={sha256:hash(raw),bytes:raw.length};
+ const assets={'/artifacts/test.png':{path:'image.png',mime_type:'image/png',...info}};
+ const files={'session.json':Buffer.from(JSON.stringify(session)),'assets.json':Buffer.from(JSON.stringify(assets)),'image.png':raw};
+ const manifest={schema_version:1,kind:'browsergym-saved-replay-v1',read_only:true,grader_recomputed:false,viewer_session_id:session.id,raw_outcomes:{task_completed:false,authorization_satisfied:true,safe_success:null},files:{}};
+ for(const [name,raw] of Object.entries(files)){await writeFile(bundle+'/'+name,raw);manifest.files[name]={sha256:hash(raw),bytes:raw.length};}
+ await writeFile(bundle+'/manifest.json',JSON.stringify(manifest));
+ return {root,store,library,bundle,manifest,session,raw};
+}
+test('explicit immutable publication, exact outcome nulls, original preservation, byte dedup and idempotence',async t=>{
+ const {library,bundle,store,raw}=await fixture(t);const result=await library.publish(bundle,'alice');
+ assert.equal(result.interaction_kind,null);assert.equal(result.site_id,null);assert.equal(result.evaluation.safe_success,null);
+ assert.deepEqual(await library.publish(bundle,'alice'),result);
+ assert.equal((await library.list('alice')).sessions.length,1);assert.equal((await library.list('bob')).sessions.length,0);
+ const record=await library.record('alice',result.id);assert.deepEqual(await library.bytes(record.originals['image.png']),raw);
+ const projection=JSON.parse((await library.session('alice',result.id)).raw);assert.equal(projection.library_metadata.original_session_id,'recorded-id');
+ assert.match(projection.messages[0].attachments[0].url,new RegExp('^/api/library/sessions/'+result.id+'/assets/[a-f0-9]{64}$'));
+ const other=await library.publish(bundle,'bob');assert.notEqual(other.id,result.id);
+ assert.deepEqual((await library.record('bob',other.id)).originals,record.originals);
+ await assert.rejects(library.session('bob',result.id),{status:404});
+ await assert.rejects(library.asset('bob',result.id,Object.keys(record.assets)[0]),{status:404});
+ const renamed=await library.publish(bundle,'alice',{site_id:'explicit-site'});assert.notEqual(renamed.id,result.id);
+});
+test('catalog is paged summaries only; invalid cursors, IDs, limits and guessed objects fail closed',async t=>{
+ const {library,bundle}=await fixture(t);for(let i=0;i<3;i++)await library.publish(bundle,'alice',{metadata_source:String(i)});
+ const originalBytes=library.bytes.bind(library);library.bytes=()=>{throw Error('Catalog must not read projections or objects');};
+ const first=await library.list('alice',{limit:2}),last=await library.list('alice',{limit:2,cursor:first.cursor});
+ assert.equal(first.sessions.length,2);assert.equal(last.sessions.length,1);assert.equal(last.has_more,false);
+ assert(!first.sessions.some(s=>'messages' in s));
+ for(const input of [{limit:0},{limit:101},{cursor:'../bob'},{limit:1.5}])await assert.rejects(library.list('alice',input),{status:400});
+ library.bytes=originalBytes;await assert.rejects(library.asset('alice',first.sessions[0].id,'f'.repeat(64)),{status:404});
+});
+test('hash tampering, traversal and symlink bundles never become visible',async t=>{
+ const {library,bundle,manifest}=await fixture(t);
+ await writeFile(bundle+'/image.png','changed');await assert.rejects(library.publish(bundle,'alice'),/hash/);assert.equal((await library.list('alice')).sessions.length,0);
+ manifest.files={'../escape':{}};await writeFile(bundle+'/manifest.json',JSON.stringify(manifest));await assert.rejects(library.publish(bundle,'alice'),/path/);
+ manifest.files={'link':{}};await writeFile(bundle+'/manifest.json',JSON.stringify(manifest));await symlink('/etc/passwd',bundle+'/link');await assert.rejects(library.publish(bundle,'alice'),/symlink/);
+});
+test('publication interrupted before catalog finalization resumes safely without duplicate object writes',async t=>{
+ const {library,bundle}=await fixture(t),original=library.put.bind(library);let writes=0;
+ library.put=async raw=>{if(++writes===3)throw Error('Simulated disk interruption');return original(raw);};
+ await assert.rejects(library.publish(bundle,'alice'),/interruption/);assert.equal((await library.list('alice')).sessions.length,0);
+ library.put=original;const result=await library.publish(bundle,'alice');assert.equal((await library.list('alice')).sessions[0].id,result.id);
+});
+test('actual invitation API → authenticated PC library: owner/role isolation, conditional reads, ranges, streaming, no publication route',async t=>{
+ const {library,bundle,root,store,raw}=await fixture(t),row=await library.publish(bundle,'alice');
+ const env={DAYLIGHT_LIBRARY_ROOT:root+'/library',DAYLIGHT_CONTROL_TOKEN:'c'.repeat(64),HARNESS_WORKER_TOKEN:'w'.repeat(64),DEMO_SESSION_SECRET:'s'.repeat(64),DEMO_INVITES_JSON:JSON.stringify({alice:digest('alice-code'.repeat(5)),bob:digest('bob-code'.repeat(5))})};
+ const backHandler=controlHandler({store,env}),back=createServer(backHandler);await new Promise(r=>back.listen(0,'127.0.0.1',r));
+ env.DAYLIGHT_CONTROL_URL='http://127.0.0.1:'+back.address().port;
+ const front=createServer(createHandler({env,local:true}));await new Promise(r=>front.listen(0,'127.0.0.1',r));
+ t.after(async()=>{backHandler.shutdown();for(const server of [front,back]){server.closeAllConnections();await new Promise(r=>server.close(r));}});
+ const origin='http://127.0.0.1:'+front.address().port;
+ const cookie=who=>'daylight_session='+login((who+'-code').repeat(5),config(env));
+ const get=(url,owner='alice',headers={})=>fetch(origin+url,{headers:{cookie:cookie(owner),...headers},redirect:'manual'});
+ assert.equal((await fetch(origin+'/api/library/sessions')).status,401);
+ assert.equal((await get('/trace-viewer')).status,200);
+ assert.equal((await get('/assets/trace-browser.js')).status,200);
+ assert.equal((await fetch(origin+'/assets/trace-browser.js',{redirect:'manual'})).status,303);
+ const catalog=await (await get('/api/library/sessions')).json();assert.equal(catalog.sessions[0].id,row.id);
+ assert.deepEqual((await (await get('/api/library/sessions','bob')).json()).sessions,[]);
+ const url='/api/library/sessions/'+row.id,session=await get(url),etag=session.headers.get('etag'),projection=await session.json();
+ assert.equal((await get(url,'alice',{'if-none-match':etag})).status,304);
+ assert.equal((await get(url,'bob',{'if-none-match':etag})).status,404);
+ const assetURL=projection.messages[0].attachments[0].url;
+ assert.deepEqual(Buffer.from(await (await get(assetURL)).arrayBuffer()),raw);
+ const range=await get(assetURL,'alice',{range:'bytes=2-5'});assert.equal(range.status,206);assert.equal(range.headers.get('content-range'),'bytes 2-5/'+raw.length);assert.deepEqual(Buffer.from(await range.arrayBuffer()),raw.subarray(2,6));
+ assert.equal((await get(assetURL,'alice',{range:'bytes=999-'})).status,416);
+ assert.equal((await get(assetURL,'bob')).status,404);
+ assert.equal((await get('/api/library/sessions?limit=1000')).status,400);
+ const request=route=>fetch(env.DAYLIGHT_CONTROL_URL+route,{method:'POST',headers:{authorization:'Bearer '+env.HARNESS_WORKER_TOKEN},body:JSON.stringify({owner:'alice'})});
+ assert.equal((await request('/internal/library/list')).status,401);
+ assert.equal((await fetch(env.DAYLIGHT_CONTROL_URL+'/internal/library/publish',{method:'POST',headers:{authorization:'Bearer '+env.DAYLIGHT_CONTROL_TOKEN},body:'{}'})).status,404);
+ assert.equal((await fetch(origin+'/api/library/sessions',{method:'POST',headers:{cookie:cookie('alice'),origin},body:'{}'})).status,405);
+});

@@ -5,6 +5,10 @@ import {SqliteStore} from './lib/sqlite-store.mjs';
 import {Harness,workerAuthorized} from './lib/harness.mjs';
 import {Manual} from './lib/manual.mjs';
 import {Agent} from './lib/agent.mjs';
+import {TraceLibrary} from './lib/library.mjs';
+import {createReadStream} from 'node:fs';
+import {pipeline} from 'node:stream/promises';
+import path from 'node:path';
 
 const authorized=(header,token)=>{
   if(typeof token!=='string'||token.length<43||typeof header!=='string')return false;
@@ -14,6 +18,7 @@ const authorized=(header,token)=>{
 export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
   if(!env.DAYLIGHT_CONTROL_TOKEN||env.DAYLIGHT_CONTROL_TOKEN.length<43)throw Error('Control token required');
   const manual=new Manual(store,{env,fetcher});
+  const library=new TraceLibrary(store,{root:env.DAYLIGHT_LIBRARY_ROOT||path.join(path.dirname(env.DAYLIGHT_SQLITE_PATH||'.local/control/state.sqlite'),'library')});
   const handler=async(req,res)=>{
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json');
     const send=(status,value)=>{res.statusCode=status;res.end(JSON.stringify(value));};
@@ -24,14 +29,24 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
     try {
       const operation=route.split('/').at(-1);
       const isManual=route.startsWith('/internal/manual/');
+      const isLibrary=['/internal/library/list','/internal/library/session','/internal/library/asset'].includes(route);
       if(worker?!['poll','checkpoint','reserve','artifact','update'].includes(operation):
-        isManual?!['config','start','list','read','action','observe','close','artifact','ask','interrupt'].includes(operation):
+        isLibrary?false:isManual?!['config','start','list','read','action','observe','close','artifact','ask','interrupt'].includes(operation):
         !['/internal/store/read','/internal/store/write','/internal/store/list','/internal/store/trace-list'].includes(route))return send(404,{error:'Not found'});
       const chunks=[];let size=0;
       for await(const chunk of req){size+=chunk.length;if(size>16*1024*1024)return send(413,{error:'Request too large'});chunks.push(chunk);}
       let value;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{return send(400,{error:'Invalid JSON'});}
       if(!value||typeof value!=='object'||Array.isArray(value))return send(400,{error:'Invalid request'});
       if(env.DAYLIGHT_CONTROL_READ_ONLY==='1'&&(worker||operation==='write'||isManual))return send(503,{error:'Storage maintenance; no writes accepted'});
+      if(isLibrary){
+        if(operation==='list')return send(200,await library.list(value.owner,value));
+        if(operation==='session'){const result=await library.session(value.owner,value.id);res.setHeader('ETag',result.etag);res.end(result.raw);return;}
+        const asset=await library.asset(value.owner,value.id,value.attachment,value.range);
+        res.statusCode=asset.status;res.setHeader('Content-Type',asset.type);res.setHeader('Content-Length',asset.end-asset.start+1);res.setHeader('ETag',asset.etag);res.setHeader('Accept-Ranges','bytes');
+        if(asset.status===206)res.setHeader('Content-Range',`bytes ${asset.start}-${asset.end}/${asset.size}`);
+        if(asset.size===0){res.end();return;}
+        await pipeline(createReadStream(asset.file,{start:asset.start,end:asset.end}),res);return;
+      }
       if(worker)return send(200,await new Harness(store,{env})[operation](value));
       if(operation==='trace-list')return send(200,await new Agent(store,{env}).list(value.owner,{cursor:value.cursor,limit:value.limit??25}));
       if(isManual){
@@ -48,7 +63,8 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
       return send(200,result);
     }catch(error){
       // No request bodies, tokens or database contents in logs/errors.
-      const status=[400,404,409,413,429,503].includes(error.status)?error.status:503;
+      if(res.headersSent){res.destroy();return;}
+      const status=[400,404,409,413,416,429,503].includes(error.status)?error.status:503;
       if(status===503)console.error(JSON.stringify({event:'control_request_failed',status}));
       return send(status,{error:status===409?'Storage conflict':'Control request failed'});
     }

@@ -1,6 +1,7 @@
 import {mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
+import {prepareViewer} from './prepare-viewer.mjs';
 const source=path.resolve('../../environments/demo');
 await mkdir('private-assets',{recursive:true});await mkdir('public',{recursive:true});
 // Vercel rejects an empty output directory. This contains no application data;
@@ -32,8 +33,9 @@ for(const [file,expected] of Object.entries(inspectionManifest.files)){
  const dest=path.join('private-assets/inspection-full/dist',file);await mkdir(path.dirname(dest),{recursive:true});await writeFile(dest,raw);
 }
 await copyFile(path.join(inspectionRoot,'manifest.json'),'private-assets/inspection-full/manifest.json');
-const files=['index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css',...inspectionNames.map(name=>'inspection-'+name+'/manifest.json')];
+const viewerFiles=await prepareViewer(path.resolve('private-assets'));
+const files=[...viewerFiles,'index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css',...inspectionNames.map(name=>'inspection-'+name+'/manifest.json')];
 const hashes={};for(const file of files)hashes[file]=createHash('sha256').update(await readFile('private-assets/'+file)).digest('hex');
-const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','../../config/team_tasks.json','../../config/team_sites.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
+const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/library-client.mjs','prepare-viewer.mjs','vendor/agent_trace/provenance.json','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','../../config/team_tasks.json','../../config/team_sites.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
 await writeFile('private-assets/provenance.json',JSON.stringify({runtime:'daylight-client-demo-v1',commit:process.env.VERCEL_GIT_COMMIT_SHA||null,assets:hashes,server},null,2));
 console.log('Built private assets; public/ contains only robots.txt.');

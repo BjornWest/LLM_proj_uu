@@ -5,6 +5,9 @@ import {config,login,authenticate,sessionCookie} from '../lib/auth.mjs';
 import {StorageError} from '../lib/store.mjs';
 import {configuredStore} from '../lib/remote-store.mjs';
 import {ManualClient} from '../lib/manual-client.mjs';
+import {LibraryClient} from '../lib/library-client.mjs';
+import {Readable} from 'node:stream';
+import {pipeline} from 'node:stream/promises';
 import {inspectionAsset,inspectionHTML,inspectionCSP,inspectionRevision} from '../lib/inspection.mjs';
 import {createHash} from 'node:crypto';
 import {Agent,completionTokenLimit} from '../lib/agent.mjs';
@@ -13,7 +16,7 @@ import {Harness,workerAuthorized} from '../lib/harness.mjs';
 // Resolve beside this module, including when the function starts at the monorepo root.
 const assets=fileURLToPath(new URL('../private-assets/',import.meta.url));
 const TYPES={html:'text/html; charset=utf-8',css:'text/css',js:'text/javascript',json:'application/json; charset=utf-8'};
-const allowed=new Set(['style.css','site.html','site.js','rooms.js','dashboard.js','world.js','observation.js','fixture.json','harness.js','harness.css','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css']);
+const allowed=new Set(['style.css','site.html','site.js','rooms.js','dashboard.js','world.js','observation.js','fixture.json','harness.js','harness.css','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css','trace-viewer.js','trace-viewer.css','trace-viewer-source.json','trace-browser.js','trace-browser.css']);
 const loginHTML=`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Daylight · Private demo</title><body style="font:17px system-ui;background:#f3f1f8;color:#292638;max-width:420px;margin:15vh auto;padding:24px"><h1>✳ Daylight</h1><p>A private demo for our project team.</p><form method="post" action="/login"><label for="code">Your invitation code</label><input id="code" name="code" type="password" required autocomplete="current-password" maxlength="200" style="display:block;width:100%;box-sizing:border-box;padding:14px;margin:12px 0"><button style="padding:12px 24px">Open demo</button></form><p style="font-size:14px">Ask Bjorn for your code. No model account needed.</p></body></html>`;
 async function body(req,limit=75000) {
   if(req.body && typeof req.body==='object') {
@@ -79,6 +82,27 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         return send(200,asset.raw,asset.type);
       }
       if(req.method==='POST'&&env.DAYLIGHT_STORAGE_MAINTENANCE==='1')return send(503,{error:'Storage maintenance. Please try again after the migration.'});
+      if(url.pathname.startsWith('/api/library/')){
+        if(req.method!=='GET')return send(405,{error:'Read only'});
+        if(!env.DAYLIGHT_CONTROL_URL){if(url.pathname==='/api/library/sessions')return send(200,{sessions:[],has_more:false,cursor:null});return send(404,{error:'Saved session not found'});}
+        const library=new LibraryClient({env,fetcher});stage='trace_library';
+        if(url.pathname==='/api/library/sessions'){
+          const result=await library.call('list',{owner,cursor:url.searchParams.get('cursor')||undefined,limit:url.searchParams.has('limit')?Number(url.searchParams.get('limit')):25});
+          return send(200,await result.json());
+        }
+        const match=url.pathname.match(/^\/api\/library\/sessions\/([a-f0-9]{20})(?:\/assets\/([a-f0-9]{64}))?$/);
+        if(!match)return send(404,{error:'Saved session not found'});
+        const [,id,attachment]=match,result=await library.call(attachment?'asset':'session',{owner,id,...(attachment?{attachment,range:req.headers.range}: {})});
+        // Authorization occurs upstream before any conditional response. Revalidate on
+        // each access so logging out or changing owner never exposes cached evidence.
+        const etag=result.headers.get('etag');res.setHeader('Cache-Control','private, no-cache');res.setHeader('Vercel-CDN-Cache-Control','no-store');
+        if(etag)res.setHeader('ETag',etag);
+        if(etag&&req.headers['if-none-match']===etag){await result.body?.cancel();res.statusCode=304;return res.end();}
+        res.statusCode=result.status;
+        for(const name of ['content-type','content-length','content-range','accept-ranges'])if(result.headers.has(name))res.setHeader(name,result.headers.get(name));
+        if(attachment)res.setHeader('Content-Disposition','inline');
+        await pipeline(Readable.fromWeb(result.body),res);return;
+      }
       if(url.pathname.startsWith('/api/manual/')){
         if(!env.DAYLIGHT_CONTROL_URL){if(url.pathname==='/api/manual/config'&&req.method==='GET')return send(200,{enabled:false,sites:[]});return send(503,{error:'Manual environments are not configured.'});}
         const manual=new ManualClient({env});stage='manual_browser';
@@ -164,9 +188,9 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         return send(404,{error:'Not found'});
       }
       if(req.method!=='GET')return send(405,{error:'Method not allowed'});
-      let file=['/','/workspace','/workspace/replays'].includes(url.pathname)?'workspace.html':url.pathname==='/demo'?'index.html':url.pathname==='/harness'?'harness.html':url.pathname.startsWith('/assets/')?url.pathname.slice(8):null;
+      let file=['/','/workspace','/workspace/replays'].includes(url.pathname)?'workspace.html':url.pathname==='/demo'?'index.html':url.pathname==='/harness'?'harness.html':url.pathname==='/trace-viewer'?'trace-viewer.html':url.pathname.startsWith('/assets/')?url.pathname.slice(8):null;
       if(/^\/world\/[a-z0-9-]+\/(shop|booking|preferences)$/.test(url.pathname))file='site.html';
-      if(!['index.html','harness.html','workspace.html'].includes(file)&&!allowed.has(file))return send(404,{error:'Not found'});
+      if(!['index.html','harness.html','workspace.html','trace-viewer.html'].includes(file)&&!allowed.has(file))return send(404,{error:'Not found'});
       stage='private_assets';
       if(file==='inspection.js'||file==='inspection.css'){
         const raw=await readFile(path.join(assetRoot,file)),etag='"'+createHash('sha256').update(raw).digest('hex')+'"';
