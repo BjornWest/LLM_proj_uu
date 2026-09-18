@@ -1,0 +1,33 @@
+{
+  "schema": "trace-triage-validation-v1",
+  "report": ".local/review/trace-triage-v2",
+  "manifest_sha256": "ac5b0164a6c9b3eb3a2b5936a23b84624a3e6d7bfb033027bf4078fc8e254534",
+  "triage_sha256": "6ff2f1f6b84dc01bac29c8d0b8d1b25d835d1a9ddb1fdd025cf3ef84ba939c47",
+  "validator_sha256": "6f9b7dd2f56bf729c6c21c38dc3efc3b8d4539c9e67e8153e74d33dde5bf3b13",
+  "episodes": 42,
+  "outcomes": {
+    "failure": 10,
+    "success": 30,
+    "unknown": 2
+  },
+  "export_hash_checks": 626,
+  "source_byte_equality_checks": 540,
+  "known_feedback_pointers_recovered": 12,
+  "all_feedback_pointers_string_checked": 65,
+  "causal_labels_validated": false,
+  "model_calls": 0,
+  "browser_agent_runs": 0,
+  "ui": {
+    "rows": 42,
+    "failure_filter": 10,
+    "unknown_filter": 2,
+    "comparison_candidates": 3,
+    "step_link_reload": true,
+    "flag_filter": true,
+    "search": true,
+    "mobile_no_overflow": true,
+    "page_errors": [],
+    "http_requests": 0,
+    "scope": "Headless local file viewer only, no task environment"
+  }
+}

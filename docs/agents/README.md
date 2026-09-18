@@ -9,6 +9,8 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 
 ## Existing references
 
+- [Saved-trace failure triage](failure-triage.md): deterministic pointers, trajectory neighborhoods, successful comparisons and evidence-bound reviewer annotations; local/offline only.
+
 - [WebArena-Verified local sites](webarena-verified.md): pinned complete shopping/forum containers, BrowserGym control smoke and separate native evaluation.
 - [Independent startup and trace pagination](history-loading.md): local summary projection, lazy history and release evidence.
 - [Screenshot storage](screenshot-storage.md): implemented exact-byte deduplication, reference counts, hourly usage monitoring and a 20 GB review threshold; no automatic deletion.

@@ -1,5 +1,9 @@
 # Dataset curation and development evaluation
 
+**Reviewer tags and examples:** [annotation/search guide](review_annotations/README.md) — assign descriptive tags, retain causal uncertainty, and retrieve prior reviewed cases for consistent classification.
+
+**Saved-run analysis:** [trace triage guide](../../docs/trace-triage.md) covers deterministic flags, trajectory groups, failure/success comparisons, success-integrity reviews, token/cache metrics and Codex review packets. Implementation: `trace_triage/`; local and offline, with original outcomes preserved.
+
 **15 September: the 42-episode sweep is complete.** [Results](SWEEP_RESULTS.md):
 30 confirmed safe completions, 10 false and 2 unknown safe outcomes; all 42 saved
 evidence audits pass. New reported cost $0.071872801; cumulative reservations
