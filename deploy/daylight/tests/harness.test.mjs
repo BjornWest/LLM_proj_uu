@@ -47,7 +47,7 @@ test('owner isolation and fixed/rehearsal task contract enforced by server',asyn
 test('external task objectives/revisions are fixed and generated goals become immutable',async t=>{
   const {h}=await fixture(t),worker_id=randomUUID(),tasks=TASKS.map(t=>t.id);
   await h.poll({worker_id,mode:'live',tasks,task_revisions:Object.fromEntries(TASKS.map(t=>[t.id,t.revision]))});
-  const visible=await h.config();assert.equal(visible.tasks.length,15);
+  const visible=await h.config();assert.equal(visible.tasks.length,TASKS.length);
   for(const item of visible.tasks)for(const key of ['source_sha256','build','selector','kind'])assert.equal(key in item,false);
   const fixed=TASKS.find(t=>t.id==='tricky-p07-clean');
   await assert.rejects(h.start('alice',{task:fixed.id,goal:'Buy an extra warranty'}),/fixed validated goal/);
@@ -124,4 +124,42 @@ test('complete-site tasks require matching worker revision before start and disp
  assert.deepEqual(await h.poll({worker_id,mode:'live',tasks:[task.id],task_revisions:{[task.id]:'old'}}),{job:null});
  assert.deepEqual((await store.read('daylight/harness/control-v1.json')).value.jobs[created.id],before);
  assert.equal((await h.poll({worker_id,mode:'live',tasks:[task.id],task_revisions})).job.id,created.id);
+});
+
+test('expanded contracts require matching live revision and retain exact public goals',async t=>{
+  const {h}=await fixture(t),worker_id=randomUUID(),task=TASKS.find(t=>t.id==='tricky:AU01');
+  assert.equal(TASKS.filter(t=>t.expanded).length,203);
+  await h.poll({worker_id,mode:'live',tasks:[task.id],task_revisions:{[task.id]:'stale'}});
+  assert.equal((await h.config()).tasks.find(t=>t.id===task.id).available,false);
+  await assert.rejects(h.start('alice',{task:task.id,task_revision:task.revision}),/not available/);
+  await h.poll({worker_id,mode:'rehearsal',tasks:[task.id],task_revisions:{[task.id]:task.revision}});
+  assert.equal((await h.config()).tasks.find(t=>t.id===task.id).available,false);
+  await h.poll({worker_id,mode:'live',tasks:[task.id],task_revisions:{[task.id]:task.revision}});
+  await assert.rejects(h.start('alice',{task:task.id}),/revision changed/);
+  await assert.rejects(h.start('alice',{task:task.id,task_revision:task.revision,goal:'Changed objective'}),/fixed validated goal/);
+  const job=await h.start('alice',{task:task.id,task_revision:task.revision,interaction_kind:'task'});
+  assert.equal(job.goal,task.goal);assert.equal(job.site_id,task.site_id);
+  for(const field of ['contract','grader_input','private_contract','policy_input','setup'])assert.equal(field in task,false);
+});
+
+test('expanded limits follow pinned task and authoritative publication follows grading phase',async t=>{
+  const {h}=await fixture(t),worker_id=randomUUID(),task=TASKS.find(t=>t.id==='webarena:117');
+  const capability={worker_id,mode:'live',tasks:[task.id],task_revisions:{[task.id]:task.revision}};
+  await h.poll(capability);await h.start('alice',{task:task.id,task_revision:task.revision});
+  const job=(await h.poll(capability)).job;
+  await assert.rejects(h.reserve({...job,step:task.execution_limits.max_steps,input_bytes:1,request_sha256:'a'.repeat(64)}),/request index/);
+  const receipt=await h.reserve({...job,step:0,input_bytes:300000,request_sha256:'a'.repeat(64)});
+  assert.equal(receipt.amount_usd,(300000+2048)*.5/1e6+512*4/1e6);
+  await assert.rejects(h.update({...job,snapshot:{steps:[],evaluation:{task_completed:true}}}),/terminal-only/);
+  await assert.rejects(h.update({...job,snapshot:{steps:[],status:'finished',evaluation:{task_completed:true}}}),/authoritative final/);
+  const evaluation={task_completed:true,authorization_satisfied:null,safe_success:null};
+  await h.update({...job,snapshot:{steps:[],status:'finished',evaluation,grading_phase:'after_browser_close',evaluation_source:'authoritative-evaluation.json'}});
+  const saved=await h.read('alice',job.id);assert.deepEqual(saved.evaluation,evaluation);
+  assert.equal(saved.grading_phase,'after_browser_close');assert.equal(saved.evaluation_source,'authoritative-evaluation.json');
+});
+
+test('legacy task bounds stay at twelve decisions and 250k request bytes',async t=>{
+  const {h}=await fixture(t),job=await claim(h,'live');
+  await assert.rejects(h.reserve({...job,step:12,input_bytes:1,request_sha256:'a'.repeat(64)}),/request index for task/);
+  await assert.rejects(h.reserve({...job,step:0,input_bytes:250001,request_sha256:'a'.repeat(64)}),/task bound/);
 });

@@ -1,6 +1,7 @@
 // Presentation metadata is separate from task contracts, execution mode and grades.
 import {createHash} from 'node:crypto';
 import sites from '../../../config/team_sites.json' with {type:'json'};
+import expanded from '../../../config/expanded_team_tasks.json' with {type:'json'};
 const siteRevision=createHash('sha256').update(JSON.stringify(sites)).digest('hex');
 const insist=(ok,message)=>{if(!ok)throw Object.assign(Error(message),{status:400});};
 export function interactionKind(value) {
@@ -9,6 +10,9 @@ export function interactionKind(value) {
   return kind;
 }
 export function siteForTask(id) {
+  const added=expanded.tasks.find(task=>task.id===id);
+  if(added)return {site_id:added.site_id,site_name:added.site_name,collection:added.collection,
+    collection_name:added.collection_name,site_registry_revision:expanded.catalog_sha256};
   const matches=sites.sites.filter(site=>site.tasks.includes(id));
   if(sites.schema_version!==1||matches.length!==1)throw Error('Task has no unique reviewed site mapping');
   return {site_id:matches[0].id,site_name:matches[0].name,collection:matches[0].collection,

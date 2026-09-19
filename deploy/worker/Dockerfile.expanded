@@ -1,0 +1,20 @@
+# Build context is the explicit output of scripts/package_expanded_worker.py,
+# not the repository. Existing certified tasks retain their original interpreter
+# dependencies and browser loop; new tasks use a separate source root/process.
+ARG LEGACY_IMAGE=intent-browser-worker:full-sites-v2
+FROM ${LEGACY_IMAGE}
+USER root
+COPY overlay/ /app/
+COPY runtime/ /opt/expanded/runtime/
+COPY registry.json manifest.json /opt/expanded/
+# Native HAR grading has conflicting exact dependencies. Keep it out of the
+# BrowserGym environment and never install dependencies during a rollout.
+RUN python -m venv /opt/native-grader \
+    && /opt/native-grader/bin/pip install --no-cache-dir webarena-verified==1.2.3
+ARG REGISTRY_SHA256
+ENV HARNESS_EXPANDED_EXECUTION_ROOT=/opt/expanded/runtime \
+    HARNESS_EXPANDED_REGISTRY=/opt/expanded/registry.json \
+    HARNESS_EXPANDED_REGISTRY_SHA256=${REGISTRY_SHA256} \
+    HARNESS_FULL_FIXTURES_DIR=/fixtures/tricky-full-v1 \
+    HARNESS_NATIVE_EVALUATOR_PYTHON=/opt/native-grader/bin/python
+USER 10001:10001

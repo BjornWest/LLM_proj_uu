@@ -10,6 +10,48 @@ from intent_browser.team_worker import TeamBackend, Broker, Publisher
 from intent_browser.backend import BackendResponseError
 
 
+@pytest.mark.parametrize('result_kind', ['graded', 'technical_error', 'missing'])
+def test_publisher_uses_authoritative_artifact_and_archives_both_phases(tmp_path, result_kind):
+    import zipfile
+    from intent_browser.task_finalization import finalize_task_run
+    from intent_browser.evaluation import Evaluation
+    directory = tmp_path / 'episode'; directory.mkdir()
+    original = Evaluation('pre-close', '1', task_completed=None).to_dict()
+    (directory / 'evaluation.json').write_text(json.dumps(original))
+    (directory / 'episode.json').write_text(json.dumps({'evaluation': original}))
+    (directory / 'events.jsonl').write_text(json.dumps({'event': 'environment_close_completed'}) + '\n')
+    calls = []
+    class Broker:
+        def post(self, operation, value): calls.append((operation, value)); return {}
+    publisher = Publisher(Broker(), {'id': 'job', 'lease': 'lease'}, tmp_path)
+    publisher.directory = directory
+    publisher.project = lambda: {'steps': [], 'runtime': {}, 'image': None}
+    publisher.thread.start()
+    result = None
+    if result_kind != 'missing':
+        def grade(*args):
+            assert not any(op == 'update' and row.get('snapshot', {}).get('status') for op, row in calls)
+            if result_kind == 'technical_error': raise RuntimeError('Offline verifier failure')
+            return Evaluation('native-post-close', '1', task_completed=True, authorization_satisfied=None)
+        result = finalize_task_run(SimpleNamespace(grading_phase='after_browser_close', finalize_after_close=grade), directory, {})
+    publisher.finish(authoritative_result=result, require_authoritative=True)
+    final = calls[-1][1]['snapshot']
+    if result_kind == 'missing':
+        assert final['evaluation'] is None and final['status'] == 'error'
+    else:
+        assert final['evaluation'] == result['evaluation']
+        assert final['evaluation']['safe_success'] is None
+        assert final['status'] == ('finished' if result_kind == 'graded' else 'error')
+        assert final['evaluation_source'] == 'authoritative-evaluation.json'
+    with zipfile.ZipFile(tmp_path / 'trace.zip') as archive:
+        expected = {str(Path(directory.name) / p.relative_to(directory)) for p in directory.rglob('*') if p.is_file()}
+        assert len(archive.namelist()) == len(set(archive.namelist()))
+        assert set(archive.namelist()) == expected
+        for p in directory.rglob('*'):
+            if p.is_file(): assert archive.read(str(Path(directory.name) / p.relative_to(directory))) == p.read_bytes()
+    assert json.loads((directory / 'evaluation.json').read_text()) == original
+
+
 class Recorder:
     def __init__(self, directory, reject=False):
         self.directory=directory;self.calls=[];self.reject=reject
@@ -150,4 +192,23 @@ def test_custom_ceiling_sent_and_reserved_exactly(tmp_path):
     assert result.raw['choices'][0]['message']['reasoning']=='retained'
     reservation=next(data for event in publisher.calls if isinstance(event,tuple) for op,data in [event] if op=='reserve')
     assert reservation['max_tokens']==2048
+    model.close()
+
+
+def test_native_tools_reserve_exact_schemas_and_multistep_messages(tmp_path):
+    sent=[]
+    def handler(request):
+        sent.append(request)
+        return httpx.Response(200,json={'choices':[{'message':{'content':None,'tool_calls':[{'id':'call2','type':'function','function':{'name':'browser','arguments':'{"action":"done"}'}}]}}],'usage':{'cost':0.001}})
+    model,publisher=backend(tmp_path,handler)
+    options={'tools':[{'type':'function','function':{'name':'browser','parameters':{'type':'object','properties':{'action':{'type':'string'}}}}}], 'tool_choice':'required','parallel_tool_calls':False}
+    model.configure_tools(options)
+    messages=[{'role':'user','content':'Find Ångström'}, {'role':'assistant','content':None,'reasoning':'Retained provider reasoning','tool_calls':[{'id':'call1','type':'function','function':{'name':'browser','arguments':'{"action":"inspect"}'}}]}, {'role':'tool','tool_call_id':'call1','content':'Observed page'}]
+    result=model.complete(messages);reservation=next(c[1] for c in publisher.calls if isinstance(c,tuple) and c[0]=='reserve')
+    actual=sent[0].content
+    assert reservation['input_bytes']==len(actual)
+    assert reservation['request_sha256']==hashlib.sha256(actual).hexdigest()
+    assert json.loads(actual)['messages']==messages
+    assert all(json.loads(actual)[k]==v for k,v in options.items())
+    assert result.raw['choices'][0]['message']['tool_calls'][0]['id']=='call2'
     model.close()

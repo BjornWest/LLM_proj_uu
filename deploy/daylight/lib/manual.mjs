@@ -13,7 +13,9 @@ const terminal=new Set(['finished','error','interrupted']);
 const assert=(ok,message,status=400)=>{if(!ok)throw Object.assign(Error(message),{status});};
 const stamp=()=>new Date().toISOString();
 const key=id=>prefix+id+'.json';
-export const MANUAL_TASKS=TASKS.filter(t=>t.id!=='rooms');
+// Expanded benchmark tasks run through their reset/grading worker lifecycle;
+// they are not manual fixture selectors. Generic browse.* sessions stay separate.
+export const MANUAL_TASKS=TASKS.filter(t=>t.id!=='rooms'&&!t.expanded);
 
 const SITE_REVISION=MANUAL_TASKS.find(t=>t.site_revision)?.site_revision;
 export const BROWSE_TASKS=[['tricky-shop','Shop'],['tricky-health','Health'],['tricky-news','News'],['tricky-music','Music'],['webarena-shopping','WebArena shopping'],['webarena-forum','WebArena forum']].map(([site_id,title])=>({id:'browse.'+site_id,site_id,title:'Browse '+title,collection:site_id.startsWith('tricky-')?'trickyarena':'webarena-verified',condition:null,browse_only:true,ask_enabled:true,site_revision:site_id.startsWith('tricky-')?SITE_REVISION:null}));

@@ -1,0 +1,545 @@
+{
+  "schema": "expanded-task-bridge-local-validation-v1",
+  "status": "partial_integration_not_deployed",
+  "registry": {
+    "path": ".local/curation-expansion/worker-registry-v2.json",
+    "sha256": "e971412dcf8b8e914b3a1c23c1d13f7b49e9fa3ef980b0b38654518474466b52",
+    "tasks": 203
+  },
+  "offline_tests": 16,
+  "tricky": {
+    "selected_cases": [
+      {
+        "task_id": "tricky:AU01",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU01-positive/report.json",
+        "sha256": "d9aa024271af4f6cac8d2ddb5a4a7d58d05d9df3c5c1961e8c685186e8466293",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU01-positive/traces/20260919T221107Z-efb387cf",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU01",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU01-negative/report.json",
+        "sha256": "608bba652f96c9589a8c60203e2d65778ed9c8c971a46d73d3b9337439a3f2ea",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU01-negative/traces/20260919T221107Z-9c8534a7",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU21",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU21-positive/report.json",
+        "sha256": "08cbfbd84ff943f18f837f5a96ed17a8aa44b2d534917089fbeded7e01197acc",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU21-positive/traces/20260919T221118Z-d821b1ca",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU21",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU21-negative/report.json",
+        "sha256": "0730f24a2b807663a0be31863c6a4b807360bf05f1264b468e161815a9979faa",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU21-negative/traces/20260919T221118Z-18e66162",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU41",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU41-positive/report.json",
+        "sha256": "81941a4c34ae9f48769ed6620fe848bf3d7bfc21286ae464e86d7b8d6a1bcffd",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU41-positive/traces/20260919T221124Z-5cf44464",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU41",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU41-negative/report.json",
+        "sha256": "71d676e9e025054de6d85f41ee99e25893e9b8ef2c149d1ad2542948ff2c2408",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU41-negative/traces/20260919T221124Z-dda0ba0c",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU46",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU46-positive/report.json",
+        "sha256": "76dd798256f0c9460d1c5bede3239d570679465ccd687ab0ad88553c5c2741fd",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU46-positive/traces/20260919T221130Z-e4d69b81",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU46",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU46-negative/report.json",
+        "sha256": "acc69fa4456a2132afa3eeb29602bd180c1b3fffd49bedb04da4f7edb99107b1",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU46-negative/traces/20260919T221130Z-5a7462f5",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU64",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU64-positive/report.json",
+        "sha256": "14afeb9dd3793dcb28e03061d3bb75f64f857c47c779df682dfdc83c11b5e4c0",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU64-positive/traces/20260919T221135Z-47f973ef",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU64",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU64-negative/report.json",
+        "sha256": "a2e5378dfc8a6589dc0597564a32711e483c8327f44919243dda7dd277da32fd",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU64-negative/traces/20260919T221135Z-10a53367",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TA11",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/TA11-positive/report.json",
+        "sha256": "f6801326a1575c53d14515de7a837e58009ba9810d1481c3f9e31c9ca1b3c7d2",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/TA11-positive/traces/20260919T221141Z-db757e05",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TA11",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/TA11-negative/report.json",
+        "sha256": "4b522aa61e9a2dcfafdba3366c94c98e75605a86379cdd319a45e844d7194971",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/TA11-negative/traces/20260919T221141Z-d1c7f8a7",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TO15",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/TO15-positive/report.json",
+        "sha256": "e6533138c9ee384695a4b359eefee3690ba42b0537aa55f9615821f34ef932e8",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/TO15-positive/traces/20260919T221150Z-fcc4b259",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TO15",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/TO15-negative/report.json",
+        "sha256": "adddd0532c0da5a5126f03937d5671f2f04b2f601b9cbaa045e08f5efb9c3590",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/TO15-negative/traces/20260919T221150Z-c5e34ea4",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX01",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/TX01-positive/report.json",
+        "sha256": "fa0c7c6fcd0175559a18c17a3e42afe72e650125793e34b5805dccccb27a5931",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/TX01-positive/traces/20260919T221159Z-2a173652",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX01",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/TX01-negative/report.json",
+        "sha256": "1975cf7cdb520c0e958ba7e01c41a283cb6fb756cb2f30d6576a7e9979713a2f",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/TX01-negative/traces/20260919T221159Z-85115fda",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU54",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU54-positive/report.json",
+        "sha256": "9fb0aaf998a5a771f25343c126a5620a45a9abe3539a915b14e9ade76afbe6e7",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU54-positive/traces/20260919T221205Z-d8c9eb91",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:AU54",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v1/AU54-negative/report.json",
+        "sha256": "677587013d40166d6b9ed20b1a11d55ceba10c6ab2d8901098c59ddddfedd294",
+        "trace": ".local/curation-expansion/worker-tricky-families-v1/AU54-negative/traces/20260919T221205Z-f615b2b8",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX06",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v2/TX06-positive/report.json",
+        "sha256": "f77bbbc4618db908371193df84ab859ad78470249643e9b7d7b89ac037255589",
+        "trace": ".local/curation-expansion/worker-tricky-families-v2/TX06-positive/traces/20260919T221323Z-a0faef2d",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX06",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v2/TX06-negative/report.json",
+        "sha256": "8c34e05a507af696d1133b878f9ee6344f167ce854714613b889bdfb455f49cb",
+        "trace": ".local/curation-expansion/worker-tricky-families-v2/TX06-negative/traces/20260919T221323Z-b62de8eb",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX08",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v2/TX08-positive/report.json",
+        "sha256": "cca69cc3dc498df9cfd9ca0d9f330681f506b43cc5669cd4d593aa6d5b335cd8",
+        "trace": ".local/curation-expansion/worker-tricky-families-v2/TX08-positive/traces/20260919T221327Z-edb54b75",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX08",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v2/TX08-negative/report.json",
+        "sha256": "8d0883708d0af2de72153dfc7db7976e06330fe7c6262db1f7d183449f72dd0c",
+        "trace": ".local/curation-expansion/worker-tricky-families-v2/TX08-negative/traces/20260919T221327Z-5dc871c9",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX10",
+        "negative": false,
+        "report": ".local/curation-expansion/worker-tricky-families-v2/TX10-positive/report.json",
+        "sha256": "fdebfb05ba45241a0527d5c1b95d44bf1428ee455abb520d3980b2de4cc5198b",
+        "trace": ".local/curation-expansion/worker-tricky-families-v2/TX10-positive/traces/20260919T221331Z-5fdbf05c",
+        "action_errors": 0
+      },
+      {
+        "task_id": "tricky:TX10",
+        "negative": true,
+        "report": ".local/curation-expansion/worker-tricky-families-v2/TX10-negative/report.json",
+        "sha256": "ea0916b8aaaae24fb08e107f0317115bdad93a47f448dff138e2b4d3d3ec44ab",
+        "trace": ".local/curation-expansion/worker-tricky-families-v2/TX10-negative/traces/20260919T221331Z-0d3d12bf",
+        "action_errors": 0
+      }
+    ],
+    "case_count": 24,
+    "sites": [
+      "shop",
+      "health",
+      "news",
+      "spotify"
+    ],
+    "coverage": "All eight adapter factory groups, seeded cart and saved-article setup, plus site-specific lookup checks; 12 of 100 tasks newly run positive/negative. Not a new all100 execution.",
+    "retained_development_attempts": [
+      ".local/curation-expansion/worker-tricky-smoke-v1/report.json",
+      ".local/curation-expansion/worker-tricky-families-v1/TX06-positive/report.json",
+      ".local/curation-expansion/worker-tricky-families-v1/TX06-negative/report.json"
+    ],
+    "development_note": "TX06 original functional checks passed, but broad glob provenance gate detected an unrelated newly added worker_sites.py. No existing selected file changed; new cases separately reran after narrowing the guard to the initially selected files. Historical reports untouched."
+  },
+  "proxy": {
+    "path": ".local/curation-expansion/worker-proxy-private-v2/report.json",
+    "sha256": "240d193c035e99006a766c24f8ace7c175485474cb653c5b1828c46e18f7f693",
+    "scope": "Synthetic Chromium + private httpx proxy, authentic server-cookie sharing, secret absent from HAR. Prior APIRequestContext CONNECT failure retained in worker-proxy-private-v1."
+  },
+  "saved_collectors": {
+    "path": ".local/curation-expansion/worker-collectors-replay-v2/report.json",
+    "sha256": "70f5a4906b2c13e5f081f5f8bed6c55e03c75881d526867ef723e0a3b9868c58",
+    "cases": 53,
+    "scope": "Saved biography/vote/wishlist/post collector/checker parity, no fresh WebArena browser runs."
+  },
+  "native_replay": {
+    "cases": {
+      "positive": {
+        "path": ".local/curation-expansion/worker-native-replay-v1/positive-pinned-grade.json",
+        "sha256": "4b898fc60baecdb7e254ab4faf083cea763178e5137f2aca4243f4c9015bcff7",
+        "score": 1.0,
+        "status": "success"
+      },
+      "negative": {
+        "path": ".local/curation-expansion/worker-native-replay-v1/negative-pinned-grade.json",
+        "sha256": "c2b8c3e24a364da0ebe5ec18ee908cc3fdebbdff00d49d6ea0ab38f51d25037d",
+        "score": 0.0,
+        "status": "failure"
+      }
+    },
+    "scope": "Existing task117 HAR replay through current native helper with package version and exact dataset pin; no new application run."
+  },
+  "pending": [
+    "Shared worker dispatcher/container/packaging acceptance.",
+    "Coordinated production release and UI launch checks."
+  ],
+  "model_calls": 0,
+  "training_eligible": false,
+  "production_verified": false,
+  "source_sha256": {
+    "data/curation/worker_integration/__init__.py": "767962c68a7d89f8e002232579f2518ade334c00505a553e7881868bc0f538b7",
+    "data/curation/worker_integration/audit_saved_collectors.py": "bba2506c351b51d01da5a75d8b9560877a5b6e7b92caf1e6d19d3bdb5bab1318",
+    "data/curation/worker_integration/bindings.py": "541a8eff81bfa273492477da7ec0dde5355e300ed16c2e2b8cc1e18a0bfe5977",
+    "data/curation/worker_integration/context.py": "6b64a3f3ca2c5710bd56783f707bf6737e77a1a63c9c0388c53ffb892f41f7a6",
+    "data/curation/worker_integration/native_grader.py": "63bdec1ff7ceca3f286dacd13b7614ec1c449cdffac9b9b7ba222c812f58cbfe",
+    "data/curation/worker_integration/private_http.py": "7cf158456934d08c36cd105cca093d00cc2bc8525e952b6655dfc04c1dbe52ec",
+    "data/curation/worker_integration/provenance.py": "20de571e52fa3404fa2191919e3e0993350531343d420c81014d56697e1b784b",
+    "data/curation/worker_integration/tasks.py": "dfd2d289213e7d2e3b96596c240553e9c3203e14dbb36e8c65d92c237fd2c726",
+    "data/curation/worker_integration/test_bridge.py": "5ec553b81db0aa4098d544e13b2a24f0d8678ba658e9a49b5261e4e3e7a151f4",
+    "data/curation/worker_integration/tricky.py": "fe7f9b87c8fcc766e47784ec3c3e54da225431146ae712b52b1ec8e4ba6eb2e7",
+    "data/curation/worker_integration/verify_proxy.py": "c7c83b029eb9710d133f9d98baf4350feb8695e262a12a1b26e9b9483071d603",
+    "data/curation/worker_integration/verify_tricky.py": "be8359ebe321698f481e93464c694d26baeb53755d2beeed9a4994b496008091",
+    "data/curation/worker_integration/verify_webarena.py": "af2a51e5f9c2c822ee93e54c4f35045a0275cdb642069034cc295702595c235b",
+    "data/curation/worker_integration/webarena.py": "32f4f02df284b3070a96bc625c4a35a1725f9feec21d81dd3dd3f07ffd800c81"
+  },
+  "current_delta": {
+    "description": "Added expanded-runtime-sources.json to prepare metadata; checker/setup/action behavior unchanged. Earlier Tricky cases retain their exact source maps.",
+    "model_calls": 0,
+    "fresh_logging_smoke": {
+      "path": ".local/curation-expansion/worker-tricky-provenance-smoke-v1/report.json",
+      "passed": true
+    }
+  },
+  "webarena_live": {
+    "cases": [
+      {
+        "task_id": "webarena:117",
+        "negative": false,
+        "passed": true,
+        "task_completed": true,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-probe-v1/webarena-117/report.json",
+        "sha256": "346258a954a962343a643b9eb4ecaaabf42533edb08b08a9c92a157465fdee5e",
+        "source_unchanged": null,
+        "credentials_absent_byte_scan": null
+      },
+      {
+        "task_id": "webarena:399",
+        "negative": false,
+        "passed": false,
+        "task_completed": true,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-probe-v1/webarena-399/report.json",
+        "sha256": "11397f8237c9d821c2aa66fd49b4198d9854c764390f6cb53f068fb81894fcae",
+        "source_unchanged": null,
+        "credentials_absent_byte_scan": null
+      },
+      {
+        "task_id": "webarena:117",
+        "negative": true,
+        "passed": true,
+        "task_completed": false,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-families-v1/webarena-117-negative/report.json",
+        "sha256": "c063bc56fd9fcc5fb2599393a22e5636f228dccd209299e9e3f0c1f2ba091493",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:516",
+        "negative": true,
+        "passed": false,
+        "task_completed": true,
+        "action_errors": 0,
+        "technical_error": "TimeoutError: Locator.wait_for: Timeout 12000ms exceeded.\nCall log:\nwaiting for locator(\".products-grid.wishlist li.product-item\").first.get_by_role(\"link\", name=\"Remove Item\", exact=True) to be visible\n",
+        "report": ".local/curation-expansion/worker-webarena-families-v1/webarena-516-negative/report.json",
+        "sha256": "3fe84e6cfcee8a1a0b165ebbe42a8cd14ca1141c30b03a424a2f71ac796bce50",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:516",
+        "negative": false,
+        "passed": true,
+        "task_completed": true,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-families-v1/webarena-516-positive/report.json",
+        "sha256": "db2aaa835afb5a33f6294b351345e43814cf9ccb64135964db03fa2262f0de33",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:399",
+        "negative": true,
+        "passed": false,
+        "task_completed": false,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-forum-families-v1/webarena-399-negative/report.json",
+        "sha256": "ee636c9e59a3508faee02093c712a9ddbc9e340e0c7500858c35b3904774af52",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:400",
+        "negative": true,
+        "passed": false,
+        "task_completed": false,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-forum-families-v1/webarena-400-negative/report.json",
+        "sha256": "30b765c4321c9bc8e251a9a266bce25b11c42772981d3fabf093feffb6253a30",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:400",
+        "negative": false,
+        "passed": false,
+        "task_completed": true,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-forum-families-v1/webarena-400-positive/report.json",
+        "sha256": "5fd0ecf3091d1809a84fe32bba1baeff1f303b9c0f70f6dda9813592032d5625",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:407",
+        "negative": true,
+        "passed": true,
+        "task_completed": false,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-forum-families-v1/webarena-407-negative/report.json",
+        "sha256": "a8c6bb075627dc273c02e20c7347f7166ccb40786ca7c2f62973d3381acc5192",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:407",
+        "negative": false,
+        "passed": true,
+        "task_completed": true,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-forum-families-v1/webarena-407-positive/report.json",
+        "sha256": "a8ef8eae4773be3ee79b2db98cd5d5b944d9b04d9323c72c9e2b981f06b6a485",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:630",
+        "negative": true,
+        "passed": false,
+        "task_completed": false,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-forum-families-v1/webarena-630-negative/report.json",
+        "sha256": "5b777dceeca77e20ae21820cd87db98b1219870ba375c4f8dfa8fdee10c17e8f",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:630",
+        "negative": false,
+        "passed": false,
+        "task_completed": true,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-forum-families-v1/webarena-630-positive/report.json",
+        "sha256": "b3045a23ec3e867dd3e6b0180c2cb10ea38b7a9363eec413e9ff3ec098ed1853",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:28",
+        "negative": true,
+        "passed": false,
+        "task_completed": false,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-controls-v2/webarena-28-negative/report.json",
+        "sha256": "a85b6e921b39a5784374807e315d40450f92787568fd4e9603d6ef827d3d6531",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:28",
+        "negative": false,
+        "passed": false,
+        "task_completed": true,
+        "action_errors": 1,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-controls-v2/webarena-28-positive/report.json",
+        "sha256": "286175c6e6691aea38331f063a7d7eb94370dcf80cc897f83b99cf1162107f43",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:516",
+        "negative": true,
+        "passed": false,
+        "task_completed": true,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-controls-v2/webarena-516-negative/report.json",
+        "sha256": "b1938bbf30199ad1e2afcce05961c713d7285dfba7fff347b5c89337e29bfbd5",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:689",
+        "negative": true,
+        "passed": true,
+        "task_completed": false,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-contact-v1/webarena-689-negative/report.json",
+        "sha256": "8e0b5975676842da30fed184b8ca1d24e4bd6b13a635d75919c0eab6d142259a",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:689",
+        "negative": false,
+        "passed": true,
+        "task_completed": true,
+        "action_errors": 0,
+        "technical_error": null,
+        "report": ".local/curation-expansion/worker-webarena-contact-v1/webarena-689-positive/report.json",
+        "sha256": "b62dd4aa828818984358702f059e87a09596efe41f9062c66fa2a17a9da6a3e1",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      },
+      {
+        "task_id": "webarena:516",
+        "negative": true,
+        "passed": true,
+        "task_completed": false,
+        "action_errors": 0,
+        "technical_error": null,
+        "scripted_wait_for_visible_idle": true,
+        "report": ".local/curation-expansion/worker-wishlist-visible-wait-v1/report.json",
+        "sha256": "d8381db3164cdeae9be1d5ad89243752320b485570ca3e08d60317197db92c24",
+        "source_unchanged": true,
+        "credentials_absent_byte_scan": true
+      }
+    ],
+    "browser_cases": 18,
+    "strict_passes": 8,
+    "families_with_valid_pair": [
+      "native shopping read-only",
+      "wishlist (explicit visible-busy native wait in negative control)",
+      "contact draft",
+      "forum vote"
+    ],
+    "families_held_for_action_timeout": [
+      "native forum read-only",
+      "biography",
+      "post creation"
+    ],
+    "notes": [
+      "No model calls. All app accesses used dedicated worker leases, not manual/shared services.",
+      "Correct independent grades with an action timeout do not pass zero-error readiness.",
+      "Wishlist failed label and premature-click controls preserved; final wait is a separately labeled ordinary native action, not a hidden warm-up or click replay.",
+      "One unsupported task27 test-selector failure occurred before lease/browser creation; replacement task28 is an accepted contract."
+    ],
+    "scope": "Historical initial5000ms controls; later navigation amendment retained separately under webarena_navigation_amendment."
+  },
+  "webarena_navigation_amendment": {
+    "action_timeout_ms": 30000,
+    "profile_builder": "intent_browser.expanded_tasks.runner_options",
+    "fresh_cases": 8,
+    "strict_passes": 8,
+    "action_errors": 0,
+    "model_calls": 0,
+    "evidence": {
+      "plan.json": {
+        "path": ".local/curation-expansion/worker-forum-deadline-v1/plan.json",
+        "sha256": "7fe8545b9a5e8083183fdfef4799e095a0bff88808c06262b2b53d40a95f2940"
+      },
+      "report.json": {
+        "path": ".local/curation-expansion/worker-forum-deadline-v1/report.json",
+        "sha256": "caac440aa846d62b1a02d021e9ba34aa0836d75df3f66764a7e1a9bedf1b64f4"
+      },
+      "audit.json": {
+        "path": ".local/curation-expansion/worker-forum-deadline-v1/audit.json",
+        "sha256": "affaa803364af20c59da7ff05fe444a9b2a49c4486b9518b56cda38ae5605f6f"
+      }
+    },
+    "artifact_hashes_checked": 828,
+    "scope": "Separate positive/negative family controls399/400/630/28 on dedicated forum clone; original5000ms cases unchanged. All selected runtime/bridge sources unchanged during this suite. Not a new execution of every203 task."
+  },
+  "source_sha256_scope": "Current bridge checkout at index update; historical cases keep their own recorded source maps, not retroactively recertified."
+}

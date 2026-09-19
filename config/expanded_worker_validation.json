@@ -1,0 +1,55 @@
+{
+  "schema": "expanded-worker-local-acceptance-v1",
+  "status": "validated_local_candidate_not_deployed",
+  "model_calls": 0,
+  "training_eligible": false,
+  "scope": "Shared 203-row factory, representative family acceptance, real local API and isolated container tests; not 203 new model runs",
+  "worker_image": "sha256:c16fc291239fa52248ab3c69653127cbb868c8fe7f9e22b130c0800cd398406a",
+  "control_image": "sha256:31235550899e423615c7215b0f777cd856e127017265e7bbefc8399427c21c59",
+  "certificate_sha256": "aa8044650ebf719faefc803354fedd38a3db31a1a3dac3fa2633a8472cb04260",
+  "package_sha256": "ed43eb0c0d7bb1cb5f852c86951eec3a059dbb9950cc234eb46b197e6ba85429",
+  "reports": [
+    {
+      "path": ".local/worker-expansion/container-v3/error/report.json",
+      "sha256": "fa5aa00ac632456485facf3d496d1f2b378a391996813e9f776e54732e589aa8"
+    },
+    {
+      "path": ".local/worker-expansion/container-v3/tricky-positive/report.json",
+      "sha256": "7da27a4123c18ec89352cd2c62c00969d6be89d50ee6d53b3deb34c5032f730c"
+    },
+    {
+      "path": ".local/worker-expansion/container-v3/tricky-negative/report.json",
+      "sha256": "cdecbfc2f04744a6ebc5f581a8766e4f015d417ff50dc847fd04b79125bdc16f"
+    },
+    {
+      "path": ".local/worker-expansion/container-v3/native188/report.json",
+      "sha256": "84c296b624c76bf31b0b8cba5ad57263c76d617650983d2fc3b5d0906c017d3c"
+    },
+    {
+      "path": ".local/worker-expansion/container-v3/native188-negative/report.json",
+      "sha256": "dedd798cee7b63d632f291956cb99cdc6027f3c05cd593b7c3a9bea2db68e890"
+    },
+    {
+      "path": ".local/worker-expansion/navigation-deadline-v3/report.json",
+      "sha256": "85aef004f64fc9547fa51b3240b281d52591ea833a9aa8ff94518b7a0c2fe956"
+    },
+    {
+      "path": ".local/worker-expansion/http-handler-v1/case/report.json",
+      "sha256": "6bf797add076513227768fc762689136580d0ecd8611ece92cc7e53cda479a66"
+    }
+  ],
+  "curation_validation_sha256": "d0b91cea44ee4f12b8cc24d00a5b185e12547c7ad4366e52d9cd5827307851de",
+  "legacy_compatibility": "Legacy source certificates: 14 isolated task pairs: 7",
+  "node_tests": 116,
+  "ui_checks": {
+    "catalog_launch": 20,
+    "workspace": 32
+  },
+  "test_note": "Full parallel Python run exposed CLI mock signature drift (fixed/tested) and stale optional fixtures-v1 selection (now explicit; real legacy package/constructors tested in frozen container).",
+  "known_limits": [
+    "Page-size select can change before its application handler is ready; retained failed scripted checks, no hidden retry.",
+    "Historical 5000ms navigation failures retained; explicit 30000ms adoption separately tested.",
+    "HTTP handler v1 was before driver-label correction; container-v3 proves explicit scripted-validation metadata.",
+    "Original 14 tasks retain their original runtime and certificates."
+  ]
+}

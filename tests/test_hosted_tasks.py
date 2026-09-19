@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import pytest
 from intent_browser import hosted_tasks
@@ -35,7 +36,10 @@ def test_registry_tamper_rejected(tmp_path, monkeypatch):
 
 
 def test_packaged_current_adapters_and_isolated_sessions():
-    root = hosted_tasks.ROOT/'.local/team-worker/fixtures-v1'
+    selected = os.environ.get('HARNESS_TEST_FIXTURES_DIR')
+    if not selected:
+        pytest.skip('Select an export certified for this interpreter with HARNESS_TEST_FIXTURES_DIR; historical fixtures-v1 is not current')
+    root = Path(selected)
     if not root.is_dir(): pytest.skip('Optional exported local fixtures are absent')
     hosted_tasks.check_package(root)
     for task in hosted_tasks.registry()['tasks']:
@@ -45,6 +49,12 @@ def test_packaged_current_adapters_and_isolated_sessions():
         assert one.policy_goal == two.policy_goal == task['goal']
         assert one.session != two.session
         assert one.server is two.server is None  # construction never starts a server
+
+
+def test_historical_fixture_registry_is_rejected(tmp_path):
+    (tmp_path / 'package.json').write_text(json.dumps({'registry_sha256': 'historical'}))
+    with pytest.raises(ValueError, match='different task registry'):
+        hosted_tasks.check_package(tmp_path)
 
 
 def test_publisher_preserves_adapter_route_and_fails_uncertified_chaos():

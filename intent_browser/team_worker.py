@@ -148,7 +148,7 @@ class Publisher:
                 self.failure = exc
                 return
 
-    def finish(self, error=None):
+    def finish(self, error=None, *, authoritative_result=None, require_authoritative=False):
         self.stopped.set()
         self.thread.join(timeout=35)
         if self.thread.is_alive():
@@ -161,6 +161,17 @@ class Publisher:
                 summary = json.loads(summary_path.read_text())
                 snapshot['evaluation'] = summary.get('evaluation')
                 error = error or summary.get('error')
+            if authoritative_result is not None:
+                recorded = json.loads((self.directory / 'authoritative-evaluation.json').read_text())
+                if recorded != authoritative_result:
+                    raise ValueError('Authoritative result differs from retained artifact')
+                snapshot['evaluation'] = recorded['evaluation']
+                snapshot['grading_phase'] = recorded['grading_phase']
+                snapshot['evaluation_source'] = 'authoritative-evaluation.json'
+                error = error or recorded['evaluation'].get('technical_error')
+            elif require_authoritative:
+                snapshot['evaluation'] = None
+                error = error or 'Authoritative grading did not complete; no fallback to runtime evaluation'
             # ZIP retains every original file and relative path. No trace conversion.
             archive = self.folder / 'trace.zip'
             with zipfile.ZipFile(archive, 'x', zipfile.ZIP_DEFLATED) as zipped:
@@ -185,6 +196,9 @@ class Publisher:
 
 
 class TeamBackend(ChatCompletionsBackend):
+    # complete() reserves the full serialized payload, including tool definitions
+    # and assistant/tool history, before a single dispatch.
+    supports_native_tools = True
     def __init__(self, publisher, env):
         options = provider_options(env.get('OPENROUTER_PROVIDERS') or DEFAULT_PROVIDERS)
         options['provider']['max_price'] = {'prompt': 0.5, 'completion': 4, 'request': 0}
@@ -290,14 +304,21 @@ class RoomsSite:
 
 
 class PublishedTask:
-    def __init__(self, task, publisher, origin): self.task, self.publisher, self.origin = task, publisher, origin
+    def __init__(self, task, publisher, origin, expanded=None):
+        self.task, self.publisher, self.origin, self.expanded = task, publisher, origin, expanded
     def __getattr__(self, name): return getattr(self.task, name)
     def prepare(self, trace):
         self.publisher.attach(trace)
         record = self.task.prepare(trace)
         if self.publisher.job['task'].startswith('chaos-') and not self.task.verifier_ready:
             raise RuntimeError('Chaos build lacks current contract certification')
-        if self.publisher.job['task'] != 'rooms':
+        if self.expanded:
+            row = self.expanded.row
+            if self.task.policy_goal != row['policy_input']['goal'] or self.publisher.job['goal'] != self.task.policy_goal:
+                raise ValueError('Expanded task goal differs from pinned registry')
+            record['team_task'] = {'id': row['id'], 'revision': row['revision'],
+                                   'registry_sha256': self.expanded.registry_sha256}
+        elif self.publisher.job['task'] != 'rooms':
             from .hosted_tasks import entry, digest, REGISTRY
             registered = entry(self.publisher.job['task'])
             if registered['goal'] is not None and self.task.policy_goal != registered['goal']:
@@ -321,6 +342,9 @@ class PublishedTask:
 
 
 def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=None):
+    if env.get('HARNESS_EXPANDED_EXECUTION_ROOT') and job['task'].startswith(('tricky:', 'webarena:')) and backend_factory is None:
+        from .expanded_tasks import isolated_runtime
+        return isolated_runtime(env, 'execute', {'job': job, 'data_dir': str(data_dir)})
     from .runner import run_episode
     from .actions import make_action_set
     import browsergym.core  # noqa: F401
@@ -328,7 +352,10 @@ def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=N
     folder = data_dir / 'jobs' / job['id'];folder.mkdir(parents=True, exist_ok=False)
     write_json(folder / 'job.json', {k: v for k, v in job.items() if k != 'lease'})
     publisher = Publisher(broker, job, folder);publisher.thread.start()
-    site = backend = task = None
+    site = backend = task = expanded = None
+    authoritative_result = None
+    expanded_requested = job['task'].startswith(('tricky:', 'webarena:'))
+    runner_options = {'max_steps': 12}
     environment = {}
     error = None
     try:
@@ -348,6 +375,18 @@ def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=N
             if job['mode'] == 'rehearsal' and job['goal'] != EXAMPLES['booking']['goal']:
                 raise ValueError('Rehearsal only supports the exact study-room example; use Live for custom goals')
             default_backend = lambda: TeamBackend(publisher, env) if job['mode'] == 'live' else RehearsalBackend('booking')
+        elif expanded_requested:
+            from .expanded_tasks import ExpandedTaskSession
+            expanded = ExpandedTaskSession(job['task'], job.get('task_revision'), job['id'], env,
+                                           require_certificate=backend_factory is None)
+            task = expanded.task
+            runner_options = expanded.runner_options()
+            wrapped = PublishedTask(task, publisher, None, expanded=expanded)
+            def factory(video):
+                return task.make_env(video, action_mapping=actions.to_python_code)
+            def default_backend():
+                if job['mode'] == 'live': return TeamBackend(publisher, env)
+                raise ValueError('Expanded tasks need a live worker or trusted local scripted backend')
         elif job['task'] != 'rooms':
             from .hosted_tasks import make_task, entry
             registered = entry(job['task'])
@@ -372,24 +411,35 @@ def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=N
             instance = original_factory(video)
             environment['env'] = instance
             return instance
-        hook = backend.before_observation if isinstance(backend, TeamBackend) else publisher.checkpoint
-        run_episode(factory, backend, {'task': job['task'], 'goal': job['goal'], 'team_job': job['id'],
+        original_hook = backend.before_observation if isinstance(backend, TeamBackend) else publisher.checkpoint
+        def hook():
+            value = original_hook()
+            if expanded: expanded.checkpoint()
+            return value
+        trace_directory, summary = run_episode(factory, backend, {'task': job['task'], 'goal': job['goal'], 'team_job': job['id'],
                     'episode_boundary': 'first_accepted_reservation' if job['task'] == 'rooms' else 'agent_finished',
-                    'driver': 'llm' if job['mode'] == 'live' else 'scripted-rehearsal',
+                    'driver': 'scripted-validation' if backend_factory is not None else 'llm' if job['mode'] == 'live' else 'scripted-rehearsal',
                     'model': getattr(backend, 'model', 'scripted-rehearsal'), 'training_eligible': False,
                     'task_revision': job.get('task_revision'),
+                    **(expanded.activity_metadata() if expanded else {}),
                     'generation': {'max_tokens': backend.max_tokens, **backend.request_options} if isinstance(backend, TeamBackend) else None},
-                    output=data_dir / 'runs', max_steps=12, before_observation=hook, episode_task=wrapped,
-                    record_video=True)
+                    output=data_dir / 'runs', before_observation=hook, episode_task=wrapped,
+                    record_video=True, **runner_options)
+        if expanded:
+            from .task_finalization import finalize_task_run
+            authoritative_result = finalize_task_run(task, trace_directory, summary)
     except Exception as exc:
         error = f'{type(exc).__name__}: {exc}'
         write_json(folder / 'worker-error.json', {'error': error})
     finally:
-        if backend: backend.close()
-        if task and hasattr(task, 'close'): task.close()
-        elif task and hasattr(task, 'client'): task.client.close()
-        if site: site.close()
-        try: publisher.finish(error)
+        for resource in (backend, expanded if expanded else task, site):
+            try:
+                if resource and hasattr(resource, 'close'): resource.close()
+                elif resource and hasattr(resource, 'client'): resource.client.close()
+            except Exception as exc:
+                error = error or f'{type(exc).__name__}: Resource cleanup failed'
+                write_json(folder / 'cleanup-error.json', {'error': type(exc).__name__, 'replay_allowed': False})
+        try: publisher.finish(error, authoritative_result=authoritative_result, require_authoritative=expanded_requested)
         except Exception as exc:
             write_json(folder / 'publication-error.json', {'error': f'{type(exc).__name__}: {exc}',
                        'replay_allowed': False, 'original_trace': str(publisher.directory) if publisher.directory else None})
@@ -430,7 +480,11 @@ def main():
     tasks = ['rooms'] + capabilities(mode, env.get('HARNESS_FIXTURES_DIR'), chaos_url)
     while True:
         try:
-            result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks, 'task_revisions': {t['id']:t['revision'] for t in registry()['tasks']}})
+            from .expanded_tasks import certified_tasks, isolated_runtime
+            extra = (isolated_runtime(env, 'capabilities') if env.get('HARNESS_EXPANDED_EXECUTION_ROOT')
+                     else certified_tasks(env)[0]) if mode == 'live' else []
+            result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks+[t['id'] for t in extra],
+                                'task_revisions': {t['id']:t['revision'] for t in registry()['tasks']+extra}})
             if result.get('job'):
                 print('Starting team job', result['job']['id'], flush=True)
                 execute_job(broker, result['job'], data_dir, env, chaos_url)

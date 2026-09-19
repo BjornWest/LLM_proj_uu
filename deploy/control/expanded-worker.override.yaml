@@ -1,0 +1,24 @@
+# Append only after expanded runtime and dedicated-clone acceptance.
+# Retain existing control, manual-browser and worker trace volumes.
+services:
+  control:
+    image: intent-browser-control:expanded-candidate-v1
+  worker:
+    image: intent-browser-worker:expanded-candidate-v3
+    env_file:
+      - ../../.local/worker-sites/worker.env
+    environment:
+      HARNESS_EXPANDED_CERTIFICATE: /opt/expanded/certificate.json
+    volumes:
+      - type: bind
+        source: ${EXPANDED_WORKER_CERTIFICATE:?Set a reviewed expanded worker certificate}
+        target: /opt/expanded/certificate.json
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${EXPANDED_FULL_FIXTURES:?Set the verified complete Tricky fixture directory}
+        target: /fixtures/tricky-full-v1
+        read_only: true
+        bind:
+          create_host_path: false

@@ -2,6 +2,7 @@
 import {randomUUID,createHash,timingSafeEqual} from 'node:crypto';
 import {Agent,completionTokenLimit} from './agent.mjs';
 import registry from '../../../config/team_tasks.json' with {type:'json'};
+import expanded from '../../../config/expanded_team_tasks.json' with {type:'json'};
 import {interactionKind,siteForTask,recordedActivity,validateSite} from './activity.mjs';
 
 const KEY='daylight/harness/control-v1.json';
@@ -15,7 +16,10 @@ export const TASKS=[
   ...registry.tasks.map(task=>({id:task.id,title:task.title,goal:task.goal,goal_mode:task.goal_mode,
     custom_goal:false,revision:task.revision,site_revision:task.site_revision??null,site:task.site,condition:task.condition,
     verification_scope:task.verification_scope,development_only:true})),
+  ...expanded.tasks,
 ].map(task=>({...task,...siteForTask(task.id)}));
+const needsRevision=task=>!!(task?.site_revision||task?.expanded);
+const limitsFor=id=>TASKS.find(task=>task.id===id)?.execution_limits||{max_steps:12,max_input_bytes:250000};
 export function workerAuthorized(header,env) {
   const secret=env.HARNESS_WORKER_TOKEN;
   if(typeof secret!=='string'||secret.length<43||typeof header!=='string')return false;
@@ -61,7 +65,7 @@ export class Harness {
     return {enabled:this.enabled(),worker:{online:!!worker&&this.now()-Date.parse(worker.updated_at)<45000,
       updated_at:worker?.updated_at||null,mode:worker?.mode||null},
       tasks:TASKS.map(task=>({...task,custom_goal:task.custom_goal&&worker?.mode==='live',
-        available:worker?worker.tasks.includes(task.id)&&(!task.site_revision||worker.task_revisions?.[task.id]===task.revision):task.id==='rooms'}))};
+        available:worker?worker.tasks.includes(task.id)&&(!needsRevision(task)||worker.task_revisions?.[task.id]===task.revision)&&(!task.expanded||worker.mode==='live'):task.id==='rooms'}))};
   }
   async list(owner) {
     const state=await this.state();
@@ -82,14 +86,14 @@ export class Harness {
     insist(interaction_kind!=='ask'||task.custom_goal,'This reviewed task does not support custom Ask requests');
     const site=siteForTask(task.id);validateSite(value,site);
     const dynamic=task.goal_mode==='resolve_after_session_prepare';
-    insist(value.task_revision===undefined||value.task_revision===task.revision,'Task revision changed; refresh the task list',409);
+    insist((value.task_revision===undefined&&!task.expanded)||value.task_revision===task.revision,'Task revision changed; refresh the task list',409);
     const goal=task.custom_goal?value.goal:task.goal;
     if(dynamic)insist(value.goal===undefined||value.goal===null||value.goal==='','This task resolves its trusted objective in a fresh session');
     else insist(typeof goal==='string'&&goal.trim().length>0&&goal.length<=2000,'Enter a request up to 2000 characters');
     const id=randomUUID();
     return this.mutate(state=>{
       this.expire(state);
-      insist(state.worker?state.worker.tasks.includes(task.id)&&(!task.site_revision||state.worker.task_revisions?.[task.id]===task.revision):task.id==='rooms','This task is not available on the configured worker',409);
+      insist(state.worker?state.worker.tasks.includes(task.id)&&(!needsRevision(task)||state.worker.task_revisions?.[task.id]===task.revision)&&(!task.expanded||state.worker.mode==='live'):task.id==='rooms','This task is not available on the configured worker',409);
       insist(dynamic||task.custom_goal||value.goal===undefined||value.goal===task.goal,'This task uses its fixed validated goal');
       insist(goal===task.goal||state.worker?.mode==='live','Custom requests require a live worker',409);
       insist(Object.keys(state.jobs).length<100,'This development queue reached 100 saved jobs; ask Bjorn to archive it',429);
@@ -120,7 +124,8 @@ export class Harness {
     insist(['live','rehearsal'].includes(value.mode),'Invalid worker mode');
     insist(Array.isArray(value.tasks)&&value.tasks.every(id=>TASKS.some(t=>t.id===id)),'Invalid worker capabilities');
     const eligible=job=>job.status==='queued'&&value.tasks.includes(job.task)&&
-      (!TASKS.find(t=>t.id===job.task)?.site_revision||value.task_revisions?.[job.task]===job.task_revision)&&
+      (!needsRevision(TASKS.find(t=>t.id===job.task))||value.task_revisions?.[job.task]===job.task_revision)&&
+      (!TASKS.find(t=>t.id===job.task)?.expanded||value.mode==='live')&&
       (!job.required_execution_mode||job.required_execution_mode===value.mode);
     const observed=await this.state();
     if(!observed.active&&!Object.values(observed.jobs).some(eligible)&&
@@ -152,8 +157,8 @@ export class Harness {
     });
   }
   async reserve(value) {
-    insist(Number.isInteger(value.step)&&value.step>=0&&value.step<12,'Invalid request index');
-    insist(Number.isInteger(value.input_bytes)&&value.input_bytes>0&&value.input_bytes<=250000,'Request input exceeds bound');
+    insist(Number.isInteger(value.step)&&value.step>=0&&value.step<50,'Invalid request index');
+    insist(Number.isInteger(value.input_bytes)&&value.input_bytes>0&&value.input_bytes<=1000000,'Request input exceeds bound');
     insist(/^[a-f0-9]{64}$/.test(value.request_sha256),'Invalid request fingerprint');
     // Legacy workers omitted the field and are pinned to 512. New workers
     // require an acknowledged ceiling before dispatch; never silently underreserve.
@@ -161,7 +166,9 @@ export class Harness {
     insist(Number.isSafeInteger(max_tokens)&&max_tokens>0&&max_tokens<=completionTokenLimit(this.env.OPENROUTER_MAX_TOKENS),'Output token limit exceeds configured bound');
     const amount=(value.input_bytes+2048)*0.5/1e6+max_tokens*4/1e6;
     await this.mutate(state=>{
-      const job=this.leased(state,value);
+      const job=this.leased(state,value),limits=limitsFor(job.task);
+      insist(value.step<limits.max_steps,'Invalid request index for task');
+      insist(value.input_bytes<=limits.max_input_bytes,'Request input exceeds task bound');
       insist(job.mode==='live'&&job.reservations.length===value.step,'Request already attempted or out of order',409);
       job.reservations.push({step:value.step,request_sha256:value.request_sha256,max_tokens,amount_usd:amount,status:'pending',at:iso(this.now())});
     });
@@ -185,10 +192,19 @@ export class Harness {
     return {ok:true};
   }
   async update(value) {
-    const snap=value.snapshot;insist(snap&&JSON.stringify(snap).length<=60000,'Snapshot exceeds bound');
-    insist(Array.isArray(snap.steps)&&snap.steps.length<=12,'Invalid step list');
+    const snap=value.snapshot;insist(snap&&JSON.stringify(snap).length<=300000,'Snapshot exceeds bound');
+    insist(Array.isArray(snap.steps)&&snap.steps.length<=50,'Invalid step list');
     return this.mutate(state=>{
-      const job=this.leased(state,value);
+      const job=this.leased(state,value),limits=limitsFor(job.task);
+      insist(snap.steps.length<=limits.max_steps,'Invalid step list for task');
+      insist(JSON.stringify(snap).length<=(TASKS.find(t=>t.id===job.task)?.expanded?300000:60000),'Snapshot exceeds task bound');
+      const task=TASKS.find(t=>t.id===job.task);
+      if(task?.expanded) {
+        if(!snap.status)insist(snap.evaluation==null,'Authoritative grading is terminal-only');
+        else if(snap.evaluation!=null||snap.status==='finished')
+          insist(snap.evaluation&&snap.grading_phase===task.grading_phase&&snap.evaluation_source==='authoritative-evaluation.json','Missing authoritative final result');
+        else insist(typeof snap.error==='string'&&snap.error.length>0,'Missing technical failure evidence');
+      }
       if(snap.resolved_goal!==undefined&&snap.resolved_goal!==null) {
         insist(typeof snap.resolved_goal==='string'&&snap.resolved_goal.length>0&&snap.resolved_goal.length<=5000,'Invalid resolved objective');
         insist(job.goal===null||job.goal===snap.resolved_goal,'Cannot replace the trusted objective',409);
@@ -196,7 +212,7 @@ export class Harness {
       }
       insist(snap.steps.every((step,index)=>step.step===index),'Recorded steps must be unique and sequential');
       for(const step of snap.steps) {
-        insist(Number.isInteger(step.step)&&step.step>=0&&step.step<12,'Invalid recorded step');
+        insist(Number.isInteger(step.step)&&step.step>=0&&step.step<limits.max_steps,'Invalid recorded step');
         if(step.artifact)for(const name of Object.values(step.artifact))insist(job.artifacts[name],'Observation not uploaded');
       }
       insist(snap.steps.length>=job.steps.length,'Cannot remove recorded steps',409);
@@ -205,6 +221,7 @@ export class Harness {
       if(snap.trace_parts)for(const name of snap.trace_parts)insist(/^trace-\d{3}\.part$/.test(name)&&job.artifacts[name],'Trace archive incomplete');
       Object.assign(job,{steps:snap.steps,step_count:snap.steps.length,episode:snap.episode||null,runtime:snap.runtime||null,
         cost:snap.cost||null,
+        grading_phase:snap.grading_phase??null,evaluation_source:snap.evaluation_source??null,
         evaluation:snap.evaluation||null,error:snap.error||null,updated_at:iso(this.now()),
         image:snap.image?`/api/harness/jobs/${job.id}/artifacts/${snap.image}`:job.image});
       if(snap.trace_parts?.length)job.trace_parts=snap.trace_parts;
