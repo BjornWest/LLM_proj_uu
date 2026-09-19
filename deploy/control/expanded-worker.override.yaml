@@ -16,9 +16,6 @@ services:
         read_only: true
         bind:
           create_host_path: false
-      - type: bind
-        source: ${EXPANDED_FULL_FIXTURES:?Set the verified complete Tricky fixture directory}
-        target: /fixtures/tricky-full-v1
-        read_only: true
-        bind:
-          create_host_path: false
+          propagation: rprivate
+    # /fixtures/tricky-full-v1 already comes from the immutable full-site export.
+    # Avoid a redundant nested mount (unsupported by this Docker Desktop bridge).
