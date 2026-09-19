@@ -2,10 +2,10 @@
 (() => {
   'use strict';
   const prefix='/sites/tricky', route=location.pathname.slice(prefix.length), storage=window.sessionStorage;
-  const site=route.startsWith('/health')?'health':route.startsWith('/spotify')?'music':'shop';
+  const site=route.startsWith('/health')?'health':route.startsWith('/spotify')?'music':route.startsWith('/news')?'news':'shop';
   const revision=document.querySelector('meta[name="intent-site-revision"]')?.content;
   if(!revision)throw Error('Missing shared site revision');
-  const setup={shop:{entry:'/shop',pattern:'w',name:'Shopping',workspace:'tricky-shop'},music:{entry:'/spotify',pattern:'am',name:'Music',workspace:'tricky-music'},health:{entry:'/health',pattern:'cs',name:'Health',workspace:'tricky-health'}}[site];
+  const setup={shop:{entry:'/shop',pattern:'w',name:'Shopping',workspace:'tricky-shop'},music:{entry:'/spotify',pattern:'am',name:'Music',workspace:'tricky-music'},health:{entry:'/health',pattern:'cs',name:'Health',workspace:'tricky-health'},news:{entry:'/news',name:'News',workspace:'tricky-news'}}[site];
   const condition=new URLSearchParams(location.search).get('dp')||'clean';
   const activeKey='daylight-full-inspection-active:'+revision;
   let selected=storage.getItem(activeKey)||condition;storage.setItem(activeKey,selected);

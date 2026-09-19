@@ -4,9 +4,12 @@ import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id);
 const activeStatuses=new Set(['queued','claimed','starting','running','ready','pending','awaiting_client']);
 const gradeNames={success:'Succeeded',failed:'Failed',partial:'Partial',ungraded:'Not graded',unknown:'Unknown',pending:'Pending'};
-const collectionNames={demo:'Campus demos','browser-agent-chaos':'Browser Agent Chaos',trickyarena:'TrickyArena','synthetic-development':'Development examples'};
+const collectionNames={demo:'Campus demos','browser-agent-chaos':'Browser Agent Chaos',trickyarena:'TrickyArena','webarena-verified':'WebArena Verified','synthetic-development':'Development examples'};
 const siteNames={chaos:'Chaos scenarios','tricky-shop':'Tricky shop','tricky-health':'Tricky health','tricky-music':'Tricky music','authorized-warranty':'Warranty example','browser-agent-chaos':'Browser Agent Chaos',trickyarena:'TrickyArena','synthetic-development':'Authorized extras'};
 let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoRows=[],siteID='campus',view='explore',globalPage=false,currentRun=null;
+let reviewCatalog=null,catalogError='',catalogLoading=false,catalogSite=null,catalogLimit=24;
+const catalogSiteFor=id=>reviewCatalog?.sites.find(site=>site.id===id);
+const catalogTasks=id=>(reviewCatalog?.tasks||[]).filter(task=>task.site_id===id);
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
 let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
 let activeTurn=null,interrupting=false,conversationID=null;
@@ -62,6 +65,7 @@ function buildSites(){
   for(const task of tasks)if(task.collection&&task.collection_name)collectionNames[task.collection]=task.collection_name;
   const map=new Map([['campus',{id:'campus',name:'Campus',collection:'demo',description:'Study rooms, campus supplies and account preferences.',interactive:true,icon:'C'}]]);
   for(const task of tasks){const id=taskSite(task);if(!map.has(id))map.set(id,{id,name:task.site_name||siteNames[id]||id,collection:task.collection||'Reviewed environments',description:'Reviewed tasks run through BrowserGym on the remote worker.',interactive:false,icon:(task.site_name||siteNames[id]||id).slice(0,1)});}
+  for(const site of reviewCatalog?.sites||[]){if(!map.has(site.id))map.set(site.id,{id:site.id,name:site.name,collection:site.dataset,interactive:false,icon:site.name.slice(0,1)});map.get(site.id).description='Browse the original website and inspect task objectives. Review objectives and existing worker tasks are listed separately.';}
   sites=[...map.values()];
   if(requestedSite&&siteFor(requestedSite)){siteID=requestedSite;requestedSite=null;}
   if(!siteFor(siteID))siteID='campus';
@@ -97,8 +101,10 @@ function renderSites(){
     for(const site of matching){
       const button=node('button',undefined,'site-choice');button.type='button';button.dataset.site=site.id;button.disabled=askBusy;button.setAttribute('aria-current',String(!globalPage&&site.id===siteID));
       const text=node('span',undefined,'site-choice-text'),heading=node('span',undefined,'site-choice-heading'),count=taskCounts.get(site.id)||0;
-      const badge=node('span',Array.isArray(config?.tasks)?count+' '+(count===1?'task':'tasks'):'… tasks','site-task-count');badge.title=Array.isArray(config?.tasks)?'Registered tasks, including unavailable tasks and separate conditions':'Loading task catalog';
-      heading.append(node('strong',site.name),badge);text.append(heading,node('small',site.interactive?'Explore · replays':manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site.id)?'Manual explore · replays':'Remote tasks · replays'));
+      const reviewCount=catalogTasks(site.id).length,displayCount=reviewCount||count;
+      const badge=node('span',reviewCount||Array.isArray(config?.tasks)?displayCount+' '+(displayCount===1?'task':'tasks'):'… tasks','site-task-count');badge.title=reviewCount?'Review catalog objectives; agent execution is not enabled':'Registered worker tasks, including unavailable tasks and separate conditions';
+      heading.append(node('strong',site.name),badge);text.append(heading,node('small',site.interactive?'Explore · replays':reviewCount?'Browse · review tasks':manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site.id)?'Manual explore · replays':'Remote tasks · replays'));
+      if(reviewCount&&count)text.append(node('span','+ '+count+' worker '+(count===1?'task':'tasks'),'site-worker-count'));
       button.append(node('span',site.icon,'site-icon'),text);button.onclick=()=>selectSite(site.id);details.append(button);
     }
     $('site-folders').append(details);
@@ -143,8 +149,43 @@ function recordRow(record,all){
   const grade=node('td');grade.append(gradeBadge(record));row.append(grade,node('td',dateLabel(record.at),'when'));
   const action=node('td'),open=node('button',activeStatuses.has(record.status)&&record.source==='harness'?'Watch →':['harness','library'].includes(record.source)?'Replay ↗':record.source==='demo'?'Conversation ↗':'Inspect ↗','replay-action');open.type='button';open.setAttribute('aria-label','Open '+record.title);open.onclick=()=>openRecord(record,all);action.append(open);row.append(action);return row;
 }
+function catalogClientURL(site){return /^\/sites\/tricky\/(shop|health|news|spotify)(\/[^?#]*)?$/.test(site?.client_url||'')?site.client_url:null;}
+function catalogRemoteAvailable(site){return !!(manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site?.manual_site_id&&row.tasks?.length));}
+function catalogAccess(site){return catalogClientURL(site)?'Manual site browsing available. Opening the site does not prepare a task or run its verifier.':catalogRemoteAvailable(site)?'Remote manual browsing available. Task-specific setup and agent launch are not enabled for these objectives.':'Remote manual browsing is not available for this site yet. All objectives remain available for review.';}
+function catalogBrowse(site){
+  const url=catalogClientURL(site);
+  if(url){const link=node('a','Browse site · no task setup ↗','catalog-browse');link.href=url;link.target='_blank';link.rel='noopener noreferrer';return link;}
+  const button=node('button',catalogRemoteAvailable(site)?'Open remote site controls →':'Remote browsing unavailable');button.type='button';button.disabled=!catalogRemoteAvailable(site);button.onclick=()=>{$('catalog-dialog').close();selectSite(site.id);};return button;
+}
+function showCatalogTask(task){
+  const site=catalogSiteFor(task.site_id);$('catalog-dialog-site').textContent=site.name+' / Review objective';$('catalog-dialog-title').textContent=task.id;$('catalog-dialog-goal').textContent=task.goal;
+  $('catalog-dialog-facts').replaceChildren(...[['Origin',task.origin==='project_authored'?'Project authored':'Original'],['Kind',task.kind],['Condition',task.condition],['Template',task.template_id],['Original starting path',task.start_path]].flatMap(([label,value])=>[node('dt',label),node('dd',value??'Not recorded')]));
+  $('catalog-dialog-scope').textContent=task.inspection_scope+' '+catalogAccess(site);$('catalog-dialog-browse').replaceChildren(catalogBrowse(site));$('catalog-dialog').showModal();
+}
+function renderCatalogTasks(){
+  $('catalog-status').textContent=catalogError?'Review catalog unavailable: '+catalogError:reviewCatalog?reviewCatalog.tasks.length+' review objectives across '+reviewCatalog.sites.length+' sites. Worker tasks are listed separately.':'Loading review task catalog…';
+  $('catalog-retry').hidden=!catalogError;$('catalog-retry').disabled=catalogLoading;
+  const site=catalogSiteFor(siteID);$('catalog-section').hidden=!site;if(!site)return;
+  if(catalogSite!==siteID){catalogSite=siteID;catalogLimit=24;$('catalog-search').value='';$('catalog-origin').value='all';$('catalog-kind').replaceChildren(node('option','All kinds'));$('catalog-kind').firstChild.value='all';for(const kind of [...new Set(catalogTasks(siteID).map(task=>task.kind))].sort()){const option=node('option',kind);option.value=kind;$('catalog-kind').append(option);}}
+  const all=catalogTasks(siteID),query=$('catalog-search').value.trim().toLowerCase(),origin=$('catalog-origin').value,kind=$('catalog-kind').value;
+  const filtered=all.filter(task=>(origin==='all'||task.origin===origin)&&(kind==='all'||task.kind===kind)&&(!query||[task.id,task.goal,task.template_id,task.condition].join(' ').toLowerCase().includes(query)));
+  $('catalog-heading').textContent=site.name+' · '+all.length+' review objectives';$('catalog-results').textContent='Showing '+Math.min(catalogLimit,filtered.length)+' of '+filtered.length+' matching objectives ('+all.length+' for this site).';$('catalog-access').textContent=catalogAccess(site);
+  const workerCount=tasks.filter(task=>taskSite(task)===siteID).length;$('catalog-worker-link').hidden=!workerCount;$('catalog-worker-link').textContent='Jump to '+workerCount+' existing worker '+(workerCount===1?'task':'tasks')+' ↓';
+  $('catalog-cards').replaceChildren(...filtered.slice(0,catalogLimit).map(task=>{const card=node('article',undefined,'task-card catalog-card');card.dataset.catalogTask=task.id;card.append(node('span',task.id,'task-index'),node('p',task.goal,'catalog-goal'),node('p',(task.origin==='project_authored'?'Project authored':'Original')+' · '+task.kind+' · '+task.condition,'catalog-facts'),node('span','Review only · launch unavailable','subtle-badge'));const button=node('button','View objective →');button.type='button';button.onclick=()=>showCatalogTask(task);card.append(button);return card;}));
+  if(!filtered.length)$('catalog-cards').append(node('p','No objectives match these filters.','muted'));$('catalog-more').hidden=filtered.length<=catalogLimit;
+}
+async function loadCatalog(){
+  if(catalogLoading||authExpired)return;catalogLoading=true;catalogError='';
+  try{const value=await api('/api/task-catalog');if(value.schema!=='browser-task-review-catalog-v1'||!Array.isArray(value.sites)||!Array.isArray(value.tasks))throw Error('Unexpected catalog format');reviewCatalog=value;catalogSite=null;buildSites();render();}
+  catch(error){catalogError=error.message;}
+  finally{catalogLoading=false;renderCatalogTasks();}
+}
+$('catalog-retry').onclick=loadCatalog;
+for(const id of ['catalog-search','catalog-origin','catalog-kind'])$(id).addEventListener(id==='catalog-search'?'input':'change',()=>{catalogLimit=24;renderCatalogTasks();});
+$('catalog-more').onclick=()=>{catalogLimit+=24;renderCatalogTasks();};
 function renderTasks(){
-  $('task-list-heading').textContent='Tasks for '+siteFor(siteID).name;
+  renderCatalogTasks();
+  $('task-list-heading').textContent='Worker tasks for '+siteFor(siteID).name;
   const currentTasks=tasks.filter(t=>taskSite(t)===siteID);
   $('task-cards').replaceChildren(...currentTasks.map((task,i)=>{const card=node('article',undefined,'task-card'+(task.available===false?' unavailable':''));card.append(node('span','TASK '+String(i+1).padStart(2,'0'),'task-index'),node('h3',task.title||task.id));if(task.condition)card.append(node('span',task.condition,'condition'));card.append(node('p',sessionGoal(task)?'The trusted objective is resolved when the new session starts.':task.goal||'No goal available.'));const button=node('button',task.available===false?'Task unavailable':'View task →');button.type='button';button.dataset.task=task.id;button.onclick=()=>showTask(task);card.append(button);return card;}));
   if(!currentTasks.length)$('task-cards').append(node('p','No reviewed tasks are registered for this site.','task-empty'));
@@ -219,7 +260,7 @@ function render(){
   const site=siteFor(siteID);if(!site)return;
   if(globalPage||view!=='explore'||!site.interactive)fullScreen.setActive(false,{focus:false});
   document.querySelector('.site-heading').hidden=globalPage;document.querySelector('.site-tabs').hidden=globalPage;
-  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Browse yourself or ask the agent to use this same remote session.':site.description;$('site-label').textContent=site.interactive?'Interactive website':'Remote worker environment';
+  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Browse yourself or ask the agent to use this same remote session.':site.description;$('site-label').textContent=site.interactive?'Interactive website':catalogSiteFor(siteID)?'Website + review catalog':'Remote worker environment';
   $('explore-view').hidden=globalPage||view!=='explore';$('research-view').hidden=globalPage||view!=='research';$('global-view').hidden=!globalPage||view==='review';$('review-view').hidden=view!=='review';
   $('explore-tab').setAttribute('aria-pressed',String(view==='explore'));$('research-tab').setAttribute('aria-pressed',String(view!=='explore'));$('replay-count').textContent=historyLoaded?String(records().filter(r=>r.site===siteID).length)+(historyMore?'+':''):'…';
   $('tab-note').textContent=view==='explore'?'Browse the site or open a reviewed task.':'Tasks and recorded attempts for this site.';
@@ -231,6 +272,7 @@ function render(){
 }
 function updateManualViews(){
   renderManual();renderSites();syncControls();
+  if(view==='research')renderCatalogTasks();
   if(currentRun?.source==='manual')currentRun=records().find(record=>record.key===currentRun.key)||currentRun;
   if(view==='research')renderTasks();if(globalPage&&view!=='review')renderGlobal();if(view==='review')renderReview();
   $('replay-count').textContent=historyLoaded?String(records().filter(record=>record.site===siteID).length)+(historyMore?'+':''):'…';
@@ -240,6 +282,8 @@ function rememberManual(session){
   manualSessions=[session,...manualSessions.filter(row=>row.id!==session.id)];
 }
 function renderManual(){
+  const reviewSite=catalogSiteFor(siteID);$('catalog-site-launch').hidden=!reviewSite||['tricky-shop','tricky-health','tricky-music'].includes(siteID);
+  if(reviewSite){$('catalog-site-title').textContent='Browse '+reviewSite.name;$('catalog-site-access').textContent=catalogAccess(reviewSite);$('catalog-site-browse').replaceChildren(catalogBrowse(reviewSite));}
   $('local-shop-launch').hidden=!['tricky-shop','authorized-warranty'].includes(siteID);
   $('local-shop-clean').hidden=siteID==='authorized-warranty';
   $('local-music-launch').hidden=siteID!=='tricky-music';
@@ -544,4 +588,4 @@ window.addEventListener('message',event=>{const frame=$('shared-trace-viewer');i
 buildSites();readRoute();
 api('/assets/fixture.json').then(value=>{fixture=value;window.demoWorld=new World(fixture);render();}).catch(error=>notice(error.message));
 api('/api/config').then(value=>{modelConfig=value;syncControls();if(!value.live_available)$('chat-status').textContent='OpenRouter is not configured for this deployment.';}).catch(error=>notice(error.message));
-refresh();loadManual();
+refresh();loadManual();loadCatalog();
