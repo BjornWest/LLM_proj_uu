@@ -1,0 +1,68 @@
+{
+  "schema": "manual-site-provisioning-validation-v1",
+  "canonical_origin": "http://172.23.129.52:8896",
+  "model_calls": 0,
+  "production_verified": false,
+  "lease_revocation_verified": false,
+  "ownership": "Backend owns both clone lifecycles after DATA-EXP-BROWSE-01 handoff; curation has stopped mutations.",
+  "sites": {
+    "shopping": {
+      "spec": {
+        "name": "daylight-manual-shopping-v1",
+        "port": 17870,
+        "control_port": 17871,
+        "memory": "4g",
+        "image": "am1n3e/webarena-verified-shopping@sha256:3e8cb9b945ea9b1c94ab26dba53e8d12dd0406abbf4bf686fd3bb2b6a5908feb",
+        "image_id": "sha256:a5b6fb47ee9f378ceca18e32261a92a8964f0ccfb9f1d3741ce3a0e2d990839d"
+      },
+      "upstream_origin": "http://127.0.0.1:17870",
+      "container_after": {
+        "Id": "49d5d5f24b3296f8562b23c49815307552817e8a382c74e788ec0dc48418d93c",
+        "Image": "sha256:a5b6fb47ee9f378ceca18e32261a92a8964f0ccfb9f1d3741ce3a0e2d990839d",
+        "Created": "2026-09-19T21:08:35.949553161Z",
+        "Mounts": []
+      },
+      "rehearsal_report": ".local/manual-sites/shopping-reset-rehearsal-v4/report.json",
+      "rehearsal_report_sha256": "442813f9ce2b45b023ce1faf8b736785c37dafebe1683267867b0d85e1da4993",
+      "initial_equals_restored": true,
+      "native_mutation_observed": true
+    },
+    "forum": {
+      "spec": {
+        "name": "daylight-manual-forum-v1",
+        "port": 19170,
+        "control_port": 19171,
+        "memory": "2g",
+        "image": "am1n3e/webarena-verified-reddit@sha256:0594908059a03e5f610005689440a95c05e776e734006197c7b1eba12734cb46",
+        "image_id": "sha256:59a4863de0f2107ef275e4ee33d8ca37d76ccceeed8ec558cdda1a0c64939914"
+      },
+      "upstream_origin": "http://127.0.0.1:19170",
+      "container_after": {
+        "Id": "4c408f8273848e84e10c9290b1da2edc0044b1db6880c765d12a7ff2ebd76205",
+        "Image": "sha256:59a4863de0f2107ef275e4ee33d8ca37d76ccceeed8ec558cdda1a0c64939914",
+        "Created": "2026-09-19T21:09:23.097749197Z",
+        "Mounts": []
+      },
+      "rehearsal_report": ".local/manual-sites/forum-reset-rehearsal-v3/report.json",
+      "rehearsal_report_sha256": "a9d6b2ae8fde015422dbd1a590fbe7ca5020796129c03a463e7e2c53317fab09",
+      "initial_equals_restored": true,
+      "native_mutation_observed": true
+    }
+  },
+  "source_sha256": {
+    "data/curation/manual_sites/clones.py": "15657a1ddf0436f65784595ab90d9b965790a9167e3ee486334dbd14e1f9f7fb",
+    "data/curation/manual_sites/test_clones.py": "e1e0a35482b35b8fd705c78929d63f42bd76f76304f9bccd5554a9d17065f573",
+    "data/curation/manual_sites/rehearse.py": "e265b47e92b1b2e483b517f4aa8cb034275bff09ab530a074cf00137b1b99947"
+  },
+  "limitations": [
+    "One native saved mutation per site, not comprehensive database coverage.",
+    "Test transport was a temporary loopback forwarder, not the production lease proxy.",
+    "Native browser page-error events retained (service-worker register TypeError); these did not prevent observed save/reset.",
+    "Earlier failed route-interception development reports are retained separately."
+  ],
+  "nonfatal_page_error_diagnostic": {
+    "report": ".local/manual-sites/service-worker-probe.json",
+    "sha256": "b5b813ec7e9f4255c2f7b708c315a4cacfc93cb1f1cbc5a512c718a15fd63a7a",
+    "finding": "Identical register TypeError reproduced with service_workers=block on synthetic HTTP non-secure origin; absent with allow. navigator.serviceWorker is undefined in both. No upstream site requests."
+  }
+}

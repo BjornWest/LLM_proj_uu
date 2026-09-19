@@ -1,0 +1,47 @@
+{
+  "scope": "Pre-release local and container manual browsing; not production/model/task certification",
+  "source_sha256": {
+    "deploy/control/Dockerfile": "765eb404b9e72cdb5d421a31d4327f6f464b171f1efc7bb232fb9d1c8ae6fef2",
+    "deploy/control/Dockerfile.dockerignore": "453826b23fdb2d254575e17cc6e230ec3bdc5936c6d5d98180d017c5e7ab643e",
+    "deploy/control/browse.override.yaml": "6220a48804ea3aa38cc914d94149064d1164b705bc0bbd3ec74cd8f727d4fee5",
+    "deploy/daylight/lib/manual.mjs": "4b181070a9ea3d8a66ae393b3c08aa764aeddf7d107df87c4f31558a12b1f50c",
+    "deploy/daylight/lib/browse-pool.mjs": "f5a42d2d91aab7c99e757c77a72cd0032f1f79bb35453a80a6f188935f6cf68c",
+    "deploy/daylight/tests/manual-server.mjs": "f20000975d4d0ba9beda8ca29c9cd96941e915d45872ed838c6a2960f526216f",
+    "deploy/daylight/tests/manual.test.mjs": "0d2e1795a44472724b21fe4b0aa1cbcf1b9830fa29a1caa9a040051bf437292f",
+    "scripts/manual_environment.py": "62f23801ff36eff8b0b7c676beadb1845d57f9e4e95e9e8464f9910e24547856",
+    "scripts/manual_browse_runtime.py": "d156de75a0bd194bea55b91cc94523e8a181dfa91f7421a72c479b773697b1a8",
+    "scripts/browse_pool_server.py": "31b5ced342e724d2b92f8e4dd714fa5d988aa145f2cc6f07d966908316215622",
+    "scripts/test_manual_environment.py": "960ce18993090e51f7c611466dd508551674ed9c78df5a6491549a26c99178ae",
+    "scripts/verify_generic_browsing.mjs": "1217863d63ff0a43df51c2180f57eeb818bfbafaeeeb9abc72944e432552cc09",
+    "scripts/verify_browse_isolation.mjs": "7d42b697a01f4642548ed57dde999cda36fe7bbfc2cda2170854f44e0dc0490b",
+    "scripts/smoke_generic_browsing_live.py": "2da8a92c052c925f3584140eaee4974bc4a1892d26d6685faec64ba10f237a23",
+    "scripts/verify_browse_pool_live.py": "3cb2a1dcd840b14833fb08e2dff9febae5eb59d22cc26c11c990c1281a4050cc",
+    "scripts/verify_browse_redirects.py": "c908161685a1a5eb2faea73bd6c0a8befb456b3948c7bc85af577d5d930d6a04",
+    "tests/test_browse_pool.py": "26904c2778f8e44773c688b51c9a89214239c7fa7e8a03edba70b73b8f4c6be5",
+    "docs/agents/all-site-browsing.md": "87210ff9e0da267a1167b6a90d9559e7880458c57656b0672f9ec0472b9fa468",
+    "docs/agents/manual-site-clones.md": "5f1973c06f92a249969205f6cf4fec3acf28aa1d64c4473ecdb5f7a0e16f7824",
+    "data/curation/manual_sites/clones.py": "15657a1ddf0436f65784595ab90d9b965790a9167e3ee486334dbd14e1f9f7fb",
+    "data/curation/manual_sites/test_clones.py": "e1e0a35482b35b8fd705c78929d63f42bd76f76304f9bccd5554a9d17065f573",
+    "data/curation/manual_sites/rehearse.py": "e265b47e92b1b2e483b517f4aa8cb034275bff09ab530a074cf00137b1b99947",
+    "data/curation/manual_sites/validation.json": "39b8c96b1951ea4c7d05d5a5d369bd21a86323fffe9fbac58ea8fb9e9487ed44",
+    "data/curation/manual_sites/LEASE_REVIEW.md": "c035271e2f36de6077dcd8331186527a440bd737468b83d21d11afc538390b33"
+  },
+  "evidence_sha256": {
+    ".local/manual-browse/tricky-v1/report.json": "02569137ce2aeeb6c23c231f01d85ae428d2d3593add69a93f6135f8ba068896",
+    ".local/manual-browse/tricky-ui-v3/report.json": "01b6c688f660284bfaf91ea79750fd05e19c06f5f493cb9542418dc13396c095",
+    ".local/manual-browse/tricky-isolation-v1/report.json": "458ec5ee793adaeef5a398214392e7437716757ceed7c8a1e43a1dfea9484a59",
+    ".local/manual-browse/redirect-v2/report.json": "c32f4e811284c4913d29bf4e2c992265c217bcb42a8308cda4777a52d69d59cb",
+    ".local/manual-browse/pool-native-v2/report.json": "ea2f664cf0613e1f3efe9b0348590f99eca1eb691c2d2750e9af09270ee7f281",
+    ".local/manual-browse/container-tricky-ui-v1/report.json": "1532bc3778471c331b5cf1d5ecb587d08989949c994db9cd421c89063734c280",
+    ".local/manual-browse/container-webarena-ui-v2/report.json": "a518600917db8aca9de27a0d05baea09059b96a915bc4fb47642665a4764974d",
+    ".local/manual-sites/independent-lease-review-v2/report.json": "948c388d57e8c4da5a2c983fb948cb1fca65285cbbd545fee32db0ae4b959f97"
+  },
+  "model_calls": 0,
+  "control_image_id": "sha256:f9654e589f980f9d2df1e190015e9dcb6352b60b5b7e07a3a4c131e5acec87bb",
+  "redirect_broker_sha256": "31b5ced342e724d2b92f8e4dd714fa5d988aa145f2cc6f07d966908316215622",
+  "notes": [
+    "Earlier proxy-v1 evidence retained but excluded from final redirect acceptance",
+    "Container source fingerprints verified separately before rollout",
+    "Six generic sites are manual-only, ungraded; 203 catalog tasks stay review-only"
+  ]
+}

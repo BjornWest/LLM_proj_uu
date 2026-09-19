@@ -30,4 +30,11 @@ class ManualActionTests(unittest.TestCase):
             self.assertTrue(action_code({'type':'press','key':key},1280,720))
         self.assertTrue(action_code({'type':'type','text':'a'*1000},1280,720))
 
+    def test_navigation_is_explicitly_browse_only(self):
+        for name in ['back','forward','reload']:
+            with self.assertRaises(ValueError):action_code({'type':name},1280,720)
+            code=action_code({'type':name},1280,720,browsing=True)
+            self.assertTrue(code.startswith('page.'))
+            with self.assertRaises(ValueError):action_code({'type':name,'url':'http://outside'},1280,720,browsing=True)
+
 if __name__=='__main__':unittest.main()

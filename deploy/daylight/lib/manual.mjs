@@ -5,6 +5,7 @@ import {mkdir,readFile,appendFile,realpath,stat,open,writeFile,rename} from 'nod
 import path from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
 import {infer} from './manual-agent.mjs';
+import {BrowsePool} from './browse-pool.mjs';
 import {TASKS} from './harness.mjs';
 
 const prefix='daylight/manual/',ID=/^[a-f0-9-]{36}$/;
@@ -13,19 +14,22 @@ const assert=(ok,message,status=400)=>{if(!ok)throw Object.assign(Error(message)
 const stamp=()=>new Date().toISOString();
 const key=id=>prefix+id+'.json';
 export const MANUAL_TASKS=TASKS.filter(t=>t.id!=='rooms');
+
+const SITE_REVISION=MANUAL_TASKS.find(t=>t.site_revision)?.site_revision;
+export const BROWSE_TASKS=[['tricky-shop','Shop'],['tricky-health','Health'],['tricky-news','News'],['tricky-music','Music'],['webarena-shopping','WebArena shopping'],['webarena-forum','WebArena forum']].map(([site_id,title])=>({id:'browse.'+site_id,site_id,title:'Browse '+title,collection:site_id.startsWith('tricky-')?'trickyarena':'webarena-verified',condition:null,browse_only:true,site_revision:site_id.startsWith('tricky-')?SITE_REVISION:null}));
 const publicSession=row=>{
-  const {owner,directory,frame_files,commands,process_token,archive,trace_directory,...out}=row;
+  const {owner,directory,frame_files,commands,process_token,archive,trace_directory,browse_lease,...out}=row;
   return {...out,frame:row.frame?{...row.frame,url:`/api/manual/sessions/${row.id}/frame/${row.frame.id}`}:null};
 };
 
 class Driver {
-  constructor({python,script,packageDir,directory,task,actor='human',timeout=24000}) {
+  constructor({python,script,packageDir,directory,task,actor='human',browseConfig=null,timeout=24000}) {
     this.timeout=timeout;this.waiter=null;this.last=null;this.exited=false;this.logBytes=0;
     // The browser process gets no control token, model key or invitation secret.
     const env={PATH:process.env.PATH,HOME:'/tmp',PYTHONUNBUFFERED:'1',PYTHONDONTWRITEBYTECODE:'1',
       PYTHONPATH:path.join(packageDir,'runtime'),PLAYWRIGHT_BROWSERS_PATH:process.env.PLAYWRIGHT_BROWSERS_PATH||'/opt/playwright'};
     if(process.env.LD_LIBRARY_PATH)env.LD_LIBRARY_PATH=process.env.LD_LIBRARY_PATH;
-    this.child=spawn(python,[script,'--package',packageDir,'--output',directory,'--task',task,'--actor',actor],
+    this.child=spawn(python,[script,'--package',packageDir,'--output',directory,'--task',task,'--actor',actor,...(browseConfig?['--browse-config',browseConfig]:[])],
       {env,detached:true,stdio:['ignore','pipe','pipe','pipe','pipe']});
     // Dataset CLIs may inspect/change stdin. Keep commands on a private descriptor.
     this.commands=this.child.stdio[4];
@@ -53,7 +57,8 @@ class Driver {
 }
 
 export class Manual {
-  constructor(store,{env=process.env,driverFactory=args=>new Driver(args),fetcher=fetch}={}){
+  constructor(store,{env=process.env,driverFactory=args=>new Driver(args),fetcher=fetch,pool=null}={}){
+    this.pool=pool||new BrowsePool(env,fetcher);
     this.store=store;this.env=env;this.fetcher=fetcher;this.driverFactory=driverFactory;this.live=new Map();this.ownerLocks=new Set();this.reserved=0;
     this.processToken=randomUUID();
     this.root=path.resolve(env.DAYLIGHT_MANUAL_ROOT||'/manual');
@@ -65,14 +70,23 @@ export class Manual {
       try{const m=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'manifest.json')));available=MANUAL_TASKS.every(t=>m.datasets.some(d=>d.tasks.includes(t.id)));
         if(available&&MANUAL_TASKS.some(t=>t.site_revision)){const registry=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'runtime/config/team_tasks.json')));available=MANUAL_TASKS.every(t=>!t.site_revision||registry.tasks.some(r=>r.id===t.id&&r.revision===t.revision&&r.site_revision===t.site_revision));}}catch{}
     }
+    let poolStatus={sites:[]};
+    if(this.env.DAYLIGHT_BROWSE_ENABLED==='1')try{poolStatus=await this.pool.status();}catch{}
+    const browsing=this.env.DAYLIGHT_BROWSE_ENABLED==='1'?BROWSE_TASKS.map(t=>{
+      const slot=poolStatus.sites.find(s=>s.site_id===t.site_id);
+      const local=t.site_id.startsWith('tricky-');
+      return {...t,available:available&&(local||slot?.status==='ready'),
+        unavailable_reason:!available?'service_unavailable':local?null:slot?.status==='leased'?'pool_busy':slot?.status==='resetting'?'resetting':slot?.status==='ready'?null:'service_unavailable'};
+    }):[];
     const sites=[];
-    for(const t of MANUAL_TASKS){let s=sites.find(s=>s.site_id===t.site_id);if(!s){s={site_id:t.site_id,default_task:t.id,tasks:[]};sites.push(s);}s.tasks.push({id:t.id,title:t.title,condition:t.condition,site_revision:t.site_revision??null});}
+    for(const t of [...browsing,...MANUAL_TASKS]){let s=sites.find(s=>s.site_id===t.site_id);if(!s){s={site_id:t.site_id,default_task:t.id,tasks:[]};sites.push(s);}s.tasks.push({id:t.id,title:t.title,condition:t.condition,site_revision:t.site_revision??null,browse_only:!!t.browse_only,ask_enabled:!t.browse_only,available:t.available??available,unavailable_reason:t.unavailable_reason??null});s.available=s.tasks.some(t=>t.available);s.unavailable_reason=s.available?null:t.unavailable_reason??'service_unavailable';}
     return {enabled:available,ask_enabled:available&&!!this.env.OPENROUTER_API_KEY,sites,limits:{max_sessions:2,idle_seconds:300,max_seconds:900,max_actions:100,max_ask_turns:30,max_model_calls_per_turn:12}};
   }
   async record(owner,id){
     assert(typeof owner==='string'&&/^[a-z0-9-]{1,40}$/.test(owner),'Invalid owner');assert(ID.test(id),'Invalid session ID');
     let saved=await this.store.read(key(id));assert(saved?.value.owner===owner,'Manual session not found',404);
     if(!terminal.has(saved.value.status)&&saved.value.process_token!==this.processToken){
+      await this.releaseLease(saved.value);
       saved.value.status='interrupted';saved.value.controller='human';
       for(const ask of saved.value.asks||[])if(['running','stopping'].includes(ask.status)){ask.status='interrupted';ask.error='Browser service restarted; consult original request records. Pending billing may be unknown.';}
       saved.value.error='The manual browser service restarted. Earlier page changes may have happened; no actions were replayed.';
@@ -96,29 +110,40 @@ export class Manual {
     assert(typeof owner==='string'&&/^[a-z0-9-]{1,40}$/.test(owner),'Invalid owner');
     assert(!this.ownerLocks.has(owner),'Another manual session is starting',409);this.ownerLocks.add(owner);
     try{
-      const selected=MANUAL_TASKS.find(t=>t.id===task);assert(selected,'Unsupported manual task');
+      const selected=[...MANUAL_TASKS,...(this.env.DAYLIGHT_BROWSE_ENABLED==='1'?BROWSE_TASKS:[])].find(t=>t.id===task);assert(selected,'Unsupported manual task');
       assert(!selected.site_revision||site_revision===selected.site_revision,'Client and remote site versions differ; refresh after deployment',409);
       assert(!(await this.list(owner)).sessions.some(s=>!terminal.has(s.status)),'Close your current manual session before opening another',409);
       assert(this.live.size+this.reserved<2,'Both manual browser slots are in use; close a session or try later',429);
       const id=randomUUID(),directory=path.join(this.root,id),now=stamp();
       const row={id,owner,task,site_revision:selected.site_revision??null,site_id:selected.site_id,collection:selected.collection,condition:selected.condition??null,
         task_name:selected.title,interaction_kind:'manual',runtime:'BrowserGym',status:'starting',created_at:now,updated_at:now,
-        reference_goal:null,asks:[],controller:'human',frame:null,action_count:0,last_action:null,last_error:null,evaluation:null,
+        browse_only:!!selected.browse_only,ask_enabled:!selected.browse_only,reference_goal:null,asks:[],controller:'human',frame:null,action_count:0,last_action:null,last_error:null,evaluation:null,
         reference_evaluation:null,trace_ready:false,error:null,directory,commands:[],frame_files:{},process_token:this.processToken};
       let driver;this.reserved++;
       try{
         await mkdir(directory,{recursive:true,mode:0o700});
         await this.store.write(key(id),row);
+        let browseConfig=null;
+        if(selected.browse_only&&selected.site_id.startsWith('webarena-')){
+          row.browse_lease=await this.pool.acquire(selected.site_id,id);
+          await this.save(row);
+          browseConfig=path.join(directory,'browser-launch.json');
+          await writeFile(browseConfig,JSON.stringify(row.browse_lease),{mode:0o600,flag:'wx'});
+        }
         driver=this.driverFactory({python:this.env.DAYLIGHT_MANUAL_PYTHON||'python',script:this.env.DAYLIGHT_MANUAL_DRIVER,
-          packageDir:this.env.DAYLIGHT_MANUAL_PACKAGE,directory,task,
+          packageDir:this.env.DAYLIGHT_MANUAL_PACKAGE,directory,task,browseConfig,
           actor:this.env.DAYLIGHT_MANUAL_ACTOR==='scripted_validation'?'scripted_validation':'human'});
-        this.live.set(id,{driver,owner,lastActive:Date.now(),started:Date.now(),busy:true});
+        this.live.set(id,{driver,owner,row,lastActive:Date.now(),started:Date.now(),busy:true});
         const result=await driver.ready();assert(['ready','finished'].includes(result.kind),'Invalid browser startup',503);
         await this.apply(row,result);const live=this.live.get(id);if(live)live.busy=false;
         return publicSession(row);
-      }catch(error){driver?.kill();this.live.delete(id);row.status='error';row.error='Manual browser setup failed; no model was called.';row.updated_at=stamp();try{await this.save(row);}catch{};throw Object.assign(Error(row.error),{status:503});}
+      }catch(error){driver?.kill();await this.releaseLease(row);this.live.delete(id);row.status='error';row.error='Manual browser setup failed; no model was called.';row.updated_at=stamp();try{await this.save(row);}catch{};throw Object.assign(Error(row.error),{status:error.status===429?429:503});}
       finally{this.reserved--;}
     }finally{this.ownerLocks.delete(owner);}
+  }
+  async releaseLease(row){
+    if(!row.browse_lease)return;
+    try{await this.pool.release(row.browse_lease);row.browse_lease=null;}catch{/* Failed release stays leased until expiry; never locally reuse a slot. */}
   }
   async apply(row,result){
     if(result.trace_directory){const directory=path.resolve(result.trace_directory);assert(directory===row.directory||directory.startsWith(row.directory+path.sep),'Invalid trace directory',503);row.trace_directory=directory;}
@@ -129,12 +154,12 @@ export class Manual {
       row.frame_files[result.frame.id]=file;
       row.frame={id:result.frame.id,width:result.frame.width,height:result.frame.height,page_url:result.frame.page_url};
     }
-    row.reference_goal=result.reference_goal??row.reference_goal;row.action_count=result.action_count??row.action_count;
+    row.reference_goal=row.browse_only?null:result.reference_goal??row.reference_goal;row.action_count=result.action_count??row.action_count;
     row.last_error=result.last_error??null;row.updated_at=stamp();
     row.status=result.kind==='finished'?(result.error?'error':'finished'):row.controller==='agent'?'busy':'ready';
     if(result.kind==='finished'){
-      row.error=result.error??null;row.reference_evaluation=result.reference_evaluation??null;
-      row.trace_ready=!!result.archive;row.archive=result.archive;row.stop_reason=result.stop_reason;this.live.delete(row.id);
+      row.error=result.error??null;row.reference_evaluation=row.browse_only?null:result.reference_evaluation??null;
+      row.trace_ready=!!result.archive;row.archive=result.archive;row.stop_reason=result.stop_reason;await this.releaseLease(row);this.live.delete(row.id);
     }
     await this.save(row);
   }
@@ -162,7 +187,7 @@ export class Manual {
       await this.apply(row,result);return publicSession(row);
     }catch(error){
       if(error.manualRejected)throw error;
-      live.driver.kill();this.live.delete(id);row.status='interrupted';row.error='Manual command did not complete reliably. Earlier page changes may have happened; no automatic replay.';
+      live.driver.kill();await this.releaseLease(row);this.live.delete(id);row.status='interrupted';row.error='Manual command did not complete reliably. Earlier page changes may have happened; no automatic replay.';
       row.updated_at=stamp();row.last_error=row.error;try{await this.save(row);}catch{}
       throw Object.assign(Error(row.error),{status:503});
     }finally{live.busy=false;}
@@ -188,6 +213,7 @@ export class Manual {
     assert(typeof goal==='string'&&goal.trim()&&goal.length<=2000,'Provide a request up to 2000 characters');
     assert(this.env.OPENROUTER_API_KEY,'Remote inference is not configured',503);
     const row=(await this.record(owner,id)).value;
+    assert(row.ask_enabled!==false,'This session supports manual browsing only',409);
     const prior=row.asks?.find(a=>a.id===request_id);if(prior){assert(prior.goal===goal,'Request ID already used',409);return publicSession(row);}
     const live=this.live.get(id);assert(live&&!live.busy&&row.status==='ready','Browser is already controlled or closed',409);
     assert(!row.environment_finished,'The environment has ended; open a new session',409);
@@ -301,5 +327,5 @@ os.replace(tmp,dest)`;
   async expire(){for(const [id,live]of this.live){if(!live.busy&&(Date.now()-live.lastActive>300000||Date.now()-live.started>900000)){
     try{await this.command(live.owner,id,'close',{request_id:randomUUID(),reason:'manual_session_timeout'});}catch{}
   }}}
-  shutdown(){clearInterval(this.timer);for(const live of this.live.values()){live.cancel?.abort();live.driver.kill();}this.live.clear();}
+  shutdown(){clearInterval(this.timer);for(const live of this.live.values()){live.cancel?.abort();live.driver.kill();if(live.row)this.releaseLease(live.row).catch(()=>{});}this.live.clear();}
 }

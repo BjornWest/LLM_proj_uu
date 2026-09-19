@@ -1,0 +1,7 @@
+# Append to the existing full-site/control/library Compose stack.
+# Keep the host lease proxy running and preserve all existing volumes.
+services:
+  control:
+    image: intent-browser-control:all-sites-v1
+    env_file:
+      - ../../.local/browse-pool/control.env

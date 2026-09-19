@@ -16,15 +16,18 @@ import time
 from uuid import uuid4
 import zipfile
 
+NAVIGATION = {name: f"page.{method}(timeout=20000, wait_until='domcontentloaded')" for name, method in [('back','go_back'),('forward','go_forward'),('reload','reload')]}
+
 KEYS = {'Tab', 'Shift+Tab', 'Enter', 'Escape', 'Backspace', 'Delete', 'Space',
         'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End',
         'PageUp', 'PageDown', 'ControlOrMeta+a'}
 
 
-def action_code(value, width, height):
+def action_code(value, width, height, *, browsing=False):
     if not isinstance(value, dict):
         raise ValueError('Invalid manual action')
     kind = value.get('type')
+    if browsing and kind in NAVIGATION and set(value) == {'type'}: return NAVIGATION[kind]
     def number(name, low, high):
         n = value.get(name)
         if type(n) not in (int, float) or not math.isfinite(n) or not low <= n <= high:
@@ -91,7 +94,14 @@ def run(args):
     def interrupted(*_):
         raise InterruptedError('Manual controller stopped the session')
     signal.signal(signal.SIGTERM, interrupted)
-    with EnvironmentRuntime(args.package, output/'environment') as runtime:
+    browsing = args.task.startswith('browse.')
+    if browsing:
+        from manual_browse_runtime import BrowsingRuntime
+        launch = json.loads(Path(args.browse_config).read_text()) if args.browse_config else {}
+        runtime_context = BrowsingRuntime(args.package, output/'environment', launch=launch)
+    else:
+        runtime_context = EnvironmentRuntime(args.package, output/'environment')
+    with runtime_context as runtime:
       with runtime.session(args.task) as session:
         try:
             trace = Trace(output/'runs', {'task': args.task, 'driver': args.actor, 'interaction_kind': 'manual',
@@ -106,11 +116,14 @@ def run(args):
             trace.event('task_prepare_completed', artifact='task.json')
             actions = HighLevelActionSet(subsets=['coord', 'bid'], strict=True, multiaction=False)
             trace.event('environment_create_started')
-            env = session.make_env(action_mapping=actions.to_python_code, headless=True)
+            def mapping(code):
+                if browsing and code in NAVIGATION.values(): return code
+                return actions.to_python_code(code)
+            env = session.make_env(action_mapping=mapping, headless=True)
             trace.event('environment_reset_started', seed=args.seed)
             obs, info = env.reset(seed=args.seed)
             initial = session.capture_initial(env, obs, info)
-            reference_goal = getattr(session.task, 'policy_goal', None) or obs['goal']
+            reference_goal = None if browsing else (getattr(session.task, 'policy_goal', None) or obs['goal'])
             write_json(trace.directory/'initial-state.json', {'resolved_goal': reference_goal, 'task_state': initial, 'browsergym_seed': args.seed})
             trace.event('environment_reset_completed', artifacts=['initial-state.json'])
             obs = refresh_observation(env)
@@ -126,6 +139,9 @@ def run(args):
                 if operation == 'close':
                     stop_reason = command.get('reason', 'user_close')
                     break
+                if browsing and operation in ('agent_observe','agent_action'):
+                    emit({'kind':'rejected','request_id':last_command,'error':'This site session supports manual browsing only.'})
+                    continue
                 if operation == 'agent_observe':
                     goal = command.get('goal')
                     ask_id = command.get('ask_id')
@@ -180,7 +196,7 @@ def run(args):
                         continue
                     pending_decision = None
                     try:
-                        code = action_code(command.get('action'), frame['width'], frame['height'])
+                        code = action_code(command.get('action'), frame['width'], frame['height'], browsing=browsing)
                     except ValueError as error:
                         trace.event('manual_action_rejected', request_id=last_command, error=str(error))
                         emit({'kind': 'rejected', 'request_id': last_command, 'error': str(error)})
@@ -242,7 +258,7 @@ def run(args):
         finally:
             reference_evaluation = None
             if trace:
-                if env is not None and obs is not None:
+                if env is not None and obs is not None and not browsing:
                     trace.event('evaluation_started', scope='reference_task_diagnostic_only')
                     try:
                         assessment = session.evaluate(env, trace, {'final_reward': reward, 'terminated': terminated,
@@ -262,6 +278,7 @@ def run(args):
                     except Exception as error:
                         technical_error = technical_error or type(error).__name__+': close failed'
                     trace.event('environment_closed')
+                if browsing: session.close()
                 ask_records = [json.loads(p.read_text()) for p in sorted(trace.directory.glob('ask-*.json'))]
                 model_attempts = [step for ask in ask_records for step in ask.get('steps', []) if step.get('dispatch_at')]
                 models = sorted({step['request']['model'] for step in model_attempts})
@@ -286,6 +303,7 @@ if __name__ == '__main__':
     parser.add_argument('--package', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--task', required=True)
+    parser.add_argument('--browse-config')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--actor', choices=['human', 'scripted_validation'], default='human')
     parser.add_argument('--rpc-fd', type=int, default=3)
