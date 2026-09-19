@@ -1,5 +1,10 @@
 # Tricky original-task expansion: first batch
 
+**Final review snapshot:** 100 accepted tasks on four complete imported sites:
+21 originals plus 79 authored instances from 60 authored templates. See the
+[review guide](../dataset-expansion-review.md). Counts below retain batch history;
+no model/training readiness is implied.
+
 This is a local, offline development batch for general browser capability. It
 uses the **complete existing pinned Tricky website**, without adding dark
 patterns, removing routes, editing site assets, or changing shared runtime

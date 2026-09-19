@@ -1,0 +1,878 @@
+{
+  "schema": "webarena-wishlist-validation-index-v1",
+  "source_task_ids": [
+    465,
+    466,
+    467,
+    468,
+    469,
+    516,
+    517,
+    518,
+    519,
+    520
+  ],
+  "source_template_ids": [
+    186,
+    196
+  ],
+  "cases": [
+    {
+      "task_id": 516,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-session-probe-v2/516-positive/report.json",
+      "report_sha256": "2e8c99208efa42e2bb138606ea5a758d43628c2a68cc753ebd023c4e97710f71",
+      "trace": ".local/curation-expansion/wishlist-session-probe-v2/516-positive/traces/20260919T172826Z-baa960b5",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          3
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 465,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/465-positive/report.json",
+      "report_sha256": "654ea826b8570770050ad7309be8654e9164130f6d9da1696f26401c01695169",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/465-positive/traces/20260919T172857Z-eccd1b4a",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          4
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": false,
+      "action_errors": [
+        {
+          "step": 1,
+          "action": "press(bid='195', key_comb='Enter')",
+          "error": "TimeoutError: Locator.press: Timeout 500ms exceeded.\nCall log:\nwaiting for get_by_test_id(\"195\")\n  -   locator resolved to <input name=\"q\" bid=\"195\" id=\"search\" type=\"text\" maxle\u2026/>\n  - elementHandle.press(\"Enter\")\n"
+        }
+      ],
+      "technical_error": null
+    },
+    {
+      "task_id": 465,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/465-wrong-product/report.json",
+      "report_sha256": "47668fd65bc7e4af713217a3688ac2dd1fdc0c70ce524da261c9eb0ae4ac6d80",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/465-wrong-product/traces/20260919T172932Z-2aadcf84",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": false,
+      "action_errors": [
+        {
+          "step": 1,
+          "action": "press(bid='175', key_comb='Enter')",
+          "error": "TimeoutError: Locator.press: Timeout 500ms exceeded.\nCall log:\nwaiting for get_by_test_id(\"175\")\n  -   locator resolved to <input name=\"q\" bid=\"175\" id=\"search\" type=\"text\" maxle\u2026/>\n  - elementHandle.press(\"Enter\")\n"
+        }
+      ],
+      "technical_error": null
+    },
+    {
+      "task_id": 466,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/466-positive/report.json",
+      "report_sha256": "f4c1570c7a3685d4c5f0dd41d7517889c409017fbf148c705b8af1385f157604",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/466-positive/traces/20260919T172956Z-2f083db6",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          6
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": false,
+      "action_errors": [
+        {
+          "step": 1,
+          "action": "press(bid='201', key_comb='Enter')",
+          "error": "TimeoutError: Locator.press: Timeout 500ms exceeded.\nCall log:\nwaiting for get_by_test_id(\"201\")\n  -   locator resolved to <input name=\"q\" bid=\"201\" id=\"search\" type=\"text\" maxle\u2026/>\n  - elementHandle.press(\"Enter\")\n"
+        }
+      ],
+      "technical_error": null
+    },
+    {
+      "task_id": 466,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/466-wrong-product/report.json",
+      "report_sha256": "a31032d72ef752a9ec9d5e7d294546299702d0bd5c530025e47edf37edff61b3",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/466-wrong-product/traces/20260919T173016Z-9129ee8d",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 467,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/467-positive/report.json",
+      "report_sha256": "f1e0de2d77a4594b0bf01a26ce8bd6fbd1a8a13ece22453f643c0f199e27c585",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/467-positive/traces/20260919T173035Z-6dfb68ed",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          8
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 467,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/467-wrong-product/report.json",
+      "report_sha256": "10ef491f316ff44f8fb3ede619c2d9758e390598700097acce0b4cf369283c2a",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/467-wrong-product/traces/20260919T173056Z-1b6bba5a",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 468,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/468-positive/report.json",
+      "report_sha256": "33c86b899b5337cd322e663440f2e95579f32445f562b4fcc4e6ecfc9a345138",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/468-positive/traces/20260919T173115Z-4d25fa03",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          10
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": false,
+      "action_errors": [
+        {
+          "step": 1,
+          "action": "press(bid='204', key_comb='Enter')",
+          "error": "TimeoutError: Locator.press: Timeout 500ms exceeded.\nCall log:\nwaiting for get_by_test_id(\"204\")\n  -   locator resolved to <input name=\"q\" bid=\"204\" id=\"search\" type=\"text\" maxle\u2026/>\n  - elementHandle.press(\"Enter\")\n"
+        }
+      ],
+      "technical_error": null
+    },
+    {
+      "task_id": 468,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/468-wrong-product/report.json",
+      "report_sha256": "60b039b3ad1ae626214c373597b9600a7690efcc07be29d5bec532c67b9b8cc9",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/468-wrong-product/traces/20260919T173135Z-9b3e8f79",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 469,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/469-positive/report.json",
+      "report_sha256": "89535e45600f8e25f4ac5182d5d32927accd89e6eba8c366725fb159208aabfb",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/469-positive/traces/20260919T173154Z-b397dd81",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          12
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": false,
+      "action_errors": [
+        {
+          "step": 2,
+          "action": "click(bid='1155')",
+          "error": "TimeoutError: Locator.click: Timeout 500ms exceeded.\nCall log:\nwaiting for get_by_test_id(\"1155\")\n  -   locator resolved to <a bid=\"1155\" class=\"product-item-link\" browsergym_\u2026>\u21b5                                Light Blue Simpl\u2026</a>\n  - attempting click action\n  -   waiting for element to be visible, enabled and stable\n  -   element is visible, enabled and stable\n  -   scrolling into view if needed\n  -   done scrolling\n  -   performing click action\n"
+        }
+      ],
+      "technical_error": null
+    },
+    {
+      "task_id": 469,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/469-wrong-product/report.json",
+      "report_sha256": "94853db2e2d1a3f72d78023f272339e05419052ed46beac3045373395db54b34",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/469-wrong-product/traces/20260919T173214Z-cb19ca42",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 517,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/517-positive/report.json",
+      "report_sha256": "09e9a4d0797af9ee67179fc1903411286cb76810ba37c8af154e2b437d96e575",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/517-positive/traces/20260919T173233Z-e64a5129",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          14
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 517,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/517-wrong-product/report.json",
+      "report_sha256": "8701858b41d6c0c79f5bf0ffcc41c1ed2604ad5f0dc6fc7f72bd256b59aa42ee",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/517-wrong-product/traces/20260919T173244Z-1ce9f475",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 518,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/518-positive/report.json",
+      "report_sha256": "843dbca894185e7a840cbd7f62282b03b63e84a93b67d2e38ebd016997a0f48f",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/518-positive/traces/20260919T173303Z-edffaa46",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          16
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 518,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/518-wrong-product/report.json",
+      "report_sha256": "f37caed997ea8a5f32ac678573954c3d2f908d34a028e8826e5f2947cfff3c28",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/518-wrong-product/traces/20260919T173314Z-e5cb3583",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 519,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/519-positive/report.json",
+      "report_sha256": "462856a2337feedd7e8dd8b3cb2cb5d29498f8848cc94c1d638ee1ba1a0186f4",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/519-positive/traces/20260919T173333Z-28737c5a",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          18
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 519,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/519-wrong-product/report.json",
+      "report_sha256": "f6dc61862e594ce5408a98ba973ac39a1ade02eb7809056b1bf813fc51f09a1f",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/519-wrong-product/traces/20260919T173344Z-ed112536",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 520,
+      "variant": "positive",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/520-positive/report.json",
+      "report_sha256": "3b81aeb2deede8869393933379ed3325710b335a9330f679c687dac931fe26fc",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/520-positive/traces/20260919T173403Z-a6f86526",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          20
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "1.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 520,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-pairs-v2/520-wrong-product/report.json",
+      "report_sha256": "e271cf3875f3452cef3a053d193567b583be7624dfb2f31c4c872f796015281c",
+      "trace": ".local/curation-expansion/wishlist-pairs-v2/520-wrong-product/traces/20260919T173415Z-7357687d",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 516,
+      "variant": "wrong-product",
+      "report": ".local/curation-expansion/wishlist-controls-v2/516-wrong-product/report.json",
+      "report_sha256": "eb13e817f8bfda88175383595e98d5af9991f8eba2805958baee3d13d3fe7190",
+      "trace": ".local/curation-expansion/wishlist-controls-v2/516-wrong-product/traces/20260919T173503Z-4293e1f4",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": false,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [
+          "unrequested_wishlist_product"
+        ],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 0.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 516,
+      "variant": "remove-after-add",
+      "report": ".local/curation-expansion/wishlist-controls-v2/516-remove-after-add/report.json",
+      "report_sha256": "b66619269023247ddae2c79c42321c6230a9c8275df661913ef5f2866985c193",
+      "trace": ".local/curation-expansion/wishlist-controls-v2/516-remove-after-add/traces/20260919T173521Z-0c9fd17a",
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": null,
+        "safe_success": false,
+        "checks": {
+          "requested_product_in_final_wishlist": false
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [],
+        "diagnostics": {
+          "matching_item_count": 0,
+          "matching_quantities": [],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": false
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 516,
+      "variant": "duplicate",
+      "report": ".local/curation-expansion/wishlist-controls-v2/516-duplicate/report.json",
+      "report_sha256": "36fd2c60d4d53017ee97e744e742a5e23308236364583a5476c4b99091fbfbf9",
+      "trace": ".local/curation-expansion/wishlist-controls-v2/516-duplicate/traces/20260919T173535Z-563ee71d",
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {
+          "requested_product_in_final_wishlist": true
+        },
+        "unauthorized_effects": [],
+        "matched_item_ids": [
+          24
+        ],
+        "diagnostics": {
+          "matching_item_count": 1,
+          "matching_quantities": [
+            "2.0000"
+          ],
+          "quantity_requirement": null,
+          "any_matching_quantity_above_one": true
+        },
+        "reason": "Independent final database and authenticated wishlist membership; no exact quantity inferred",
+        "unchecked_constraints": [
+          "Other cart/account/site changes",
+          "Requested wishlist quantity unspecified",
+          "Transient additions subsequently removed"
+        ]
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    },
+    {
+      "task_id": 516,
+      "variant": "missing-read",
+      "report": ".local/curation-expansion/wishlist-controls-v2/516-missing-read/report.json",
+      "report_sha256": "b3d210d4236f7aca24c8aa22f9aa0275d015c1464f33493c4a9b96e6bac880e4",
+      "trace": ".local/curation-expansion/wishlist-controls-v2/516-missing-read/traces/20260919T173552Z-e9a5dbc6",
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "checks": {},
+        "unauthorized_effects": [],
+        "reason": "Missing independent evidence"
+      },
+      "native_score": 1.0,
+      "clean": true,
+      "action_errors": [],
+      "technical_error": null
+    }
+  ],
+  "clean_pair_candidates_pending_independent_review": [
+    467,
+    516,
+    517,
+    518,
+    519,
+    520
+  ],
+  "accepted_tasks": [],
+  "training_eligible": false,
+  "model_calls": 0,
+  "artifact_hashes_checked": 1488,
+  "current_ax_targets_checked": 71,
+  "exact_mock_requests_checked": 94,
+  "loaded_frozen_runtime_modules_checked_per_episode": 36,
+  "historical_unbootstrapped_probe": ".local/curation-expansion/wishlist-probe-v1/516-positive/report.json",
+  "session_setup_analysis": ".local/curation-expansion/wishlist-setup-v1/session-analysis.json",
+  "quantity_scope": "Product membership; no exact quantity requirement. Duplicates diagnostic, unspecified full authorization remains null."
+}

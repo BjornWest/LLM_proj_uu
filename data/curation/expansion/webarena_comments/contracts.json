@@ -1,0 +1,423 @@
+{
+  "schema": "webarena-comments-contract-v1",
+  "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "tasks": [
+    {
+      "source": "webarena-verified",
+      "source_task_id": 610,
+      "source_template_id": 9,
+      "source_task_revision": 2,
+      "original": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 610,
+        "intent_template_id": 9,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a review of my recent reading, titled \"To Kill a Mockingbird by Harper Lee\" in f/books and then comment \"good book!\" on the created post",
+        "intent_template": "Post a review of my recent reading, titled \"{{book}}\" in f/books and then comment \"{{content}}\" on the created post",
+        "instantiation_dict": {
+          "book": "To Kill a Mockingbird by Harper Lee",
+          "content": "good book!"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "To Kill a Mockingbird by Harper Lee",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "^__REDDIT__/f/books/\\d+/-/comment$",
+              "http_method": "POST",
+              "headers": {
+                "referer": "^__REDDIT__/f/books/\\d+/to-kill-a-mockingbird-by-harper-lee$"
+              },
+              "post_data": {
+                "$.^reply_to_submission_\\d+\\[comment\\]$": "good book!"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Post a review of my recent reading, titled \"To Kill a Mockingbird by Harper Lee\" in f/books and then comment \"good book!\" on the created post"
+      },
+      "grader_input": {
+        "author": "MarvelsGrantMan136",
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "To Kill a Mockingbird by Harper Lee",
+        "comment": "good book!",
+        "review_semantics": null
+      },
+      "acceptance": {
+        "runtime_validated": false,
+        "accepted": false,
+        "training_eligible": false,
+        "blockers": [
+          "User review body/opinion absent; content quality and representing the user truthfully cannot be established by title and comment alone.",
+          "Upstream native comment checker does not establish final requested linkage."
+        ]
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 611,
+      "source_template_id": 9,
+      "source_task_revision": 2,
+      "original": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 611,
+        "intent_template_id": 9,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a review of my recent reading, titled \"Harry Potter\" in f/books and then comment \"Wonderful journey\" on the created post",
+        "intent_template": "Post a review of my recent reading, titled \"{{book}}\" in f/books and then comment \"{{content}}\" on the created post",
+        "instantiation_dict": {
+          "book": "Harry Potter",
+          "content": "Wonderful journey"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "Harry Potter",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/f/books/{{post_id}}/-/comment",
+              "http_method": "POST",
+              "post_data": {
+                "reply_to_submission_{{post_id}}[comment]": "Wonderful journey"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Post a review of my recent reading, titled \"Harry Potter\" in f/books and then comment \"Wonderful journey\" on the created post"
+      },
+      "grader_input": {
+        "author": "MarvelsGrantMan136",
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "Harry Potter",
+        "comment": "Wonderful journey",
+        "review_semantics": null
+      },
+      "acceptance": {
+        "runtime_validated": false,
+        "accepted": false,
+        "training_eligible": false,
+        "blockers": [
+          "User review body/opinion absent; content quality and representing the user truthfully cannot be established by title and comment alone.",
+          "Upstream native comment checker does not establish final requested linkage."
+        ]
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 612,
+      "source_template_id": 9,
+      "source_task_revision": 2,
+      "original": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 612,
+        "intent_template_id": 9,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a review of my recent reading, titled \"big little lies\" in f/books and then comment \"can't stop it\" on the created post",
+        "intent_template": "Post a review of my recent reading, titled \"{{book}}\" in f/books and then comment \"{{content}}\" on the created post",
+        "instantiation_dict": {
+          "book": "big little lies",
+          "content": "can't stop it"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "big little lies",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/f/books/{{post_id}}/-/comment",
+              "http_method": "POST",
+              "post_data": {
+                "reply_to_submission_{{post_id}}[comment]": "can't stop it"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Post a review of my recent reading, titled \"big little lies\" in f/books and then comment \"can't stop it\" on the created post"
+      },
+      "grader_input": {
+        "author": "MarvelsGrantMan136",
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "big little lies",
+        "comment": "can't stop it",
+        "review_semantics": null
+      },
+      "acceptance": {
+        "runtime_validated": false,
+        "accepted": false,
+        "training_eligible": false,
+        "blockers": [
+          "User review body/opinion absent; content quality and representing the user truthfully cannot be established by title and comment alone.",
+          "Upstream native comment checker does not establish final requested linkage."
+        ]
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 613,
+      "source_template_id": 9,
+      "source_task_revision": 2,
+      "original": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 613,
+        "intent_template_id": 9,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a review of my recent reading, titled \"Love story\" in f/books and then comment \"I cried\" on the created post",
+        "intent_template": "Post a review of my recent reading, titled \"{{book}}\" in f/books and then comment \"{{content}}\" on the created post",
+        "instantiation_dict": {
+          "book": "Love story",
+          "content": "I cried"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "Love story",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/f/books/{{post_id}}/-/comment",
+              "http_method": "POST",
+              "post_data": {
+                "reply_to_submission_{{post_id}}[comment]": "I cried"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Post a review of my recent reading, titled \"Love story\" in f/books and then comment \"I cried\" on the created post"
+      },
+      "grader_input": {
+        "author": "MarvelsGrantMan136",
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "Love story",
+        "comment": "I cried",
+        "review_semantics": null
+      },
+      "acceptance": {
+        "runtime_validated": false,
+        "accepted": false,
+        "training_eligible": false,
+        "blockers": [
+          "User review body/opinion absent; content quality and representing the user truthfully cannot be established by title and comment alone.",
+          "Upstream native comment checker does not establish final requested linkage."
+        ]
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 614,
+      "source_template_id": 9,
+      "source_task_revision": 2,
+      "original": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 614,
+        "intent_template_id": 9,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a review of my recent reading, titled \"Gone with the wind\" in f/books and then comment \"It's a book with history\" on the created post",
+        "intent_template": "Post a review of my recent reading, titled \"{{book}}\" in f/books and then comment \"{{content}}\" on the created post",
+        "instantiation_dict": {
+          "book": "Gone with the wind",
+          "content": "It's a book with history"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "Gone with the wind",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/f/books/{{post_id}}/-/comment",
+              "http_method": "POST",
+              "post_data": {
+                "reply_to_submission_{{post_id}}[comment]": "It's a book with history"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Post a review of my recent reading, titled \"Gone with the wind\" in f/books and then comment \"It's a book with history\" on the created post"
+      },
+      "grader_input": {
+        "author": "MarvelsGrantMan136",
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "Gone with the wind",
+        "comment": "It's a book with history",
+        "review_semantics": null
+      },
+      "acceptance": {
+        "runtime_validated": false,
+        "accepted": false,
+        "training_eligible": false,
+        "blockers": [
+          "User review body/opinion absent; content quality and representing the user truthfully cannot be established by title and comment alone.",
+          "Upstream native comment checker does not establish final requested linkage."
+        ]
+      }
+    }
+  ],
+  "terminal_response_instruction": "End with a JSON object having task_type=\"mutate\", status=\"SUCCESS\", retrieved_data=null.",
+  "scripted_diagnostic_body": "This is a scripted structural test review, not a statement of the user's reading or opinion. The book raises questions about how people judge one another.",
+  "scripted_body_scope": "Synthetic privileged driver input for structural validation only; not provided by the user, not a reference answer, not a certified review."
+}

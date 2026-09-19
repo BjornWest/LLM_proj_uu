@@ -1,0 +1,339 @@
+{
+  "schema": "expansion-policy-format-audit-v1",
+  "scope": "Current exported task input and71 upstream result schemas, not full runtime information-flow certification.",
+  "discovery_count": 197,
+  "native_schema_task_count": 71,
+  "native_schema_tasks": [
+    "webarena:117",
+    "webarena:143",
+    "webarena:144",
+    "webarena:145",
+    "webarena:146",
+    "webarena:147",
+    "webarena:148",
+    "webarena:149",
+    "webarena:150",
+    "webarena:163",
+    "webarena:164",
+    "webarena:165",
+    "webarena:166",
+    "webarena:167",
+    "webarena:188",
+    "webarena:189",
+    "webarena:190",
+    "webarena:191",
+    "webarena:192",
+    "webarena:21",
+    "webarena:22",
+    "webarena:225",
+    "webarena:227",
+    "webarena:228",
+    "webarena:229",
+    "webarena:23",
+    "webarena:230",
+    "webarena:231",
+    "webarena:232",
+    "webarena:233",
+    "webarena:234",
+    "webarena:235",
+    "webarena:24",
+    "webarena:242",
+    "webarena:25",
+    "webarena:26",
+    "webarena:260",
+    "webarena:274",
+    "webarena:275",
+    "webarena:277",
+    "webarena:278",
+    "webarena:28",
+    "webarena:285",
+    "webarena:29",
+    "webarena:298",
+    "webarena:30",
+    "webarena:300",
+    "webarena:31",
+    "webarena:320",
+    "webarena:321",
+    "webarena:322",
+    "webarena:323",
+    "webarena:324",
+    "webarena:325",
+    "webarena:327",
+    "webarena:329",
+    "webarena:330",
+    "webarena:331",
+    "webarena:333",
+    "webarena:334",
+    "webarena:336",
+    "webarena:337",
+    "webarena:338",
+    "webarena:359",
+    "webarena:360",
+    "webarena:361",
+    "webarena:362",
+    "webarena:388",
+    "webarena:48",
+    "webarena:49",
+    "webarena:50"
+  ],
+  "unique_schemas": [
+    {
+      "schema": {
+        "items": {
+          "format": "date",
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:117",
+        "webarena:334",
+        "webarena:336",
+        "webarena:337",
+        "webarena:338",
+        "webarena:359"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "format": "currency",
+          "type": "number"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:143",
+        "webarena:145",
+        "webarena:150",
+        "webarena:188",
+        "webarena:189",
+        "webarena:190",
+        "webarena:192",
+        "webarena:320",
+        "webarena:321",
+        "webarena:322",
+        "webarena:323",
+        "webarena:329",
+        "webarena:330",
+        "webarena:331",
+        "webarena:333"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "type": "number"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:144"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "properties": {
+            "height": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:146",
+        "webarena:147"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:148",
+        "webarena:149",
+        "webarena:163",
+        "webarena:164",
+        "webarena:165",
+        "webarena:167",
+        "webarena:21",
+        "webarena:23",
+        "webarena:231",
+        "webarena:232",
+        "webarena:233",
+        "webarena:25",
+        "webarena:26",
+        "webarena:360",
+        "webarena:388"
+      ]
+    },
+    {
+      "schema": {
+        "type": "null"
+      },
+      "task_ids": [
+        "webarena:166",
+        "webarena:191",
+        "webarena:22",
+        "webarena:225",
+        "webarena:234",
+        "webarena:235",
+        "webarena:24",
+        "webarena:242",
+        "webarena:260",
+        "webarena:274",
+        "webarena:275",
+        "webarena:277",
+        "webarena:278",
+        "webarena:285",
+        "webarena:298",
+        "webarena:300",
+        "webarena:324",
+        "webarena:325",
+        "webarena:327"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "properties": {
+            "max": {
+              "format": "currency",
+              "type": "number"
+            },
+            "min": {
+              "format": "currency",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:227",
+        "webarena:228",
+        "webarena:229",
+        "webarena:230"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "properties": {
+            "count": {
+              "type": "number"
+            },
+            "post_title": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:28",
+        "webarena:29",
+        "webarena:30",
+        "webarena:31"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "properties": {
+            "order_number": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:361"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "properties": {
+            "city": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "house_number": {
+              "type": "string"
+            },
+            "postcode": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            },
+            "street": {
+              "type": "string"
+            }
+          },
+          "title": "full_address",
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:362"
+      ]
+    },
+    {
+      "schema": {
+        "items": {
+          "properties": {
+            "amount": {
+              "format": "currency",
+              "type": "number"
+            },
+            "order_count": {
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "task_ids": [
+        "webarena:48",
+        "webarena:49",
+        "webarena:50"
+      ]
+    }
+  ],
+  "findings": [],
+  "source_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "binding_builder_sha256": "70ca80957bd49454acf1315588b31751565c74d03349d1a5ce9c6c3ba44c5d06",
+  "observations": [
+    "Schemas contain structural types, field names, date/currency formats and full_address title only. No enum/const/default/example/description/pattern or numeric bounds occur.",
+    "All197 projections contain only original/authored goal and terminal format instruction.",
+    "Private scripted drivers remain privileged reachability tests; this audit does not promote them to teacher trajectories."
+  ],
+  "model_calls": 0,
+  "browser_runs": 0,
+  "training_eligible": false
+}

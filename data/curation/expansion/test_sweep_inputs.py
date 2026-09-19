@@ -83,5 +83,21 @@ class SweepInputsTests(unittest.TestCase):
         alias=next(r for r in rows if r['id']=='webarena:644')
         self.assertIn('games forum',policy_projection(alias)['goal'])
         self.assertNotIn('gaming',policy_projection(alias)['goal'])
+    def test_wishlist_uses_session_wrapper_and_preserves_original_start(self):
+        rows=build(['webarena:467','webarena:516'])['tasks']
+        for row in rows:
+            self.assertEqual(row['implementation']['factory']['symbol'],'SessionWishlistTask')
+            self.assertEqual(row['implementation']['browser_task']['symbol'],'SessionBrowserTask')
+            self.assertTrue(row['implementation']['pre_import_runtime_activation']['required'])
+            self.assertEqual(row['validation_profile']['max_steps'],24)
+            self.assertEqual(row['environment']['origin_at_validation'],'http://localhost:17770')
+            self.assertEqual(row['verifier']['timing'],'before_browser_close')
+            self.assertNotIn('customer/account',str(policy_projection(row)))
+        current=next(r for r in rows if r['id']=='webarena:516')
+        self.assertNotEqual(current['environment']['original_start_url'],'__SHOPPING__')
+        self.assertEqual(current['private_contract_row_id'],516)
+    def test_warning_wishlist_pairs_and_ambiguous_comments_remain_held(self):
+        for tid in ['465','466','468','469','610','611','612','613','614']:
+            with self.assertRaises(ValueError):build(['webarena:'+tid])
 
 if __name__=='__main__':unittest.main()

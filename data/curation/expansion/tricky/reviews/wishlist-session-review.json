@@ -1,0 +1,76 @@
+{
+  "schema": "independent-wishlist-session-review-v1",
+  "coordination_id": "WISHLIST-SESSION-REVIEW-01",
+  "status": "accepted_scoped_session_setup",
+  "artifact_hashes_checked": 88,
+  "source_hashes_checked": 248,
+  "exact_requests_checked": 4,
+  "current_AX_targets_checked": 2,
+  "records": [
+    {
+      "cohort": "wishlist-probe-v1",
+      "report_sha256": "104c80317a04e0c82caa994467cb5a261502e3a73395052fdf2705c57412537e",
+      "trace": ".local/curation-expansion/wishlist-probe-v1/516-positive/traces/20260919T172616Z-69279553",
+      "original_goal": "Add the product on the current page to my wishlist",
+      "initial_url": "http://localhost:17770/elmwood-inn-fine-teas-orange-vanilla-caffeine-free-fruit-infusion-16-ounce-pouch.html",
+      "session_cookie_present_on_add": false,
+      "form_key_post_matches_browser_cookie": true,
+      "pre_start_account_get": false,
+      "add_response_status": 302,
+      "server_message_type": "Invalid Form Key",
+      "persisted_matching_item_ids": [],
+      "derived_completed": false,
+      "native_score": 1.0,
+      "authorization_satisfied": null,
+      "evaluation_before_close": true,
+      "current_AX_target_bid": "1305",
+      "container": {
+        "Id": "9e17931800c695e21a956fe77a5b110c14cd90e5f7caa3c2b7c9bf73dc4ac917",
+        "Image": "sha256:a5b6fb47ee9f378ceca18e32261a92a8964f0ccfb9f1d3741ce3a0e2d990839d",
+        "Created": "2026-09-19T17:19:48.679229802Z",
+        "Mounts": []
+      }
+    },
+    {
+      "cohort": "wishlist-session-probe-v2",
+      "report_sha256": "2e8c99208efa42e2bb138606ea5a758d43628c2a68cc753ebd023c4e97710f71",
+      "trace": ".local/curation-expansion/wishlist-session-probe-v2/516-positive/traces/20260919T172826Z-baa960b5",
+      "original_goal": "Add the product on the current page to my wishlist",
+      "initial_url": "http://localhost:17770/elmwood-inn-fine-teas-orange-vanilla-caffeine-free-fruit-infusion-16-ounce-pouch.html",
+      "session_cookie_present_on_add": true,
+      "form_key_post_matches_browser_cookie": true,
+      "pre_start_account_get": true,
+      "add_response_status": 302,
+      "server_message_type": "success",
+      "persisted_matching_item_ids": [
+        3
+      ],
+      "derived_completed": true,
+      "native_score": 1.0,
+      "authorization_satisfied": null,
+      "evaluation_before_close": true,
+      "current_AX_target_bid": "1292",
+      "container": {
+        "Id": "9e17931800c695e21a956fe77a5b110c14cd90e5f7caa3c2b7c9bf73dc4ac917",
+        "Image": "sha256:a5b6fb47ee9f378ceca18e32261a92a8964f0ccfb9f1d3741ce3a0e2d990839d",
+        "Created": "2026-09-19T17:19:48.679229802Z",
+        "Mounts": []
+      }
+    }
+  ],
+  "findings": [],
+  "assessment": "Ordinary account GET establishes server-issued session cookies using the original benchmark auto-login header, then the browser visits the unchanged product start URL. The wrapper does not inject cookies/form keys, bypass CSRF, fulfill responses or modify application source. Failed v1 has Invalid Form Key and no item despite native score1; v2 has normal browser add and independently confirmed final membership.",
+  "causal_limit": "Two scripted probes support session establishment as the operational fix; no instrumentation of server CSRF internals or claim of randomised causal isolation. Authentication still uses the benchmark fixture auto-login mechanism, not a human password login.",
+  "triage_note": "Bounded triage comparison found identical semantic two-action sequence but reported same_goal=false/source_identity_unknown; exact contracts, metadata and first requests independently prove same original goal. Do not treat that triage field as authoritative.",
+  "scope": [
+    "No candidate checker/adapter imports.",
+    "No server/browser/database/network/model operations.",
+    "No broad authorization, quantity requirement, training readiness or full ten-task acceptance.",
+    "Two inspected episodes only; ongoing wishlist suite not reviewed."
+  ],
+  "source_sha256": {
+    "run_v1": "7e3bc4209ba5a5409664da3941a343b26b6cc728e6fd7d6c8c0cee8b4babe173",
+    "run_v2": "33140193b48047adb41a4ea4084d55f2c8f00de05d66a76e990e275b7183a1d4",
+    "reviewer": "ddcb2101aa9f2db23e1dacace405a3dc384dba8d31837d93a7f1ef644fafd66a"
+  }
+}

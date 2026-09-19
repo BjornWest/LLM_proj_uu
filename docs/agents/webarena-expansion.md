@@ -1,5 +1,10 @@
 # WebArena task expansion
 
+**Final review snapshot:** 103 accepted original tasks / 30 upstream templates on
+shopping and forum sites. See [review guide](../dataset-expansion-review.md) for
+current scope and limitations; counts below are historical batch records. Further
+adaptation and Maps/Wikipedia provisioning are paused at user request.
+
 Owner: curation WebArena worker. No shared harness, site source, production catalog,
 or existing database is modified. This is original-task development and scripted
 verification, not model evaluation or training certification.

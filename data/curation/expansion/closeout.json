@@ -1,0 +1,46 @@
+{
+  "schema": "dataset-expansion-closeout-v1",
+  "date": "2026-09-19T17:50:12.201881+00:00",
+  "status": "closed_for_user_review",
+  "counts": {
+    "trickyarena": 100,
+    "webarena-verified": 103
+  },
+  "template_counts": {
+    "trickyarena": 81,
+    "webarena-verified": 30
+  },
+  "site_counts": {
+    "trickyarena/shop": 42,
+    "trickyarena/health": 20,
+    "trickyarena/news": 20,
+    "trickyarena/spotify": 18,
+    "webarena-verified/shopping": 78,
+    "webarena-verified/reddit": 25
+  },
+  "catalog": {
+    "path": ".local/curation-expansion/accepted-discovery-v14.json",
+    "sha256": "065dbd3a8a1c4024375f9fd501d696444c8286ba46b0313e3d02624117eafa74"
+  },
+  "bindings": {
+    "path": ".local/curation-expansion/sweep-inputs-203-v3.json",
+    "sha256": "ac6eec74fb0870b77a737e30666da2882f174a59ef3d7fc29fb5c6e7596f3b3e"
+  },
+  "reference_hash_checks": 126,
+  "policy_projection_checks": 203,
+  "binding_unit_tests_passed": 15,
+  "review_page_check": "203 rows; exact ID filtering and reset passed using existing local browser libraries",
+  "initial_review_browser_check": "Direct launch lacked libasound; existing .local/system-libs LD_LIBRARY_PATH resolved. No dependency installation.",
+  "downloads_paused": true,
+  "download_pause_evidence": ".local/curation-expansion/infrastructure/download-paused-v1.json",
+  "new_model_calls": 0,
+  "new_benchmark_runs_for_closeout": 0,
+  "training_eligible": false,
+  "production_ready": false,
+  "limitations": [
+    "Scripted acceptance is not model performance.",
+    "Bindings require new profile/environment/reset review before model use.",
+    "Maps/Wikipedia not runnable; further adaptation paused by user.",
+    "197-row independent binding audit remains historical; six wishlist additions have separate saved-evidence review and boundary tests."
+  ]
+}

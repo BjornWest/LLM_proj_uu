@@ -1,0 +1,619 @@
+{
+  "schema": "webarena-wishlist-contract-v1",
+  "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "tasks": [
+    {
+      "source": "webarena-verified",
+      "source_task_id": 465,
+      "source_template_id": 186,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 465,
+        "intent_template_id": 186,
+        "start_urls": [
+          "__SHOPPING__"
+        ],
+        "intent": "Add Tide PODS Spring Meadow Scent HE Turbo Laundry Detergent Pacs, 81 Count to my wish list",
+        "intent_template": "Add {{product}} to my wish list",
+        "instantiation_dict": {
+          "product": "Tide PODS Spring Meadow Scent HE Turbo Laundry Detergent Pacs, 81 Count"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "71337",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add Tide PODS Spring Meadow Scent HE Turbo Laundry Detergent Pacs, 81 Count to my wish list"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__"
+      },
+      "grader_input": {
+        "product_id": 71337,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 466,
+      "source_template_id": 186,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 466,
+        "intent_template_id": 186,
+        "start_urls": [
+          "__SHOPPING__"
+        ],
+        "intent": "Add 2 Hawaiian Bamboo Orchid Roots #zc50 - by Discount Hawaiian Gifts to my wish list",
+        "intent_template": "Add {{product}} to my wish list",
+        "instantiation_dict": {
+          "product": "2 Hawaiian Bamboo Orchid Roots #zc50 - by Discount Hawaiian Gifts"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "22787",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add 2 Hawaiian Bamboo Orchid Roots #zc50 - by Discount Hawaiian Gifts to my wish list"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__"
+      },
+      "grader_input": {
+        "product_id": 22787,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 467,
+      "source_template_id": 186,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 467,
+        "intent_template_id": 186,
+        "start_urls": [
+          "__SHOPPING__"
+        ],
+        "intent": "Add HONGJ Hawaiian Beach Outfits Set for Mens, Summer Tropical Tree Printed Relaxed-fit Hawaii Shirts Shorts 2 Piece Suits to my wish list",
+        "intent_template": "Add {{product}} to my wish list",
+        "instantiation_dict": {
+          "product": "HONGJ Hawaiian Beach Outfits Set for Mens, Summer Tropical Tree Printed Relaxed-fit Hawaii Shirts Shorts 2 Piece Suits"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "85498",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add HONGJ Hawaiian Beach Outfits Set for Mens, Summer Tropical Tree Printed Relaxed-fit Hawaii Shirts Shorts 2 Piece Suits to my wish list"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__"
+      },
+      "grader_input": {
+        "product_id": 85498,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 468,
+      "source_template_id": 186,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 468,
+        "intent_template_id": 186,
+        "start_urls": [
+          "__SHOPPING__"
+        ],
+        "intent": "Add DkRgVNY Lace Spcling Lingerie Womens Sexy Hollow Out Underwear Bodysuit One Piece Snap Crotch Clubwear Teddy Bodysuit to my wish list",
+        "intent_template": "Add {{product}} to my wish list",
+        "instantiation_dict": {
+          "product": "DkRgVNY Lace Spcling Lingerie Womens Sexy Hollow Out Underwear Bodysuit One Piece Snap Crotch Clubwear Teddy Bodysuit"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "30843",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add DkRgVNY Lace Spcling Lingerie Womens Sexy Hollow Out Underwear Bodysuit One Piece Snap Crotch Clubwear Teddy Bodysuit to my wish list"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__"
+      },
+      "grader_input": {
+        "product_id": 30843,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 469,
+      "source_template_id": 186,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 469,
+        "intent_template_id": 186,
+        "start_urls": [
+          "__SHOPPING__"
+        ],
+        "intent": "Add Light Blue Simple Summer New Low Heels Slippers for Women Fashion Chunky Heels Pointed Toe Wine Glasses Sandals Comfortable Walking Shoes Ladies All-Match Sexy Party Shoes to my wish list",
+        "intent_template": "Add {{product}} to my wish list",
+        "instantiation_dict": {
+          "product": "Light Blue Simple Summer New Low Heels Slippers for Women Fashion Chunky Heels Pointed Toe Wine Glasses Sandals Comfortable Walking Shoes Ladies All-Match Sexy Party Shoes"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "60047",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add Light Blue Simple Summer New Low Heels Slippers for Women Fashion Chunky Heels Pointed Toe Wine Glasses Sandals Comfortable Walking Shoes Ladies All-Match Sexy Party Shoes to my wish list"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__"
+      },
+      "grader_input": {
+        "product_id": 60047,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 516,
+      "source_template_id": 196,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 516,
+        "intent_template_id": 196,
+        "start_urls": [
+          "__SHOPPING__/elmwood-inn-fine-teas-orange-vanilla-caffeine-free-fruit-infusion-16-ounce-pouch.html"
+        ],
+        "intent": "Add the product on the current page to my wishlist",
+        "intent_template": "Add the product on the current page to my wishlist",
+        "instantiation_dict": {},
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "104497",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add the product on the current page to my wishlist"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__/elmwood-inn-fine-teas-orange-vanilla-caffeine-free-fruit-infusion-16-ounce-pouch.html"
+      },
+      "grader_input": {
+        "product_id": 104497,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 517,
+      "source_template_id": 196,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 517,
+        "intent_template_id": 196,
+        "start_urls": [
+          "__SHOPPING__/skinit-decal-gaming-skin-compatible-with-xbox-one-s-console-and-controller-bundle-officially-licensed-nfl-baltimore-ravens-design.html"
+        ],
+        "intent": "Add the product on the current page to my wishlist",
+        "intent_template": "Add the product on the current page to my wishlist",
+        "instantiation_dict": {},
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "37811",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add the product on the current page to my wishlist"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__/skinit-decal-gaming-skin-compatible-with-xbox-one-s-console-and-controller-bundle-officially-licensed-nfl-baltimore-ravens-design.html"
+      },
+      "grader_input": {
+        "product_id": 37811,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 518,
+      "source_template_id": 196,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 518,
+        "intent_template_id": 196,
+        "start_urls": [
+          "__SHOPPING__/sceptre-e195bd-srr-19-inch-720p-led-tv-true-black-2017.html"
+        ],
+        "intent": "Add the product on the current page to my wishlist",
+        "intent_template": "Add the product on the current page to my wishlist",
+        "instantiation_dict": {},
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "37285",
+                "qty": null
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add the product on the current page to my wishlist"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__/sceptre-e195bd-srr-19-inch-720p-led-tv-true-black-2017.html"
+      },
+      "grader_input": {
+        "product_id": 37285,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 519,
+      "source_template_id": 196,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 519,
+        "intent_template_id": 196,
+        "start_urls": [
+          "__SHOPPING__/iphone-13-pro-max-case-neon-turtle-iphone-13-pro-max-cases-tempered-glass-back-soft-silicone-tpu-shock-protective-case-for-apple-iphone-13-pro-max.html"
+        ],
+        "intent": "Add the product on the current page to my wishlist",
+        "intent_template": "Add the product on the current page to my wishlist",
+        "instantiation_dict": {},
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "37339",
+                "qty": "1"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add the product on the current page to my wishlist"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__/iphone-13-pro-max-case-neon-turtle-iphone-13-pro-max-cases-tempered-glass-back-soft-silicone-tpu-shock-protective-case-for-apple-iphone-13-pro-max.html"
+      },
+      "grader_input": {
+        "product_id": 37339,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    },
+    {
+      "source": "webarena-verified",
+      "source_task_id": 520,
+      "source_template_id": 196,
+      "original": {
+        "sites": [
+          "shopping"
+        ],
+        "task_id": 520,
+        "intent_template_id": 196,
+        "start_urls": [
+          "__SHOPPING__/magnetic-metal-stainless-steel-d-pads-kits-directional-pad-replacement-parts-for-xbox-one-elite-controller-elite-series-2-xbox-one-xbox-one-s-x-controller.html"
+        ],
+        "intent": "Add the product on the current page to my wishlist",
+        "intent_template": "Add the product on the current page to my wishlist",
+        "instantiation_dict": {},
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__SHOPPING__/wishlist/index/add/",
+              "http_method": "POST",
+              "post_data": {
+                "product": "37313",
+                "qty": "1"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "policy_input": {
+        "goal": "Add the product on the current page to my wishlist"
+      },
+      "setup": {
+        "start_url": "__SHOPPING__/magnetic-metal-stainless-steel-d-pads-kits-directional-pad-replacement-parts-for-xbox-one-elite-controller-elite-series-2-xbox-one-xbox-one-s-x-controller.html"
+      },
+      "grader_input": {
+        "product_id": 37313,
+        "customer_email": "emma.lopez@gmail.com",
+        "quantity_requirement": null
+      },
+      "acceptance": {
+        "accepted": false,
+        "training_eligible": false,
+        "runtime_validated": false
+      }
+    }
+  ],
+  "quantity_scope": "Requested product membership only. Original goals specify no wishlist quantity; leading 2 in task466 is part of product name. Repeated-add quantity is retained as a diagnostic, not silently converted to exact-1 requirement.",
+  "terminal_response_instruction": "End with a JSON object having task_type=\"mutate\", status=\"SUCCESS\", retrieved_data=null."
+}

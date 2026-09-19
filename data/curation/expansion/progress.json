@@ -43,8 +43,8 @@
     "webarena-verified": {
       "source_task_count": 812,
       "source_template_count": 190,
-      "accepted_development_tasks": 97,
-      "first_batch_status": "97 original tasks independently accepted:71 read-only native-check pairs, five biography mutations, five contact-form drafts, one forum upvote and15 forum-post tasks with scoped derived verifiers. Ambiguous source goals and action-warning cohorts held separately.",
+      "accepted_development_tasks": 103,
+      "first_batch_status": "103 original tasks independently accepted:71 read-only native-check pairs, five biography mutations, five contact-form drafts, one forum upvote,15 forum-post tasks and six wishlist tasks with scoped derived verifiers. Ambiguous source goals and action-warning cohorts held separately.",
       "model_tested_new_tasks": 0,
       "training_eligible": false,
       "positive_feasibility_reviewed_tasks": 10,
@@ -127,6 +127,12 @@
         "402",
         "403",
         "407",
+        "467",
+        "516",
+        "517",
+        "518",
+        "519",
+        "520",
         "630",
         "631",
         "632",
@@ -153,8 +159,8 @@
       "batch03_review": "data/curation/expansion/webarena-batch03-independent-review.json",
       "batch04_review": "data/curation/expansion/webarena-batch04-independent-review.json",
       "accepted_native_positive_negative_cases": 142,
-      "derived_verifier_tasks": 26,
-      "derived_verifier_browser_cases": 69,
+      "derived_verifier_tasks": 32,
+      "derived_verifier_browser_cases": 84,
       "derived_verifier_review": "data/curation/expansion/webarena-biography-independent-review.json",
       "coupon_review": "data/curation/expansion/tricky/reviews/coupon-review-v2.json",
       "batch05_review": "data/curation/expansion/webarena-batch05-independent-review-v2.json",
@@ -163,10 +169,16 @@
       "batch06_review": "data/curation/expansion/webarena-batch06-independent-review-v2.json",
       "batch06_semantic_review": "data/curation/expansion/webarena-batch06-semantic-review.json",
       "biography_batch02_review": "data/curation/expansion/webarena/reviews/biography-batch02-review.json",
-      "posts_review": "data/curation/expansion/webarena-posts-independent-review.json"
+      "posts_review": "data/curation/expansion/webarena-posts-independent-review.json",
+      "wishlist_review": "data/curation/expansion/webarena-wishlist-independent-review.json"
     }
   },
   "resource_plan": "data/curation/expansion/download-plan-v2.json",
   "work_plan": "docs/agents/dataset-expansion.md",
-  "resource_ledger": ".local/curation-expansion/downloads-static-v2/ranges-ledger.json"
+  "resource_ledger": ".local/curation-expansion/downloads-static-v2/ranges-ledger.json",
+  "status": "closed_for_review",
+  "stopped_by_user": true,
+  "additional_adaptation_paused": true,
+  "resource_status": "downloads_stopped_preserved; Maps/Wikipedia not runnable",
+  "resource_pause_evidence": ".local/curation-expansion/infrastructure/download-paused-v1.json"
 }

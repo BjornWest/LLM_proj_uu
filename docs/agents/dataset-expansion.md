@@ -1,9 +1,15 @@
 # General-browsing dataset expansion
 
-Owner: curation. Started 2026-09-19. Active goal: work toward 100 accepted
-general-browsing tasks each from WebArena-Verified and TrickyArena. First
-checkpoint: 10 accepted tasks per dataset, spanning available sites. This is
-integration and scripted validation, not an authorized paid model cohort.
+Owner: curation. Started and closed for review 2026-09-19. Final scope: **100
+Tricky tasks and 103 WebArena tasks**, independently reviewed scripted development
+on six website contexts. No model calls, training approval, or deployment
+promotion. Further adaptation and Maps/Wikipedia staging paused at user request.
+
+Start with the [human review guide](../dataset-expansion-review.md) and
+[searchable local catalog](http://localhost:8876/dataset-expansion/). Final discovery
+export: `.local/curation-expansion/accepted-discovery-v14.json`; implementation
+bindings: `.local/curation-expansion/sweep-inputs-203-v3.json`. Older counts and
+plans below are retained as chronological development evidence.
 
 ## Ownership and ordering
 
@@ -511,3 +517,66 @@ Neither corruption nor successful recovery is established. Preserve original
 archive and diagnose actual startup on new volumes before any repair. Evidence:
 `data/curation/expansion/maps-tile-startup-review.json`. No database/service start,
 volume extraction, network download or inference was performed by these audits.
+
+
+Checkpoint07203b5 contains the completed curation integration and documentation;
+backend owns publication. It includes no raw trace/archive downloads, shared core
+or training/deployment changes. Late binding audit passes197 tasks,411 saved
+protocol records and122 references; report is
+`tricky/reviews/sweep-bindings-197-review.json` (not in that checkpoint).
+
+Root independently reviewed all three original-comment diagnostic browser cases:
+376 artifact hashes,369 source hashes,30 scripted requests and27 current AX
+targets. The clean wrong-parent run creates post3 but comments on prior post2,
+yet native score remains1. Whole-goal positive stays null because unspecified
+review content is not verified; action warnings on the positive and omitted
+comment cases remain explicit. All610–614 stay held. See
+`forum-comments-independent-review.json`; no new browser/model calls by review.
+
+
+Downloader v3 stopped again on DNS resolution failure; PID18341 absent and tool
+session47121 returned exit1. DNS resolved on read-only recheck. Separately
+versioned v4 reuses one requests.Session per worker, clears cross-request cookies,
+retains zero automatic retries, and closes sessions after pending workers finish.
+Plan/range/ETag/completed-hash checks are unchanged (AST comparison recorded).
+Fourteen offline tests pass, including partial failure and exact resume without
+additional requests for completed files. Same198,568,153,001-byte reservation and
+200GB allowance; no reset or new source. New live tool49750 logs to
+`.local/curation-expansion/infrastructure/download-ranges-static-v4.log`;
+amendment and previous ledger captured in `download-v4-amendment.json` and
+`download-v4-before-ledger.json`. Original logs/source preserved. Connection reuse
+may reduce DNS churn; no claim that the upstream/WSL DNS cause is resolved.
+
+
+## Final closeout — 2026-09-19
+
+User requested finish/polish/review rather than further adaptation. Final accepted
+index is100Tricky/103WebArena,81/30 declared templates on six website contexts.
+Wishlist review adds467 and516–520:15 clean browser cases for these six IDs,
+including three516 controls. The wider review covers18 clean cases because three
+negative cases belong to held pairs; those orphan negatives add no accepted task.
+Checks:1,117 artifact hashes,2,258 source checks,69 scripted requests,51 current-AX
+targets. Four warning-bearing pairs remain held. Source goals, deictic starting
+pages, unknown broad authorization and unspecified quantity remain unchanged.
+
+Final exports: accepted-discovery-v14.json and sweep-inputs-203-v3.json under
+.local/curation-expansion/. Fifteen binding tests pass, including v2 session-wrapper
+selection, original starting URL, pre-import runtime activation and held-ID rejection.
+The197-task independent binding review remains historical; it is not relabeled203.
+The additional session-wrapper review independently checks the ordinary account GET.
+
+Download v4 independent review passed21 offline tests with no network/process
+changes. On user stop, PID81712 receivedSIGINT and exited after pending range work.
+No downloader remains active. Preserved tile archive41,280,327,680bytes and
+Nominatim completed ranges15,401,484,288bytes (56.68GB unique data bodies total;
+assembled tile and range files both remain on disk). Routing/Wikipedia data not
+started; images/metadata are additional. Reservation198,568,153,001bytes remains
+historical, not a claim of actual download usage. Pause evidence:
+.local/curation-expansion/infrastructure/download-paused-v1.json.
+Maps preflight v2 has20 offline tests but no service/browser validation. Do not
+run its CLI until missing assets, restore/startup and source checks are resolved.
+
+No new task runs, adaptations, paid inference, training or deployment promotion
+are pending in this closed increment. Model-sweep orchestration and complete
+unrestricted-agent resets remain future work, not silently delivered by bindings.
+See ../dataset-expansion-review.md for the human review entry point.

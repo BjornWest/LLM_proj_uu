@@ -94,6 +94,15 @@ def binding(row):
             result['environment']={'origin_at_validation':'http://localhost:19099','isolation':'Complete independently owned forum reset required; scripts use initial/final ID sets and scoped test cleanup, not a general agent reset.'}
             result['verifier']={'origin':'project_derived_final_persisted_post','timing':'before_browser_close','version':'final-persisted-post-v3','native_grading':'Separate post-close diagnostic; prior correct publication can survive overwrite in native request-history score.','historical_execution':'Selected cases use multiple pinned driver/checker versions. Current v3 duplicate semantics have a fresh case; other selected outcomes independently replay equivalently.'}
             result['validation_profile'].update(max_steps=24,slow_mo_ms=0)
+        elif tid in {'467','516','517','518','519','520'}:
+            contract=load(BASE/'webarena_wishlist/contracts.json')
+            task=next(t for t in contract['tasks'] if str(t['source_task_id'])==tid)
+            result['policy_input']['terminal_response_instruction']=contract['terminal_response_instruction']
+            module='data.curation.expansion.webarena_wishlist.run_v2'
+            result['implementation']={'type':'existing_episode_task_with_external_factory','factory':symbol(module,'SessionWishlistTask'),'constructor_bindings':{'contract':'private contract row','variant':'positive (ordinary verification; not declared outcome)'},'browser_task':symbol(module,'SessionBrowserTask'),'factory_recipe':pin(BASE/'webarena_wishlist/run_v2.py')}
+            result['environment']={'origin_at_validation':'http://localhost:17770','original_start_url':task['setup']['start_url'],'isolation':'Complete independently owned shopping reset required; scoped wishlist cleanup is not a general agent reset.','session_setup':'Ordinary authenticated account GET before original start; retain private setup evidence and original deictic goal. No CSRF bypass or site modification.'}
+            result['verifier']={'origin':'project_derived_final_wishlist_membership','timing':'before_browser_close','quantity':'Original goal unspecified; repeated matching additions diagnostic only.','native_grading':'Separate post-close diagnostic; task467 native quantity mismatch rejects correct addition, add-then-remove history can pass.'}
+            result['validation_profile'].update(max_steps=24,slow_mo_ms=0)
         elif tid=='407':
             result['policy_input']['terminal_response_instruction']='When finished, call send_msg_to_user with a JSON object containing task_type="mutate", status="SUCCESS" or an applicable failure status, and retrieved_data=null.'
             result['implementation']={'type':'existing_episode_task_with_external_factory','factory':symbol('data.curation.expansion.webarena_votes.run_v2','VoteTask'),'constructor_bindings':{'task':'private contract row','variant':'positive (ordinary verification; not declared outcome)'},'browser_task':symbol('data.curation.expansion.webarena_votes.run_v2','BrowserTask'),'factory_recipe':pin(BASE/'webarena_votes/run_v2.py')}
@@ -119,7 +128,7 @@ def binding(row):
             if type(cap) is not int or cap<=0:raise ValueError('Invalid recorded step cap')
             result['validation_profile'].update(max_steps=cap,slow_mo_ms=100,recorded_case_profile=pin(case_profile))
             result['required_preflight'].append('Retain or explicitly amend the recorded max_steps; task batches use different caps.')
-        if tid in {'399','400','401','402','403','407','689','690','691','692','693'} or int(tid) in set(range(630,635))|set(range(640,650)):
+        if tid in {'399','400','401','402','403','407','467','516','517','518','519','520','689','690','691','692','693'} or int(tid) in set(range(630,635))|set(range(640,650)):
             result['implementation']['pre_import_runtime_activation']={
                 'required':True,'environment_variable':'CURATION_FROZEN_RUNTIME',
                 'snapshot_directory':'.local/curation-expansion/frozen-runtime-v1',

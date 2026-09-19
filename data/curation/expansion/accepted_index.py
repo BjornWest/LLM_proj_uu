@@ -191,6 +191,30 @@ def collect():
             'license':'See pinned upstream dataset/environment terms; do not infer asset sublicensing',
             'status':'independently_reviewed_scripted_development','model_tested':False,
             'training_eligible':False,'production_ready':False})
+    wishlist_review=BASE/'webarena-wishlist-independent-review.json';wishlist=load(wishlist_review)
+    wishlist_contract=BASE/'webarena_wishlist/contracts.json';wishlist_tasks=load(wishlist_contract)
+    for task in wishlist_tasks['tasks']:
+        if task['source_task_id'] not in wishlist['accepted_ids']:continue
+        tid=str(task['source_task_id']);raw=source[tid]
+        assert task['original']==raw and task['policy_input']['goal']==raw['intent']
+        rows.append({'id':'webarena:'+tid,'dataset':'webarena-verified','instance_id':tid,
+            'source_task_id':tid,'origin':'original','template_id':task['source_template_id'],
+            'sites':['shopping'],'goal':raw['intent'],'original_prompt':raw['intent'],
+            'source_revision':wishlist_tasks['source_revision'],
+            'source_dataset_sha256':wishlist_tasks['dataset_sha256'],
+            'kind':'mutate','condition':'upstream_original',
+            'contract_reference':pin(wishlist_contract),'contract_row_id':task['source_task_id'],
+            'review_references':[pin(wishlist_review)],'verifier_origin':'project_derived_final_wishlist_membership',
+            'terminal_instruction_integration_required':True,'authorization_coverage':None,
+            'execution_requirements':{'profile':'core-tools-v3','slow_mo_ms':0,'observation_characters':48000,
+                'isolated_service_at_validation':'http://localhost:17770',
+                'original_start_url':task['setup']['start_url'],
+                'authenticated_session_setup_before_original_start':True,
+                'complete_independent_reset_before_unrestricted_model_runs':True},
+            'limitations':wishlist['limitations']+[wishlist_tasks['quantity_scope']],
+            'license':'See pinned upstream dataset/environment terms; do not infer asset sublicensing',
+            'status':'independently_reviewed_scripted_development','model_tested':False,
+            'training_eligible':False,'production_ready':False})
     # Dataset identities must not split merely because one contract serialized
     # an upstream integer as a string. Preserve the raw value separately.
     for row in rows:

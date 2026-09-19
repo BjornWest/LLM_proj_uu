@@ -1,0 +1,27 @@
+{
+  "schema": "maps-preflight-offline-validation-v1",
+  "coordination_id": "MAP-PREFLIGHT-03",
+  "created_at": "2026-09-19T17:28:48.328985+00:00",
+  "status": "offline_checked_live_unexecuted",
+  "test_count": 12,
+  "test_command": "python3 -m unittest data.curation.expansion.webarena_maps_preflight.test_preflight -v",
+  "compiled": "run.py",
+  "source_sha256": {
+    "README.md": "2ef67d4fca7ffb727c139ec6365e31275364a136ab77292f89255f991c43d95c",
+    "test_preflight.py": "439ca94e09d36390f6fe7e2e78d014a7d14463ef1a437ffa92cc88d46a16fae4",
+    "run.py": "c50233ea0eba1e6cbf467402c147719eadb2bd5bc6eb750a05afb09fa5c19e86",
+    "source-pins.json": "59be330030070c37c5b0efa1c5d463da7b162ffe87f59a556035dbea26faf794",
+    "evidence.py": "c537d06d2e71f79063c27ba3ab99e46481f04f6ca2fbf6c3b7ff29a19087d793"
+  },
+  "browser_calls": 0,
+  "network_calls": 0,
+  "model_calls": 0,
+  "services_started": 0,
+  "task_acceptance": false,
+  "training_eligible": false,
+  "limitations": [
+    "First original-site execution must confirm deployed selectors and exact read-only POST path.",
+    "Task-specific endpoint identity and outcome graders not implemented.",
+    "No server-side network isolation or tile startup claim."
+  ]
+}

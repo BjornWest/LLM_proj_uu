@@ -1,0 +1,49 @@
+{
+  "schema": "independent-download-v4-review-v1",
+  "coordination_id": "DOWNLOAD-V4-REVIEW-01",
+  "status": "accepted_transport_amendment",
+  "amendment_sha256": "a36fa83574408aa4dacdc133c66635ebb63cf0f61088fb7c51130851b5e8baf6",
+  "source_pins_match": true,
+  "v4_delta_exactly_limited_to": [
+    "Docstring/import",
+    "Per-worker RangeSessions transport",
+    "Pool/helper SHA logged in implementations",
+    "Session context closes only after executor drains"
+  ],
+  "unchanged_functions": {
+    "validate_range": true,
+    "file_sha": true,
+    "verify_completed": true
+  },
+  "range_and_resume_logic_byte_identical_after_transport_normalization": true,
+  "tests_run": 21,
+  "new_independent_tests": 7,
+  "upstream_tests": 14,
+  "test_log": "test_byte_cap_plan_rejection_before_io (__main__.Tests.test_byte_cap_plan_rejection_before_io) ... ok\ntest_cookie_clear_does_not_strip_explicit_fields (__main__.Tests.test_cookie_clear_does_not_strip_explicit_fields) ... ok\ntest_real_session_redirect_retains_cookie_only_inside_call (__main__.Tests.test_real_session_redirect_retains_cookie_only_inside_call) ... ok\ntest_resume_validates_unchanged_manifest_before_transport (__main__.Tests.test_resume_validates_unchanged_manifest_before_transport) ... ok\ntest_terminal_get_failure_never_automatically_retried (__main__.Tests.test_terminal_get_failure_never_automatically_retried) ... ok\ntest_thread_local_and_close_after_workers (__main__.Tests.test_thread_local_and_close_after_workers) ... ok\ntest_v4_validation_exact_fail_closed_cases (__main__.Tests.test_v4_validation_exact_fail_closed_cases) ... ok\ntest_cookies_cleared_but_request_fields_unchanged (data.curation.expansion.test_download_ranges_v4.Sessions.test_cookies_cleared_but_request_fields_unchanged) ... ok\ntest_partial_failure_resume_and_complete_hash (data.curation.expansion.test_download_ranges_v4.Sessions.test_partial_failure_resume_and_complete_hash) ... {\"asset\": \"file\", \"completed_bytes\": 4, \"expected_bytes\": 5}\n{\"asset\": \"file\", \"completed_bytes\": 5, \"expected_bytes\": 5}\n{\"asset\": \"file\", \"status\": \"complete\", \"sha256\": \"36bbe50ed96841d10443bcb670d6554f0a34b761be67ec9c4a8ad2c0c44ca42c\"}\nok\ntest_retry_adapter_rejected (data.curation.expansion.test_download_ranges_v4.Sessions.test_retry_adapter_rejected) ... ok\ntest_reuse_same_worker_and_close (data.curation.expansion.test_download_ranges_v4.Sessions.test_reuse_same_worker_and_close) ... ok\ntest_workers_do_not_share_session (data.curation.expansion.test_download_ranges_v4.Sessions.test_workers_do_not_share_session) ... ok\ntest_changed_etag_rejected (data.curation.expansion.test_download_ranges_v3.PrefixRange.test_changed_etag_rejected) ... ok\ntest_prefix_uses_original_total (data.curation.expansion.test_download_ranges_v3.PrefixRange.test_prefix_uses_original_total) ... ok\ntest_short_total_rejected (data.curation.expansion.test_download_ranges_v3.PrefixRange.test_short_total_rejected) ... ok\ntest_missing_digest (data.curation.expansion.test_download_ranges_v2.ResumeChecks.test_missing_digest) ... ok\ntest_same_size_change (data.curation.expansion.test_download_ranges_v2.ResumeChecks.test_same_size_change) ... ok\ntest_size_change (data.curation.expansion.test_download_ranges_v2.ResumeChecks.test_size_change) ... ok\ntest_symlink (data.curation.expansion.test_download_ranges_v2.ResumeChecks.test_symlink) ... ok\ntest_unchanged (data.curation.expansion.test_download_ranges_v2.ResumeChecks.test_unchanged) ... ok\ntest_unfinished_not_promoted (data.curation.expansion.test_download_ranges_v2.ResumeChecks.test_unfinished_not_promoted) ... ok\n\n----------------------------------------------------------------------\nRan 21 tests in 0.053s\n\nOK\n",
+  "reserved_bytes": 198568153001,
+  "limit_bytes": 200000000000,
+  "remaining_plan_allowance_bytes": 1431846999,
+  "findings": [],
+  "semantics": [
+    "One requests Session per executor worker and per asset, never shared across concurrent workers.",
+    "Adapters with nonzero automatic retry total rejected; range failure propagates with no same-call retry. Already in-flight bounded workers may finish before shutdown, as in v3.",
+    "Cookies cleared before each range; cookies within a single redirect chain preserved as with requests.get. Explicit request range/ETag/identity headers and timeout unchanged.",
+    "Completed chunks and archives keep prior hashes; partial prefix restart requests suffix only; whole-file expected identity and exact original source total retained.",
+    "Plan cap is planned asset-body reservation plus existing reservations; not measured TCP/TLS/redirect traffic or crash-loss retransmission. Existing v3 accounting meaning unchanged."
+  ],
+  "limits": [
+    "No live network or connection reuse/DNS improvement measured.",
+    "Live ledger/process/download files were not opened, modified, restarted or stopped. Ledger-before SHA is retained amendment assertion, not independently reconstructed.",
+    "This checks transport delta and offline guards, not completed archive identity or overall site readiness."
+  ],
+  "source_sha256": {
+    "data/curation/expansion/download_ranges_v3.py": "c29b3e1211d23bce5a200ce7fe772af1810bd22a3266e00c4bf90c288be13392",
+    "data/curation/expansion/download_ranges_v4.py": "9b88d9b9cccf3a35c0813ce44542c1cb730136150c310cf8b8642cc92bed62b4",
+    "data/curation/expansion/range_http_pool.py": "035d67a452724d5dcb25bec419acf4846e4270ff61273849079c8983d931c23c",
+    "data/curation/expansion/test_download_ranges_v4.py": "5ffe688d4ef4ec8044cfdd3bc60f774ce681800ed1a8350e440f6df22498bf16",
+    "data/curation/expansion/tricky/reviews/download-v4-review.py": "46d50bbd2ebf34d8f8946984c832c63f841bbc5d2febfe23a9ee2b508276a038"
+  },
+  "network_calls": 0,
+  "browser_calls": 0,
+  "model_calls": 0
+}

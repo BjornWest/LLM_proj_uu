@@ -1,0 +1,48 @@
+{
+  "schema": "maps-preflight-source-pins-v1",
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "archives": [
+    {
+      "path": ".local/curation-expansion/webarena-maps-source-v1/sources.json",
+      "sha256": "644cc4a688250bfcc9dc16e48510b1c4d369c49efb29086f557075b77c37ccf9"
+    },
+    {
+      "path": ".local/curation-expansion/webarena-maps-source-v2/sources.json",
+      "sha256": "4e9457d56d4035ae857a8d43258067898d9182388c2e366b4688e5c2e3f6e6e9"
+    }
+  ],
+  "selected_sources": [
+    {
+      "upstream_path": "/app/app/assets/javascripts/index/directions.js",
+      "sha256": "873d4f97c074f4a9d0aaf04db04e6612ccbb9f24bdf0d0054efffe1d671f3b44",
+      "archive": ".local/curation-expansion/webarena-maps-source-v1/sources.json"
+    },
+    {
+      "upstream_path": "/app/app/assets/javascripts/index/directions/fossgis_osrm.js",
+      "sha256": "a0bc434b18ab0495bce219a8f8f64d5ed28149e1d0e059d967dd37bd6567afc8",
+      "archive": ".local/curation-expansion/webarena-maps-source-v1/sources.json"
+    },
+    {
+      "upstream_path": "/app/app/views/geocoder/search.html.erb",
+      "sha256": "831fb0f98b4ad019211ddf90c799655c9e17bbb424185012709f4dbd158b94ae",
+      "archive": ".local/curation-expansion/webarena-maps-source-v1/sources.json"
+    },
+    {
+      "upstream_path": "/app/app/views/layouts/_search.html.erb",
+      "sha256": "7e241cad7532facae2bb3dc2179032382943b1d78f1fee24ce8a7dc52ed6264d",
+      "archive": ".local/curation-expansion/webarena-maps-source-v1/sources.json"
+    },
+    {
+      "upstream_path": "/app/app/controllers/geocoder_controller.rb",
+      "sha256": "00f6cc6ed9a5215f3c4c8411d85596f1f7da33d6cfbc0464dae314e247ab10b2",
+      "archive": ".local/curation-expansion/webarena-maps-source-v1/sources.json"
+    },
+    {
+      "upstream_path": "/app/app/assets/javascripts/index/search.js",
+      "sha256": "7c106433c9450538d169a2749ae2d068713ebdd093ef43d36dc32d07e01b4c77",
+      "archive": ".local/curation-expansion/webarena-maps-source-v2/sources.json"
+    }
+  ],
+  "read_only_post_route": "/geocoder/search_osm_nominatim",
+  "route_note": "Controller action and view data-href are source-confirmed; exact deployed Rails path is a runtime hypothesis. Any different POST is blocked and recorded, not silently widened."
+}

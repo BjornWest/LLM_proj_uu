@@ -1,0 +1,43 @@
+{
+  "schema": "maps-preflight-offline-validation-v2",
+  "coordination_id": "MAP-PREFLIGHT-03",
+  "created_at": "2026-09-19T17:35:21.788324+00:00",
+  "status": "offline_checked_live_unexecuted",
+  "test_count": 20,
+  "new_revision_tests": 8,
+  "test_command": "python3 -m unittest data.curation.expansion.webarena_maps_preflight.test_preflight_v2 -v",
+  "compiled": "run_v2.py",
+  "source_sha256": {
+    "README.md": "2ef67d4fca7ffb727c139ec6365e31275364a136ab77292f89255f991c43d95c",
+    "parallel.py": "994b66a4e1321873bc69eb1a9c86bc1c9cb628adb31b7ecb7ec06482f2cbe0b0",
+    "README_v2.md": "77cfeb7987ad854932e241f8c01f12012e575f465e3c4ef80466b648ccac668c",
+    "test_preflight.py": "439ca94e09d36390f6fe7e2e78d014a7d14463ef1a437ffa92cc88d46a16fae4",
+    "run.py": "c50233ea0eba1e6cbf467402c147719eadb2bd5bc6eb750a05afb09fa5c19e86",
+    "run_v2.py": "e05d5303a07b89a19635963491f72da27b28f8aef476888fa16064a3d598dd83",
+    "source-pins.json": "59be330030070c37c5b0efa1c5d463da7b162ffe87f59a556035dbea26faf794",
+    "evidence_v2.py": "e606d3c8e61931d9d07b2cbdf5c4e0a8f54922012300ebb3ce71e65d5d1d8bf5",
+    "offline-validation.json": "73ff613a333600492a99f3e711c4d1b76c75224490b30b47b4ab6dc4bb412b21",
+    "test_preflight_v2.py": "e4b8f46a8d205128caa40c85979ac7c8ff850d0f45ba241d41cddeceed69efd4",
+    "evidence.py": "c537d06d2e71f79063c27ba3ab99e46481f04f6ca2fbf6c3b7ff29a19087d793"
+  },
+  "historical_source_preservation": {
+    "README.md": true,
+    "test_preflight.py": true,
+    "run.py": true,
+    "source-pins.json": true,
+    "evidence.py": true
+  },
+  "historical_validation_sha256": "73ff613a333600492a99f3e711c4d1b76c75224490b30b47b4ab6dc4bb412b21",
+  "changes": [
+    "Nonzero or invalid native action error count forces unknown even when fatal error is null.",
+    "Default bounded concurrency2 in separate processes/contexts/output paths, individual and parent source captures.",
+    "Timed-out child process group terminated; original servers unaffected."
+  ],
+  "browser_calls": 0,
+  "network_calls": 0,
+  "model_calls": 0,
+  "services_started": 0,
+  "offline_test_subprocesses": "Tiny local Python children only, no browser imports",
+  "task_acceptance": false,
+  "training_eligible": false
+}

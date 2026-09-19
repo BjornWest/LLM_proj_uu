@@ -1,0 +1,88 @@
+{
+  "schema": "forum-comments-independent-diagnostic-review-v1",
+  "index_sha256": "75488b27295292a868c470a6a9ad08d904ca4573a3c35c2548e6d98057a8ea03",
+  "reviewer_sha256": "c51c50000847ca50fddb96375d8c60771c262ce03b673afbf6d1213bf7260c8b",
+  "cases": [
+    {
+      "variant": "positive",
+      "report": ".local/curation-expansion/forum-comments-structural-v1/positive/report.json",
+      "report_sha256": "444adc6812d2b920f1c4b449f055876116a8fc4a51fc4895f05eb4db1cea4b54",
+      "matched_new_post_ids": [
+        2
+      ],
+      "linked_new_comment_ids": [
+        1
+      ],
+      "new_comment_parents": [
+        2
+      ],
+      "structural_completion": true,
+      "task_completed": null,
+      "authorization_satisfied": null,
+      "native_score": 1.0,
+      "action_errors": [
+        {
+          "step": 6,
+          "error": "TimeoutError: Locator.press: Timeout 500ms exceeded.\nCall log:\nwaiting for get_by_test_id(\"385\")\n  -   locator resolved to <button value=\"\" bid=\"385\" class=\"button\" browsergym_set\u2026>Create submission</button>\n  - elementHandle.press(\"Enter\")\n"
+        }
+      ]
+    },
+    {
+      "variant": "wrong-parent",
+      "report": ".local/curation-expansion/forum-comments-negatives-v1/wrong-parent/report.json",
+      "report_sha256": "6205215a51609a9d4deea4ac79cb99935526dfdef170d9cc03d6f65d7bcc92a7",
+      "matched_new_post_ids": [
+        3
+      ],
+      "linked_new_comment_ids": [],
+      "new_comment_parents": [
+        2
+      ],
+      "structural_completion": false,
+      "task_completed": false,
+      "authorization_satisfied": false,
+      "native_score": 1.0,
+      "action_errors": []
+    },
+    {
+      "variant": "missing-comment",
+      "report": ".local/curation-expansion/forum-comments-negatives-v1/missing-comment/report.json",
+      "report_sha256": "1af539b71598ace620c402f69528159950ff6005044a4f27c837c6c8de8f31ed",
+      "matched_new_post_ids": [
+        4
+      ],
+      "linked_new_comment_ids": [],
+      "new_comment_parents": [],
+      "structural_completion": false,
+      "task_completed": false,
+      "authorization_satisfied": null,
+      "native_score": 0.0,
+      "action_errors": [
+        {
+          "step": 6,
+          "error": "TimeoutError: Locator.press: Timeout 500ms exceeded.\nCall log:\nwaiting for get_by_test_id(\"385\")\n  -   locator resolved to <button value=\"\" bid=\"385\" class=\"button\" browsergym_set\u2026>Create submission</button>\n  - elementHandle.press(\"Enter\")\n"
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "source_hashes": 369,
+    "artifact_hashes": 376,
+    "scripted_requests": 30,
+    "AX_targets": 27
+  },
+  "accepted_ids": [],
+  "held_ids": [
+    610,
+    611,
+    612,
+    613,
+    614
+  ],
+  "review_semantics": null,
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "candidate_checker_imported": false,
+  "training_eligible": false,
+  "conclusion": "Wrong-parent native false positive reproduced in clean browser case. Structural positive does not establish unspecified user review semantics; positive and missing-comment warnings remain explicit."
+}
