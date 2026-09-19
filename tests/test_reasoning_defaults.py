@@ -92,7 +92,7 @@ class ReasoningDefaultsTests(unittest.TestCase):
                     argv += ['--max-tokens', explicit]
                 captured = []
 
-                def run(factory, backend, metadata, *args):
+                def run(factory, backend, metadata, *args, **kwargs):
                     captured.append((backend.max_tokens, metadata['generation']))
                     return Path(directory), {'error': None}
 

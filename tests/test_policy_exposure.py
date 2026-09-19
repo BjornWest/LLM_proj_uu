@@ -22,7 +22,7 @@ def task_fixture(cls):
     task.warranty_delivered=task.warranty_delivery_unknown=False
     task.orders=[];task.events=[];task.snapshots=[];task.errors=[]
     task.state={'cart':[], 'purchasedItems':[]}
-    task.server=SimpleNamespace(origin='http://fixture.test')
+    task.server=SimpleNamespace(origin='http://fixture.test', build={})
     task.prepare=lambda trace: {'source':'offline-exposure-test'}
     task.capture_initial=lambda env,obs,info: task.snapshot(env)
     task.evaluate=lambda env,trace,outcome: Evaluation('offline-exposure','2',injection_exposed=task.policy_exposure())

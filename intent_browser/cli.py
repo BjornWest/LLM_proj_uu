@@ -75,6 +75,25 @@ def main():
     parser.add_argument("--pilot-task", choices=['P07','P10','P11'], help="Local Tricky shopping, privacy or membership fixture")
     parser.add_argument("--condition", choices=['clean','injected','warranty'], default=None, help='Default injected; warranty is the legacy P07 alias')
     parser.add_argument("--goal", default="Click the Finish button.")
+    parser.add_argument('--native-tool-choice', choices=['auto','required'], default='auto',
+                        help='core-tools profiles only: advertise tools normally or require a tool call')
+    parser.add_argument('--strict-tools', action='store_true',
+                        help='core-tools profiles only: request provider-side strict argument schemas')
+    parser.add_argument('--reasoning-replay', choices=['preserve','strip'], default=None,
+                        help='core-tools profiles: preserve returned reasoning (default), or strip for an ablation')
+    parser.add_argument('--harness-profile', choices=['legacy', 'append-feedback-v1', 'append-events-v1', 'core-feedback-v2', 'core-tools-v1', 'core-tools-v2', 'core-tools-v3', 'core-tools-v4-navigation', 'core-tools-v5-feedback', 'core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'],
+                        default='legacy', help='Development opt-in; existing task adapters need separate adoption')
+    parser.add_argument('--navigation-origin', action='append', default=[],
+                        help='Trusted exact HTTP(S) origin; repeat for multi-site navigation profile')
+    parser.add_argument('--image-retention', choices=['retain','agent'], default=None,
+                        help='v8 vision: retain images by default, or allow explicit agent release')
+    parser.add_argument('--ax-tokenizer-file', help='core-tools-v6-ax: existing local tokenizer.json')
+    parser.add_argument('--ax-overview-tokens', type=int, default=2000)
+    parser.add_argument('--ax-result-tokens', type=int, default=1500)
+    parser.add_argument('--ax-verbose', action='store_true', help='v7: include AX extraction diagnostics by default')
+    parser.add_argument('--ax-repeat', action='store_true', help='v7: resend known AX content by default (ablation)')
+    parser.add_argument("--action-timeout-ms", type=int, default=None,
+                        help="Override project action deadlines (default 5000 ms; 500 reproduces legacy timing)")
     parser.add_argument("--model", default=os.getenv("MODEL_NAME"))
     parser.add_argument("--base-url", default=os.getenv("MODEL_BASE_URL"))
     parser.add_argument("--api-key-env", default="MODEL_API_KEY")
@@ -202,6 +221,47 @@ def main():
         else:
             from .tricky_privacy import PrivacyTask
             episode_task = PrivacyTask(condition=condition)
+    if args.harness_profile not in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision') and (args.strict_tools or args.native_tool_choice != 'auto' or args.reasoning_replay is not None):
+        parser.error('Native tool options require --harness-profile core-tools-v1/v2/v3/v4-navigation/v5-feedback')
+    if args.harness_profile not in ('core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision') and bool(args.navigation_origin) != (args.harness_profile in ('core-tools-v4-navigation','core-tools-v5-feedback')):
+        parser.error('Navigation profiles require --navigation-origin; other profiles do not accept it')
+    if bool(args.ax_tokenizer_file) != (args.harness_profile in ('core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision')):
+        parser.error('AX profiles require --ax-tokenizer-file; non-AX profiles do not accept it')
+    if (args.ax_verbose or args.ax_repeat) and args.harness_profile not in ('core-tools-v7-context','core-tools-v8-vision'):
+        parser.error('--ax-verbose/--ax-repeat require core-tools-v7-context')
+    if args.image_retention is not None and args.harness_profile != "core-tools-v8-vision":
+        parser.error("--image-retention requires core-tools-v8-vision")
+    ax_config = None
+    if args.ax_tokenizer_file:
+        from .ax_explorer import AXConfig
+        ax_config = AXConfig(args.ax_tokenizer_file, args.ax_overview_tokens, args.ax_result_tokens,
+            incremental=args.harness_profile in ('core-tools-v7-context','core-tools-v8-vision'), verbose=args.ax_verbose, repeat=args.ax_repeat)
+    harness_profile = None
+    if args.harness_profile != 'legacy':
+        if episode_task is not None:
+            parser.error('Development harness profiles are not yet adopted by certified task adapters')
+        from .harness import HarnessProfile
+        if args.harness_profile in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'):
+            if args.mode != 'run':
+                parser.error('Native tools require run mode with an API backend')
+            from .vision import VisionConfig
+            from .harness import native_tools_profile
+            harness_profile=native_tools_profile(tool_choice=args.native_tool_choice,strict=args.strict_tools,
+                parallel_tool_calls=False if args.harness_profile=='core-tools-v1' else None,
+                compact_feedback=args.harness_profile in ('core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'),
+                navigation_origins=tuple(args.navigation_origin),
+                timeout_feedback=args.harness_profile in ('core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'),
+                ax_config=ax_config,
+                vision_config=VisionConfig(args.image_retention or "retain") if args.harness_profile=="core-tools-v8-vision" else None,
+                reasoning_replay=args.reasoning_replay or 'preserve')
+        elif args.harness_profile == 'core-feedback-v2':
+            from .harness import core_feedback_profile
+            harness_profile=core_feedback_profile()
+        elif args.harness_profile == 'append-events-v1':
+            from .browser_feedback import BrowserEventFeedback
+            harness_profile = HarnessProfile(name='append-events-v1', feedback_factory=BrowserEventFeedback)
+        else:
+            harness_profile = HarnessProfile()
     action_set = make_action_set()
 
     def env_factory(video_dir):
@@ -220,6 +280,7 @@ def main():
                ) if args.mode in ("manual", "development")
                else ChatCompletionsBackend(args.base_url, args.model, os.getenv(args.api_key_env),
                                            args.timeout, args.max_tokens,
+                                           supports_images=args.harness_profile=="core-tools-v8-vision",
                                            request_options=request_options, session_routing=session_routing))
     metadata = {"task": args.task, "goal": args.goal if args.task == "openended" else None,
                 "start_url": args.url or ("built-in smoke fixture" if args.task == "openended" else None),
@@ -242,7 +303,9 @@ def main():
         metadata["context_note"] = "Actions supplied through stdin by the development assistant; its full context is not captured by the harness messages. Not a controlled model evaluation."
     try:
         _, summary = run_episode(env_factory, backend, metadata, args.output, args.max_steps,
-                                 args.seed, args.video, args.hold_seconds, search_backend, episode_task)
+                                 args.seed, args.video, args.hold_seconds, search_backend, episode_task,
+                                 action_timeout_ms=args.action_timeout_ms,
+                                 **({'harness_profile': harness_profile} if harness_profile else {}))
     finally:
         backend.close()
         if search_backend:

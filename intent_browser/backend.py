@@ -37,7 +37,8 @@ class ChatCompletionsBackend:
 
     def __init__(self, base_url: str, model: str, api_key: str | None = None,
                  timeout: float = 90, max_tokens: int | None = None, *, request_options=None,
-                 session_routing: bool = False):
+                 session_routing: bool = False, supports_images: bool = False):
+        self.supports_images = supports_images
         self.base_url = base_url.rstrip("/")
         self.model = model
         is_openrouter = urlparse(self.base_url).hostname == 'openrouter.ai'
@@ -64,6 +65,17 @@ class ChatCompletionsBackend:
             trust_env=False,
         )
 
+    def configure_tools(self, options):
+        """Configure an explicit episode protocol before inference; no defaults changed."""
+        if type(self) is not ChatCompletionsBackend and not type(self).__dict__.get('supports_native_tools', False):
+            raise ValueError('Backend subclass must explicitly adopt native messages and schema token budgeting')
+        if not {'tools','tool_choice'} <= set(options) or set(options) - {'tools','tool_choice','parallel_tool_calls'}:
+            raise ValueError('Unexpected native tool configuration')
+        for name, value in options.items():
+            if name in self.request_options and self.request_options[name] != value:
+                raise ValueError('Conflicting native tool configuration: ' + name)
+        self.request_options.update(deepcopy(options))
+
     def begin_episode(self, episode_id):
         if not self.session_routing:
             return None
@@ -74,6 +86,9 @@ class ChatCompletionsBackend:
                 'provider': deepcopy(self.request_options.get('provider'))}
 
     def complete(self, messages: list[dict]) -> Completion:
+        if not self.supports_images and any(isinstance(m.get('content'), list) and
+                any(p.get('type') == 'image_url' for p in m['content']) for m in messages):
+            raise ValueError('Backend has not explicitly enabled image input')
         if self.session_routing and self.session_id is None:
             raise ValueError('Begin an episode before sending a session-routed request')
         request = {
