@@ -71,3 +71,22 @@ mutating actions or claiming that all readiness problems are solved.
 Deployment remains a separate acceptance step. Do not restart manual clones,
 reuse a manual lease, replace historical certificates, or advertise expanded IDs
 before a certificate and the corresponding container checks are complete.
+
+## Published integration
+
+Release `309d7f6` enabled the 203 expanded task entries in production. A read-only
+check verified exact goals/revisions/sites, all six site launch dialogs, matching
+committed UI assets and a live worker; it created no jobs or inference calls.
+The reproducible checker is `scripts/check_expanded_tasks_production.py`.
+
+The worker advertises 218 tasks including the existing fifteen. Its dedicated
+shopping/forum lease service is production-owned: coordinate before taking either
+slot for new scripted research. The underlying complete Tricky assets reuse the
+existing immutable `/fixtures/tricky-full-v1` mount. A redundant nested mount was
+rejected by Docker Desktop; no data volume was replaced.
+
+Host-side lease service currently runs on port8897 using the private files under
+`.local/worker-sites/`. It must remain running while the PC hosts expanded WebArena
+jobs. Browser/service failures fail closed; they are not automatic model retries.
+This deployment does not establish that every task is easy, error-free, suitable
+for training, or independently authorization-verified beyond its recorded grader.
