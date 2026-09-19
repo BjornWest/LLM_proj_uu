@@ -90,10 +90,17 @@ function records(){
 }
 function renderSites(){
   const query=$('site-search').value.trim().toLowerCase();$('site-folders').replaceChildren();
+  const taskCounts=new Map();for(const task of tasks){const id=taskSite(task);taskCounts.set(id,(taskCounts.get(id)||0)+1);}
   for(const collection of [...new Set(sites.map(s=>s.collection))]){
     const matching=sites.filter(s=>s.collection===collection&&[s.name,s.description,collection].join(' ').toLowerCase().includes(query));if(!matching.length)continue;
     const details=node('details',undefined,'site-folder');details.open=folderState.get(collection)??true;details.ontoggle=()=>{if(details.isConnected)folderState.set(collection,details.open);};const summary=node('summary',collectionNames[collection]||collection);summary.append(node('span',String(matching.length)));details.append(summary);
-    for(const site of matching){const button=node('button',undefined,'site-choice');button.type='button';button.dataset.site=site.id;button.disabled=askBusy;button.setAttribute('aria-current',String(!globalPage&&site.id===siteID));const text=node('span');text.append(node('strong',site.name),node('small',site.interactive?'Explore · tasks · replays':manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site.id)?'Manual explore · tasks · replays':'Remote tasks · replays'));button.append(node('span',site.icon,'site-icon'),text);button.onclick=()=>selectSite(site.id);details.append(button);}
+    for(const site of matching){
+      const button=node('button',undefined,'site-choice');button.type='button';button.dataset.site=site.id;button.disabled=askBusy;button.setAttribute('aria-current',String(!globalPage&&site.id===siteID));
+      const text=node('span',undefined,'site-choice-text'),heading=node('span',undefined,'site-choice-heading'),count=taskCounts.get(site.id)||0;
+      const badge=node('span',Array.isArray(config?.tasks)?count+' '+(count===1?'task':'tasks'):'… tasks','site-task-count');badge.title=Array.isArray(config?.tasks)?'Registered tasks, including unavailable tasks and separate conditions':'Loading task catalog';
+      heading.append(node('strong',site.name),badge);text.append(heading,node('small',site.interactive?'Explore · replays':manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site.id)?'Manual explore · replays':'Remote tasks · replays'));
+      button.append(node('span',site.icon,'site-icon'),text);button.onclick=()=>selectSite(site.id);details.append(button);
+    }
     $('site-folders').append(details);
   }
   $('sites-empty').hidden=!!$('site-folders').children.length;
