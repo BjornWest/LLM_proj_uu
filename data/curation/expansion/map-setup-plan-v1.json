@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "status": "prepared_waiting_for_complete_archives",
+  "source_config_sha256": "030dfd32002a1609565ed71d5bbab0bb89a8031b9585193ef7a8786b34d0b5b3",
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "project": "curation-webarena-map-v1",
+  "browser_origin": "http://localhost:13030",
+  "control_origin": "http://localhost:13031",
+  "download_ledger": ".local/curation-expansion/downloads-ranged/ranges-ledger.json",
+  "new_paid_calls": 0,
+  "training_eligible": false,
+  "required_before_launch": [
+    "All three approved archives complete and their local SHA256 hashes rechecked",
+    "Extract only into new curation-owned volumes; reject existing initialized volume without separate review",
+    "Check current disk capacity for extracted data, retained archive and retained range copies",
+    "Record extraction commands, exact image ID, named volume ownership and server initialization",
+    "Verify all three routing modes, place lookup and original page assets",
+    "Native BrowserGym positive/negative checks on original objectives; no static-page-only readiness"
+  ],
+  "volumes": [
+    {
+      "name": "curation-map-v1-tiles-db",
+      "source_archive": "osm_tile_server.tar",
+      "source_prefix": "projects/ogma3/docker/volumes/osm-data/_data",
+      "strip_components": 6,
+      "mount": "/data/database"
+    },
+    {
+      "name": "curation-map-v1-nominatim-db",
+      "source_archive": "nominatim_volumes.tar",
+      "source_prefix": "projects/metis2/docker/docker/volumes/nominatim-data/_data",
+      "strip_components": 7,
+      "mount": "/data/nominatim/postgres"
+    },
+    {
+      "name": "curation-map-v1-nominatim-flatnode",
+      "source_archive": "nominatim_volumes.tar",
+      "source_prefix": "projects/metis2/docker/docker/volumes/nominatim-flatnode/_data",
+      "strip_components": 7,
+      "mount": "/data/nominatim/flatnode"
+    },
+    {
+      "name": "curation-map-v1-routing-car",
+      "source_archive": "osrm_routing.tar",
+      "source_prefix": "car",
+      "strip_components": 1,
+      "mount": "/data/routing/car"
+    },
+    {
+      "name": "curation-map-v1-routing-bike",
+      "source_archive": "osrm_routing.tar",
+      "source_prefix": "bike",
+      "strip_components": 1,
+      "mount": "/data/routing/bike"
+    },
+    {
+      "name": "curation-map-v1-routing-foot",
+      "source_archive": "osrm_routing.tar",
+      "source_prefix": "foot",
+      "strip_components": 1,
+      "mount": "/data/routing/foot"
+    }
+  ]
+}

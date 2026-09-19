@@ -1,0 +1,1132 @@
+{
+  "schema": "webarena-posts-contract-v1",
+  "source_revision": "WebArena-Verified 1.2.3 / per-task revision2",
+  "source_dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "instances": 15,
+  "templates": 3,
+  "terminal_response_instruction": "When finished, call send_msg_to_user with a JSON object containing task_type=\"mutate\", status=\"SUCCESS\" or an applicable failure status, and retrieved_data=null.",
+  "tasks": [
+    {
+      "id": "WA630",
+      "source": "webarena-verified",
+      "source_task_id": 630,
+      "template_id": "15",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Create a post in f/headphones. Title it \"noise-cancelling headphones recommendations?\" and in post details ask \"Hey, looking for good noise-cancelling headphones under $200, any suggestions?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 630,
+        "intent_template_id": 15,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Create a post in f/headphones. Title it \"noise-cancelling headphones recommendations?\" and in post details ask \"Hey, looking for good noise-cancelling headphones under $200, any suggestions?\"",
+        "intent_template": "Create a post in {{forum}}. Title it \"{{category}} recommendations?\" and in post details ask \"Hey, looking for good {{category}} under {{price}}, any suggestions?\"",
+        "instantiation_dict": {
+          "category": "noise-cancelling headphones",
+          "price": "$200",
+          "forum": "f/headphones"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/headphones"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "noise-cancelling headphones recommendations?",
+                "submission[body]": "Hey, looking for good noise-cancelling headphones under $200, any suggestions?",
+                "submission[forum]": "10050"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "noise-cancelling headphones recommendations?",
+        "body": "Hey, looking for good noise-cancelling headphones under $200, any suggestions?",
+        "forum_wording": "headphones",
+        "observed_forum_label": "headphones"
+      },
+      "grader_input": {
+        "forum_id": 10050,
+        "forum_name": "headphones",
+        "title": "noise-cancelling headphones recommendations?",
+        "body": "Hey, looking for good noise-cancelling headphones under $200, any suggestions?",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA631",
+      "source": "webarena-verified",
+      "source_task_id": 631,
+      "template_id": "15",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Create a post in f/sports. Title it \"running shoes recommendations?\" and in post details ask \"Hey, looking for good running shoes under $100, any suggestions?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 631,
+        "intent_template_id": 15,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Create a post in f/sports. Title it \"running shoes recommendations?\" and in post details ask \"Hey, looking for good running shoes under $100, any suggestions?\"",
+        "intent_template": "Create a post in {{forum}}. Title it \"{{category}} recommendations?\" and in post details ask \"Hey, looking for good {{category}} under {{price}}, any suggestions?\"",
+        "instantiation_dict": {
+          "category": "running shoes",
+          "price": "$100",
+          "forum": "f/sports"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/sports"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "running shoes recommendations?",
+                "submission[body]": "Hey, looking for good running shoes under $100, any suggestions?",
+                "submission[forum]": "10080"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "running shoes recommendations?",
+        "body": "Hey, looking for good running shoes under $100, any suggestions?",
+        "forum_wording": "sports",
+        "observed_forum_label": "sports"
+      },
+      "grader_input": {
+        "forum_id": 10080,
+        "forum_name": "sports",
+        "title": "running shoes recommendations?",
+        "body": "Hey, looking for good running shoes under $100, any suggestions?",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA632",
+      "source": "webarena-verified",
+      "source_task_id": 632,
+      "template_id": "15",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Create a post in f/sports. Title it \"running shoes recommendations?\" and in post details ask \"Hey, looking for good running shoes under $500, any suggestions?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 632,
+        "intent_template_id": 15,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Create a post in f/sports. Title it \"running shoes recommendations?\" and in post details ask \"Hey, looking for good running shoes under $500, any suggestions?\"",
+        "intent_template": "Create a post in {{forum}}. Title it \"{{category}} recommendations?\" and in post details ask \"Hey, looking for good {{category}} under {{price}}, any suggestions?\"",
+        "instantiation_dict": {
+          "category": "running shoes",
+          "price": "$500",
+          "forum": "f/sports"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/sports"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "running shoes recommendations?",
+                "submission[body]": "Hey, looking for good running shoes under $500, any suggestions?",
+                "submission[forum]": "10080"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "running shoes recommendations?",
+        "body": "Hey, looking for good running shoes under $500, any suggestions?",
+        "forum_wording": "sports",
+        "observed_forum_label": "sports"
+      },
+      "grader_input": {
+        "forum_id": 10080,
+        "forum_name": "sports",
+        "title": "running shoes recommendations?",
+        "body": "Hey, looking for good running shoes under $500, any suggestions?",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA633",
+      "source": "webarena-verified",
+      "source_task_id": 633,
+      "template_id": "15",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Create a post in f/sports. Title it \"running pants recommendations?\" and in post details ask \"Hey, looking for good running pants under $500, any suggestions?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 633,
+        "intent_template_id": 15,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Create a post in f/sports. Title it \"running pants recommendations?\" and in post details ask \"Hey, looking for good running pants under $500, any suggestions?\"",
+        "intent_template": "Create a post in {{forum}}. Title it \"{{category}} recommendations?\" and in post details ask \"Hey, looking for good {{category}} under {{price}}, any suggestions?\"",
+        "instantiation_dict": {
+          "category": "running pants",
+          "price": "$500",
+          "forum": "f/sports"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/sports"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "running pants recommendations?",
+                "submission[body]": "Hey, looking for good running pants under $500, any suggestions?",
+                "submission[forum]": "10080"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "running pants recommendations?",
+        "body": "Hey, looking for good running pants under $500, any suggestions?",
+        "forum_wording": "sports",
+        "observed_forum_label": "sports"
+      },
+      "grader_input": {
+        "forum_id": 10080,
+        "forum_name": "sports",
+        "title": "running pants recommendations?",
+        "body": "Hey, looking for good running pants under $500, any suggestions?",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA634",
+      "source": "webarena-verified",
+      "source_task_id": 634,
+      "template_id": "15",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Create a post in f/iphone. Title it \"used iphone recommendations?\" and in post details ask \"Hey, looking for good used iphone under $1000, any suggestions?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 634,
+        "intent_template_id": 15,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Create a post in f/iphone. Title it \"used iphone recommendations?\" and in post details ask \"Hey, looking for good used iphone under $1000, any suggestions?\"",
+        "intent_template": "Create a post in {{forum}}. Title it \"{{category}} recommendations?\" and in post details ask \"Hey, looking for good {{category}} under {{price}}, any suggestions?\"",
+        "instantiation_dict": {
+          "category": "used iphone",
+          "price": "$1000",
+          "forum": "f/iphone"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/iphone"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "used iphone recommendations?",
+                "submission[body]": "Hey, looking for good used iphone under $1000, any suggestions?",
+                "submission[forum]": "10052"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "used iphone recommendations?",
+        "body": "Hey, looking for good used iphone under $1000, any suggestions?",
+        "forum_wording": "iphone",
+        "observed_forum_label": "iphone"
+      },
+      "grader_input": {
+        "forum_id": 10052,
+        "forum_name": "iphone",
+        "title": "used iphone recommendations?",
+        "body": "Hey, looking for good used iphone under $1000, any suggestions?",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA640",
+      "source": "webarena-verified",
+      "source_task_id": 640,
+      "template_id": "16",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post a notice in f/books titled \"book reading Meet up!\". Set post details to \"virtual meetup for book reading on March 15th\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 640,
+        "intent_template_id": 16,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a notice in f/books titled \"book reading Meet up!\". Set post details to \"virtual meetup for book reading on March 15th\"",
+        "intent_template": "Post a notice in {{forum}} titled \"{{interest}} Meet up!\". Set post details to \"virtual meetup for {{interest}} on {{date}}\"",
+        "instantiation_dict": {
+          "interest": "book reading",
+          "date": "March 15th",
+          "forum": "f/books"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "book reading Meet up!",
+                "submission[body]": "virtual meetup for book reading on March 15th",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "book reading Meet up!",
+        "body": "virtual meetup for book reading on March 15th",
+        "forum_wording": "books",
+        "observed_forum_label": "books"
+      },
+      "grader_input": {
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "book reading Meet up!",
+        "body": "virtual meetup for book reading on March 15th",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA641",
+      "source": "webarena-verified",
+      "source_task_id": 641,
+      "template_id": "16",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post a notice in books forum titled \"Harry Potter Meet up!\". Set post details to \"virtual meetup for Harry Potter on July 8th\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 641,
+        "intent_template_id": 16,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a notice in books forum titled \"Harry Potter Meet up!\". Set post details to \"virtual meetup for Harry Potter on July 8th\"",
+        "intent_template": "Post a notice in {{forum}} titled \"{{interest}} Meet up!\". Set post details to \"virtual meetup for {{interest}} on {{date}}\"",
+        "instantiation_dict": {
+          "interest": "Harry Potter",
+          "date": "July 8th",
+          "forum": "books forum"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "Harry Potter Meet up!",
+                "submission[body]": "virtual meetup for Harry Potter on July 8th",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "Harry Potter Meet up!",
+        "body": "virtual meetup for Harry Potter on July 8th",
+        "forum_wording": "books",
+        "observed_forum_label": "books"
+      },
+      "grader_input": {
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "Harry Potter Meet up!",
+        "body": "virtual meetup for Harry Potter on July 8th",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA642",
+      "source": "webarena-verified",
+      "source_task_id": 642,
+      "template_id": "16",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post a notice in books forum titled \"Big little lies Meet up!\". Set post details to \"virtual meetup for Big little lies on Sep 10th\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 642,
+        "intent_template_id": 16,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a notice in books forum titled \"Big little lies Meet up!\". Set post details to \"virtual meetup for Big little lies on Sep 10th\"",
+        "intent_template": "Post a notice in {{forum}} titled \"{{interest}} Meet up!\". Set post details to \"virtual meetup for {{interest}} on {{date}}\"",
+        "instantiation_dict": {
+          "interest": "Big little lies",
+          "date": "Sep 10th",
+          "forum": "books forum"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "Big little lies Meet up!",
+                "submission[body]": "virtual meetup for Big little lies on Sep 10th",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "Big little lies Meet up!",
+        "body": "virtual meetup for Big little lies on Sep 10th",
+        "forum_wording": "books",
+        "observed_forum_label": "books"
+      },
+      "grader_input": {
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "Big little lies Meet up!",
+        "body": "virtual meetup for Big little lies on Sep 10th",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA643",
+      "source": "webarena-verified",
+      "source_task_id": 643,
+      "template_id": "16",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post a notice in nyc forum titled \"racing cars Meet up!\". Set post details to \"virtual meetup for racing cars on Oct 21st\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 643,
+        "intent_template_id": 16,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a notice in nyc forum titled \"racing cars Meet up!\". Set post details to \"virtual meetup for racing cars on Oct 21st\"",
+        "intent_template": "Post a notice in {{forum}} titled \"{{interest}} Meet up!\". Set post details to \"virtual meetup for {{interest}} on {{date}}\"",
+        "instantiation_dict": {
+          "interest": "racing cars",
+          "date": "Oct 21st",
+          "forum": "nyc forum"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/nyc"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "racing cars Meet up!",
+                "submission[body]": "virtual meetup for racing cars on Oct 21st",
+                "submission[forum]": "10067"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "racing cars Meet up!",
+        "body": "virtual meetup for racing cars on Oct 21st",
+        "forum_wording": "nyc",
+        "observed_forum_label": "nyc"
+      },
+      "grader_input": {
+        "forum_id": 10067,
+        "forum_name": "nyc",
+        "title": "racing cars Meet up!",
+        "body": "virtual meetup for racing cars on Oct 21st",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA644",
+      "source": "webarena-verified",
+      "source_task_id": 644,
+      "template_id": "16",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post a notice in games forum titled \"Tears of Kingdom Meet up!\". Set post details to \"virtual meetup for Tears of Kingdom on Dec 15th\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 644,
+        "intent_template_id": 16,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post a notice in games forum titled \"Tears of Kingdom Meet up!\". Set post details to \"virtual meetup for Tears of Kingdom on Dec 15th\"",
+        "intent_template": "Post a notice in {{forum}} titled \"{{interest}} Meet up!\". Set post details to \"virtual meetup for {{interest}} on {{date}}\"",
+        "instantiation_dict": {
+          "interest": "Tears of Kingdom",
+          "date": "Dec 15th",
+          "forum": "games forum"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/gaming"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "Tears of Kingdom Meet up!",
+                "submission[body]": "virtual meetup for Tears of Kingdom on Dec 15th",
+                "submission[forum]": "10048"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "Tears of Kingdom Meet up!",
+        "body": "virtual meetup for Tears of Kingdom on Dec 15th",
+        "forum_wording": "games",
+        "observed_forum_label": "gaming"
+      },
+      "grader_input": {
+        "forum_id": 10048,
+        "forum_name": "gaming",
+        "title": "Tears of Kingdom Meet up!",
+        "body": "virtual meetup for Tears of Kingdom on Dec 15th",
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [
+        "Original goal says games; existing site and source grader identify gaming; no games forum exists."
+      ],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA645",
+      "source": "webarena-verified",
+      "source_task_id": 645,
+      "template_id": "19",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post in books forum with title \"What could machine learning help the books field?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 645,
+        "intent_template_id": 19,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post in books forum with title \"What could machine learning help the books field?\"",
+        "intent_template": "Post in {{forum}} forum with title \"{{title}}\"",
+        "instantiation_dict": {
+          "model_type": "machine learning",
+          "title": "What could machine learning help the books field?",
+          "forum": "books"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/books"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "What could machine learning help the books field?",
+                "submission[forum]": "10037"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "What could machine learning help the books field?",
+        "body": null,
+        "forum_wording": "books",
+        "observed_forum_label": "books"
+      },
+      "grader_input": {
+        "forum_id": 10037,
+        "forum_name": "books",
+        "title": "What could machine learning help the books field?",
+        "body": null,
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA646",
+      "source": "webarena-verified",
+      "source_task_id": 646,
+      "template_id": "19",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post in DIY forum with title \"What could midjourney help the DIY field?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 646,
+        "intent_template_id": 19,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post in DIY forum with title \"What could midjourney help the DIY field?\"",
+        "intent_template": "Post in {{forum}} forum with title \"{{title}}\"",
+        "instantiation_dict": {
+          "model_type": "midjourney",
+          "title": "What could midjourney help the DIY field?",
+          "forum": "DIY"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/DIY"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "What could midjourney help the DIY field?",
+                "submission[forum]": "10007"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "What could midjourney help the DIY field?",
+        "body": null,
+        "forum_wording": "DIY",
+        "observed_forum_label": "DIY"
+      },
+      "grader_input": {
+        "forum_id": 10007,
+        "forum_name": "DIY",
+        "title": "What could midjourney help the DIY field?",
+        "body": null,
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA647",
+      "source": "webarena-verified",
+      "source_task_id": 647,
+      "template_id": "19",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post in technology forum with title \"What could open-source LLMs help the technology field?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 647,
+        "intent_template_id": 19,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post in technology forum with title \"What could open-source LLMs help the technology field?\"",
+        "intent_template": "Post in {{forum}} forum with title \"{{title}}\"",
+        "instantiation_dict": {
+          "model_type": "open-source LLMs",
+          "title": "What could open-source LLMs help the technology field?",
+          "forum": "technology"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/technology"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "What could open-source LLMs help the technology field?",
+                "submission[forum]": "10082"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "What could open-source LLMs help the technology field?",
+        "body": null,
+        "forum_wording": "technology",
+        "observed_forum_label": "technology"
+      },
+      "grader_input": {
+        "forum_id": 10082,
+        "forum_name": "technology",
+        "title": "What could open-source LLMs help the technology field?",
+        "body": null,
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA648",
+      "source": "webarena-verified",
+      "source_task_id": 648,
+      "template_id": "19",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post in dataisbeautiful forum with title \"What could large language models help the dataisbeautiful field?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 648,
+        "intent_template_id": 19,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post in dataisbeautiful forum with title \"What could large language models help the dataisbeautiful field?\"",
+        "intent_template": "Post in {{forum}} forum with title \"{{title}}\"",
+        "instantiation_dict": {
+          "model_type": "large language models",
+          "title": "What could large language models help the dataisbeautiful field?",
+          "forum": "dataisbeautiful"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/dataisbeautiful"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "What could large language models help the dataisbeautiful field?",
+                "submission[forum]": "10042"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "What could large language models help the dataisbeautiful field?",
+        "body": null,
+        "forum_wording": "dataisbeautiful",
+        "observed_forum_label": "dataisbeautiful"
+      },
+      "grader_input": {
+        "forum_id": 10042,
+        "forum_name": "dataisbeautiful",
+        "title": "What could large language models help the dataisbeautiful field?",
+        "body": null,
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    },
+    {
+      "id": "WA649",
+      "source": "webarena-verified",
+      "source_task_id": 649,
+      "template_id": "19",
+      "origin": "original",
+      "policy_input": {
+        "goal": "Post in dataisbeautiful forum with title \"What could diffusion model help the dataisbeautiful field?\""
+      },
+      "original_source": {
+        "sites": [
+          "reddit"
+        ],
+        "task_id": 649,
+        "intent_template_id": 19,
+        "start_urls": [
+          "__REDDIT__"
+        ],
+        "intent": "Post in dataisbeautiful forum with title \"What could diffusion model help the dataisbeautiful field?\"",
+        "intent_template": "Post in {{forum}} forum with title \"{{title}}\"",
+        "instantiation_dict": {
+          "model_type": "diffusion model",
+          "title": "What could diffusion model help the dataisbeautiful field?",
+          "forum": "dataisbeautiful"
+        },
+        "eval": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": [
+                "__REDDIT__/submit",
+                "__REDDIT__/submit/dataisbeautiful"
+              ],
+              "http_method": "POST",
+              "post_data": {
+                "submission[title]": "What could diffusion model help the dataisbeautiful field?",
+                "submission[forum]": "10042"
+              },
+              "response_status": 302
+            }
+          }
+        ],
+        "revision": 2
+      },
+      "scripted_input_from_user_goal": {
+        "title": "What could diffusion model help the dataisbeautiful field?",
+        "body": null,
+        "forum_wording": "dataisbeautiful",
+        "observed_forum_label": "dataisbeautiful"
+      },
+      "grader_input": {
+        "forum_id": 10042,
+        "forum_name": "dataisbeautiful",
+        "title": "What could diffusion model help the dataisbeautiful field?",
+        "body": null,
+        "author": "MarvelsGrantMan136"
+      },
+      "adaptation": "Independent final persisted rows and authenticated post GET; raw native HAR evaluator retained separately. No source/page changes.",
+      "contract_notes": [],
+      "authorization_satisfied": null,
+      "training_eligible": false,
+      "readiness": "pending_original_browser_validation"
+    }
+  ]
+}

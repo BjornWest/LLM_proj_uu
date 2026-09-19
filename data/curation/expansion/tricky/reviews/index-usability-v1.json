@@ -1,0 +1,241 @@
+{
+  "schema": "tricky-index-usability-review-v1",
+  "read_only": true,
+  "model_calls": 0,
+  "browser_runs": 0,
+  "status": "counts_identity_private_projection_and_strict_references_pass_two_usability_findings",
+  "index": ".local/curation-expansion/accepted-discovery-v2.json",
+  "index_sha256": "ce4cc600364aa418318caae19f01f8d3051b344c493490997d56248be1ffcef4",
+  "builder": {
+    "path": "data/curation/expansion/accepted_index.py",
+    "sha256": "11ddd1c7ba10897c727d16bd2b51dc7cb0eefec3f2779bfdcaf696dcd76c9a66"
+  },
+  "live_builder_rows_equal_saved": true,
+  "counts": {
+    "trickyarena": 100,
+    "webarena-verified": 20
+  },
+  "tricky_origin_counts": {
+    "project_authored": 79,
+    "original": 21
+  },
+  "tricky_site_counts": {
+    "shop": 42,
+    "health": 20,
+    "news": 20,
+    "spotify": 18
+  },
+  "template_counts": {
+    "tricky_authored_declared_ids": 60,
+    "tricky_original_declared_ids": 21,
+    "tricky_all_declared_ids": 81,
+    "webarena_declared_ids": 14
+  },
+  "unique_ids": 120,
+  "pinned_reference_checks": 254,
+  "unique_pinned_references": 19,
+  "goal_projection_matches_contract_rows": 120,
+  "private_expected_setup_fields_absent_from_discovery_rows": true,
+  "discovery_is_not_itself_a_policy_payload": true,
+  "strict_draft_cases": [
+    {
+      "id": "AU46",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU46-positive/traces/20260919T151004Z-d9931d2f"
+    },
+    {
+      "id": "AU46",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU46-negative/traces/20260919T151010Z-57949424"
+    },
+    {
+      "id": "AU47",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU47-positive/traces/20260919T151016Z-dde8ddf2"
+    },
+    {
+      "id": "AU47",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU47-negative/traces/20260919T151022Z-29a34b31"
+    },
+    {
+      "id": "AU51",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU51-positive/traces/20260919T151028Z-ffd4203e"
+    },
+    {
+      "id": "AU51",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU51-negative/traces/20260919T151037Z-08192b71"
+    },
+    {
+      "id": "AU52",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU52-positive/traces/20260919T151045Z-68b10aab"
+    },
+    {
+      "id": "AU52",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU52-negative/traces/20260919T151055Z-4ff2aa00"
+    }
+  ],
+  "strict_review_reference": {
+    "path": "data/curation/expansion/tricky-authored-drafts-v2-independent-review.json",
+    "sha256": "245da36e6ea98c7ae12f74a4dc88a9e1a3b8c5a815a09c1eaed4f712e82c1354"
+  },
+  "documented_command_mapping": [
+    {
+      "batch": "authored",
+      "document": "data/curation/expansion/tricky/authored/README.md",
+      "documented_wrapper": "verify_native.py",
+      "adapter": "native.py",
+      "grader": "grader.py",
+      "profile": "core-tools-v3",
+      "accepted_version_match": true,
+      "note": "Explicit new reviewed deadline/window required; protocol supplied by runner, not bare policy_goal.",
+      "readme_sha256": "161ba15f3673d41c9f13c38dcf150a7bd4e13d9de179aea5a961d71ed9570a4b",
+      "wrapper_sha256": "2fd82d68bd88bb59c347182a009fa4c74dc0f675c1092c4264eddbf4e21083d3",
+      "adapter_sha256": "07cdcea1d4488e03b3fbb30872e0d0586f0e2d1c7fe629d87677a55770adf511",
+      "grader_sha256": "b6a51db13a69003afd3540797f3cafca4b16ae575d1749b8ee33a9df8b9bd580"
+    },
+    {
+      "batch": "authored02",
+      "document": "data/curation/expansion/tricky/authored02/README.md",
+      "documented_wrapper": "verify_native_v2.py",
+      "adapter": "native_v2.py",
+      "grader": "grader_v2.py",
+      "profile": "core-tools-v3",
+      "accepted_version_match": true,
+      "note": "Copied runtime selected in command; plain reachability remains separately scoped historical grading.",
+      "readme_sha256": "502a59e93175740addba60c8eef640f839875a9ae712fa3da3e1739435eaec84",
+      "wrapper_sha256": "3d7c1fc1cb2e178cb379c0d3d162b7613653730bddd697809da7328193cb533c",
+      "adapter_sha256": "7f483aedb205f86fbdb3b1304d11bc3aba7a6980a4edf41e2c077e9a206870a6",
+      "grader_sha256": "59b2caed33cc14c5f67ff7107860c91fcb569ef5ae36707d9f19eb202169f2d8"
+    },
+    {
+      "batch": "authored03",
+      "document": "data/curation/expansion/tricky/authored03/README.md",
+      "documented_wrapper": "verify_native.py",
+      "adapter": "native.py",
+      "grader": "grader.py",
+      "profile": "core-tools-v3",
+      "accepted_version_match": false,
+      "note": "Main executable block runs all20 on v1, including four draft tasks accepted only under native_v2/grader_v2. Later prose corrects scope but provides no replacement command.",
+      "readme_sha256": "8ccf82e3e4aa085fbcdfa06617a17d8359d78f1cf80bb4b54a8356e97a32193a",
+      "wrapper_sha256": "ac6731457f2cb8524c032415a213c881498d48e7a4a1fed7bacdc036db495518",
+      "adapter_sha256": "6d930cbd16a6e9b52a16392c5d88dd5319d23d9baef74ab1c1c9f4905ec6eebd",
+      "grader_sha256": "078c9d2774813b2f91ec46bf82ed83a28be2699a4d7b90176af078d4198cf508"
+    },
+    {
+      "batch": "authored04",
+      "document": "data/curation/expansion/tricky/authored04/README.md",
+      "documented_wrapper": "verify_native.py",
+      "adapter": "native.py",
+      "grader": "grader.py",
+      "profile": "core-tools-v3",
+      "accepted_version_match": true,
+      "note": "Grader contains the strict-draft comparison; copied runtime selected.",
+      "readme_sha256": "c8b36768d4599a11e2ee539f33a27a71505b010dbb228e20dac85561d3cbd82b",
+      "wrapper_sha256": "ee66ecb0c131ad34b4c2e6217de0f442b4a6f9c1d70559320d877894497483e5",
+      "adapter_sha256": "10d937bc753d695932efebd3306eb67bf43f78b50b42c800dcdd1b33b4b5be6c",
+      "grader_sha256": "0fb67f09fa2ade4fb898ee03e76eae343a756b5492113e1fa4ce4cdf86b8ade1"
+    }
+  ],
+  "source_revision_scope_mismatches": [
+    {
+      "id": "TO15",
+      "discovery_source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+      "inventory_task_source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+      "actual_discovery_revision_repository": "devinat1/agenttrickydps",
+      "task_source_repository": "LiteAgent/liteagent"
+    },
+    {
+      "id": "TO16",
+      "discovery_source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+      "inventory_task_source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+      "actual_discovery_revision_repository": "devinat1/agenttrickydps",
+      "task_source_repository": "LiteAgent/liteagent"
+    },
+    {
+      "id": "TO17",
+      "discovery_source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+      "inventory_task_source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+      "actual_discovery_revision_repository": "devinat1/agenttrickydps",
+      "task_source_repository": "LiteAgent/liteagent"
+    },
+    {
+      "id": "TO18",
+      "discovery_source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+      "inventory_task_source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+      "actual_discovery_revision_repository": "devinat1/agenttrickydps",
+      "task_source_repository": "LiteAgent/liteagent"
+    },
+    {
+      "id": "TO19",
+      "discovery_source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+      "inventory_task_source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+      "actual_discovery_revision_repository": "devinat1/agenttrickydps",
+      "task_source_repository": "LiteAgent/liteagent"
+    },
+    {
+      "id": "TO20",
+      "discovery_source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+      "inventory_task_source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+      "actual_discovery_revision_repository": "devinat1/agenttrickydps",
+      "task_source_repository": "LiteAgent/liteagent"
+    },
+    {
+      "id": "TO21",
+      "discovery_source_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+      "inventory_task_source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+      "actual_discovery_revision_repository": "devinat1/agenttrickydps",
+      "task_source_repository": "LiteAgent/liteagent"
+    }
+  ],
+  "findings": [
+    {
+      "id": "IDX-QA-01",
+      "severity": "medium",
+      "scope": "documented execution usability",
+      "status": "open",
+      "title": "authored03 primary command selects superseded grader for four accepted draft tasks",
+      "evidence": [
+        "data/curation/expansion/tricky/authored03/README.md:48",
+        "data/curation/expansion/tricky/authored03/README.md:53",
+        "data/curation/expansion/tricky/authored03/verify_native.py:19",
+        "data/curation/expansion/tricky/authored03/native.py:12",
+        "data/curation/expansion/tricky/authored03/grader.py:22"
+      ],
+      "impact": "Copying the primary native command reruns AU46/AU47/AU51/AU52 with normalization that fails the accepted exact-draft contract. Existing accepted discovery references remain correct.",
+      "suggested_fix": "Replace the current-use command block with an explicit16-task v1 selection plus four-task verify_native_v2.py selection, and the v2 regression-test command. Keep historical scripts/evidence unchanged."
+    },
+    {
+      "id": "IDX-QA-02",
+      "severity": "medium",
+      "scope": "source identity for downstream consumers",
+      "status": "open",
+      "title": "Unqualified source_revision mixes task-repository and environment-repository revisions",
+      "evidence": [
+        "data/curation/expansion/accepted_index.py:31",
+        "data/curation/expansion/tricky_original_remaining/contracts.json",
+        "data/curation/inventory.jsonl"
+      ],
+      "affected_ids": [
+        "TO15",
+        "TO16",
+        "TO17",
+        "TO18",
+        "TO19",
+        "TO20",
+        "TO21"
+      ],
+      "impact": "TO15\u2013TO21 carry environment SHA8201821... in the same unqualified field where TX/TA originals carry task-source SHA4ed5d744.... Treating source_revision uniformly as task-repository provenance would pin the wrong repository revision. Historical source is recoverable through the inventory and source/build evidence; this does not invalidate accepted cases.",
+      "suggested_fix": "Preserve raw historical contract values, but qualify their repository/scope and expose separate task-source and environment-source references in a new discovery revision."
+    }
+  ],
+  "limits": [
+    "Declared template IDs are not independent mechanisms; count81 mixes original source task families and authored template naming.",
+    "Checked saved discovery and current builder byte binding; no new episodes, grader executions, deployments or source edits.",
+    "README acceptance/pending wording is historical in places; this review reports only concrete execution/provenance mismatches."
+  ]
+}

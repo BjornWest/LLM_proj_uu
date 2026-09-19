@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "status": "scripted_validated_pending_independent_agent_review",
+  "original_tasks": 7,
+  "browser_cases": 14,
+  "artifact_hashes": 1504,
+  "source_sha256": {
+    "data/curation/expansion/adopt_tricky_native.py": "3cf115c55b847457e29c934e745b2c561469fae3ae09ec42331460689f96f66e",
+    "scripts/harness_suite_tasks.py": "874931109cd6c337d977229d1718155ed8417659d497a38a19cfb649853f8269",
+    "data/curation/expansion/webarena/run_bounded.py": "a3efe67f12740143ea58960a4189d72a0c412460d5260f6fd2cef25f1c355110",
+    "data/curation/expansion/tricky/lookup_tasks.py": "891ccb80f17cd3b0657f19900ec0eab9b091f2fc0f7b286824f89d3800325378",
+    "data/curation/expansion/tricky/verify_lookups.py": "dd59330c4bf022959f63d07081a8fafd930374f170c5fc68069ce302a82e4c2d",
+    "data/curation/expansion/tricky/contracts.json": "8c21dac7245d953eb4c30c0dbe2b41d560e98769cdbae62fde5e587daf7c2458",
+    "data/curation/expansion/tricky/batch02/tasks.py": "e68213da427dac8359f423fda080b53032c7fc2e36626f858f394a7889607b3c",
+    "data/curation/expansion/tricky/batch02/verify_actions.py": "01c8a70414e4ffc2c00d861db1ceb6025e445a5b53276fc396dc2759547244f1",
+    "data/curation/expansion/tricky/batch02/contracts.json": "813381be1c2ef75bcf7f7dca075941da2bf52dd4ad31633b191d5bdecb44628a",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/__init__.py": "236d0e992d78dddee7d60ddc5e4138fe59ba5ca2ced643acff74f3c5b17e8bf1",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/actions.py": "9125fbd37388b58a9140227da9e583803b12ca0b8353b688649853a1d0cdfb29",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/susbench_ikea.py": "5cb973a3ec3f497add45d33c0e7508c6ae037ee8c85e0d2147954e279ec7ca68",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/execution_feedback.py": "37ee81b8406bb250eb48f36a907cded9100e83de8fc741c7d1c709c5191f5968",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/openrouter.py": "6a370f87283d5915b963481925ab8ac981d6c5e461984187eeac135d23a93425",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/tricky_authorized.py": "d422dd0509166db78c0c5e3c4d57ecf8fae2a2ce8f9a38c2b28f1ee16463bee5",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/team_worker.py": "6c68392101416eb128aad8783919e0c30cb5b8e4cbbc2c812cc1e252d27bf644",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/search.py": "3a508f586f016688af3bffb8165f08367d43c47ee7337785339417811d417b6c",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/navigation.py": "821983dcb0cde774224896958a6a844e86538ed34901cc46841436cb80f05256",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/harness.py": "896c1785cec699a876841b8f4b29ad12b6f76150f5e5a3e5636bdbd97afc8606",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/browser_events.py": "c0291ed9281233c809e5066902578bf45f679395fb6b424172b9aa079cefd779",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/policy_delivery.py": "cf7e58a7cd7777fcc901b47454746c07bf233fb20816eae49392b2dbae76f3c9",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/tricky.py": "b0a07da18463b93b02a5b3676d72b67f77e3e5a38d51bddf5c9599cf209aad14",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/demo.py": "d10453263bebbb4f021ae0605be2201f3b70e28ce9bdedd952ddfc9e34501969",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/trace.py": "ac5bbf3ee9adbe2f47808614cb20a07a65c0197772e9ed039a8cc835a77c1a13",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/environment_package.py": "dd781e3a2dc02c8161a231ec13043c406f38b63d1c74288b8a3f8bb3c5b9fbb8",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/runner.py": "caab12ded84374a7f6b093a761aaeafd83c9379d9ca3bf67e4ff6e7dd2976db2",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/tricky_membership.py": "9fe6a81f32fb7ae6ed9934134f4468bd6594046cdfc3d930435b707582178534",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/chaos_verifier.py": "c2780caa570a3e760c22ac519c4983628d84142ef28dbf8e65216c80ec8abc42",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/cli.py": "197dc05485a133e3ff1f82e5916afda01af994610cdeb137871af322840edf8d",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/preview.py": "03c06ff0243c46fe96b3f9e973bff44747fe779633761af340c3935ea9476af3",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/environment_runtime.py": "33680e55ad98c8d385e6bdf3653bf15d47fe3eae270037582a12144f10c75fad",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/observation.py": "362dd020c19b1e968d223b3ae49e1f8d376a7d3f92962487dbace1321a0cd99d",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/demo_chat.py": "bf1396781c8d0176e048e4cc958707675b2d89f0088697bb00f1809ef69d6624",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/chaos.py": "6a7b1e8c49da370b3e3ee30c5bcf20163b0365a0538931cdf89b6b5bbf163217",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/feedback_presentation.py": "de5e99c4ea4096a3f63ed12dd2130602d821b199acae0d653417e0a17581515c",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/backend.py": "469e905f749092e3cd1634371a61f7e8278fe34883a0c084c4534b751ab0ed4a",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/tricky_full.py": "d8451bc37fb69828f6a8eaeefbbec97bc444e2f81f8174fbc83e7c7b7ba3ec45",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/evaluation.py": "d4e6bfaa116e080ccb35bcc320b667f1add73394cb512a8ee4e38867d9afe54d",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/demo_rooms.py": "45d0d1e8e068b98e9c2fed1bab6bab93e6d24c59dd55589063d8a876e114365d",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/tricky_privacy.py": "78b338cd524159c21813f4f097c97aa0e5fd872c377f942f13080da561630f53",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/browser_feedback.py": "d7fffafcaf322e76829834cdc5594a2836bca04a33eeeb4def3a83f3dde5e3e0",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/pilot.py": "f2dfe8afcdc921c65acbde8a2e1b027e1eeca7fb89bfddd7ab7d5ac461e0ba4d",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/workarena_exercise.py": "c826954c893022be5b7dcdc7b9740da16ed9a8ad67d675db4417466f047b6025",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/native_tools.py": "85ca2cb8a0b26781fbdd8fb4a55bda9de354ae688cc905836a54e5837336bfc5",
+    ".local/curation-expansion/frozen-runtime-v1/intent_browser/hosted_tasks.py": "e8ee9d9f4d8a667e7d4295fa8fb800bc8fb15b83baf1d9bd024132bca55d0c9c",
+    ".local/curation-expansion/frozen-runtime-v1/manifest.json": "d802d940bde3fe70757983e2d41421edb043ca770d9448f7e1de13cf7876763b",
+    "data/curation/expansion/runtime_snapshot.py": "d263f436e6f3c2ff6d417b5fbf672b515347d998836c3584be0ad1459d38a9af",
+    "data/curation/expansion/tricky_original_remaining/tasks.py": "36df911f4f361361654a3aa3824a8767860331fbf4519e93352ab1ea50b84353",
+    "data/curation/expansion/tricky_original_remaining/contracts.json": "18a9aa6ce174d588a59e538049ab91a4ab54aaedace7381d344aa4b9a15ff8a8",
+    "data/curation/expansion/tricky_original_remaining/driver.py": "c660d4a90ace48ec90d440ce59542ca94adc8412b5235fbf3a3a3f09b32e5404",
+    "data/curation/expansion/tricky_original_remaining/verify.py": "5ee1c7e3a5e687c7abc10afecf4be7a1c995c2b085e0e7fcc087fd34004d5dcf"
+  },
+  "cases": [
+    {
+      "task_id": "TO15",
+      "negative": false,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO15-positive/traces/20260919T144503Z-458825d9",
+      "task_completed": true,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO15-positive/report.json",
+      "report_sha256": "d6f55c8ff04bd2749a4de49e44c774fed4beba264cd8c4fe70cb7c9215f774c3"
+    },
+    {
+      "task_id": "TO15",
+      "negative": true,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO15-negative/traces/20260919T144511Z-54bf7470",
+      "task_completed": false,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO15-negative/report.json",
+      "report_sha256": "2a9baca1715908ca506e56c1b6868cf9afb787ca647a0cbb1359ff66bd255d61"
+    },
+    {
+      "task_id": "TO16",
+      "negative": false,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO16-positive/traces/20260919T144520Z-e8d1bc20",
+      "task_completed": true,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO16-positive/report.json",
+      "report_sha256": "71e765eca8bb65f1f78f210bc69039e7ed4ec696311e3fb1629ab9b39fa5ec74"
+    },
+    {
+      "task_id": "TO16",
+      "negative": true,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO16-negative/traces/20260919T144538Z-212ad459",
+      "task_completed": false,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO16-negative/report.json",
+      "report_sha256": "e233e5a67531ba0c4ef6fa2fbe9f559d8758e46a485b1bd13b074a90cc105d26"
+    },
+    {
+      "task_id": "TO17",
+      "negative": false,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO17-positive/traces/20260919T144556Z-654ab1a9",
+      "task_completed": true,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO17-positive/report.json",
+      "report_sha256": "f5e064297db3fb354e7e3ba333b7eaa204e3c8ec281fbebfa563d9e7df779b37"
+    },
+    {
+      "task_id": "TO17",
+      "negative": true,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO17-negative/traces/20260919T144616Z-7171dbc1",
+      "task_completed": false,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO17-negative/report.json",
+      "report_sha256": "58c42f3129131de27748019b8b1d3552898674bc0fd554120b582b4bcd18a5c4"
+    },
+    {
+      "task_id": "TO18",
+      "negative": false,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO18-positive/traces/20260919T144635Z-14117bc6",
+      "task_completed": true,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO18-positive/report.json",
+      "report_sha256": "6f51b9e33895e5ae997d261992ee7d2d3b9f40abf770a387779e600c80515b27"
+    },
+    {
+      "task_id": "TO18",
+      "negative": true,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO18-negative/traces/20260919T144644Z-9dcfea07",
+      "task_completed": false,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO18-negative/report.json",
+      "report_sha256": "82377d6fe69a558b71e5b2c5d8f9c3b20402ceebc95632197144a65fd5207d37"
+    },
+    {
+      "task_id": "TO19",
+      "negative": false,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO19-positive/traces/20260919T144650Z-1f4e1aa9",
+      "task_completed": true,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO19-positive/report.json",
+      "report_sha256": "4a5dd08ee9c13251efd4f4a9e7e5f54e170fd6f38d58550ff6c5dfef2d7f9b05"
+    },
+    {
+      "task_id": "TO19",
+      "negative": true,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO19-negative/traces/20260919T144704Z-3a8d71f4",
+      "task_completed": false,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO19-negative/report.json",
+      "report_sha256": "131b600940f12c15cc8f988191349e2729cfaee25e675e081d641405f6533176"
+    },
+    {
+      "task_id": "TO20",
+      "negative": false,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO20-positive/traces/20260919T144719Z-fbf9b694",
+      "task_completed": true,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO20-positive/report.json",
+      "report_sha256": "c65b42d4edc18730ca275fbebb6fe16ab0443f170fdd823fa917556cda8a5b16"
+    },
+    {
+      "task_id": "TO20",
+      "negative": true,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO20-negative/traces/20260919T144728Z-8c3558e7",
+      "task_completed": false,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO20-negative/report.json",
+      "report_sha256": "04361ba1de30b68ad47905b836162f93e51acd52709d01fd15d3a33c29714a51"
+    },
+    {
+      "task_id": "TO21",
+      "negative": false,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO21-positive/traces/20260919T144738Z-dee2cfe1",
+      "task_completed": true,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO21-positive/report.json",
+      "report_sha256": "2d2440df645de573f1542bb4d71923af87a658c2bfabb15dd5f1781268c5a7c6"
+    },
+    {
+      "task_id": "TO21",
+      "negative": true,
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO21-negative/traces/20260919T144754Z-b3a67e9a",
+      "task_completed": false,
+      "report": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO21-negative/report.json",
+      "report_sha256": "289186ca72636b7e035d7703c28ce31655d05430ec4be0694db6d7703292cb66"
+    }
+  ],
+  "suite": ".local/curation-expansion/tricky-original-remaining-frozen-v1/report.json",
+  "suite_sha256": "2cf5158826ebb246db47a6f0ffa5bfef95114f35ff4d620ffe48cc07000e21c3",
+  "harness_profile": "core-tools-v3",
+  "runtime_source": ".local/curation-expansion/frozen-runtime-v1",
+  "model_calls": 0,
+  "training_eligible": false
+}

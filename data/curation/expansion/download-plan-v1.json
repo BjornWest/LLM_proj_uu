@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "authorization": "User explicitly approved up to200GB total new downloads, 2026-09-19. No model/cloud budget.",
+  "limit_bytes": 200000000000,
+  "other_reserved_bytes": 3432864959,
+  "other_reservations": [
+    {
+      "site": "shopping_admin",
+      "image": "am1n3e/webarena-verified-shopping_admin@sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+      "compressed_image_layer_bytes": 1245375030,
+      "additional_data_bytes_approximate": null,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/shopping_admin.md"
+    },
+    {
+      "site": "map",
+      "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+      "compressed_image_layer_bytes": 1187489929,
+      "additional_data_bytes_approximate": 60000000000,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/map.md"
+    }
+  ],
+  "metadata_and_image_retry_allowance_bytes": 1000000000,
+  "assets": [
+    {
+      "filename": "osm_tile_server.tar",
+      "url": "https://webarena-map-server-data.s3.amazonaws.com/osm_tile_server.tar",
+      "bytes": 41280327680,
+      "etag": "\"ad8987fdc6ea2578c2a9f9c476465057-4921\""
+    },
+    {
+      "filename": "nominatim_volumes.tar",
+      "url": "https://webarena-map-server-data.s3.amazonaws.com/nominatim_volumes.tar",
+      "bytes": 124774901760,
+      "etag": "\"c9b49aa6ebe21e00fa49fefec17d4f3d-233\""
+    },
+    {
+      "filename": "osrm_routing.tar",
+      "url": "https://webarena-map-server-data.s3.amazonaws.com/osrm_routing.tar",
+      "bytes": 21278935040,
+      "etag": "\"8015f9b773f5e7292a7448a3e34a3333-2537\""
+    }
+  ]
+}

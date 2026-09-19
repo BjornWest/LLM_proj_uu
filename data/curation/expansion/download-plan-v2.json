@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "authorization": "User explicitly approved up to200GB total new downloads, 2026-09-19. No model/cloud budget.",
+  "limit_bytes": 200000000000,
+  "other_reserved_bytes": 3479376907,
+  "other_reservations": [
+    {
+      "site": "shopping_admin",
+      "image": "am1n3e/webarena-verified-shopping_admin@sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+      "compressed_image_layer_bytes": 1245375030,
+      "additional_data_bytes_approximate": null,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/shopping_admin.md"
+    },
+    {
+      "site": "map",
+      "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+      "compressed_image_layer_bytes": 1187489929,
+      "additional_data_bytes_approximate": 60000000000,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/map.md"
+    },
+    {
+      "site": "wikipedia",
+      "image": "am1n3e/webarena-verified-wikipedia@sha256:8c52e6cc8b7cc6f77daaf279929517399b1889bd02b09a257ebd465364ad387d",
+      "compressed_image_layer_bytes": 46511948
+    }
+  ],
+  "metadata_and_image_retry_allowance_bytes": 1000000000,
+  "assets": [
+    {
+      "filename": "osm_tile_server.tar",
+      "url": "https://webarena-map-server-data.s3.amazonaws.com/osm_tile_server.tar",
+      "bytes": 41280327680,
+      "etag": "\"ad8987fdc6ea2578c2a9f9c476465057-4921\""
+    },
+    {
+      "filename": "nominatim-postgres-exact-prefix.tar-part",
+      "url": "https://webarena-map-server-data.s3.amazonaws.com/nominatim_volumes.tar",
+      "bytes": 37329782784,
+      "etag": "\"c9b49aa6ebe21e00fa49fefec17d4f3d-233\"",
+      "source_bytes": 124774901760,
+      "source_range_start": 0,
+      "scope": "Exact source TAR prefix containing all PostgreSQL files; excludes ONLY flatnode directory/cache; not the full upstream TAR."
+    },
+    {
+      "filename": "osrm_routing.tar",
+      "url": "https://webarena-map-server-data.s3.amazonaws.com/osrm_routing.tar",
+      "bytes": 21278935040,
+      "etag": "\"8015f9b773f5e7292a7448a3e34a3333-2537\""
+    },
+    {
+      "filename": "wikipedia_en_all_maxi_2022-05.zim",
+      "url": "https://archive.org/download/wikipedia_en_all_maxi_2022-05/wikipedia_en_all_maxi_2022-05.zim",
+      "bytes": 95199730590,
+      "etag": "\"677142ae-162a589b9e\"",
+      "expected_sha256": "f12163513307893c87fd75009b1d61677bae675627eaadf4cb0fa63953eea021",
+      "expected_sha1": "1c7ea05511c33be200aff28f01b4403db851a0d4",
+      "identity_evidence": [
+        "https://lists.nongnu.org/archive/html/guix-patches/2022-12/msg01019.html",
+        ".local/curation-expansion/infrastructure/wikipedia-archive-metadata-v1.json"
+      ],
+      "scope": "Same named May2022 full-image ZIM; mirror identity provisional until whole-file checksums pass."
+    }
+  ],
+  "supersedes_plan": {
+    "path": "data/curation/expansion/download-plan-v1.json",
+    "sha256": "1108d053a082d9b20db4aa35cec437d4958adbfd6e746f938649a5da88a8110e",
+    "reason": "Replace not-yet-downloaded full Nominatim archive with its complete PostgreSQL prefix; skip only update-only flatnode cache and use remaining allowance for original Wikipedia snapshot. Preserve all downloaded bytes by checked continuation."
+  },
+  "selection_evidence": {
+    "headers": [
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v1.json",
+        "sha256": "4361c96969d2dd07bca079366aef9d803420e4c43e0e285692b9355bafee0d7e"
+      },
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v2.json",
+        "sha256": "90ec54c90fa487d6382af7eb4dea6dfdf10bc1978e6e865aadc121dabe941c84"
+      },
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v3.json",
+        "sha256": "82ea18203d1c5944f34aacc65f3084484d1265ec3bd34609741a29aa8c11eb65"
+      },
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v5.json",
+        "sha256": "d4c440bd21464257341357a53b792b58dea61c31d462e2ae088121ce6716c473"
+      },
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v6.json",
+        "sha256": "b90da651c7e7e513b23aecc120c6530fc66b442217d9ce75e6147d6b31f62fa5"
+      },
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v7.json",
+        "sha256": "20207a8b6595e460f755aeffcb1010450fd0c232c4b5ad20baa0a93261c22fa8"
+      },
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v8.json",
+        "sha256": "263459c5588035d466e7be6815a33954c015bfd56aa90f8b517299837865ea46"
+      },
+      {
+        "path": ".local/curation-expansion/infrastructure/nominatim-headers-v9.json",
+        "sha256": "c37f5a5cbdd3839f9bbb6f4b39dd0739813851be420d0197eb2e65cf2dc55e55"
+      }
+    ],
+    "total_source_members": 7224,
+    "omitted_members": [
+      {
+        "offset": 37329782784,
+        "name": "projects/metis2/docker/docker/volumes/nominatim-flatnode",
+        "bytes": 0,
+        "type": "5"
+      },
+      {
+        "offset": 37329783296,
+        "name": "projects/metis2/docker/docker/volumes/nominatim-flatnode/_data",
+        "bytes": 0,
+        "type": "5"
+      },
+      {
+        "offset": 37329783808,
+        "name": "projects/metis2/docker/docker/volumes/nominatim-flatnode/_data/flatnode.file",
+        "bytes": 87445115784,
+        "type": "0"
+      }
+    ],
+    "independent_static_geocoding_review": "data/curation/expansion/tricky/reviews/maps-static-data-review-v1.json",
+    "no_database_table_drops": true,
+    "no_replication_or_updates": true
+  }
+}

@@ -1,0 +1,969 @@
+{
+  "schema": "webarena-batch04-independent-review-v1",
+  "index_sha256": "48e7424ac98b27da0ee84b58b62e37b70fd912f38cc235ecbb3715c2b09b554f",
+  "review_source_sha256": "e66cc350a112fe5fd2362f3c7e39be5c5e7bd3aa84cdb6e824d0b8d12923f7be",
+  "checked_tasks": 30,
+  "accepted_development_tasks": 23,
+  "accepted_ids": [
+    "25",
+    "48",
+    "49",
+    "50",
+    "148",
+    "149",
+    "150",
+    "165",
+    "167",
+    "190",
+    "192",
+    "233",
+    "275",
+    "300",
+    "320",
+    "321",
+    "322",
+    "325",
+    "327",
+    "330",
+    "360",
+    "361",
+    "362"
+  ],
+  "checks": {
+    "artifact_hashes": 6585,
+    "native_verdict_replays": 60,
+    "mock_requests": 330,
+    "current_AX_targets": 270
+  },
+  "records": [
+    {
+      "source_task_id": "25",
+      "template_id": "222",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/25-positive/traces/20260919T152333Z-2ce752e8",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/25-negative/traces/20260919T152333Z-6368702c",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "48",
+      "template_id": "197",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/48-positive/traces/20260919T152342Z-c35ddbc3",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/48-negative/traces/20260919T152342Z-d34e3d91",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "49",
+      "template_id": "197",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/49-positive/traces/20260919T152353Z-53faa434",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/49-negative/traces/20260919T152353Z-b2fae587",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "50",
+      "template_id": "197",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/50-positive/traces/20260919T152405Z-118df5f8",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/50-negative/traces/20260919T152405Z-04c53009",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "51",
+      "template_id": "197",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_date_interval_ambiguity",
+        "Calendar-six-month result is9/$1774.62; original native expects7/$1700.84. Explicit-date goal proposed separately, not executed."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/51-positive/traces/20260919T152417Z-46608143",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/51-negative/traces/20260919T152417Z-eeac4fd2",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "141",
+      "template_id": "162",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "semantic_food_scope_review",
+        "Food-related selection includes cake decorations; correct raw native result does not settle interpretation."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/141-positive/traces/20260919T152429Z-2f74dad9",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/141-negative/traces/20260919T152429Z-48d413d5",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "148",
+      "template_id": "155",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/148-positive/traces/20260919T152456Z-b8104c21",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/148-negative/traces/20260919T152456Z-13cd1823",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "149",
+      "template_id": "155",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/149-positive/traces/20260919T152523Z-e938168d",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/149-negative/traces/20260919T152524Z-2fd64214",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "150",
+      "template_id": "155",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/150-positive/traces/20260919T152551Z-9cdbcb6f",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/150-negative/traces/20260919T152551Z-382ba66d",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "165",
+      "template_id": "136",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/165-positive/traces/20260919T152619Z-bb764b1c",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/165-negative/traces/20260919T152619Z-1ccc8bac",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "167",
+      "template_id": "136",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/167-positive/traces/20260919T152625Z-e0fde056",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/167-negative/traces/20260919T152626Z-c2619647",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "190",
+      "template_id": "214",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/190-positive/traces/20260919T152632Z-906da5a6",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/190-negative/traces/20260919T152632Z-01aad9a3",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "192",
+      "template_id": "214",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/192-positive/traces/20260919T152643Z-9deefece",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/192-negative/traces/20260919T152643Z-4164a88d",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "233",
+      "template_id": "213",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/233-positive/traces/20260919T152655Z-30f8e833",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/233-negative/traces/20260919T152655Z-9ccbe33e",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "275",
+      "template_id": "212",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/275-positive/traces/20260919T152707Z-530531d5",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/275-negative/traces/20260919T152707Z-8a548f17",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "281",
+      "template_id": "204",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_native_verifier_disagreement",
+        "Corrected query Oral-B limits overbroad Oral matching floral/coral. Product-family membership still checked from visible names; original failed30-page attempt retained."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/281-positive/traces/20260919T152717Z-582be2b9",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/281-negative/traces/20260919T152719Z-fbd43845",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "300",
+      "template_id": "180",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/300-positive/traces/20260919T152740Z-db159f0e",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/300-negative/traces/20260919T152741Z-06ae4223",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "320",
+      "template_id": "160",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/320-positive/traces/20260919T152754Z-6e61f632",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/320-negative/traces/20260919T152758Z-7f502689",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "321",
+      "template_id": "160",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/321-positive/traces/20260919T152806Z-af28e5c9",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/321-negative/traces/20260919T152810Z-c72eee32",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "322",
+      "template_id": "160",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/322-positive/traces/20260919T152818Z-c11e2d2c",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/322-negative/traces/20260919T152821Z-42f7b79f",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "325",
+      "template_id": "208",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/325-positive/traces/20260919T152837Z-f05162e0",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/325-negative/traces/20260919T152840Z-9674ac25",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "327",
+      "template_id": "208",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/327-positive/traces/20260919T152849Z-ea43a17c",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/327-negative/traces/20260919T152855Z-f7b06557",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "330",
+      "template_id": "147",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/330-positive/traces/20260919T152904Z-057ea771",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/330-negative/traces/20260919T152913Z-5499f0c9",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "360",
+      "template_id": "206",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/360-positive/traces/20260919T152931Z-78bf4a78",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/360-negative/traces/20260919T152940Z-13a88844",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "361",
+      "template_id": "206",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/361-positive/traces/20260919T152945Z-731094db",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/361-negative/traces/20260919T152954Z-37655c37",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "362",
+      "template_id": "206",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/362-positive/traces/20260919T152958Z-8ad30284",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/362-negative/traces/20260919T153006Z-89a482df",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "67",
+      "template_id": "17",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_description_scope",
+        "A Christmas Carol occurs in title, not body. Proposed visible-post-text wording retained separately."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/67-positive/traces/20260919T153012Z-bc9bab06",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/67-negative/traces/20260919T153020Z-b241a889",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "68",
+      "template_id": "17",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_description_scope",
+        "Same title/body ambiguity; expected author null despite public schema string is retained raw."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/68-positive/traces/20260919T153033Z-a57f7102",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/68-negative/traces/20260919T153040Z-b5616895",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "653",
+      "template_id": "153",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_derived_draft_semantics",
+        "Native HAR accepts wrong final draft. Derived keyword check also accepts a synthetic Do not refund counterexample; final browser pair alone is insufficient. Exact-message adaptation proposed, not executed."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/653-positive/traces/20260919T153053Z-08a3bd1f",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/653-negative/traces/20260919T153101Z-d9ed95f1",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "689",
+      "template_id": "163",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "derived_draft_pair_pending_independent_review",
+        "Native requires an aborted dummy_bin bridge; no such synthetic traffic is emitted. Final-DOM positive/negative checks are separate."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/689-positive/traces/20260919T153111Z-aca7b974",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch04-frozen-pairs-v3/689-negative/traces/20260919T153119Z-aae0cf17",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    }
+  ],
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "limitations": [
+    "Native-grader replay is not an independent grading implementation.",
+    "Seeded dataset content and initial state remain part of each task contract.",
+    "Unaccepted cases retain useful harness diagnostics; they are not model failures."
+  ]
+}

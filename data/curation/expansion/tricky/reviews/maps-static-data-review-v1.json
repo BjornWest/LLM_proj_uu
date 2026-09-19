@@ -1,0 +1,81 @@
+{
+  "schema": "maps-static-data-review-v1",
+  "status": "conditional_source_feasible_not_runtime_validated",
+  "question": "Can static full forward/reverse geocoding use the exact upstream PostgreSQL archive without the flatnode update cache?",
+  "answer": "Yes, the pinned Nominatim 4.2.4 source separates query service from the flatnode import/update cache. Conditional on a complete compatible database and packaged query/tokenizer resources; live behavior is not established here.",
+  "scope": {
+    "offline_cached_image_only": true,
+    "service_launches": 0,
+    "downloads": 0,
+    "browser_calls": 0,
+    "model_calls": 0,
+    "runtime_or_shared_source_changes": false,
+    "readiness_promoted": false
+  },
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "input_evidence": [
+    {
+      "path": ".local/curation-expansion/infrastructure/nominatim-image-flatnode-inspection-v1.json",
+      "sha256": "77505a702b2f34f9420f1744b20f49a90beeaf914394afeea5dc62a7b5da28f7"
+    },
+    {
+      "path": "data/curation/expansion/tricky/reviews/maps-static-data-review-v1.source.json",
+      "sha256": "2bccf3d4e9cb78cb9de9baa294a8d6becaefc146296c7da2c777c90346356b6e"
+    },
+    {
+      "path": ".local/curation-expansion/infrastructure/dev_environments_docker_sites_map_scripts_setup_volumes.sh",
+      "sha256": "eb7c09f392f7b54894f98451c5f213d705235688bd982ce495702395d92ad611"
+    }
+  ],
+  "findings": [
+    {
+      "id": "MAPS-STATIC-01",
+      "claim": "Upstream freeze explicitly retains geocoding while deleting the configured flatnode file.",
+      "evidence_paths": [
+        "/usr/local/lib/nominatim/lib-python/nominatim/clicmd/freeze.py",
+        "/usr/local/lib/nominatim/lib-python/nominatim/tools/freeze.py"
+      ],
+      "implication": "Strong source evidence that external flatnode storage is not a query-service dependency; freeze itself is not needed or recommended."
+    },
+    {
+      "id": "MAPS-STATIC-02",
+      "claim": "Search/reverse handlers use PostgreSQL-backed query classes and packaged tokenizer. No flatnode reference appeared in 59 inspected PHP files.",
+      "evidence_paths": [
+        "/usr/local/lib/nominatim/lib-php/website/search.php",
+        "/usr/local/lib/nominatim/lib-php/website/reverse.php",
+        "/usr/local/lib/nominatim/lib-php/DB.php",
+        "/usr/local/lib/nominatim/lib-php/Geocode.php"
+      ],
+      "implication": "Static geocoding can use indexed imported data, not raw node cache; absence scan alone is not a runtime proof."
+    },
+    {
+      "id": "MAPS-STATIC-03",
+      "claim": "Entrypoint makes flatnode-directory handling conditional; supervisor declares no import/replication worker.",
+      "evidence_paths": [
+        "/entrypoint.sh:175-216",
+        "/etc/supervisor/conf.d/supervisord.conf"
+      ],
+      "implication": "No inspected startup gate forces the cache to exist. Effective environment and any additional update scheduler still need checking."
+    }
+  ],
+  "risks_and_remaining_checks": [
+    "This is static code evidence, not a restored PostgreSQL archive or live geocoding validation. Archive completeness, database compatibility, indexes and task-specific coverage remain unverified.",
+    "Preserve exact upstream PostgreSQL archive as the input. Do not run freeze: it drops update tables with CASCADE and changes the database. A running PostgreSQL copy is writable, and entrypoint refresh updates functions/project output; do not promise byte-identical runtime database files.",
+    "Retain full database schema/query data, PostgreSQL 14 and compatible extensions, packaged PHP/Python and ICU tokenizer/project resources. Search becomes reverse-only when search_name is absent.",
+    "No import/replication/update operation may assume an omitted flatnode file. Empty base .env is not sufficient if project or OS environment overrides it; inspect effective configuration before launch.",
+    "Flatnode omission does not replace tiles, car/bike/foot routing, Rails website data or map UI assets. Full-site acceptance must test these independently.",
+    "Existing volume setup script unconditionally extracts both database and flatnode trees from one archive. Omitting the flatnode extraction alone does not prove a download reduction; archive layout/transport must be handled separately.",
+    "Startup refresh failure is only a warning. Require positive search/reverse/API and browser task checks, not just a healthy container process."
+  ],
+  "recommended_next_gate": [
+    "Restore source-pinned database into a disposable writable copy with flatnode absent and effective configuration recorded.",
+    "Confirm search_name exists and forward, structured, reverse and OSM-ID lookup queries return expected upstream data.",
+    "Exercise actual Maps search/results/navigation plus routing and tile loading in the complete website; compare source-grounded task outcomes.",
+    "Record archive hash, container image digest, extraction selection and runtime refresh/provenance before promoting readiness."
+  ],
+  "authored03_documentation": {
+    "path": "data/curation/expansion/tricky/authored03/README.md",
+    "sha256": "30b634f4d737915e564fd4b2e7b97f324c53bd72d36c0f8489ff7ac16243458e",
+    "change": "Primary commands distinguish retained 16-task v1 closure from four strict-draft v2 tasks; no historical source or cohort edits."
+  }
+}

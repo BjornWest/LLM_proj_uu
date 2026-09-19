@@ -1,0 +1,18 @@
+{
+  "schema": "map-preparation-provenance-addendum-v1",
+  "current_script_sha256": "591947bce68e37ee3d3a79b43b1ab57e5136d67dbef88e0d5083453a3ffd95bf",
+  "independent_review_sha256": "e5562b6110e048a5c86fc23aa74f28b90d87ffdc640e83e6836496b8011e09f4",
+  "prior_source_reconstructed_exactly": true,
+  "changes": [
+    "Capture ledger bytes once; hash and save those exact bytes before mutation.",
+    "Record hashes of imported v1 helpers and their imported download modules."
+  ],
+  "validation": {
+    "root_tests": 7,
+    "independent_regressions_on_current_source": 11,
+    "passed": true,
+    "real_docker_calls": 0,
+    "browser_model_calls": 0
+  },
+  "site_ready": false
+}

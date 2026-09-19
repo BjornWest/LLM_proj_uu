@@ -1,0 +1,45 @@
+{
+  "schema": "map-preparation-independent-review-v2",
+  "coordination_id": "MAP-PREP-REVIEW-01",
+  "status": "three_prior_execution_safety_blockers_resolved_offline",
+  "inputs": {
+    "data/curation/expansion/prepare_map_volumes_v2.py": "6e485629453ecdf6a81a54cf78aacdab89799f526bb95f8015987939518219d8",
+    "data/curation/expansion/prepare_map_volumes.py": "9ae1543077a044dff94b30813f370190b0c21927bc3deb931888f202410d088e",
+    "data/curation/expansion/map-setup-plan-v2.json": "c05ef0ef75a1ccd99fbe832b9cb02bc9e3cbbcd8db82e720f8b431cc6551eb02",
+    "data/curation/expansion/download-plan-v2.json": "51e15e710740c261ba67c3a5f557486457275a2d1c9dd7e0cc39a9d348cdfa77",
+    "data/curation/expansion/tricky/reviews/test_map_preparation_v2.py": "a8626d1580b12d698978997d747f796df84103f0fdde2c0d497cb42aa58db39d"
+  },
+  "tests": {
+    "command": "python3 -m unittest data.curation.expansion.tricky.reviews.test_map_preparation_v2",
+    "cases": 11,
+    "additional_bad_plan_subcases": 4,
+    "passed": true,
+    "mocked_docker_only": true
+  },
+  "closed_findings": {
+    "MAP-PREP-01": "Unique token-scoped names, two ownership checks before extraction, cooperative flock. Mocked foreign-volume race rejected without mounting or deleting it.",
+    "MAP-PREP-02": "Exclusive report open precedes work; fsynced in-progress report exists before create; failures and partial metadata are retained. Existing/dangling report paths rejected without commands.",
+    "MAP-PREP-03": "Verified file descriptors held, path/descriptor identity checked pre/post extraction, actual source bytes hashed during stream. Path replacement, in-place mutation, and wrong stream hash all reject success.",
+    "MAP-PREP-04": "Duplicate names, unsafe archive basenames/prefixes and mismatched strip counts reject before Docker commands. Current plan remains structurally valid."
+  },
+  "additional_checks": [
+    "Cached-image runs explicitly use --pull never.",
+    "Tar failure preserves incomplete volume record and failure report.",
+    "Locked extraction directory blocks before Docker work.",
+    "Source symlink rejected without creating volumes.",
+    "Successful mocked transfer retains actual streamed hash and token-bearing volume name."
+  ],
+  "unchanged_selection_evidence": "map-preparation-review-v1.json validates complete saved PostgreSQL header-prefix selection; not repeated payload verification.",
+  "residual_nonblocking_limits": [
+    "No real volume extraction, disk capacity measurement or Maps runtime validation was performed. Downloader was untouched.",
+    "Whole-system adversaries changing Docker objects after ownership checks are outside this cooperative local-process guard.",
+    "Report hashes the current ledger path after separately reading it; an actively updated ledger could make that hash describe a newer byte snapshot. Hash the captured ledger bytes for exact future provenance. Completed source entries and actual stream hashes still gate extraction.",
+    "v2 imports helpers from v1; the independent review pins both, whereas the extraction report currently records only its own script hash. Include dependency hashes in final integration closure."
+  ],
+  "actual_downloads": 0,
+  "actual_docker_calls": 0,
+  "services_or_volumes_created": 0,
+  "model_calls": 0,
+  "site_ready": false,
+  "training_eligible": false
+}

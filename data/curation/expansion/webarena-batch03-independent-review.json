@@ -1,0 +1,592 @@
+{
+  "schema": "webarena-batch03-independent-review-v1",
+  "index_sha256": "a48a2ee7b2c8382e74ce3366a1b4c429bbb58bf7a8504b717355e1f9aabc4047",
+  "review_source_sha256": "dac2e47c39fb56bb071a7b562c92f22102f180d07070170da5a8b512a963efd6",
+  "checked_tasks": 20,
+  "accepted_development_tasks": 11,
+  "accepted_ids": [
+    "146",
+    "329",
+    "334",
+    "28",
+    "29",
+    "30",
+    "31",
+    "164",
+    "189",
+    "232",
+    "359"
+  ],
+  "checks": {
+    "artifact_hashes": 4276,
+    "native_verdict_replays": 32,
+    "mock_requests": 190,
+    "current_AX_targets": 158,
+    "retained_action_errors": 1
+  },
+  "records": [
+    {
+      "source_task_id": "118",
+      "template_id": "151",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Broad clinical-benefit goal and URL keyword matcher lack validated discrimination against unrelated teeth/mouth products; retain navigation evidence only"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/118-positive/traces/20260919T145002Z-c5aca88f",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/118-negative/traces/20260919T145014Z-5dc3bc5a",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "124",
+      "template_id": "159",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_answer_scope_validation",
+        "Ordinary search returns unrelated products; derived maximum is not the requested product-family range."
+      ],
+      "cases": [],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "146",
+      "template_id": "155",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/146-positive/traces/20260919T145028Z-75581f9c",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/146-negative/traces/20260919T145050Z-4d39643a",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "226",
+      "template_id": "370",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Brand membership inferred from title prefix; catalog completeness and inclusion/exclusion scope not independently established"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/226-positive/traces/20260919T145111Z-f8082f94",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/226-negative/traces/20260919T145129Z-dab92159",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "269",
+      "template_id": "139",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_scripted_navigation",
+        "Requested under-$25 control not reached; first development menu click also exceeded the150s bound."
+      ],
+      "cases": [],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "313",
+      "template_id": "134",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Native exception is not a successful negative rejection",
+        "Negative nonnull answer triggers native null-schema exception; contact-page-only inspection does not prove site-wide absence."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/313-positive/traces/20260919T145147Z-7669c290",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/313-negative/traces/20260919T145154Z-bb453cd5",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": true
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "319",
+      "template_id": "160",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_native_response_normalization",
+        "Source omits expected retrieved_data; native actual normalization drops the key and rejects tested NOT_FOUND answers."
+      ],
+      "cases": [],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "329",
+      "template_id": "147",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/329-positive/traces/20260919T145200Z-08f9badc",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/329-negative/traces/20260919T145211Z-0e6586ae",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "334",
+      "template_id": "169",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/334-positive/traces/20260919T145223Z-3d4ec575",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/334-negative/traces/20260919T145306Z-43094efb",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "351",
+      "template_id": "137",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_native_route_coverage",
+        "Native checker rejects sidebar-filter URL; both routes have identical228 ordered products in separate GET-only comparison."
+      ],
+      "cases": [],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "28",
+      "template_id": "33",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-comment-v4/28-positive/traces/20260919T145914Z-f4094df8",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-comment-v4/28-negative/traces/20260919T145932Z-e71b9385",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "29",
+      "template_id": "33",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/29-positive/traces/20260919T145422Z-e0594c3c",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/29-negative/traces/20260919T145438Z-e82bb473",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "30",
+      "template_id": "33",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/30-positive/traces/20260919T145453Z-f4374c7b",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/30-negative/traces/20260919T145506Z-83b021b8",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "31",
+      "template_id": "33",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/31-positive/traces/20260919T145519Z-4748223e",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/31-negative/traces/20260919T145537Z-fa2f8040",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "69",
+      "template_id": "17",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Goal says URLs in description; evidence derives a bare domain in title, requiring explicit contract clarification"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/69-positive/traces/20260919T145554Z-9d93b8d5",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/69-negative/traces/20260919T145609Z-6f02fc64",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "164",
+      "template_id": "136",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/164-positive/traces/20260919T145624Z-7d333f95",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/164-negative/traces/20260919T145630Z-f55d105d",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "189",
+      "template_id": "214",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/189-positive/traces/20260919T145636Z-ede37ec2",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/189-negative/traces/20260919T145648Z-8111a27e",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "232",
+      "template_id": "213",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/232-positive/traces/20260919T145700Z-1e1e9d93",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/232-negative/traces/20260919T145713Z-b6349482",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "299",
+      "template_id": "180",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Action-warning cohort; keep diagnostics outside clean acceptance"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/299-positive/traces/20260919T145726Z-c1c9787d",
+          "native_recomputed": 1.0,
+          "action_errors": 1,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/299-negative/traces/20260919T145742Z-4068ade6",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "359",
+      "template_id": "206",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/359-positive/traces/20260919T145759Z-fa6e39ca",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch03-frozen-pairs-v3/359-negative/traces/20260919T145811Z-04f29470",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    }
+  ],
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "limitations": [
+    "Native-grader replay is not an independent grading implementation.",
+    "Seeded dataset content and initial state remain part of each task contract.",
+    "Unaccepted cases retain useful harness diagnostics; they are not model failures."
+  ]
+}

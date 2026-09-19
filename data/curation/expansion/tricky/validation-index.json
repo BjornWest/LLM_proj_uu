@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "status": "scripted_pass_pending_independent_review",
+  "source_revision": "4ed5d744d8e9fb53abb7057ba7c5664feb2a67e4",
+  "environment_revision": "8201821fb64a5075f50b015f99653881ab09a030",
+  "full_site_revision": "9fc287a252ddee32e579575bec50e33568070272de2e81ef5c9033bde19eb90e",
+  "task_contract_count": 10,
+  "site_count": 4,
+  "browser_case_count": 21,
+  "model_calls": 0,
+  "training_eligible": false,
+  "independent_review": false,
+  "authorization_coverage": null,
+  "artifact_hash_checks": 547,
+  "native_action_target_in_current_AX_checks": 37,
+  "browser_extractions_in_current_AX_checks": 21,
+  "checks": [
+    "exact_artifact_hashes",
+    "source_hashes_match_current_candidate",
+    "raw_evaluations_match",
+    "evaluation_before_browser_close",
+    "all_positive_and_negative_expectations",
+    "BIDs_present_in_current_delivered_AX",
+    "extracted_browser_answers_present_in_current_delivered_AX"
+  ],
+  "reports": {
+    ".local/curation-expansion/tricky/lookup-driver-probe-v3/report.json": "547c24f13259ed90239ce0e687bb381fc5b9b54a33e809dfe162814ae8e514f4",
+    ".local/curation-expansion/tricky/site-gates-v2/report.json": "ea04b224afc6410b663b6efec7f26acdbc0b6582557228cd80231a1355c9cb83"
+  },
+  "source_sha256": {
+    "data/curation/expansion/tricky/lookup_tasks.py": "891ccb80f17cd3b0657f19900ec0eab9b091f2fc0f7b286824f89d3800325378",
+    "data/curation/expansion/tricky/verify_lookups.py": "dd59330c4bf022959f63d07081a8fafd930374f170c5fc68069ce302a82e4c2d",
+    "data/curation/expansion/tricky/contracts.json": "8c21dac7245d953eb4c30c0dbe2b41d560e98769cdbae62fde5e587daf7c2458",
+    "environments/tricky_full/build-record.json": "5c372ac15ca13c81b8edfeabdde4f791fb0e8ff7c237b87e66bd1fe9efda77b6"
+  },
+  "cases": [
+    {
+      "task_id": "TX01",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135016Z-a75b8be8",
+      "passed": true
+    },
+    {
+      "task_id": "TX01",
+      "site": "shop",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135020Z-ebafb0aa",
+      "passed": true
+    },
+    {
+      "task_id": "TX02",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135024Z-fb97b82c",
+      "passed": true
+    },
+    {
+      "task_id": "TX02",
+      "site": "shop",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135029Z-72737019",
+      "passed": true
+    },
+    {
+      "task_id": "TX03",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135033Z-f5713f33",
+      "passed": true
+    },
+    {
+      "task_id": "TX03",
+      "site": "shop",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135037Z-53286e54",
+      "passed": true
+    },
+    {
+      "task_id": "TX04",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135041Z-38cf6f53",
+      "passed": true
+    },
+    {
+      "task_id": "TX04",
+      "site": "shop",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135045Z-e04cb24c",
+      "passed": true
+    },
+    {
+      "task_id": "TX05",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135049Z-59ede6b9",
+      "passed": true
+    },
+    {
+      "task_id": "TX05",
+      "site": "shop",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135053Z-e6945752",
+      "passed": true
+    },
+    {
+      "task_id": "TX06",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135056Z-9ec7a8dd",
+      "passed": true
+    },
+    {
+      "task_id": "TX06",
+      "site": "health",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135102Z-aee16269",
+      "passed": true
+    },
+    {
+      "task_id": "TX07",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135105Z-303cd0dc",
+      "passed": true
+    },
+    {
+      "task_id": "TX07",
+      "site": "health",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135108Z-8118f483",
+      "passed": true
+    },
+    {
+      "task_id": "TX08",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135111Z-cdb9f904",
+      "passed": true
+    },
+    {
+      "task_id": "TX08",
+      "site": "news",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135114Z-1a0d4898",
+      "passed": true
+    },
+    {
+      "task_id": "TX09",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135117Z-df949fca",
+      "passed": true
+    },
+    {
+      "task_id": "TX09",
+      "site": "news",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135121Z-c4abd30a",
+      "passed": true
+    },
+    {
+      "task_id": "TX09",
+      "site": "news",
+      "case": "wrong_page",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135124Z-e9238e57",
+      "passed": true
+    },
+    {
+      "task_id": "TX10",
+      "site": "spotify",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135128Z-c800a1c1",
+      "passed": true
+    },
+    {
+      "task_id": "TX10",
+      "site": "spotify",
+      "case": "wrong_answer",
+      "trace": ".local/curation-expansion/tricky/lookup-driver-probe-v3/episodes/20260919T135133Z-47a3ee32",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "container_created_never_started": true,
+  "container_removed": true,
+  "raw_local_snapshot": {
+    "path": ".local/curation-expansion/tricky/maps-static-data-review-v1-source.json",
+    "sha256": "4494ac3b050e4f3f1cbda0b8e43ccbb6ea34e443b11373330f82afe2521ac68b"
+  },
+  "scan": {
+    "files": 160,
+    "php_files": 59,
+    "php_flatnode_references": 0
+  },
+  "flatnode_references": {
+    "/usr/local/lib/nominatim/lib-python/nominatim/clicmd/args.py": [
+      {
+        "line": 191,
+        "text": "                    flatnode_file=str(self.config.get_path('FLATNODE_FILE') or ''),"
+      }
+    ],
+    "/usr/local/lib/nominatim/lib-python/nominatim/clicmd/freeze.py": [
+      {
+        "line": 41,
+        "text": "        freeze.drop_flatnode_file(args.config.get_path('FLATNODE_FILE'))"
+      }
+    ],
+    "/usr/local/lib/nominatim/lib-python/nominatim/tools/database_import.py": [
+      {
+        "line": 100,
+        "text": "    if not options['flatnode_file'] and options['osm2pgsql_cache'] == 0:"
+      },
+      {
+        "line": 125,
+        "text": "    if drop and options['flatnode_file']:"
+      },
+      {
+        "line": 126,
+        "text": "        Path(options['flatnode_file']).unlink()"
+      }
+    ],
+    "/usr/local/lib/nominatim/lib-python/nominatim/tools/exec_utils.py": [
+      {
+        "line": 135,
+        "text": "    if options['flatnode_file']:"
+      },
+      {
+        "line": 136,
+        "text": "        cmd.extend(('--flat-nodes', options['flatnode_file']))"
+      }
+    ],
+    "/usr/local/lib/nominatim/lib-python/nominatim/tools/freeze.py": [
+      {
+        "line": 48,
+        "text": "def drop_flatnode_file(fpath: Optional[Path]) -> None:"
+      },
+      {
+        "line": 49,
+        "text": "    \"\"\" Remove the flatnode file if it exists."
+      }
+    ],
+    "/nominatim-base/.env": [
+      {
+        "line": 6,
+        "text": "NOMINATIM_FLATNODE_FILE="
+      }
+    ]
+  },
+  "selected_evidence": [
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-python/nominatim/clicmd/freeze.py",
+      "sha256": "0ce231dde11e0ff91cc394607816049e8bb358f6725892de5dafc58d5b2e121a",
+      "bytes": 1298,
+      "excerpts": [
+        {
+          "first_line": 20,
+          "last_line": 41,
+          "text": "class SetupFreeze:\n    \"\"\"\\\n    Make database read-only.\n\n    About half of data in the Nominatim database is kept only to be able to\n    keep the data up-to-date with new changes made in OpenStreetMap. This\n    command drops all this data and only keeps the part needed for geocoding\n    itself.\n\n    This command has the same effect as the `--no-updates` option for imports.\n    \"\"\"\n\n    def add_args(self, parser: argparse.ArgumentParser) -> None:\n        pass # No options\n\n\n    def run(self, args: NominatimArgs) -> int:\n        from ..tools import freeze\n\n        with connect(args.config.get_libpq_dsn()) as conn:\n            freeze.drop_update_tables(conn)\n        freeze.drop_flatnode_file(args.config.get_path('FLATNODE_FILE'))"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-python/nominatim/tools/freeze.py",
+      "sha256": "3d537dad461ab55c49ddd2692dbdb43d55d1be3d85c51d040378cfc4a583e8c4",
+      "bytes": 1370,
+      "excerpts": [
+        {
+          "first_line": 9,
+          "last_line": 52,
+          "text": "\"\"\"\nfrom typing import Optional\nfrom pathlib import Path\n\nfrom psycopg2 import sql as pysql\n\nfrom nominatim.db.connection import Connection\n\nUPDATE_TABLES = [\n    'address_levels',\n    'gb_postcode',\n    'import_osmosis_log',\n    'import_polygon_%',\n    'location_area%',\n    'location_road%',\n    'place',\n    'planet_osm_%',\n    'search_name_%',\n    'us_postcode',\n    'wikipedia_%'\n]\n\ndef drop_update_tables(conn: Connection) -> None:\n    \"\"\" Drop all tables only necessary for updating the database from\n        OSM replication data.\n    \"\"\"\n    parts = (pysql.SQL(\"(tablename LIKE {})\").format(pysql.Literal(t)) for t in UPDATE_TABLES)\n\n    with conn.cursor() as cur:\n        cur.execute(pysql.SQL(\"SELECT tablename FROM pg_tables WHERE \")\n                    + pysql.SQL(' or ').join(parts))\n        tables = [r[0] for r in cur]\n\n        for table in tables:\n            cur.drop_table(table, cascade=True)\n\n    conn.commit()\n\n\ndef drop_flatnode_file(fpath: Optional[Path]) -> None:\n    \"\"\" Remove the flatnode file if it exists.\n    \"\"\"\n    if fpath and fpath.exists():\n        fpath.unlink()"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-python/nominatim/tools/exec_utils.py",
+      "sha256": "a43ebde20c5e18fac197801428fc7cc092bb1f9e2d53bf43bef8ba99287661b5",
+      "bytes": 6415,
+      "excerpts": [
+        {
+          "first_line": 133,
+          "last_line": 136,
+          "text": "    cmd.append('--append' if options['append'] else '--create')\n\n    if options['flatnode_file']:\n        cmd.extend(('--flat-nodes', options['flatnode_file']))"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-python/nominatim/config.py",
+      "sha256": "c2b798882470b037ad3ecafcee0d484bf89d245444d1b54a8ef2863483e87d70",
+      "bytes": 12113,
+      "excerpts": [
+        {
+          "first_line": 48,
+          "last_line": 58,
+          "text": "    \"\"\" Load and manage the project configuration.\n\n        Nominatim uses dotenv to configure the software. Configuration options\n        are resolved in the following order:\n\n         * from the OS environment (or the dirctionary given in `environ`\n         * from the .env file in the project directory of the installation\n         * from the default installation in the configuration directory\n\n        All Nominatim configuration options are prefixed with 'NOMINATIM_' to\n        avoid conflicts with other environment variables."
+        },
+        {
+          "first_line": 88,
+          "last_line": 94,
+          "text": "    def __getattr__(self, name: str) -> str:\n        name = 'NOMINATIM_' + name\n\n        if name in self.environ:\n            return self.environ[name]\n\n        return self._config[name] or ''"
+        },
+        {
+          "first_line": 126,
+          "last_line": 141,
+          "text": "    def get_path(self, name: str) -> Optional[Path]:\n        \"\"\" Return the given configuration parameter as a Path.\n            If a relative path is configured, then the function converts this\n            into an absolute path with the project directory as root path.\n            If the configuration is unset, None is returned.\n        \"\"\"\n        value = getattr(self, name)\n        if not value:\n            return None\n\n        cfgpath = Path(value)\n\n        if not cfgpath.is_absolute():\n            cfgpath = self.project_dir / cfgpath\n\n        return cfgpath.resolve()"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-python/nominatim/tools/refresh.py",
+      "sha256": "69eb0cb1ecbd78adab6021019fc2969fdbfc8917e7888a71dda6eb4c9d2605a6",
+      "bytes": 9915,
+      "excerpts": [
+        {
+          "first_line": 87,
+          "last_line": 107,
+          "text": "def create_functions(conn: Connection, config: Configuration,\n                     enable_diff_updates: bool = True,\n                     enable_debug: bool = False) -> None:\n    \"\"\" (Re)create the PL/pgSQL functions.\n    \"\"\"\n    sql = SQLPreprocessor(conn, config)\n\n    sql.run_sql_file(conn, 'functions.sql',\n                     disable_diff_updates=not enable_diff_updates,\n                     debug=enable_debug)\n\n\n\nWEBSITE_SCRIPTS = (\n    'deletable.php',\n    'details.php',\n    'lookup.php',\n    'polygons.php',\n    'reverse.php',\n    'search.php',\n    'status.php'"
+        },
+        {
+          "first_line": 212,
+          "last_line": 244,
+          "text": "def setup_website(basedir: Path, config: Configuration, conn: Connection) -> None:\n    \"\"\" Create the website script stubs.\n    \"\"\"\n    if not basedir.exists():\n        LOG.info('Creating website directory.')\n        basedir.mkdir()\n\n    template = dedent(f\"\"\"\\\n                      <?php\n\n                      @define('CONST_Debug', $_GET['debug'] ?? false);\n                      @define('CONST_LibDir', '{config.lib_dir.php}');\n                      @define('CONST_TokenizerDir', '{config.project_dir / 'tokenizer'}');\n                      @define('CONST_NominatimVersion', '{version_str()}');\n\n                      \"\"\")\n\n    for php_name, conf_name, var_type in PHP_CONST_DEFS:\n        varout = _quote_php_variable(var_type, config, conf_name)\n\n        template += f\"@define('CONST_{php_name}', {varout});\\n\"\n\n    template += f\"\\nrequire_once('{config.lib_dir.php}/website/{{}}');\\n\"\n\n    search_name_table_exists = bool(conn and conn.table_exists('search_name'))\n\n    for script in WEBSITE_SCRIPTS:\n        if not search_name_table_exists and script == 'search.php':\n            (basedir / script).write_text(template.format('reverse-only-search.php'), 'utf-8')\n        else:\n            (basedir / script).write_text(template.format(script), 'utf-8')\n\n"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-php/DB.php",
+      "sha256": "9d34ebcf0b5326eae1aa5dd50583757e54ec785618cb15c3e4c30ecb1e26767f",
+      "bytes": 10818,
+      "excerpts": [
+        {
+          "first_line": 16,
+          "last_line": 42,
+          "text": " * Uses PDO to access the database specified in the CONST_Database_DSN\n * setting.\n */\nclass DB\n{\n    protected $connection;\n\n    public function __construct($sDSN = null)\n    {\n        $this->sDSN = $sDSN ?? getSetting('DATABASE_DSN');\n    }\n\n    public function connect($bNew = false, $bPersistent = true)\n    {\n        if (isset($this->connection) && !$bNew) {\n            return true;\n        }\n        $aConnOptions = array(\n                         \\PDO::ATTR_ERRMODE            => \\PDO::ERRMODE_EXCEPTION,\n                         \\PDO::ATTR_DEFAULT_FETCH_MODE => \\PDO::FETCH_ASSOC,\n                         \\PDO::ATTR_PERSISTENT         => $bPersistent\n        );\n\n        // https://secure.php.net/manual/en/ref.pdo-pgsql.connection.php\n        try {\n            $conn = new \\PDO($this->sDSN, null, null, $aConnOptions);\n        } catch (\\PDOException $e) {"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-php/website/search.php",
+      "sha256": "6c4fa33eef45788e967176f45c7d3648b9224dcaab3e20fe6769b449fa647984",
+      "bytes": 2900,
+      "excerpts": [
+        {
+          "first_line": 13,
+          "last_line": 21,
+          "text": "require_once(CONST_LibDir.'/Geocode.php');\nrequire_once(CONST_LibDir.'/output.php');\nini_set('memory_limit', '200M');\n\n$oDB = new Nominatim\\DB(CONST_Database_DSN);\n$oDB->connect();\n$oParams = new Nominatim\\ParameterParser();\n\n$oGeocode = new Nominatim\\Geocode($oDB);"
+        },
+        {
+          "first_line": 63,
+          "last_line": 67,
+          "text": "$hLog = logStart($oDB, 'search', $oGeocode->getQueryString(), $aLangPrefOrder);\n\n$aSearchResults = $oGeocode->lookup();\n\nlogEnd($oDB, $hLog, count($aSearchResults));"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-php/website/reverse.php",
+      "sha256": "77fb9e451bfbcaf7704b086e6b2f0e7f682f3e5c98d477d3d075c3ad61011e89",
+      "bytes": 2852,
+      "excerpts": [
+        {
+          "first_line": 27,
+          "last_line": 51,
+          "text": "$oDB = new Nominatim\\DB(CONST_Database_DSN);\n$oDB->connect();\n\n$hLog = logStart($oDB, 'reverse', $_SERVER['QUERY_STRING'], $aLangPrefOrder);\n\n$oPlaceLookup = new Nominatim\\PlaceLookup($oDB);\n$oPlaceLookup->loadParamArray($oParams);\n$oPlaceLookup->setIncludeAddressDetails($oParams->getBool('addressdetails', true));\n\n$sOsmType = $oParams->getSet('osm_type', array('N', 'W', 'R'));\n$iOsmId = $oParams->getInt('osm_id', -1);\n$fLat = $oParams->getFloat('lat');\n$fLon = $oParams->getFloat('lon');\n$iZoom = $oParams->getInt('zoom', 18);\n\nif ($sOsmType && $iOsmId > 0) {\n    $aPlace = $oPlaceLookup->lookupOSMID($sOsmType, $iOsmId);\n} elseif ($fLat !== false && $fLon !== false) {\n    $oReverseGeocode = new Nominatim\\ReverseGeocode($oDB);\n    $oReverseGeocode->setZoom($iZoom);\n\n    $oLookup = $oReverseGeocode->lookup($fLat, $fLon);\n\n    if ($oLookup) {\n        $aPlaces = $oPlaceLookup->lookup(array($oLookup->iId => $oLookup));"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-php/Geocode.php",
+      "sha256": "81fdf2abe7a012c4b338b8b6a9a0b5945dd32d88393976849b8ab789c25d5bb8",
+      "bytes": 36409,
+      "excerpts": [
+        {
+          "first_line": 17,
+          "last_line": 20,
+          "text": "require_once(CONST_LibDir.'/SearchContext.php');\nrequire_once(CONST_LibDir.'/SearchPosition.php');\nrequire_once(CONST_LibDir.'/TokenList.php');\nrequire_once(CONST_TokenizerDir.'/tokenizer.php');"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/usr/local/lib/nominatim/lib-php/ReverseGeocode.php",
+      "sha256": "c07d351a0c4c4bddc463a4ba64a5dadb5f93cb3aa95ebc9c6bf1880e742ac13e",
+      "bytes": 17610,
+      "excerpts": [
+        {
+          "first_line": 66,
+          "last_line": 79,
+          "text": "        $sSQL = 'SELECT place_id, parent_place_id, 30 as rank_search,';\n        $sSQL .= '  (CASE WHEN endnumber != startnumber';\n        $sSQL .= '        THEN (endnumber - startnumber) * ST_LineLocatePoint(linegeo,'.$sPointSQL.')';\n        $sSQL .= '        ELSE startnumber END) as fhnr,';\n        $sSQL .= '  startnumber, endnumber, step,';\n        $sSQL .= '  ST_Distance(linegeo,'.$sPointSQL.') as distance';\n        $sSQL .= ' FROM location_property_osmline';\n        $sSQL .= ' WHERE ST_DWithin('.$sPointSQL.', linegeo, '.$fSearchDiam.')';\n        $sSQL .= '       and indexed_status = 0 and startnumber is not NULL ';\n        $sSQL .= '       and parent_place_id != 0';\n        $sSQL .= ' ORDER BY distance ASC limit 1';\n        Debug::printSQL($sSQL);\n\n        return $this->oDB->getRow("
+        },
+        {
+          "first_line": 118,
+          "last_line": 136,
+          "text": "                // look for place nodes with the given country code\n                $sSQL = 'SELECT place_id FROM';\n                $sSQL .= ' (SELECT place_id, rank_search,';\n                $sSQL .= '         ST_distance('.$sPointSQL.', geometry) as distance';\n                $sSQL .= ' FROM placex';\n                $sSQL .= ' WHERE osm_type = \\'N\\'';\n                $sSQL .= ' AND country_code = \\''.$sCountryCode.'\\'';\n                $sSQL .= ' AND rank_search < 26 '; // needed to select right index\n                $sSQL .= ' AND rank_search between 5 and ' .min(25, $iMaxRank);\n                $sSQL .= ' AND class = \\'place\\' AND type != \\'postcode\\'';\n                $sSQL .= ' AND name IS NOT NULL ';\n                $sSQL .= ' and indexed_status = 0 and linked_place_id is null';\n                $sSQL .= ' AND ST_DWithin('.$sPointSQL.', geometry, 1.8)) p ';\n                $sSQL .= 'WHERE distance <= reverse_place_diameter(rank_search)';\n                $sSQL .= ' ORDER BY rank_search DESC, distance ASC';\n                $sSQL .= ' LIMIT 1';\n                Debug::printSQL($sSQL);\n\n                $aPlace = $this->oDB->getRow($sSQL, null, 'Could not determine place node.');"
+        }
+      ]
+    },
+    {
+      "path_in_image": "/nominatim-base/.env",
+      "sha256": "a410e768163ee64b3de295f74269e395c2f3accba28ee8320fb36d505dc88cc2",
+      "bytes": 222,
+      "excerpts": [
+        {
+          "first_line": 1,
+          "last_line": 6,
+          "text": "NOMINATIM_TOKENIZER=icu\nNOMINATIM_REPLICATION_URL=__REPLICATION_URL__\nNOMINATIM_REPLICATION_UPDATE_INTERVAL=86400\nNOMINATIM_REPLICATION_RECHECK_INTERVAL=900\nNOMINATIM_IMPORT_STYLE=__IMPORT_STYLE__\nNOMINATIM_FLATNODE_FILE="
+        }
+      ]
+    }
+  ]
+}

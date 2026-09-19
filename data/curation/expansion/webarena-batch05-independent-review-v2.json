@@ -1,0 +1,1069 @@
+{
+  "schema": "webarena-batch05-independent-review-v2",
+  "index_sha256": "7b1a8fd21d0ab27071892fe26a48649f4643579c695c759516bd59e36b1afb92",
+  "review_source_sha256": "f5ff9dda2cdacd7c401f8d7f961144b144b60c9706aacafad9afb9e3436d2bc8",
+  "checked_tasks": 30,
+  "accepted_development_tasks": 20,
+  "accepted_ids": [
+    "143",
+    "144",
+    "145",
+    "147",
+    "166",
+    "191",
+    "225",
+    "227",
+    "228",
+    "229",
+    "230",
+    "234",
+    "235",
+    "277",
+    "278",
+    "285",
+    "323",
+    "331",
+    "333",
+    "388"
+  ],
+  "checks": {
+    "artifact_hashes": 9870,
+    "native_verdict_replays": 52,
+    "mock_requests": 502,
+    "current_AX_targets": 450,
+    "retained_action_errors": 9,
+    "ungraded_incomplete_cases": 4,
+    "failed_scripted_decisions": 4
+  },
+  "records": [
+    {
+      "source_task_id": "142",
+      "template_id": "162",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_hair_accessory_scope",
+        "Broad hair-style total includes$11.99 hairbands; native excludes them. Original wording retained; explicit exclusion proposed, not executed.",
+        "Action-warning cohort"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/142-positive/traces/20260919T154628Z-6181b14d",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 1,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/142-negative/traces/20260919T154628Z-4b98c140",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 1,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "143",
+      "template_id": "162",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/143-positive/traces/20260919T154656Z-0291dc3c",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/143-negative/traces/20260919T154656Z-c40ca652",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "144",
+      "template_id": "162",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/144-positive/traces/20260919T154716Z-9e2cdc4a",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/144-negative/traces/20260919T154716Z-578a9505",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "145",
+      "template_id": "162",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/145-positive/traces/20260919T154744Z-4652574e",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/145-negative/traces/20260919T154744Z-d51b9f2f",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "147",
+      "template_id": "155",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/147-positive/traces/20260919T154805Z-38417be7",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/147-negative/traces/20260919T154805Z-0286d9d4",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "166",
+      "template_id": "136",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/166-positive/traces/20260919T155059Z-2193410d",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/166-negative/traces/20260919T155059Z-0600cfcb",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "191",
+      "template_id": "214",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/191-positive/traces/20260919T155106Z-9936ba82",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/191-negative/traces/20260919T155106Z-c26966a6",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "225",
+      "template_id": "135",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/225-positive/traces/20260919T155118Z-4e491181",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/225-negative/traces/20260919T155118Z-9cdeba9e",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "227",
+      "template_id": "370",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/227-positive/traces/20260919T155147Z-259ae8ad",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/227-negative/traces/20260919T155147Z-23755fe2",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "228",
+      "template_id": "370",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/228-positive/traces/20260919T155158Z-1261db99",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/228-negative/traces/20260919T155158Z-6e8f908c",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "229",
+      "template_id": "370",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/229-positive/traces/20260919T155209Z-c8eff9ef",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/229-negative/traces/20260919T155209Z-92318aa9",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "230",
+      "template_id": "370",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/230-positive/traces/20260919T155222Z-03afca2f",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/230-negative/traces/20260919T155222Z-2489e988",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "234",
+      "template_id": "213",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/234-positive/traces/20260919T155233Z-e7f49867",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/234-negative/traces/20260919T155233Z-e6b756b2",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "235",
+      "template_id": "213",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/235-positive/traces/20260919T155245Z-a8731db9",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/235-negative/traces/20260919T155245Z-88acaec1",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "261",
+      "template_id": "211",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_nested_menu_path",
+        "Only failed original keyboard-opening development path retained; no hidden-menu click, hover-tool addition or direct-URL shortcut.",
+        "No complete selected browser pair",
+        "Incomplete scripted/delivery evidence"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-development-positive-v1/261-positive/traces/20260919T154039Z-1bb944d8",
+          "native_recomputed": null,
+          "scripted_path_completed": false,
+          "delivery_aligned": false,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": null
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "262",
+      "template_id": "211",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_nested_menu_path",
+        "Only failed original keyboard-opening development path retained; no hidden-menu click, hover-tool addition or direct-URL shortcut.",
+        "No complete selected browser pair",
+        "Incomplete scripted/delivery evidence"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-development-positive-v1/262-positive/traces/20260919T154056Z-c7f09ff8",
+          "native_recomputed": null,
+          "scripted_path_completed": false,
+          "delivery_aligned": false,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": null
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "263",
+      "template_id": "211",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_nested_menu_path",
+        "Only failed original keyboard-opening development path retained; no hidden-menu click, hover-tool addition or direct-URL shortcut.",
+        "No complete selected browser pair",
+        "Incomplete scripted/delivery evidence"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-development-positive-v1/263-positive/traces/20260919T154114Z-445d7bf3",
+          "native_recomputed": null,
+          "scripted_path_completed": false,
+          "delivery_aligned": false,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": null
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "264",
+      "template_id": "211",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_nested_menu_path",
+        "Only failed original keyboard-opening development path retained; no hidden-menu click, hover-tool addition or direct-URL shortcut.",
+        "No complete selected browser pair",
+        "Incomplete scripted/delivery evidence"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-development-positive-v1/264-positive/traces/20260919T154131Z-b42fdbb4",
+          "native_recomputed": null,
+          "scripted_path_completed": false,
+          "delivery_aligned": false,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": null
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "276",
+      "template_id": "212",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "scripted_pair_with_action_warnings",
+        "Action-warning cohort"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/276-positive/traces/20260919T155257Z-fc0e2fba",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 1,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/276-negative/traces/20260919T155257Z-93c906c2",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 1,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "277",
+      "template_id": "212",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/277-positive/traces/20260919T155307Z-95bab0c9",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/277-negative/traces/20260919T155310Z-9ed03984",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "278",
+      "template_id": "212",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/278-positive/traces/20260919T155317Z-1ff88a72",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/278-negative/traces/20260919T155322Z-5ce42739",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "285",
+      "template_id": "207",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-capacity-pair-v5/285-positive/traces/20260919T160338Z-a6366413",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-capacity-pair-v5/285-negative/traces/20260919T160338Z-685799b1",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "301",
+      "template_id": "180",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_native_history_query_coverage",
+        "Full37-row inspection uses limit=50; native response accepts absence but navigation predicate rejects that display-only query. No evidence rewritten to remove it.",
+        "Negative preserves null data and changes status toSUCCESS; schema errors never count as intentional rejection."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/301-positive/traces/20260919T155420Z-06ba28b6",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/301-negative/traces/20260919T155425Z-9c353a6c",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "302",
+      "template_id": "180",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "blocked_native_history_query_coverage",
+        "Full37-row inspection uses limit=50; native response accepts absence but navigation predicate rejects that display-only query. No evidence rewritten to remove it.",
+        "Negative preserves null data and changes status toSUCCESS; schema errors never count as intentional rejection."
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/302-positive/traces/20260919T155432Z-dccaf640",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/302-negative/traces/20260919T155438Z-90030c18",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "323",
+      "template_id": "160",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/323-positive/traces/20260919T155444Z-1f03fed9",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/323-negative/traces/20260919T155450Z-8395a9dd",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "331",
+      "template_id": "147",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/331-positive/traces/20260919T155511Z-3824fa41",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/331-negative/traces/20260919T155517Z-7fc65868",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "332",
+      "template_id": "147",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "scripted_pair_with_action_warnings",
+        "Action-warning cohort"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/332-positive/traces/20260919T155530Z-4788b2f4",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/332-negative/traces/20260919T155536Z-34c93fe0",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 1,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "333",
+      "template_id": "147",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/333-positive/traces/20260919T155637Z-50998c0e",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/333-negative/traces/20260919T155641Z-a1c4dbde",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "387",
+      "template_id": "1356",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "scripted_pair_with_action_warnings",
+        "Action-warning cohort"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-review-author-pairs-v6/387-positive/traces/20260919T160611Z-0253742a",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 2,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-review-author-pairs-v6/387-negative/traces/20260919T160611Z-74cd652e",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 2,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "388",
+      "template_id": "1356",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/batch05-review-author-pairs-v6/388-positive/traces/20260919T160641Z-5b2a61f4",
+          "native_recomputed": 1.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/batch05-review-author-pairs-v6/388-negative/traces/20260919T160642Z-cb6dec0f",
+          "native_recomputed": 0.0,
+          "scripted_path_completed": true,
+          "delivery_aligned": true,
+          "action_errors": 0,
+          "observation_chars": 48000,
+          "native_grader_error": false
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    }
+  ],
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "limitations": [
+    "Native-grader replay is not an independent grading implementation.",
+    "Seeded dataset content and initial state remain part of each task contract.",
+    "Unaccepted cases retain useful harness diagnostics; they are not model failures."
+  ]
+}

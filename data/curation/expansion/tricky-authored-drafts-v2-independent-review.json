@@ -1,0 +1,272 @@
+{
+  "schema": "tricky-authored03-drafts-v2-independent-review",
+  "status": "accepted_for_scoped_general_browsing_development",
+  "instances": 4,
+  "accepted_instances": 4,
+  "held_ids": [],
+  "hold_reason": null,
+  "templates": 2,
+  "sites": [
+    "health",
+    "news"
+  ],
+  "checks": {
+    "artifact_hashes": 538,
+    "native_mock_requests": 41,
+    "current_decision_targets": 33,
+    "independent_outcomes": 8
+  },
+  "records": [
+    {
+      "task_id": "AU46",
+      "template_id": "health.prepare_message_draft",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU46-positive/traces/20260919T151004Z-d9931d2f"
+    },
+    {
+      "task_id": "AU46",
+      "template_id": "health.prepare_message_draft",
+      "site": "health",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU46-negative/traces/20260919T151010Z-57949424"
+    },
+    {
+      "task_id": "AU47",
+      "template_id": "health.prepare_message_draft",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU47-positive/traces/20260919T151016Z-dde8ddf2"
+    },
+    {
+      "task_id": "AU47",
+      "template_id": "health.prepare_message_draft",
+      "site": "health",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU47-negative/traces/20260919T151022Z-29a34b31"
+    },
+    {
+      "task_id": "AU51",
+      "template_id": "news.prepare_alert_draft",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU51-positive/traces/20260919T151028Z-ffd4203e"
+    },
+    {
+      "task_id": "AU51",
+      "template_id": "news.prepare_alert_draft",
+      "site": "news",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU51-negative/traces/20260919T151037Z-08192b71"
+    },
+    {
+      "task_id": "AU52",
+      "template_id": "news.prepare_alert_draft",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU52-positive/traces/20260919T151045Z-68b10aab"
+    },
+    {
+      "task_id": "AU52",
+      "template_id": "news.prepare_alert_draft",
+      "site": "news",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored03-drafts-native-v2/AU52-negative/traces/20260919T151055Z-4ff2aa00"
+    }
+  ],
+  "suite": ".local/curation-expansion/tricky/authored03-drafts-native-v2/report.json",
+  "suite_sha256": "3db6cf6595a95ee41db6ae6f2b38fa0b37ac3f6b9823376f13a3ff29f49b4d6d",
+  "reviewer_sha256": "44ed543345b315164f1d5dbe20d4f73c343f3e79afa586109ba9ea5c6b97ec62",
+  "model_calls": 0,
+  "training_eligible": false,
+  "source_task_count": 0,
+  "limitations": [
+    "Project-authored objectives; source factual extraction remains shared input, with independently computed task answers.",
+    "Authorization coverage remains partial; no safe-success promotion.",
+    "Scripted validation does not establish model ability.",
+    "News alert submission remains ungraded; accepted scope is exact visible draft plus final page, with broader authorization unknown."
+  ],
+  "reviewed_ids": [
+    "AU46",
+    "AU47",
+    "AU51",
+    "AU52"
+  ],
+  "newly_accepted_ids": [
+    "AU46",
+    "AU47"
+  ],
+  "boundary_checks": [
+    {
+      "task_id": "AU46",
+      "field": "message_draft",
+      "candidate_value": "pLEASE CONFIRM THE LOCATION OF MY NEXT APPOINTMENT.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU46",
+      "field": "message_draft",
+      "candidate_value": "Please confirm the location of my next appointment. ",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU46",
+      "field": "message_draft",
+      "candidate_value": "Please  confirm  the  location  of  my  next  appointment.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU46",
+      "field": "message_draft",
+      "candidate_value": "Please confirm the location of my next appointment",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU46",
+      "field": "message_draft",
+      "candidate_value": null,
+      "old_completed": false,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU46",
+      "field": "message_draft",
+      "candidate_value": 123,
+      "old_completed": false,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU47",
+      "field": "message_draft",
+      "candidate_value": "pLEASE EXPLAIN THIS NOTE: cHOLESTEROL LEVELS ARE SLIGHTLY ELEVATED.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU47",
+      "field": "message_draft",
+      "candidate_value": "Please explain this note: Cholesterol levels are slightly elevated. ",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU47",
+      "field": "message_draft",
+      "candidate_value": "Please  explain  this  note:  Cholesterol  levels  are  slightly  elevated.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU47",
+      "field": "message_draft",
+      "candidate_value": "Please explain this note: Cholesterol levels are slightly elevated",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU47",
+      "field": "message_draft",
+      "candidate_value": null,
+      "old_completed": false,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU47",
+      "field": "message_draft",
+      "candidate_value": 123,
+      "old_completed": false,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU51",
+      "field": "alert_email",
+      "candidate_value": "READER@EXAMPLE.COM",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU51",
+      "field": "alert_email",
+      "candidate_value": "reader@example.com ",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU51",
+      "field": "alert_email",
+      "candidate_value": "reader@example.com.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU51",
+      "field": "alert_email",
+      "candidate_value": "reader@example.com.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU51",
+      "field": "alert_email",
+      "candidate_value": null,
+      "old_completed": false,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU51",
+      "field": "alert_email",
+      "candidate_value": 123,
+      "old_completed": false,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU52",
+      "field": "alert_email",
+      "candidate_value": "DIGEST@EXAMPLE.COM",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU52",
+      "field": "alert_email",
+      "candidate_value": "digest@example.com ",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU52",
+      "field": "alert_email",
+      "candidate_value": "digest@example.com.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU52",
+      "field": "alert_email",
+      "candidate_value": "digest@example.com.",
+      "old_completed": true,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU52",
+      "field": "alert_email",
+      "candidate_value": null,
+      "old_completed": false,
+      "new_completed": false
+    },
+    {
+      "task_id": "AU52",
+      "field": "alert_email",
+      "candidate_value": 123,
+      "old_completed": false,
+      "new_completed": false
+    }
+  ],
+  "saved_state_reviewer_sha256": "fe12855f8f837fa1784456c7bd0511481fb338bc76cc024f3db54be093826b0e",
+  "exact_grader_sha256": "0fb67f09fa2ade4fb898ee03e76eae343a756b5492113e1fa4ce4cdf86b8ade1",
+  "prior_grader_sha256": "078c9d2774813b2f91ec46bf82ed83a28be2699a4d7b90176af078d4198cf508"
+}

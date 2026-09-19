@@ -1,0 +1,38 @@
+{
+  "schema": "maps-description-preflight-review-v1",
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "scope": "Image-layer read-only source inspection and isolated temporary PostgreSQL startup; no website/browser/model execution.",
+  "evidence": {
+    ".local/curation-expansion/infrastructure/probe-map-image-database-v2.py": "3aa62cb2dc3ac04d20d2867ec953aab8f1af28b7ca40c3427f9845ea39011b7d",
+    ".local/curation-expansion/infrastructure/map-image-database-v2.json": "2667c271554df15be9b52e5247bcefe08d39b2f5e56fc5e1051a5d795819cbb2",
+    ".local/curation-expansion/infrastructure/map-description-source-v1.json": "3cbdb731f2b8f4e51777bfa6baee851dfd1aad2700cc5604e3721b5d75e8f823",
+    ".local/curation-expansion/maps-native-http-status-v2/report.json": "aec61073d05b98811c08b0e4d9e39b9918753c57b0b37813eea72bdf816a9b11"
+  },
+  "observed": {
+    "image_website_database_present": false,
+    "databases": [
+      "postgres",
+      "template0",
+      "template1"
+    ],
+    "entrypoint_initialization": "Creates openstreetmap database and migrates schema; no object import in inspected initialization.",
+    "description_controller": "Reads local Way/Node/Relation records; missing records yield404.",
+    "synthetic_native_checks": {
+      "cases": 30,
+      "matching_url_empty_content_200_accepted": 5,
+      "matching_url_404_or_500_rejected": 10,
+      "wrong_url_all_status_rejected": 15
+    }
+  },
+  "inference": "Under the documented mounts, description pages likely lack source objects. Confirm actual initialized page behavior before accepting tasks369\u2013373; search/routing use separate data and are not disproven by this probe.",
+  "limitations": [
+    "No claim of actual website404 reproduction yet.",
+    "Native grader defaults toHTTP200: earlier concern that404 would pass was NOT reproduced.",
+    "HTTP200 matching URL with empty description is accepted by native checker; rendering/content needs independent validation.",
+    "Historical synthetic v1 omitted Accept and failed every control; superseded by valid-header v2 without altering original report.",
+    "Historical image probe v1 assumed database existed and exited1; empty output preserved."
+  ],
+  "model_calls": 0,
+  "browser_runs": 0,
+  "training_eligible": false
+}

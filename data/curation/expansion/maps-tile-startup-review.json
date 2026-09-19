@@ -1,0 +1,38 @@
+{
+  "schema": "maps-tile-startup-review-v1",
+  "control_report": {
+    "path": ".local/curation-expansion/maps-tile-archive-audit-v2/report.json",
+    "sha256": "c2518d64423780e3bc17150df942e3b926b24eadabc18788fbaa3ea77a9469d1"
+  },
+  "wal_report": {
+    "path": ".local/curation-expansion/maps-tile-wal-audit-v1/report.json",
+    "sha256": "8ea691684eb05a708699deac41e7b24e01a100e6788943fb41dad3f7c57a896f"
+  },
+  "observed": {
+    "postgres_major": 15,
+    "archive_members": 1624,
+    "selected_payload_bytes": 41279487138,
+    "cluster_state": "in production",
+    "postmaster_pid_present": true,
+    "checkpoint_wal_segment_present": true,
+    "wal_dump_returncode": 1,
+    "wal_records_read": 3,
+    "wal_tail_message": "invalid record length at 9/63903E90: wanted24, got0"
+  },
+  "interpretation": [
+    "Original entrypoint expects postgres/ below tile mount; original archive matches. Initial audit mistakenly assumed root-level PG_VERSION, failure preserved.",
+    "Control state and retained pid show a running-source snapshot. Full startup recovery and stale-lock handling must be observed; archive is not certified clean shutdown.",
+    "WAL dump reads the reported checkpoint and nearby records then reaches a zero-length record before requested five. This is not itself a proof of database corruption or startup success.",
+    "Original entrypoint has no explicit postmaster.pid removal. Do not remove files or reset WAL preemptively. Diagnose actual isolated startup if it fails."
+  ],
+  "required_next_evidence": [
+    "Actual original-image startup against a fresh restored copy, with complete logs and resulting cluster state.",
+    "Tile database queries and rendered original tiles before task acceptance.",
+    "No pg_resetwal, omission of database pages, or synthetic replacement of unavailable site content."
+  ],
+  "site_ready": false,
+  "task_acceptance": false,
+  "model_calls": 0,
+  "database_started": false,
+  "training_eligible": false
+}

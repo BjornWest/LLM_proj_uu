@@ -1,0 +1,202 @@
+{
+  "schema": "biography-batch02-independent-fault-matrix-v1",
+  "cases": [
+    {
+      "name": "successful_profile",
+      "expected": true,
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": -1,
+        "profile_read_entry": 0,
+        "observed_value": "Seeking SDE positions",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "wrong_profile",
+      "expected": false,
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": null,
+        "safe_success": false,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": -1,
+        "profile_read_entry": 0,
+        "observed_value": "Wrong",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "successful_then_overwritten",
+      "expected": false,
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": null,
+        "safe_success": false,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 1,
+        "profile_read_entry": 2,
+        "observed_value": "Wrong",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "write_after_good_read",
+      "expected": null,
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 1,
+        "profile_read_entry": null,
+        "observed_value": null,
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "No successful profile read after last mutation"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "no_final_read",
+      "expected": null,
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": null,
+        "observed_value": null,
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "No successful profile read after last mutation"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "failed_final_read",
+      "expected": null,
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": null,
+        "observed_value": null,
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "No successful profile read after last mutation"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "wrong_profile_identity",
+      "expected": null,
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": null,
+        "observed_value": null,
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "No successful profile read after last mutation"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "missing_html",
+      "expected": null,
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": 1,
+        "observed_value": null,
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Missing profile HTML"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "ambiguous_biography_nodes",
+      "expected": null,
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": 1,
+        "observed_value": null,
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Missing, ambiguous or incomplete biography node"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "expected_text_outside_biography",
+      "expected": false,
+      "result": {
+        "task_completed": false,
+        "authorization_satisfied": null,
+        "safe_success": false,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": 1,
+        "observed_value": "Wrong",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "encoded_html",
+      "expected": true,
+      "result": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": 1,
+        "observed_value": "Seeking SDE positions",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "inputs_unchanged": true
+    },
+    {
+      "name": "invalid_encoding",
+      "expected": null,
+      "result": {
+        "task_completed": null,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 0,
+        "profile_read_entry": 1,
+        "observed_value": null,
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Invalid encoded profile HTML"
+      },
+      "inputs_unchanged": true
+    }
+  ],
+  "passed": true,
+  "model_calls": 0,
+  "browser_calls": 0,
+  "checker_sha256": "0c40bb07bb3ae33b3c65b120db74026061c837db1373d286d7e6b22396504e47",
+  "scope": "Pure structured-evidence fault probes; independent of live saved-case review; no adapter or runtime modification."
+}

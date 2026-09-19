@@ -1,0 +1,73 @@
+{
+  "schema": "maps-description-app-review-v2",
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "scope": "Isolated Rails integration requests with original initialization; geocoding/routing/tile data not mounted; not full site readiness",
+  "probe": "Rails ActionDispatch integration requests; no browser or listening host port",
+  "container_policy": {
+    "network": "none",
+    "mounts": [],
+    "memory": "2g",
+    "cpus": 2,
+    "hostname": "curation-map-probe",
+    "hostname_resolution": "--add-host curation-map-probe:127.0.0.1",
+    "removed_after_exit": true
+  },
+  "counts": {
+    "nodes": 0,
+    "ways": 0,
+    "relations": 0
+  },
+  "responses": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/way/154257484",
+      "status": 404
+    },
+    {
+      "path": "/relation/2279034",
+      "status": 404
+    },
+    {
+      "path": "/node/2710170970",
+      "status": 404
+    },
+    {
+      "path": "/way/168456128",
+      "status": 404
+    },
+    {
+      "path": "/node/10114377662",
+      "status": 404
+    }
+  ],
+  "held_task_ids": [
+    369,
+    370,
+    371,
+    372,
+    373
+  ],
+  "reason": "Original image initialization creates empty object tables; all five description targets return404 while homepage returns200. Separate Nominatim/tile/routing archives do not mount the website database.",
+  "evidence": {
+    ".local/curation-expansion/infrastructure/map-description-app-probe-v2.log": "8e8bf6c200d27c1d74192ff287cdf11688c6d92b0362ff75f5aedf5aec1d7446",
+    ".local/curation-expansion/infrastructure/map-description-app-probe-v2.json": "29d2d37537142b1266a2dc30d2d2da81fa266ae20b6cbe67a2a6328c05b44c55",
+    ".local/curation-expansion/infrastructure/map-description-app-probe-v1.sh": "fcaa3ce5588a84963bdedfb5264f26d4b396f0b1840138750b518a7c43af0af7",
+    ".local/curation-expansion/infrastructure/map-description-source-v1.json": "3cbdb731f2b8f4e51777bfa6baee851dfd1aad2700cc5604e3721b5d75e8f823"
+  },
+  "historical_failure": {
+    "path": ".local/curation-expansion/infrastructure/map-description-app-probe-v1.log",
+    "reason": "Network-none container hostname failed DNS during LogStasher initialization; corrected hostname mapping only, no application code change."
+  },
+  "limitations": [
+    "Geocoder, tiles and routing not mounted; this does not assess those functions.",
+    "No rendered BrowserGym page claim; original Rails request pipeline and empty database checked.",
+    "Response evidence retains status plus first12000 characters of HTML, not full bodies.",
+    "Source pages not removed; task scope held pending complete original object data."
+  ],
+  "model_calls": 0,
+  "browser_runs": 0,
+  "new_downloads": 0
+}

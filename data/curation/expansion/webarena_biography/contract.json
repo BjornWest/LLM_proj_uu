@@ -1,0 +1,45 @@
+{
+  "id": "WAV399-derived-final-read-v1",
+  "source": "webarena-verified",
+  "source_task_id": 399,
+  "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "template_id": "6",
+  "policy_input": {
+    "goal": "Change my bio to \"I am a robot\" in the discussion forum",
+    "response_protocol": "When finished, call send_msg_to_user with a JSON object containing task_type=\"mutate\", status=\"SUCCESS\" or an applicable failure status, and retrieved_data=null."
+  },
+  "grader_input": {
+    "expected_biography": "I am a robot",
+    "username": "MarvelsGrantMan136",
+    "native_evaluators": [
+      {
+        "evaluator": "AgentResponseEvaluator",
+        "results_schema": {
+          "type": "null"
+        },
+        "expected": {
+          "task_type": "mutate",
+          "status": "SUCCESS",
+          "retrieved_data": null
+        }
+      },
+      {
+        "evaluator": "NetworkEventEvaluator",
+        "last_event_only": false,
+        "expected": {
+          "url": "__REDDIT__/user/MarvelsGrantMan136/edit_biography",
+          "http_method": "POST",
+          "post_data": {
+            "user_biography[biography]": "I am a robot"
+          },
+          "response_status": 302
+        }
+      }
+    ],
+    "derived_requirement": "Final independent server-rendered profile biography exactly matches normalized target text; correct earlier state does not count."
+  },
+  "authorization_coverage": null,
+  "training_eligible": false,
+  "model_tested": false,
+  "adaptation": "Original task intent and complete website retained; project-derived final-state verifier supplements known history-sensitive native grader."
+}

@@ -1,0 +1,311 @@
+{
+  "schema": "tricky-authored-independent-review-v1",
+  "status": "accepted_for_scoped_general_browsing_development",
+  "instances": 20,
+  "templates": 16,
+  "sites": [
+    "health",
+    "news",
+    "shop",
+    "spotify"
+  ],
+  "checks": {
+    "artifact_hashes": 2390,
+    "native_mock_requests": 175,
+    "current_decision_targets": 135,
+    "independent_outcomes": 40
+  },
+  "records": [
+    {
+      "task_id": "AU01",
+      "template_id": "shop.price_difference",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU01-positive/traces/20260919T142458Z-7270fcc8"
+    },
+    {
+      "task_id": "AU01",
+      "template_id": "shop.price_difference",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU01-negative/traces/20260919T142508Z-acd9376b"
+    },
+    {
+      "task_id": "AU02",
+      "template_id": "shop.compose_cart",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU02-positive/traces/20260919T142518Z-cc3bdada"
+    },
+    {
+      "task_id": "AU02",
+      "template_id": "shop.compose_cart",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU02-negative/traces/20260919T142527Z-4eace10e"
+    },
+    {
+      "task_id": "AU03",
+      "template_id": "shop.compose_cart",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU03-positive/traces/20260919T142536Z-0aa5c1cd"
+    },
+    {
+      "task_id": "AU03",
+      "template_id": "shop.compose_cart",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU03-negative/traces/20260919T142545Z-ad881f9b"
+    },
+    {
+      "task_id": "AU04",
+      "template_id": "shop.compare_review_count",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU04-positive/traces/20260919T142554Z-b840ebf6"
+    },
+    {
+      "task_id": "AU04",
+      "template_id": "shop.compare_review_count",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU04-negative/traces/20260919T142605Z-284cffdb"
+    },
+    {
+      "task_id": "AU05",
+      "template_id": "shop.filter_lookup",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU05-positive/traces/20260919T142614Z-e0dc7644"
+    },
+    {
+      "task_id": "AU05",
+      "template_id": "shop.filter_lookup",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU05-negative/traces/20260919T142619Z-2dfef986"
+    },
+    {
+      "task_id": "AU06",
+      "template_id": "shop.filter_lookup",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU06-positive/traces/20260919T142623Z-4e964095"
+    },
+    {
+      "task_id": "AU06",
+      "template_id": "shop.filter_lookup",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU06-negative/traces/20260919T142628Z-9fbc084b"
+    },
+    {
+      "task_id": "AU07",
+      "template_id": "shop.sum_ranked_prices",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU07-positive/traces/20260919T142633Z-615fe3e6"
+    },
+    {
+      "task_id": "AU07",
+      "template_id": "shop.sum_ranked_prices",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU07-negative/traces/20260919T142639Z-2bca4a8a"
+    },
+    {
+      "task_id": "AU08",
+      "template_id": "shop.compose_cart",
+      "site": "shop",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU08-positive/traces/20260919T142644Z-41441d43"
+    },
+    {
+      "task_id": "AU08",
+      "template_id": "shop.compose_cart",
+      "site": "shop",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU08-negative/traces/20260919T142653Z-02a54fb5"
+    },
+    {
+      "task_id": "AU09",
+      "template_id": "health.record_fields",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU09-positive/traces/20260919T142703Z-fc68e9a5"
+    },
+    {
+      "task_id": "AU09",
+      "template_id": "health.record_fields",
+      "site": "health",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU09-negative/traces/20260919T142707Z-63d24996"
+    },
+    {
+      "task_id": "AU10",
+      "template_id": "health.latest_record",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU10-positive/traces/20260919T142710Z-e60228dc"
+    },
+    {
+      "task_id": "AU10",
+      "template_id": "health.latest_record",
+      "site": "health",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU10-negative/traces/20260919T142713Z-3e187b6b"
+    },
+    {
+      "task_id": "AU11",
+      "template_id": "health.count_records",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU11-positive/traces/20260919T142717Z-d74de693"
+    },
+    {
+      "task_id": "AU11",
+      "template_id": "health.count_records",
+      "site": "health",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU11-negative/traces/20260919T142720Z-cdebcb99"
+    },
+    {
+      "task_id": "AU12",
+      "template_id": "health.cross_page_dates",
+      "site": "health",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU12-positive/traces/20260919T142723Z-9e3f26be"
+    },
+    {
+      "task_id": "AU12",
+      "template_id": "health.cross_page_dates",
+      "site": "health",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU12-negative/traces/20260919T142728Z-7f786ef7"
+    },
+    {
+      "task_id": "AU13",
+      "template_id": "news.save_article_set",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU13-positive/traces/20260919T142733Z-a9312658"
+    },
+    {
+      "task_id": "AU13",
+      "template_id": "news.save_article_set",
+      "site": "news",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU13-negative/traces/20260919T142743Z-ac19e130"
+    },
+    {
+      "task_id": "AU14",
+      "template_id": "news.save_article_set",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU14-positive/traces/20260919T142758Z-0384892c"
+    },
+    {
+      "task_id": "AU14",
+      "template_id": "news.save_article_set",
+      "site": "news",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU14-negative/traces/20260919T142805Z-a5b5235b"
+    },
+    {
+      "task_id": "AU15",
+      "template_id": "news.two_article_quotes",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU15-positive/traces/20260919T142816Z-c2ca5f73"
+    },
+    {
+      "task_id": "AU15",
+      "template_id": "news.two_article_quotes",
+      "site": "news",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU15-negative/traces/20260919T142823Z-3b3c4c75"
+    },
+    {
+      "task_id": "AU16",
+      "template_id": "news.filtered_chronological_list",
+      "site": "news",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU16-positive/traces/20260919T142830Z-d111fb55"
+    },
+    {
+      "task_id": "AU16",
+      "template_id": "news.filtered_chronological_list",
+      "site": "news",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU16-negative/traces/20260919T142833Z-e09d993e"
+    },
+    {
+      "task_id": "AU17",
+      "template_id": "music.artist_catalog",
+      "site": "spotify",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU17-positive/traces/20260919T142837Z-69f808a4"
+    },
+    {
+      "task_id": "AU17",
+      "template_id": "music.artist_catalog",
+      "site": "spotify",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU17-negative/traces/20260919T142843Z-deac7b0b"
+    },
+    {
+      "task_id": "AU18",
+      "template_id": "music.plan_price_difference",
+      "site": "spotify",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU18-positive/traces/20260919T142849Z-000494c6"
+    },
+    {
+      "task_id": "AU18",
+      "template_id": "music.plan_price_difference",
+      "site": "spotify",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU18-negative/traces/20260919T142853Z-d65ee8d9"
+    },
+    {
+      "task_id": "AU19",
+      "template_id": "music.track_album_join",
+      "site": "spotify",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU19-positive/traces/20260919T142857Z-3e7d5915"
+    },
+    {
+      "task_id": "AU19",
+      "template_id": "music.track_album_join",
+      "site": "spotify",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU19-negative/traces/20260919T142905Z-c90da32b"
+    },
+    {
+      "task_id": "AU20",
+      "template_id": "music.biography_catalog_join",
+      "site": "spotify",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU20-positive/traces/20260919T142912Z-80ab71e4"
+    },
+    {
+      "task_id": "AU20",
+      "template_id": "music.biography_catalog_join",
+      "site": "spotify",
+      "case": "negative",
+      "trace": ".local/curation-expansion/tricky/authored-native-v2/AU20-negative/traces/20260919T142919Z-ef6098c2"
+    }
+  ],
+  "suite": ".local/curation-expansion/tricky/authored-native-v2/report.json",
+  "suite_sha256": "09a5c6a5727a8e73a5e6bd3037e701b8207a7adaadc9a7b641f98d0f1837f759",
+  "reviewer_sha256": "cbbaef94a87d9aeaa56fa932beaacec28b4f9ae5a9aaa56eae93eceba3432a5f",
+  "model_calls": 0,
+  "training_eligible": false,
+  "source_task_count": 0,
+  "limitations": [
+    "Project-authored objectives; source factual extraction remains shared input, with independently computed task answers.",
+    "Authorization coverage remains partial; no safe-success promotion.",
+    "Scripted validation does not establish model ability."
+  ]
+}

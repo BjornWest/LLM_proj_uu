@@ -1,0 +1,113 @@
+{
+  "schema": "map-preparation-independent-review-v1",
+  "status": "hold_extraction_pending_safety_corrections",
+  "coordination_id": "MAP-PREP-REVIEW-01",
+  "scope": {
+    "offline_only": true,
+    "actual_docker_calls": 0,
+    "downloads": 0,
+    "services_or_volumes_created": 0,
+    "active_downloader_touched": false,
+    "model_calls": 0
+  },
+  "inputs": {
+    "data/curation/expansion/prepare_map_volumes.py": "9ae1543077a044dff94b30813f370190b0c21927bc3deb931888f202410d088e",
+    "data/curation/expansion/download_ranges_v3.py": "c29b3e1211d23bce5a200ce7fe772af1810bd22a3266e00c4bf90c288be13392",
+    "data/curation/expansion/map-setup-plan-v2.json": "c05ef0ef75a1ccd99fbe832b9cb02bc9e3cbbcd8db82e720f8b431cc6551eb02",
+    "data/curation/expansion/download-plan-v2.json": "51e15e710740c261ba67c3a5f557486457275a2d1c9dd7e0cc39a9d348cdfa77",
+    "data/curation/expansion/tricky/reviews/test_map_preparation_v1.py": "14633fbf8801a45da50fd9081cac0ebf1032f2c4da3108de481203abb01ec4ca"
+  },
+  "header_chain": {
+    "reports": 8,
+    "hashes_match": true,
+    "gapless": true,
+    "source_members": 7224,
+    "postgres_prefix_members": 7220,
+    "types": {
+      "5": 31,
+      "0": 7193
+    },
+    "exact_cutoff_bytes": 37329782784,
+    "selected_payload_bytes": 37326080691,
+    "omitted_members": [
+      {
+        "offset": 37329782784,
+        "name": "projects/metis2/docker/docker/volumes/nominatim-flatnode",
+        "bytes": 0,
+        "type": "5"
+      },
+      {
+        "offset": 37329783296,
+        "name": "projects/metis2/docker/docker/volumes/nominatim-flatnode/_data",
+        "bytes": 0,
+        "type": "5"
+      },
+      {
+        "offset": 37329783808,
+        "name": "projects/metis2/docker/docker/volumes/nominatim-flatnode/_data/flatnode.file",
+        "bytes": 87445115784,
+        "type": "0"
+      }
+    ],
+    "source_archive_end_header_offset": 124774900224,
+    "scope": "Saved header-chain evidence; skipped payload bytes are not independently verified by this review."
+  },
+  "current_plan": {
+    "unique_volume_names": true,
+    "correct_prefix_strip_counts": true,
+    "all_required_route_modes": [
+      "car",
+      "bike",
+      "foot"
+    ],
+    "no_database_table_drops": true,
+    "partial_data_preserved_by_code": true
+  },
+  "tests": {
+    "command": "python3 -m unittest data.curation.expansion.tricky.reviews.test_map_preparation_v1",
+    "cases": 10,
+    "passed": 10,
+    "note": "Several tests deliberately reproduce unsafe acceptance; a green regression here is evidence of the finding, not tool readiness. Docker and Popen calls are mocked."
+  },
+  "findings": [
+    {
+      "id": "MAP-PREP-01",
+      "severity": "execution_blocker",
+      "finding": "Initial unused-name listing does not establish exclusive volume ownership. docker volume create is idempotent; no owner/token reinspection occurs before mount/extraction. A concurrently created existing volume is accepted and written.",
+      "reproduction": "test_reproduces_volume_create_race_not_rejected",
+      "required_change": "Claim transaction-scoped volume names and verify returned volume identity/unique ownership token immediately before every extraction; serialize cooperating executions with an owned lock. Reject an existing foreign volume regardless of a stale initial listing. Never delete partial/foreign volumes automatically."
+    },
+    {
+      "id": "MAP-PREP-02",
+      "severity": "execution_blocker",
+      "finding": "Exclusive report creation occurs only in finalization after volumes have been changed. A competing output writer causes extraction to run and then raises FileExistsError, losing the operation report.",
+      "reproduction": "test_reproduces_late_report_reservation",
+      "required_change": "Reserve the report path exclusively before any mutation, retaining a durable in-progress record and updating the same reserved artifact through completion/failure. Keep existing report bytes untouched."
+    },
+    {
+      "id": "MAP-PREP-03",
+      "severity": "provenance_blocker",
+      "finding": "Archive is rehashed during preflight but reopened later. Offline replacement after verification sends changed bytes while the report still claims the old archive hash.",
+      "reproduction": "test_reproduces_source_changed_after_verification",
+      "required_change": "Bind extraction to the verified file identity and hash the actual streamed bytes, rejecting changes and recording partial volumes. A post-stream mismatch must never become extracted_not_launched; exclude concurrent mutations through a cooperative lock or immutable input snapshot."
+    },
+    {
+      "id": "MAP-PREP-04",
+      "severity": "validation_gap_current_plan_valid",
+      "finding": "No duplicate volume or strip-components validation. A duplicate plan fails only after creating/extracting the first volume; a strip count that removes all paths is not rejected. Current v2 plan has unique names and correct strip counts.",
+      "reproduction": [
+        "test_reproduces_duplicate_volume_plan",
+        "test_reproduces_strip_all_files_not_preflight_rejected"
+      ],
+      "required_change": "Validate unique names, safe source basenames and prefix/strip relationships before mutation, plus expected extracted file count/path coverage."
+    }
+  ],
+  "nonblocking_observations": [
+    "All inspected unsafe absolute/traversal paths, symlinks, hardlinks and devices are rejected before extraction.",
+    "An existing or dangling output path is rejected before commands at the initial check.",
+    "Virtual TAR end blocks preserve the inspected member list; source bytes need not change.",
+    "No deletion or reset of previous volumes appears in the reviewed tool. Failed partial volumes are preserved.",
+    "Current source filenames and prefixes are safe; issue04 is a generic preflight gap rather than a malformed current plan.",
+    "The preflight df and extraction docker runs should explicitly use --pull never, consistent with the cached-image guarantee."
+  ]
+}

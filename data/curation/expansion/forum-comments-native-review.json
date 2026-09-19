@@ -1,0 +1,27 @@
+{
+  "schema": "forum-comments-native-review-v1",
+  "report": ".local/curation-expansion/forum-comments-native-audit-v1/report.json",
+  "report_sha256": "3e85aca5049006032c7a79e9c81f1a554a6c335d6d95627fb564edfce2d350ee",
+  "source_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "findings": [
+    {
+      "ids": [
+        610
+      ],
+      "finding": "Synthetic two successful requests receive native score1 even when comment targets456 and creation redirects to123. Requires final parent-link verification."
+    },
+    {
+      "ids": [
+        611,
+        612,
+        613,
+        614
+      ],
+      "finding": "Original expected URLs and form keys retain literal {{post_id}}. Synthetic matching numeric requests get0 for both correct and wrong parent. Retain native outcomes; do not silently substitute grader patterns."
+    }
+  ],
+  "scope": "10 synthetic HAR evaluations, not site execution. All five original tasks remain unaccepted pending original-site native-action and final-state validation.",
+  "model_calls": 0,
+  "browser_runs": 0,
+  "training_eligible": false
+}

@@ -1,0 +1,60 @@
+{
+  "schema": "webarena-biography-independent-review-v1",
+  "source_task_id": "399",
+  "accepted_development_task": true,
+  "goal_unchanged": true,
+  "verifier_origin": "project_derived_scoped_server_profile",
+  "cases": [
+    {
+      "case": "positive",
+      "trace": ".local/curation-expansion/webarena-biography-v4/positive/traces/20260919T154102Z-851de659",
+      "recomputed_completion": true,
+      "observed_value": "I am a robot",
+      "upstream_native_score": 1.0
+    },
+    {
+      "case": "wrong",
+      "trace": ".local/curation-expansion/webarena-biography-v4/wrong/traces/20260919T154118Z-cdbff085",
+      "recomputed_completion": false,
+      "observed_value": "Wrong biography for negative validation",
+      "upstream_native_score": 0.0
+    },
+    {
+      "case": "correct-then-wrong",
+      "trace": ".local/curation-expansion/webarena-biography-v4/correct-then-wrong/traces/20260919T154134Z-11ffaa91",
+      "recomputed_completion": false,
+      "observed_value": "Wrong biography after initially correct save",
+      "upstream_native_score": 1.0
+    },
+    {
+      "case": "missing-final-read",
+      "trace": ".local/curation-expansion/webarena-biography-v4/missing-final-read/traces/20260919T154156Z-b1fb382a",
+      "recomputed_completion": null,
+      "observed_value": null,
+      "upstream_native_score": 1.0
+    }
+  ],
+  "checks": {
+    "artifact_hashes": 371,
+    "mock_requests": 32,
+    "current_AX_targets": 28
+  },
+  "index_sha256": "d9c446f61feb31426910486d3432c0400b68173a1724929cfe486e8acaf8c39d",
+  "suite_sha256": "ca3634db91f22374b707ad221c2c7225c053518c5c305b33625251c4dda3a960",
+  "reviewer_sha256": "4cf3ca1b408a65f031fa475d9e7978bcaacb9ea1c645395c1b594127ddb92ab3",
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "authorization_satisfied": null,
+  "profile": {
+    "native": "core-tools-v3",
+    "slow_mo_ms": 0,
+    "observation_characters": 48000
+  },
+  "limitations": [
+    "Rendered server-profile read, not a complete transaction/account ledger.",
+    "Original upstream false-positive remains recorded separately.",
+    "Scripted suite restores known biography field between controlled cases; unrestricted model runs require complete independent reset.",
+    "Historical500ms timeout cases remain separate; zero-slow-mo validation does not repair the shared timeout."
+  ]
+}

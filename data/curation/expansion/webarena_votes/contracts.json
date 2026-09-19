@@ -1,0 +1,205 @@
+{
+  "schema": "webarena-votes-derived-contract-v1",
+  "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "tasks": [
+    {
+      "id": "WAV404-final-vote-v1",
+      "source_task_id": 404,
+      "template_id": 22,
+      "policy_input": {
+        "goal": "Upvote the newest post in books forum"
+      },
+      "scripted_navigation": {
+        "forum_label": "books",
+        "assistance": "Privileged semantic alias resolution; actual post target extracted from current first New row, never copied from evaluator ID."
+      },
+      "grader_input": {
+        "target_id": 124260,
+        "username": "MarvelsGrantMan136",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/sv/124260.json",
+              "http_method": "POST",
+              "post_data": {
+                "choice": "1"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "WAV405-final-vote-v1",
+      "source_task_id": 405,
+      "template_id": 22,
+      "policy_input": {
+        "goal": "Upvote the newest post in DIY forum"
+      },
+      "scripted_navigation": {
+        "forum_label": "DIY",
+        "assistance": "Privileged semantic alias resolution; actual post target extracted from current first New row, never copied from evaluator ID."
+      },
+      "grader_input": {
+        "target_id": 119019,
+        "username": "MarvelsGrantMan136",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/sv/119019.json",
+              "http_method": "POST",
+              "post_data": {
+                "choice": "1"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "WAV406-final-vote-v1",
+      "source_task_id": 406,
+      "template_id": 22,
+      "policy_input": {
+        "goal": "Upvote the newest post in future technology forum"
+      },
+      "scripted_navigation": {
+        "forum_label": "Futurology",
+        "assistance": "Privileged semantic alias resolution; actual post target extracted from current first New row, never copied from evaluator ID."
+      },
+      "grader_input": {
+        "target_id": 119517,
+        "username": "MarvelsGrantMan136",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/sv/119517.json",
+              "http_method": "POST",
+              "post_data": {
+                "choice": "1"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "WAV407-final-vote-v1",
+      "source_task_id": 407,
+      "template_id": 22,
+      "policy_input": {
+        "goal": "Upvote the newest post in the deep learning forum"
+      },
+      "scripted_navigation": {
+        "forum_label": "deeplearning",
+        "assistance": "Privileged semantic alias resolution; actual post target extracted from current first New row, never copied from evaluator ID."
+      },
+      "grader_input": {
+        "target_id": 125036,
+        "username": "MarvelsGrantMan136",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/sv/125036.json",
+              "http_method": "POST",
+              "post_data": {
+                "choice": "1"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "WAV408-final-vote-v1",
+      "source_task_id": 408,
+      "template_id": 22,
+      "policy_input": {
+        "goal": "Upvote the newest post in explain like im 5 forum"
+      },
+      "scripted_navigation": {
+        "forum_label": "explainlikeimfive",
+        "assistance": "Privileged semantic alias resolution; actual post target extracted from current first New row, never copied from evaluator ID."
+      },
+      "grader_input": {
+        "target_id": 125342,
+        "username": "MarvelsGrantMan136",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__REDDIT__/sv/125342.json",
+              "http_method": "POST",
+              "post_data": {
+                "choice": "1"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "interpretation": "Original goal newest is ambiguous when original UI-New ordering (descending ID) conflicts with creation/publication timestamps. These tasks are held, not redefined. A diagnostic source-target final-vote outcome remains separate from original-goal completion.",
+  "authorization_coverage": null,
+  "training_eligible": false,
+  "task_acceptance": "held_pending_per_instance_timestamp_agreement"
+}

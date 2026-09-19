@@ -1,0 +1,17 @@
+# Additional complete application; harness-diversity candidate, not task acceptance.
+name: curation-webarena-admin-v1
+services:
+  shopping_admin:
+    image: am1n3e/webarena-verified-shopping_admin@sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13
+    pull_policy: never
+    labels:
+      intent.owner: curation-expansion
+      intent.reset-scope: isolated-disposable
+    ports:
+      - "127.0.0.1:17780:80"
+      - "127.0.0.1:17781:8877"
+    environment:
+      WA_ENV_CTRL_EXTERNAL_SITE_URL: http://localhost:17780
+    mem_limit: 4g
+    cpus: 2
+    shm_size: 256m

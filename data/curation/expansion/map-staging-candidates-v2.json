@@ -1,0 +1,322 @@
+{
+  "schema": "maps-staging-candidate-plan-v2",
+  "source_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "status": "offline_planning_only_data_download_in_progress",
+  "priority_candidates": [
+    {
+      "task_id": 70,
+      "template_id": 70,
+      "policy_input": {
+        "goal": "What is the zip code of Carnegie Mellon University?"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 70
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 71,
+      "template_id": 70,
+      "policy_input": {
+        "goal": "What is the zip code of Chatham University?"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 71
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 73,
+      "template_id": 70,
+      "policy_input": {
+        "goal": "What is the zip code of Columbia University?"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 73
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 248,
+      "template_id": 46,
+      "policy_input": {
+        "goal": "Get the coordinates of Carnegie Mellon Caf\u00e9. Return an object with keys \"latitude\" and \"longitude\" (as decimal degrees) only, without any additional details."
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 248
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 377,
+      "template_id": 59,
+      "policy_input": {
+        "goal": "Show on the map restaurants near CMU ArtPark Lab"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 377
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 52,
+      "template_id": 68,
+      "policy_input": {
+        "goal": "How long does it take to walk from Carnegie Mellon University to starbucks on Craig Street? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 52
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 84,
+      "template_id": 64,
+      "policy_input": {
+        "goal": "From my stay at DoubleTree by Hilton New York Downtown, what's the estimated driving time to reach Keens Steakhouse? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 84
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 363,
+      "template_id": 58,
+      "policy_input": {
+        "goal": "Measure distance between Carnegie Mellon University and Carnegie Music Hall by walking. Return the value as a string (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 363
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 16,
+      "template_id": 73,
+      "policy_input": {
+        "goal": "Get the time for walking and driving route from 5000 Fifth Avenue, Pittsburgh to UPMC family health center. Return a list of objects with keys \"mode\" (driving or walking) and \"duration\" (in HH:MM:SS format) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 16
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 36,
+      "template_id": 77,
+      "policy_input": {
+        "goal": "Determine whether the social security administration in Pittsburgh can be reached within one hour by car from Carnegie Mellon University. Return true if it can, otherwise false. (Use the OSRM direction service.)"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 36
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 137,
+      "template_id": 51,
+      "policy_input": {
+        "goal": "What is the estimated driving time between the city where the Liberty Bell is located and the home city of Pirates? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 137
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 151,
+      "template_id": 36,
+      "policy_input": {
+        "goal": "What is the minimum travel time by car from CMU to University of Pittsburgh? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 151
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    },
+    {
+      "task_id": 287,
+      "template_id": 47,
+      "policy_input": {
+        "goal": "How much time does it take from Pittsburgh to Philadelphia by car? Return the value as a string in HH:MM:SS format only, without any additional details."
+      },
+      "private_source_row": {
+        "path": ".local/webarena-verified/dataset.json",
+        "task_id": 287
+      },
+      "status": "candidate_not_executed",
+      "requirements": [
+        "Exact requested place identity from visible original site, not just first search hit.",
+        "Answer or route supported by delivered current page evidence.",
+        "Native positive and deliberate wrong-outcome negative; unknown on infrastructure failure."
+      ],
+      "model_calls": 0,
+      "accepted": false
+    }
+  ],
+  "holds": [
+    {
+      "ids": [
+        369,
+        370,
+        371,
+        372,
+        373
+      ],
+      "reason": "Description targets return404 in initialized Rails application; empty local object tables.",
+      "evidence": "data/curation/expansion/maps-description-app-review.json"
+    },
+    {
+      "ids": [
+        356,
+        757,
+        758,
+        761,
+        762,
+        763,
+        764,
+        765,
+        766,
+        767
+      ],
+      "reason": "Native checker accepts unrelated root visit; needs separate actual route/endpoint/mode/rendering verification.",
+      "evidence": "data/curation/expansion/maps-route-grader-review.json"
+    },
+    {
+      "ids": [
+        253
+      ],
+      "reason": "Upstream expects NOT_FOUND_ERROR. Do not treat broken description infrastructure as proof a valid information lookup lacks a phone number.",
+      "evidence": "Pinned original source task253 plus empty-object database probe."
+    },
+    {
+      "ids": [
+        254,
+        255,
+        256,
+        257
+      ],
+      "reason": "Tag information requires confirming its visible availability; do not inject private Nominatim/DB results into policy. Description database gap is a dependency concern, not yet an individual browser reproduction."
+    }
+  ],
+  "wikipedia_followup": {
+    "candidates": [
+      97,
+      265,
+      266,
+      267,
+      268,
+      737,
+      738,
+      739,
+      740,
+      741
+    ],
+    "requirements": [
+      "Same complete May2022 ZIM identity verified.",
+      "Actual browser lookup on Wikipedia and local Maps; answer not supplied by checker.",
+      "Inspect each native checker for complete cross-site outcome coverage."
+    ],
+    "caution": "Seven film/city info-page objectives424\u2013430 may share the description-data blocker; review exact source endpoints before selection."
+  },
+  "site_ready": false,
+  "task_acceptance": false,
+  "training_eligible": false
+}

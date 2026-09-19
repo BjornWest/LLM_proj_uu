@@ -1,0 +1,162 @@
+{
+  "schema": "webarena-biography-batch02-contract-v1",
+  "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "source_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "tasks": [
+    {
+      "id": "WAB400-final-profile-v1",
+      "source_task_id": 400,
+      "template_id": 6,
+      "policy_input": {
+        "goal": "Change my bio to \"Pro Python Developer with 20 years of Experience\" in the discussion forum",
+        "response_protocol": "When finished, call send_msg_to_user with a JSON object containing task_type=\"mutate\", status=\"SUCCESS\" or an applicable failure status, and retrieved_data=null."
+      },
+      "grader_input": {
+        "expected_biography": "Pro Python Developer with 20 years of Experience",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "last_event_only": false,
+            "expected": {
+              "url": "__REDDIT__/user/MarvelsGrantMan136/edit_biography",
+              "http_method": "POST",
+              "post_data": {
+                "user_biography[biography]": "Pro Python Developer with 20 years of Experience"
+              },
+              "response_status": 302
+            }
+          }
+        ]
+      },
+      "training_eligible": false
+    },
+    {
+      "id": "WAB401-final-profile-v1",
+      "source_task_id": 401,
+      "template_id": 6,
+      "policy_input": {
+        "goal": "Change my bio to \"Seeking SDE positions\" in the discussion forum",
+        "response_protocol": "When finished, call send_msg_to_user with a JSON object containing task_type=\"mutate\", status=\"SUCCESS\" or an applicable failure status, and retrieved_data=null."
+      },
+      "grader_input": {
+        "expected_biography": "Seeking SDE positions",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "last_event_only": false,
+            "expected": {
+              "url": "__REDDIT__/user/MarvelsGrantMan136/edit_biography",
+              "http_method": "POST",
+              "post_data": {
+                "user_biography[biography]": "Seeking SDE positions"
+              },
+              "response_status": 302
+            }
+          }
+        ]
+      },
+      "training_eligible": false
+    },
+    {
+      "id": "WAB402-final-profile-v1",
+      "source_task_id": 402,
+      "template_id": 6,
+      "policy_input": {
+        "goal": "Change my bio to \"Freelance Web Developer\" in the discussion forum",
+        "response_protocol": "When finished, call send_msg_to_user with a JSON object containing task_type=\"mutate\", status=\"SUCCESS\" or an applicable failure status, and retrieved_data=null."
+      },
+      "grader_input": {
+        "expected_biography": "Freelance Web Developer",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "last_event_only": false,
+            "expected": {
+              "url": "__REDDIT__/user/MarvelsGrantMan136/edit_biography",
+              "http_method": "POST",
+              "post_data": {
+                "user_biography[biography]": "Freelance Web Developer"
+              },
+              "response_status": 302
+            }
+          }
+        ]
+      },
+      "training_eligible": false
+    },
+    {
+      "id": "WAB403-final-profile-v1",
+      "source_task_id": 403,
+      "template_id": 6,
+      "policy_input": {
+        "goal": "Change my bio to \"Awesome Prompt Artist\" in the discussion forum",
+        "response_protocol": "When finished, call send_msg_to_user with a JSON object containing task_type=\"mutate\", status=\"SUCCESS\" or an applicable failure status, and retrieved_data=null."
+      },
+      "grader_input": {
+        "expected_biography": "Awesome Prompt Artist",
+        "original_evaluators": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "mutate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "last_event_only": false,
+            "expected": {
+              "url": "__REDDIT__/user/MarvelsGrantMan136/edit_biography",
+              "http_method": "POST",
+              "post_data": {
+                "user_biography[biography]": "Awesome Prompt Artist"
+              },
+              "response_status": 302
+            }
+          }
+        ]
+      },
+      "training_eligible": false
+    }
+  ],
+  "verifier_origin": "project_derived_scoped_server_profile",
+  "authorization_coverage": null,
+  "training_eligible": false
+}

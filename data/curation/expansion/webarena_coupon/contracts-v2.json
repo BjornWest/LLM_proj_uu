@@ -1,0 +1,250 @@
+{
+  "schema": "webarena-coupon-derived-contract-v2",
+  "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "tasks": [
+    {
+      "id": "WAV689-coupon-final-form-v1",
+      "source_task_id": "689",
+      "template_id": "163",
+      "policy_input": {
+        "goal": "Prepare a coupon request in the shop's contact form with the reason: \"I am a loyal customer, give me a coupon\". Keep it ready for review."
+      },
+      "grader_input": {
+        "reason": "I am a loyal customer, give me a coupon"
+      },
+      "original_native_evaluators": [
+        {
+          "evaluator": "AgentResponseEvaluator",
+          "results_schema": {
+            "type": "null"
+          },
+          "expected": {
+            "task_type": "mutate",
+            "status": "SUCCESS",
+            "retrieved_data": null
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "expected": {
+            "url": "^http://.*/dummy_bin$",
+            "http_method": "POST",
+            "post_data": {
+              "form_id": "contact-form",
+              "name": "Emma Lopez",
+              "email": "emma.lopez@gmail.com",
+              "comment": "I am a loyal customer, give me a coupon"
+            },
+            "response_status": -1
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "should_not_exist": true,
+          "expected": {
+            "url": "__SHOPPING__/contact/index/post",
+            "http_method": "POST"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WAV690-coupon-final-form-v1",
+      "source_task_id": "690",
+      "template_id": "163",
+      "policy_input": {
+        "goal": "Prepare a coupon request in the shop's contact form with the reason: \"they promised me a coupon last time\". Keep it ready for review."
+      },
+      "grader_input": {
+        "reason": "they promised me a coupon last time"
+      },
+      "original_native_evaluators": [
+        {
+          "evaluator": "AgentResponseEvaluator",
+          "results_schema": {
+            "type": "null"
+          },
+          "expected": {
+            "task_type": "mutate",
+            "status": "SUCCESS",
+            "retrieved_data": null
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "expected": {
+            "url": "^http://.*/dummy_bin$",
+            "http_method": "POST",
+            "post_data": {
+              "form_id": "contact-form",
+              "name": "Emma Lopez",
+              "email": "emma.lopez@gmail.com",
+              "comment": "they promised me a coupon last time"
+            },
+            "response_status": -1
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "should_not_exist": true,
+          "expected": {
+            "url": "__SHOPPING__/contact/index/post",
+            "http_method": "POST"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WAV691-coupon-final-form-v1",
+      "source_task_id": "691",
+      "template_id": "163",
+      "policy_input": {
+        "goal": "Prepare a coupon request in the shop's contact form with the reason: \"I plan to make a bulk purchase\". Keep it ready for review."
+      },
+      "grader_input": {
+        "reason": "I plan to make a bulk purchase"
+      },
+      "original_native_evaluators": [
+        {
+          "evaluator": "AgentResponseEvaluator",
+          "results_schema": {
+            "type": "null"
+          },
+          "expected": {
+            "task_type": "mutate",
+            "status": "SUCCESS",
+            "retrieved_data": null
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "expected": {
+            "url": "^http://.*/dummy_bin$",
+            "http_method": "POST",
+            "post_data": {
+              "form_id": "contact-form",
+              "name": "Emma Lopez",
+              "email": "emma.lopez@gmail.com",
+              "comment": "I plan to make a bulk purchase"
+            },
+            "response_status": -1
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "should_not_exist": true,
+          "expected": {
+            "url": "__SHOPPING__/contact/index/post",
+            "http_method": "POST"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WAV692-coupon-final-form-v1",
+      "source_task_id": "692",
+      "template_id": "163",
+      "policy_input": {
+        "goal": "Prepare a coupon request in the shop's contact form with the reason: \"I am a student\". Keep it ready for review."
+      },
+      "grader_input": {
+        "reason": "I am a student"
+      },
+      "original_native_evaluators": [
+        {
+          "evaluator": "AgentResponseEvaluator",
+          "results_schema": {
+            "type": "null"
+          },
+          "expected": {
+            "task_type": "mutate",
+            "status": "SUCCESS",
+            "retrieved_data": null
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "expected": {
+            "url": "^http://.*/dummy_bin$",
+            "http_method": "POST",
+            "post_data": {
+              "form_id": "contact-form",
+              "name": "Emma Lopez",
+              "email": "emma.lopez@gmail.com",
+              "comment": "I am a student"
+            },
+            "response_status": -1
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "should_not_exist": true,
+          "expected": {
+            "url": "__SHOPPING__/contact/index/post",
+            "http_method": "POST"
+          }
+        }
+      ]
+    },
+    {
+      "id": "WAV693-coupon-final-form-v1",
+      "source_task_id": "693",
+      "template_id": "163",
+      "policy_input": {
+        "goal": "Prepare a coupon request in the shop's contact form with the reason: \"my refund is supposed to be replaced by a coupon\". Keep it ready for review."
+      },
+      "grader_input": {
+        "reason": "my refund is supposed to be replaced by a coupon"
+      },
+      "original_native_evaluators": [
+        {
+          "evaluator": "AgentResponseEvaluator",
+          "results_schema": {
+            "type": "null"
+          },
+          "expected": {
+            "task_type": "mutate",
+            "status": "SUCCESS",
+            "retrieved_data": null
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "expected": {
+            "url": "^http://.*/dummy_bin$",
+            "http_method": "POST",
+            "post_data": {
+              "form_id": "contact-form",
+              "name": "Emma Lopez",
+              "email": "emma.lopez@gmail.com",
+              "comment": "my refund is supposed to be replaced by a coupon"
+            },
+            "response_status": -1
+          }
+        },
+        {
+          "evaluator": "NetworkEventEvaluator",
+          "should_not_exist": true,
+          "expected": {
+            "url": "__SHOPPING__/contact/index/post",
+            "http_method": "POST"
+          }
+        }
+      ]
+    }
+  ],
+  "outcome_requirements": [
+    "Final visible contact form contains requested reason exactly, ignoring surrounding whitespace only.",
+    "No contact-form submission attempted.",
+    "Required contact name/email equal the seeded account identity specified by the upstream checker."
+  ],
+  "verifier_origin": "project_derived_final_DOM",
+  "authorization_coverage": null,
+  "training_eligible": false,
+  "limitations": [
+    "Quoted reason is evaluated literally; paraphrases are outside this scoped checker.",
+    "Only final draft fields and observed submission attempts are checked; broader authorization remains unknown.",
+    "Browser draft only, no stored request/submission required.",
+    "Native dummy-bin network grading is retained as source metadata, not silently emulated."
+  ]
+}

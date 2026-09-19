@@ -1,0 +1,124 @@
+{
+  "schema": "webarena-batch05-parent-semantic-review-v1",
+  "index_sha256": "30fd5e8610b99b96f27a9fd7d158f45749bf7ea023a53a521b0a3c0bac8f92f3",
+  "records": [
+    {
+      "task_id": "143",
+      "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/143-positive/traces/20260919T154656Z-0291dc3c",
+      "evidence_sha256": "2d978c232f471c06a322062f3aad7011fc7bcb84dd6d04a7ba03437fa4758dd8",
+      "checks": {
+        "selected_skus": [
+          "B07WN2FF9B"
+        ],
+        "sum": "260.69",
+        "semantic_review": "Artificial topiary is decoration; speakers excluded.",
+        "order_detail_count": 1
+      }
+    },
+    {
+      "task_id": "144",
+      "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/144-positive/traces/20260919T154716Z-9e2cdc4a",
+      "evidence_sha256": "64e3625b58a0b8be32ea9f22da65fd96f9b2b8976e8e3d07177b64441aac9a72",
+      "checks": {
+        "selected_skus": [],
+        "sum": "0",
+        "semantic_review": "All actual lines are cosmetic/hair products, topiary or speakers; none food.",
+        "order_detail_count": 2
+      }
+    },
+    {
+      "task_id": "145",
+      "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/145-positive/traces/20260919T154744Z-4652574e",
+      "evidence_sha256": "b025b750563d5cdc6f2e7614c18d4342d255db8259da53a7711bc4cfd489de9c",
+      "checks": {
+        "selected_skus": [
+          "B001EQ5AVI",
+          "B086R3RYK9"
+        ],
+        "sum": "42.35",
+        "semantic_review": "Ready meal and citrus beverage both food/drink; both included.",
+        "order_detail_count": 1
+      }
+    },
+    {
+      "task_id": "227",
+      "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/227-positive/traces/20260919T155147Z-259ae8ad",
+      "evidence_sha256": "3de3c6ce4d0c62854c6173bdafc558d56a6d72cc76dd3f498c3344aa070d9951",
+      "checks": {
+        "all_search_result_min": "9.99",
+        "all_search_result_max": "9.99",
+        "answer": [
+          {
+            "min": 9.99,
+            "max": 9.99
+          }
+        ],
+        "all_results_count": 1
+      }
+    },
+    {
+      "task_id": "228",
+      "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/228-positive/traces/20260919T155158Z-1261db99",
+      "evidence_sha256": "d2da8f70165ae07be6802def20e592c5220ff59cabd0d573a3068ead68c629c3",
+      "checks": {
+        "all_search_result_min": "18.18",
+        "all_search_result_max": "94.99",
+        "answer": [
+          {
+            "min": 18.18,
+            "max": 94.99
+          }
+        ],
+        "all_results_count": 6
+      }
+    },
+    {
+      "task_id": "229",
+      "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/229-positive/traces/20260919T155209Z-c8eff9ef",
+      "evidence_sha256": "1a8ca784a9083b0ffe5584de7f148d23939d3dfbcd7320edf99997800fe2d179",
+      "checks": {
+        "all_search_result_min": "6.99",
+        "all_search_result_max": "38.99",
+        "answer": [
+          {
+            "min": 6.99,
+            "max": 38.99
+          }
+        ],
+        "all_results_count": 20,
+        "review_note": "Driver excluded Bundle UGREEN by prefix rule; full20-result range independently agrees. Bundle24.99 does not change6.99\u201338.99 endpoints. No manufacturer-field or globally exhaustive catalog claim."
+      }
+    },
+    {
+      "task_id": "230",
+      "trace": ".local/expansion-webarena/batch05-frozen-pairs-v2/230-positive/traces/20260919T155222Z-03afca2f",
+      "evidence_sha256": "de019e75d29e69600afa7c4e7df8484a0b4e5a82ed39c8f863339931497396f6",
+      "checks": {
+        "all_search_result_min": "35.00",
+        "all_search_result_max": "149.00",
+        "answer": [
+          {
+            "min": 35.0,
+            "max": 149.0
+          }
+        ],
+        "all_results_count": 4
+      }
+    },
+    {
+      "task_id": "285",
+      "trace": ".local/expansion-webarena/batch05-capacity-pair-v5/285-positive/traces/20260919T160338Z-a6366413",
+      "evidence_sha256": "625dd7759f41bc9aa256ade516f98eff4aaa48de2974db7cb9a75c56f205d366",
+      "checks": {
+        "cheaper_capacity": 10,
+        "selected_capacity": 40,
+        "threshold": 15,
+        "selected_price": "11.99",
+        "review_note": "Evidence uses each product own title/description/specification, not related-product content. Bound to the seeded Nintendo Switch name-search results; native destination agrees."
+      }
+    }
+  ],
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "scope": "Independent arithmetic and manual semantic assessment of saved actual products; does not prove general category/brand classifiers."
+}

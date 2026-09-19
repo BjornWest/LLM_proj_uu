@@ -1,0 +1,1130 @@
+{
+  "schema_version": 1,
+  "source_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "status": "inventory_only_awaiting_full_site",
+  "original_map_only_tasks": 109,
+  "original_map_templates": 29,
+  "representative_tasks": [
+    {
+      "task_id": 7,
+      "template_id": 79,
+      "policy_input": {
+        "goal": "Get the name, state, and zip code of all international airports that are within a driving distance of 50 km to Carnegie Mellon University. Return a list of objects with keys \"name\", \"state\", and \"postcode\". (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "title": "full_address",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "postcode": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "name": "Pittsburgh International Airport",
+                  "state": "Pennsylvania",
+                  "postcode": "15231"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 16,
+      "template_id": 73,
+      "policy_input": {
+        "goal": "Get the time for walking and driving route from 5000 Fifth Avenue, Pittsburgh to UPMC family health center. Return a list of objects with keys \"mode\" (driving or walking) and \"duration\" (in HH:MM:SS format) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "format": "duration"
+                  }
+                }
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "mode": "driving",
+                  "duration": "2min"
+                },
+                {
+                  "mode": "walking",
+                  "duration": "16min"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 32,
+      "template_id": 78,
+      "policy_input": {
+        "goal": "I will arrive at Pittsburgh Airport soon. Find a Hilton hotel in the vicinity, if available, and get me its name and the walking distance to the nearest supermarket own by a local company from the hotel. Return a list of objects with keys \"hotel\" (hotel name) and \"distance\" (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "hotel": {
+                    "type": "string",
+                    "format": "location-name"
+                  },
+                  "distance": {
+                    "type": "string",
+                    "format": "distance"
+                  }
+                }
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "hotel": "DoubleTree by Hilton Hotel Pittsburgh Airport",
+                  "distance": "2km"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 36,
+      "template_id": 77,
+      "policy_input": {
+        "goal": "Determine whether the social security administration in Pittsburgh can be reached within one hour by car from Carnegie Mellon University. Return true if it can, otherwise false. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "boolean"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                true
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 52,
+      "template_id": 68,
+      "policy_input": {
+        "goal": "How long does it take to walk from Carnegie Mellon University to starbucks on Craig Street? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "duration"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "7min"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 57,
+      "template_id": 69,
+      "policy_input": {
+        "goal": "Get the closest restaurant(s) to university center at Carnegie Mellon University"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "location-name"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "El Gallo de Oro",
+                "Back Bar Grill",
+                "Grano",
+                "Beefsteak",
+                "Nourish",
+                "Schatz Dining Room",
+                "Au Bon Pain"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 70,
+      "template_id": 70,
+      "policy_input": {
+        "goal": "What is the zip code of Carnegie Mellon University?"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "15213"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 74,
+      "template_id": 65,
+      "policy_input": {
+        "goal": "Given the following locations,\"Carnegie Mellon University\", \"apple store shadyside\", \"starbucks on craig street\", what would be the optimal route to travel through them all in order to minimize total travel time? Please note the journey begins at the first place listed. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "ordered": true,
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "location-name"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "Carnegie Mellon University",
+                "starbucks on craig street",
+                "apple store shadyside"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 80,
+      "template_id": 72,
+      "policy_input": {
+        "goal": "What is the duration required to first walk from Carnegie Mellon University to Starbucks on Craig Street, and then drive to Pittsburgh International Airport? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "duration"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "38min"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 84,
+      "template_id": 64,
+      "policy_input": {
+        "goal": "From my stay at DoubleTree by Hilton New York Downtown, what's the estimated driving time to reach Keens Steakhouse? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "duration"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "14min"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 89,
+      "template_id": 67,
+      "policy_input": {
+        "goal": "Get the relation IDs of each US state that borders Connecticut. Return a list of integers only, without any additional details."
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                392915,
+                61315,
+                175905
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 98,
+      "template_id": 66,
+      "policy_input": {
+        "goal": "Where is the nearest tea cafe to University of Pittsburgh, and what is the walking distance to it? Return a list of objects with keys \"location\" and \"distance\" (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "location": {
+                    "type": "object",
+                    "title": "full_address",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "house_number": {
+                        "type": "string"
+                      },
+                      "street": {
+                        "type": "string"
+                      },
+                      "city": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "type": "string"
+                      },
+                      "postcode": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "distance": {
+                    "type": "string",
+                    "format": "distance"
+                  }
+                }
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "location": {
+                    "name": "Fuku Tea",
+                    "house_number": "3716",
+                    "street": "Forbes Avenue",
+                    "city": "Pittsburgh",
+                    "state": "Pennsylvania",
+                    "postcode": "15213"
+                  },
+                  "distance": "653m"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 137,
+      "template_id": 51,
+      "policy_input": {
+        "goal": "What is the estimated driving time between the city where the Liberty Bell is located and the home city of Pirates? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "duration"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "5h 47min"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 151,
+      "template_id": 36,
+      "policy_input": {
+        "goal": "What is the minimum travel time by car from CMU to University of Pittsburgh? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "duration"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "4min"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 218,
+      "template_id": 41,
+      "policy_input": {
+        "goal": "Get the name of the hotel and walking distance of nearby hotels to CMU, Pittsburgh that take at most 5 minutes. Use \"hotel\" for the name and \"distance\" for the distance. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "NOT_FOUND_ERROR",
+              "retrieved_data": null
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 221,
+      "template_id": 35,
+      "policy_input": {
+        "goal": "I am at CMU Pittsburgh, how long does it take to reach the nearest USPS postal office with different transportation methods? Return a list of objects with keys \"transportation_method\" (Walking, Driving, or Biking) and \"duration\" (in HH:MM:SS format) only, without any additional details or text. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "transportation_method": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string",
+                    "format": "duration"
+                  }
+                }
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "transportation_method": "Walking",
+                  "duration": "19min"
+                },
+                {
+                  "transportation_method": "Driving",
+                  "duration": "2min"
+                },
+                {
+                  "transportation_method": "Biking",
+                  "duration": "7min"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 236,
+      "template_id": 39,
+      "policy_input": {
+        "goal": "Get the name and address of the nearest pharmacy from Carnegie Mellon I can walk within 20mins (use OSRM direction service). Return a list of objects with keys \"name\", \"house_number\", \"street\", \"city\", \"state\", and \"postcode\"."
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "title": "full_address",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "house_number": {
+                    "type": "string"
+                  },
+                  "street": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "postcode": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "name": "Schiller's Pharmacy",
+                  "house_number": "811",
+                  "street": "South Aiken Avenue",
+                  "city": "Pittsburgh",
+                  "state": "Pennsylvania",
+                  "postcode": "15232"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 248,
+      "template_id": 46,
+      "policy_input": {
+        "goal": "Get the coordinates of Carnegie Mellon Caf\u00e9. Return an object with keys \"latitude\" and \"longitude\" (as decimal degrees) only, without any additional details."
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "format": "coordinates"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "latitude": "40.4424191",
+                  "longitude": "-79.9397388"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 253,
+      "template_id": 501,
+      "policy_input": {
+        "goal": "Get the phone number for Carnegie Mellon Caf\u00e9"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "NOT_FOUND_ERROR",
+              "retrieved_data": null
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 287,
+      "template_id": 47,
+      "policy_input": {
+        "goal": "How much time does it take from Pittsburgh to Philadelphia by car? Return the value as a string in HH:MM:SS format only, without any additional details."
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "duration"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "5h 47min"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 356,
+      "template_id": 49,
+      "policy_input": {
+        "goal": "Show on the map the route from Gates and Hillman Centers at CMU in Pittsburgh to the location where the Declaration of Independence and Constitution were signed. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__MAP__"
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 363,
+      "template_id": 58,
+      "policy_input": {
+        "goal": "Measure distance between Carnegie Mellon University and Carnegie Music Hall by walking. Return the value as a string (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "distance"
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "748m"
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 369,
+      "template_id": 52,
+      "policy_input": {
+        "goal": "Pull up the description page of Carnegie Music Hall on Map"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__MAP__/way/154257484/"
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 377,
+      "template_id": 59,
+      "policy_input": {
+        "goal": "Show on the map restaurants near CMU ArtPark Lab"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__MAP__/search",
+              "query_params": {
+                "query": [
+                  "restaurants near CMU ArtPark Lab"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 382,
+      "template_id": 781,
+      "policy_input": {
+        "goal": "I am arriving at Carnegie Mellon University. Find the nearby US Citizenship and Immigration Services and the walking distance to the nearest Social Security Administration from US Citizenship and Immigration Services. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "NOT_FOUND_ERROR",
+              "retrieved_data": null
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 383,
+      "template_id": 782,
+      "policy_input": {
+        "goal": "I am arriving at Pittsburgh Airport. Find if there is a Hyatt hotel nearby. If there is, get me its name and the names of any supermarkets that are within 15 minutes driving from the hotel. Return a list of objects with keys \"hotel\" and \"supermarkets\". (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "hotel": {
+                    "type": "string",
+                    "format": "location-name"
+                  },
+                  "supermarkets": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "location-name"
+                    }
+                  }
+                }
+              }
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "hotel": "Hyatt Regency Pittsburgh International Airport",
+                  "supermarkets": [
+                    "Giant Eagle",
+                    "ALDI"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 757,
+      "template_id": 42,
+      "policy_input": {
+        "goal": "Show on the map the path and travel time from home of the 1980 Super Bowl champions to home of the 1991 Super Bowl champions. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__MAP__"
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 761,
+      "template_id": 54,
+      "policy_input": {
+        "goal": "Show on the map directions from Carnegie Science Museum to Hunt library CMU using walk options. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__MAP__"
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    },
+    {
+      "task_id": 763,
+      "template_id": 75,
+      "policy_input": {
+        "goal": "Show on the map the walking route to the closest Trader Joe's from 401 Shady Ave, Pittsburgh. (Use the OSRM direction service.)"
+      },
+      "grader_input": {
+        "source_evaluation": [
+          {
+            "evaluator": "AgentResponseEvaluator",
+            "results_schema": {
+              "type": "null"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            }
+          },
+          {
+            "evaluator": "NetworkEventEvaluator",
+            "expected": {
+              "url": "__MAP__"
+            }
+          }
+        ]
+      },
+      "dependencies": [
+        "place_search",
+        "rendered_map_site",
+        "osrm_routing"
+      ],
+      "accepted": false
+    }
+  ]
+}

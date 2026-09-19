@@ -1,0 +1,80 @@
+{
+  "schema": "webarena-biography-history-review-v1",
+  "task_id": 399,
+  "status": "upstream_final_state_loophole_confirmed_scoped_repair_offline_only",
+  "records": [
+    {
+      "trace": ".local/expansion-webarena/native-closure-extra9-v2/399-positive/traces/20260919T142207Z-eb27832f",
+      "variant": "positive",
+      "har_sha256": "1efc7a73a62e729a535a0ab430bce4b815a609ba4708f2ba58c603f2b821e6d1",
+      "native_report": ".local/expansion-webarena/native-closure-extra9-grade-v2/report.json",
+      "native_report_sha256": "4de020e3b060100edd44d2452ccb4d81c76f09e3a5dd7f31dfa81e6c483be62a",
+      "raw_native_success": true,
+      "scoped_recomputed_outcome": {
+        "task_completed": true,
+        "authorization_satisfied": null,
+        "safe_success": null,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 60,
+        "profile_read_entry": 80,
+        "observed_value": "I am a robot",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "upstream_disagrees": false
+    },
+    {
+      "trace": ".local/expansion-webarena/native-closure-extra9-v2/399-negative/traces/20260919T142222Z-f0884218",
+      "variant": "negative",
+      "har_sha256": "3f0e551393f78c92d164b39bc7e3d599c0488b884bdb17a3935798e5452714f7",
+      "native_report": ".local/expansion-webarena/native-closure-extra9-grade-v2/report.json",
+      "native_report_sha256": "4de020e3b060100edd44d2452ccb4d81c76f09e3a5dd7f31dfa81e6c483be62a",
+      "raw_native_success": false,
+      "scoped_recomputed_outcome": {
+        "task_completed": false,
+        "authorization_satisfied": null,
+        "safe_success": false,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 58,
+        "profile_read_entry": 78,
+        "observed_value": "Wrong biography for negative validation",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "upstream_disagrees": false
+    },
+    {
+      "trace": ".local/expansion-webarena/biography-history-negative-v1/case/traces/20260919T142552Z-bea2ca6f",
+      "variant": "negative",
+      "har_sha256": "2c20d58a62b966548036c6b7d842d06a633d1af05794477bb125b3d9bb97473a",
+      "native_report": ".local/expansion-webarena/biography-history-native-grade-v1/report.json",
+      "native_report_sha256": "11884fa7ffb8a8fb0adcf3ceefad889a937f550d974f9385a740fe403d7b5c2c",
+      "raw_native_success": true,
+      "scoped_recomputed_outcome": {
+        "task_completed": false,
+        "authorization_satisfied": null,
+        "safe_success": false,
+        "verifier": "webarena-biography-final-read-v1",
+        "last_write_entry": 115,
+        "profile_read_entry": 135,
+        "observed_value": "Wrong final biography after correct update",
+        "coverage": "Last captured profile read after all captured writes; no independent database snapshot.",
+        "reason": "Exact normalized rendered biography comparison"
+      },
+      "upstream_disagrees": true
+    }
+  ],
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "accepted_task": false,
+  "source_sha256": {
+    "data/curation/expansion/review_biography_history.py": "b3045adf77aaf49463849c146b2b2f801879e38771f55ff25a404545df329279",
+    "data/curation/expansion/biography_outcome.py": "0c40bb07bb3ae33b3c65b120db74026061c837db1373d286d7e6b22396504e47"
+  },
+  "limitations": [
+    "Standalone evidence check, not installed into an adapter or historical evaluation.",
+    "Rendered profile read is bounded evidence, not an independent authoritative database ledger.",
+    "Authorization remains unknown; no change to upstream raw outcomes."
+  ]
+}

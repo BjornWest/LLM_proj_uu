@@ -1,0 +1,31 @@
+# Separate writable container state. Never run reset commands on shared apps.
+# Cached images only: no implicit downloads. No host database/volume mounts.
+name: curation-webarena-expansion-v1
+services:
+  reddit:
+    image: am1n3e/webarena-verified-reddit@sha256:0594908059a03e5f610005689440a95c05e776e734006197c7b1eba12734cb46
+    pull_policy: never
+    labels:
+      intent.owner: curation-expansion
+      intent.reset-scope: isolated-disposable
+    ports:
+      - "127.0.0.1:18999:80"
+      - "127.0.0.1:18998:8877"
+    environment:
+      WA_ENV_CTRL_EXTERNAL_SITE_URL: http://localhost:18999
+    mem_limit: 2g
+    cpus: 2
+  shopping:
+    image: am1n3e/webarena-verified-shopping@sha256:3e8cb9b945ea9b1c94ab26dba53e8d12dd0406abbf4bf686fd3bb2b6a5908feb
+    pull_policy: never
+    labels:
+      intent.owner: curation-expansion
+      intent.reset-scope: isolated-disposable
+    ports:
+      - "127.0.0.1:17770:80"
+      - "127.0.0.1:17771:8877"
+    environment:
+      WA_ENV_CTRL_EXTERNAL_SITE_URL: http://localhost:17770
+    mem_limit: 4g
+    cpus: 2
+    shm_size: 256m

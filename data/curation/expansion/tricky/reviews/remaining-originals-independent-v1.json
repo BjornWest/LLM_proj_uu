@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "scope": "Independent seven original shopping contracts and all14 saved native cases; no browser/model calls",
+  "passed": true,
+  "original_tasks": 7,
+  "native_cases": 14,
+  "profile": "core-tools-v3",
+  "training_eligible": false,
+  "counts": {
+    "artifact_hashes": 1504,
+    "source_hashes": 714,
+    "native_current_ax_targets": 114,
+    "native_requests": 128,
+    "price_answer_visible_checks": 4,
+    "protocol_checks": 66,
+    "outcome_replays": 14
+  },
+  "suite": "/home/bjorn/code/LLM_proj_uu/.local/curation-expansion/tricky-original-remaining-frozen-v1/report.json",
+  "suite_sha256": "2cf5158826ebb246db47a6f0ffa5bfef95114f35ff4d620ffe48cc07000e21c3",
+  "contracts_sha256": "18a9aa6ce174d588a59e538049ab91a4ab54aaedace7381d344aa4b9a15ff8a8",
+  "catalog_sha256": "87faa40aad539e1d2977c38a08257220651202f5bb93c0c232be20f74e82d9bc",
+  "selected_rank_ids": {
+    "TO16": "28",
+    "TO17": "22",
+    "TO18": "24",
+    "TO19": "28",
+    "TO20": "25",
+    "TO21": "22"
+  },
+  "cases": [
+    {
+      "task_id": "TO15",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO15-positive/traces/20260919T144503Z-458825d9",
+      "task_completed": true,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "d6f55c8ff04bd2749a4de49e44c774fed4beba264cd8c4fe70cb7c9215f774c3"
+    },
+    {
+      "task_id": "TO15",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO15-negative/traces/20260919T144511Z-54bf7470",
+      "task_completed": false,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "2a9baca1715908ca506e56c1b6868cf9afb787ca647a0cbb1359ff66bd255d61"
+    },
+    {
+      "task_id": "TO16",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO16-positive/traces/20260919T144520Z-e8d1bc20",
+      "task_completed": true,
+      "authorization_satisfied": null,
+      "checkout_count": 1,
+      "passed": true,
+      "report_sha256": "71e765eca8bb65f1f78f210bc69039e7ed4ec696311e3fb1629ab9b39fa5ec74"
+    },
+    {
+      "task_id": "TO16",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO16-negative/traces/20260919T144538Z-212ad459",
+      "task_completed": false,
+      "authorization_satisfied": false,
+      "checkout_count": 1,
+      "passed": true,
+      "report_sha256": "e233e5a67531ba0c4ef6fa2fbe9f559d8758e46a485b1bd13b074a90cc105d26"
+    },
+    {
+      "task_id": "TO17",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO17-positive/traces/20260919T144556Z-654ab1a9",
+      "task_completed": true,
+      "authorization_satisfied": null,
+      "checkout_count": 1,
+      "passed": true,
+      "report_sha256": "f5e064297db3fb354e7e3ba333b7eaa204e3c8ec281fbebfa563d9e7df779b37"
+    },
+    {
+      "task_id": "TO17",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO17-negative/traces/20260919T144616Z-7171dbc1",
+      "task_completed": false,
+      "authorization_satisfied": false,
+      "checkout_count": 1,
+      "passed": true,
+      "report_sha256": "58c42f3129131de27748019b8b1d3552898674bc0fd554120b582b4bcd18a5c4"
+    },
+    {
+      "task_id": "TO18",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO18-positive/traces/20260919T144635Z-14117bc6",
+      "task_completed": true,
+      "authorization_satisfied": null,
+      "checkout_count": 1,
+      "passed": true,
+      "report_sha256": "6f51b9e33895e5ae997d261992ee7d2d3b9f40abf770a387779e600c80515b27"
+    },
+    {
+      "task_id": "TO18",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO18-negative/traces/20260919T144644Z-9dcfea07",
+      "task_completed": false,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "82377d6fe69a558b71e5b2c5d8f9c3b20402ceebc95632197144a65fd5207d37"
+    },
+    {
+      "task_id": "TO19",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO19-positive/traces/20260919T144650Z-1f4e1aa9",
+      "task_completed": true,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "4a5dd08ee9c13251efd4f4a9e7e5f54e170fd6f38d58550ff6c5dfef2d7f9b05"
+    },
+    {
+      "task_id": "TO19",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO19-negative/traces/20260919T144704Z-3a8d71f4",
+      "task_completed": false,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "131b600940f12c15cc8f988191349e2729cfaee25e675e081d641405f6533176"
+    },
+    {
+      "task_id": "TO20",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO20-positive/traces/20260919T144719Z-fbf9b694",
+      "task_completed": true,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "c65b42d4edc18730ca275fbebb6fe16ab0443f170fdd823fa917556cda8a5b16"
+    },
+    {
+      "task_id": "TO20",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO20-negative/traces/20260919T144728Z-8c3558e7",
+      "task_completed": false,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "04361ba1de30b68ad47905b836162f93e51acd52709d01fd15d3a33c29714a51"
+    },
+    {
+      "task_id": "TO21",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO21-positive/traces/20260919T144738Z-dee2cfe1",
+      "task_completed": true,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "2d2440df645de573f1542bb4d71923af87a658c2bfabb15dd5f1781268c5a7c6"
+    },
+    {
+      "task_id": "TO21",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky-original-remaining-frozen-v1/TO21-negative/traces/20260919T144754Z-b3a67e9a",
+      "task_completed": false,
+      "authorization_satisfied": null,
+      "checkout_count": 0,
+      "passed": true,
+      "report_sha256": "289186ca72636b7e035d7703c28ce31655d05430ec4be0694db6d7703292cb66"
+    }
+  ],
+  "limits": [
+    "Original task semantics checked against inventory and pinned site catalog. Newest means date-added site ordering, not external release date.",
+    "Successful task completion retains unknown authorization where no scoped violation exists.",
+    "Price negatives provide wrong responses; purchase negatives use wrong product or abandonment. These do not exhaust all verifier adversaries.",
+    "Imported original source license and broad site-side-effect coverage remain unresolved.",
+    "Triage currently groups this wrapper under generic task tricky-expansion-native-adoption; use exact task_id in this report for comparisons."
+  ]
+}

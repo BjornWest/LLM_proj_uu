@@ -1,0 +1,32 @@
+{
+  "schema": "wikipedia-static-setup-plan-v1",
+  "status": "waiting_for_zim_identity_check",
+  "image": "am1n3e/webarena-verified-wikipedia@sha256:8c52e6cc8b7cc6f77daaf279929517399b1889bd02b09a257ebd465364ad387d",
+  "platform": "linux/arm64",
+  "project": "curation-webarena-wikipedia-v1",
+  "browser_origin": "http://localhost:18888",
+  "control_origin": "http://localhost:18874",
+  "zim_file": "wikipedia_en_all_maxi_2022-05.zim",
+  "expected_bytes": 95199730590,
+  "expected_sha256": "f12163513307893c87fd75009b1d61677bae675627eaadf4cb0fa63953eea021",
+  "read_only_mount": "/data/wikipedia_en_all_maxi_2022-05.zim",
+  "runtime_env": {
+    "WA_ENV_CTRL_SITE_URL": "http://localhost:18888",
+    "WA_ENV_CTRL_KIWIX_PORT": "8080",
+    "WA_ENV_CTRL_PORT": "8874"
+  },
+  "published_ports": {
+    "127.0.0.1:18888": "8080",
+    "127.0.0.1:18874": "8874"
+  },
+  "required_acceptance": [
+    "Complete download and published whole-file SHA256 identity match.",
+    "Bound read-only original ZIM, pinned image and explicit emulated architecture.",
+    "Initial index, article, search and image/media endpoints work.",
+    "Fresh BrowserGym native scripted tasks with actual other required site; independent negatives."
+  ],
+  "platform_evidence": ".local/curation-expansion/infrastructure/wikipedia-image-platform-preflight-v1.json",
+  "model_calls": 0,
+  "site_ready": false,
+  "training_eligible": false
+}

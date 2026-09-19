@@ -1,0 +1,31 @@
+{
+  "schema": "webarena-maps-preflight-requirements-v1",
+  "implemented_preflight_runner": false,
+  "implemented_task_verifier": false,
+  "requirements": {
+    "dataset_and_image_pins": "Retain original task rows/revision, exact image ID/digest, archive manifests and relevant original/patched config/source hashes; no reduced website fixture.",
+    "full_original_assets": "Original navigation, surrounding pages, CSS/JS and distractions remain available. Missing object data is a task hold, not permission to remove links.",
+    "geocoder_forward": "Actual forward and structured requests, successful schema, distinct place identities, postal-code coverage, negative and service-error controls. Homepage200 insufficient.",
+    "tile_rendering": "Actual browser map tiles loaded and rendered over task regions; preserve screenshot plus requests and errors.",
+    "local_only_runtime": "Closed-network browser/service rehearsal. Keep complete local geocoder/routing/tile dependencies. Allow source-supported read-only geocoder POST endpoints after exact route inspection; deny all other mutations.",
+    "current_AX_controls": "Source selectors resolve to current delivered native BrowserGym BIDs, engine option labels and source text; no hidden-element action or private data projection.",
+    "task_place_identity": "Visible requested feature name/type/locality established, including ambiguous same-name alternatives; first search hit alone insufficient.",
+    "visible_answer_evidence": "Policy-visible page text or native exposed control yields the answer at available precision. Hidden data-lat/data-lon, privileged Nominatim results and gold never become policy inputs.",
+    "route_engine_bindings": "Bind selected label/engine ID to actual routed-car/routed-foot/routed-bike request prefix and current successful response; route/v1/driving occurs for all modes.",
+    "route_endpoint_identity": "Record original input, resolved visible display_name and private effective coordinates/place identity, in correct from/to order; reject wrong or stale matches.",
+    "route_geometry_and_summary": "Nonempty current geometry, instructions and visible duration/distance from same response; reject prior route retained after error or cleared route. Native root visit is never proof.",
+    "regional_route_coverage": "Northeast data covers Pittsburgh, New York and Philadelphia endpoints and connecting route; no success from route service error/empty body.",
+    "visible_coordinates_path": "Demonstrate original accessible coordinate display for the exact cafe without relying on broken object pages or hidden DOM attributes. Existing path unverified.",
+    "nearby_results_and_map_rendering": "Visible restaurant identity/locality and original map result behavior; search query success and auto-centering alone insufficient. Hover-only markers require explicit capability assessment.",
+    "both_modes_independently_observed": "Walking and driving each captured after successful selected-mode route resolution, with separate evidence and no reuse of previous mode's summary.",
+    "minimum_within_original_service_semantics": "Document what original OSRM first-route optimization establishes; do not claim arbitrary globally fastest route or fabricate alternative comparison.",
+    "threshold_precision_sufficient": "Rounded H:MM display converted to HH:MM:00. Exactly1:00 cannot distinguish below/above3600seconds; retain unknown if no original visible higher-precision evidence."
+  },
+  "grading_policy": {
+    "native": "Run actual pinned upstream evaluator on saved agent response/HAR; preserve raw score/error separately.",
+    "derived": "Not implemented. Independently establish task-specific identity/state/evidence and grade each outcome requirement separately before admission.",
+    "infrastructure_error": "technical_failure with task_completed null; never manufacture semantic NOT_FOUND.",
+    "authorization": null,
+    "training_eligible": false
+  }
+}

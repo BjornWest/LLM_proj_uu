@@ -1,0 +1,1517 @@
+{
+  "schema": "webarena-maps-original-staging-v1",
+  "source_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "source_only": true,
+  "model_calls": 0,
+  "browser_runs": 0,
+  "tasks": [
+    {
+      "id": "WA-MAP-70-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 70,
+      "source_template_id": 70,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "What is the zip code of Carnegie Mellon University?",
+      "policy_input": {
+        "goal": "What is the zip code of Carnegie Mellon University?"
+      },
+      "task_kind": "postcode",
+      "driver_public_slots": {
+        "query": "Carnegie Mellon University"
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 70,
+          "intent_template_id": 70,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "What is the zip code of Carnegie Mellon University?",
+          "intent_template": "What is the zip code of {{place}}?",
+          "instantiation_dict": {
+            "place": "Carnegie Mellon University"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  "15213"
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-248-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 248,
+      "source_template_id": 46,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "Get the coordinates of Carnegie Mellon Café. Return an object with keys \"latitude\" and \"longitude\" (as decimal degrees) only, without any additional details.",
+      "policy_input": {
+        "goal": "Get the coordinates of Carnegie Mellon Café. Return an object with keys \"latitude\" and \"longitude\" (as decimal degrees) only, without any additional details."
+      },
+      "task_kind": "coordinates",
+      "driver_public_slots": {
+        "query": "Carnegie Mellon Café"
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "format": "coordinates"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 248,
+          "intent_template_id": 46,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "Get the coordinates of Carnegie Mellon Café. Return an object with keys \"latitude\" and \"longitude\" (as decimal degrees) only, without any additional details.",
+          "intent_template": "Get the coordinates of {{location}}. {{retrieved_data_format_spec}}.",
+          "instantiation_dict": {
+            "location": "Carnegie Mellon Café",
+            "retrieved_data_format_spec": "Return an object with keys \"latitude\" and \"longitude\" (as decimal degrees) only, without any additional details"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "format": "coordinates"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  {
+                    "latitude": "40.4424191",
+                    "longitude": "-79.9397388"
+                  }
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "visible_coordinates_path",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "visible_coordinates_path"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-377-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 377,
+      "source_template_id": 59,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "Show on the map restaurants near CMU ArtPark Lab",
+      "policy_input": {
+        "goal": "Show on the map restaurants near CMU ArtPark Lab"
+      },
+      "task_kind": "nearby_map",
+      "driver_public_slots": {
+        "query": "restaurants near CMU ArtPark Lab"
+      },
+      "response_schema": {
+        "type": "null"
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 377,
+          "intent_template_id": 59,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "Show on the map restaurants near CMU ArtPark Lab",
+          "intent_template": "Show on the map {{space}} near {{location}}",
+          "instantiation_dict": {
+            "location": "CMU ArtPark Lab",
+            "space": "restaurants"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "null"
+              },
+              "expected": {
+                "task_type": "navigate",
+                "status": "SUCCESS",
+                "retrieved_data": null
+              }
+            },
+            {
+              "evaluator": "NetworkEventEvaluator",
+              "expected": {
+                "url": "__MAP__/search",
+                "query_params": {
+                  "query": [
+                    "restaurants near CMU ArtPark Lab"
+                  ]
+                }
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "nearby_results_and_map_rendering",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "nearby_results_and_map_rendering"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-52-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 52,
+      "source_template_id": 68,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "How long does it take to walk from Carnegie Mellon University to starbucks on Craig Street? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)",
+      "policy_input": {
+        "goal": "How long does it take to walk from Carnegie Mellon University to starbucks on Craig Street? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "task_kind": "duration",
+      "driver_public_slots": {
+        "from": "Carnegie Mellon University",
+        "to": "starbucks on Craig Street",
+        "modes": [
+          "walking"
+        ]
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "duration"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 52,
+          "intent_template_id": 68,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "How long does it take to walk from Carnegie Mellon University to starbucks on Craig Street? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)",
+          "intent_template": "How long does it take to walk from {{start}} to {{end}}? {{retrieved_data_format_spec}}. (Use the OSRM direction service.)",
+          "instantiation_dict": {
+            "start": "Carnegie Mellon University",
+            "end": "starbucks on Craig Street",
+            "retrieved_data_format_spec": "Return the value as a string in HH:MM:SS format only, without any additional details"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "duration"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  "7min"
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "route_engine_bindings",
+            "result": null
+          },
+          {
+            "id": "route_endpoint_identity",
+            "result": null
+          },
+          {
+            "id": "route_geometry_and_summary",
+            "result": null
+          },
+          {
+            "id": "regional_route_coverage",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown",
+          "wrong_mode",
+          "swapped_endpoint",
+          "stale_previous_route_after_failed_request"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "route_engine_bindings",
+        "route_endpoint_identity",
+        "route_geometry_and_summary",
+        "regional_route_coverage"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-84-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 84,
+      "source_template_id": 64,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "From my stay at DoubleTree by Hilton New York Downtown, what's the estimated driving time to reach Keens Steakhouse? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)",
+      "policy_input": {
+        "goal": "From my stay at DoubleTree by Hilton New York Downtown, what's the estimated driving time to reach Keens Steakhouse? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "task_kind": "duration",
+      "driver_public_slots": {
+        "from": "DoubleTree by Hilton New York Downtown",
+        "to": "Keens Steakhouse",
+        "modes": [
+          "driving"
+        ]
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "duration"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 84,
+          "intent_template_id": 64,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "From my stay at DoubleTree by Hilton New York Downtown, what's the estimated driving time to reach Keens Steakhouse? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)",
+          "intent_template": "From my stay at {{hotel}}, what's the estimated driving time to reach {{place}}? {{retrieved_data_format_spec}}. (Use the OSRM direction service.)",
+          "instantiation_dict": {
+            "hotel": "DoubleTree by Hilton New York Downtown",
+            "place": "Keens Steakhouse",
+            "retrieved_data_format_spec": "Return the value as a string in HH:MM:SS format only, without any additional details"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "duration"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  "14min"
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "route_engine_bindings",
+            "result": null
+          },
+          {
+            "id": "route_endpoint_identity",
+            "result": null
+          },
+          {
+            "id": "route_geometry_and_summary",
+            "result": null
+          },
+          {
+            "id": "regional_route_coverage",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown",
+          "wrong_mode",
+          "swapped_endpoint",
+          "stale_previous_route_after_failed_request"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "route_engine_bindings",
+        "route_endpoint_identity",
+        "route_geometry_and_summary",
+        "regional_route_coverage"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-363-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 363,
+      "source_template_id": 58,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "Measure distance between Carnegie Mellon University and Carnegie Music Hall by walking. Return the value as a string (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details. (Use the OSRM direction service.)",
+      "policy_input": {
+        "goal": "Measure distance between Carnegie Mellon University and Carnegie Music Hall by walking. Return the value as a string (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "task_kind": "distance",
+      "driver_public_slots": {
+        "from": "Carnegie Mellon University",
+        "to": "Carnegie Music Hall",
+        "modes": [
+          "walking"
+        ]
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "distance"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 363,
+          "intent_template_id": 58,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "Measure distance between Carnegie Mellon University and Carnegie Music Hall by walking. Return the value as a string (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details. (Use the OSRM direction service.)",
+          "intent_template": "Measure distance between {{location_address_1}} and {{location_address_2}} by walking. {{retrieved_data_format_spec}}. (Use the OSRM direction service.)",
+          "instantiation_dict": {
+            "location_address_1": "Carnegie Mellon University",
+            "location_address_2": "Carnegie Music Hall",
+            "retrieved_data_format_spec": "Return the value as a string (numeric value with unit km or m, e.g., 2.4km, 500m) only, without any additional details"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "distance"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  "748m"
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "route_engine_bindings",
+            "result": null
+          },
+          {
+            "id": "route_endpoint_identity",
+            "result": null
+          },
+          {
+            "id": "route_geometry_and_summary",
+            "result": null
+          },
+          {
+            "id": "regional_route_coverage",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown",
+          "wrong_mode",
+          "swapped_endpoint",
+          "stale_previous_route_after_failed_request"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "route_engine_bindings",
+        "route_endpoint_identity",
+        "route_geometry_and_summary",
+        "regional_route_coverage"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-16-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 16,
+      "source_template_id": 73,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "Get the time for walking and driving route from 5000 Fifth Avenue, Pittsburgh to UPMC family health center. Return a list of objects with keys \"mode\" (driving or walking) and \"duration\" (in HH:MM:SS format) only, without any additional details. (Use the OSRM direction service.)",
+      "policy_input": {
+        "goal": "Get the time for walking and driving route from 5000 Fifth Avenue, Pittsburgh to UPMC family health center. Return a list of objects with keys \"mode\" (driving or walking) and \"duration\" (in HH:MM:SS format) only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "task_kind": "multi_mode_duration",
+      "driver_public_slots": {
+        "from": "5000 Fifth Avenue, Pittsburgh",
+        "to": "UPMC family health center",
+        "modes": [
+          "walking",
+          "driving"
+        ]
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string"
+            },
+            "duration": {
+              "type": "string",
+              "format": "duration"
+            }
+          }
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 16,
+          "intent_template_id": 73,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "Get the time for walking and driving route from 5000 Fifth Avenue, Pittsburgh to UPMC family health center. Return a list of objects with keys \"mode\" (driving or walking) and \"duration\" (in HH:MM:SS format) only, without any additional details. (Use the OSRM direction service.)",
+          "intent_template": "Get the time for walking and driving route from {{start}} to {{end}}. {{retrieved_data_format_spec}}. (Use the OSRM direction service.)",
+          "instantiation_dict": {
+            "start": "5000 Fifth Avenue, Pittsburgh",
+            "end": "UPMC family health center",
+            "retrieved_data_format_spec": "Return a list of objects with keys \"mode\" (driving or walking) and \"duration\" (in HH:MM:SS format) only, without any additional details"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string"
+                    },
+                    "duration": {
+                      "type": "string",
+                      "format": "duration"
+                    }
+                  }
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  {
+                    "mode": "driving",
+                    "duration": "2min"
+                  },
+                  {
+                    "mode": "walking",
+                    "duration": "16min"
+                  }
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "route_engine_bindings",
+            "result": null
+          },
+          {
+            "id": "route_endpoint_identity",
+            "result": null
+          },
+          {
+            "id": "route_geometry_and_summary",
+            "result": null
+          },
+          {
+            "id": "regional_route_coverage",
+            "result": null
+          },
+          {
+            "id": "both_modes_independently_observed",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown",
+          "wrong_mode",
+          "swapped_endpoint",
+          "stale_previous_route_after_failed_request",
+          "one_mode_only"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "route_engine_bindings",
+        "route_endpoint_identity",
+        "route_geometry_and_summary",
+        "regional_route_coverage",
+        "both_modes_independently_observed"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-36-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 36,
+      "source_template_id": 77,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "Determine whether the social security administration in Pittsburgh can be reached within one hour by car from Carnegie Mellon University. Return true if it can, otherwise false. (Use the OSRM direction service.)",
+      "policy_input": {
+        "goal": "Determine whether the social security administration in Pittsburgh can be reached within one hour by car from Carnegie Mellon University. Return true if it can, otherwise false. (Use the OSRM direction service.)"
+      },
+      "task_kind": "duration_threshold",
+      "driver_public_slots": {
+        "from": "Carnegie Mellon University",
+        "to": "social security administration in Pittsburgh",
+        "modes": [
+          "driving"
+        ],
+        "threshold_seconds": 3600
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "boolean"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 36,
+          "intent_template_id": 77,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "Determine whether the social security administration in Pittsburgh can be reached within one hour by car from Carnegie Mellon University. Return true if it can, otherwise false. (Use the OSRM direction service.)",
+          "intent_template": "Determine whether the {{place}} in Pittsburgh can be reached within one hour by car from {{location}}{{retrieved_data_format_spec}} (Use the OSRM direction service.)",
+          "instantiation_dict": {
+            "place": "social security administration",
+            "location": "Carnegie Mellon University",
+            "retrieved_data_format_spec": ". Return true if it can, otherwise false."
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "boolean"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  true
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "route_engine_bindings",
+            "result": null
+          },
+          {
+            "id": "route_endpoint_identity",
+            "result": null
+          },
+          {
+            "id": "route_geometry_and_summary",
+            "result": null
+          },
+          {
+            "id": "regional_route_coverage",
+            "result": null
+          },
+          {
+            "id": "threshold_precision_sufficient",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown",
+          "wrong_mode",
+          "swapped_endpoint",
+          "stale_previous_route_after_failed_request"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "route_engine_bindings",
+        "route_endpoint_identity",
+        "route_geometry_and_summary",
+        "regional_route_coverage",
+        "threshold_precision_sufficient"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-151-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 151,
+      "source_template_id": 36,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "What is the minimum travel time by car from CMU to University of Pittsburgh? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)",
+      "policy_input": {
+        "goal": "What is the minimum travel time by car from CMU to University of Pittsburgh? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)"
+      },
+      "task_kind": "minimum_duration",
+      "driver_public_slots": {
+        "from": "CMU",
+        "to": "University of Pittsburgh",
+        "modes": [
+          "driving"
+        ]
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "duration"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 151,
+          "intent_template_id": 36,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "What is the minimum travel time by car from CMU to University of Pittsburgh? Return the value as a string in HH:MM:SS format only, without any additional details. (Use the OSRM direction service.)",
+          "intent_template": "What is the minimum travel time by car from {{location1}} to {{location2}}? {{retrieved_data_format_spec}}. (Use the OSRM direction service.)",
+          "instantiation_dict": {
+            "location1": "CMU",
+            "location2": "University of Pittsburgh",
+            "retrieved_data_format_spec": "Return the value as a string in HH:MM:SS format only, without any additional details"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "duration"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  "4min"
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "route_engine_bindings",
+            "result": null
+          },
+          {
+            "id": "route_endpoint_identity",
+            "result": null
+          },
+          {
+            "id": "route_geometry_and_summary",
+            "result": null
+          },
+          {
+            "id": "regional_route_coverage",
+            "result": null
+          },
+          {
+            "id": "minimum_within_original_service_semantics",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown",
+          "wrong_mode",
+          "swapped_endpoint",
+          "stale_previous_route_after_failed_request"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "route_engine_bindings",
+        "route_endpoint_identity",
+        "route_geometry_and_summary",
+        "regional_route_coverage",
+        "minimum_within_original_service_semantics"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    },
+    {
+      "id": "WA-MAP-287-original-staging-v1",
+      "source": "webarena-verified",
+      "source_task_id": 287,
+      "source_template_id": 47,
+      "source_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+      "original_prompt": "How much time does it take from Pittsburgh to Philadelphia by car? Return the value as a string in HH:MM:SS format only, without any additional details.",
+      "policy_input": {
+        "goal": "How much time does it take from Pittsburgh to Philadelphia by car? Return the value as a string in HH:MM:SS format only, without any additional details."
+      },
+      "task_kind": "duration",
+      "driver_public_slots": {
+        "from": "Pittsburgh",
+        "to": "Philadelphia",
+        "modes": [
+          "driving"
+        ]
+      },
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "duration"
+        }
+      },
+      "grader_input": {
+        "original_source_row": {
+          "sites": [
+            "map"
+          ],
+          "task_id": 287,
+          "intent_template_id": 47,
+          "start_urls": [
+            "__MAP__"
+          ],
+          "intent": "How much time does it take from Pittsburgh to Philadelphia by car? Return the value as a string in HH:MM:SS format only, without any additional details.",
+          "intent_template": "How much time does it take from Pittsburgh to Philadelphia by car? {{retrieved_data_format_spec}}.",
+          "instantiation_dict": {
+            "retrieved_data_format_spec": "Return the value as a string in HH:MM:SS format only, without any additional details"
+          },
+          "eval": [
+            {
+              "evaluator": "AgentResponseEvaluator",
+              "results_schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "duration"
+                }
+              },
+              "expected": {
+                "task_type": "retrieve",
+                "status": "SUCCESS",
+                "retrieved_data": [
+                  "5h 47min"
+                ]
+              }
+            }
+          ],
+          "revision": 2
+        },
+        "verifier_origin": "upstream_native_plus_project_evidence_requirements_not_implemented",
+        "required_checks": [
+          {
+            "id": "dataset_and_image_pins",
+            "result": null
+          },
+          {
+            "id": "full_original_assets",
+            "result": null
+          },
+          {
+            "id": "geocoder_forward",
+            "result": null
+          },
+          {
+            "id": "tile_rendering",
+            "result": null
+          },
+          {
+            "id": "local_only_runtime",
+            "result": null
+          },
+          {
+            "id": "current_AX_controls",
+            "result": null
+          },
+          {
+            "id": "task_place_identity",
+            "result": null
+          },
+          {
+            "id": "visible_answer_evidence",
+            "result": null
+          },
+          {
+            "id": "route_engine_bindings",
+            "result": null
+          },
+          {
+            "id": "route_endpoint_identity",
+            "result": null
+          },
+          {
+            "id": "route_geometry_and_summary",
+            "result": null
+          },
+          {
+            "id": "regional_route_coverage",
+            "result": null
+          }
+        ],
+        "negative_cases": [
+          "wrong_answer_or_destination",
+          "wrong_place_same_name",
+          "infrastructure_failure_unknown",
+          "wrong_mode",
+          "swapped_endpoint",
+          "stale_previous_route_after_failed_request"
+        ],
+        "proposed_checker": null
+      },
+      "required_preflight_gates": [
+        "dataset_and_image_pins",
+        "full_original_assets",
+        "geocoder_forward",
+        "tile_rendering",
+        "local_only_runtime",
+        "current_AX_controls",
+        "task_place_identity",
+        "visible_answer_evidence",
+        "route_engine_bindings",
+        "route_endpoint_identity",
+        "route_geometry_and_summary",
+        "regional_route_coverage"
+      ],
+      "acceptance": {
+        "source_inspected": true,
+        "browser_positive": null,
+        "browser_negative": null,
+        "native_grade": null,
+        "derived_grade": null,
+        "independent_review": null,
+        "training_eligible": false
+      },
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "license_references": {
+        "task_and_integration_code": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/LICENSE",
+        "website_components": "Per-component license audit required before redistribution; source task license does not cover all image assets."
+      }
+    }
+  ],
+  "excluded_source_ids": {
+    "369-373": "Confirmed description404/empty object DB",
+    "253": "Infrastructure failure cannot prove semantic NOT_FOUND",
+    "356,757,758,761-767": "Native root-visit predicate insufficient"
+  }
+}

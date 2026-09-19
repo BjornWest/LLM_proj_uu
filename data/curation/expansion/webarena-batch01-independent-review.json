@@ -1,0 +1,774 @@
+{
+  "schema_version": 1,
+  "reviewer": "curation-parent-independent",
+  "candidate_index_sha256": "e972a330d3bf21eb0816dcf5caca649c9c7cd8b161b5e2bc87c2d4e7a9e8d22e",
+  "review_script_sha256": "794777fab76f20867100d6f36157b7ee93b8443299894a14aaa43cd5c07e9086",
+  "native_package_version": "1.2.3",
+  "status": "positive_feasibility_verified_acceptance_incomplete",
+  "checks": {
+    "artifact_hashes": 246,
+    "index_hashes": 2,
+    "current_AX_targets": 32,
+    "native_positive_replays": 10
+  },
+  "source_task_count": 10,
+  "site_count": 2,
+  "records": [
+    {
+      "source_task_id": "21",
+      "template_id": "222",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135037Z-e80162e1",
+      "native_positive_recomputed": {
+        "task_id": 21,
+        "intent_template_id": 222,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "Catso",
+                "Dibbins",
+                "Anglebert Dinkherhump",
+                "Michelle Davis"
+              ]
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": [
+                "catso",
+                "dibbins",
+                "anglebert dinkherhump",
+                "michelle davis"
+              ],
+              "task_type": "retrieve"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "success",
+              "retrieved_data": [
+                "catso",
+                "dibbins",
+                "anglebert dinkherhump",
+                "michelle davis"
+              ]
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "27",
+      "template_id": "33",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135044Z-f11c4570",
+      "native_positive_recomputed": {
+        "task_id": 27,
+        "intent_template_id": 33,
+        "sites": [
+          "reddit"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "username": "Hammer94",
+                  "post_title": "56 year old mom has no retirement. Where do I even start on her behalf?",
+                  "count": 0
+                }
+              ]
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": [
+                {
+                  "username": "hammer94",
+                  "post_title": "56 year old mom has no retirement. where do i even start on her behalf?",
+                  "count": 0.0
+                }
+              ],
+              "task_type": "retrieve"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "success",
+              "retrieved_data": [
+                {
+                  "username": "hammer94",
+                  "post_title": "56 year old mom has no retirement. where do i even start on her behalf?",
+                  "count": 0.0
+                }
+              ]
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "66",
+      "template_id": "17",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135054Z-6609a3d1",
+      "native_positive_recomputed": {
+        "task_id": 66,
+        "intent_template_id": 17,
+        "sites": [
+          "reddit"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "I just finished reading The Hobbit to my 6 year old daughter, and she loved it!",
+                "Apple Books has a free audiobook of A Christmas Carol narrated by LeVar Burton!"
+              ]
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": [
+                "i just finished reading the hobbit to my 6 year old daughter, and she loved it!",
+                "apple books has a free audiobook of a christmas carol narrated by levar burton!"
+              ],
+              "task_type": "retrieve"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "success",
+              "retrieved_data": [
+                "i just finished reading the hobbit to my 6 year old daughter, and she loved it!",
+                "apple books has a free audiobook of a christmas carol narrated by levar burton!"
+              ]
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "96",
+      "template_id": "193",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135110Z-38a17c05",
+      "native_positive_recomputed": {
+        "task_id": 96,
+        "intent_template_id": 193,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                {
+                  "status": "canceled",
+                  "arrival_date": null
+                }
+              ]
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": [
+                {
+                  "status": "canceled",
+                  "arrival_date": null
+                }
+              ],
+              "task_type": "retrieve"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "success",
+              "retrieved_data": [
+                {
+                  "status": "canceled",
+                  "arrival_date": null
+                }
+              ]
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "117",
+      "template_id": "161",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135121Z-a38d7642",
+      "native_positive_recomputed": {
+        "task_id": 117,
+        "intent_template_id": 161,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "2022-03-02"
+              ]
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": [
+                "2022-03-02"
+              ],
+              "task_type": "retrieve"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "success",
+              "retrieved_data": [
+                "2022-03-02"
+              ]
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "158",
+      "template_id": "171",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135130Z-40f4f4fe",
+      "native_positive_recomputed": {
+        "task_id": 158,
+        "intent_template_id": 171,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": null,
+              "task_type": "navigate"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "success",
+              "retrieved_data": null
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          },
+          {
+            "evaluator_name": "NetworkEventEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": [
+              {
+                "url": "http://localhost:7770/heiying-game-card-case-for-nintendo-switch-switch-oled-game-card-or-micro-sd-memory-cards-portable-switch-game-memory-card-storage-with-24-game-card-slots-and-24-micro-sd-card-slots-black.html",
+                "headers": null,
+                "query_params": null,
+                "post_data": null,
+                "response_content": null,
+                "response_status": 200,
+                "http_method": "GET",
+                "response_cookies": null
+              }
+            ],
+            "actual_normalized": [
+              {
+                "url": {
+                  "base_url": "__SHOPPING__/heiying-game-card-case-for-nintendo-switch-switch-oled-game-card-or-micro-sd-memory-cards-portable-switch-game-memory-card-storage-with-24-game-card-slots-and-24-micro-sd-card-slots-black.html",
+                  "query_params": {}
+                },
+                "response_status": 200,
+                "http_method": "GET",
+                "post_data": null,
+                "response_content": null,
+                "response_cookies": null
+              }
+            ],
+            "expected": {
+              "url": {
+                "base_url": "__SHOPPING__/heiying-game-card-case-for-nintendo-switch-switch-oled-game-card-or-micro-sd-memory-cards-portable-switch-game-memory-card-storage-with-24-game-card-slots-and-24-micro-sd-card-slots-black.html",
+                "query_params": {}
+              },
+              "response_status": 200,
+              "http_method": "GET",
+              "post_data": null,
+              "response_content": null,
+              "response_cookies": null
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": false
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "163",
+      "template_id": "136",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135140Z-0b59dfc6",
+      "native_positive_recomputed": {
+        "task_id": 163,
+        "intent_template_id": 136,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                "Memory Card Came Defective"
+              ]
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": [
+                "memory card came defective"
+              ],
+              "task_type": "retrieve"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "success",
+              "retrieved_data": [
+                "memory card came defective"
+              ]
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "188",
+      "template_id": "214",
+      "trace": ".local/expansion-webarena/browser-batch-02/traces/20260919T135147Z-11d5907b",
+      "native_positive_recomputed": {
+        "task_id": 188,
+        "intent_template_id": 214,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "retrieve",
+              "status": "SUCCESS",
+              "retrieved_data": [
+                365.42
+              ]
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": [
+                "365.42"
+              ],
+              "task_type": "retrieve"
+            },
+            "expected": {
+              "task_type": "retrieve",
+              "status": "success",
+              "retrieved_data": [
+                "365.42"
+              ]
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "260",
+      "template_id": "211",
+      "trace": ".local/expansion-webarena/browser-bounded-03/task-260/traces/20260919T135643Z-81d9d026",
+      "native_positive_recomputed": {
+        "task_id": 260,
+        "intent_template_id": 211,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": null,
+              "task_type": "navigate"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "success",
+              "retrieved_data": null
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          },
+          {
+            "evaluator_name": "NetworkEventEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": [
+              {
+                "url": "http://localhost:7770/video-games.html",
+                "headers": null,
+                "query_params": null,
+                "post_data": null,
+                "response_content": null,
+                "response_status": 200,
+                "http_method": "GET",
+                "response_cookies": null
+              }
+            ],
+            "actual_normalized": [
+              {
+                "url": {
+                  "base_url": "__SHOPPING__/video-games.html",
+                  "query_params": {}
+                },
+                "response_status": 200,
+                "http_method": "GET",
+                "post_data": null,
+                "response_content": null,
+                "response_cookies": null
+              }
+            ],
+            "expected": {
+              "url": {
+                "base_url": "__SHOPPING__/video-games.html",
+                "query_params": {}
+              },
+              "response_status": 200,
+              "http_method": "GET",
+              "post_data": null,
+              "response_content": null,
+              "response_cookies": null
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": false
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    },
+    {
+      "source_task_id": "324",
+      "template_id": "208",
+      "trace": ".local/expansion-webarena/browser-bounded-03/task-324/traces/20260919T135649Z-4c569b9b",
+      "native_positive_recomputed": {
+        "task_id": 324,
+        "intent_template_id": 208,
+        "sites": [
+          "shopping"
+        ],
+        "task_revision": 2,
+        "status": "success",
+        "score": 1.0,
+        "evaluators_results": [
+          {
+            "evaluator_name": "AgentResponseEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": {
+              "task_type": "navigate",
+              "status": "SUCCESS",
+              "retrieved_data": null
+            },
+            "actual_normalized": {
+              "status": "success",
+              "retrieved_data": null,
+              "task_type": "navigate"
+            },
+            "expected": {
+              "task_type": "navigate",
+              "status": "success",
+              "retrieved_data": null
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": null
+          },
+          {
+            "evaluator_name": "NetworkEventEvaluator",
+            "status": "success",
+            "score": 1.0,
+            "actual": [
+              {
+                "url": "http://localhost:7770/catalogsearch/result/index/?product_list_order=price&q=chairs&product_list_dir=asc",
+                "headers": null,
+                "query_params": null,
+                "post_data": null,
+                "response_content": null,
+                "response_status": 200,
+                "http_method": "GET",
+                "response_cookies": null
+              }
+            ],
+            "actual_normalized": [
+              {
+                "url": {
+                  "base_url": "__SHOPPING__/catalogsearch/result/index/",
+                  "query_params": {
+                    "product_list_order": [
+                      "price"
+                    ],
+                    "q": [
+                      "chairs"
+                    ],
+                    "product_list_dir": [
+                      "asc"
+                    ]
+                  }
+                },
+                "response_status": 200,
+                "http_method": "GET",
+                "post_data": null,
+                "response_content": null,
+                "response_cookies": null
+              }
+            ],
+            "expected": {
+              "url": {
+                "base_url": "__SHOPPING__/catalogsearch/result/index",
+                "query_params": {
+                  "product_list_order": [
+                    "price"
+                  ],
+                  "q": [
+                    "chairs"
+                  ],
+                  "product_list_dir": [
+                    "asc"
+                  ]
+                }
+              },
+              "response_status": 200,
+              "http_method": "GET",
+              "post_data": null,
+              "response_content": null,
+              "response_cookies": null
+            },
+            "assertions": null,
+            "error_msg": null,
+            "should_not_exist": false
+          }
+        ],
+        "error_msg": null,
+        "webarena_verified_version": "1.2.3",
+        "webarena_verified_evaluator_checksum": "35c3385b1db4b3378657589f95f50defd4234bd36e5b93d44733fd561b01db4e",
+        "webarena_verified_data_checksum": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30"
+      },
+      "browser_positive_reviewed": true,
+      "original_unknown_evaluation_preserved": true,
+      "fully_accepted": false,
+      "pending": [
+        "Actual browser negative-path review",
+        "New native-tool profile adoption",
+        "Task-specific data/reset closure"
+      ]
+    }
+  ],
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "limitations": [
+    "Native grader replay is not independent implementation of grader semantics.",
+    "HAR navigation success may mean a page was visited, not the correct final page.",
+    "Legacy 120000-character AX profile; no current teacher-profile compatibility claim.",
+    "Source fixtures vary in runtime; retained first-attempt hang is not overwritten."
+  ]
+}

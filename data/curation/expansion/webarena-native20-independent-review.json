@@ -1,0 +1,619 @@
+{
+  "schema": "webarena-native20-independent-review-v1",
+  "index_sha256": "2dbd01c8db160925ad679293a828da7f2da3c0572c5c241008a507241d90e6f2",
+  "review_source_sha256": "1e610bbb8d4366bea7b7d286ce598e8ebf1d81db38cdf71f6d05752e4658df43",
+  "checked_tasks": 20,
+  "accepted_development_tasks": 9,
+  "accepted_ids": [
+    "21",
+    "117",
+    "163",
+    "188",
+    "231",
+    "260",
+    "274",
+    "298",
+    "324"
+  ],
+  "checks": {
+    "artifact_hashes": 2518,
+    "native_verdict_replays": 40,
+    "mock_requests": 189,
+    "current_AX_targets": 149,
+    "retained_action_errors": 4
+  },
+  "records": [
+    {
+      "source_task_id": "21",
+      "template_id": "222",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/21-positive/traces/20260919T141510Z-2d86ef92",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/21-negative/traces/20260919T141519Z-b87c7ced",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "27",
+      "template_id": "33",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Action-warning cohort; retain for harness diagnostics before clean acceptance"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/27-positive/traces/20260919T141531Z-0e4321d4",
+          "native_recomputed": 1.0,
+          "action_errors": 1,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/27-negative/traces/20260919T141552Z-25d8f359",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "66",
+      "template_id": "17",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Action-warning cohort; retain for harness diagnostics before clean acceptance"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/66-positive/traces/20260919T141605Z-b09c3104",
+          "native_recomputed": 1.0,
+          "action_errors": 1,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/66-negative/traces/20260919T141627Z-15d832b8",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "96",
+      "template_id": "193",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Action-warning cohort; retain for harness diagnostics before clean acceptance"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/96-positive/traces/20260919T141647Z-b5ac090d",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/96-negative/traces/20260919T141659Z-050d724b",
+          "native_recomputed": 0.0,
+          "action_errors": 1,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "117",
+      "template_id": "161",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/117-positive/traces/20260919T141711Z-05a0e352",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/117-negative/traces/20260919T141722Z-4c565327",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "158",
+      "template_id": "171",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Unqualified best criterion; target selection is not uniquely justified by original goal"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/158-positive/traces/20260919T141734Z-ddf2f1c6",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/158-negative/traces/20260919T141747Z-81d28ae7",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "163",
+      "template_id": "136",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/163-positive/traces/20260919T141803Z-0aac254d",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/163-negative/traces/20260919T141812Z-61d24638",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "188",
+      "template_id": "214",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/188-positive/traces/20260919T141820Z-6ab5381d",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/188-negative/traces/20260919T141829Z-72bb5994",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "231",
+      "template_id": "213",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/231-positive/traces/20260919T142016Z-79b64c70",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/231-negative/traces/20260919T142025Z-958d053d",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "260",
+      "template_id": "211",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/260-positive/traces/20260919T141838Z-9f2664b1",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/260-negative/traces/20260919T141846Z-1f1a29a2",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "274",
+      "template_id": "212",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/274-positive/traces/20260919T142122Z-39af9233",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/274-negative/traces/20260919T142132Z-f0248832",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "298",
+      "template_id": "180",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/298-positive/traces/20260919T142034Z-33ed428c",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/298-negative/traces/20260919T142045Z-cbfa78cb",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "324",
+      "template_id": "208",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": true,
+      "acceptance_blockers": [],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/324-positive/traces/20260919T141855Z-9f436883",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-first10-v2/324-negative/traces/20260919T141910Z-4eb83200",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "358",
+      "template_id": "206",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Action-warning cohort; retain for harness diagnostics before clean acceptance"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/358-positive/traces/20260919T142059Z-4a5f9a56",
+          "native_recomputed": 1.0,
+          "action_errors": 1,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/358-negative/traces/20260919T142111Z-26989347",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "386",
+      "template_id": "1355",
+      "sites": [
+        "shopping"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Native answer65 requires percent; original goal does not disambiguate equivalent5-star units"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/386-positive/traces/20260919T142144Z-8348a39e",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/386-negative/traces/20260919T142156Z-55d9411e",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "399",
+      "template_id": "6",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Final-state and history robustness required beyond native matching-request evidence",
+        "Real correct-then-wrong biography history earns native success"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/399-positive/traces/20260919T142207Z-eb27832f",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/399-negative/traces/20260919T142222Z-f0884218",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "404",
+      "template_id": "22",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Final-state and history robustness required beyond native matching-request evidence"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/404-positive/traces/20260919T142236Z-f51dffde",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/404-negative/traces/20260919T142249Z-164ae553",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "595",
+      "template_id": "4",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Final-state and history robustness required beyond native matching-request evidence",
+        "Requires separately evaluated wider observation profile"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-595-wide-v2/595-positive/traces/20260919T142415Z-1fec692e",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 120000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-595-wide-v2/595-negative/traces/20260919T142432Z-44152a75",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 120000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "640",
+      "template_id": "16",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Final-state and history robustness required beyond native matching-request evidence"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/640-positive/traces/20260919T142303Z-2829e845",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/640-negative/traces/20260919T142317Z-5340e333",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    },
+    {
+      "source_task_id": "731",
+      "template_id": "27",
+      "sites": [
+        "reddit"
+      ],
+      "accepted_development_task": false,
+      "acceptance_blockers": [
+        "Final-state and history robustness required beyond native matching-request evidence"
+      ],
+      "cases": [
+        {
+          "variant": "positive",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/731-positive/traces/20260919T142331Z-c00f8627",
+          "native_recomputed": 1.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        },
+        {
+          "variant": "negative",
+          "trace": ".local/expansion-webarena/native-closure-extra9-v2/731-negative/traces/20260919T142345Z-7ee228a4",
+          "native_recomputed": 0.0,
+          "action_errors": 0,
+          "observation_chars": 48000
+        }
+      ],
+      "authorization_satisfied": null,
+      "safe_success": null,
+      "training_eligible": false
+    }
+  ],
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false,
+  "limitations": [
+    "Native-grader replay is not an independent grading implementation.",
+    "Seeded dataset content and initial state remain part of each task contract.",
+    "Unaccepted cases retain useful harness diagnostics; they are not model failures."
+  ]
+}

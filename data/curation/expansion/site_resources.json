@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "inspected_at": "2026-09-19T13:43:22.423384+00:00",
+  "measurement": "Docker registry manifest layer sizes; no image layers downloaded. Unpacked sizes unknown. External data sizes are approximate upstream documentation values.",
+  "upstream_documentation_revision": "6473f72db5dcefc97b5725b59e734504edc28a21",
+  "download_authorization": {
+    "approved_bytes": 200000000000,
+    "source": "Explicit user reply 2026-09-19",
+    "model_spending_authorized": false
+  },
+  "sites": [
+    {
+      "site": "gitlab",
+      "image": "am1n3e/webarena-verified-gitlab@sha256:673ba94d757c5b3f4bb55751ad8b745a33bad2b987349322403cbc41035a92e0",
+      "compressed_image_layer_bytes": 22006162655,
+      "additional_data_bytes_approximate": null,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/gitlab.md"
+    },
+    {
+      "site": "shopping_admin",
+      "image": "am1n3e/webarena-verified-shopping_admin@sha256:d0531dd27ed98d0c459ff9e88118bf2ed8b660b0ed99c38837db46c065a5be13",
+      "compressed_image_layer_bytes": 1245375030,
+      "additional_data_bytes_approximate": null,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/shopping_admin.md"
+    },
+    {
+      "site": "map",
+      "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+      "compressed_image_layer_bytes": 1187489929,
+      "additional_data_bytes_approximate": 60000000000,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/map.md"
+    },
+    {
+      "site": "wikipedia",
+      "image": "am1n3e/webarena-verified-wikipedia@sha256:8c52e6cc8b7cc6f77daaf279929517399b1889bd02b09a257ebd465364ad387d",
+      "compressed_image_layer_bytes": 46511948,
+      "additional_data_bytes_approximate": 100000000000,
+      "unpacked_bytes": null,
+      "documentation": "https://github.com/ServiceNow/webarena-verified/blob/6473f72db5dcefc97b5725b59e734504edc28a21/docs/environments/wikipedia.md"
+    }
+  ],
+  "verified_map_data_bytes": 187334164480,
+  "map_overview_underestimate": "Pinned documentation says approximately60GB but HEAD lengths include124774901760-byte Nominatim archive; full three-tar sum187334164480.",
+  "wikipedia_original_endpoint": "HTTP403; HTTPS connection failed on2026-09-19. No alternate snapshot substituted.",
+  "execution_plan": "download-plan-v1.json"
+}

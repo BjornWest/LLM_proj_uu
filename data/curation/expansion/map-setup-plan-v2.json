@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "status": "prepared_waiting_for_static_data_downloads",
+  "source_config_sha256": "030dfd32002a1609565ed71d5bbab0bb89a8031b9585193ef7a8786b34d0b5b3",
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "project": "curation-webarena-map-v2",
+  "browser_origin": "http://localhost:13030",
+  "control_origin": "http://localhost:13031",
+  "download_ledger": ".local/curation-expansion/downloads-static-v2/ranges-ledger.json",
+  "new_paid_calls": 0,
+  "training_eligible": false,
+  "required_before_launch": [
+    "Three required Map assets complete and local SHA256 rechecked; Nominatim exact database prefix is an explicitly derived packaging layout, not a full archive",
+    "Extract only into new curation-owned volumes; reject existing initialized volume without separate review",
+    "Check current disk capacity for extracted data, retained archive and retained range copies",
+    "Record extraction commands, exact image ID, named volume ownership and server initialization",
+    "Verify all three routing modes, place lookup and original page assets",
+    "Native BrowserGym positive/negative checks on original objectives; no static-page-only readiness",
+    "Do not run nominatim freeze or drop any source database tables",
+    "No source replication/import updates supported without omitted flatnode cache",
+    "Verify search AND reverse geocoding against imported database before task acceptance",
+    "Capture image/runtime/source closures independently of historical accepted tasks"
+  ],
+  "volumes": [
+    {
+      "name": "curation-map-v2-tiles-db",
+      "source_archive": "osm_tile_server.tar",
+      "source_prefix": "projects/ogma3/docker/volumes/osm-data/_data",
+      "strip_components": 6,
+      "mount": "/data/database"
+    },
+    {
+      "name": "curation-map-v2-nominatim-db",
+      "source_archive": "nominatim-postgres-exact-prefix.tar-part",
+      "source_prefix": "projects/metis2/docker/docker/volumes/nominatim-data/_data",
+      "strip_components": 7,
+      "mount": "/data/nominatim/postgres",
+      "append_virtual_tar_terminator": true
+    },
+    {
+      "name": "curation-map-v2-routing-car",
+      "source_archive": "osrm_routing.tar",
+      "source_prefix": "car",
+      "strip_components": 1,
+      "mount": "/data/routing/car"
+    },
+    {
+      "name": "curation-map-v2-routing-bike",
+      "source_archive": "osrm_routing.tar",
+      "source_prefix": "bike",
+      "strip_components": 1,
+      "mount": "/data/routing/bike"
+    },
+    {
+      "name": "curation-map-v2-routing-foot",
+      "source_archive": "osrm_routing.tar",
+      "source_prefix": "foot",
+      "strip_components": 1,
+      "mount": "/data/routing/foot"
+    },
+    {
+      "name": "curation-map-v2-website-db",
+      "mount": "/var/lib/postgresql/14/main",
+      "source_archive": null
+    },
+    {
+      "name": "curation-map-v2-tiles-cache",
+      "mount": "/data/tiles",
+      "source_archive": null
+    },
+    {
+      "name": "curation-map-v2-style",
+      "mount": "/data/style",
+      "source_archive": null
+    }
+  ],
+  "previous_plan": {
+    "path": "data/curation/expansion/map-setup-plan-v1.json",
+    "sha256": "bba860d732a774620c97cad740238e9534a95c776128456490d4cc9caa83f856"
+  },
+  "static_geocoding_evidence": "data/curation/expansion/tricky/reviews/maps-static-data-review-v1.json",
+  "image_inspection": ".local/curation-expansion/infrastructure/nominatim-image-flatnode-inspection-v1.json"
+}

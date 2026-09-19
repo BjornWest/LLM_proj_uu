@@ -1,0 +1,152 @@
+{
+  "schema": "maps-route-grader-independent-source-review-v1",
+  "input_sha256": "f3a87f01e272e2e38a8e733bf7a8c1331cb15f281551aa4c082910b412739066",
+  "dataset_sha256": "d65275660814663375028e9017e1f929e3c38321041b125795e2713b52243d30",
+  "reviewed_false_positive_ids": [
+    356,
+    757,
+    758,
+    761,
+    762,
+    763,
+    764,
+    765,
+    766,
+    767
+  ],
+  "records": [
+    {
+      "task_id": "356",
+      "goal": "Show on the map the route from Gates and Hillman Centers at CMU in Pittsburgh to the location where the Declaration of Independence and Constitution were signed. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "757",
+      "goal": "Show on the map the path and travel time from home of the 1980 Super Bowl champions to home of the 1991 Super Bowl champions. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "758",
+      "goal": "Show on the map the path and travel time from the big apple to biggest city in Maine. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "761",
+      "goal": "Show on the map directions from Carnegie Science Museum to Hunt library CMU using walk options. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "762",
+      "goal": "Show on the map directions from Carnegie Music Hall in NYC to Carnegie Mellon University using driving options. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "763",
+      "goal": "Show on the map the walking route to the closest Trader Joe's from 401 Shady Ave, Pittsburgh. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "764",
+      "goal": "Show on the map the walking route to the closest Target from 401 Shady Ave, Pittsburgh. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "765",
+      "goal": "Show on the map the walking route to the closest Japanese food market from 401 Shady Ave, Pittsburgh. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "766",
+      "goal": "Show on the map the walking route to the closest grocery owned by Amazon from 401 Shady Ave, Pittsburgh. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    },
+    {
+      "task_id": "767",
+      "goal": "Show on the map the walking route to the closest chain grocery owned by a local business from 401 Shady Ave, Pittsburgh. (Use the OSRM direction service.)",
+      "raw_evaluator": {
+        "evaluator": "NetworkEventEvaluator",
+        "expected": {
+          "url": "__MAP__"
+        }
+      },
+      "synthetic_native_score": 1.0,
+      "accepted": false,
+      "required_additional_coverage": "Final displayed route endpoints/mode and rendered route result; unrelated root and wrong/cleared route must fail. Source route-selector text may also constrain the engine."
+    }
+  ],
+  "new_browser_calls": 0,
+  "new_model_calls": 0,
+  "scope": "Independent source predicate/report consistency, not an independent live Map execution or replay of native library."
+}

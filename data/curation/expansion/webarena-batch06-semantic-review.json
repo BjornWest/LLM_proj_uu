@@ -1,0 +1,69 @@
+{
+  "schema": "webarena-batch06-semantic-review-v1",
+  "index_sha256": "500e2cd5f3f6cb9b08b5d37d72eadc5efc207ec21f03f34f6dacf4bf28138577",
+  "cases": [
+    {
+      "task_id": "22",
+      "source_artifact": ".local/expansion-webarena/batch06-development-positive-v1/22-positive/traces/20260919T161521Z-3d7e312b/native-case-validation.json",
+      "sha256": "88dfcbdbbe400168847e5bf7831fd02b0957ab8cc9149a26fa0619b11a1141b4",
+      "review_count_in_saved_pages": 12,
+      "authors_selected": [],
+      "semantic_review": "All saved reviews read: snow, rain, beach and lake photography are mentioned, but none claims underwater photography. Source NOT_FOUND consistent with scoped review content.",
+      "accepted_semantics": true
+    },
+    {
+      "task_id": "23",
+      "source_artifact": ".local/expansion-webarena/batch06-development-positive-v1/23-positive/traces/20260919T161521Z-d8e2198a/native-case-validation.json",
+      "sha256": "32358019a9e4792fada8037ca29e57e361d0a08736863f4d58b8dab4dcab5d8e",
+      "review_count_in_saved_pages": 12,
+      "authors_selected": [
+        "Rachel",
+        "T. Gannon"
+      ],
+      "semantic_review": "Rachel explicitly says fingerprint resistant; T. Gannon explicitly says resist fingerprints. Other installation/finger-motion comments do not assert fingerprint resistance.",
+      "accepted_semantics": true
+    },
+    {
+      "task_id": "24",
+      "source_artifact": ".local/expansion-webarena/batch06-development-positive-v1/24-positive/traces/20260919T161531Z-8ce30928/native-case-validation.json",
+      "sha256": "ee723c30d191453f9741e49b0f4e2b510ca4748a9102db4c87c2c341d73bf594",
+      "review_count_in_saved_pages": 2,
+      "authors_selected": [],
+      "semantic_review": "Both saved reviews are positive everyday-use/expected-quality comments, with no price complaint.",
+      "accepted_semantics": true
+    },
+    {
+      "task_id": "26",
+      "source_artifact": "/home/bjorn/code/LLM_proj_uu/.local/expansion-webarena/batch06-repaired-pairs-v3/26-positive/traces/20260919T163930Z-5ee0af1c/native-case-validation.json",
+      "sha256": "b8dc8dfb253604ab412d9edeef26948e8dd87c9c88eda4c296354b2068de95d4",
+      "review_count_in_saved_pages": 12,
+      "authors_selected": [
+        "Bob in Vegas",
+        "RemyRRemyR"
+      ],
+      "semantic_review": "Bob in Vegas and RemyRRemyR explicitly criticize Epson support, beyond printer-quality criticism alone.",
+      "accepted_semantics": true
+    },
+    {
+      "task_id": "384",
+      "source_artifact": ".local/expansion-webarena/batch06-development-positive-v1/384-positive/traces/20260919T162047Z-350c823d/native-case-validation.json",
+      "sha256": "92ebd2cceee9fbc9fb0de0ea82ac47c68620bb52c2f9530388406c1fbca6eb39",
+      "review_count_in_saved_pages": 12,
+      "authors_selected": [
+        "Lisa Lee",
+        "Evelyn Kurver",
+        "Amanda",
+        "N Randall"
+      ],
+      "semantic_review": "Hold semantic boundary: source selects four durability complaints. MH reports minor imperfections and Misba009 complains of oily plastic; these plausibly count as quality complaints under the unchanged broad goal. A durability-only regex is narrower than the original wording.",
+      "accepted_semantics": false
+    }
+  ],
+  "additional_held_ids": [
+    "384"
+  ],
+  "scope": "Manual saved-content semantic review, not a model judgment or new browser run. Original labels unchanged.",
+  "model_calls": 0,
+  "new_browser_runs": 0,
+  "training_eligible": false
+}

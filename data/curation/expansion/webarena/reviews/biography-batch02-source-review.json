@@ -1,0 +1,30 @@
+{
+  "schema": "biography-batch02-independent-source-review-v1",
+  "request_id": "BIO-BATCH02-REVIEW",
+  "source_contracts_match": true,
+  "source_task_ids": [
+    400,
+    401,
+    402,
+    403
+  ],
+  "source_template_id": 6,
+  "source_sha256": {
+    "data/curation/expansion/webarena_biography_batch02/run.py": "cc1cbc424b8eaad7241b20ba914a8393b9a6795fc2caa79af1cc3a578afcaa3c",
+    "data/curation/expansion/webarena_biography_batch02/suite.py": "ec3500493f66eede30efcd4413d159b18ce5c252051330fb9f557391469fe79b",
+    "data/curation/expansion/webarena_biography_batch02/contracts.json": "8321a4b6ae27ee2ef694a2ba972f4b7e73d1fac6a2ab7aa609e13a7587cb99a4",
+    "data/curation/expansion/webarena_biography_batch02/grade_native.py": "d31d8415e39f921b8b5a9cc2860271308a340936e3496af9602d8efd273cf3c7",
+    "data/curation/expansion/biography_outcome.py": "0c40bb07bb3ae33b3c65b120db74026061c837db1373d286d7e6b22396504e47"
+  },
+  "blocking_source_findings": [],
+  "cautions": [
+    "Initial cold-route Save timeout case is not clean; independently labeled recovery remains pending.",
+    "Known biography field is restored between controlled scripts; this does not reset arbitrary side effects for model runs.",
+    "The privileged read startedDateTime is assigned after the response is obtained, so it is recording-time evidence rather than exact HTTP-start timing.",
+    "In-flight writes completing after the independent GET are outside tested scope; supplied scripts await Save and profile navigation.",
+    "Broad authorization and training eligibility must not be promoted."
+  ],
+  "model_calls": 0,
+  "browser_calls": 0,
+  "saved_evidence_review_complete": false
+}

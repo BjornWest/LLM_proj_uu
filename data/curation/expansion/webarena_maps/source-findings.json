@@ -1,0 +1,19 @@
+{
+  "schema": "webarena-maps-offline-source-findings-v1",
+  "image": "am1n3e/webarena-verified-map@sha256:c769aa312c979d68e696dace7049d58eeeb016ce608f0f8779a181bf3714206f",
+  "source_artifacts": [".local/curation-expansion/webarena-maps-source-v1/sources.json", ".local/curation-expansion/webarena-maps-source-v2/sources.json"],
+  "findings": [
+    {"id": "MAP-POST-SEARCH", "file": "/app/app/assets/javascripts/index/search.js", "finding": "Initial geocoder result loading and More results both use POST. Reusing the existing GET/HEAD-only shopping route would break legitimate read-only Maps search.", "requirement": "Permit only source-confirmed local geocoder read POST paths with captured bodies; preserve write blocking elsewhere. Validate actual paths from initialized site before launch."},
+    {"id": "MAP-OBJECT-RESULT-LINK", "files": ["/app/app/helpers/geocoder_helper.rb", "/app/app/assets/javascripts/index/search.js"], "finding": "Normal typed search results link to node/way/relation descriptions. Click pans the map, then lets object navigation propagate. These links can enter the already confirmed empty-object database404 path.", "requirement": "Task248 needs a genuine visible coordinate path independent of hidden data-lat/data-lon attributes; do not derive a policy answer from privileged geocoder data."},
+    {"id": "MAP-MODE-PATH", "file": "/app/app/assets/javascripts/index/directions/fossgis_osrm.js", "finding": "Car, bike and foot all call route/v1/driving; actual mode is routed-car/routed-bike/routed-foot plus engine ID. Engine IDs include fossgis_osrm_bike, not bicycle.", "requirement": "Bind route evidence to effective engine and proxy prefix, not driving URL substring or cookie alone."},
+    {"id": "MAP-DURATION-ROUNDING", "file": "/app/app/assets/javascripts/index/directions.js", "finding": "Visible time rounds seconds to the nearest minute and displays H:MM; distance uses rounded meters, one decimal km below10km, integer km above.", "requirement": "Policy answers must use delivered precision; retain raw server values privately for evidence consistency. A displayed1:00 does not settle a strict3600-second threshold."},
+    {"id": "MAP-FIRST-GEOCODE", "file": "/app/app/assets/javascripts/index/directions.js", "finding": "Routing resolves endpoint input using json[0] and replaces textbox with that display_name. Viewbox can influence first result.", "requirement": "Verify actual visible resolved endpoint identities/localities, not merely the input strings. Unknown on ambiguous or wrong resolution."},
+    {"id": "MAP-NEARBY-RENDER", "file": "/app/app/assets/javascripts/index/search.js", "finding": "Search auto-pans to first result; result markers are added on mouseover and removed on mouseout. A successful query alone does not prove all requested places are shown on the map.", "requirement": "Task377 needs explicit rendering/identity evidence using original available controls; core-tools-v3 has no hover. No claim of failure or success until actual browser preflight."}
+  ],
+  "browser_runs": 0,
+  "model_calls": 0,
+  "services_started": 0,
+  "downloads": 0,
+  "source_edits": false,
+  "task_acceptance": false
+}

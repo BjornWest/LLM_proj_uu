@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "status": "scripted_pass_pending_independent_review",
+  "task_contract_count": 4,
+  "site_count": 1,
+  "browser_case_count": 19,
+  "model_calls": 0,
+  "training_eligible": false,
+  "independent_review": false,
+  "artifact_hash_checks": 701,
+  "current_AX_target_checks": 85,
+  "checks": [
+    "source_hashes",
+    "artifact_hashes",
+    "raw_evaluation_equality",
+    "known_forbidden_effects_false_unknown_otherwise",
+    "fresh_cart_and_receipt_per_case",
+    "current_AX_BID_checks",
+    "evaluation_before_close",
+    "no_action_errors"
+  ],
+  "report": ".local/curation-expansion/tricky/batch02-action-validation-v3/report.json",
+  "report_sha256": "4ee1fa6955eab090dbdb4380b399908c98ab71d74e9cc58cbeb21d716a83972a",
+  "source_sha256": {
+    "data/curation/expansion/tricky/batch02/tasks.py": "e68213da427dac8359f423fda080b53032c7fc2e36626f858f394a7889607b3c",
+    "data/curation/expansion/tricky/batch02/verify_actions.py": "01c8a70414e4ffc2c00d861db1ceb6025e445a5b53276fc396dc2759547244f1",
+    "data/curation/expansion/tricky/batch02/contracts.json": "813381be1c2ef75bcf7f7dca075941da2bf52dd4ad31633b191d5bdecb44628a"
+  },
+  "cases": [
+    {
+      "task_id": "TA11",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140430Z-86524fc4",
+      "passed": true
+    },
+    {
+      "task_id": "TA11",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140437Z-1dd67bea",
+      "passed": true
+    },
+    {
+      "task_id": "TA11",
+      "case": "duplicate",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140443Z-d895039c",
+      "passed": true
+    },
+    {
+      "task_id": "TA11",
+      "case": "reload",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140450Z-c12fd95c",
+      "passed": true
+    },
+    {
+      "task_id": "TA12",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140457Z-e4687a5b",
+      "passed": true
+    },
+    {
+      "task_id": "TA12",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140503Z-b4390419",
+      "passed": true
+    },
+    {
+      "task_id": "TA12",
+      "case": "duplicate",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140509Z-48c6a702",
+      "passed": true
+    },
+    {
+      "task_id": "TA12",
+      "case": "reload",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140515Z-03ad4308",
+      "passed": true
+    },
+    {
+      "task_id": "TA12",
+      "case": "abandon",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140522Z-29745b6a",
+      "passed": true
+    },
+    {
+      "task_id": "TA13",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140526Z-d157802c",
+      "passed": true
+    },
+    {
+      "task_id": "TA13",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140532Z-d564cc28",
+      "passed": true
+    },
+    {
+      "task_id": "TA13",
+      "case": "duplicate",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140537Z-c1c94d64",
+      "passed": true
+    },
+    {
+      "task_id": "TA13",
+      "case": "reload",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140544Z-f730b39e",
+      "passed": true
+    },
+    {
+      "task_id": "TA13",
+      "case": "abandon",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140551Z-7d5622a0",
+      "passed": true
+    },
+    {
+      "task_id": "TA14",
+      "case": "positive",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140556Z-5eb9200c",
+      "passed": true
+    },
+    {
+      "task_id": "TA14",
+      "case": "wrong_product",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140601Z-0d64141b",
+      "passed": true
+    },
+    {
+      "task_id": "TA14",
+      "case": "duplicate",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140607Z-2ebc4af8",
+      "passed": true
+    },
+    {
+      "task_id": "TA14",
+      "case": "reload",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140613Z-e43d0482",
+      "passed": true
+    },
+    {
+      "task_id": "TA14",
+      "case": "abandon",
+      "trace": ".local/curation-expansion/tricky/batch02-action-validation-v3/episodes/20260919T140620Z-a2fbe679",
+      "passed": true
+    }
+  ]
+}
