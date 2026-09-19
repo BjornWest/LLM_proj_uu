@@ -33,9 +33,16 @@ for(const [file,expected] of Object.entries(inspectionManifest.files)){
  const dest=path.join('private-assets/inspection-full/dist',file);await mkdir(path.dirname(dest),{recursive:true});await writeFile(dest,raw);
 }
 await copyFile(path.join(inspectionRoot,'manifest.json'),'private-assets/inspection-full/manifest.json');
+// Frozen answer-free review projection only; private graders are never bundled.
+const catalogSource='../../data/curation/expansion/hosted-review-catalog.json';
+const catalogRaw=await readFile(catalogSource);
+if(createHash('sha256').update(catalogRaw).digest('hex')!=='ff5dc3550ed053a9f8c3c7bdd7fe3b375416a219c49fef9c52d58994edbe97f4')throw Error('Review catalog changed; review and pin an explicit new revision');
+const catalog=JSON.parse(catalogRaw);
+if(catalog.schema!=='browser-task-review-catalog-v1'||catalog.tasks.length!==203||catalog.tasks.some(t=>t.execution_available!==false))throw Error('Invalid review-only catalog');
+await writeFile('private-assets/task-catalog.json',catalogRaw);
 const viewerFiles=await prepareViewer(path.resolve('private-assets'));
-const files=[...viewerFiles,'index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css',...inspectionNames.map(name=>'inspection-'+name+'/manifest.json')];
+const files=['task-catalog.json',...viewerFiles,'index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css',...inspectionNames.map(name=>'inspection-'+name+'/manifest.json')];
 const hashes={};for(const file of files)hashes[file]=createHash('sha256').update(await readFile('private-assets/'+file)).digest('hex');
-const server={};for(const file of ['api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/library-client.mjs','prepare-viewer.mjs','vendor/agent_trace/provenance.json','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','../../config/team_tasks.json','../../config/team_sites.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
+const server={};for(const file of [catalogSource,'api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/library-client.mjs','prepare-viewer.mjs','vendor/agent_trace/provenance.json','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','../../config/team_tasks.json','../../config/team_sites.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
 await writeFile('private-assets/provenance.json',JSON.stringify({runtime:'daylight-client-demo-v1',commit:process.env.VERCEL_GIT_COMMIT_SHA||null,assets:hashes,server},null,2));
 console.log('Built private assets; public/ contains only robots.txt.');

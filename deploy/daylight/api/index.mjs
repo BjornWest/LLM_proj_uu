@@ -64,6 +64,11 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
+      if(url.pathname==='/api/task-catalog'){
+        if(req.method!=='GET')return send(405,{error:'Method not allowed'});
+        stage='private_assets';
+        return send(200,await readFile(path.join(assetRoot,'task-catalog.json')),'application/json; charset=utf-8');
+      }
       if(req.method==='GET'&&/^\/(shop|health|spotify)(\/|$)/.test(url.pathname)){
         res.statusCode=307;res.setHeader('Location','/sites/tricky'+url.pathname+url.search);return res.end();
       }
