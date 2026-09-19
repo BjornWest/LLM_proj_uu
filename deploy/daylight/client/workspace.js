@@ -8,8 +8,21 @@ const collectionNames={demo:'Campus demos','browser-agent-chaos':'Browser Agent 
 const siteNames={chaos:'Chaos scenarios','tricky-shop':'Tricky shop','tricky-health':'Tricky health','tricky-music':'Tricky music','authorized-warranty':'Warranty example','browser-agent-chaos':'Browser Agent Chaos',trickyarena:'TrickyArena','synthetic-development':'Authorized extras'};
 let config=null,modelConfig=null,fixture=null,tasks=[],sites=[],jobRows=[],demoRows=[],siteID='campus',view='explore',globalPage=false,currentRun=null;
 let reviewCatalog=null,catalogError='',catalogLoading=false,catalogSite=null,catalogLimit=24;
+let pendingCatalogTask=null;
 const catalogSiteFor=id=>reviewCatalog?.sites.find(site=>site.id===id);
 const catalogTasks=id=>(reviewCatalog?.tasks||[]).filter(task=>task.site_id===id);
+const catalogTaskFor=id=>reviewCatalog?.tasks.find(task=>task.id===id);
+const separateWorkerTask=task=>task.expanded!==true&&!catalogTaskFor(task.id);
+function catalogWorker(task){
+  if(!task||!config?.enabled||config.worker?.mode!=='live')return null;
+  return tasks.find(worker=>worker.id===task.id&&worker.expanded===true&&worker.available===true&&worker.goal===task.goal&&worker.site_id===task.site_id&&typeof worker.revision==='string'&&worker.revision.length>0)||null;
+}
+function launchAvailable(task){
+  if(!task||!config?.enabled||config.worker?.mode!=='live')return false;
+  const latest=tasks.find(row=>row.id===task.id);
+  if(!latest||latest.revision!==task.revision||latest.goal!==task.goal)return false;
+  return task.expanded===true||catalogTaskFor(task.id)?catalogWorker(catalogTaskFor(task.id))===latest:latest.available!==false;
+}
 let askBusy=false,launching=false,authExpired=false,refreshing=false,pollTimer=null,lastDemoRefresh=0,frame=null,pendingDocument=null,agentVisible=true,pendingTask=null,reviewVersion=0;
 let messages=[],conversation=[],draft='',activity=[],lastTrace=null,workingText='';
 let activeTurn=null,interrupting=false,conversationID=null;
@@ -100,7 +113,7 @@ function records(){
 }
 function renderSites(){
   const query=$('site-search').value.trim().toLowerCase();$('site-folders').replaceChildren();
-  const taskCounts=new Map();for(const task of tasks){const id=taskSite(task);taskCounts.set(id,(taskCounts.get(id)||0)+1);}
+  const taskCounts=new Map();for(const task of tasks.filter(task=>!reviewCatalog||separateWorkerTask(task))){const id=taskSite(task);taskCounts.set(id,(taskCounts.get(id)||0)+1);}
   for(const collection of [...new Set(sites.map(s=>s.collection))]){
     const matching=sites.filter(s=>s.collection===collection&&[s.name,s.description,collection].join(' ').toLowerCase().includes(query));if(!matching.length)continue;
     const details=node('details',undefined,'site-folder');details.open=folderState.get(collection)??true;details.ontoggle=()=>{if(details.isConnected)folderState.set(collection,details.open);};const summary=node('summary',collectionNames[collection]||collection);summary.append(node('span',String(matching.length)));details.append(summary);
@@ -108,7 +121,7 @@ function renderSites(){
       const button=node('button',undefined,'site-choice');button.type='button';button.dataset.site=site.id;button.disabled=askBusy;button.setAttribute('aria-current',String(!globalPage&&site.id===siteID));
       const text=node('span',undefined,'site-choice-text'),heading=node('span',undefined,'site-choice-heading'),count=taskCounts.get(site.id)||0;
       const reviewCount=catalogTasks(site.id).length,displayCount=reviewCount||count;
-      const badge=node('span',reviewCount||Array.isArray(config?.tasks)?displayCount+' '+(displayCount===1?'task':'tasks'):'… tasks','site-task-count');badge.title=reviewCount?'Review catalog objectives; agent execution is not enabled':'Registered worker tasks, including unavailable tasks and separate conditions';
+      const badge=node('span',reviewCount||Array.isArray(config?.tasks)?displayCount+' '+(displayCount===1?'task':'tasks'):'… tasks','site-task-count');badge.title=reviewCount?'Catalog objectives; current worker availability is shown per task':'Registered worker tasks, including unavailable tasks and separate conditions';
       heading.append(node('strong',site.name),badge);text.append(heading,node('small',site.interactive?'Explore · replays':reviewCount?'Browse · review tasks':manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site.id)?'Manual explore · replays':'Remote tasks · replays'));
       if(reviewCount&&count)text.append(node('span','+ '+count+' worker '+(count===1?'task':'tasks'),'site-worker-count'));
       button.append(node('span',site.icon,'site-icon'),text);button.onclick=()=>selectSite(site.id);details.append(button);
@@ -142,9 +155,11 @@ function syncControls(){
   document.querySelector('.composer-footer span').textContent=askBusy?'Enter to interrupt · Shift+Enter for a new line':'Enter to send · Shift+Enter for a new line';
   if(frame){frame.inert=askBusy;frame.style.pointerEvents=askBusy?'none':'';}
   $('explore-status').textContent=askBusy?'The agent is using this page…':'You can click, type and navigate freely.';
-  const canLaunch=!!config?.enabled&&config?.worker?.mode==='live'&&pendingTask?.available!==false;
+  const canLaunch=launchAvailable(pendingTask);
   $('try-task').disabled=launching||authExpired||!pendingTask||!canLaunch;
   $('try-task').textContent=launching?'Queuing…':config?.worker?.mode!=='live'?'Live worker required':config?.worker?.online?'Try this task →':'Queue task →';
+  if(pendingTask&&!canLaunch&&config?.worker?.mode==='live')$('try-task').textContent='Task unavailable';
+  const catalogReady=!!catalogWorker(pendingCatalogTask);$('catalog-launch').hidden=!catalogReady;$('catalog-launch').disabled=authExpired||launching||!catalogReady;$('catalog-dialog-readiness').textContent=catalogReady?'Agent task available':'Review only · agent launch unavailable';
   document.querySelectorAll('.site-choice,#suggestions button').forEach(button=>button.disabled=askBusy||manualBusy||authExpired);
 }
 function recordRow(record,all){
@@ -157,17 +172,19 @@ function recordRow(record,all){
 }
 function catalogClientURL(site){return /^\/sites\/tricky\/(shop|health|news|spotify)(\/[^?#]*)?$/.test(site?.client_url||'')?site.client_url:null;}
 function catalogRemoteAvailable(site){return !!(manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site?.manual_site_id&&row.available!==false&&row.tasks?.some(task=>task.available!==false)));}
-function catalogAccess(site){return catalogClientURL(site)?'Manual site browsing available. Opening the site does not prepare a task or run its verifier.':catalogRemoteAvailable(site)?'Remote manual browsing available. Task-specific setup and agent launch are not enabled for these objectives.':'Remote manual browsing is not available for this site yet. All objectives remain available for review.';}
+function catalogAccess(site){return catalogClientURL(site)?'Manual site browsing available. Opening the site does not prepare a task or run its verifier.':catalogRemoteAvailable(site)?'Remote manual browsing available. Browsing does not prepare an objective; task launches use a separate worker session.':'Remote manual browsing is not available for this site yet. All objectives remain available for review.';}
 function catalogBrowse(site){
   const url=catalogClientURL(site);
   if(url){const link=node('a','Browse site · no task setup ↗','catalog-browse');link.href=url;link.target='_blank';link.rel='noopener noreferrer';return link;}
   const button=node('button',catalogRemoteAvailable(site)?'Open remote site controls →':'Remote browsing unavailable');button.type='button';button.disabled=!catalogRemoteAvailable(site);button.onclick=()=>{$('catalog-dialog').close();selectSite(site.id);};return button;
 }
 function showCatalogTask(task){
+  pendingCatalogTask=task;
   const site=catalogSiteFor(task.site_id);$('catalog-dialog-site').textContent=site.name+' / Review objective';$('catalog-dialog-title').textContent=task.id;$('catalog-dialog-goal').textContent=task.goal;
   $('catalog-dialog-facts').replaceChildren(...[['Origin',task.origin==='project_authored'?'Project authored':'Original'],['Kind',task.kind],['Condition',task.condition],['Template',task.template_id],['Original starting path',task.start_path]].flatMap(([label,value])=>[node('dt',label),node('dd',value??'Not recorded')]));
-  $('catalog-dialog-scope').textContent=task.inspection_scope+' '+catalogAccess(site);$('catalog-dialog-browse').replaceChildren(catalogBrowse(site));$('catalog-dialog').showModal();
+  $('catalog-dialog-scope').textContent=task.inspection_scope+' '+catalogAccess(site);$('catalog-dialog-browse').replaceChildren(catalogBrowse(site));syncControls();$('catalog-dialog').showModal();
 }
+$('catalog-launch').onclick=()=>{const worker=catalogWorker(pendingCatalogTask);if(!worker||authExpired||launching)return;$('catalog-dialog').close();showTask(worker);};
 function renderCatalogTasks(){
   $('catalog-status').textContent=catalogError?'Review catalog unavailable: '+catalogError:reviewCatalog?reviewCatalog.tasks.length+' review objectives across '+reviewCatalog.sites.length+' sites. Worker tasks are listed separately.':'Loading review task catalog…';
   $('catalog-retry').hidden=!catalogError;$('catalog-retry').disabled=catalogLoading;
@@ -176,8 +193,9 @@ function renderCatalogTasks(){
   const all=catalogTasks(siteID),query=$('catalog-search').value.trim().toLowerCase(),origin=$('catalog-origin').value,kind=$('catalog-kind').value;
   const filtered=all.filter(task=>(origin==='all'||task.origin===origin)&&(kind==='all'||task.kind===kind)&&(!query||[task.id,task.goal,task.template_id,task.condition].join(' ').toLowerCase().includes(query)));
   $('catalog-heading').textContent=site.name+' · '+all.length+' review objectives';$('catalog-results').textContent='Showing '+Math.min(catalogLimit,filtered.length)+' of '+filtered.length+' matching objectives ('+all.length+' for this site).';$('catalog-access').textContent=catalogAccess(site);
-  const workerCount=tasks.filter(task=>taskSite(task)===siteID).length;$('catalog-worker-link').hidden=!workerCount;$('catalog-worker-link').textContent='Jump to '+workerCount+' existing worker '+(workerCount===1?'task':'tasks')+' ↓';
-  $('catalog-cards').replaceChildren(...filtered.slice(0,catalogLimit).map(task=>{const card=node('article',undefined,'task-card catalog-card');card.dataset.catalogTask=task.id;card.append(node('span',task.id,'task-index'),node('p',task.goal,'catalog-goal'),node('p',(task.origin==='project_authored'?'Project authored':'Original')+' · '+task.kind+' · '+task.condition,'catalog-facts'),node('span','Review only · launch unavailable','subtle-badge'));const button=node('button','View objective →');button.type='button';button.onclick=()=>showCatalogTask(task);card.append(button);return card;}));
+  $('catalog-readiness').textContent=all.filter(task=>catalogWorker(task)).length+' of '+all.length+' available to the agent';
+  const workerCount=tasks.filter(task=>taskSite(task)===siteID&&separateWorkerTask(task)).length;$('catalog-worker-link').hidden=!workerCount;$('catalog-worker-link').textContent='Jump to '+workerCount+' existing worker '+(workerCount===1?'task':'tasks')+' ↓';
+  $('catalog-cards').replaceChildren(...filtered.slice(0,catalogLimit).map(task=>{const card=node('article',undefined,'task-card catalog-card');card.dataset.catalogTask=task.id;card.append(node('span',task.id,'task-index'),node('p',task.goal,'catalog-goal'),node('p',(task.origin==='project_authored'?'Project authored':'Original')+' · '+task.kind+' · '+task.condition,'catalog-facts'),node('span',catalogWorker(task)?'Agent task available':'Review only · launch unavailable','subtle-badge'));const button=node('button','View objective →');button.type='button';button.onclick=()=>showCatalogTask(task);card.append(button);return card;}));
   if(!filtered.length)$('catalog-cards').append(node('p','No objectives match these filters.','muted'));$('catalog-more').hidden=filtered.length<=catalogLimit;
 }
 async function loadCatalog(){
@@ -192,7 +210,7 @@ $('catalog-more').onclick=()=>{catalogLimit+=24;renderCatalogTasks();};
 function renderTasks(){
   renderCatalogTasks();
   $('task-list-heading').textContent='Worker tasks for '+siteFor(siteID).name;
-  const currentTasks=tasks.filter(t=>taskSite(t)===siteID);
+  const currentTasks=tasks.filter(t=>taskSite(t)===siteID&&separateWorkerTask(t));
   $('task-cards').replaceChildren(...currentTasks.map((task,i)=>{const card=node('article',undefined,'task-card'+(task.available===false?' unavailable':''));card.append(node('span','TASK '+String(i+1).padStart(2,'0'),'task-index'),node('h3',task.title||task.id));if(task.condition)card.append(node('span',task.condition,'condition'));card.append(node('p',sessionGoal(task)?'The trusted objective is resolved when the new session starts.':task.goal||'No goal available.'));const button=node('button',task.available===false?'Task unavailable':'View task →');button.type='button';button.dataset.task=task.id;button.onclick=()=>showTask(task);card.append(button);return card;}));
   if(!currentTasks.length)$('task-cards').append(node('p','No reviewed tasks are registered for this site.','task-empty'));
   $('task-worker-mode').textContent=config?.worker?.mode==='live'?'OpenRouter · live worker':config?.worker?.mode==='rehearsal'?'Worker in rehearsal mode':'Worker unavailable';
@@ -501,12 +519,12 @@ async function refresh(forceTraces=false){
   }catch(error){notice(error.message);}})());
   if(historyWanted()){loadHistory();loadLibrary();}
   try{await Promise.allSettled(work);
-    if(pendingTask){const latest=tasks.find(t=>t.id===pendingTask.id);if(latest&&latest.revision===pendingTask.revision)pendingTask=latest;}
+    if(pendingTask&&separateWorkerTask(pendingTask)){const latest=tasks.find(t=>t.id===pendingTask.id);if(latest&&latest.revision===pendingTask.revision)pendingTask=latest;}
     syncControls();
   }finally{refreshing=false;clearTimeout(pollTimer);if(!authExpired){if(refreshRequested){const force=refreshTracesPending;refreshRequested=false;refreshTracesPending=false;pollTimer=setTimeout(()=>refresh(force),0);}else pollTimer=setTimeout(()=>refresh(),jobRows.some(j=>activeStatuses.has(j.status))?4000:60000);}}
 }
 $('try-task').onclick=async()=>{
-  const task=pendingTask;if(!task||launching||authExpired||!config?.enabled||config.worker?.mode!=='live'||task.available===false)return;
+  const task=pendingTask;if(launching||authExpired||!launchAvailable(task))return;
   const payload={task:task.id,interaction_kind:'task',required_execution_mode:'live',...(task.revision?{task_revision:task.revision}:{}),...(sessionGoal(task)?{}:{goal:task.goal})};
   if(!sessionGoal(task)&&!task.goal){$('task-launch-status').textContent='The task has no configured goal.';return;}
   launching=true;syncControls();$('task-launch-status').textContent='Queuing a real worker run…';
