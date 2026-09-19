@@ -19,6 +19,12 @@ const manualChoices=new Map(),manualLive=session=>session&&['starting','ready','
 const manualSite=()=>manualConfig?.sites?.find(site=>site.site_id===siteID);
 const manualCurrent=()=>manualSessions.find(session=>session.site_id===siteID&&manualLive(session))||manualSessions.find(session=>session.site_id===siteID);
 const manualOwnerLive=()=>manualSessions.find(manualLive);
+const manualSelection=(site,session)=>{
+  const saved=manualChoices.get(siteID);
+  return (manualLive(session)?session.task:null)||(site?.tasks?.some(task=>task.id===saved)?saved:null)||site?.tasks?.find(task=>task.id.startsWith('browse.'))?.id||site?.default_task||site?.tasks?.[0]?.id||'';
+};
+const manualOnly=capability=>capability?.ask_enabled===false||capability?.browse_only===true;
+const manualAvailabilityReason=reason=>({pool_busy:'This site’s browser is in use. Refresh session status to check for a free slot.',resetting:'This site’s browser is being reset. Refresh session status to check when it is ready.',service_unavailable:'The browser service for this site is unavailable. Refresh session status to check again.'}[reason]||'Manual browsing is unavailable for this session type.');
 let sidebarBeforeFullscreen=true;
 const fullScreen=createFullScreenMode($('enter-fullscreen'),$('exit-fullscreen'),active=>{
   if(active){sidebarBeforeFullscreen=agentVisible;setAgentVisible(true);}else setAgentVisible(sidebarBeforeFullscreen);
@@ -150,7 +156,7 @@ function recordRow(record,all){
   const action=node('td'),open=node('button',activeStatuses.has(record.status)&&record.source==='harness'?'Watch →':['harness','library'].includes(record.source)?'Replay ↗':record.source==='demo'?'Conversation ↗':'Inspect ↗','replay-action');open.type='button';open.setAttribute('aria-label','Open '+record.title);open.onclick=()=>openRecord(record,all);action.append(open);row.append(action);return row;
 }
 function catalogClientURL(site){return /^\/sites\/tricky\/(shop|health|news|spotify)(\/[^?#]*)?$/.test(site?.client_url||'')?site.client_url:null;}
-function catalogRemoteAvailable(site){return !!(manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site?.manual_site_id&&row.tasks?.length));}
+function catalogRemoteAvailable(site){return !!(manualConfig?.enabled&&manualConfig.sites?.some(row=>row.site_id===site?.manual_site_id&&row.available!==false&&row.tasks?.some(task=>task.available!==false)));}
 function catalogAccess(site){return catalogClientURL(site)?'Manual site browsing available. Opening the site does not prepare a task or run its verifier.':catalogRemoteAvailable(site)?'Remote manual browsing available. Task-specific setup and agent launch are not enabled for these objectives.':'Remote manual browsing is not available for this site yet. All objectives remain available for review.';}
 function catalogBrowse(site){
   const url=catalogClientURL(site);
@@ -224,7 +230,7 @@ function renderReview(){
   if(isLibrary){$('run-viewer').hidden=true;$('browser-trace-review').hidden=true;$('manual-review').hidden=true;if(shared.dataset.session!==record.id){shared.dataset.session=record.id;shared.src='/trace-viewer?embed=1#'+encodeURIComponent(record.id);}return;}
   if(shared.hasAttribute('src')){shared.removeAttribute('src');delete shared.dataset.session;}
   const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isManual;$('browser-trace-download').hidden=isJob;$('trace-raw-details').hidden=isJob;$('manual-review').hidden=!isManual;
-  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded browser actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent='Reference objective: '+(session.reference_goal||'Not recorded');$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
+  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded browser actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent=session.browse_only?'Manual browsing only · no task setup or reference objective.':'Reference objective: '+(session.reference_goal||'Not recorded');$('manual-review-reference').hidden=!!session.browse_only;$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
   if(isJob){renderJobConversation(record);const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
 }
 function recordForKey(key){return records().find(record=>record.key===key||record.turns?.some(turn=>'d:'+turn.id===key))||null;}
@@ -260,7 +266,7 @@ function render(){
   const site=siteFor(siteID);if(!site)return;
   if(globalPage||view!=='explore'||!site.interactive)fullScreen.setActive(false,{focus:false});
   document.querySelector('.site-heading').hidden=globalPage;document.querySelector('.site-tabs').hidden=globalPage;
-  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Browse yourself or ask the agent to use this same remote session.':site.description;$('site-label').textContent=site.interactive?'Interactive website':catalogSiteFor(siteID)?'Website + review catalog':'Remote worker environment';
+  $('site-breadcrumb').textContent=(collectionNames[site.collection]||site.collection)+' / '+site.name;$('site-name').textContent=site.name;$('site-description').textContent=!site.interactive&&manualConfig?.enabled&&manualSite()?'Explore this site in a private remote session. Ask availability is shown for each session.':site.description;$('site-label').textContent=site.interactive?'Interactive website':catalogSiteFor(siteID)?'Website + review catalog':'Remote worker environment';
   $('explore-view').hidden=globalPage||view!=='explore';$('research-view').hidden=globalPage||view!=='research';$('global-view').hidden=!globalPage||view==='review';$('review-view').hidden=view!=='review';
   $('explore-tab').setAttribute('aria-pressed',String(view==='explore'));$('research-tab').setAttribute('aria-pressed',String(view!=='explore'));$('replay-count').textContent=historyLoaded?String(records().filter(r=>r.site===siteID).length)+(historyMore?'+':''):'…';
   $('tab-note').textContent=view==='explore'?'Browse the site or open a reviewed task.':'Tasks and recorded attempts for this site.';
@@ -289,14 +295,17 @@ function renderManual(){
   $('local-music-launch').hidden=siteID!=='tricky-music';
   $('local-health-launch').hidden=siteID!=='tricky-health';
   const site=manualSite(),session=manualCurrent(),live=manualOwnerLive(),ready=session?.status==='ready';
-  renderRemoteAsk(session);
   const pending=manualBusy||!!manualLoading;
   const elsewhere=live&&live.site_id!==siteID,otherName=elsewhere?(siteFor(live.site_id)?.name||live.site_id):'';
   const ended=!!session&&!manualLive(session);
-  const selected=(manualLive(session)?session.task:null)||manualChoices.get(siteID)||site?.default_task||site?.tasks?.[0]?.id||'';
-  $('manual-task').replaceChildren(...(site?.tasks||[]).map(task=>{const option=node('option',(task.title||task.id)+(task.condition?' · '+task.condition:''));option.value=task.id;return option;}));$('manual-task').value=selected;
+  const selected=manualSelection(site,session),selectedTask=site?.tasks?.find(task=>task.id===selected),scope=manualLive(session)?session:selectedTask;
+  $('manual-task').replaceChildren(...(site?.tasks||[]).map(task=>{const option=node('option',(task.title||task.id)+(task.condition?' · '+task.condition:'')+(manualOnly(task)?' · Manual only':''));option.value=task.id;return option;}));$('manual-task').value=selected;
+  document.querySelector('.manual-agent-note').textContent=manualOnly(scope)?'Manual browsing only. No model is running. This fresh browser has no task-specific setup, reference objective or task grade.':manualConfig?.ask_enabled?'Ask is available in supported sessions. Human controls pause while the agent acts; Stop returns control after any action already in progress. Worker tasks start a separate fresh browser.':'You control this fresh browser; no model is running. Ask is unavailable. Worker tasks and their grading remain separate.';
+  renderRemoteAsk(session,selectedTask);
   $('manual-task').disabled=pending||!!live||authExpired;
-  $('manual-open').disabled=pending||manualUncertain||!!live||authExpired||!manualConfig?.enabled||!selected;
+  const unavailable=site?.available===false||selectedTask?.available===false;
+  $('manual-open').disabled=pending||manualUncertain||!!live||authExpired||!manualConfig?.enabled||!selected||unavailable;
+  $('manual-availability').hidden=!!live||!unavailable;$('manual-availability').textContent=manualAvailabilityReason(selectedTask?.unavailable_reason||site?.unavailable_reason);
   $('manual-open').textContent=manualBusy&&!session?'Opening…':session?'Open new session':'Open website';
   $('manual-check').disabled=pending||authExpired;
   $('manual-close').disabled=pending||manualUncertain||authExpired||!manualLive(session)||!ready;
@@ -318,21 +327,24 @@ function renderManual(){
   $('manual-surface').dataset.state=ended?'closed':manualBusy||['starting','busy'].includes(session?.status)?'busy':manualImageError?'unavailable':!manualFrameLoaded?'loading':controls?'unavailable':'ready';
   $('manual-frame-status').textContent=ended?'Saved screenshot — session '+session.status+'. This image is not a live browser.':manualImageError|| (manualBusy||session?.status==='busy'?'Browser command in progress. Actions are locked until its outcome is known.':!manualFrameLoaded?'Loading screenshot…':elsewhere?'Saved screenshot from this site; another site has your active session.':'Remote browser ready. Click the image to interact.');
   for(const id of ['manual-scroll-up','manual-scroll-down','manual-press','manual-key','manual-send-text'])$(id).disabled=controls;
+  $('manual-navigation').hidden=!session?.browse_only;
+  for(const id of ['manual-back','manual-forward','manual-reload'])$(id).disabled=controls;
   $('manual-text').disabled=authExpired||!ready;
   $('manual-refresh').disabled=pending||manualUncertain||authExpired||!ready;
   $('manual-page-url').textContent=f?.page_url||'Remote browser';
   $('manual-session-facts').textContent=session?[session.task_name||session.task,session.condition,session.controller==='agent'?'Agent controlled · BrowserGym':'Human controlled · BrowserGym'].filter(Boolean).join(' · '):'';
   if(session?.site_revision&&!manualBusy&&!manualLoading)$('manual-status').textContent+=' · Site version '+session.site_revision.slice(0,12);
-  $('manual-reference-goal').textContent=session?.reference_goal||'Resolved when the session starts.';
+  document.querySelector('.manual-reference').hidden=!!session?.browse_only;
+  $('manual-reference-goal').textContent=session?.browse_only?'No reference objective — manual browsing only.':session?.reference_goal||'Resolved when the session starts.';
 }
-function renderRemoteAsk(session){
+function renderRemoteAsk(session,selectedTask=manualSite()?.tasks?.find(task=>task.id===$('manual-task').value)){
   const active=session?.controller==='agent',ask=session?.asks?.at(-1);
-  const canAsk=manualConfig?.ask_enabled&&session?.status==='ready'&&!session?.environment_finished;
-  $('remote-question').disabled=authExpired||remoteSending||!(canAsk||active);
+  const allowed=!!manualConfig?.ask_enabled&&!manualOnly(session),canAsk=allowed&&session?.status==='ready'&&!session?.environment_finished;
+  $('remote-question').disabled=authExpired||remoteSending||!allowed||!(canAsk||active);
   $('remote-send').disabled=$('remote-question').disabled;
   $('remote-send').textContent=active?'Interrupt and send':'Send';
   $('remote-stop').disabled=authExpired||remoteSending||!active;
-  $('remote-agent-status').textContent=active?'Agent is using this browser. You can interrupt with a new message or Stop.':!session?'Open a remote session to ask the agent.':!manualConfig?.ask_enabled?'Remote inference is not configured.':session.environment_finished?'This environment ended. Open a new session to continue.':session.status==='ready'?'You control this browser. Ask requests are recorded and are not automatically graded.':'This session is not ready for Ask.';
+  $('remote-agent-status').textContent=manualOnly(session||selectedTask)?'Manual browsing only. Ask is not available for this session.':active?'Agent is using this browser. You can interrupt with a new message or Stop.':!session?'Open a supported remote session to ask the agent.':!manualConfig?.ask_enabled?'Remote inference is not configured.':session.environment_finished?'This environment ended. Open a new session to continue.':session.status==='ready'?'You control this browser. Ask requests are recorded and are not automatically graded.':'This session is not ready for Ask.';
   const content=JSON.stringify([session?.id,session?.asks]);
   if(content!==remoteRendered){remoteRendered=content;const log=$('remote-conversation');log.replaceChildren();
     for(const turn of session?.asks||[]){
@@ -363,11 +375,11 @@ async function remoteInterrupt(session){
 }
 $('remote-ask-form').onsubmit=async event=>{
   event.preventDefault();const goal=$('remote-question').value.trim(),session=manualCurrent();
-  if(!goal||!session||remoteSending||authExpired)return;
+  if(!goal||!session||remoteSending||authExpired||!manualConfig?.ask_enabled||manualOnly(session))return;
   remoteSending=true;renderRemoteAsk(session);
   try{
     const current=await remoteInterrupt(session);
-    if(current.status!=='ready')throw Error('Browser is not ready for a new request');
+    if(current.status!=='ready'||manualOnly(current)||!manualConfig?.ask_enabled)throw Error('This session is not available for Ask');
     const result=await api('/api/manual/sessions/'+session.id+'/ask',{request_id:crypto.randomUUID(),goal});
     $('remote-question').value='';rememberManual(result);manualUncertain=false;
   }catch(error){manualError=error.message+' No request was automatically retried.';}
@@ -392,7 +404,7 @@ async function manualCommand(operation,action,targetSession=null){
   if(manualBusy||manualLoading||manualUncertain||authExpired)return;
   if(targetSession&&(operation!=='close'||manualOwnerLive()?.id!==targetSession.id))return;
   const session=targetSession||manualCurrent();
-  if(operation==='open'){if(manualOwnerLive()||!manualConfig?.enabled||!$('manual-task').value)return;}
+  if(operation==='open'){const site=manualSite(),selected=site?.tasks?.find(task=>task.id===$('manual-task').value);if(manualOwnerLive()||!manualConfig?.enabled||!selected||site.available===false||selected.available===false)return;}
   else if(session?.status!=='ready'||operation==='action'&&!manualFrameLoaded)return;
   const task=$('manual-task').value,request_id=crypto.randomUUID();manualBusy=true;manualError='';updateManualViews();
   try{
@@ -402,8 +414,9 @@ async function manualCommand(operation,action,targetSession=null){
   }catch(error){manualError=error.message+' No command will be retried. Use Check sessions to recover its recorded state.';manualUncertain=true;}
   finally{manualBusy=false;updateManualViews();}
 }
-$('manual-task').onchange=()=>manualChoices.set(siteID,$('manual-task').value);
+$('manual-task').onchange=()=>{manualChoices.set(siteID,$('manual-task').value);renderManual();};
 $('manual-open').onclick=()=>manualCommand('open');$('manual-close').onclick=()=>manualCommand('close');$('manual-refresh').onclick=()=>manualCommand('observe');$('manual-check').onclick=()=>loadManual();
+for(const type of ['back','forward','reload'])$('manual-'+type).onclick=()=>{if(manualCurrent()?.browse_only)manualCommand('action',{type});};
 $('manual-other').onclick=()=>{const session=manualOwnerLive();if(session)selectSite(session.site_id);};
 $('manual-close-other').onclick=()=>manualCommand('close',undefined,manualOwnerLive());
 $('manual-frame').onload=()=>{manualFrameLoaded=true;manualImageError='';renderManual();};

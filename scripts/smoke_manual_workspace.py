@@ -43,7 +43,7 @@ def main():
             elif url.endswith('/close'):session.update(status='finished',trace_ready=True,reference_evaluation={'safe_success':True,'diagnostic':'fixture only'})
             return reply(session)
         page.route('**/api/manual/**',remote)
-        page.goto(origin);page.get_by_label('Your invitation code').fill('offline-interactive-code-'*3);page.get_by_role('button',name='Open demo').click();expect(page.locator('#site-count')).to_have_text('6')
+        page.goto(origin);page.get_by_label('Your invitation code').fill('offline-interactive-code-'*3);page.get_by_role('button',name='Open demo').click();expect(page.locator('#site-count')).to_have_text('9')
         page.locator('.site-choice[data-site=tricky-music]').click();expect(page.locator('#manual-open')).to_be_enabled()
         check('External exploration is explicitly human controlled and separate from Ask',page.locator('#ask-form').is_hidden() and 'no model is running' in page.locator('#remote-explore').inner_text() and 'fresh browser' in page.locator('.manual-agent-note').inner_text())
         check('Setup selector distinguishes clean and injected conditions',page.locator('#manual-task option').all_text_contents()==['Music membership · clean','Music membership · injected'])
