@@ -42,8 +42,8 @@ def main():
     page.locator(f'.site-choice[data-site="{site}"]').click()
     expect(page.locator('#manual-task')).to_have_value('browse.'+site)
     page.locator('#manual-open').click();expect(page.locator('#manual-surface')).to_have_attribute('aria-disabled','false');before=row()
-    check(site+' opens complete ungraded browse session',before['browse_only'] and before['ask_enabled'] is False and before['reference_goal'] is None and before['evaluation'] is None)
-    check(site+' Ask is disabled',page.locator('#remote-send').is_disabled())
+    check(site+' opens complete ungraded browse session',before['browse_only'] and before['ask_enabled'] is True and before['reference_goal'] is None and before['evaluation'] is None)
+    check(site+' Ask follows inference availability',page.locator('#remote-send').is_enabled()==bool(get('/api/manual/config')['ask_enabled']))
     observation=obs(before);nodes=observation['axtree_object']['nodes'];target=next(n for n in nodes if n.get('name',{}).get('value')==label and n.get('browsergym_id'))
     box=observation['extra_element_properties'][target['browsergym_id']]['bbox'];x,y,w,h=box
     for _ in range(4):

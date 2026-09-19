@@ -7,14 +7,15 @@ import {Manual,MANUAL_TASKS} from '../lib/manual.mjs';
 import {SqliteStore} from '../lib/sqlite-store.mjs';
 const gate=()=>{let release;return {promise:new Promise(r=>release=r),release:(...args)=>release(...args)};};
 const reply=action=>new Response(JSON.stringify({id:randomUUID(),model:'qwen',provider:'Parasail',usage:{cost:0.0001},choices:[{message:{content:JSON.stringify({action})}}]}),{status:200});
-async function setup(t,{fetcher=async()=>reply('send_msg_to_user("Answer")'),driverHook}={}){
+async function setup(t,{fetcher=async()=>reply('send_msg_to_user("Answer")'),driverHook,browse=false,pool}={}){
  const root=await mkdtemp(tmpdir()+'/shared-browser-'),store=new SqliteStore(root+'/store.sqlite');
  await mkdir(root+'/package/runtime/config',{recursive:true});
  await writeFile(root+'/package/manifest.json',JSON.stringify({datasets:[{tasks:MANUAL_TASKS.map(t=>t.id)}]}));
  await writeFile(root+'/package/runtime/config/team_tasks.json',JSON.stringify({tasks:MANUAL_TASKS}));
  const env={DAYLIGHT_MANUAL_ROOT:root+'/sessions',DAYLIGHT_MANUAL_PACKAGE:root+'/package',DAYLIGHT_MANUAL_DRIVER:'fake',OPENROUTER_API_KEY:'test-only',DEMO_DAILY_BUDGET_USD:'1'};
  const calls=[],drivers=[];
- const manual=new Manual(store,{env,fetcher:async(...args)=>{calls.push(args);return fetcher(...args);},driverFactory:({directory})=>{
+ if(browse)env.DAYLIGHT_BROWSE_ENABLED='1';
+ const manual=new Manual(store,{env,pool,fetcher:async(...args)=>{calls.push(args);return fetcher(...args);},driverFactory:({directory})=>{
   const state=()=>({trace_directory:directory,reference_goal:'PRIVILEGED REFERENCE MUST NOT LEAK',action_count:driver.count,frame:{id:randomUUID(),width:800,height:600,page_url:'http://local',artifact:{screenshot:'frame.png'}}});
   const driver={count:0,commands:[],async ready(){await writeFile(directory+'/frame.png','image');return {kind:'ready',...state()};},
    async send(command){driver.commands.push(command);if(driverHook)await driverHook(command);
@@ -30,7 +31,7 @@ async function setup(t,{fetcher=async()=>reply('send_msg_to_user("Answer")'),dri
   drivers.push(driver);return driver;
  }});
  t.after(async()=>{for(const l of manual.live.values())if(l.work)await l.work;manual.shutdown();store.close();await rm(root,{recursive:true,force:true});});
- const task=MANUAL_TASKS.find(t=>t.id==='tricky-p11-clean');const session=await manual.start('alice',{task:task.id,site_revision:task.site_revision});
+ const task=MANUAL_TASKS.find(t=>t.id==='tricky-p11-clean');const session=await manual.start('alice',{task:browse?'browse.webarena-shopping':task.id,site_revision:task.site_revision});
  return {manual,session,drivers,calls,env,store,root,async finish(){await manual.live.get(session.id)?.work;return manual.read('alice',session.id);},async evidence(id){return JSON.parse(await readFile(root+'/sessions/'+session.id+'/ask-'+id+'.json'));}};
 }
 test('same browser action, answer, human takeover and follow-up; exact request evidence and shared budget',async t=>{
@@ -114,4 +115,17 @@ test('service restart does not leave a dead session claiming agent control',asyn
 test('answer may explain an earlier action error without misattributing it to this reply',async t=>{
  const s=await setup(t),send=s.drivers[0].send.bind(s.drivers[0]);s.drivers[0].send=async c=>({...await send(c),last_error:'Old click failed'});
  await s.manual.ask('alice',s.session.id,{request_id:randomUUID(),goal:'What happened?'});const row=await s.finish();assert.equal(row.asks[0].status,'complete');assert.equal(row.asks[0].error,null);assert.equal(row.asks[0].answer,'Answer');
+});
+
+test('generic Ask retains the same exclusive lease and null grades; uncertain command releases once',async t=>{
+ let acquired=0,released=0;const pool={async status(){return {sites:[{site_id:'webarena-shopping',status:'ready'}]};},async acquire(){acquired++;return {lease_token:'lease-secret',site_id:'webarena-shopping',origin:'http://private.local'};},async release(){released++;}};
+ const s=await setup(t,{browse:true,pool});assert(s.session.ask_enabled);assert(s.session.browse_only);
+ await s.manual.ask('alice',s.session.id,{request_id:randomUUID(),goal:'Question'});const done=await s.finish();
+ assert.equal(done.asks[0].status,'complete');assert.equal(done.evaluation,null);assert.equal(done.reference_goal,null);assert.equal(acquired,1);assert.equal(released,0);assert.equal(s.drivers.length,1);assert(!JSON.stringify(done).includes('lease-secret'));assert(!JSON.stringify(s.calls).includes('lease-secret'));
+ s.drivers[0].send=async()=>{throw Error('uncertain browser pipe');};await s.manual.ask('alice',s.session.id,{request_id:randomUUID(),goal:'Question again'});const work=s.manual.live.get(s.session.id).work;await work;
+ const failed=await s.manual.read('alice',s.session.id);assert.equal(failed.status,'interrupted');assert.equal(failed.asks[1].status,'error');assert.equal(released,1);assert.equal(s.calls.length,1);assert.equal(s.manual.live.size,0);
+});
+test('historical explicitly disabled Ask is not silently enabled',async t=>{
+ const s=await setup(t),saved=await s.store.read('daylight/manual/'+s.session.id+'.json');saved.value.ask_enabled=false;saved.value.browse_only=true;await s.store.write('daylight/manual/'+s.session.id+'.json',saved.value,saved.etag);
+ await assert.rejects(s.manual.ask('alice',s.session.id,{request_id:randomUUID(),goal:'Question'}),{status:409});assert.equal(s.calls.length,0);
 });

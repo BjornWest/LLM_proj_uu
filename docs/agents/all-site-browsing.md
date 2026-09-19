@@ -4,9 +4,11 @@ This increment adds generic `browse.*` sessions for the four complete Tricky sit
 (shop, health, news, music) and the cached WebArena Verified shopping/forum apps.
 It is separate from the 203 review objectives and existing graded worker tasks.
 No objective, task-specific setup, model request or grade is assigned on open.
-Both `evaluation` and `reference_evaluation` are null for these sessions. Existing
-legacy sessions retain their explicitly advertised Ask capability; generic
-browsing is manual-only in this increment.
+An explicit Ask request can let the agent inspect or act in that same browser.
+Both `evaluation` and `reference_evaluation` are null for these sessions. Ask requests and generic
+sessions remain ungraded. The `browse_only` field denotes absence of task setup
+and grading; `ask_enabled` is the independent agent capability. Historical sessions
+that explicitly recorded `ask_enabled: false` are not silently upgraded.
 
 Vercel hosts the invitation-protected controls and catalog. A PC BrowserGym process
 provides the actual page image and native click, text, key, scroll, Back, Forward
@@ -76,7 +78,7 @@ with `down -v`. The WebArena pool is a separately scoped pair of containers.
 
 - `python3 -m unittest tests.test_browse_pool`: exclusive leases, revocation before
   drain, stale-token rejection, expiry, failed reset and actual HTTP forwarding.
-- `npm --prefix deploy/daylight test`: owner checks, no Ask in generic sessions,
+- `npm --prefix deploy/daylight test`: owner checks, generic Ask capability,
   startup-failure cleanup and existing control regressions.
 - `scripts/verify_generic_browsing.mjs OUTPUT`: actual four Tricky browsers.
 - `scripts/verify_browse_isolation.mjs OUTPUT`: simultaneous distinct carts,
@@ -118,3 +120,30 @@ and a separate invocation with `--webarena`. They create real manual sessions
 using the local test invitation, and close them; there are no model requests.
 Run only while those owner/site slots are free. Local/container checks additionally
 exercise another invitation's denial of access to state, images and ZIPs.
+
+
+## Ask in generic sessions
+
+New sessions on all six sites support the existing shared-browser Ask loop when
+inference is configured. There is no browser reset between human interaction,
+Ask and human takeover. The controller locks native input while the agent owns
+the browser; Stop prevents subsequent model actions and waits for any already
+executing action receipt. Answering leaves the browser open. A new request gets
+a fresh observation from the same page. Explicit user requests, raw model
+requests/responses, actions and interruptions are retained in the shared trace.
+Neither Ask completion nor an answer is a verified task-success label.
+
+WebArena keeps its original exclusive lease throughout normal Ask completion,
+interruption and parse errors. Uncertain browser transport or failed durable
+result persistence kills the browser and revokes its lease before reset; there
+is no action retry. Existing owner, action, step and spending limits still apply.
+Browser processes receive no model or controller credential. The generic agent
+uses the already deployed shared-browser policy, not a newly benchmarked model
+or the evolving experimental harness profile.
+
+Offline acceptance: `scripts/smoke_generic_ask.py --output NEWDIR` and a separate
+`--webarena` invocation exercise real UI/native browsers with scripted model
+transport. `scripts/verify_generic_ask.mjs OUTPUT` checks the same handover and
+trace path inside the control image. They issue no real model requests. Old
+manual-only acceptance is preserved in `config/all_site_browsing_validation.json`;
+Ask adoption has its own source/evidence record.

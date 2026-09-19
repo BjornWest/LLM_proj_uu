@@ -7,15 +7,23 @@ import {SqliteStore} from '../lib/sqlite-store.mjs';
 import {controlHandler} from '../control-server.mjs';
 import {createHandler} from '../api/index.mjs';
 import {digest} from '../lib/auth.mjs';
+const browsing=process.env.SHARED_TEST_BROWSE==='1';
 const root=path.resolve(process.env.SHARED_TEST_OUTPUT);await mkdir(root,{recursive:true});
 const store=new SqliteStore(root+'/store.sqlite');let count=0;
 const env={DAYLIGHT_MANUAL_PACKAGE:path.resolve('../../.local/environment-packages/portable-full-v2'),DAYLIGHT_MANUAL_DRIVER:path.resolve('../../scripts/manual_environment.py'),DAYLIGHT_MANUAL_PYTHON:path.resolve('../../.venv/bin/python'),DAYLIGHT_MANUAL_ROOT:root+'/sessions',DAYLIGHT_MANUAL_ACTOR:'scripted_validation',DAYLIGHT_CONTROL_TOKEN:randomUUID().repeat(2),DEMO_SESSION_SECRET:randomUUID().repeat(2),DEMO_INVITES_JSON:JSON.stringify({tester:digest('offline-shared-browser-code-'.repeat(3))}),OPENROUTER_API_KEY:'fake-never-sent-externally',DEMO_DAILY_BUDGET_USD:'1'};
+if(browsing)Object.assign(env,{DAYLIGHT_BROWSE_ENABLED:'1',DAYLIGHT_BROWSE_POOL_URL:process.env.DAYLIGHT_BROWSE_POOL_URL,DAYLIGHT_BROWSE_POOL_TOKEN:process.env.DAYLIGHT_BROWSE_POOL_TOKEN});
+const turns=new Map();
 const fake=async(url,options)=>{
+ if(browsing&&url.startsWith(env.DAYLIGHT_BROWSE_POOL_URL+'/_control/'))return fetch(url,options);
  if(url!=='https://openrouter.ai/api/v1/chat/completions')throw Error('Unexpected model URL');
  const request=JSON.parse(options.body),text=request.messages.at(-1).content;
  await appendFile(root+'/requests.jsonl',JSON.stringify(request)+'\n');count++;
  let action='send_msg_to_user("This is the same browser, and your earlier navigation is preserved.")';
  const goal=text.split('\n')[0];
+ if(goal.startsWith('CURRENT REQUEST: Test click: ')){
+  const label=goal.slice('CURRENT REQUEST: Test click: '.length),key=request.session_id+'|'+goal,n=turns.get(key)||0;turns.set(key,n+1);
+  if(!n){const line=text.split('Accessibility tree:').at(-1).split('\n').find(line=>line.includes("'"+label+"'")),bid=line?.match(/\[([^\]]+)\]/)?.[1];if(!bid)throw Error('Requested visible control missing');action=`click(${JSON.stringify(bid)})`;}
+ }
  if(goal.includes('Show subscriptions')&&!text.split('Accessibility tree:').at(-1).includes("button 'Buy now'")){
   const bid=text.split('Accessibility tree:').at(-1).match(/\[([^\]]+)\] link 'Navigate to Membership'/)?.[1];
   if(!bid)throw Error('Subscriptions control missing');action=`click(${JSON.stringify(bid)})`;

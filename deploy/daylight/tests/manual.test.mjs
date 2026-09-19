@@ -133,14 +133,14 @@ test('new frontend refuses an old control service before starting a mismatched b
  {setHeader(){},set statusCode(v){status=v;},end(v){text=v;}});
  assert.equal(status,409);assert.match(text,/site versions differ/);assert.deepEqual(calls,['/internal/manual/config']);
 });
-test('generic browse leases are private, exclusive, released on close, and never allow Ask',async t=>{
+test('generic browse leases stay private/exclusive and advertise Ask separately from grading',async t=>{
  const s=await setup(t);s.env.DAYLIGHT_BROWSE_ENABLED='1';s.env.OPENROUTER_API_KEY='must-not-be-used';
  let held=false,releases=0;
  s.manual.pool={async status(){return {sites:[{site_id:'webarena-shopping',status:held?'leased':'ready'}]};},async acquire(site,id){if(held)throw Object.assign(Error('busy'),{status:429});held=true;return {site_id:site,origin:'http://private.local',image_id:'sha256:test',lease_token:'private-token'};},async release(){held=false;releases++;}};
  const config=await s.manual.config();assert.equal(config.sites.find(s=>s.site_id==='webarena-shopping').default_task,'browse.webarena-shopping');
  const a=await s.manual.start('alice',{task:'browse.webarena-shopping'});
- assert.equal(a.browse_only,true);assert.equal(a.ask_enabled,false);assert.equal(a.reference_goal,null);assert(!JSON.stringify(a).includes('private-token'));
- await assert.rejects(s.manual.ask('alice',a.id,{request_id:randomUUID(),goal:'Click something'}),{status:409});assert.equal(s.drivers[0].sends.length,0);
+ assert.equal(a.browse_only,true);assert.equal(a.ask_enabled,true);assert.equal(a.reference_goal,null);assert(!JSON.stringify(a).includes('private-token'));
+ assert.equal(config.sites.find(s=>s.site_id==='webarena-shopping').tasks[0].ask_enabled,true);assert.equal(s.drivers[0].sends.length,0);
  assert.equal((await s.manual.config()).sites.find(s=>s.site_id==='webarena-shopping').unavailable_reason,'pool_busy');
  await assert.rejects(s.manual.start('bob',{task:'browse.webarena-shopping'}),{status:429});assert.equal(s.drivers.length,1);assert.equal(releases,0);
  const closed=await s.manual.command('alice',a.id,'close',{request_id:randomUUID()});assert.equal(closed.reference_evaluation,null);assert.equal(releases,1);

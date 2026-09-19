@@ -139,9 +139,6 @@ def run(args):
                 if operation == 'close':
                     stop_reason = command.get('reason', 'user_close')
                     break
-                if browsing and operation in ('agent_observe','agent_action'):
-                    emit({'kind':'rejected','request_id':last_command,'error':'This site session supports manual browsing only.'})
-                    continue
                 if operation == 'agent_observe':
                     goal = command.get('goal')
                     ask_id = command.get('ask_id')

@@ -1,0 +1,31 @@
+{
+  "scope": "Generic Ask with scripted model transport; not a model performance result or task grading certificate",
+  "source_sha256": {
+    "deploy/control/browse.override.yaml": "63621e139b266cf8d67003d084872812c62d83a512561a9b29a9646ca2f55d36",
+    "deploy/daylight/client/workspace.js": "1c412072327889c1aa78459ba66692220f3bacaa1f25283992a934f53464ba8c",
+    "deploy/daylight/lib/manual.mjs": "04401b67b67af1e0c76498c4e71bfbfd08792c123c0a5b6a6c9ff80007608628",
+    "deploy/daylight/tests/manual.test.mjs": "08c1e37952c83888b70bf616e96e4b16e7fc8c3e80414f15842a8d3e21ed5298",
+    "deploy/daylight/tests/shared-browser-server.mjs": "5d8afc8b3d7614e0ad1917ea6e9b79861c5b720470c459b3151846cc6d5675a6",
+    "deploy/daylight/tests/shared-browser.test.mjs": "6f8cd354b5a41c3a9e2f9b8f3d5151fa813d86f165effd62eec71efd4bb4f640",
+    "docs/agents/all-site-browsing.md": "94d3780bf590d76814a06ba062fadfa87b28656dac5c246e94998acf96aeb1b9",
+    "scripts/manual_environment.py": "bfab7eff4c8ad9550408127577534baadb172e202823b8666cc7cb8802f002da",
+    "scripts/smoke_generic_browsing_live.py": "efb4a34b2ca99ee3dafc5d09865e4c5263a390bc31a03413a15c009c07b73c68",
+    "scripts/smoke_generic_ask.py": "be64492c4400e0b7ce0378c58d03c3be20bee203f5947ed2fd5eb5519c9e2cc3",
+    "scripts/verify_generic_ask.mjs": "59c3ce87433fac2b075570676f21c64695ae4d67c959beeec671c09a48cef32e"
+  },
+  "evidence_sha256": {
+    ".local/manual-browse/ask-tricky-v1/report.json": "840cd4a555dda6f6af4a07d9e8f78b01289516097eadc8636de9a577a73fbb94",
+    ".local/manual-browse/ask-webarena-v1/report.json": "e5bdd4084dc1c8d8ecd9fa05a6377d94032a0a082587ab320a83466e0a0ad8ad",
+    ".local/manual-browse/ask-container-v2/output/ask-acceptance/report.json": "a8131290db8bebcf84dd997b0c150015ec23505389b9ad0be1b79bf4801713d0",
+    ".local/shared-browser/acceptance-5dad1dae/report.json": "3dc508b2b9b9fc304336016daef707104f791254d9c84090ac77adb10acd7bd8",
+    ".local/vercel-demo/generic-manual-ui-d62dd389/report.json": "6665cc98e0aa648fbb3ac614fbc1d1836a1a3bf8537fe3bdb028ee656d98f898"
+  },
+  "real_model_calls": 0,
+  "paid_calls": 0,
+  "sites": 6,
+  "ui_checks": 56,
+  "node_tests": 113,
+  "container_checks": 42,
+  "image_id": "sha256:8181fdfaa64ef4db543198e6c0652651e6a736a921e8a830db9f59bb5cc03e56",
+  "note": "First container probe completed but tmpfs originals vanished at exit; repeated with retained bind-mounted originals in v2. No v1 artifact certification claimed."
+}

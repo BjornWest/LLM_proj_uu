@@ -16,7 +16,7 @@ const key=id=>prefix+id+'.json';
 export const MANUAL_TASKS=TASKS.filter(t=>t.id!=='rooms');
 
 const SITE_REVISION=MANUAL_TASKS.find(t=>t.site_revision)?.site_revision;
-export const BROWSE_TASKS=[['tricky-shop','Shop'],['tricky-health','Health'],['tricky-news','News'],['tricky-music','Music'],['webarena-shopping','WebArena shopping'],['webarena-forum','WebArena forum']].map(([site_id,title])=>({id:'browse.'+site_id,site_id,title:'Browse '+title,collection:site_id.startsWith('tricky-')?'trickyarena':'webarena-verified',condition:null,browse_only:true,site_revision:site_id.startsWith('tricky-')?SITE_REVISION:null}));
+export const BROWSE_TASKS=[['tricky-shop','Shop'],['tricky-health','Health'],['tricky-news','News'],['tricky-music','Music'],['webarena-shopping','WebArena shopping'],['webarena-forum','WebArena forum']].map(([site_id,title])=>({id:'browse.'+site_id,site_id,title:'Browse '+title,collection:site_id.startsWith('tricky-')?'trickyarena':'webarena-verified',condition:null,browse_only:true,ask_enabled:true,site_revision:site_id.startsWith('tricky-')?SITE_REVISION:null}));
 const publicSession=row=>{
   const {owner,directory,frame_files,commands,process_token,archive,trace_directory,browse_lease,...out}=row;
   return {...out,frame:row.frame?{...row.frame,url:`/api/manual/sessions/${row.id}/frame/${row.frame.id}`}:null};
@@ -79,7 +79,7 @@ export class Manual {
         unavailable_reason:!available?'service_unavailable':local?null:slot?.status==='leased'?'pool_busy':slot?.status==='resetting'?'resetting':slot?.status==='ready'?null:'service_unavailable'};
     }):[];
     const sites=[];
-    for(const t of [...browsing,...MANUAL_TASKS]){let s=sites.find(s=>s.site_id===t.site_id);if(!s){s={site_id:t.site_id,default_task:t.id,tasks:[]};sites.push(s);}s.tasks.push({id:t.id,title:t.title,condition:t.condition,site_revision:t.site_revision??null,browse_only:!!t.browse_only,ask_enabled:!t.browse_only,available:t.available??available,unavailable_reason:t.unavailable_reason??null});s.available=s.tasks.some(t=>t.available);s.unavailable_reason=s.available?null:t.unavailable_reason??'service_unavailable';}
+    for(const t of [...browsing,...MANUAL_TASKS]){let s=sites.find(s=>s.site_id===t.site_id);if(!s){s={site_id:t.site_id,default_task:t.id,tasks:[]};sites.push(s);}s.tasks.push({id:t.id,title:t.title,condition:t.condition,site_revision:t.site_revision??null,browse_only:!!t.browse_only,ask_enabled:t.ask_enabled!==false,available:t.available??available,unavailable_reason:t.unavailable_reason??null});s.available=s.tasks.some(t=>t.available);s.unavailable_reason=s.available?null:t.unavailable_reason??'service_unavailable';}
     return {enabled:available,ask_enabled:available&&!!this.env.OPENROUTER_API_KEY,sites,limits:{max_sessions:2,idle_seconds:300,max_seconds:900,max_actions:100,max_ask_turns:30,max_model_calls_per_turn:12}};
   }
   async record(owner,id){
@@ -117,7 +117,7 @@ export class Manual {
       const id=randomUUID(),directory=path.join(this.root,id),now=stamp();
       const row={id,owner,task,site_revision:selected.site_revision??null,site_id:selected.site_id,collection:selected.collection,condition:selected.condition??null,
         task_name:selected.title,interaction_kind:'manual',runtime:'BrowserGym',status:'starting',created_at:now,updated_at:now,
-        browse_only:!!selected.browse_only,ask_enabled:!selected.browse_only,reference_goal:null,asks:[],controller:'human',frame:null,action_count:0,last_action:null,last_error:null,evaluation:null,
+        browse_only:!!selected.browse_only,ask_enabled:selected.ask_enabled!==false,reference_goal:null,asks:[],controller:'human',frame:null,action_count:0,last_action:null,last_error:null,evaluation:null,
         reference_evaluation:null,trace_ready:false,error:null,directory,commands:[],frame_files:{},process_token:this.processToken};
       let driver;this.reserved++;
       try{
@@ -278,12 +278,12 @@ export class Manual {
       if(ask.status==='running')ask.status='step_limit';
     }catch(error){
       ask.error=String(error.message);ask.status='error';
-      if(browserPending){live.driver.kill();this.live.delete(row.id);row.status='interrupted';row.error='Browser command outcome uncertain; no action was retried.';}
+      if(browserPending){live.driver.kill();await this.releaseLease(row);this.live.delete(row.id);row.status='interrupted';row.error='Browser command outcome uncertain; no action was retried.';}
     }finally{
       if(cancelled())ask.status='interrupted';
       ask.finished_at=stamp();row.controller='human';
       if(!terminal.has(row.status))row.status='ready';
-      try{await persist();await this.publishAsk(row,ask);}catch{row.status='interrupted';live.driver.kill();this.live.delete(row.id);}
+      try{await persist();await this.publishAsk(row,ask);}catch{row.status='interrupted';live.driver.kill();await this.releaseLease(row);this.live.delete(row.id);}
       live.busy=false;live.ask=null;live.lastActive=Date.now();
     }
   }

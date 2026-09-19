@@ -23,7 +23,7 @@ const manualSelection=(site,session)=>{
   const saved=manualChoices.get(siteID);
   return (manualLive(session)?session.task:null)||(site?.tasks?.some(task=>task.id===saved)?saved:null)||site?.tasks?.find(task=>task.id.startsWith('browse.'))?.id||site?.default_task||site?.tasks?.[0]?.id||'';
 };
-const manualOnly=capability=>capability?.ask_enabled===false||capability?.browse_only===true;
+const manualOnly=capability=>capability?.ask_enabled===false||(capability?.browse_only===true&&capability?.ask_enabled!==true);
 const manualAvailabilityReason=reason=>({pool_busy:'This site’s browser is in use. Refresh session status to check for a free slot.',resetting:'This site’s browser is being reset. Refresh session status to check when it is ready.',service_unavailable:'The browser service for this site is unavailable. Refresh session status to check again.'}[reason]||'Manual browsing is unavailable for this session type.');
 let sidebarBeforeFullscreen=true;
 const fullScreen=createFullScreenMode($('enter-fullscreen'),$('exit-fullscreen'),active=>{
@@ -230,7 +230,7 @@ function renderReview(){
   if(isLibrary){$('run-viewer').hidden=true;$('browser-trace-review').hidden=true;$('manual-review').hidden=true;if(shared.dataset.session!==record.id){shared.dataset.session=record.id;shared.src='/trace-viewer?embed=1#'+encodeURIComponent(record.id);}return;}
   if(shared.hasAttribute('src')){shared.removeAttribute('src');delete shared.dataset.session;}
   const isJob=record.source==='harness',isManual=record.source==='manual';$('run-viewer').hidden=!isJob;$('browser-trace-review').hidden=isManual;$('browser-trace-download').hidden=isJob;$('trace-raw-details').hidden=isJob;$('manual-review').hidden=!isManual;
-  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded browser actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent=session.browse_only?'Manual browsing only · no task setup or reference objective.':'Reference objective: '+(session.reference_goal||'Not recorded');$('manual-review-reference').hidden=!!session.browse_only;$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
+  if(isManual){const session=record.raw;$('manual-review-summary').textContent=[session.status,(session.action_count??0)+' recorded browser actions',session.condition,session.site_revision?'Site version '+session.site_revision.slice(0,12):null].filter(Boolean).join(' · ');$('manual-review-goal').textContent=session.browse_only?'Exploration session · no task setup or reference objective.':'Reference objective: '+(session.reference_goal||'Not recorded');$('manual-review-reference').hidden=!!session.browse_only;$('manual-reference-evaluation').textContent=session.reference_evaluation==null?'No reference evaluation recorded.':JSON.stringify(session.reference_evaluation,null,2);$('manual-trace-download').hidden=!session.trace_ready;if(session.trace_ready)$('manual-trace-download').href='/api/manual/sessions/'+encodeURIComponent(session.id)+'/trace';else $('manual-trace-download').removeAttribute('href');}
   if(isJob){renderJobConversation(record);const mode=activeStatuses.has(record.status)?'watch':'replay',src='/harness?embed=1&activity='+mode+'#'+encodeURIComponent(record.id);const viewer=$('run-viewer');if(viewer.dataset.run!==record.id){viewer.dataset.run=record.id;viewer.src=src;}}
 }
 function recordForKey(key){return records().find(record=>record.key===key||record.turns?.some(turn=>'d:'+turn.id===key))||null;}
@@ -300,7 +300,7 @@ function renderManual(){
   const ended=!!session&&!manualLive(session);
   const selected=manualSelection(site,session),selectedTask=site?.tasks?.find(task=>task.id===selected),scope=manualLive(session)?session:selectedTask;
   $('manual-task').replaceChildren(...(site?.tasks||[]).map(task=>{const option=node('option',(task.title||task.id)+(task.condition?' · '+task.condition:'')+(manualOnly(task)?' · Manual only':''));option.value=task.id;return option;}));$('manual-task').value=selected;
-  document.querySelector('.manual-agent-note').textContent=manualOnly(scope)?'Manual browsing only. No model is running. This fresh browser has no task-specific setup, reference objective or task grade.':manualConfig?.ask_enabled?'Ask is available in supported sessions. Human controls pause while the agent acts; Stop returns control after any action already in progress. Worker tasks start a separate fresh browser.':'You control this fresh browser; no model is running. Ask is unavailable. Worker tasks and their grading remain separate.';
+  document.querySelector('.manual-agent-note').textContent=manualOnly(scope)?'Manual browsing only. No model is running. This fresh browser has no task-specific setup, reference objective or task grade.':manualConfig?.ask_enabled?'Ask uses this same browser. Human controls pause while the agent acts; Stop returns control after any action already in progress. Ask requests are recorded but not automatically graded.':'You control this fresh browser; no model is running. Ask is unavailable. Worker tasks and their grading remain separate.';
   renderRemoteAsk(session,selectedTask);
   $('manual-task').disabled=pending||!!live||authExpired;
   const unavailable=site?.available===false||selectedTask?.available===false;
@@ -335,7 +335,7 @@ function renderManual(){
   $('manual-session-facts').textContent=session?[session.task_name||session.task,session.condition,session.controller==='agent'?'Agent controlled · BrowserGym':'Human controlled · BrowserGym'].filter(Boolean).join(' · '):'';
   if(session?.site_revision&&!manualBusy&&!manualLoading)$('manual-status').textContent+=' · Site version '+session.site_revision.slice(0,12);
   document.querySelector('.manual-reference').hidden=!!session?.browse_only;
-  $('manual-reference-goal').textContent=session?.browse_only?'No reference objective — manual browsing only.':session?.reference_goal||'Resolved when the session starts.';
+  $('manual-reference-goal').textContent=session?.browse_only?'No reference objective — exploration is not automatically graded.':session?.reference_goal||'Resolved when the session starts.';
 }
 function renderRemoteAsk(session,selectedTask=manualSite()?.tasks?.find(task=>task.id===$('manual-task').value)){
   const active=session?.controller==='agent',ask=session?.asks?.at(-1);

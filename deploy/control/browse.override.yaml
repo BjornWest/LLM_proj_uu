@@ -2,6 +2,6 @@
 # Keep the host lease proxy running and preserve all existing volumes.
 services:
   control:
-    image: intent-browser-control:all-sites-v1
+    image: intent-browser-control:all-sites-ask-v1
     env_file:
       - ../../.local/browse-pool/control.env
