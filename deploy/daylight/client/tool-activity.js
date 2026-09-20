@@ -171,8 +171,11 @@ export function renderToolReview(container,decisions){
     const body=element('div','trace-tool-event-body');
     const stepButton=element('button','trace-tool-event-step',decision.label+(decision.at?' · '+new Date(decision.at).toLocaleTimeString():''));stepButton.type='button';stepButton.title='Show tools available at this step';stepButton.onclick=()=>{select.value=decision.key;toolbox.open=true;showAvailable();select.focus({preventScroll:true});};
     body.append(stepButton,element('strong','',call.title));
-    body.append(element('p','trace-tool-state',call.status==='failed'?'Failed':call.status==='recorded'?'Execution recorded':'Execution unconfirmed'));
-    if(call.receipt?.description)body.append(element('p','transcript-note',call.receipt.description));
+    body.append(element('p','trace-tool-state',call.status==='failed'?'Failed':call.status==='skipped'?'Skipped · not executed':call.status==='recorded'?'Execution recorded':'Execution unconfirmed'));
+    if(call.detail)body.append(element('p','trace-tool-argument',call.detail));
+    if(call.answer&&call.status==='recorded')body.append(element('p','trace-tool-answer',call.answer));
+    if(call.resultSummary)body.append(element('p','transcript-note',call.resultSummary));
+    if(!call.resultSummary&&call.receipt?.description)body.append(element('p','transcript-note',call.receipt.description));
     if(call.receipt?.error)body.append(element('p','transcript-note',String(call.receipt.error)));
     if(call.observation)transcriptDetail(body,'Page before this decision',call.observation.text||'No page text recorded.');
     if(call.receipt?.page_after)transcriptDetail(body,'Page after action · transition feedback',call.receipt.page_after.text||'No page text recorded.');
