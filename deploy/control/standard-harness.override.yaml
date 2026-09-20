@@ -7,11 +7,29 @@ services:
   worker:
     image: intent-browser-worker:standard-agents-v1
     environment:
-      HARNESS_PRISLYKTAN_CERTIFICATE: /opt/harness/prislyktan-certificate.json
-    volumes:
+      HARNESS_PRISLYKTAN_CERTIFICATE: /acceptance/prislyktan-certificate.json
+      HARNESS_EXPANDED_CERTIFICATE: /acceptance/expanded-certificate.json
+    # Replace the previous certificate bind with one immutable directory. Set
+    # rprivate explicitly: the Desktop WSL bridge rejects its implicit default.
+    volumes: !override
+      - worker-data:/data
       - type: bind
-        source: ${PRISLYKTAN_WORKER_CERTIFICATE:?Set the source-bound Prislyktan certificate}
-        target: /opt/harness/prislyktan-certificate.json
+        source: ../../.local/team-worker/chaos
+        target: /data/chaos
+        bind:
+          create_host_path: false
+          propagation: rprivate
+      - type: bind
+        source: ${FULL_SITE_FIXTURES:?Set the matching immutable fixtures}
+        target: /fixtures
         read_only: true
         bind:
           create_host_path: false
+          propagation: rprivate
+      - type: bind
+        source: ${STANDARD_WORKER_CERTIFICATES:?Set the source-bound certificate directory}
+        target: /acceptance
+        read_only: true
+        bind:
+          create_host_path: false
+          propagation: rprivate

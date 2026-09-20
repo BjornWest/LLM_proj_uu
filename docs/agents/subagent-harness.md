@@ -1,7 +1,9 @@
 # Combined harness and bounded delegation
 
-Implemented and locally validated. Production rollout is tracked separately in
-`.local/current-standard/`; do not treat a local test as proof of deployment.
+Implemented and deployed on September 21, 2026. Code release `8bdcbde` passed
+48 read-only production checks with zero model calls. PC control and worker use
+the accepted current runtime. Detailed evidence and rollout commands are under
+`.local/current-standard/`; see [release notes](standard-harness-release.md).
 
 The current policy factory is `intent_browser.standard_profile.standard_profile`:
 native structured calls (up to eight sequential calls), preserved model reasoning,
