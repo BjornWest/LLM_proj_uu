@@ -136,6 +136,21 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         }
         return send(405,{error:'Method not allowed'});
       }
+      const workerReplay=url.pathname.match(/^\/api\/harness\/jobs\/([a-f0-9-]{36})\/(session|replay-assets)(?:\/([a-f0-9]{64}))?$/);
+      if(workerReplay){
+        if(req.method!=='GET')return send(405,{error:'Read only'});
+        const [,id,operation,attachment]=workerReplay;
+        if((operation==='replay-assets')!==!!attachment)return send(404,{error:'Not found'});
+        if(!env.DAYLIGHT_CONTROL_URL)return send(503,{error:'PC trace service unavailable'});
+        stage='trace_library';
+        const result=await new LibraryClient({env,fetcher}).call(attachment?'worker-asset':'worker-session',{owner,id,...(attachment?{attachment,range:req.headers.range}:{})});
+        const etag=result.headers.get('etag');res.setHeader('Cache-Control','private, no-cache');res.setHeader('Vercel-CDN-Cache-Control','no-store');
+        if(etag)res.setHeader('ETag',etag);
+        if(etag&&req.headers['if-none-match']===etag){await result.body?.cancel();res.statusCode=304;return res.end();}
+        res.statusCode=result.status;
+        for(const name of ['content-type','content-length','content-range','accept-ranges'])if(result.headers.has(name))res.setHeader(name,result.headers.get(name));
+        await pipeline(Readable.fromWeb(result.body),res);return;
+      }
       if(url.pathname.startsWith('/api/harness/')) {
         stage='agent_storage';const harness=new Harness(store||configuredStore(env),{env});
         if(url.pathname==='/api/harness/config'&&req.method==='GET')return send(200,await harness.config());

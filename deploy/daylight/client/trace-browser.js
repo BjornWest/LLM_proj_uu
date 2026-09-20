@@ -4,18 +4,21 @@ const element=(tag,text,className)=>{const node=document.createElement(tag);if(t
 const parse=value=>{try{return typeof value==='string'?JSON.parse(value):value;}catch{return null;}};
 export function allowedViewerAsset(value){
   if(typeof value!=='string')return false;
-  try{const url=new URL(value,location.origin);return url.origin===location.origin&&/^\/api\/library\/sessions\/[^/]+\/assets\/[^/]+$/.test(url.pathname)&&!url.search&&!url.hash;}catch{return false;}
+  try{const url=new URL(value,location.origin);return url.origin===location.origin&&/^(?:\/api\/library\/sessions\/[^/]+\/assets\/[^/]+|\/api\/harness\/jobs\/[a-f0-9-]{36}\/replay-assets\/[a-f0-9]{64})$/.test(url.pathname)&&!url.search&&!url.hash;}catch{return false;}
 }
 async function read(url){const response=await fetch(url,{credentials:'same-origin',redirect:'error'});if(!response.ok)throw Error(response.status===401?'Invitation expired':response.status===404?'Saved session unavailable':'Trace service unavailable');return response;}
+const workerSource=()=>new URLSearchParams(location.search).get('source')==='harness';
+const sessionURL=id=>workerSource()?'/api/harness/jobs/'+encodeURIComponent(id)+'/session':'/api/library/sessions/'+encodeURIComponent(id);
 let selectedResponse=null;
 export async function loadViewerIndex(){
   // The embedded view opens one authorized session without downloading the catalog.
   const id=location.hash.slice(1);
-  if(new URLSearchParams(location.search).get('embed')==='1'&&id&&id!=='latest'){
-    const response=await read('/api/library/sessions/'+encodeURIComponent(id)),data=await response.json();
+  if((new URLSearchParams(location.search).get('embed')==='1'||workerSource())&&id&&id!=='latest'){
+    const response=await read(sessionURL(id)),data=await response.json();
     selectedResponse={id,data};const {messages,...summary}=data;
     return new Response(JSON.stringify([{...summary,revision:response.headers.get('etag')||null}]));
   }
+  if(workerSource())throw Error('Select a completed worker run.');
   const sessions=[];let cursor=null;
   for(let page=0;page<100;page++){
     const response=await read('/api/library/sessions'+(cursor?'?cursor='+encodeURIComponent(cursor):'')),value=await response.json();
@@ -27,7 +30,7 @@ export async function loadViewerIndex(){
 }
 export async function loadViewerSession(id){
   if(selectedResponse?.id===id){const data=selectedResponse.data;selectedResponse=null;return new Response(JSON.stringify(data));}
-  return read('/api/library/sessions/'+encodeURIComponent(id));
+  return read(sessionURL(id));
 }
 export function browserProjection(session){
   const steps=new Map();
@@ -54,6 +57,7 @@ export function browserProjection(session){
 export function createBrowserExtension({jumpToMessage}){
   let current=null,steps=[],position=0,mode='conversation',timer=null;
   const chat=document.getElementById('chat'),main=document.getElementById('main');
+  const recorded=element('section',undefined,'browser-recorded-outcome');recorded.hidden=true;chat.before(recorded);
   const replay=element('section',undefined,'browser-replay');replay.hidden=true;replay.setAttribute('aria-label','Recorded browser replay');
   const controls=element('div',undefined,'browser-replay-controls'),previous=element('button','← Previous'),play=element('button','Play steps'),next=element('button','Next →');
   for(const button of [previous,play,next])button.type='button';
@@ -99,7 +103,16 @@ export function createBrowserExtension({jumpToMessage}){
   function resize(){if(embed&&window.parent!==window)window.parent.postMessage({type:'trace-viewer:size',height:Math.ceil(main.getBoundingClientRect().height+main.offsetTop)},location.origin);}
   new ResizeObserver(resize).observe(main);
   return {update(session){
-    if(current===session)return;current=session;stop();steps=session?browserProjection(session):[];position=0;mode='conversation';
+    if(current===session)return;current=session;stop();
+    recorded.replaceChildren();recorded.hidden=!session?.worker_trace;
+    if(session?.worker_trace){
+      const trace=session.worker_trace;
+      recorded.append(element('p','Recorded worker run · '+(session.library_metadata?.execution_status||'Unknown status')+' · no grading recomputed.','muted'));
+      if(trace.error)recorded.append(element('pre',typeof trace.error==='string'?trace.error:JSON.stringify(trace.error),'browser-replay-action'));
+      const verdict=element('details');verdict.append(element('summary','Recorded final evaluation'),element('pre',JSON.stringify(session.library_metadata?.evaluation??null,null,2)));recorded.append(verdict);
+      if(trace.id===session.id&&/^[a-f0-9-]{36}$/.test(trace.id)){const link=element('a','Download unchanged original trace ZIP');link.href='/api/harness/jobs/'+trace.id+'/trace';recorded.append(link);}
+    }
+    steps=session?browserProjection(session):[];position=0;mode='conversation';
     const browser=session?.environment==='browsergym';document.body.classList.toggle('browser-project',browser);
     if(!browser){delete document.body.dataset.browserView;replay.hidden=true;main.querySelector('.trace-tools-panel')?.remove();chat.hidden=false;return;}
     renderToolReview(chat,steps);

@@ -6,6 +6,7 @@ import {Harness,workerAuthorized} from './lib/harness.mjs';
 import {Manual} from './lib/manual.mjs';
 import {Agent} from './lib/agent.mjs';
 import {TraceLibrary} from './lib/library.mjs';
+import {WorkerReplay} from './lib/worker-replay.mjs';
 import {createReadStream} from 'node:fs';
 import {pipeline} from 'node:stream/promises';
 import path from 'node:path';
@@ -19,6 +20,7 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
   if(!env.DAYLIGHT_CONTROL_TOKEN||env.DAYLIGHT_CONTROL_TOKEN.length<43)throw Error('Control token required');
   const manual=new Manual(store,{env,fetcher});
   const library=new TraceLibrary(store,{root:env.DAYLIGHT_LIBRARY_ROOT||path.join(path.dirname(env.DAYLIGHT_SQLITE_PATH||'.local/control/state.sqlite'),'library')});
+  const replay=new WorkerReplay(store,{env,root:library.root});
   const handler=async(req,res)=>{
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json');
     const send=(status,value)=>{res.statusCode=status;res.end(JSON.stringify(value));};
@@ -29,7 +31,7 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
     try {
       const operation=route.split('/').at(-1);
       const isManual=route.startsWith('/internal/manual/');
-      const isLibrary=['/internal/library/list','/internal/library/session','/internal/library/asset'].includes(route);
+      const isLibrary=['/internal/library/list','/internal/library/session','/internal/library/asset','/internal/library/worker-session','/internal/library/worker-asset'].includes(route);
       if(worker?!['poll','checkpoint','reserve','artifact','update'].includes(operation):
         isLibrary?false:isManual?!['config','start','list','read','action','observe','close','artifact','ask','interrupt'].includes(operation):
         !['/internal/store/read','/internal/store/write','/internal/store/list','/internal/store/trace-list'].includes(route))return send(404,{error:'Not found'});
@@ -40,8 +42,8 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
       if(env.DAYLIGHT_CONTROL_READ_ONLY==='1'&&(worker||operation==='write'||isManual))return send(503,{error:'Storage maintenance; no writes accepted'});
       if(isLibrary){
         if(operation==='list')return send(200,await library.list(value.owner,value));
-        if(operation==='session'){const result=await library.session(value.owner,value.id);res.setHeader('ETag',result.etag);res.end(result.raw);return;}
-        const asset=await library.asset(value.owner,value.id,value.attachment,value.range);
+        if(operation==='session'||operation==='worker-session'){const result=await (operation==='worker-session'?replay:library).session(value.owner,value.id);res.setHeader('ETag',result.etag);res.end(result.raw);return;}
+        const asset=await (operation==='worker-asset'?replay:library).asset(value.owner,value.id,value.attachment,value.range);
         res.statusCode=asset.status;res.setHeader('Content-Type',asset.type);res.setHeader('Content-Length',asset.end-asset.start+1);res.setHeader('ETag',asset.etag);res.setHeader('Accept-Ranges','bytes');
         if(asset.status===206)res.setHeader('Content-Range',`bytes ${asset.start}-${asset.end}/${asset.size}`);
         if(asset.size===0){res.end();return;}

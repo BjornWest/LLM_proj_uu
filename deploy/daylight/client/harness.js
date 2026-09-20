@@ -220,6 +220,9 @@ function showLatestImage() {
 }
 function renderJob(job) {
   if (job.id !== selectedID) return;
+  if (activity === 'replay' && !activeStatuses.has(job.status) && job.trace_ready) {
+    location.replace('/trace-viewer?' + (embedded ? 'embed=1&' : '') + 'source=harness#' + encodeURIComponent(job.id)); return;
+  }
   const oldJob = selectedJob, oldIssueStep = $('issue-step').value;
   selectedJob = job;
   $('run-detail').hidden = false; $('issue-panel').hidden = false;

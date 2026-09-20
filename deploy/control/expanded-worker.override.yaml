@@ -2,7 +2,7 @@
 # Retain existing control, manual-browser and worker trace volumes.
 services:
   control:
-    image: intent-browser-control:expanded-candidate-v1
+    image: intent-browser-control:worker-replay-v1
   worker:
     image: intent-browser-worker:expanded-candidate-v3
     env_file:
