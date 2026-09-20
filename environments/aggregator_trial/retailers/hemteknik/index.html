@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hemteknik — Elektronik för hela hemmet</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>[hidden]{display:none!important}</style>
+</head>
+<body>
+  <div class="notice"><div class="shell notice-inner"><span>Frakt visas alltid i varukorgen</span><span>Öppet köp i 30 dagar</span><span>Trygg svensk support</span></div></div>
+  <header class="site-header">
+    <div class="shell header-main">
+      <a class="brand" href="index.html" aria-label="Hemteknik startsida"><span class="brand-mark">H</span><span>hem<span>teknik</span><small>Elektronik för hela hemmet</small></span></a>
+      <form class="search" id="search-form" role="search"><label class="sr-only" for="search-input">Sök produkt</label><input id="search-input" type="search" autocomplete="off" placeholder="Sök efter produkt, modell eller varumärke"><button type="submit" aria-label="Sök">⌕</button></form>
+      <nav class="header-actions" aria-label="Snabblänkar"><a href="#orders" id="orders-link">Mina köp</a><button class="cart-button" id="cart-toggle" type="button" aria-controls="cart-drawer" aria-expanded="false"><span class="cart-icon">▢</span> Varukorg <b id="cart-count">0</b></button></nav>
+    </div>
+    <div class="shell subnav"><button type="button" id="menu-toggle" class="menu-button" aria-expanded="false">☰ <span>Alla kategorier</span></button><nav aria-label="Huvudmeny"><a href="#deals">Veckans favoriter</a><a href="#new">Nyheter</a><a href="#guides">Köpguider</a><a href="#service">Service &amp; support</a></nav><span class="delivery-promise">Leverans från 2–4 vardagar</span></div>
+  </header>
+
+  <main class="shell page-grid">
+    <aside class="category-rail" id="category-rail" aria-label="Produktkategorier">
+      <div class="rail-heading">Handla efter kategori</div>
+      <button class="category-link active" data-category="">Alla produkter <span>›</span></button>
+      <div id="category-list"></div>
+      <div class="rail-card"><strong>Behöver du hjälp?</strong><p>Våra teknikexperter hjälper dig hitta rätt.</p><a href="#service">Kontakta oss&nbsp; →</a></div>
+    </aside>
+    <section class="catalog" aria-labelledby="catalog-title">
+      <div class="crumbs"><a href="index.html">Hem</a><span>/</span><span id="crumb-current">Alla produkter</span></div>
+      <div class="hero"><div><p class="eyebrow">HEMTEKNIK.SE</p><h1 id="catalog-title">Teknik som gör vardagen enklare</h1><p>Upptäck noga utvalda produkter för ljud, bild, dator och smartare hem.</p><a class="hero-link" href="#product-grid">Utforska sortimentet <span>→</span></a></div><div class="hero-art" aria-hidden="true"><div class="hero-device hero-laptop"></div><div class="hero-device hero-phone"></div><i></i></div></div>
+      <div class="toolbar"><div><strong id="result-count">Produkter</strong><span id="result-context"></span></div><label class="sort-label" for="sort-select">Sortera efter <select id="sort-select"><option value="recommended">Rekommenderat</option><option value="price-low">Pris: lägst först</option><option value="price-high">Pris: högst först</option><option value="name">Namn A–Ö</option></select></label></div>
+      <div id="status" class="status" role="status" aria-live="polite">Laddar sortiment…</div>
+      <div id="product-grid" class="product-grid" aria-live="polite"></div>
+      <section id="orders" class="orders-section" hidden><div class="section-title"><h2>Mina köp</h2><button type="button" id="close-orders">Stäng</button></div><div id="orders-list"></div></section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="detail-modal" hidden><section class="modal detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title"><button class="modal-close" type="button" data-close="detail-modal" aria-label="Stäng produktdetaljer">×</button><div id="detail-content"></div></section></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Varukorg" aria-hidden="true"><div class="drawer-head"><div><span class="eyebrow">DIN BESTÄLLNING</span><h2>Varukorg <span id="drawer-count">(0)</span></h2></div><button type="button" id="cart-close" aria-label="Stäng varukorg">×</button></div><div id="cart-content" class="cart-content"></div></aside>
+  <div class="modal-backdrop" id="checkout-modal" hidden><section class="modal checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title"><button class="modal-close" type="button" data-close="checkout-modal" aria-label="Stäng kassa">×</button><div class="eyebrow">SISTA STEGET</div><h2 id="checkout-title">Slutför din beställning</h2><p class="muted">Detta är ett simulerat köp. Ingen betalning genomförs. Fiktiva testuppgifter är förifyllda.</p><form id="checkout-form"><div class="form-grid"><label>För- och efternamn<input name="name" required autocomplete="name" value="Testkund"></label><label>E-post<input name="email" type="email" required autocomplete="email" value="test@example.invalid"></label><label>Adress<input name="address" required autocomplete="street-address" value="Testgatan 1"></label><label>Postnummer<input name="postal_code" required autocomplete="postal-code" inputmode="numeric" value="12345"></label><label>Ort<input name="city" required autocomplete="address-level2" value="Teststad"></label></div><div id="checkout-summary" class="checkout-summary"></div><button class="primary-button wide" type="submit">Bekräfta simulerat köp</button><div id="checkout-error" class="error" role="alert"></div></form></section></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <footer id="service"><div class="shell footer-inner"><div class="footer-brand">hem<span>teknik</span><p>Elektronik för hela hemmet</p></div><div><strong>Kundservice</strong><a href="#service">Kontakta oss</a><a href="#service">Leverans &amp; retur</a></div><div><strong>Om Hemteknik</strong><a href="#service">Om oss</a><a href="#service">Trygg e-handel</a></div><div><strong>Alltid nära</strong><p>Vardagar 09–17<br>support@hemteknik.example</p></div></div></footer>
+  <script src="app.js" defer></script>
+</body>
+</html>

@@ -109,8 +109,13 @@ class Publisher:
             steps.append({'step': row['step'], 'action': row.get('action'),
                           'error': row.get('error') or row.get('action_error'), 'artifact': artifact,
                           'browser_stepped': row.get('browser_stepped', False)})
-        known, unknown, alerts, previous_provider = [], 0, [], None
-        for row in rows:
+        family_rows=list(rows)
+        for file in sorted(directory.glob('children/*/steps.jsonl')):
+            for line in file.read_text().splitlines():
+                try:family_rows.append(json.loads(line))
+                except json.JSONDecodeError:break
+        known, unknown, alerts, previous_providers = [], 0, [], {}
+        for row in family_rows:
             response = row.get('model_response') or {}
             usage = response.get('usage') or {}
             cost = usage.get('cost')
@@ -121,14 +126,17 @@ class Publisher:
             elif row.get('model_request'):
                 unknown += 1
             provider = response.get('provider')
+            session=(row.get('model_request') or {}).get('session_id')
+            previous_provider=previous_providers.get(session)
             if provider and previous_provider and provider != previous_provider:
                 alerts.append('Provider changed within this episode; caching continuity is not guaranteed.')
-            if provider: previous_provider = provider
+            if provider: previous_providers[session] = provider
         initial_path = directory / 'initial-state.json'
         resolved_goal = json.loads(initial_path.read_text()).get('resolved_goal') if initial_path.exists() else None
         return {'episode': directory.name, 'resolved_goal': resolved_goal, 'cost': {'reported_usd': sum(known) if known else
                     (0 if metadata.get('driver') == 'scripted-rehearsal' else None),
-                    'unknown_attempts': unknown, 'alerts': sorted(set(alerts))},
+                    'unknown_attempts': unknown, 'alerts': sorted(set(alerts)),
+                    'scope':'parent and helpers','model_attempts':sum(bool(r.get('model_request')) for r in family_rows)},
                 'runtime': {'worker': 'team-browsergym-v1',
                 'driver': metadata.get('driver'), 'model': metadata.get('model'),
                 'generation': metadata.get('generation'), **metadata['runtime']},
@@ -206,7 +214,8 @@ class TeamBackend(ChatCompletionsBackend):
         if not key:
             raise ValueError('Dedicated DAYLIGHT_OPENROUTER_API_KEY is required for live worker')
         super().__init__('https://openrouter.ai/api/v1', env.get('MODEL_NAME', 'qwen/qwen3.8-27b'), key,
-                         max_tokens=completion_token_limit(env.get("OPENROUTER_MAX_TOKENS")), request_options=options, session_routing=True)
+                         max_tokens=completion_token_limit(env.get("OPENROUTER_MAX_TOKENS")), request_options=options, session_routing=True,
+                         supports_images=True)
         self.publisher, self.index, self.last_finished = publisher, 0, 0.0
         self.sources = runtime_provenance()['source_sha256']
         self.client.event_hooks['response'] = [self.record_transport]
@@ -318,6 +327,11 @@ class PublishedTask:
                 raise ValueError('Expanded task goal differs from pinned registry')
             record['team_task'] = {'id': row['id'], 'revision': row['revision'],
                                    'registry_sha256': self.expanded.registry_sha256}
+        elif self.publisher.job['task'].startswith('prislyktan:'):
+            from .prislyktan import entry
+            registered=entry(self.publisher.job['task'])
+            if self.task.policy_goal!=registered['goal']:raise ValueError('Prislyktan goal differs from registry')
+            record['team_task']={'id':registered['id'],'revision':registered['revision']}
         elif self.publisher.job['task'] != 'rooms':
             from .hosted_tasks import entry, digest, REGISTRY
             registered = entry(self.publisher.job['task'])
@@ -375,6 +389,19 @@ def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=N
             if job['mode'] == 'rehearsal' and job['goal'] != EXAMPLES['booking']['goal']:
                 raise ValueError('Rehearsal only supports the exact study-room example; use Live for custom goals')
             default_backend = lambda: TeamBackend(publisher, env) if job['mode'] == 'live' else RehearsalBackend('booking')
+        elif job['task'].startswith('prislyktan:'):
+            from .prislyktan import PrislyktanTask
+            if backend_factory is None:
+                from .prislyktan import certified_catalog
+                if job['task'] not in [r['id'] for r in certified_catalog(env)]:raise ValueError('Prislyktan task lacks current acceptance')
+            task=PrislyktanTask(job['task'],job.get('task_revision'))
+            if job['goal']!=task.policy_goal:raise ValueError('Prislyktan goal differs from trusted task')
+            wrapped=PublishedTask(task,publisher,None)
+            runner_options={'max_steps':20,'terminal_response_instruction':'Complete the requested goal and deliver the requested answer using send_msg_to_user.'}
+            def factory(video):return task.make_env(video,action_mapping=actions.to_python_code)
+            def default_backend():
+                if job['mode']=='live':return TeamBackend(publisher,env)
+                raise ValueError('Prislyktan tasks require live or explicit scripted acceptance')
         elif expanded_requested:
             from .expanded_tasks import ExpandedTaskSession
             expanded = ExpandedTaskSession(job['task'], job.get('task_revision'), job['id'], env,
@@ -406,6 +433,20 @@ def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=N
         # A callable test backend can only be supplied by trusted local Python,
         # never by the queue, browser, env vars or another serialized request.
         backend = backend_factory(task, environment) if backend_factory else default_backend()
+        if job['mode']=='live' or env.get('HARNESS_VALIDATE_CURRENT_PROFILE')=='1':
+            from dataclasses import replace
+            from .standard_profile import standard_profile
+            from .delegation import AgentLimits
+            from .current_task import CurrentPolicyTask
+            from .retry_policy import DecisionRetryPolicy
+            selected=standard_profile()
+            runner_options.update(harness_profile=replace(selected,
+                agent_limits=AgentLimits(total_model_calls=runner_options['max_steps'])),
+                retry_policy=DecisionRetryPolicy())
+            wrapped=CurrentPolicyTask(wrapped)
+            if job['task']=='rooms':
+                from .helper_browser import openended_helper_factory
+                runner_options['helper_env_factory']=openended_helper_factory
         original_factory = factory
         def factory(video):
             instance = original_factory(video)
@@ -481,10 +522,12 @@ def main():
     while True:
         try:
             from .expanded_tasks import certified_tasks, isolated_runtime
+            from .prislyktan import certified_catalog
+            prislyktan=certified_catalog(env) if mode=='live' else []
             extra = (isolated_runtime(env, 'capabilities') if env.get('HARNESS_EXPANDED_EXECUTION_ROOT')
                      else certified_tasks(env)[0]) if mode == 'live' else []
-            result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks+[t['id'] for t in extra],
-                                'task_revisions': {t['id']:t['revision'] for t in registry()['tasks']+extra}})
+            result = broker.post('poll', {'worker_id': identity, 'mode': mode, 'tasks': tasks+[t['id'] for t in extra+prislyktan],
+                                'task_revisions': {t['id']:t['revision'] for t in registry()['tasks']+extra+prislyktan}})
             if result.get('job'):
                 print('Starting team job', result['job']['id'], flush=True)
                 execute_job(broker, result['job'], data_dir, env, chaos_url)

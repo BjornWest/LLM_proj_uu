@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--task', default='tricky:AU01')
     parser.add_argument('--negative', action='store_true')
+    parser.add_argument('--current-profile', action='store_true', help='Scripted acceptance of the new standard harness')
     parser.add_argument('--backend-failure', action='store_true', help='Retain one scripted transport failure, with unknown safe success')
     parser.add_argument('--wait-after-page-size', action='store_true', help='Separate scripted control: one logged noop after selecting page size')
     parser.add_argument('--service-url')
@@ -38,6 +39,7 @@ def main():
            'HARNESS_EXPANDED_REGISTRY_SHA256': hashlib.sha256(args.registry.read_bytes()).hexdigest(),
            'HARNESS_FULL_FIXTURES_DIR': str(ROOT / '.local/tricky-full-v1'),
            'HARNESS_EXPANDED_ACTION_TIMEOUT_MS': '30000'}
+    if args.current_profile:env['HARNESS_VALIDATE_CURRENT_PROFILE']='1'
     secrets = []
     if row['family'].startswith('webarena.'):
         if not args.service_url: raise ValueError('Dedicated lease service required')
@@ -78,6 +80,20 @@ def main():
             else: calls.append({'operation': operation, 'value': value})
             return remote.post(operation, value) if remote else {'ok': True}
     def backend_factory(task, holder):
+        def adapt(driver):
+            if not args.current_profile:return scripted_backend(driver)
+            class PrivilegedScript:
+                count=0
+                def complete(self,messages):
+                    # Acceptance driver, not a model. Existing drivers use full AX
+                    # to locate prescribed controls; retain this separate evidence.
+                    from intent_browser.observation import refresh_observation
+                    from intent_browser.runner import observation_text
+                    text=observation_text(refresh_observation(holder['env']),limit=1000000)
+                    (args.output/f'scripted-driver-context-{self.count:03d}.txt').write_text(text)
+                    self.count+=1
+                    return driver.complete([{'role':'user','content':text}])
+            return scripted_backend(PrivilegedScript())
         proxy = getattr(getattr(task, 'context', None), 'browser_proxy', None)
         if proxy:
             secrets.extend([proxy['password'].encode(), base64.b64encode((proxy['username'] + ':' + proxy['password']).encode())])
@@ -102,9 +118,16 @@ def main():
                     result = driver.complete(messages)
                     self.wait_pending = args.wait_after_page_size and result.text.startswith('select_option(')
                     return result
-            return scripted_backend(BoundDriver())
-        return scripted_backend(driver_for(task, args.negative, holder))
-    execute_job(Broker(), job, args.output, env, backend_factory=backend_factory)
+            return adapt(BoundDriver())
+        return adapt(driver_for(task, args.negative, holder))
+    original_backend_factory=backend_factory
+    def adopted_backend(task,holder):
+        backend=original_backend_factory(task,holder)
+        if args.current_profile:
+            backend.supports_images=True
+            backend.requires_browser_thread=True
+        return backend
+    execute_job(Broker(), job, args.output, env, backend_factory=adopted_backend)
     (args.output / 'publication-events.json').write_text(json.dumps(calls, indent=2) + '\n')
     terminals = [c['value']['snapshot'] for c in calls if c['operation'] == 'update' and c['value']['snapshot'].get('status')]
     assert len(terminals) == 1, 'Exactly one terminal publication required'
@@ -128,7 +151,7 @@ def main():
         checks['exact_zip_members'] = set(z.namelist()) == set(expected) and len(z.namelist()) == len(expected)
         checks['exact_zip_bytes'] = all(z.read(name) == path.read_bytes() for name, path in expected.items())
     metadata = json.loads((directory / 'metadata.json').read_text())
-    checks['native_profile'] = metadata['harness_profile']['name'] == row['profile']['name']
+    checks['native_profile'] = metadata['harness_profile']['name'] == ('core-tools-v10-agents' if args.current_profile else row['profile']['name'])
     checks['scripted_driver_label'] = metadata['driver'] == 'scripted-validation'
     checks['recorded_deadline'] = metadata['browser_action_execution']['action_timeout_ms'] == 30000
     summary = json.loads((directory / 'episode.json').read_text())

@@ -15,10 +15,10 @@ const stamp=()=>new Date().toISOString();
 const key=id=>prefix+id+'.json';
 // Expanded benchmark tasks run through their reset/grading worker lifecycle;
 // they are not manual fixture selectors. Generic browse.* sessions stay separate.
-export const MANUAL_TASKS=TASKS.filter(t=>t.id!=='rooms'&&!t.expanded);
+export const MANUAL_TASKS=TASKS.filter(t=>t.id!=='rooms'&&!t.expanded&&!t.id.startsWith('prislyktan:'));
 
 const SITE_REVISION=MANUAL_TASKS.find(t=>t.site_revision)?.site_revision;
-export const BROWSE_TASKS=[['tricky-shop','Shop'],['tricky-health','Health'],['tricky-news','News'],['tricky-music','Music'],['webarena-shopping','WebArena shopping'],['webarena-forum','WebArena forum']].map(([site_id,title])=>({id:'browse.'+site_id,site_id,title:'Browse '+title,collection:site_id.startsWith('tricky-')?'trickyarena':'webarena-verified',condition:null,browse_only:true,ask_enabled:true,site_revision:site_id.startsWith('tricky-')?SITE_REVISION:null}));
+export const BROWSE_TASKS=[['tricky-shop','Shop'],['tricky-health','Health'],['tricky-news','News'],['tricky-music','Music'],['webarena-shopping','WebArena shopping'],['webarena-forum','WebArena forum'],['prislyktan','Prislyktan']].map(([site_id,title])=>({id:'browse.'+site_id,site_id,title:'Browse '+title,collection:site_id==='prislyktan'?'synthetic-development':site_id.startsWith('tricky-')?'trickyarena':'webarena-verified',condition:null,browse_only:true,ask_enabled:true,site_revision:site_id.startsWith('tricky-')?SITE_REVISION:null}));
 const publicSession=row=>{
   const {owner,directory,frame_files,commands,process_token,archive,trace_directory,browse_lease,...out}=row;
   return {...out,frame:row.frame?{...row.frame,url:`/api/manual/sessions/${row.id}/frame/${row.frame.id}`}:null};
@@ -29,6 +29,7 @@ class Driver {
     this.timeout=timeout;this.waiter=null;this.last=null;this.exited=false;this.logBytes=0;
     // The browser process gets no control token, model key or invitation secret.
     const env={PATH:process.env.PATH,HOME:'/tmp',PYTHONUNBUFFERED:'1',PYTHONDONTWRITEBYTECODE:'1',
+      HARNESS_AX_TOKENIZER:path.join(packageDir,'runtime/tokenizers/qwen/tokenizer.json'),
       PYTHONPATH:path.join(packageDir,'runtime'),PLAYWRIGHT_BROWSERS_PATH:process.env.PLAYWRIGHT_BROWSERS_PATH||'/opt/playwright'};
     if(process.env.LD_LIBRARY_PATH)env.LD_LIBRARY_PATH=process.env.LD_LIBRARY_PATH;
     this.child=spawn(python,[script,'--package',packageDir,'--output',directory,'--task',task,'--actor',actor,...(browseConfig?['--browse-config',browseConfig]:[])],
@@ -48,13 +49,15 @@ class Driver {
     this.child.on('exit',()=>{this.exited=true;if(this.waiter)this.fail(Error('Browser process ended before acknowledging the command'));});
   }
   fail(error){if(this.waiter){const w=this.waiter;this.waiter=null;clearTimeout(w.timer);w.reject(error);}}
-  wait(){
+  wait(timeout=this.timeout){
     if(this.exited)return Promise.reject(Error('Browser process is no longer running'));
     assert(!this.waiter,'Another browser command is pending',409);
-    return new Promise((resolve,reject)=>{this.waiter={resolve,reject,timer:setTimeout(()=>{this.fail(Error('Browser response timed out; no automatic replay'));this.kill();},this.timeout)};});
+    return new Promise((resolve,reject)=>{this.waiter={resolve,reject,timer:setTimeout(()=>{this.fail(Error('Browser response timed out; no automatic replay'));this.kill();},timeout)};});
   }
   ready(){return this.last?Promise.resolve(this.last):this.wait();}
-  send(value){const result=this.wait();this.commands.write(JSON.stringify(value)+'\n');return result;}
+  // One native response may execute eight bounded browser calls. Keep ordinary
+  // human commands short; the batch has its own deadline and is never replayed.
+  send(value){const result=this.wait(value.operation==='agent_action'?Math.max(this.timeout,300000):this.timeout);this.commands.write(JSON.stringify(value)+'\n');return result;}
   kill(){try{process.kill(-this.child.pid,'SIGTERM');}catch{};const t=setTimeout(()=>{try{process.kill(-this.child.pid,'SIGKILL');}catch{}},2000);t.unref();}
 }
 
@@ -67,16 +70,16 @@ export class Manual {
     this.timer=setInterval(()=>this.expire().catch(()=>{}),10000);this.timer.unref();
   }
   async config(){
-    let available=false;
+    let available=false,prislyktanAvailable=false;
     if(this.env.DAYLIGHT_MANUAL_PACKAGE&&this.env.DAYLIGHT_MANUAL_DRIVER){
-      try{const m=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'manifest.json')));available=MANUAL_TASKS.every(t=>m.datasets.some(d=>d.tasks.includes(t.id)));
+      try{const m=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'manifest.json')));available=MANUAL_TASKS.every(t=>m.datasets.some(d=>d.tasks.includes(t.id)));prislyktanAvailable=m.datasets.some(d=>d.id==='prislyktan');
         if(available&&MANUAL_TASKS.some(t=>t.site_revision)){const registry=JSON.parse(await readFile(path.join(this.env.DAYLIGHT_MANUAL_PACKAGE,'runtime/config/team_tasks.json')));available=MANUAL_TASKS.every(t=>!t.site_revision||registry.tasks.some(r=>r.id===t.id&&r.revision===t.revision&&r.site_revision===t.site_revision));}}catch{}
     }
     let poolStatus={sites:[]};
     if(this.env.DAYLIGHT_BROWSE_ENABLED==='1')try{poolStatus=await this.pool.status();}catch{}
     const browsing=this.env.DAYLIGHT_BROWSE_ENABLED==='1'?BROWSE_TASKS.map(t=>{
       const slot=poolStatus.sites.find(s=>s.site_id===t.site_id);
-      const local=t.site_id.startsWith('tricky-');
+      const local=t.site_id.startsWith('tricky-')||(t.site_id==='prislyktan'&&prislyktanAvailable);
       return {...t,available:available&&(local||slot?.status==='ready'),
         unavailable_reason:!available?'service_unavailable':local?null:slot?.status==='leased'?'pool_busy':slot?.status==='resetting'?'resetting':slot?.status==='ready'?null:'service_unavailable'};
     }):[];
@@ -252,6 +255,7 @@ export class Manual {
         browserPending=true;
         const observation=await live.driver.send({request_id:captureID,operation:'agent_observe',ask_id:ask.id,goal:ask.goal});
         browserPending=false;
+        if(observation.agent_error)throw Error(observation.agent_error);
         assert(observation.request_id===captureID&&observation.decision,'Invalid policy observation',503);
         await this.apply(row,observation);row.status='busy';await this.publishAsk(row,ask);
         const step={index:i,decision:observation.decision,request:null,response:null,output:null,usage:null};ask.steps.push(step);delete ask.pending_browser_command;await persist();
@@ -268,13 +272,25 @@ export class Manual {
         const result=await live.driver.send({request_id:actionID,operation:'agent_action',ask_id:ask.id,decision_id:observation.decision.id,evidence:step});
         browserPending=false;assert(result.request_id===actionID,'Browser acknowledgment mismatch',503);
         step.result=result;delete ask.pending_browser_command;
+        if(Array.isArray(result.actions)){step.actions=result.actions;step.action=result.actions.join('\n');}
         try{step.action=JSON.parse(step.output).action;}catch{}
-        step.error=result.agent_error||result.error||(result.answer===undefined?result.last_error:null)||null;
-        step.executed=result.kind==='rejected'?false:result.agent_error?false:result.answer!==undefined?false:step.error?null:true;
+        const executionError=result.agent_error||result.error||(Number.isInteger(result.browser_action_count)?(result.browser_action_count>0?result.last_error:null):(result.answer===undefined?result.last_error:null))||null;
+        step.error=executionError||step.error||null;
+        step.executed=Number.isInteger(result.browser_action_count)?result.browser_action_count>0:
+          result.kind==='rejected'?false:result.agent_error?false:result.answer!==undefined?false:step.error?null:true;
         await persist();await this.apply(row,result);row.status=result.kind==='finished'?row.status:'busy';await this.publishAsk(row,ask);
         if(cancelled())break;
-        if(result.kind==='rejected'||step.error)throw Error(step.error||result.error||'Action rejected');
+        if(result.kind==='rejected'||executionError)throw Error(executionError||result.error||'Action rejected');
+        if(result.retry_wait_seconds){
+          assert(Number.isFinite(result.retry_wait_seconds)&&result.retry_wait_seconds>0&&result.retry_wait_seconds<=60,'Invalid retry wait',503);
+          await new Promise(resolve=>{
+            const signal=live.cancel.signal,finish=()=>{clearTimeout(timer);signal.removeEventListener('abort',finish);resolve();};
+            const timer=setTimeout(finish,result.retry_wait_seconds*1000);
+            signal.addEventListener('abort',finish,{once:true});if(signal.aborted)finish();
+          });
+        }
         if(result.answer!==undefined){ask.answer=result.answer;ask.status='complete';break;}
+        if(result.core_finished){ask.status='step_limit';break;}
         if(result.kind==='finished'||result.terminated||result.truncated){ask.status='environment_ended';break;}
       }
       if(ask.status==='running')ask.status='step_limit';
@@ -282,6 +298,14 @@ export class Manual {
       ask.error=String(error.message);ask.status='error';
       if(browserPending){live.driver.kill();await this.releaseLease(row);this.live.delete(row.id);row.status='interrupted';row.error='Browser command outcome uncertain; no action was retried.';}
     }finally{
+      if(this.live.has(row.id)&&ask.steps.at(-1)?.decision?.protocol==='native-core-v1'){
+        // Release the suspended core conversation, including exact failed/late
+        // transport evidence. This command cannot execute a pending model action.
+        const last=ask.steps.at(-1);
+        try{await live.driver.send({request_id:randomUUID(),operation:'agent_cancel',ask_id:ask.id,
+          evidence:!last.result&&last.request?{...last,error:last.error||'Ask ended before model action delivery'}:null});}
+        catch{live.driver.kill();await this.releaseLease(row);this.live.delete(row.id);row.status='interrupted';}
+      }
       if(cancelled())ask.status='interrupted';
       ask.finished_at=stamp();row.controller='human';
       if(!terminal.has(row.status))row.status='ready';

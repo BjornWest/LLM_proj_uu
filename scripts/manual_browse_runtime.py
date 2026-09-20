@@ -12,7 +12,7 @@ from intent_browser.environment_runtime import EnvironmentRuntime
 from intent_browser.trace import write_json
 
 TRICKY = {'tricky-shop': 'shop', 'tricky-health': 'health', 'tricky-news': 'news', 'tricky-music': 'spotify'}
-SITES = set(TRICKY) | {'webarena-shopping', 'webarena-forum'}
+SITES = set(TRICKY) | {'webarena-shopping', 'webarena-forum', 'prislyktan'}
 
 class BrowsingSession:
     task = None
@@ -21,9 +21,17 @@ class BrowsingSession:
         self.site_id = task_id.removeprefix('browse.')
         if self.site_id not in SITES: raise ValueError('Unsupported browsing site')
         self.server = None
+        self.prislyktan = None
         self.requests = []; self.blocked = []
         self.headers = {}
-        if self.site_id in TRICKY:
+        if self.site_id == 'prislyktan':
+            from intent_browser.prislyktan import create_runtime, runtime_descriptor
+            self.prislyktan=create_runtime()
+            descriptor=runtime_descriptor(self.prislyktan)
+            self.origin=descriptor['origins']['aggregator']
+            self.start_url=descriptor['homepage_url']
+            self.allowed_origins=descriptor['allowed_origins']
+        elif self.site_id in TRICKY:
             from intent_browser.tricky import FixtureServer
             self.server = FixtureServer(runtime.package/'fixtures/tricky-full-v1')
             if not self.server.build.get('full_site'): raise ValueError('Complete Tricky assets required')
@@ -37,13 +45,14 @@ class BrowsingSession:
             if u.scheme != 'http' or not u.hostname or u.path or u.query or u.fragment or u.username: raise ValueError('Invalid private browsing origin')
             self.headers = {'X-Daylight-Lease': launch['lease_token']}
             self.start_url = self.origin+'/'
+        if not hasattr(self,'allowed_origins'):self.allowed_origins=[self.origin]
 
     def prepare(self, trace):
         self.trace = trace
         return {'source': self.site_id, 'interaction_kind':'manual', 'browse_only':True,
                 'task_setup_applied':False, 'grader':None, 'training_eligible':False,
                 'package_sha256':self.runtime.manifest_hash,
-                'site_revision':self.server.build['site_revision'] if self.server else self.runtime.launch['image_id'],
+                'site_revision':self.server.build['site_revision'] if self.server else self.runtime.launch.get('image_id'),
                 'lease_provenance':{k:self.runtime.launch.get(k) for k in ('image_id','generation','reset_report_sha256','broker_sha256') } if not self.server else None,
                 'driver_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
 
@@ -60,7 +69,7 @@ class BrowsingSession:
                     if cached:
                         r.fulfill(body=(session.runtime.package/'resources'/cached['file']).read_bytes(),
                                   content_type=cached['content_type'],headers={'Access-Control-Allow-Origin':'*'})
-                    elif origin == session.origin:
+                    elif origin in session.allowed_origins:
                         session.requests.append({'url':url,'method':r.request.method})
                         r.continue_()
                     elif u.scheme in ('data','blob','about'): r.continue_()
@@ -92,6 +101,8 @@ class BrowsingSession:
                 'scope':'Browser requests only; no grading, headers or lease secrets'})
         if self.server:
             self.server.close(); self.server = None
+        if self.prislyktan:
+            self.prislyktan.close();self.prislyktan=None
 
 class BrowsingRuntime(EnvironmentRuntime):
     def __init__(self, package, state, *, launch=None):

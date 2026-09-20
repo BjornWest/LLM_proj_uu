@@ -212,3 +212,21 @@ def test_native_tools_reserve_exact_schemas_and_multistep_messages(tmp_path):
     assert all(json.loads(actual)[k]==v for k,v in options.items())
     assert result.raw['choices'][0]['message']['tool_calls'][0]['id']=='call2'
     model.close()
+
+
+def test_publisher_counts_child_cost_without_cross_session_provider_warning(tmp_path):
+    folder=tmp_path/'parent';folder.mkdir()
+    (folder/'metadata.json').write_text(json.dumps({'runtime':{},'model':'scripted'}))
+    root={'step':0,'model_request':{'session_id':'parent'},'model_response':{'provider':'A','usage':{'cost':.001}}}
+    (folder/'steps.jsonl').write_text(json.dumps(root)+'\n')
+    child=folder/'children/child';child.mkdir(parents=True)
+    row={'step':0,'model_request':{'session_id':'child'},'model_response':{'provider':'B','usage':{'cost':.002}}}
+    (child/'steps.jsonl').write_text(json.dumps(row)+'\n')
+    publisher=Publisher(SimpleNamespace(post=lambda *_:{}),{'id':'job','lease':'lease'},tmp_path)
+    publisher.directory=folder
+    result=publisher.project()
+    assert result['cost']['reported_usd']==pytest.approx(.003)
+    assert result['cost']['model_attempts']==2
+    assert result['cost']['scope']=='parent and helpers'
+    assert not result['cost']['alerts']
+    assert len(result['steps'])==1

@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 
 FILES = ('metadata.json', 'episode.json', 'steps.jsonl', 'events.jsonl', 'task.json',
-         'evaluation.json', 'external_evaluation.json')
+         'evaluation.json', 'external_evaluation.json', 'agents.json')
 
 
 def safe_file(directory, name):
@@ -29,6 +29,13 @@ def asset(root, relative):
     if len(parts) < 2 or not re.fullmatch(r'[A-Za-z0-9_-]+', parts[0]):
         raise ValueError('Invalid episode')
     directory = safe_file(root, parts[0])
+    # Manual session -> Ask -> helper; no arbitrary recursive filesystem walk.
+    for _ in range(2):
+        if len(parts) >= 4 and parts[1] == 'children' and re.fullmatch(r'[A-Za-z0-9_-]+', parts[2]):
+            directory = safe_file(directory, 'children/' + parts[2])
+            parts = parts[2:]
+        else:
+            break
     metadata = read_json(directory, 'metadata.json')
     if 'browsergym_version' not in metadata:
         raise ValueError('Not a BrowserGym episode')
@@ -43,7 +50,7 @@ def asset(root, relative):
     return path, types.get(path.suffix, 'text/plain; charset=utf-8')
 
 
-def project(directory):
+def project(directory, *, artifact_prefix=None):
     from ..trace import read_events
 
     directory = Path(directory)
@@ -72,7 +79,7 @@ def project(directory):
         try:
             path, _ = asset(directory.parent, f'{directory.name}/{name}')
             if path.is_file():
-                return dict(url='/artifacts/' + quote(f'{directory.name}/{name}', safe='/'),
+                return dict(url='/artifacts/' + quote(f'{artifact_prefix or directory.name}/{name}', safe='/'),
                             label=label, image=name.endswith('.png'))
         except ValueError:
             pass
@@ -287,10 +294,22 @@ def project(directory):
     case = (metadata.get('calibration_case') or {}).get('case_id')
     title = ' · '.join(str(v) for v in (case, metadata.get('source_task_id') or metadata.get('task'),
                                        metadata.get('driver'), label, directory.name) if v)
+    lineage=metadata.get('agent_lineage')
+    related=[]
+    def relation(episode,kind):
+        if isinstance(episode,str) and re.fullmatch(r'[A-Za-z0-9_-]+',episode):
+            related.append({'id':hashlib.sha256(('browsergym:'+episode).encode()).hexdigest()[:20],
+                            'episode_id':episode,'relationship':kind})
+    if isinstance(lineage,dict):
+        relation(lineage.get('parent_episode_id'),'parent')
+        for agent in read_json(directory,'agents.json').get('agents',[]):
+            if agent.get('parent_agent_id')==lineage.get('agent_id'):
+                relation(agent.get('episode_id'),'child')
     known = [m['at'] for m in messages if m['at']]
     return dict(id=hashlib.sha256(('browsergym:' + directory.name).encode()).hexdigest()[:20],
         title=title, started_at=started, updated_at=max(known) if known else '',
         state='recorded' if episode else 'incomplete', environment='browsergym',
+        **({'agent_lineage':lineage,'related_sessions':related} if isinstance(lineage,dict) else {}),
         timestamp_source='Recorded lifecycle timestamps; step order retained; missing times unknown',
         streams=[f'{directory.name}/steps.jsonl'], messages=messages,
         message_count=len(messages), decision_count=0,

@@ -23,7 +23,8 @@ def messages_digest(messages):
 
 
 def observation_text(obs, limit=16000):
-    tree = flatten_axtree_to_str(obs["axtree_object"])
+    tree = (flatten_axtree_to_str(obs["axtree_object"])
+            if obs["axtree_object"].get("nodes") else "[No browser assigned]")
     if len(tree) > limit:
         tree = tree[:limit] + "\n[Accessibility tree truncated]"
     return f"URL: {obs['url']}\nLast action error: {obs['last_action_error']}\nAccessibility tree:\n{tree}"
@@ -33,7 +34,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 record_video=False, hold_seconds=0, search_backend=None, episode_task=None,
                 before_observation=None, *, terminal_response_instruction=None,
                 observation_text_limit=16000, harness_profile=None, action_timeout_ms=None,
-                retry_policy=None):
+                retry_policy=None, helper_env_factory=None, agent_runtime=None, agent_actor=None,
+                delegated_instructions=None, delegated_goal=None, decision_wait=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
@@ -41,6 +43,18 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
     truncation marker; callers must budget the actual serialized request bytes.
     Neither option repairs model output or changes parsing or verification.
     """
+    if harness_profile is not None and harness_profile.agent_limits and agent_runtime is None:
+        from .delegation import AgentRuntime
+        runtime=AgentRuntime(backend,harness_profile.agent_limits,harness_profile,before_observation,helper_env_factory,
+            {'search_backend':search_backend,'action_timeout_ms':action_timeout_ms,'retry_policy':retry_policy,
+             'observation_text_limit':observation_text_limit,'decision_wait':decision_wait})
+        return runtime.run(lambda actor: run_episode(env_factory,actor['backend'],metadata,output,max_steps,seed,
+            record_video,hold_seconds,search_backend,episode_task,lambda:runtime.before_observation(actor),
+            terminal_response_instruction=terminal_response_instruction,observation_text_limit=observation_text_limit,
+            harness_profile=harness_profile,action_timeout_ms=action_timeout_ms,retry_policy=retry_policy,
+            agent_runtime=runtime,agent_actor=actor,delegated_instructions=delegated_instructions,
+            delegated_goal=delegated_goal,decision_wait=decision_wait))
+    no_browser=agent_actor is not None and agent_actor['browser']=='none'
     if action_timeout_ms is not None:
         validate_action_timeout(action_timeout_ms)
     terminal_instruction = (DEFAULT_TERMINAL_RESPONSE_INSTRUCTION
@@ -82,7 +96,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         if not hasattr(backend, 'configure_tools'):
             raise ValueError('Native tool profile requires a backend with configure_tools support')
         native_options = harness_profile.tools.request_options(allow_search=search_backend is not None)
-        backend.configure_tools(native_options)
+        if not harness_profile.navigation_from_reset:
+            backend.configure_tools(native_options)
     # Preserve the historical one-argument adapter call for default users.
     render_observation = (observation_text if observation_text_limit == 16000 else
                           lambda obs: observation_text(obs, limit=observation_text_limit))
@@ -91,7 +106,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         if harness_profile.observation is not None:
             render_observation = lambda obs: harness_profile.observation(obs, limit=observation_text_limit)
         conversation = harness_profile.conversation_factory()
-        feedback = harness_profile.feedback_factory()
+        if no_browser:
+            from .harness import SemanticFeedback
+            feedback=SemanticFeedback()
+        else:feedback = harness_profile.feedback_factory()
         if harness_profile.ax_config is not None:
             from .ax_explorer import AXExplorer
             if harness_profile.ax_config.incremental:
@@ -120,6 +138,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                                "request_seconds": "backend.complete wall time including validation/reservation; not isolated HTTP latency",
                                "inference_seconds": "legacy alias for request_seconds; legacy wrappers may still pace internally",
                                "browser_step_seconds": "env.step wall time including BrowserGym observation extraction"}})
+    if agent_runtime:agent_runtime.bind(agent_actor,trace)
     delivery = PolicyDelivery(trace) if harness_profile and harness_profile.delivery_tracking else None
     env = None
     navigation = None
@@ -173,7 +192,31 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         trace.event("environment_reset_started", seed=seed)
         obs, info = env.reset(seed=seed)
         reset_complete = True
-        if harness_profile and harness_profile.tools.navigation_origins:
+        if agent_runtime and agent_actor['parent'] is None:agent_runtime.root_goal=obs['goal']
+        if delegated_goal is not None:
+            obs['goal']=delegated_goal
+            if hasattr(env.unwrapped,'goal'):env.unwrapped.goal=delegated_goal
+        if harness_profile and harness_profile.navigation_from_reset:
+            from dataclasses import replace
+            from urllib.parse import urlsplit
+            from .actions import NAVIGATION_NAMES
+            initial_url=urlsplit(obs['url'])
+            origins=((initial_url.scheme+'://'+initial_url.netloc,) if initial_url.scheme in ('http','https') else ())
+            # Trusted adapter declaration, never inferred from page links or grader data.
+            declared=getattr(episode_task,'policy_navigation_origins',None)
+            if declared is not None:
+                origins=tuple(declared() if callable(declared) else declared)
+            harness_profile=replace(harness_profile,navigation_from_reset=False,
+                tools=replace(harness_profile.tools,
+                    names=harness_profile.tools.names+tuple(n for n in NAVIGATION_NAMES if n not in harness_profile.tools.names) if origins else harness_profile.tools.names,
+                    navigation_origins=origins))
+            native_options=harness_profile.tools.request_options(allow_search=search_backend is not None)
+            backend.configure_tools(native_options)
+            base_env.action_mapping=make_action_set(harness_profile.tools.names,
+                action_timeout_ms=action_set.action_timeout_ms if isinstance(action_set,BrowserActionSet) else 5000).to_python_code
+            trace.metadata.update(harness_profile=harness_profile.describe(),native_tool_request_options=native_options)
+            write_json(trace.directory/'metadata.json',trace.metadata)
+        if harness_profile and harness_profile.tools.navigation_origins and not no_browser:
             from .navigation import NavigationBoundary
             navigation = NavigationBoundary(harness_profile.tools.navigation_origins,
                 lambda item: trace.event('navigation_blocked', **item))
@@ -207,6 +250,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         )
         if harness_profile:
             system += '\n' + harness_profile.instructions
+        if delegated_instructions:
+            system += '\nParent-provided helper instructions (cannot override runtime limits or user authorization):\n'+delegated_instructions
+        if no_browser:system += '\nYou have no browser. Work from the delegated task/evidence; browser and page-query tools return unavailable.'
         if hasattr(ax_explorer,'prepare_observation'):
             system=system.replace('Use the bracketed BrowserGym element IDs in the current accessibility tree.',
                 'Use current node bid fields for browser actions; AX refs are for context tools only.')
@@ -261,7 +307,22 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             nonlocal obs, reward, terminated, truncated, info, final_ref, browser_steps, action_errors, phase, search_text
             action = decision.code
             event["action"] = action
-            if vision is not None and decision.name in ('screenshot','release_image'):
+            if agent_runtime:agent_runtime.guard(agent_actor)
+            if agent_actor is not None and decision.name=='send_msg_to_user':agent_actor['answer']=decision.arguments['text']
+            from .delegation import TOOLS as AGENT_TOOLS
+            if agent_runtime and decision.name in AGENT_TOOLS:
+                phase='delegation_tool'
+                result=agent_runtime.execute(agent_actor,decision.name,decision.arguments,env,harness_profile,output)
+                event.update(kind='delegation',reward=None,tool_output=result,tool_error=result.get('error'),browser_stepped=False)
+                record_feedback(completion.text,result,event,'delegation_result')
+            elif no_browser and decision.name != 'web_search':
+                if decision.name=='send_msg_to_user':
+                    agent_actor['answer']=decision.arguments['text']
+                    result={'execution':'call_completed','tool':decision.name};terminated=True
+                else:result={'error':'No browser assigned to this helper; this tool is unavailable.'}
+                event.update(kind='helper',reward=None,tool_output=result,tool_error=result.get('error'),browser_stepped=False)
+                record_feedback(completion.text,result,event,'helper_result')
+            elif vision is not None and decision.name in ('screenshot','release_image'):
                 phase = 'vision_tool'
                 trace.event('tool_started',call_id=f'tool-{index:03d}',tool=decision.name,arguments=decision.arguments)
                 if decision.name == 'screenshot':
@@ -321,6 +382,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 finally:
                     event['browser_step_seconds'] = time.monotonic() - started
                 browser_steps += 1
+                if agent_runtime:
+                    agent_runtime.action_notice(agent_actor,decision.name,obs.get('url'),obs.get('last_action_error'))
                 if navigation is not None:
                     blocked = navigation.take_blocked()
                     if blocked:
@@ -371,11 +434,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             phase = "before_observation"
             captured_at = None
             try:
+                if agent_runtime:agent_runtime.guard(agent_actor)
                 if recovery is not None and recovery['wait_seconds']:
                     trace.event('decision_retry_wait_started', step=index, seconds=recovery['wait_seconds'])
                     wait_started = time.monotonic()
                     try:
-                        time.sleep(recovery['wait_seconds'])
+                        (decision_wait or time.sleep)(recovery['wait_seconds'])
                     finally:
                         event['retry_wait_seconds'] = time.monotonic() - wait_started
                         trace.event('decision_retry_wait_completed', step=index, seconds=event['retry_wait_seconds'])
@@ -419,6 +483,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     finally:
                         event['feedback_seconds']=time.monotonic()-feedback_started
                 phase = "prompt"
+                if agent_runtime and delivery is not None:
+                    notice=agent_runtime.notices(agent_actor)
+                    if notice:
+                        source=delivery.register('delegation_result',json.dumps(notice,ensure_ascii=False),step=index,
+                            provenance={'scope':'public action notices from other agents'})
+                        conversation.add_evidence(notice,source_id=source)
                 event['observation'] = final_ref
                 event['observation_text_sha256'] = hashlib.sha256(text.encode('utf-8')).hexdigest()
                 search_context = (f"\nSearch calls remaining: {search_backend.max_calls - search_backend.calls}"
@@ -489,7 +559,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     from .batching import document_signature, target_signature, batch_events
                     from copy import deepcopy
                     phase = 'batch_execution'
-                    initial_document = document_signature(env)
+                    initial_document = [] if no_browser else document_signature(env)
                     initial_targets = {d.arguments['bid']: target_signature(obs,d.arguments['bid'])
                                        for d in decisions if 'bid' in d.arguments}
                     records, results = [], []
@@ -512,10 +582,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                                 member['observation_capture_seconds'] = time.monotonic()-started
                                 member['observation'] = trace.observation(member['execution_index'],obs,
                                     observation_text(obs),phase='batch_guard')
-                                if document_signature(env) != initial_document:
+                                if not no_browser and document_signature(env) != initial_document:
                                     batch_stop = 'document_or_navigation_changed'
                                 bid = decision.arguments.get('bid')
-                                if bid is not None and (initial_targets[bid] is None or
+                                if not no_browser and bid is not None and (initial_targets[bid] is None or
                                         target_signature(obs,bid) != initial_targets[bid]):
                                     batch_stop = batch_stop or 'target_removed_or_changed'
                                 if batch_stop is None:
@@ -527,7 +597,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                                         batch_stop = 'tool_error_inspect_effects_before_retry'
                                     elif terminated or truncated or decision.name == 'send_msg_to_user':
                                         batch_stop = 'episode_finished'
-                                    elif document_signature(env) != initial_document:
+                                    elif not no_browser and document_signature(env) != initial_document:
                                         batch_stop = 'document_or_navigation_changed'
                             except Exception as exc:
                                 member['error'] = f'{type(exc).__name__}: {exc}'
@@ -623,6 +693,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         stop_reason = "error" if isinstance(exc, Exception) else "interrupted"
         error = f"{type(exc).__name__}: {exc}"
     finally:
+        if agent_runtime and agent_actor['parent'] is None:agent_runtime.finish_children()
         outcome = {"terminated": terminated, "truncated": truncated or stop_reason == "max_steps",
                    "stop_reason": stop_reason, "error": error, "final_reward": reward}
         trace.event("evaluation_started", reset_complete=reset_complete)

@@ -34,13 +34,13 @@ export class WorkerReplay {
     const revision=sha(JSON.stringify([parts,sha(source),sha(script)]));
     const key='daylight/worker-replay-index/'+sha(owner)+'/'+id+'/'+revision;
     const cached=await this.store.read(key);
-    if(cached)return {job,projection:cached.value.id};
+    if(cached)return {job,...cached.value};
     if(!this.pending.has(key)){
       // Bound global cold projection concurrency; repeated opens share work.
       if(this.pending.size>=2)fail('Trace projection busy; try again shortly',429);
       this.pending.set(key,this.build(owner,job,key).finally(()=>this.pending.delete(key)));
     }
-    return {job,projection:await this.pending.get(key)};
+    return {job,...await this.pending.get(key)};
   }
   async build(owner,job,key){
     const temp=await mkdtemp(path.join(tmpdir(),'daylight-worker-replay-'));
@@ -52,15 +52,30 @@ export class WorkerReplay {
       const metadata={};
       for(const field of ['site_id','collection','interaction_kind','task_name','condition','task_revision','goal'])metadata[field]=job[field]??null;
       Object.assign(metadata,{task_id:job.task??null,execution_status:job.status,execution_mode:job.mode??null,metadata_source:'Recorded worker job; no current-registry inference'});
-      const row=await this.library.publish(path.join(temp,'bundle'),owner,metadata);
-      try{await this.store.write(key,{id:row.id});}catch(error){const prior=await this.store.read(key);if(prior?.value.id!==row.id)throw error;}
-      return row.id;
+      const family=JSON.parse(await readFile(path.join(temp,'bundle/family.json'))),members={},assets={};
+      for(const [episode,relative] of Object.entries(family.members)){
+        if(!/^[a-f0-9]{20}$/.test(episode)||!(relative==='.'||relative==='family/'+episode))fail('Invalid family projection',503);
+        const row=await this.library.publish(path.join(temp,'bundle',relative),owner,
+          episode===family.root?metadata:{...metadata,task_id:'delegated-task',task_name:'Helper conversation',goal:null,metadata_source:'Nested recorded conversation; no independent task grading'});
+        members[episode]=row.id;
+        const record=await this.library.record(owner,row.id);
+        for(const attachment of Object.keys(record.assets)){
+          if(assets[attachment]&&assets[attachment]!==row.id)fail('Ambiguous family asset',503);
+          assets[attachment]=row.id;
+        }
+      }
+      const record={projection:members[family.root],root:family.root,members,assets};
+      try{await this.store.write(key,record);}catch(error){const prior=await this.store.read(key);if(JSON.stringify(prior?.value)!==JSON.stringify(record))throw error;}
+      return record;
     }finally{await rm(temp,{recursive:true,force:true});}
   }
-  async session(owner,id){
-    const {job,projection}=await this.resolve(owner,id),value=JSON.parse((await this.library.session(owner,projection)).raw);
+  async session(owner,id,episode=null){
+    const family=await this.resolve(owner,id),{job}=family;
+    if(episode!==null&&(!/^[a-f0-9]{20}$/.test(episode)||!Object.hasOwn(family.members,episode)))fail('Conversation not found',404);
+    const selected=episode||family.root,projection=family.members[selected],value=JSON.parse((await this.library.session(owner,projection)).raw);
     value.id=id;
-    value.library_metadata.evaluation=job.evaluation??null;
+    if(selected===family.root)value.library_metadata.evaluation=job.evaluation??null;
+    value.family_sessions=Object.keys(family.members).map(member=>({episode_id:member,relationship:member===family.root?'root':'helper',selected:member===selected}));
     value.library_metadata.execution_status=job.status;
     value.worker_trace={id,original_url:'/api/harness/jobs/'+id+'/trace',error:job.error??null,grader_recomputed:false};
     for(const message of value.messages)for(const attachment of message.attachments||[]){
@@ -68,5 +83,5 @@ export class WorkerReplay {
     }
     const raw=Buffer.from(JSON.stringify(value));return {raw,etag:'"'+sha(raw)+'"'};
   }
-  async asset(owner,id,attachment,range){const {projection}=await this.resolve(owner,id);return this.library.asset(owner,projection,attachment,range);}
+  async asset(owner,id,attachment,range){const family=await this.resolve(owner,id),projection=family.assets[attachment];if(!projection)fail('Asset not found',404);return this.library.asset(owner,projection,attachment,range);}
 }

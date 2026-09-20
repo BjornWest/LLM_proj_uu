@@ -42,7 +42,7 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
       if(env.DAYLIGHT_CONTROL_READ_ONLY==='1'&&(worker||operation==='write'||isManual))return send(503,{error:'Storage maintenance; no writes accepted'});
       if(isLibrary){
         if(operation==='list')return send(200,await library.list(value.owner,value));
-        if(operation==='session'||operation==='worker-session'){const result=await (operation==='worker-session'?replay:library).session(value.owner,value.id);res.setHeader('ETag',result.etag);res.end(result.raw);return;}
+        if(operation==='session'||operation==='worker-session'){const result=await (operation==='worker-session'?replay:library).session(value.owner,value.id,value.episode??null);res.setHeader('ETag',result.etag);res.end(result.raw);return;}
         const asset=await (operation==='worker-asset'?replay:library).asset(value.owner,value.id,value.attachment,value.range);
         res.statusCode=asset.status;res.setHeader('Content-Type',asset.type);res.setHeader('Content-Length',asset.end-asset.start+1);res.setHeader('ETag',asset.etag);res.setHeader('Accept-Ranges','bytes');
         if(asset.status===206)res.setHeader('Content-Range',`bytes ${asset.start}-${asset.end}/${asset.size}`);

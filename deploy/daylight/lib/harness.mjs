@@ -3,6 +3,7 @@ import {randomUUID,createHash,timingSafeEqual} from 'node:crypto';
 import {Agent,completionTokenLimit} from './agent.mjs';
 import registry from '../../../config/team_tasks.json' with {type:'json'};
 import expanded from '../../../config/expanded_team_tasks.json' with {type:'json'};
+import prislyktan from '../../../config/prislyktan_tasks.json' with {type:'json'};
 import {interactionKind,siteForTask,recordedActivity,validateSite} from './activity.mjs';
 
 const KEY='daylight/harness/control-v1.json';
@@ -17,8 +18,9 @@ export const TASKS=[
     custom_goal:false,revision:task.revision,site_revision:task.site_revision??null,site:task.site,condition:task.condition,
     verification_scope:task.verification_scope,development_only:true})),
   ...expanded.tasks,
+  ...prislyktan.tasks.map(({selector,...task})=>task),
 ].map(task=>({...task,...siteForTask(task.id)}));
-const needsRevision=task=>!!(task?.site_revision||task?.expanded);
+const needsRevision=task=>!!(task?.site_revision||task?.expanded||task?.id?.startsWith('prislyktan:'));
 const limitsFor=id=>TASKS.find(task=>task.id===id)?.execution_limits||{max_steps:12,max_input_bytes:250000};
 export function workerAuthorized(header,env) {
   const secret=env.HARNESS_WORKER_TOKEN;

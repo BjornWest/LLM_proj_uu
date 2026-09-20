@@ -74,43 +74,67 @@ def project(archive, output):
         metadata = json.loads((directory / 'metadata.json').read_text())
         if metadata.get('episode_id') != directory.name:
             raise ValueError('Episode identity mismatch')
-        session = browsergym.project(directory)
-        if not session:
-            raise ValueError('Not a BrowserGym trace')
-        assets, files = {}, {}
+        def emit_projection(directory, output):
+            session = browsergym.project(directory, artifact_prefix=str(directory.relative_to(scratch)))
+            if not session:
+                raise ValueError('Not a BrowserGym trace')
+            assets, files = {}, {}
 
-        def write(name, raw):
-            path = output / name
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(raw)
-            files[name] = {'sha256': sha(raw), 'bytes': len(raw)}
+            def write(name, raw):
+                path = output / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(raw)
+                files[name] = {'sha256': sha(raw), 'bytes': len(raw)}
 
-        for message in session['messages']:
-            for attachment in message.get('attachments', []):
-                url = attachment['url']
-                if not url.startswith('/artifacts/'):
-                    raise ValueError('Unexpected shared projection asset')
-                file, mime = browsergym.asset(scratch, unquote(url.removeprefix('/artifacts/')))
-                raw = file.read_bytes()
-                name = 'assets/' + sha(raw)
-                if name not in files:
-                    write(name, raw)
-                assets[url] = {'path': name, 'mime_type': mime, **files[name]}
-        write('session.json', json.dumps(session, ensure_ascii=False).encode())
-        write('assets.json', json.dumps(assets).encode())
-        # Prefer the worker's post-close authoritative evaluation when retained.
-        evaluation_file = directory / 'authoritative-evaluation.json'
-        if not evaluation_file.exists():
-            evaluation_file = directory / 'evaluation.json'
-        evaluation = json.loads(evaluation_file.read_text()) if evaluation_file.exists() else None
-        if evaluation_file.name == 'authoritative-evaluation.json' and isinstance(evaluation, dict):
-            evaluation = evaluation.get('evaluation')
-        manifest = {'schema_version': 1, 'kind': 'browsergym-saved-replay-v1',
-                    'read_only': True, 'grader_recomputed': False,
-                    'viewer_session_id': session['id'], 'raw_outcomes': evaluation,
-                    'archive_sha256': sha(Path(archive).read_bytes()),
-                    'projection_source': provenance, 'files': files}
-        (output / 'manifest.json').write_text(json.dumps(manifest))
+            for message in session['messages']:
+                for attachment in message.get('attachments', []):
+                    url = attachment['url']
+                    if not url.startswith('/artifacts/'):
+                        raise ValueError('Unexpected shared projection asset')
+                    file, mime = browsergym.asset(scratch, unquote(url.removeprefix('/artifacts/')))
+                    raw = file.read_bytes()
+                    name = 'assets/' + sha(raw)
+                    if name not in files:
+                        write(name, raw)
+                    assets[url] = {'path': name, 'mime_type': mime, **files[name]}
+            write('session.json', json.dumps(session, ensure_ascii=False).encode())
+            write('assets.json', json.dumps(assets).encode())
+            # Prefer the worker's post-close authoritative evaluation when retained.
+            evaluation_file = directory / 'authoritative-evaluation.json'
+            if not evaluation_file.exists():
+                evaluation_file = directory / 'evaluation.json'
+            evaluation = json.loads(evaluation_file.read_text()) if evaluation_file.exists() else None
+            if evaluation_file.name == 'authoritative-evaluation.json' and isinstance(evaluation, dict):
+                evaluation = evaluation.get('evaluation')
+            manifest = {'schema_version': 1, 'kind': 'browsergym-saved-replay-v1',
+                        'read_only': True, 'grader_recomputed': False,
+                        'viewer_session_id': session['id'], 'raw_outcomes': evaluation,
+                        'archive_sha256': sha(Path(archive).read_bytes()),
+                        'projection_source': provenance, 'files': files}
+            (output / 'manifest.json').write_text(json.dumps(manifest))
+            return session['id']
+
+        root_id = emit_projection(directory, output)
+        members = {root_id: '.'}
+        children = sorted([*directory.glob('children/*/metadata.json'),
+                           *directory.glob('children/*/children/*/metadata.json')])
+        if len(children) > 150:
+            raise ValueError('Too many nested conversations')
+        for metadata_path in children:
+            child = metadata_path.parent
+            metadata = json.loads(metadata_path.read_text())
+            if metadata.get('episode_id') != child.name:
+                raise ValueError('Nested episode identity mismatch')
+            member_id = hashlib.sha256(('browsergym:' + child.name).encode()).hexdigest()[:20]
+            if member_id in members:
+                raise ValueError('Duplicate nested episode identity')
+            destination = output / 'family' / member_id
+            destination.mkdir(parents=True)
+            if emit_projection(child, destination) != member_id:
+                raise ValueError('Nested projection identity mismatch')
+            members[member_id] = 'family/' + member_id
+        (output / 'family.json').write_text(json.dumps({'root': root_id, 'members': members}))
+
 
 
 if __name__ == '__main__':

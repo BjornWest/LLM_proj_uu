@@ -52,6 +52,8 @@ def run(args):
     from intent_browser.observation import refresh_observation
     from intent_browser.evaluation import Evaluation
     from shared_browser_policy import messages_for, parse_reply
+    from intent_browser.actions import parse_decision
+    from intent_browser.interactive_episode import InteractiveEpisode
 
     output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -74,6 +76,7 @@ def run(args):
     pending_decision = None
     active_ask = None
     agent_turns = 0
+    core_ask = None
     def capture(observation):
         nonlocal frame_index, frame
         if frame_index >= 300:
@@ -91,6 +94,25 @@ def run(args):
                 'trace_directory': str(trace.directory), 'episode': trace.episode_id,
                 'last_error': obs.get('last_action_error') if obs else None,
                 'terminated': terminated, 'truncated': truncated}
+    def core_step(code,result):
+        nonlocal obs,reward,terminated,truncated,info,steps,errors
+        if code.startswith('send_msg_to_user('):
+            answer=parse_decision(code).arguments['text']
+            history.append({'actor':'agent','answer':answer})
+            trace.event('shared_agent_answer',ask_id=active_ask,answer=answer)
+            return
+        if steps>=100:raise RuntimeError('Shared session action limit reached')
+        before=frame
+        obs,reward,terminated,truncated,info=result
+        capture(obs)
+        trace.append({'step':steps,'actor':'agent','ask_id':active_ask,'action':code,
+            'observation':before['artifact'],'next_observation':frame['artifact'],
+            'reward':reward,'error':obs.get('last_action_error') or None,
+            'policy_scope':'Exact model context and native calls retained in nested core Ask trace'})
+        steps+=1;errors+=bool(obs.get('last_action_error'))
+        history.append({'actor':'agent','action':code,'error':obs.get('last_action_error')})
+        if session.task and hasattr(session.task,'after_step'):
+            session.task.after_step(env,trace,steps)
     def interrupted(*_):
         raise InterruptedError('Manual controller stopped the session')
     signal.signal(signal.SIGTERM, interrupted)
@@ -136,7 +158,14 @@ def run(args):
                 last_command = command['request_id']
                 trace.event('manual_command_received', request_id=last_command, command=command)
                 operation = command.get('operation')
+                if operation == 'agent_cancel':
+                    if command.get('ask_id') != active_ask:
+                        emit({'kind':'rejected','request_id':last_command,'error':'Ask is no longer current.'});continue
+                    if core_ask and not core_ask.closed:core_ask.cancel(command.get('evidence'))
+                    pending_decision=None
+                    emit({'kind':'result','request_id':last_command,**state()});continue
                 if operation == 'close':
+                    if core_ask and not core_ask.closed:core_ask.cancel()
                     stop_reason = command.get('reason', 'user_close')
                     break
                 if operation == 'agent_observe':
@@ -145,15 +174,24 @@ def run(args):
                     if not isinstance(goal, str) or not 0 < len(goal) <= 2000 or not isinstance(ask_id, str):
                         raise ValueError('Invalid agent request')
                     if ask_id != active_ask:
+                        if core_ask and not core_ask.closed:core_ask.cancel()
+                        core_ask=InteractiveEpisode(env,goal,trace.directory/'children',on_step=core_step,public_history=history[-20:],
+                            metadata={'shared_session_episode_id':trace.episode_id,'ask_id':ask_id},
+                            navigation_origins=getattr(session,'allowed_origins',()),
+                            interrupted=lambda ident=ask_id:(trace.directory/('interrupt-'+ident+'.json')).is_file())
                         active_ask = ask_id; agent_turns += 1
-                        trace.metadata.update(interaction_kind='shared', driver='shared-browser', policy_protocol='browsergym-json-action-v1')
+                        trace.metadata.update(interaction_kind='shared', driver='shared-browser', policy_protocol='core-tools-v10-agents')
                         write_json(trace.directory/'metadata.json', trace.metadata)
                         history.append({'actor': 'human', 'request': goal})
                         trace.event('shared_agent_turn_started', ask_id=ask_id, goal=goal)
                     obs = refresh_observation(env); capture(obs)
-                    messages = messages_for(obs, goal, history)
+                    selected=core_ask.observe()
+                    if selected['kind']!='model_request':
+                        emit({'kind':'result','request_id':last_command,'answer':selected.get('answer'),'agent_error':selected.get('error'),**state()});continue
                     pending_decision = {'id': str(uuid4()), 'ask_id': ask_id,
-                        'observation': frame['artifact'], 'messages': messages, 'frame_id': frame['id']}
+                        'observation': frame['artifact'], 'messages': selected['messages'], 'frame_id': frame['id'],
+                        'protocol':'native-core-v1','session_id':selected['session_id'],
+                        'native_options':{k:selected[k] for k in ('tools','tool_choice','parallel_tool_calls') if k in selected}}
                     trace.event('shared_decision_captured', **pending_decision)
                     emit({'kind': 'result', 'request_id': last_command, 'decision': pending_decision, **state()})
                     continue
@@ -169,6 +207,17 @@ def run(args):
                     trace.event('shared_model_result', ask_id=active_ask, decision=pending_decision, evidence=evidence)
                     before = frame
                     decision_record = pending_decision; pending_decision = None
+                    if core_ask is not None:
+                        prior_steps=steps
+                        result=core_ask.accept(evidence)
+                        obs=refresh_observation(env);capture(obs)
+                        payload={'kind':'result','request_id':last_command,'actions':result.get('actions',[]),
+                            'core_episode':Path(result['trace']).name if result.get('trace') else None,
+                            'core_finished':result['kind']=='finished','browser_action_count':steps-prior_steps,
+                            'retry_wait_seconds':result.get('retry_wait_seconds',0),
+                            'agent_error':result.get('error'),**state()}
+                        if result.get('answer') is not None:payload['answer']=result['answer']
+                        emit(payload);continue
                     try:
                         decision = parse_reply(evidence.get('output', ''))
                     except Exception as error:
@@ -269,6 +318,7 @@ def run(args):
                         reference_evaluation = Evaluation('manual-reference-unavailable', '1', technical_error=type(error).__name__).to_dict()
                     write_json(trace.directory/'reference-evaluation.json', reference_evaluation)
                     trace.event('evaluation_completed', artifact='reference-evaluation.json', scope='reference_task_diagnostic_only')
+                if core_ask and not core_ask.closed:core_ask.cancel()
                 if env is not None:
                     trace.event('environment_close_started')
                     try: env.close()

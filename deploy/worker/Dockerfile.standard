@@ -1,0 +1,13 @@
+# Build context is scripts/package_standard_worker.py output, never the workspace.
+# Retain the installed native grading environment and browser binaries.
+ARG RUNTIME_IMAGE=intent-browser-worker:expanded-candidate-v3
+FROM ${RUNTIME_IMAGE}
+USER root
+RUN python -m pip install --no-cache-dir tokenizers==0.23.2
+COPY runtime/ /app/
+COPY runtime/ /opt/expanded/runtime/
+COPY registry.json /opt/expanded/registry.json
+COPY standard-manifest.json /opt/harness/manifest.json
+COPY tokenizer.json /opt/harness/tokenizer.json
+ENV HARNESS_AX_TOKENIZER=/opt/harness/tokenizer.json
+USER 10001:10001

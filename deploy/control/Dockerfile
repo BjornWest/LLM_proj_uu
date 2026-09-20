@@ -7,7 +7,7 @@ COPY deploy/daylight/lib/sqlite-store.mjs deploy/daylight/lib/harness.mjs deploy
 COPY deploy/daylight/vendor/agent_trace /app/deploy/daylight/vendor/agent_trace
 COPY scripts/project_worker_trace.py /app/scripts/
 COPY scripts/manual_environment.py scripts/manual_browse_runtime.py scripts/shared_browser_policy.py /app/scripts/
-COPY config/team_tasks.json config/team_sites.json config/expanded_team_tasks.json /app/config/
+COPY config/team_tasks.json config/team_sites.json config/expanded_team_tasks.json config/prislyktan_tasks.json /app/config/
 RUN mkdir -p /state /manual && chown 10001:10001 /state /manual
 ENV DAYLIGHT_SQLITE_PATH=/state/state.sqlite BIND_HOST=0.0.0.0 PORT=8894
 USER 10001:10001

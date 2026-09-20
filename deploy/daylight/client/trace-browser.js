@@ -8,7 +8,7 @@ export function allowedViewerAsset(value){
 }
 async function read(url){const response=await fetch(url,{credentials:'same-origin',redirect:'error'});if(!response.ok)throw Error(response.status===401?'Invitation expired':response.status===404?'Saved session unavailable':'Trace service unavailable');return response;}
 const workerSource=()=>new URLSearchParams(location.search).get('source')==='harness';
-const sessionURL=id=>workerSource()?'/api/harness/jobs/'+encodeURIComponent(id)+'/session':'/api/library/sessions/'+encodeURIComponent(id);
+const sessionURL=id=>workerSource()?'/api/harness/jobs/'+encodeURIComponent(id)+'/session'+(new URLSearchParams(location.search).has('episode')?'?episode='+encodeURIComponent(new URLSearchParams(location.search).get('episode')):''):'/api/library/sessions/'+encodeURIComponent(id);
 let selectedResponse=null;
 export async function loadViewerIndex(){
   // The embedded view opens one authorized session without downloading the catalog.
@@ -81,6 +81,10 @@ function friendlyCall(name,args,labels,refs,fallback){
     case 'go_forward':return {title:'Go forward'};
     case 'reload':return {title:'Reload page'};
     case 'noop':return {title:'Wait',detail:args.wait_ms!=null?args.wait_ms+' ms':null};
+    case 'spawn_agent':return {title:'Ask a helper',detail:short(args.task)};
+    case 'wait_agent':return {title:'Wait for helper',detail:args.agent_id};
+    case 'get_agent':return {title:'Check helper progress',detail:args.agent_id};
+    case 'cancel_agent':return {title:'Stop helper',detail:args.agent_id};
     case 'send_msg_to_user':return {title:'Reply to user',answer:args.text};
     default:return {title:fallback};
   }
@@ -232,6 +236,16 @@ export function createBrowserExtension({jumpToMessage}){
     recorded.replaceChildren();recorded.hidden=!session?.worker_trace;
     if(session?.worker_trace){
       const trace=session.worker_trace;
+      if(session.family_sessions?.length>1){
+        const family=element('nav');family.setAttribute('aria-label','Agent conversations');
+        for(const [index,member] of session.family_sessions.entries()){
+          if(!/^[a-f0-9]{20}$/.test(member.episode_id))continue;
+          const link=element('a',(member.relationship==='root'?'Parent conversation':'Helper '+index)+(member.selected?' (selected)':''));
+          const url=new URL(location.href);url.searchParams.set('episode',member.episode_id);link.href=url.pathname+url.search+url.hash;
+          link.style.marginRight='1rem';family.append(link);
+        }
+        recorded.append(family);
+      }
       recorded.append(element('p','Recorded worker run · '+(session.library_metadata?.execution_status||'Unknown status')+' · no grading recomputed.','muted'));
       if(trace.error)recorded.append(element('pre',typeof trace.error==='string'?trace.error:JSON.stringify(trace.error),'browser-replay-action'));
       const verdict=element('details');verdict.append(element('summary','Recorded final evaluation'),element('pre',JSON.stringify(session.library_metadata?.evaluation??null,null,2)));recorded.append(verdict);

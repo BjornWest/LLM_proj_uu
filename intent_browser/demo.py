@@ -138,25 +138,27 @@ class RehearsalBackend:
 
 
 class DemoBackend(ChatCompletionsBackend):
+    supports_native_tools = True
     """Separate demo ledger; reservations bound spend, anomaly flags aid review."""
     def __init__(self, ledger, config, lock, *, max_tokens=None, action_format=False):
         options=provider_options(config['providers'])
         options['provider']['max_price']={'prompt':0.5,'completion':4,'request':0}
         super().__init__('https://openrouter.ai/api/v1',config['model'],config['key'],
-                         max_tokens=completion_token_limit(max_tokens if max_tokens is not None else config.get('max_tokens')),request_options=options,session_routing=True)
+                         max_tokens=completion_token_limit(max_tokens if max_tokens is not None else config.get('max_tokens')),request_options=options,session_routing=True,supports_images=True)
         self.ledger,self.budget_lock=ledger,lock
         self.stop=False
         self.action_format=action_format
 
     def complete(self,messages):
         if self.stop or not self.session_id: raise ValueError('Demo inference stopped before dispatch')
-        if any(not isinstance(m.get('content'),str) for m in messages): raise ValueError('Demo budget supports text input only')
         if self.action_format:
             messages=deepcopy(messages)
             messages[-1]['content'] += ("\n\nACTION RESPONSE FORMAT: Return one Python-style function call, with quoted string arguments. "
                 "For example click('42') or select_option('42', 'value'). Use the actual element ID from the page. "
                 "Do not use XML, HTML tags, JSON or prose. When finished return send_msg_to_user('Done').")
-        bound=len(json.dumps(messages,ensure_ascii=False).encode())+2048
+        request={'model':self.model,'messages':messages,'temperature':0,'max_tokens':self.max_tokens,
+                 'stream':False,**self.request_options,'session_id':self.session_id}
+        bound=len(json.dumps(request,ensure_ascii=False).encode())+2048
         reserve=(Decimal(bound)*Decimal('0.5')+Decimal(self.max_tokens)*Decimal(4))/Decimal(1000000)
         with self.budget_lock:
             data=json.loads(self.ledger.read_text()) if self.ledger.exists() else {'cap_usd':'3','reserved_usd':'0','requests':[]}
@@ -196,6 +198,7 @@ class DemoBackend(ChatCompletionsBackend):
 
 
 class DemoTask:
+    supported_harness_profiles=('core-tools-v9-batch','core-tools-v10-agents')
     def __init__(self,app,job): self.app,self.job=app,job
     def prepare(self,trace):
         self.trace=trace;self.job['episode']=trace.episode_id
@@ -273,7 +276,7 @@ class DemoApp:
             import gymnasium as gym
             from .actions import make_action_set
             from .runner import run_episode
-            backend=DemoBackend(self.ledger,self.config,self.budget_lock,action_format=True) if job['mode']=='live' else RehearsalBackend(job['area'])
+            backend=DemoBackend(self.ledger,self.config,self.budget_lock,action_format=False) if job['mode']=='live' else RehearsalBackend(job['area'])
             task=DemoTask(self,job);actions=make_action_set()
             def factory(video):
                 options={'headless':True,'slow_mo':350,'wait_for_user_message':False,
@@ -295,6 +298,13 @@ class DemoApp:
                             return 0,done,'',{'episode_boundary':'first_accepted_reservation'}
                     return BrowserEnv(task_entrypoint=SingleReservationTask,**options)
                 return gym.make('browsergym/openended',task_kwargs={'start_url':url,'goal':job['goal']},**options)
+            options={}
+            if job['mode']=='live':
+                from .standard_profile import standard_profile
+                from .retry_policy import DecisionRetryPolicy
+                from .helper_browser import openended_helper_factory
+                options={'harness_profile':standard_profile(), 'retry_policy':DecisionRetryPolicy(),
+                         'helper_env_factory':openended_helper_factory}
             _,summary=run_episode(factory,backend,{'task':'daylight.'+job['area'],'source':'daylight-local-demo',
                 'goal':job['goal'],'model':backend.model if job['mode']=='live' else 'scripted-rehearsal',
                 'backend':backend.base_url if job['mode']=='live' else 'scripted-rehearsal',
@@ -302,7 +312,7 @@ class DemoApp:
                 'demo_action_format_reminder':job['mode']=='live',
                 'episode_boundary':'first_accepted_reservation' if job['area']=='booking' else 'agent_finished',
                 'training_eligible':False,'generation':{'max_tokens':backend.max_tokens,**backend.request_options} if job['mode']=='live' else None},
-                max_steps=12,record_video=True,episode_task=task,output=ROOT/'runs')
+                max_steps=12,record_video=True,episode_task=task,output=ROOT/'runs',**options)
             job['summary']=summary;job['error']=summary['error']
         except BaseException as exc: job['error']=f'{type(exc).__name__}: {exc}'
         finally:
@@ -337,7 +347,10 @@ class DemoApp:
                            'send_msg_to_user':'Finished the request'}.get(verb,'Interacted with the page')
                     data['activity'].append(label+(f' “{name}”' if name and verb!='send_msg_to_user' else ''))
         if self.ledger.exists():
-            ledger=json.loads(self.ledger.read_text());rows=[r for r in ledger['requests'] if r['session_id']==job['episode']]
+            ledger=json.loads(self.ledger.read_text());family={job['episode']}
+            if job.get('episode') and (ROOT/'runs'/job['episode']/'agents.json').is_file():
+                family.update(a.get('episode_id') for a in json.loads((ROOT/'runs'/job['episode']/'agents.json').read_text()).get('agents',[]))
+            rows=[r for r in ledger['requests'] if r['session_id'] in family]
             if rows:
                 known=[float(r['cost']) for r in rows if r.get('cost') is not None]
                 data['cost']=sum(known) if known else None

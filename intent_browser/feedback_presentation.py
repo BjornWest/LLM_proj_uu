@@ -27,7 +27,7 @@ class CompactFeedback:
                 'selection':'important events first, exact generic duplicates removed within source/window; bounded AX changes'}
 
     def __call__(self,value,*,kind):
-        if kind in ('search_result','ax_result'):return deepcopy(value)  # separate result budgets
+        if kind in ('search_result','ax_result','delegation_result','helper_result'):return deepcopy(value)  # separate result budgets
         counts={'raw_events':0,'capture_omitted':0,'focus_suppressed':0,'generic_duplicates':0,
                 'selection_omitted':0,'truncated_fields':0,'ax_lines_omitted':0}
         def clip(text,limit):

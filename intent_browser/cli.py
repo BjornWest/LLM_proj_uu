@@ -78,14 +78,15 @@ def main():
     parser.add_argument("--goal", default="Click the Finish button.")
     parser.add_argument('--native-tool-choice', choices=['auto','required'], default='auto',
                         help='core-tools profiles only: advertise tools normally or require a tool call')
-    parser.add_argument('--retry-policy', choices=['none','bounded-v1'], default='none',
+    parser.add_argument('--retry-policy', choices=['none','bounded-v1'], default=None,
                         help='Opt-in single model recovery within existing episode call/budget caps')
     parser.add_argument('--strict-tools', action='store_true',
                         help='core-tools profiles only: request provider-side strict argument schemas')
     parser.add_argument('--reasoning-replay', choices=['preserve','strip'], default=None,
                         help='core-tools profiles: preserve returned reasoning (default), or strip for an ablation')
-    parser.add_argument('--harness-profile', choices=['legacy', 'append-feedback-v1', 'append-events-v1', 'core-feedback-v2', 'core-tools-v1', 'core-tools-v2', 'core-tools-v3', 'core-tools-v4-navigation', 'core-tools-v5-feedback', 'core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'],
-                        default='legacy', help='Development opt-in; existing task adapters need separate adoption')
+    parser.add_argument('--harness-profile', choices=['legacy', 'append-feedback-v1', 'append-events-v1', 'core-feedback-v2', 'core-tools-v1', 'core-tools-v2', 'core-tools-v3', 'core-tools-v4-navigation', 'core-tools-v5-feedback', 'core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch','core-tools-v10-agents'],
+                        default=None, help='Live runs default to the combined current harness; explicit historical profiles remain available')
+    parser.add_argument('--no-subagents',action='store_true',help='Current harness ablation: omit helper tools for the whole conversation')
     parser.add_argument('--navigation-origin', action='append', default=[],
                         help='Trusted exact HTTP(S) origin; repeat for multi-site navigation profile')
     parser.add_argument('--image-retention', choices=['retain','agent'], default=None,
@@ -117,6 +118,14 @@ def main():
     parser.add_argument("--hold-seconds", type=int, default=0)
     parser.add_argument("--output", default="runs")
     args = parser.parse_args()
+    current_profile=args.harness_profile=='core-tools-v10-agents' or (args.harness_profile is None and args.mode=='run')
+    if current_profile:
+        from .standard_profile import tokenizer_path
+        args.harness_profile='core-tools-v9-batch'
+        args.ax_tokenizer_file=args.ax_tokenizer_file or tokenizer_path()
+    elif args.harness_profile is None:args.harness_profile='legacy'
+    args.retry_policy=args.retry_policy or ('bounded-v1' if current_profile else 'none')
+    if args.no_subagents and not current_profile:parser.error('--no-subagents requires the current harness')
     if not 1 <= args.preview_port <= 65535:
         parser.error('--preview-port must be 1..65535')
     if bool(args.chaos_base_url) != bool(args.chaos_task):
@@ -242,7 +251,9 @@ def main():
     harness_profile = None
     if args.harness_profile != 'legacy':
         if episode_task is not None:
-            parser.error('Development harness profiles are not yet adopted by certified task adapters')
+            if not current_profile:parser.error('Historical development profiles require explicit adapter adoption')
+            from .current_task import CurrentPolicyTask
+            episode_task=CurrentPolicyTask(episode_task)
         from .harness import HarnessProfile
         if args.harness_profile in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'):
             if args.mode != 'run':
@@ -258,6 +269,11 @@ def main():
                 vision_config=VisionConfig(args.image_retention or "retain") if args.harness_profile in ("core-tools-v8-vision","core-tools-v9-batch") else None,
                 reasoning_replay=args.reasoning_replay or 'preserve',
                 batch_size=8 if args.harness_profile=='core-tools-v9-batch' else 1)
+            if current_profile:
+                from dataclasses import replace
+                from .harness import with_subagents
+                harness_profile=replace(harness_profile,navigation_from_reset=not bool(args.navigation_origin))
+                if not args.no_subagents:harness_profile=with_subagents(harness_profile)
         elif args.harness_profile == 'core-feedback-v2':
             from .harness import core_feedback_profile
             harness_profile=core_feedback_profile()
@@ -311,7 +327,9 @@ def main():
                                  action_timeout_ms=args.action_timeout_ms,
                                  retry_policy=(DecisionRetryPolicy()
                                                if args.retry_policy == 'bounded-v1' else None),
-                                 **({'harness_profile': harness_profile} if harness_profile else {}))
+                                 **({'harness_profile': harness_profile} if harness_profile else {}),
+                                 **({'helper_env_factory': __import__('intent_browser.helper_browser',fromlist=['openended_helper_factory']).openended_helper_factory}
+                                    if current_profile and episode_task is None and args.task=='openended' else {}))
     finally:
         backend.close()
         if search_backend:

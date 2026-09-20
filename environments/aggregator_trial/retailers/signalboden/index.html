@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signalboden – uppkopplad teknik</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="utility"><span>Fri rådgivning för teknik som fungerar tillsammans</span><span>Vardagar 09–17 · 08-410 20 30</span></div>
+    <div class="header-main">
+      <a class="wordmark" href="#/" aria-label="Signalboden startsida"><span class="mark">S</span><span>signal<span class="wordmark-soft">boden</span></span></a>
+      <form id="search-form" class="search" role="search">
+        <label class="sr-only" for="search-input">Sök produkter</label>
+        <input id="search-input" type="search" placeholder="Sök efter produkt, märke eller kategori" autocomplete="off">
+        <button type="submit" aria-label="Sök">Sök</button>
+      </form>
+      <nav class="header-actions" aria-label="Snabblänkar">
+        <a href="#/orders">Mina köp</a>
+        <a class="cart-link" href="#/cart">Varukorg <span id="cart-count" class="count">0</span></a>
+      </nav>
+    </div>
+    <nav id="category-nav" class="category-tabs" aria-label="Kategorier"></nav>
+  </header>
+
+  <div class="status-bar"><div id="notice" class="notice" role="status" aria-live="polite" hidden></div><div id="loading" class="loading" aria-live="polite">Laddar Signalboden…</div></div>
+  <main id="app" class="page" tabindex="-1"></main>
+  <footer class="site-footer"><div><strong>Signalboden</strong> · Specialister på uppkopplad teknik</div><div>Simulerad butik för testköp · Inga riktiga betalningar</div></footer>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -21,7 +21,7 @@ def main():
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.on('request',lambda r:writes.append((r.url,r.post_data_json)) if r.method=='POST' and '/api/' in r.url else None)
         page.goto(origin);page.get_by_label('Your invitation code').fill('offline-interactive-code-'*3);page.get_by_role('button',name='Open demo').click()
-        expect(page.locator('#question')).to_be_enabled();expect(page.locator('#site-count')).to_have_text('9')
+        expect(page.locator('#question')).to_be_enabled();expect(page.locator('#site-count')).to_have_text('10')
         check('Authenticated root opens workspace with catalog sites',page.locator('#site-name').inner_text()=='Campus')
         check('No sample bookshop or sample runs in production','Fieldnotes' not in page.locator('body').inner_text())
         frame=page.frame_locator('#site-frames iframe');frame.get_by_role('link',name='Shop',exact=True).click();frame.get_by_role('heading',name='Ready for your next idea.').wait_for()

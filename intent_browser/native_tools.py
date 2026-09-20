@@ -80,6 +80,24 @@ SPECS = {
 }
 
 
+from .delegation import TOOLS as AGENT_TOOLS
+SPECS.update({
+ 'spawn_agent': ('Delegate a bounded task to a general-purpose helper with its own conversation. '
+   'browser=none reasons over supplied context; browser=own opens an independently owned browser when the environment supports it. '
+   'Backend/account state may be shared; browser storage is not a cloned world. Supply a precise task and relevant evidence, '
+   'avoid conflicting changes, then collect the result. Helpers cannot spawn helpers. All calls share the episode budget.',
+   {'task':{'type':'string','minLength':1,'maxLength':3000},
+    'system_prompt':{'type':'string','maxLength':2000},'context':{'type':'string','maxLength':8000},
+    'browser':{'type':'string','enum':['none','own'],'default':'none'}}, ['task']),
+ 'get_agent': ('Read an owned helper status/result without waiting. Findings are unverified agent claims; refresh before using old element IDs.',
+   {'agent_id':{'type':'string','minLength':1,'maxLength':80}}, ['agent_id']),
+ 'wait_agent': ('Wait a bounded interval for an owned helper; other conversations may progress. Return includes status and final findings when available.',
+   {'agent_id':{'type':'string','minLength':1,'maxLength':80},'timeout_seconds':{'type':'number','minimum':0,'maximum':30,'default':10}}, ['agent_id']),
+ 'cancel_agent': ('Request cancellation. Prevents future calls/actions; cannot undo effects or discard already-billed in-flight responses.',
+   {'agent_id':{'type':'string','minLength':1,'maxLength':80}}, ['agent_id']),
+})
+
+
 def _object(pairs):
     result={}
     for key,value in pairs:
@@ -101,6 +119,8 @@ def _finite(value):
 
 @dataclass(frozen=True)
 class NativeBrowserTools(BrowserTools):
+    helper_tools: bool = False
+    allow_spawn: bool = True
     vision_tools: bool = False
     ax_tools: bool = False
     incremental_ax: bool = False
@@ -127,7 +147,7 @@ class NativeBrowserTools(BrowserTools):
     def definitions(self, *, allow_search=False):
         definitions=[]
         ax_names=CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS
-        for name in self.names + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()):
+        for name in self.names + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()) + (tuple(n for n in AGENT_TOOLS if self.allow_spawn or n!='spawn_agent') if self.helper_tools else ()):
             description,properties,required=SPECS[name]
             properties=deepcopy(properties)
             if self.incremental_ax and name in CONTEXT_TOOLS:
@@ -198,14 +218,14 @@ class NativeBrowserTools(BrowserTools):
         name=function.get('name'); arguments=function.get('arguments')
         definitions={d['function']['name']:d['function'] for d in self.definitions(allow_search=allow_search)}
         if not isinstance(name,str) or name not in definitions: raise ValueError('Unsupported native tool')
-        if not isinstance(arguments,str) or len(arguments)>4096: raise ValueError('Invalid native argument encoding or size')
+        if not isinstance(arguments,str) or len(arguments)>(20000 if name in AGENT_TOOLS else 4096): raise ValueError('Invalid native argument encoding or size')
         values=json.loads(arguments,object_pairs_hook=_object,parse_constant=_invalid_constant)
         _finite(values)
         Draft202012Validator(definitions[name]['parameters']).validate(values)
         # No model Python evaluation: serialize validated JSON literals and pass
         # through the same allowlist/signature checks as historical actions.
         code=name+'('+', '.join(k+'='+repr(v) for k,v in values.items())+')'
-        decision=(Decision(name,values,code) if (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
+        decision=(Decision(name,values,code) if (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
                   parse_decision(code,allow_search=allow_search,allowed_names=self.names))
         self.validate_navigation(decision)
         content=message.get('content')

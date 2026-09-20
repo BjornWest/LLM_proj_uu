@@ -10,6 +10,7 @@ import {Readable} from 'node:stream';
 import {pipeline} from 'node:stream/promises';
 import {inspectionAsset,inspectionHTML,inspectionCSP,inspectionRevision} from '../lib/inspection.mjs';
 import {createHash} from 'node:crypto';
+import {prislyktanAsset,previewCSP} from '../lib/prislyktan-preview.mjs';
 import {Agent,completionTokenLimit} from '../lib/agent.mjs';
 import {checkStorage} from '../lib/storage-check.mjs';
 import {Harness,workerAuthorized} from '../lib/harness.mjs';
@@ -64,6 +65,15 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       }
       const owner=authenticate(req.headers.cookie,settings);
       if(!owner)return url.pathname.startsWith('/api/')?send(401,{error:'Please sign in'}):redirect('/login');
+      if(url.pathname==='/environments/prislyktan'||url.pathname.startsWith('/environments/prislyktan/')){
+        if(req.method!=='GET')return send(405,{error:'Read only preview'});
+        const asset=await prislyktanAsset(assetRoot,url.pathname);
+        if(!asset)return send(404,{error:'Not found'});
+        res.setHeader('Content-Security-Policy',previewCSP);res.setHeader('ETag',asset.etag);
+        res.setHeader('Cache-Control','private, max-age=3600');res.setHeader('Vercel-CDN-Cache-Control','no-store');
+        if(req.headers['if-none-match']===asset.etag){res.statusCode=304;return res.end();}
+        return send(200,asset.raw,asset.type);
+      }
       if(url.pathname==='/api/task-catalog'){
         if(req.method!=='GET')return send(405,{error:'Method not allowed'});
         stage='private_assets';
@@ -143,7 +153,7 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
         if((operation==='replay-assets')!==!!attachment)return send(404,{error:'Not found'});
         if(!env.DAYLIGHT_CONTROL_URL)return send(503,{error:'PC trace service unavailable'});
         stage='trace_library';
-        const result=await new LibraryClient({env,fetcher}).call(attachment?'worker-asset':'worker-session',{owner,id,...(attachment?{attachment,range:req.headers.range}:{})});
+        const result=await new LibraryClient({env,fetcher}).call(attachment?'worker-asset':'worker-session',{owner,id,...(attachment?{attachment,range:req.headers.range}:{episode:url.searchParams.get('episode')})});
         const etag=result.headers.get('etag');res.setHeader('Cache-Control','private, no-cache');res.setHeader('Vercel-CDN-Cache-Control','no-store');
         if(etag)res.setHeader('ETag',etag);
         if(etag&&req.headers['if-none-match']===etag){await result.body?.cancel();res.statusCode=304;return res.end();}

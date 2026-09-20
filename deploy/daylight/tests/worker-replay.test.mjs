@@ -56,3 +56,25 @@ test('authenticated Vercel handler -> PC projection and assets: no inference, co
  assert.equal((await get(asset)).status,200);assert.equal((await get(asset,'bob')).status,404);assert.equal((await get(asset,'alice',{range:'bytes=0-2'})).status,206);
  assert.equal((await fetch(origin+route,{method:'POST',headers:{cookie:'daylight_session='+login('alice-code'.repeat(5),config(env)),origin},body:'{}'})).status,405);
 });
+
+test('nested helpers have separate owner-scoped views and assets without inheriting parent verdict',async t=>{
+ const {root,store,env,job,state}=await fixture(t);
+ execFileSync('python3',['-c',`import json,zipfile,sys
+with zipfile.ZipFile(sys.argv[1],'a') as z:
+ for name,value in {'metadata.json':json.dumps({'episode_id':'helper','browsergym_version':'test','agent_lineage':{'parent_episode_id':'episode'}}),'episode.json':'{}','events.jsonl':'','evaluation.json':'{"safe_success":null}', 'steps.jsonl':json.dumps({'step':0,'model_output':'Helper only evidence','observation':{'text':'observation-000.txt','screenshot':'observation-000.png'}})+'\\n','observation-000.txt':'Child page only','observation-000.png':'child image'}.items(): z.writestr('episode/children/helper/'+name,value)
+`,root+'/trace.zip']);
+ const raw=await readFile(root+'/trace.zip'),name='trace-000.part';job.artifacts[name].sha256=hash(raw);job.status='finished';job.evaluation={safe_success:true};
+ const before=await store.read('daylight/harness/control-v1.json');await store.write('daylight/harness/control-v1.json',state,before.etag);
+ const partKey=`daylight/harness/artifacts/${id}/${name}.json`,part=await store.read(partKey);await store.write(partKey,{sha256:hash(raw),data:raw.toString('base64')},part.etag);
+ const replay=new WorkerReplay(store,{env,root:root+'/library'}),parent=JSON.parse((await replay.session('alice',id)).raw);
+ assert.equal(parent.family_sessions.length,2);assert.equal(parent.library_metadata.evaluation.safe_success,true);
+ const member=parent.family_sessions.find(x=>x.relationship==='helper'),child=JSON.parse((await replay.session('alice',id,member.episode_id)).raw);
+ assert.equal(child.library_metadata.evaluation.safe_success,null);
+ assert(child.messages.some(m=>m.text.includes('Child page only')));
+ assert(!parent.messages.some(m=>m.text.includes('Child page only')));
+ const asset=child.messages.flatMap(m=>m.attachments||[]).find(a=>a.image);
+ assert(asset);assert.equal((await replay.asset('alice',id,asset.url.split('/').at(-1))).status,200);
+ await assert.rejects(replay.session('bob',id,member.episode_id),{status:404});
+ await assert.rejects(replay.session('alice',id,'a'.repeat(20)),{status:404});
+ await assert.rejects(replay.session('alice',id,'../helper'),{status:404});
+});

@@ -1,6 +1,8 @@
-import {mkdir,readFile,writeFile,copyFile} from 'node:fs/promises';
+import {mkdir,readFile,writeFile,copyFile,mkdtemp,cp,rm} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
+import {tmpdir} from 'node:os';
+import {execFileSync} from 'node:child_process';
 import {prepareViewer} from './prepare-viewer.mjs';
 const source=path.resolve('../../environments/demo');
 await mkdir('private-assets',{recursive:true});await mkdir('public',{recursive:true});
@@ -40,9 +42,14 @@ if(createHash('sha256').update(catalogRaw).digest('hex')!=='ff5dc3550ed053a9f8c3
 const catalog=JSON.parse(catalogRaw);
 if(catalog.schema!=='browser-task-review-catalog-v1'||catalog.tasks.length!==203||catalog.tasks.some(t=>t.execution_available!==false))throw Error('Invalid review-only catalog');
 await writeFile('private-assets/task-catalog.json',catalogRaw);
+const previewTemp=await mkdtemp(path.join(tmpdir(),'prislyktan-build-'));
+try{
+ execFileSync('python3',['../../environments/aggregator_trial/preview/export_preview.py','--output',path.join(previewTemp,'site'),'--base-path','/environments/prislyktan']);
+ await cp(path.join(previewTemp,'site'),'private-assets/prislyktan',{recursive:true});
+}finally{await rm(previewTemp,{recursive:true,force:true});}
 const viewerFiles=await prepareViewer(path.resolve('private-assets'));
-const files=['task-catalog.json',...viewerFiles,'index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css',...inspectionNames.map(name=>'inspection-'+name+'/manifest.json')];
+const files=['prislyktan/manifest.json','task-catalog.json',...viewerFiles,'index.html','style.css','site.html','rooms.js','site.js','dashboard.js','world.js','observation.js','fixture.json','harness.html','harness.js','harness.css','workspace.html','workspace.js','workspace.css','tool-activity.js','tool-activity.css','inspection.js','inspection.css',...inspectionNames.map(name=>'inspection-'+name+'/manifest.json')];
 const hashes={};for(const file of files)hashes[file]=createHash('sha256').update(await readFile('private-assets/'+file)).digest('hex');
-const server={};for(const file of [catalogSource,'api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/library-client.mjs','prepare-viewer.mjs','vendor/agent_trace/provenance.json','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','../../config/team_tasks.json','../../config/team_sites.json','../../config/expanded_team_tasks.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
+const server={};for(const file of [catalogSource,'api/index.mjs','lib/agent.mjs','lib/auth.mjs','lib/store.mjs','lib/remote-store.mjs','lib/manual-client.mjs','lib/library-client.mjs','prepare-viewer.mjs','vendor/agent_trace/provenance.json','lib/storage-check.mjs','lib/harness.mjs','lib/activity.mjs','lib/inspection.mjs','lib/prislyktan-preview.mjs','../../config/prislyktan_tasks.json','../../config/team_tasks.json','../../config/team_sites.json','../../config/expanded_team_tasks.json','package-lock.json','build.mjs'])server[file]=createHash('sha256').update(await readFile(file)).digest('hex');
 await writeFile('private-assets/provenance.json',JSON.stringify({runtime:'daylight-client-demo-v1',commit:process.env.VERCEL_GIT_COMMIT_SHA||null,assets:hashes,server},null,2));
 console.log('Built private assets; public/ contains only robots.txt.');

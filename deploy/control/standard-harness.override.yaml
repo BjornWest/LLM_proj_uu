@@ -1,0 +1,17 @@
+# Append only after the current profile's worker/manual acceptance. All existing
+# state volumes and the public connector are retained. Recreate worker with
+# control because its network namespace is service:control.
+services:
+  control:
+    image: intent-browser-control:standard-agents-v2
+  worker:
+    image: intent-browser-worker:standard-agents-v1
+    environment:
+      HARNESS_PRISLYKTAN_CERTIFICATE: /opt/harness/prislyktan-certificate.json
+    volumes:
+      - type: bind
+        source: ${PRISLYKTAN_WORKER_CERTIFICATE:?Set the source-bound Prislyktan certificate}
+        target: /opt/harness/prislyktan-certificate.json
+        read_only: true
+        bind:
+          create_host_path: false
