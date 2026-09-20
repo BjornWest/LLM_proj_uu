@@ -2,7 +2,7 @@
 
 Implemented locally as the opt-in `core-tools-v9-batch` profile. Existing
 single-call profiles, production workers and saved cohorts have not been switched.
-No paid model call was made for this increment.
+Initial implementation was validated offline; the subsequent live Qwen check is recorded below.
 
 ## Interface
 
@@ -91,4 +91,26 @@ passing acceptance reports. V3 passed the initial seven cases.
 The 113-test focused regression suite covers legacy native calls, bounded retry,
 vision, pacing, policy delivery, feedback, AX and navigation. The browser report
 contains exact source hashes and trace paths. This is scripted protocol/execution
-validation, not evidence that Qwen will batch effectively; the model rerun is next.
+validation, not evidence that Qwen will batch effectively; the subsequent model probe is recorded below.
+
+## First live Qwen check
+
+Saved run: `.local/preflight/room-batch-model-v1/traces/20260920T210723Z-25ff7f6a`.
+Reproducer: `scripts/run_batch_probe.py` (requires explicit live flag and bounded
+cap); saved audit: `scripts/audit_batch_probe.py`. Review report:
+`.local/review/room-batch-model-v1/{index.html,audit.json}`.
+
+Qwen completed the synthetic room-request task in four requests, all resolved to
+Parasail: three AX reads, six field updates, one submission, then the final reply.
+The six form updates executed in one batch. Exactly one receipt matched the goal,
+with zero notification changes, action errors, skipped members or retries. Reported
+cost was $0.00745920 under a $0.10 cap, with zero unresolved reservations. Exact
+request/result alignment, immutable prior prefixes and one current-observation
+section per new group of tool results passed the saved audit. Browser runtime was
+about 35.5 seconds; this is not a controlled latency comparison.
+
+The current generic triage/viewer still reads singular `action`, so its
+`completion_without_state_action` flag on this run is a known projection false
+positive. The batch-aware review report displays all 11 recorded calls and their
+results; raw trace evidence is unchanged. Updating shared viewer/triage batch
+projection is a follow-up, not a model or execution failure.
