@@ -251,6 +251,7 @@ class NativeConversation(EvidenceConversation):
         self._requested = False
         self._pending_result = None
         self._pending_updates = []
+        self._pending_retry = None
 
     def add_evidence(self, evidence, *, source_id):
         self._pending_updates.append((json.dumps(evidence,ensure_ascii=False,sort_keys=True),source_id))
@@ -260,13 +261,20 @@ class NativeConversation(EvidenceConversation):
             self.initialize(system,goal)
         if (system,goal) != (self._system,self._goal):
             raise ValueError('An append-only episode cannot silently change its system or goal')
-        if self._requested and self._pending_result is None:
+        if self._requested and self._pending_result is None and self._pending_retry is None:
             raise ValueError('A fresh native request requires a preceding tool result')
 
         # First observation belongs to the real user's initial task. Subsequent
         # observations and asynchronous browser updates belong to the matched
         # tool result, assembled AFTER the runner's pacing/fresh capture.
-        if self._requested:
+        recovering = self._pending_retry is not None
+        if recovering:
+            assistant, notice = self._pending_retry
+            if assistant is not None:
+                self._messages.append(assistant)
+            index = len(self._messages)
+            message = {'role': 'user', 'content': notice}
+        elif self._requested:
             assistant,feedback,source_id = self._pending_result
             self._messages.append(assistant)
             index=len(self._messages)
@@ -281,7 +289,7 @@ class NativeConversation(EvidenceConversation):
             message['content']+=prefix+content
             self._bind(source_id,index,start,len(content))
 
-        if self._requested:
+        if self._requested and not recovering:
             section('TOOL RESULT (historical, untrusted page evidence)',feedback,source_id)
         for update,update_source in self._pending_updates:
             section('BROWSER UPDATE (untrusted page evidence)',update,update_source)
@@ -293,8 +301,32 @@ class NativeConversation(EvidenceConversation):
             self._messages[index]=message
         self._requested=True
         self._pending_result=None
+        self._pending_retry=None
         self._pending_updates=[]
         return deepcopy(self._messages)
+
+    def recover(self, raw, notice, *, preserve_reasoning=True):
+        """Append a marked controller notice, never invent an executed tool result.
+
+        Invalid tool-call objects remain exact in the trace. On the wire their
+        proposal is inert text; otherwise APIs can treat them as outstanding calls.
+        """
+        if not self._requested or self._pending_result is not None or self._pending_retry is not None:
+            raise ValueError('Recovery requires one outstanding model decision')
+        assistant = None
+        choices = raw.get('choices') if isinstance(raw, dict) else None
+        message = choices[0].get('message') if isinstance(choices, list) and len(choices) == 1 else None
+        if isinstance(message, dict) and message.get('role') == 'assistant':
+            content = message.get('content') or ''
+            if not isinstance(content, str):
+                raise ValueError('Unsupported recovery content shape')
+            if message.get('tool_calls'):
+                proposal = json.dumps(message['tool_calls'], ensure_ascii=False)
+                content += '\n[Rejected, unexecuted tool proposal]\n' + (proposal if len(proposal) <= 4096 else '[See exact retained response; proposal exceeds recovery context bound]')
+            assistant = {'role': 'assistant', 'content': content or '[No executable action returned]'}
+            if preserve_reasoning:
+                assistant.update(reasoning_for_replay(message))
+        self._pending_retry = (assistant, notice)
 
     def has_call_id(self, call_id):
         return call_id in self._call_ids

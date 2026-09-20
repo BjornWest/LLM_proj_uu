@@ -32,7 +32,8 @@ def observation_text(obs, limit=16000):
 def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, seed=0,
                 record_video=False, hold_seconds=0, search_backend=None, episode_task=None,
                 before_observation=None, *, terminal_response_instruction=None,
-                observation_text_limit=16000, harness_profile=None, action_timeout_ms=None):
+                observation_text_limit=16000, harness_profile=None, action_timeout_ms=None,
+                retry_policy=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
@@ -66,6 +67,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
     if harness_profile and harness_profile.vision_config:
         if not native_tools or getattr(backend, "supports_images", False) is not True:
             raise ValueError("Vision profile requires explicit multimodal backend support")
+    if retry_policy is not None:
+        from .retry_policy import DecisionRetryPolicy
+        if not isinstance(retry_policy, DecisionRetryPolicy) or not native_tools:
+            raise ValueError('Decision retries require a native-tool profile and DecisionRetryPolicy')
+    retries_used = 0
+    pending_retry = None
     native_options = None
     if native_tools:
         if terminal_response_instruction is None:
@@ -91,6 +98,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             else: ax_explorer = AXExplorer(harness_profile.ax_config)
             render_observation = ax_explorer.overview
     profile_metadata = ({'harness_profile': harness_profile.describe()} if harness_profile else {})
+    if retry_policy is not None:
+        profile_metadata['decision_retry_policy'] = retry_policy.describe()
     if native_tools:
         profile_metadata['native_tool_request_options'] = native_options
     trace = Trace(output, {**metadata, **profile_metadata, "seed": seed, "max_steps": max_steps,
@@ -123,6 +132,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
     action_errors = 0
     timing_totals = {key: 0.0 for key in ('pacing_seconds', 'request_seconds',
                                          'observation_capture_seconds', 'browser_step_seconds')}
+    if retry_policy is not None:
+        timing_totals['retry_wait_seconds'] = 0.0
     if feedback is not None:
         timing_totals['feedback_seconds'] = 0.0
     search_text = ""
@@ -239,11 +250,24 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                      "request_seconds": None, "inference_seconds": None,
                      "observation_capture_seconds": None, "browser_step_seconds": None,
                      "observation_age_lower_bound_seconds_at_model_call": None}
+            recovery = pending_retry
+            pending_retry = None
+            if recovery is not None:
+                event['retry_of_step'] = recovery['step']
+                event['retry_reason'] = recovery['reason']
             model_called = False
             phase = "before_observation"
             captured_at = None
             try:
-                if before_observation is not None or ax_explorer is not None:
+                if recovery is not None and recovery['wait_seconds']:
+                    trace.event('decision_retry_wait_started', step=index, seconds=recovery['wait_seconds'])
+                    wait_started = time.monotonic()
+                    try:
+                        time.sleep(recovery['wait_seconds'])
+                    finally:
+                        event['retry_wait_seconds'] = time.monotonic() - wait_started
+                        trace.event('decision_retry_wait_completed', step=index, seconds=event['retry_wait_seconds'])
+                if before_observation is not None or ax_explorer is not None or recovery is not None:
                     trace.event("observation_wait_started", step=index)
                     started = time.monotonic()
                     try:
@@ -440,6 +464,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             except (Exception, KeyboardInterrupt) as exc:
                 event["error"] = f"{type(exc).__name__}: {exc}"
                 event['failure_phase'] = phase
+                if model_called and getattr(exc, 'http_status', None) is not None:
+                    event['model_error_http_status'] = exc.http_status
+                    event['model_error_retry_after'] = exc.retry_after
                 if model_called and hasattr(exc, "request_payload"):
                     event.update(model_request=exc.request_payload, model_response=exc.response_payload)
                 elif model_called and hasattr(backend, "last_request"):
@@ -460,6 +487,16 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     except (Exception, KeyboardInterrupt) as evidence_error:
                         event['policy_evidence_error'] = f'{type(evidence_error).__name__}: {evidence_error}'
                 trace.event("decision_error", step=index, error=event["error"])
+                retry = (retry_policy.select(exc, phase, event, used=retries_used,
+                            remaining_calls=max_steps-index-1) if retry_policy is not None else None)
+                if retry is not None:
+                    conversation.recover(event.get('model_response'), retry['notice'],
+                        preserve_reasoning=harness_profile.tools.reasoning_replay == 'preserve')
+                    retries_used += 1
+                    pending_retry = {**retry, 'step': index}
+                    event['decision_retry'] = {**retry, 'ordinal': retries_used, 'next_step': index+1}
+                    trace.event('decision_retry_scheduled', step=index, **event['decision_retry'])
+                    continue  # finally persists this failed attempt before any further request
                 raise
             finally:
                 request = event.get('model_request')
@@ -535,6 +572,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                    "search_request_count": search_backend.calls if search_backend else 0,
                    "final_observation": final_ref, "final_info": info,
                    "evaluation": evaluation_data, "evaluation_file": "evaluation.json"}
+        if retry_policy is not None:
+            summary['decision_retry_count'] = retries_used
         trace.finish(summary)
     print(f"Trace: {trace.directory}\nResult: {summary}", flush=True)
     return trace.directory, summary

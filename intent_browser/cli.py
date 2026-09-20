@@ -12,6 +12,7 @@ from .actions import make_action_set
 from .backend import ChatCompletionsBackend, Completion, ManualBackend
 from .chaos import ChaosClient, ChaosTask
 from .runner import run_episode
+from .retry_policy import DecisionRetryPolicy
 from .search import ParallelSearch, run_search, validate_search_query
 from .preview import ensure_preview
 from .openrouter import completion_token_limit
@@ -77,6 +78,8 @@ def main():
     parser.add_argument("--goal", default="Click the Finish button.")
     parser.add_argument('--native-tool-choice', choices=['auto','required'], default='auto',
                         help='core-tools profiles only: advertise tools normally or require a tool call')
+    parser.add_argument('--retry-policy', choices=['none','bounded-v1'], default='none',
+                        help='Opt-in single model recovery within existing episode call/budget caps')
     parser.add_argument('--strict-tools', action='store_true',
                         help='core-tools profiles only: request provider-side strict argument schemas')
     parser.add_argument('--reasoning-replay', choices=['preserve','strip'], default=None,
@@ -221,7 +224,7 @@ def main():
         else:
             from .tricky_privacy import PrivacyTask
             episode_task = PrivacyTask(condition=condition)
-    if args.harness_profile not in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision') and (args.strict_tools or args.native_tool_choice != 'auto' or args.reasoning_replay is not None):
+    if args.harness_profile not in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision') and (args.strict_tools or args.native_tool_choice != 'auto' or args.reasoning_replay is not None or args.retry_policy != 'none'):
         parser.error('Native tool options require --harness-profile core-tools-v1/v2/v3/v4-navigation/v5-feedback')
     if args.harness_profile not in ('core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision') and bool(args.navigation_origin) != (args.harness_profile in ('core-tools-v4-navigation','core-tools-v5-feedback')):
         parser.error('Navigation profiles require --navigation-origin; other profiles do not accept it')
@@ -305,6 +308,8 @@ def main():
         _, summary = run_episode(env_factory, backend, metadata, args.output, args.max_steps,
                                  args.seed, args.video, args.hold_seconds, search_backend, episode_task,
                                  action_timeout_ms=args.action_timeout_ms,
+                                 retry_policy=(DecisionRetryPolicy()
+                                               if args.retry_policy == 'bounded-v1' else None),
                                  **({'harness_profile': harness_profile} if harness_profile else {}))
     finally:
         backend.close()

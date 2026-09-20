@@ -22,10 +22,12 @@ class Backend(Protocol):
 
 
 class BackendResponseError(RuntimeError):
-    def __init__(self, message, request, response):
+    def __init__(self, message, request, response, *, http_status=None, retry_after=None):
         super().__init__(message)
         self.request_payload = request
         self.response_payload = response
+        self.http_status = http_status
+        self.retry_after = retry_after
 
 
 class ChatCompletionsBackend:
@@ -104,7 +106,8 @@ class ChatCompletionsBackend:
         except ValueError:
             raw = {"unparsed_body": response.text}
         if not response.is_success:
-            raise BackendResponseError(f"Model endpoint HTTP {response.status_code}", request, raw)
+            raise BackendResponseError(f"Model endpoint HTTP {response.status_code}", request, raw,
+                                       http_status=response.status_code, retry_after=response.headers.get("retry-after"))
         try:
             content = raw["choices"][0]["message"].get("content")
         except (KeyError, IndexError, TypeError, AttributeError) as exc:
