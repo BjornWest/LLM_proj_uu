@@ -6,7 +6,8 @@ projection in `deploy/daylight/vendor/agent_trace` is the same source closure as
 common_agent_util commit `0887af2`. Existing single-call traces remain supported.
 
 The website's **Tools only** view retains its numbered chronological list. Calls
-in the same model turn share a turn label; results are matched by tool-call ID,
+in the same model turn share a prominent header and bordered group with a call
+count; numbering continues across groups. Results are matched by tool-call ID,
 not array position. Skipped calls are explicitly not executed. Readable element
 labels come from selected observations and earlier recorded AX tool results.
 Document changes, removed nodes and full legacy snapshots invalidate stale

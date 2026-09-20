@@ -164,8 +164,19 @@ export function renderToolReview(container,decisions){
   const source=element('p','transcript-note'),cards=element('div','trace-tool-cards');inventory.append(select,source,cards);toolbox.append(inventory);toolbar.append(toolbox);panel.append(toolbar);
   const timeline=element('div','trace-tool-timeline'),events=decisions.flatMap(decision=>decision.calls.map(call=>({decision,call})));
   timeline.append(element('p','transcript-note',events.length+' recorded tool event'+(events.length===1?'':'s')+' · chronological order. Missing execution evidence is marked unconfirmed.'));
-  const list=element('ol','trace-tool-events');list.setAttribute('aria-label','Chronological tool activity');
-  for(const [index,{decision,call}] of events.entries()){
+  let eventNumber=0;
+  for(const decision of decisions){
+    if(!decision.calls.length&&!decision.error)continue;
+    const group=element('section','trace-tool-turn');group.dataset.turnKey=decision.key;
+    group.setAttribute('aria-label',decision.label);
+    const heading=element('header','trace-tool-turn-heading');
+    heading.append(element('h3','',decision.label),element('span','trace-tool-turn-count',decision.calls.length+' tool call'+(decision.calls.length===1?'':'s')+(decision.browserReview?' · one model response':'')));
+    group.append(heading);
+    if(decision.error)group.append(element('p','trace-tool-turn-error',decision.error));
+    const list=element('ol','trace-tool-events');list.start=eventNumber+1;list.setAttribute('aria-label',decision.label+' tool activity');
+    for(const call of decision.calls){
+      const index=eventNumber++;
+
     const item=element('li','trace-tool-event');item.dataset.state=call.status;
     item.append(element('span','trace-tool-number',String(index+1)));
     const body=element('div','trace-tool-event-body');
@@ -181,9 +192,11 @@ export function renderToolReview(container,decisions){
     if(call.receipt?.page_after)transcriptDetail(body,'Page after action · transition feedback',call.receipt.page_after.text||'No page text recorded.');
     transcriptDetail(body,'Exact recorded action and execution evidence',JSON.stringify({action:call.action,receipt:call.receipt??null},null,2));
     item.append(body);list.append(item);
+    }
+    group.append(list);timeline.append(group);
   }
   if(!events.length)timeline.append(element('p','trace-tools-empty','No tool calls are recorded in this conversation.'));
-  timeline.append(list);panel.append(timeline);
+  panel.append(timeline);
   function showMode(mode){panel.dataset.mode=mode;const onlyTools=mode==='tools';container.hidden=onlyTools;timeline.hidden=!onlyTools;conversation.setAttribute('aria-pressed',String(!onlyTools));toolsOnly.setAttribute('aria-pressed',String(onlyTools));}
   conversation.onclick=()=>showMode('conversation');toolsOnly.onclick=()=>showMode('tools');
   function showAvailable(){

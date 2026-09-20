@@ -41,7 +41,12 @@ try:
         titles=page.locator('.trace-tool-event-body>strong').all_text_contents()
         check('Tools retain the existing numbered layout',page.locator('.trace-tool-number').all_text_contents()==list(map(str,range(1,12))))
         check('Click and fill use recorded labels', 'Click “Submit booking request”' in titles and 'Fill “Meeting title”' in titles)
-        check('Batch membership is visible',sum(t.startswith('Turn 2') for t in page.locator('.trace-tool-event-step').all_text_contents())==6)
+        groups=page.locator('.trace-tool-turn')
+        expect(groups).to_have_count(4)
+        check('Four prominent turn headers',page.locator('.trace-tool-turn-heading h3').all_text_contents()==['Turn 1','Turn 2','Turn 3','Turn 4'])
+        check('Each turn contains its own calls',[groups.nth(i).locator('.trace-tool-event').count() for i in range(4)]==[3,6,1,1])
+        check('Six-call batch is explicitly labeled','6 tool calls · one model response' in groups.nth(1).inner_text())
+        check('Numbering continues across turn boundaries',[groups.nth(i).locator('ol').get_attribute('start') for i in range(4)]==['1','4','10','11'])
         check('Reply remains readable in tools-only view','Exactly one request' in page.locator('.trace-tool-answer').inner_text())
         check('Batch execution is not incorrectly marked unconfirmed','Execution unconfirmed' not in page.locator('.trace-tool-timeline').inner_text())
         page.screenshot(path=str(out/'tools.png'),full_page=True)
@@ -52,7 +57,7 @@ try:
         check('Recorded replay still renders',True)
         check('No JavaScript errors',not errors);check('Zero model or browser-agent writes',not writes)
         browser.close()
-    sources=['deploy/daylight/client/trace-browser.js','deploy/daylight/client/trace-browser.css','deploy/daylight/client/tool-activity.js','deploy/daylight/vendor/agent_trace/adapters/browsergym.py']
+    sources=['deploy/daylight/client/trace-browser.js','deploy/daylight/client/trace-browser.css','deploy/daylight/client/tool-activity.js','deploy/daylight/client/tool-activity.css','deploy/daylight/vendor/agent_trace/adapters/browsergym.py']
     (out/'report.json').write_text(json.dumps({'passed':True,'checks':checks,'model_calls':0,'source_sha256':{f:hashlib.sha256((ROOT/f).read_bytes()).hexdigest() for f in sources}},indent=2)+'\n');print(out/'report.json')
 finally:
     process.terminate();process.wait(timeout=15)
