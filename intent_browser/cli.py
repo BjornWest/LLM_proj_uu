@@ -84,7 +84,7 @@ def main():
                         help='core-tools profiles only: request provider-side strict argument schemas')
     parser.add_argument('--reasoning-replay', choices=['preserve','strip'], default=None,
                         help='core-tools profiles: preserve returned reasoning (default), or strip for an ablation')
-    parser.add_argument('--harness-profile', choices=['legacy', 'append-feedback-v1', 'append-events-v1', 'core-feedback-v2', 'core-tools-v1', 'core-tools-v2', 'core-tools-v3', 'core-tools-v4-navigation', 'core-tools-v5-feedback', 'core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'],
+    parser.add_argument('--harness-profile', choices=['legacy', 'append-feedback-v1', 'append-events-v1', 'core-feedback-v2', 'core-tools-v1', 'core-tools-v2', 'core-tools-v3', 'core-tools-v4-navigation', 'core-tools-v5-feedback', 'core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'],
                         default='legacy', help='Development opt-in; existing task adapters need separate adoption')
     parser.add_argument('--navigation-origin', action='append', default=[],
                         help='Trusted exact HTTP(S) origin; repeat for multi-site navigation profile')
@@ -224,39 +224,40 @@ def main():
         else:
             from .tricky_privacy import PrivacyTask
             episode_task = PrivacyTask(condition=condition)
-    if args.harness_profile not in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision') and (args.strict_tools or args.native_tool_choice != 'auto' or args.reasoning_replay is not None or args.retry_policy != 'none'):
+    if args.harness_profile not in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch') and (args.strict_tools or args.native_tool_choice != 'auto' or args.reasoning_replay is not None or args.retry_policy != 'none'):
         parser.error('Native tool options require --harness-profile core-tools-v1/v2/v3/v4-navigation/v5-feedback')
-    if args.harness_profile not in ('core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision') and bool(args.navigation_origin) != (args.harness_profile in ('core-tools-v4-navigation','core-tools-v5-feedback')):
+    if args.harness_profile not in ('core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch') and bool(args.navigation_origin) != (args.harness_profile in ('core-tools-v4-navigation','core-tools-v5-feedback')):
         parser.error('Navigation profiles require --navigation-origin; other profiles do not accept it')
-    if bool(args.ax_tokenizer_file) != (args.harness_profile in ('core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision')):
+    if bool(args.ax_tokenizer_file) != (args.harness_profile in ('core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch')):
         parser.error('AX profiles require --ax-tokenizer-file; non-AX profiles do not accept it')
-    if (args.ax_verbose or args.ax_repeat) and args.harness_profile not in ('core-tools-v7-context','core-tools-v8-vision'):
+    if (args.ax_verbose or args.ax_repeat) and args.harness_profile not in ('core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'):
         parser.error('--ax-verbose/--ax-repeat require core-tools-v7-context')
-    if args.image_retention is not None and args.harness_profile != "core-tools-v8-vision":
+    if args.image_retention is not None and args.harness_profile not in ("core-tools-v8-vision","core-tools-v9-batch"):
         parser.error("--image-retention requires core-tools-v8-vision")
     ax_config = None
     if args.ax_tokenizer_file:
         from .ax_explorer import AXConfig
         ax_config = AXConfig(args.ax_tokenizer_file, args.ax_overview_tokens, args.ax_result_tokens,
-            incremental=args.harness_profile in ('core-tools-v7-context','core-tools-v8-vision'), verbose=args.ax_verbose, repeat=args.ax_repeat)
+            incremental=args.harness_profile in ('core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'), verbose=args.ax_verbose, repeat=args.ax_repeat)
     harness_profile = None
     if args.harness_profile != 'legacy':
         if episode_task is not None:
             parser.error('Development harness profiles are not yet adopted by certified task adapters')
         from .harness import HarnessProfile
-        if args.harness_profile in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'):
+        if args.harness_profile in ('core-tools-v1','core-tools-v2','core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'):
             if args.mode != 'run':
                 parser.error('Native tools require run mode with an API backend')
             from .vision import VisionConfig
             from .harness import native_tools_profile
             harness_profile=native_tools_profile(tool_choice=args.native_tool_choice,strict=args.strict_tools,
                 parallel_tool_calls=False if args.harness_profile=='core-tools-v1' else None,
-                compact_feedback=args.harness_profile in ('core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'),
+                compact_feedback=args.harness_profile in ('core-tools-v3','core-tools-v4-navigation','core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'),
                 navigation_origins=tuple(args.navigation_origin),
-                timeout_feedback=args.harness_profile in ('core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision'),
+                timeout_feedback=args.harness_profile in ('core-tools-v5-feedback','core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch'),
                 ax_config=ax_config,
-                vision_config=VisionConfig(args.image_retention or "retain") if args.harness_profile=="core-tools-v8-vision" else None,
-                reasoning_replay=args.reasoning_replay or 'preserve')
+                vision_config=VisionConfig(args.image_retention or "retain") if args.harness_profile in ("core-tools-v8-vision","core-tools-v9-batch") else None,
+                reasoning_replay=args.reasoning_replay or 'preserve',
+                batch_size=8 if args.harness_profile=='core-tools-v9-batch' else 1)
         elif args.harness_profile == 'core-feedback-v2':
             from .harness import core_feedback_profile
             harness_profile=core_feedback_profile()
@@ -283,7 +284,7 @@ def main():
                ) if args.mode in ("manual", "development")
                else ChatCompletionsBackend(args.base_url, args.model, os.getenv(args.api_key_env),
                                            args.timeout, args.max_tokens,
-                                           supports_images=args.harness_profile=="core-tools-v8-vision",
+                                           supports_images=args.harness_profile in ("core-tools-v8-vision","core-tools-v9-batch"),
                                            request_options=request_options, session_routing=session_routing))
     metadata = {"task": args.task, "goal": args.goal if args.task == "openended" else None,
                 "start_url": args.url or ("built-in smoke fixture" if args.task == "openended" else None),

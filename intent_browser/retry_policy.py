@@ -57,6 +57,8 @@ class DecisionRetryPolicy:
             elif isinstance(exc, (httpx.TimeoutException, httpx.NetworkError)):
                 reason, delay = 'transport_failure', 2.0
         elif phase == 'action_parse' and isinstance(raw, dict):
+            if 'Repeated native tool call ID' in str(exc):
+                return None
             choices = raw.get('choices')
             choice = choices[0] if isinstance(choices, list) and len(choices) == 1 else {}
             if not isinstance(choice, dict):

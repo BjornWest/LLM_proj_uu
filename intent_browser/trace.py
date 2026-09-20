@@ -58,9 +58,9 @@ class Trace:
         self.lifecycle.flush()
 
     def observation(self, index, obs, text, *, phase="transition"):
-        if phase not in ("transition", "decision"):
+        if phase not in ("transition", "decision", "batch_guard"):
             raise ValueError("Unknown observation phase")
-        stem = f"{'decision-' if phase == 'decision' else ''}observation-{index:03d}"
+        stem = f"{phase+'-' if phase != 'transition' else ''}observation-{index:03d}"
         Image.fromarray(obs["screenshot"]).save(self.directory / f"{stem}.png")
         with gzip.open(self.directory / f"{stem}.json.gz", "wt", encoding="utf-8") as f:
             json.dump({k: v for k, v in obs.items() if k != "screenshot"}, f, default=json_default)

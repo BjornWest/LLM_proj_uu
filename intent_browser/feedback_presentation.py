@@ -72,7 +72,7 @@ class CompactFeedback:
                     if identity in seen:counts['generic_duplicates']+=1;continue
                     seen.add(identity)
                 compact={'kind':k,'phase':group}
-                for key in ('sequence','page','frame','text','label','checked','value','attribute','previous','url','dialog_type','count'):
+                for key in ('batch_call','sequence','page','frame','text','label','checked','value','attribute','previous','url','dialog_type','count'):
                     if key in event and event[key] not in ('',None):
                         compact[key]=clip(event[key],300 if key in ('text','url') else 180)
                 if event.get('truncated'):compact['capture_truncated']=True

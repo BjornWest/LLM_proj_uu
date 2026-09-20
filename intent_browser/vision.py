@@ -102,18 +102,17 @@ class VisionConversation(NativeConversation):
 
     def __init__(self):
         super().__init__()
-        self._pending_image = None
+        self._pending_images = []
         self._image_locations = {}
 
     def attach_image(self, record, data):
-        if self._pending_image is not None: raise ValueError('Pending image already exists')
-        self._pending_image = (deepcopy(record), bytes(data))
+        self._pending_images.append((deepcopy(record), bytes(data), getattr(self, '_active_tool_call_id', None)))
 
     def request(self, *args, **kwargs):
         messages=super().request(*args, **kwargs)
-        if self._pending_image:
-            record, data = self._pending_image
-            index = len(self._messages) - 1
+        for record, data, call_id in self._pending_images:
+            index = (next(i for i, m in enumerate(self._messages) if m.get('tool_call_id') == call_id)
+                     if call_id is not None else len(self._messages) - 1)
             message = self._messages[index]
             if message['role'] != 'tool': raise ValueError('Image requires a screenshot tool result')
             message['content'] = [
@@ -121,8 +120,8 @@ class VisionConversation(NativeConversation):
                 {'type': 'image_url', 'image_url': {'url': 'data:image/png;base64,' + base64.b64encode(data).decode()}},
             ]
             self._image_locations[record['image_id']] = (index, 1)
-            self._pending_image = None
             messages[index]=deepcopy(message)
+        self._pending_images = []
         return messages
 
     def release_image(self, image_id, keep_notes):

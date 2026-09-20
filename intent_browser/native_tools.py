@@ -1,8 +1,8 @@
 """Native Chat Completions tools, independent of BrowserGym execution.
 
 JSON schemas constrain the interface, not the selected action's correctness.
-All calls are validated locally before any action; multiple calls are rejected
-atomically until a separately designed batching policy exists.
+All calls are validated locally before any action. Batching is explicitly opt-in;
+historical single-call profiles retain their parser and request options.
 """
 from copy import deepcopy
 from dataclasses import dataclass
@@ -109,6 +109,7 @@ class NativeBrowserTools(BrowserTools):
     choice: str = 'auto'
     strict: bool = False
     parallel_tool_calls: bool | None = False
+    batch_size: int = 1
     reasoning_replay: str = 'preserve'
     protocol: str = 'native-tool-calls-v1'
 
@@ -118,6 +119,8 @@ class NativeBrowserTools(BrowserTools):
         if type(self.strict) is not bool: raise ValueError('strict must be boolean')
         if self.reasoning_replay not in ('preserve', 'strip'):
             raise ValueError('reasoning_replay must be preserve or strip')
+        if type(self.batch_size) is not int or not 1 <= self.batch_size <= 8:
+            raise ValueError('batch_size must be an integer between 1 and 8')
         if self.parallel_tool_calls is not None and self.parallel_tool_calls is not False:
             raise ValueError('Parallel hint must be false or omitted; batches are not supported')
 
@@ -213,6 +216,32 @@ class NativeBrowserTools(BrowserTools):
         return decision, assistant
 
 
+    def parse_batch(self, completion, *, allow_search=False):
+        """Validate every member before execution; reuse the single-call schema path."""
+        from .backend import Completion
+        raw = completion.raw
+        choices = raw.get('choices') if isinstance(raw, dict) else None
+        if not isinstance(choices, list) or len(choices) != 1:
+            raise ValueError('Expected one completion choice')
+        message = choices[0].get('message', {})
+        calls = message.get('tool_calls')
+        if not isinstance(calls, list) or not 1 <= len(calls) <= self.batch_size:
+            raise ValueError(f'Expected 1..{self.batch_size} native tool calls')
+        decisions, ids, assistant = [], set(), None
+        for call in calls:
+            single = deepcopy(raw)
+            single['choices'][0]['message']['tool_calls'] = [call]
+            decision, item = self.parse_completion(Completion(completion.text, single), allow_search=allow_search)
+            if call['id'] in ids:
+                raise ValueError('Repeated native tool call ID')
+            ids.add(call['id']); decisions.append(decision)
+            if assistant is None: assistant = item
+        if any(d.name == 'send_msg_to_user' for d in decisions[:-1]):
+            raise ValueError('send_msg_to_user must be the last call in a batch')
+        assistant['tool_calls'] = deepcopy(calls)
+        return decisions, assistant
+
+
 def reasoning_for_replay(message):
     """Copy one native representation; never rewrite signed/opaque blocks.
 
@@ -275,10 +304,17 @@ class NativeConversation(EvidenceConversation):
             index = len(self._messages)
             message = {'role': 'user', 'content': notice}
         elif self._requested:
-            assistant,feedback,source_id = self._pending_result
+            assistant, results = self._pending_result
             self._messages.append(assistant)
+            # Each ID receives exactly one result. Only the last carries the
+            # consolidated observation and asynchronous update section.
+            for call_id, content, source in results[:-1]:
+                prefix = 'TOOL RESULT (historical, untrusted page evidence)\n'
+                self._bind(source, len(self._messages), len(prefix), len(content))
+                self._messages.append({'role':'tool','tool_call_id':call_id,'content':prefix+content})
+            call_id, feedback, source_id = results[-1]
             index=len(self._messages)
-            message={'role':'tool','tool_call_id':assistant['tool_calls'][0]['id'],'content':''}
+            message={'role':'tool','tool_call_id':call_id,'content':''}
         else:
             index=1
             message={'role':'user','content':f'USER GOAL: {goal}'}
@@ -332,11 +368,17 @@ class NativeConversation(EvidenceConversation):
         return call_id in self._call_ids
 
     def record(self, output, feedback, *, feedback_source=None, assistant_message=None):
+        self.record_batch(assistant_message, [(feedback, feedback_source)])
+
+    def record_batch(self, assistant_message, results):
         if not self._requested or self._pending_result is not None:
             raise ValueError('Native results must alternate with requests')
         if assistant_message is None: raise ValueError('Native result requires its validated assistant call')
-        call_id=assistant_message['tool_calls'][0]['id']
-        if call_id in self._call_ids: raise ValueError('Repeated native tool call ID')
-        self._call_ids.add(call_id)
-        content=json.dumps(feedback,ensure_ascii=False,sort_keys=True)
-        self._pending_result=(deepcopy(assistant_message),content,feedback_source)
+        ids = [call['id'] for call in assistant_message['tool_calls']]
+        if len(ids) != len(results): raise ValueError('Every native call requires a result')
+        if len(set(ids)) != len(ids) or any(i in self._call_ids for i in ids):
+            raise ValueError('Repeated native tool call ID')
+        self._call_ids.update(ids)
+        self._pending_result = (deepcopy(assistant_message), [
+            (call_id, json.dumps(value,ensure_ascii=False,sort_keys=True), source)
+            for call_id, (value, source) in zip(ids, results)])

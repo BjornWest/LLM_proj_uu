@@ -218,6 +218,8 @@ class HarnessProfile:
                 **({'vision': self.vision_config.describe()} if self.vision_config else {}), 'action_protocol': getattr(self.tools,'protocol','one-literal-call'),
                 **({'native_tools': self.tools.request_options()} if hasattr(self.tools,'request_options') else {}),
                 'reasoning_replay': getattr(self.tools, 'reasoning_replay', 'strip'),
+                **({'batch': {'max_calls':self.tools.batch_size, 'execution':'sequential', 'page_update':'once after batch'}}
+                   if getattr(self.tools,'batch_size',1)>1 else {}),
                 'subagents': 'disabled', 'validation': 'development; not a frozen benchmark profile'}
 
 
@@ -228,7 +230,7 @@ def core_feedback_profile():
 
 
 def native_tools_profile(*, tool_choice='auto', strict=False, parallel_tool_calls=False, compact_feedback=False,
-                         reasoning_replay='preserve', navigation_origins=(), timeout_feedback=False, ax_config=None, vision_config=None):
+                         reasoning_replay='preserve', navigation_origins=(), timeout_feedback=False, ax_config=None, vision_config=None, batch_size=1):
     from .browser_feedback import CoreBrowserFeedback
     from .native_tools import NativeBrowserTools, NativeConversation
     from .feedback_presentation import CompactFeedback
@@ -281,4 +283,18 @@ def native_tools_profile(*, tool_choice='auto', strict=False, parallel_tool_call
                 ('Keep requested images throughout this episode; release_image will report disabled.' if vision_config.retention == 'retain' else
                  'Keep images by default. If finished with an image, use release_image with important takeaways promptly; '
                  'later removal changes the prefix and can invalidate more cached context.')))
+    if batch_size != 1:
+        if not compact_feedback or not ax_config or not ax_config.incremental:
+            raise ValueError('Batches require compact feedback and incremental AX')
+        if parallel_tool_calls is not None:
+            raise ValueError('Batches use omitted parallel hint; execution is sequential')
+        profile = replace(profile, name='core-tools-v9-batch',
+            tools=replace(profile.tools, batch_size=batch_size),
+            instructions=profile.instructions.replace('No subagent or batch tool is enabled.', 'No subagent is enabled.')
+                .replace('No subagent, screenshot or batch tool is enabled.', 'No subagent or screenshot tool is enabled.') +
+                f' You may return 1..{batch_size} native calls. They execute in order, not concurrently. '
+                'All arguments must be known now; no references to another call result. Each call gets a result; '
+                'one consolidated current page update follows the batch. Stop to inspect unfamiliar state. '
+                'Failures, navigation, or removed/renamed targets stop remaining calls; skipped calls have no effects. '
+                'send_msg_to_user must be last. Do not repeat committed actions after partial execution.')
     return profile
