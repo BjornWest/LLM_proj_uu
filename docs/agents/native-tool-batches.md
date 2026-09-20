@@ -65,9 +65,9 @@ record `batch_call_completed`. `execution_index` names unique per-call artifacts
 result and the single final observation. Raw reasoning is preserved as before.
 
 Consumers must count `batch_calls` rather than treating the null singular action
-as no activity. Existing older viewer projections need that additive awareness
-before they can show individual batch actions in their tool-only timeline; exact
-native responses/results and nested trace evidence are already retained. This
+as no activity. The shared viewer now projects individual members and corrected counters; see
+[browser-batch-viewer.md](browser-batch-viewer.md). Exact native responses/results
+and nested trace evidence are retained. This
 increment does not publish a viewer or worker release.
 
 ## Offline acceptance
@@ -109,8 +109,9 @@ request/result alignment, immutable prior prefixes and one current-observation
 section per new group of tool results passed the saved audit. Browser runtime was
 about 35.5 seconds; this is not a controlled latency comparison.
 
-The current generic triage/viewer still reads singular `action`, so its
+At the first review, the generic triage/viewer read singular `action`, so its
 `completion_without_state_action` flag on this run is a known projection false
 positive. The batch-aware review report displays all 11 recorded calls and their
-results; raw trace evidence is unchanged. Updating shared viewer/triage batch
-projection is a follow-up, not a model or execution failure.
+results; raw trace evidence is unchanged. This projection issue is now fixed by the shared adapter/triage update described
+in [browser-batch-viewer.md](browser-batch-viewer.md); old derivative reports remain
+unchanged. It was not a model or execution failure.

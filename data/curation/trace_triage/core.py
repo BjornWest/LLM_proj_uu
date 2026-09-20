@@ -317,6 +317,20 @@ def analyze(directory, metric_thresholds=None):
                "browser_stepped": s.get("browser_stepped")}
         metric = request_metrics(s)
         metric_rows.append(metric)
+        if isinstance(s.get('batch_calls'), list):
+            row['batch_actions'] = []
+            for member in s['batch_calls']:
+                if not isinstance(member, dict): continue
+                item = {key:member.get(key) for key in ('batch_call','tool_call_id','execution_index',
+                    'not_executed','browser_stepped','action_error','tool_error','error')}
+                item['action'] = action_info(member.get('action'), nodes)
+                # Resolve against selected, delivered AX only. A refreshed guard
+                # is review evidence, not newly delivered target information.
+                item['target_resolution_scope'] = 'selected decision AX only; historical tool results not indexed'
+                row['batch_actions'].append(item)
+                if member.get('action_error') or member.get('tool_error') or member.get('error'):
+                    flag('action_error', i, str(member.get('action_error') or member.get('tool_error') or member.get('error')),
+                         [steps_name], batch_call=member.get('batch_call'))
         row['usage'] = metric
         row['native_tool_calls'] = (s.get('assistant_tool_message') or {}).get('tool_calls')
         row['policy_delivery'] = s.get('policy_delivery')
@@ -335,9 +349,11 @@ def analyze(directory, metric_thresholds=None):
     if apparent_success:
         if safe is True and ((recorded or {}).get('task_completed') is False or (recorded or {}).get('authorization_satisfied') is False):
             flag('success_verdict_contradiction', None, 'Recorded safe success contradicts a recorded completion/authorization check. Review grader integrity; no grade changed.', [evaluation_file if evaluation is not None else 'episode.json'], layer='integrity')
-        if any(s['error'] or s['action_error'] for s in timeline):
+        if any(s['error'] or s['action_error'] or any(m['error'] or m['action_error'] or m['tool_error'] for m in s.get('batch_actions',[])) for s in timeline):
             flag('completion_with_errors', None, 'Recorded completion/pass coexists with an error. Recovery may be valid; inspect the outcome evidence.', [steps_name], layer='integrity')
-        if not any(s['action']['parseable'] and s['action']['tool'] not in ('send_msg_to_user','noop','web_search') for s in timeline):
+        if not any(m['action']['parseable'] and not m.get('not_executed') and
+                   m['action']['tool'] not in ('send_msg_to_user','noop','web_search','ax_read','ax_search','ax_changes','screenshot','release_image')
+                   for s in timeline for m in s.get('batch_actions',[s])):
             flag('completion_without_state_action', None, 'No parsed state-changing action recorded before completion/pass. Read-only goals or valid initial state can explain this.', [steps_name], layer='integrity')
     flags.sort(key=lambda f: (-f["priority"], f["step"] if f["step"] is not None else -1, f["code"]))
     source, task = meta.get("source") or case.get("source") or case.get('family'), meta.get("task") or case.get("task")
@@ -358,6 +374,10 @@ def analyze(directory, metric_thresholds=None):
               'resolved_providers': metrics['providers'], 'resolved_models': metrics['resolved_models'],
               'apparent_success': apparent_success, 'additional_evidence': additional_evidence,
               "recorded_evaluation": recorded, "evaluation_recomputed": False,
+              'action_counts': {
+                  'recorded':sum(m['action']['parseable'] for s in timeline for m in s.get('batch_actions',[s])),
+                  'skipped':sum(bool(m.get('not_executed')) for s in timeline for m in s.get('batch_actions',[s])),
+                  'returned_browser_steps':sum(m.get('browser_stepped') is True and not m.get('not_executed') for s in timeline for m in s.get('batch_actions',[s]))},
               "outcome_group": outcome, "technical_error": technical, "finished_record_present": finished,
               "evaluation_conflict": conflict, "flags": flags, "timeline": timeline,
               "diagnosis": {"status": "unreviewed", "primary_failure": None, "secondary_failures": [],
@@ -368,10 +388,20 @@ def analyze(directory, metric_thresholds=None):
 
 
 def tokens(episode):
-    # Unresolved actions MUST NOT match across episodes on incidental raw IDs.
-    return [s["action"]["signature"] if s["action"]["signature"] and
-            not (s["action"]["bid"] is not None and s["action"]["target"] is None)
-            else f"unresolved:{episode['source_path']}:{s['step']}" for s in episode["timeline"]]
+    # One comparison token per model decision keeps alignment indices valid.
+    # Batch identity includes ordered members and skipped status; unresolved BIDs
+    # never match different episodes just because their incidental IDs agree.
+    result=[]
+    for s in episode['timeline']:
+        values=[]
+        for ordinal,m in enumerate(s.get('batch_actions',[s])):
+            action=m['action']
+            value=(action['signature'] if action['signature'] and not
+                   (action['bid'] is not None and action['target'] is None) else
+                   f"unresolved:{episode['source_path']}:{s['step']}" + (f":{ordinal}" if 'batch_actions' in s else ''))
+            values.append(('skipped:' if m.get('not_executed') else '')+value)
+        result.append('batch:'+digest(values) if 'batch_actions' in s else values[0])
+    return result
 
 
 def compare(left, right):

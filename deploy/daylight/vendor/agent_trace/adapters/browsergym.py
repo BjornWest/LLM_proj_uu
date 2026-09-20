@@ -33,7 +33,8 @@ def asset(root, relative):
     if 'browsergym_version' not in metadata:
         raise ValueError('Not a BrowserGym episode')
     name = '/'.join(parts[1:])
-    if not (name in FILES or re.fullmatch(r'(?:decision-)?observation-[0-9]+\.(?:png|txt|json\.gz)', name)
+    if not (name in FILES or re.fullmatch(r'(?:(?:decision|batch_guard)-)?observation-[0-9]+\.(?:png|txt|json\.gz)', name)
+            or re.fullmatch(r'image-[0-9]+\.png', name)
             or re.fullmatch(r'video/(task_video|chat_video)/[A-Za-z0-9_-]+\.webm', name)):
         raise ValueError('Artifact not allowed')
     path = safe_file(directory, name)
@@ -83,7 +84,21 @@ def project(directory):
     add('user', 'Recorded policy goal', goal or 'Goal not separately recorded; inspect captured input.',
         'task.json' if task else 'metadata.json', started)
     add('note', 'Episode metadata', metadata, 'metadata.json', started, collapsed=True)
-    returned_actions = [row for row in steps if row.get('browser_stepped') is True]
+    def members(row):
+        batch = row.get('batch_calls')
+        return [m for m in batch if isinstance(m, dict)] if isinstance(batch, list) else [row]
+
+    def status(member):
+        if member.get('not_executed') or (member.get('policy_feedback') or {}).get('execution') == 'not_executed':
+            return 'skipped'
+        if member.get('error') or member.get('action_error') or member.get('tool_error'):
+            return 'failed'
+        if member.get('browser_stepped') or 'tool_output' in member:
+            return 'completed'
+        return 'unknown'
+
+    actions = [member for row in steps for member in members(row) if member.get('action') is not None]
+    returned_actions = [m for m in actions if m.get('browser_stepped') is True and status(m) != 'skipped']
     def action_name(row):
         action = row.get('action')
         match = re.match(r'\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(', action) if isinstance(action, str) else None
@@ -105,6 +120,14 @@ def project(directory):
         'recorded_model_request_attempts': sum(row.get('model_request') is not None for row in steps),
         'request_count_scope': 'Saved request payload records, including failed attempts; not confirmed HTTP dispatches or successful responses. Local/scripted decisions without a request payload are excluded.',
         'recorded_step_rows': len(steps),
+        'recorded_tool_calls': {key: sum(status(m) == key for m in actions)
+                                for key in ('completed','failed','skipped','unknown')},
+        'recorded_tool_call_count': len(actions),
+        'executed_tool_calls': sum(status(m) != 'skipped' and (
+            m.get('browser_stepped') is True or 'tool_output' in m or
+            (m.get('execution_index') is not None and timestamp('tool_started', f"tool-{m['execution_index']:03d}") is not None)
+            ) for m in actions),
+        'tool_count_scope': 'Batch members counted individually; skipped proposals are not executions. Failed/unknown calls may have effects. Executed count requires a returned browser step, recorded tool output, or dispatch lifecycle event.',
         'returned_browser_actions': {
             'total': len(returned_actions), 'noop': noop_count,
             'terminal_message': terminal_count,
@@ -112,8 +135,8 @@ def project(directory):
         },
         'action_rows_without_recorded_browser_return': sum(
             row.get('action') is not None and row.get('kind') != 'search'
-            and row.get('browser_stepped') is not True for row in steps),
-        'recorded_action_errors': sum(bool(row.get('action_error')) for row in steps),
+            and row.get('browser_stepped') is not True and status(row) != 'skipped' for row in actions),
+        'recorded_action_errors': sum(bool(row.get('action_error')) for row in actions),
         'action_count_scope': 'Returned BrowserGym steps include noop and terminal messages. A recorded action or returned step does not establish a server-side commit, task success, provider usage or cost.',
         'episode_reported_counts': {key: episode[key] for key in
             ('step_count', 'browser_step_count', 'action_error_count') if key in episode},
@@ -124,7 +147,7 @@ def project(directory):
     add('note', 'Recorded execution summary', summary, 'steps.jsonl', finished,
         summary_sources=['steps.jsonl', 'episode.json', 'metadata.json'])
     seen_observations = set()
-    def observation(value, at, turn, role):
+    def observation(value, at, turn, role, **extra):
         if not isinstance(value, dict):
             return
         name = value.get('text')
@@ -135,19 +158,22 @@ def project(directory):
         path, _ = asset(directory.parent, f'{directory.name}/{name}')
         text = path.read_text(encoding='utf-8') if path.is_file() else 'Observation text unavailable.'
         titles = {'selected': 'Selected decision observation', 'transition': 'Browser transition observation',
-                  'final': 'Final recorded observation'}
+                  'final': 'Final recorded observation',
+                  'consolidated': 'Consolidated page update — selected for next request'}
         add('note', titles[role],
             text, name, at, turn=turn, collapsed=True, observation_role=role,
-            attachments=attachments([(value.get('screenshot'), 'Screenshot'), (name, 'Observation text')]))
-    for row in steps:
+            attachments=attachments([(value.get('screenshot'), 'Screenshot (review artifact)'), (name, 'Observation text')]), **extra)
+    consumed_selections = set()
+    for position, row in enumerate(steps):
         index = row['step']
         model_id, tool_id = f'model-{index:03d}', f'tool-{index:03d}'
         before = timestamp('model_started', model_id)
         after = timestamp('model_completed', model_id) or timestamp('decision_error', step=index)
-        observation(row.get('transition_observation'),
+        observation(None if position in consumed_selections else row.get('transition_observation'),
                     timestamp('tool_completed', f'tool-{index - 1:03d}') if index else timestamp('environment_reset_completed'),
                     index, 'transition')
-        observation(row.get('observation'), before, index, 'selected')
+        if position not in consumed_selections:
+            observation(row.get('observation'), before, index, 'selected')
         request = row.get('model_request')
         if request is not None:
             add('prompt', 'Retained model request payload', request, 'steps.jsonl', before,
@@ -166,6 +192,64 @@ def project(directory):
                 status='error' if isinstance(response, dict) and response.get('error') else 'returned')
         if row.get('error'):
             add('note', 'Step error', row['error'], 'steps.jsonl', after, turn=index, status='error')
+        if isinstance(row.get('batch_calls'), list):
+            batch = members(row)
+            add('note', f'Batch — {len(batch)} proposed calls',
+                {'stop_reason':row.get('batch_stop_reason'),
+                 'scope':'Sequential execution within one model turn. Each result below is recorded; completion is not a task-success verdict.'},
+                'steps.jsonl', after, turn=index, batch=True)
+            for member in batch:
+                ordinal = member.get('batch_call')
+                execution = member.get('execution_index')
+                local_id = f'tool-{execution:03d}' if type(execution) is int else None
+                dispatched = timestamp('tool_started', local_id) if local_id else None
+                completed = timestamp('tool_completed', local_id) if local_id else None
+                state = status(member)
+                fields = {'turn':index,'batch_call':ordinal,'tool_call_id':member.get('tool_call_id'),
+                          'execution_index':execution,'status':'error' if state == 'failed' else state,
+                          'execution_status':state}
+                before_ref = member.get('observation') or {}
+                after_ref = member.get('next_observation') or {}
+                pictures = [(before_ref.get('screenshot'),'Guard snapshot (review only; not model input)')]
+                if member.get('browser_stepped'):
+                    pictures.append((after_ref.get('screenshot'),'After action (review only)'))
+                capture = (member.get('tool_output') or {}) if isinstance(member.get('tool_output'),dict) else {}
+                if capture.get('image_id'):
+                    pictures.append((capture.get('artifact'),'Requested screenshot (delivery recorded separately)'))
+                title = 'Skipped tool call' if state == 'skipped' else 'Browser action' if member.get('kind') == 'browser' else 'Tool call'
+                add('tool', title, member.get('action'), 'steps.jsonl', dispatched,
+                    attachments=attachments(pictures), **fields)
+                add('result', 'Tool result — ' + state,
+                    {'result':member.get('policy_feedback',member.get('tool_output')),
+                     **{key:member[key] for key in ('error','action_error','tool_error',
+                         'not_executed','browser_stepped','terminated','truncated') if key in member}},
+                    'steps.jsonl', completed, **fields)
+            if row.get('batch_events') is not None:
+                add('note', 'Consolidated batch events (historical page evidence)',row['batch_events'],
+                    'steps.jsonl', None, turn=index, batch=True)
+            # Project the exact next selected AX once, at the batch boundary.
+            # Guard and transition snapshots remain attachments, not claimed
+            # model inputs. With no next retained request, do not invent delivery.
+            if position + 1 < len(steps):
+                next_row = steps[position+1]
+                req = next_row.get('model_request')
+                selected = next_row.get('observation') or {}
+                name = selected.get('text')
+                if isinstance(req,dict) and name:
+                    path, _ = asset(directory.parent, f'{directory.name}/{name}')
+                    selected_text = path.read_text(encoding='utf-8') if path.is_file() else None
+                    contents = []
+                    for message in req.get('messages',[]):
+                        if message.get('role') != 'tool': continue
+                        if message.get('tool_call_id') not in {m.get('tool_call_id') for m in batch}: continue
+                        content = message.get('content')
+                        contents.extend([content] if isinstance(content,str) else
+                            [part.get('text','') for part in content or [] if isinstance(part,dict) and part.get('type')=='text'])
+                    if selected_text and any(selected_text in text for text in contents):
+                        observation(selected,timestamp('model_started',f"model-{next_row['step']:03d}"),index,
+                                    'consolidated',next_decision=next_row['step'],delivery_scope='retained_request_content')
+                        consumed_selections.add(position+1)
+            continue
         if row.get('action') is not None:
             dispatched = timestamp('tool_started', tool_id)
             add('tool', 'Browser action' if row.get('kind') == 'browser' else 'Action',
