@@ -1,0 +1,7 @@
+# Append after actual-cost.override.yaml; retain state and the reviewed amended
+# certificate directory selected by STANDARD_WORKER_CERTIFICATES.
+services:
+  control:
+    image: intent-browser-control:live-batches-v1
+  worker:
+    image: intent-browser-worker:live-batches-v1

@@ -59,6 +59,27 @@ class Broker:
         return response.json()
 
 
+def project_step_calls(row):
+    """Small read-only live projection; original per-call evidence stays in the ZIP."""
+    if not isinstance(row.get('batch_calls'), list):
+        return None
+    calls = []
+    for member in row['batch_calls']:
+        code = member.get('action') or ''
+        error = member.get('error') or member.get('action_error') or member.get('tool_error')
+        feedback = member.get('policy_feedback') or {}
+        skipped = member.get('not_executed') or feedback.get('execution') == 'not_executed'
+        recorded = bool(member.get('browser_stepped') or feedback) and not skipped
+        status = 'skipped' if skipped else 'failed' if error else 'recorded' if recorded else 'unconfirmed'
+        calls.append({'action': code[:200], 'action_truncated': len(code) > 200,
+                      'tool_call_id': member.get('tool_call_id'), 'batch_call': member.get('batch_call'),
+                      'kind': member.get('kind'), 'status': status,
+                      'browser_stepped': bool(member.get('browser_stepped')),
+                      'error': str(error)[:160] if error else None,
+                      'stop_reason': feedback.get('reason') if skipped else None})
+    return calls
+
+
 class Publisher:
     """Separate readonly projection; reviewer notes are never read by the policy."""
     def __init__(self, broker, job, folder):
@@ -114,9 +135,15 @@ class Publisher:
                 self.upload(latest, (directory / latest).read_bytes())
             elif artifact.get('image'):
                 latest = artifact['image']
-            steps.append({'step': row['step'], 'action': row.get('action'),
-                          'error': row.get('error') or row.get('action_error'), 'artifact': artifact,
-                          'browser_stepped': row.get('browser_stepped', False)})
+            step = {'step': row['step'], 'action': row.get('action'),
+                    'error': row.get('error') or row.get('action_error'), 'artifact': artifact,
+                    'browser_stepped': row.get('browser_stepped', False)}
+            calls = project_step_calls(row)
+            if calls is not None:
+                step.update(calls=calls, projection_version=2, batch_stop_reason=row.get('batch_stop_reason'))
+                step['action'] = '\n'.join(c['action'] + (' …' if c['action_truncated'] else '') +
+                                          ' [' + c['status'] + ']' for c in calls)[:600] or None
+            steps.append(step)
         family_rows=list(rows)
         for file in sorted(directory.glob('children/*/steps.jsonl')):
             for line in file.read_text().splitlines():

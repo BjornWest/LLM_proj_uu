@@ -258,3 +258,22 @@ def test_failed_cost_write_retains_raw_response_and_stops_action(tmp_path):
     assert error.value.response_payload['usage']['cost'] == .001
     assert (tmp_path / 'model-transport.jsonl').exists()
     model.close()
+
+
+def test_live_projection_preserves_native_calls_and_execution_boundaries():
+    from intent_browser.team_worker import project_step_calls
+    rows = [
+        {'action': "fill(bid='13', value='Aurora')", 'browser_stepped': True, 'policy_feedback': {'execution': 'call_completed'}},
+        {'action': "ax_search(query='Blue')", 'kind': 'ax_query', 'policy_feedback': {'tool': 'ax_search', 'items': []}},
+        {'action': "click(bid='14')", 'not_executed': True, 'policy_feedback': {'execution': 'not_executed', 'reason': 'document_or_navigation_changed'}},
+        {'action': "click(bid='99')", 'browser_stepped': True, 'action_error': 'Not found'},
+    ]
+    projected = project_step_calls({'action': None, 'batch_calls': rows})
+    assert [c['status'] for c in projected] == ['recorded', 'recorded', 'skipped', 'failed']
+    assert [c['action'] for c in projected] == [r['action'] for r in rows]
+    assert not projected[1]['browser_stepped']
+    assert projected[2]['stop_reason'] == 'document_or_navigation_changed'
+    assert project_step_calls({'action': "click('1')"}) is None
+    clipped = project_step_calls({'batch_calls': [{'action': 'a'*10000}]})[0]
+    assert clipped['action_truncated'] and len(clipped['action']) == 200
+    assert clipped['status'] == 'unconfirmed'

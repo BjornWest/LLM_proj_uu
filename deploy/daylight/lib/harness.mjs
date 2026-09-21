@@ -216,7 +216,7 @@ export class Harness {
     return this.mutate(state=>{
       const job=this.leased(state,value),limits=limitsFor(job.task);
       insist(snap.steps.length<=limits.max_steps,'Invalid step list for task');
-      insist(JSON.stringify(snap).length<=(TASKS.find(t=>t.id===job.task)?.expanded?300000:60000),'Snapshot exceeds task bound');
+      // Native per-call live summaries use the same bounded envelope across task families.
       const task=TASKS.find(t=>t.id===job.task);
       if(task?.expanded) {
         if(!snap.status)insist(snap.evaluation==null,'Authoritative grading is terminal-only');

@@ -26,3 +26,16 @@ test('native function definitions and calls preserve names and raw parameters wi
   const evidence=traceToolEvidence([{id:'one',steps:[{request:{tools:[tool]},response:{choices:[{message:{tool_calls:[call]}}]}}]}]);
   assert.equal(evidence[0].available[0].definition,tool);assert.equal(evidence[0].calls[0].action,call);assert.equal(evidence[0].calls[0].status,'unconfirmed');
 });
+
+test('live worker batches retain each call and distinguish AX, skipped and failed actions',async()=>{
+ const {jobToolEvidence}=await import('../client/tool-activity.js');
+ const decisions=jobToolEvidence({id:'job',steps:[{step:0,action:null,calls:[
+  {action:"fill(bid='13', value='Aurora')",status:'recorded',browser_stepped:true},
+  {action:"ax_search(query='Blue')",status:'recorded',browser_stepped:false},
+  {action:"click(bid='14')",status:'skipped',browser_stepped:false,stop_reason:'document_or_navigation_changed'},
+  {action:"click(bid='99')",status:'failed',error:'Not found'}]}]});
+ assert.equal(decisions[0].label,'Model turn 1');assert.equal(decisions[0].calls.length,4);
+ assert.deepEqual(decisions[0].calls.map(c=>c.status),['recorded','recorded','skipped','failed']);
+ assert.equal(decisions[0].calls[1].name,'ax_search');assert.equal(decisions[0].calls[2].resultSummary,'document_or_navigation_changed');
+ const old=jobToolEvidence({id:'old',steps:[{step:0,action:null,browser_stepped:true}]});assert.deepEqual(old[0].calls,[]);
+});

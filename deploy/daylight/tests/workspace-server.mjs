@@ -23,7 +23,7 @@ const fetcher=async(_,options)=>{
       action={action:'click',id:target.id};
     } else action={action:'done',message:goal.startsWith('Book')?'The requested booking is confirmed.':'The displayed availability is filtered to Ångström, Wednesday, three people and 60 minutes.'};
   }
-  return new Response(JSON.stringify({id:'scripted-browser-check',model:request.model,provider:'Offline fixture',
+  return new Response(JSON.stringify({id:'scripted-browser-check-'+randomUUID(),model:request.model,provider:'Offline fixture',
     choices:[{message:{content:JSON.stringify(action)}}],usage:{cost:0,prompt_tokens:100,completion_tokens:20}}));
 };
 const store=new FileStore(await mkdtemp(tmpdir()+'/daylight-workspace-browser-'));

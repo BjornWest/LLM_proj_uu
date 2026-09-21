@@ -166,6 +166,8 @@ function renderIssues(issues) {
   }));
 }
 function presentStep(step) {
+  if(Array.isArray(step.calls))return {label:step.calls.length+' tool call'+(step.calls.length===1?'':'s'),
+    detail:step.calls.map(call=>call.action+(call.action_truncated?' …':'')+' · '+call.status).join('\n')||'No accepted calls',routine:false};
   const raw = describe(step.action) || '', name = typeof step.action === 'object' ? step.action?.action : raw.match(/^\s*(\w+)\s*\(/)?.[1];
   if (step.error) return {label: 'Action failed', detail: describe(step.error), routine: false};
   const labels = {click:'Click a page control',fill:'Enter text',type:'Type text',select_option:'Choose an option',scroll:'Scroll the page',press:'Press a key',hover:'Hover over a control',focus:'Focus a control',goto:'Open a page',go_back:'Go back',go_forward:'Go forward',send_msg_to_user:'Message to the user',web_search:'Search request',noop:'Wait'};

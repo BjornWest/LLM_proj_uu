@@ -1,4 +1,4 @@
-import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice,transcriptBubble,transcriptDetail,renderTraceConversation,groupTraceSessions,renderJobToolReview} from './tool-activity.js';
+import {createToolActivity,keepChatPosition,showChatWorking,bindChatEnter,createFullScreenMode,InterruptibleTurn,TurnInterrupted,interruptionNotice,transcriptBubble,transcriptDetail,renderTraceConversation,groupTraceSessions,renderJobToolReview,jobToolEvidence} from './tool-activity.js';
 import {World} from './world.js';
 import {snapshot,executeAndWait,waitForDocument} from './observation.js';
 const $=id=>document.getElementById(id);
@@ -254,13 +254,21 @@ function renderReview(){
 function recordForKey(key){return records().find(record=>record.key===key||record.turns?.some(turn=>'d:'+turn.id===key))||null;}
 function renderJobConversation(record){
   const log=$('trace-conversation'),job=record.raw,key=JSON.stringify([record.key,job.goal,job.steps]);if(log.dataset.job===key)return;log.dataset.job=key;log.replaceChildren();
-  $('browser-record-summary').textContent='Recorded goal and browser actions. Full model messages are not published for this run. Screenshots and exact step observations are below.';
+  $('browser-record-summary').textContent='Live goal and tool-call summaries. Full model messages and original calls appear in the complete trace after the run finishes.';
   log.append(transcriptBubble('user',record.kind==='task'?'Task objective':'Recorded goal',job.goal||'Goal not recorded yet.'));
-  for(const step of job.steps||[]){
-    const action=typeof step.action==='string'?step.action:JSON.stringify(step.action??'No action recorded');
-    log.append(transcriptBubble('assistant',job.mode==='live'?'Model · recorded decision '+step.step:job.mode==='rehearsal'?'Scripted decision '+step.step:'Recorded decision '+step.step,action));
-    const receipt=transcriptBubble('tool','Browser tool · Step '+step.step,step.error?'Failed: '+String(step.error):step.browser_stepped?'Browser action recorded.':'Browser execution is not confirmed.');
-    transcriptDetail(receipt,'Exact action',action);log.append(receipt);
+  for(const [index,decision] of jobToolEvidence(job).entries()){
+    const step=job.steps[index];
+    const text=decision.calls.length?decision.calls.map(call=>call.title).join('\n'):
+      step.error?'Decision failed before an action was accepted.':'Live tool details were not published by this worker. The complete trace may contain them.';
+    log.append(transcriptBubble('assistant',job.mode==='live'?decision.label:job.mode==='rehearsal'?'Scripted decision '+(step.step+1):'Recorded decision '+(step.step+1),text));
+    for(const call of decision.calls){
+      const status=call.status==='skipped'?'Skipped · not executed':call.status==='failed'?'Failed':call.status==='recorded'?'Execution recorded':'Execution unconfirmed';
+      const receipt=transcriptBubble('tool','Tool · '+status,call.title);
+      if(call.receipt.error)receipt.append(node('p',call.receipt.error));
+      if(call.resultSummary)receipt.append(node('p',call.resultSummary));
+      transcriptDetail(receipt,'Published call and execution evidence',JSON.stringify(call.receipt,null,2));log.append(receipt);
+    }
+    if(step.error)log.append(transcriptBubble('tool','Decision error',step.error));
   }
   renderJobToolReview(log,job);
 }

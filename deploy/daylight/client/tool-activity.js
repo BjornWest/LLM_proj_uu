@@ -146,11 +146,15 @@ export function traceToolEvidence(traces){
     return {key:trace.id+':'+index,label:'Turn '+(turn+1)+' · Step '+(index+1),at:step.requested_at||null,available,source,selected:action?.action||calls[0]?.name||null,calls};
   }));
 }
-export function renderJobToolReview(container,job){
-  const decisions=(job.steps||[]).map(step=>({key:job.id+':'+step.step,label:'Step '+step.step,at:null,available:null,source:null,
-    calls:step.action?[{name:null,title:typeof step.action==='string'?step.action:JSON.stringify(step.action),action:step.action,receipt:{browser_stepped:step.browser_stepped??null,error:step.error??null},status:step.error?'failed':step.browser_stepped?'recorded':'unconfirmed'}]:[]}));
-  renderToolReview(container,decisions);
+export function jobToolEvidence(job){
+  return (job.steps||[]).map(step=>({key:job.id+':'+step.step,label:'Model turn '+(step.step+1),at:null,available:null,source:null,error:step.error||null,
+    calls:Array.isArray(step.calls)?step.calls.map(call=>({name:call.action?.match(/^\s*(\w+)\s*\(/)?.[1]||null,
+      title:call.action+(call.action_truncated?' … (full call in original trace)':''),action:call.action,
+      receipt:{browser_stepped:call.browser_stepped,status:call.status,error:call.error,stop_reason:call.stop_reason,action_truncated:call.action_truncated},
+      status:call.status||'unconfirmed',resultSummary:call.stop_reason||null})):
+      step.action?[{name:null,title:typeof step.action==='string'?step.action:JSON.stringify(step.action),action:step.action,receipt:{browser_stepped:step.browser_stepped??null,error:step.error??null},status:step.error?'failed':step.browser_stepped?'recorded':'unconfirmed'}]:[]}));
 }
+export function renderJobToolReview(container,job){renderToolReview(container,jobToolEvidence(job));}
 export function renderToolReview(container,decisions){
   const old=container.parentElement?.querySelector('.trace-tools-panel');
   const previousMode=old?.dataset.mode||'conversation',previousSelection=old?.querySelector('select')?.value,wasOpen=old?.querySelector('.trace-toolbox')?.open||false;
