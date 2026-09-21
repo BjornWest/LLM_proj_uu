@@ -59,6 +59,7 @@ class Recorder:
     def rpc(self, operation, **data):
         self.calls.append((operation,data))
         if self.reject:raise RuntimeError('Budget rejected')
+        if operation == 'settle': return {'status': 'settled'}
         return {'amount_usd':0.1,'max_tokens':data['max_tokens']}
 
 
@@ -230,3 +231,30 @@ def test_publisher_counts_child_cost_without_cross_session_provider_warning(tmp_
     assert result['cost']['scope']=='parent and helpers'
     assert not result['cost']['alerts']
     assert len(result['steps'])==1
+
+
+def test_settlement_precedes_action_and_retains_parse_failure_cost(tmp_path):
+    model, publisher = backend(tmp_path, lambda request: httpx.Response(200, json={
+        'id': 'gen-cost', 'usage': {'cost': .001}, 'choices': []}))
+    with pytest.raises(BackendResponseError, match='response shape'):
+        model.complete([{'role': 'user', 'content': 'goal'}])
+    settlements = [x[1] for x in publisher.calls if isinstance(x, tuple) and x[0] == 'settle']
+    assert len(settlements) == 1
+    assert json.loads(settlements[0]['response_text'])['usage']['cost'] == .001
+    assert (tmp_path / 'team-settlements.jsonl').exists()
+    model.close()
+
+
+def test_failed_cost_write_retains_raw_response_and_stops_action(tmp_path):
+    model, publisher = backend(tmp_path, lambda request: httpx.Response(200, json={
+        'id': 'gen-cost', 'usage': {'cost': .001}, 'choices': [{'message': {'content': "click('4')"}}]}))
+    original = publisher.rpc
+    def rpc(operation, **data):
+        if operation == 'settle': raise RuntimeError('Offline storage failure')
+        return original(operation, **data)
+    publisher.rpc = rpc
+    with pytest.raises(BackendResponseError, match='accounting failed') as error:
+        model.complete([{'role': 'user', 'content': 'goal'}])
+    assert error.value.response_payload['usage']['cost'] == .001
+    assert (tmp_path / 'model-transport.jsonl').exists()
+    model.close()

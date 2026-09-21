@@ -1,4 +1,5 @@
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createHash} from 'node:crypto';
+import {Budget} from './budget.mjs';
 import {interactionKind,siteForTask,recordedActivity,validateSite} from './activity.mjs';
 const PROVIDERS=['chutes','dekallm','phala','parasail','akashml','ionstream','cloudflare'];
 export const MAX_STEPS=12;
@@ -166,17 +167,8 @@ export class Agent {
       conversation_id,conversation_source:body.conversation_id?'client_declaration':previousConversation?'owned_continuation':'server_generated'};
     await this.store.write(traceKey(owner,id),row);return {id,conversation_id};
   }
-  async reserve(amount) {
-    const date=new Date().toISOString().slice(0,10),key=`daylight/budgets/${date}.json`;
-    const prior=await this.store.read(key),row=prior?.value||{date,reserved_usd:0,calls:0};
-    const cap=Number(this.env.DEMO_DAILY_BUDGET_USD||1);
-    insist(Number.isFinite(cap)&&cap>0&&cap<=100,'Invalid daily budget',503);
-    insist(row.reserved_usd+amount<=cap && row.calls<Number(this.env.DEMO_DAILY_CALL_LIMIT||100),'Demo daily allowance reached',429);
-    row.reserved_usd+=amount;row.calls++;
-    // Conditional write serializes reservations across function instances. Conflicts do not send inference.
-    await this.store.write(key,row,prior?.etag||null);
-    return {date,amount_usd:amount,daily_reserved_usd:row.reserved_usd,daily_limit_usd:cap};
-  }
+  async reserve(amount) {return new Budget(this.store,{env:this.env}).reserve(amount);}
+  async settle(receipt,evidence) {return new Budget(this.store,{env:this.env}).settle(receipt,evidence);}
   async step(owner,body) {
     insist(this.env.OPENROUTER_API_KEY,'Inference is not configured',503);
     const saved=await this.read(owner,body.id),trace=saved.value;
@@ -212,7 +204,7 @@ export class Agent {
       step.reservation=await this.reserve(reserve);
       step.dispatch_at=new Date().toISOString();
       etag=await this.saveProgress(trace,etag);
-      if(trace.interruption){delete step.dispatch_at;await this.saveProgress(trace,etag);return {id:trace.id,status:'interrupted',action:null,answer:null,cost:null};}
+      if(trace.interruption){delete step.dispatch_at;step.budget_settlement=await this.settle(step.reservation,{cost:0,not_sent:true});await this.saveProgress(trace,etag);return {id:trace.id,status:'interrupted',action:null,answer:null,cost:null};}
       const response=await this.fetcher('https://openrouter.ai/api/v1/chat/completions',{
         method:'POST',headers:{Authorization:`Bearer ${this.env.OPENROUTER_API_KEY}`,'Content-Type':'application/json'},
         body:JSON.stringify(request),signal:AbortSignal.timeout(90000)});
@@ -239,6 +231,13 @@ export class Agent {
       if(trace.mode!=='chat') {step.action=parseAction(text,obs.controls);trace.status='awaiting_client';}
       else trace.status='complete';
     } catch(error) {step.error=error.message;step.error_code=error.code||null;step.error_detail=error.detail||null;trace.status='error';}
+    if(step.reservation){
+      try{step.budget_settlement=await this.settle(step.reservation,{
+        cost:typeof step.usage?.cost==='number'&&Number.isFinite(step.usage.cost)&&step.usage.cost>=0?step.usage.cost:null,
+        response_id:step.response?.id??null,
+        response_sha256:step.response_text==null?null:createHash('sha256').update(step.response_text).digest('hex')});}
+      catch(error){step.budget_error=error.message;step.error=step.error||'Cost accounting failed; stopped before action delivery';trace.status='error';step.action=null;}
+    }
     step.finished_at=new Date().toISOString();
     // Never deliver an unlogged decision. Failed final writes leave the durable pending attempt visible.
     await this.saveProgress(trace,etag);

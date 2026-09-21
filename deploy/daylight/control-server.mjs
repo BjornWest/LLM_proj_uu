@@ -5,6 +5,7 @@ import {SqliteStore} from './lib/sqlite-store.mjs';
 import {Harness,workerAuthorized} from './lib/harness.mjs';
 import {Manual} from './lib/manual.mjs';
 import {Agent} from './lib/agent.mjs';
+import {budgetTotals} from './lib/budget.mjs';
 import {TraceLibrary} from './lib/library.mjs';
 import {WorkerReplay} from './lib/worker-replay.mjs';
 import {createReadStream} from 'node:fs';
@@ -32,7 +33,7 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
       const operation=route.split('/').at(-1);
       const isManual=route.startsWith('/internal/manual/');
       const isLibrary=['/internal/library/list','/internal/library/session','/internal/library/asset','/internal/library/worker-session','/internal/library/worker-asset'].includes(route);
-      if(worker?!['poll','checkpoint','reserve','artifact','update'].includes(operation):
+      if(worker?!['poll','checkpoint','reserve','settle','artifact','update'].includes(operation):
         isLibrary?false:isManual?!['config','start','list','read','action','observe','close','artifact','ask','interrupt'].includes(operation):
         !['/internal/store/read','/internal/store/write','/internal/store/list','/internal/store/trace-list'].includes(route))return send(404,{error:'Not found'});
       const chunks=[];let size=0;
@@ -59,6 +60,11 @@ export function controlHandler({store,env=process.env,fetcher=fetch}={}) {
         if(operation==='read')return send(200,await manual.read(value.owner,value.id));
         if(operation==='artifact')return send(200,await manual.artifact(value.owner,value.id,value.frame_id,value.part));
         return send(200,await manual.command(value.owner,value.id,operation,value));
+      }
+      if(operation==='write'&&/^daylight\/budgets\//.test(value.key)&&value.value?.schema_version===2){
+        const totals=budgetTotals(value.value);
+        if(['actual_spent_usd','outstanding_usd','reserved_usd'].some(k=>typeof value.value[k]!=='number'||Math.abs(value.value[k]-totals[k])>1e-10))
+          return send(409,{error:'Budget writer uses outdated accounting; refresh deployment'});
       }
       const result=operation==='read'?await store.read(value.key):operation==='write'?
         await store.write(value.key,value.value,value.etag??null):await store.listKeys(value.prefix,{cursor:value.cursor,limit:value.limit});

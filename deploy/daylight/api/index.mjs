@@ -47,7 +47,7 @@ export function createHandler({store,env=process.env,fetcher=fetch,assetRoot=ass
       if(url.pathname.startsWith('/api/harness/worker/')) {
         if(req.method!=='POST'||!workerAuthorized(req.headers.authorization,env))return send(401,{error:'Worker authentication required'});
         operation=url.pathname.split('/').at(-1);
-        if(!['poll','checkpoint','reserve','artifact','update'].includes(operation))return send(404,{error:'Not found'});
+        if(!['poll','checkpoint','reserve','settle','artifact','update'].includes(operation))return send(404,{error:'Not found'});
         if(env.DAYLIGHT_STORAGE_MAINTENANCE==='1')return send(503,{error:'Storage maintenance; worker paused.'});
         stage='agent_storage';
         const harness=new Harness(store||configuredStore(env),{env});

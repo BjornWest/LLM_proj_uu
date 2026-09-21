@@ -163,3 +163,17 @@ test('legacy task bounds stay at twelve decisions and 250k request bytes',async 
   await assert.rejects(h.reserve({...job,step:12,input_bytes:1,request_sha256:'a'.repeat(64)}),/request index for task/);
   await assert.rejects(h.reserve({...job,step:0,input_bytes:250001,request_sha256:'a'.repeat(64)}),/task bound/);
 });
+
+test('worker cost settlement binds lease/request, frees unused budget, and accepts late response after termination',async t=>{
+ const {h,store}=await fixture(t),job=await claim(h,'live');
+ const req={...job,step:0,input_bytes:1000,request_sha256:'a'.repeat(64),max_tokens:4096};
+ const receipt=await h.reserve(req);
+ const response_text=JSON.stringify({id:'generation1',usage:{cost:.001},choices:[]});
+ await assert.rejects(h.settle({...req,request_sha256:'b'.repeat(64),response_text}),/does not match/);
+ await assert.rejects(h.settle({...req,lease:randomUUID(),response_text}),/does not match/);
+ await h.update({...job,snapshot:{steps:[],status:'error',error:'Parser failure'}});
+ const settled=await h.settle({...req,response_text});assert.equal(settled.actual_spent_usd,.001);assert.equal(settled.outstanding_usd,0);
+ assert.deepEqual(await h.settle({...req,response_text}),settled);
+ const row=(await store.read(`daylight/budgets/${receipt.date}.json`)).value;assert.equal(row.calls,1);
+ assert.equal((await h.read('alice',job.id)).status,'error');
+});

@@ -3,7 +3,7 @@ FROM ${RUNTIME_IMAGE}
 USER root
 WORKDIR /app
 COPY deploy/daylight/control-server.mjs /app/deploy/daylight/
-COPY deploy/daylight/lib/sqlite-store.mjs deploy/daylight/lib/harness.mjs deploy/daylight/lib/agent.mjs deploy/daylight/lib/activity.mjs deploy/daylight/lib/manual.mjs deploy/daylight/lib/browse-pool.mjs deploy/daylight/lib/manual-agent.mjs deploy/daylight/lib/library.mjs deploy/daylight/lib/worker-replay.mjs /app/deploy/daylight/lib/
+COPY deploy/daylight/lib/budget.mjs deploy/daylight/lib/sqlite-store.mjs deploy/daylight/lib/harness.mjs deploy/daylight/lib/agent.mjs deploy/daylight/lib/activity.mjs deploy/daylight/lib/manual.mjs deploy/daylight/lib/browse-pool.mjs deploy/daylight/lib/manual-agent.mjs deploy/daylight/lib/library.mjs deploy/daylight/lib/worker-replay.mjs /app/deploy/daylight/lib/
 COPY deploy/daylight/vendor/agent_trace /app/deploy/daylight/vendor/agent_trace
 COPY scripts/project_worker_trace.py /app/scripts/
 COPY scripts/manual_environment.py scripts/manual_browse_runtime.py scripts/shared_browser_policy.py /app/scripts/

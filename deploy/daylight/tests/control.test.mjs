@@ -54,7 +54,7 @@ test('unavailable remote never retries or falls back to Blob',async()=>{
   await assert.rejects(remote.write('daylight/x',{}),e=>e.code==='CONTROL_UNAVAILABLE'&&!e.message.includes(secret));assert.equal(calls,1);
 });
 test('direct local worker and remote frontend share owner isolation, lease and budget',async t=>{
-  const {remote,store,env}=await setup(t),front=new Harness(remote,{env}),back=new Harness(store,{env}),worker_id=randomUUID();
+  const {remote,store,env,origin}=await setup(t),front=new Harness(remote,{env}),back=new Harness(store,{env}),worker_id=randomUUID();
   await back.poll({worker_id,mode:'live',tasks:['rooms']});
   const created=await front.start('alice',{task:'rooms',goal:'Book a room'});
   const job=(await back.poll({worker_id,mode:'live',tasks:['rooms']})).job;
@@ -64,6 +64,11 @@ test('direct local worker and remote frontend share owner isolation, lease and b
   assert.equal(reserved.amount_usd,(100+2048)*.5/1e6+4096*4/1e6);
   const next=await new Agent(remote,{env}).reserve(.01);
   assert.equal(next.daily_reserved_usd,reserved.amount_usd+.01);
+  const result=await fetch(origin+'/api/harness/worker/settle',{method:'POST',headers:{authorization:'Bearer '+worker,'content-type':'application/json'},body:JSON.stringify({...job,step:0,request_sha256:'a'.repeat(64),response_text:JSON.stringify({id:'settle1',usage:{cost:.001}})})});
+  assert.equal(result.status,200);assert.equal((await result.json()).actual_spent_usd,.001);
+  const settled=(await store.read('daylight/budgets/'+reserved.date+'.json')).value;assert.equal(settled.outstanding_usd,.01);
+  const stale=await remote.read('daylight/budgets/'+reserved.date+'.json');stale.value.calls++;stale.value.reserved_usd+=.02;
+  await assert.rejects(remote.write('daylight/budgets/'+reserved.date+'.json',stale.value,stale.etag),e=>e.code==='BLOB_WRITE_CONFLICT');
   assert.equal((await back.poll({worker_id,mode:'live',tasks:['rooms']})).job,null);
 });
 test('interrupt pending response through remote SQLite retains cost and never revives trace',async t=>{

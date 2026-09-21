@@ -47,7 +47,15 @@ class Broker:
     def post(self, operation, value):
         response = self.client.post('/api/harness/worker/' + operation, json=value)
         if not response.is_success:
-            raise RuntimeError(f'Worker API {operation} returned HTTP {response.status_code}; no automatic replay')
+            detail = ''
+            if operation == 'reserve' and response.status_code == 429:
+                try:
+                    message = response.json().get('error', '')
+                    if isinstance(message, str) and message.startswith('Demo daily '):
+                        detail = ': ' + message[:400]
+                except ValueError:
+                    pass
+            raise RuntimeError(f'Worker API {operation} returned HTTP {response.status_code}{detail}; no automatic replay')
         return response.json()
 
 
@@ -217,6 +225,7 @@ class TeamBackend(ChatCompletionsBackend):
                          max_tokens=completion_token_limit(env.get("OPENROUTER_MAX_TOKENS")), request_options=options, session_routing=True,
                          supports_images=True)
         self.publisher, self.index, self.last_finished = publisher, 0, 0.0
+        self.pending_settlement = None
         self.sources = runtime_provenance()['source_sha256']
         self.client.event_hooks['response'] = [self.record_transport]
 
@@ -227,6 +236,18 @@ class TeamBackend(ChatCompletionsBackend):
                'recorded_at_unix': time.time()}
         with (self.publisher.directory / 'model-transport.jsonl').open('a') as file:
             file.write(json.dumps(row) + '\n')
+        if self.pending_settlement is not None:
+            try:
+                result = self.publisher.rpc('settle', **self.pending_settlement, response_text=response.text)
+                with (self.publisher.directory / 'team-settlements.jsonl').open('a') as file:
+                    file.write(json.dumps({'request': self.pending_settlement, 'result': result}) + '\n')
+            except Exception as exc:
+                try:
+                    raw = response.json()
+                except ValueError:
+                    raw = {'unparsed_body': response.text}
+                raise BackendResponseError('Cost accounting failed; stopped before action delivery',
+                                           json.loads(response.request.content), raw) from exc
 
     def before_observation(self):
         wait = max(0, self.last_finished + 10 - time.monotonic())
@@ -247,6 +268,7 @@ class TeamBackend(ChatCompletionsBackend):
         receipt = self.publisher.rpc('reserve', step=self.index, input_bytes=len(raw), request_sha256=digest(raw), max_tokens=self.max_tokens)
         with (self.publisher.directory / 'team-reservations.jsonl').open('a') as file:
             file.write(json.dumps({'step': self.index, 'request_sha256': digest(raw), 'receipt': receipt}) + '\n')
+        self.pending_settlement = {'step': self.index, 'request_sha256': digest(raw)}
         self.index += 1
         if receipt.get('max_tokens') != self.max_tokens:
             raise RuntimeError('Broker did not acknowledge the requested output ceiling; no inference sent')
@@ -261,6 +283,7 @@ class TeamBackend(ChatCompletionsBackend):
                 raise BackendResponseError('Worker connection lost before action delivery', result.request, result.raw) from exc
             return result
         finally:
+            self.pending_settlement = None
             self.last_finished = time.monotonic()
 
 

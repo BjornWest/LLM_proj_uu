@@ -1,0 +1,7 @@
+# Append after standard-harness.override.yaml. Use the reviewed certificate
+# directory for this transport-only worker amendment; preserve all state volumes.
+services:
+  control:
+    image: intent-browser-control:actual-cost-v2
+  worker:
+    image: intent-browser-worker:actual-cost-v2

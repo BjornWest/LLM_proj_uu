@@ -174,13 +174,30 @@ export class Harness {
       insist(job.mode==='live'&&job.reservations.length===value.step,'Request already attempted or out of order',409);
       job.reservations.push({step:value.step,request_sha256:value.request_sha256,max_tokens,amount_usd:amount,status:'pending',at:iso(this.now())});
     });
-    // Same daily ledger as the existing Vercel demo. Never retry or refund this reservation.
+    // Shared daily ledger: charge reported cost after dispatch; retain unknown liabilities.
     const reservation={...await new Agent(this.store,{env:this.env}).reserve(amount),max_tokens};
     await this.mutate(state=>{
       const job=this.leased(state,value),row=job.reservations[value.step];
       insist(row.status==='pending','Reservation state changed',409);row.status='reserved';row.receipt=reservation;
     });
     return reservation;
+  }
+  async settle(value) {
+    const state=await this.state(),job=state.jobs[value.id],row=job?.reservations?.[value.step];
+    // A late response may settle a finished job, but never grants another action/lease.
+    insist(job&&job.lease===value.lease&&row?.receipt&&row.request_sha256===value.request_sha256,'Settlement does not match a reserved request',409);
+    insist(typeof value.response_text==='string'&&value.response_text.length<=8000000,'Invalid settlement evidence');
+    let response;try{response=JSON.parse(value.response_text);}catch{}
+    const cost=response?.usage?.cost;
+    const result=await new Agent(this.store,{env:this.env}).settle(row.receipt,{
+      cost:typeof cost==='number'&&Number.isFinite(cost)&&cost>=0?cost:null,
+      response_id:response?.id??null,response_sha256:sha(Buffer.from(value.response_text))});
+    await this.mutate(state=>{
+      const saved=state.jobs[value.id].reservations[value.step];
+      saved.settlement=result;saved.response_sha256=sha(Buffer.from(value.response_text));
+      saved.status=result.status;
+    });
+    return result;
   }
   async artifact(value) {
     insist(ART.test(value.name),'Unsupported artifact');

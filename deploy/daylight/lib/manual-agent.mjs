@@ -1,4 +1,5 @@
 // Model transport only. BrowserGym supplies policy observations and parses actions.
+import {createHash} from 'node:crypto';
 import {Agent,completionTokenLimit} from './agent.mjs';
 const PROVIDERS=['chutes','dekallm','phala','parasail','akashml','ionstream','cloudflare'];
 export function modelRequest(env,sessionID,messages,decision=null){
@@ -17,8 +18,8 @@ export async function infer({store,env,fetcher,sessionID,messages,signal,step,pe
   const bound=(bytes+2048)*0.5/1e6+step.request.max_tokens*4/1e6;
   await persist();if(signal.aborted)return;
   step.reservation=await new Agent(store,{env}).reserve(bound);
-  await persist();if(signal.aborted)return;
-  step.dispatch_at=new Date().toISOString();await persist();if(signal.aborted){delete step.dispatch_at;await persist();return;}
+  await persist();if(signal.aborted){step.budget_settlement=await new Agent(store,{env}).settle(step.reservation,{cost:0,not_sent:true});await persist();return;}
+  step.dispatch_at=new Date().toISOString();await persist();if(signal.aborted){delete step.dispatch_at;step.budget_settlement=await new Agent(store,{env}).settle(step.reservation,{cost:0,not_sent:true});await persist();return;}
   try{
     const response=await fetcher('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+env.OPENROUTER_API_KEY,'Content-Type':'application/json'},body:JSON.stringify(step.request),signal:AbortSignal.any([signal,AbortSignal.timeout(90000)])});
     step.http_status=response.status;step.response_text=await response.text();step.retry_after=response.headers.get('retry-after');
@@ -36,5 +37,13 @@ export async function infer({store,env,fetcher,sessionID,messages,signal,step,pe
     if(step.decision?.protocol==='native-core-v1'&&!signal.aborted&&[408,429,500,502,503,504].includes(step.http_status))return;
     throw error;
   }
-  finally{step.finished_at=new Date().toISOString();await persist();}
+  finally{
+    step.finished_at=new Date().toISOString();
+    // Save the provider evidence even if settlement/storage fails.
+    await persist();
+    step.budget_settlement=await new Agent(store,{env}).settle(step.reservation,{
+      cost:typeof step.usage?.cost==='number'&&Number.isFinite(step.usage.cost)&&step.usage.cost>=0?step.usage.cost:null,
+      response_id:step.response?.id??null,response_sha256:step.response_text==null?null:createHash('sha256').update(step.response_text).digest('hex')});
+    await persist();
+  }
 }
