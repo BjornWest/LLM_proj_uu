@@ -623,7 +623,14 @@ async function readRoute(){
 document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden){refresh();loadManual();}else clearTimeout(remotePollTimer);});
 window.addEventListener('popstate',readRoute);window.addEventListener('pagehide',()=>{clearTimeout(pollTimer);clearTimeout(remotePollTimer);});
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('run-viewer').contentWindow||event.data?.type!=='harness:size')return;const height=Number(event.data.height);if(Number.isFinite(height))$('run-viewer').style.height=Math.min(8000,Math.max(650,height))+'px';});
-window.addEventListener('message',event=>{const frame=$('shared-trace-viewer');if(event.origin!==location.origin||event.source!==frame.contentWindow||event.data?.type!=='trace-viewer:size')return;const height=Number(event.data.height);if(Number.isFinite(height))frame.style.height=Math.min(14000,Math.max(800,height))+'px';});
+window.addEventListener('message',event=>{
+  const frame=$('shared-trace-viewer');
+  if(event.origin!==location.origin||event.source!==frame.contentWindow||event.data?.type!=='trace-viewer:size')return;
+  const height=Number(event.data.height);
+  // The child reports content height; border-box sizing must also include the
+  // iframe's borders. Let long traces grow so the workspace owns page scrolling.
+  if(Number.isFinite(height)&&height>0)frame.style.height=Math.max(800,Math.ceil(height+frame.offsetHeight-frame.clientHeight))+'px';
+});
 // Render the workspace immediately; network dependencies settle independently.
 buildSites();readRoute();
 api('/assets/fixture.json').then(value=>{fixture=value;window.demoWorld=new World(fixture);render();}).catch(error=>notice(error.message));

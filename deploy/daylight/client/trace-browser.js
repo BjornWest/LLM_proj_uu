@@ -193,7 +193,9 @@ export function createBrowserExtension({jumpToMessage}){
   const select=element('select');select.setAttribute('aria-label','Recorded browser step');
   const slider=element('input');slider.type='range';slider.min='0';slider.setAttribute('aria-label','Replay step position');
   const phase=element('select');phase.setAttribute('aria-label','Recorded observation type');
-  controls.append(previous,play,next,select,slider,phase);
+  const phaseLabel=element('label','Recorded page state','browser-replay-observation');phaseLabel.append(phase);
+  const phaseHelp=element('p',undefined,'muted browser-replay-observation-help');phaseHelp.id='replay-observation-help';phase.setAttribute('aria-describedby',phaseHelp.id);
+  controls.append(previous,play,next,select,slider,phaseLabel,phaseHelp);
   const status=element('p',undefined,'muted');status.setAttribute('role','status');
   const stage=element('div',undefined,'browser-replay-stage'),picture=element('img');picture.alt='Recorded browser screenshot';picture.loading='lazy';
   const missing=element('p',undefined,'muted');stage.append(picture,missing);
@@ -204,8 +206,8 @@ export function createBrowserExtension({jumpToMessage}){
   function showStep(){
     const step=steps[position];previous.disabled=position===0;next.disabled=!step||position>=steps.length-1;play.disabled=steps.length<2;select.value=String(position);slider.value=String(position);slider.disabled=steps.length<2;
     phase.replaceChildren();
-    for(const [index,item] of (step?.observations||[]).entries()){const option=element('option',item.observation_role==='selected'?'Decision observation':item.observation_role==='transition'?'Transition · separate from decision input':item.observation_role==='consolidated'?'Consolidated update · next request':'Final recorded observation');option.value=String(index);phase.append(option);}
-    const selected=step?.observations.findIndex(item=>item.observation_role==='selected');phase.value=String(selected>=0?selected:0);phase.hidden=!step?.observations.length;
+    for(const [index,item] of (step?.observations||[]).entries()){const option=element('option',item.observation_role==='selected'?'Decision observation':item.observation_role==='transition'?'Transition · separate from decision input':item.observation_role==='consolidated'?'Page update for next turn':'Final recorded observation');option.value=String(index);phase.append(option);}
+    const selected=step?.observations.findIndex(item=>item.observation_role==='selected');phase.value=String(selected>=0?selected:0);phaseLabel.hidden=phaseHelp.hidden=!step?.observations.length;
     status.textContent=step?'Step '+step.turn+' · '+(position+1)+' / '+steps.length:'No recorded browser steps available.';
     action.textContent=step?.tools.map(tool=>tool.text).join('\n')||'No browser action recorded at this step.';
     inspect.disabled=!step?.messages.length;const inventory=main.querySelector('.trace-tool-decision');if(step&&inventory&&inventory.value!==step.key){inventory.value=step.key;inventory.dispatchEvent(new Event('change'));}showObservation();
@@ -215,6 +217,7 @@ export function createBrowserExtension({jumpToMessage}){
     picture.hidden=!asset;missing.hidden=!!asset;
     if(asset){picture.src=asset.url;picture.alt=observation.title+' · step '+steps[position].turn;}else{picture.removeAttribute('src');missing.textContent='No screenshot recorded for this observation.';}
     observationText.textContent=observation?.text||'No observation text recorded.';
+    phaseHelp.textContent=({selected:'Page state recorded for this turn’s decision.',transition:'Page state immediately after an action; it may differ from the next decision’s input.',consolidated:'Page update saved after this turn for a possible next model request. Another request may not have been sent.',final:'The last recorded page state.'})[observation?.observation_role]||'';
   }
   function move(index){position=Math.min(Math.max(0,index),Math.max(0,steps.length-1));showStep();}
   function showMode(value){mode=value;outputReview.hidden=value!=='conversation';rawRecords.hidden=value!=='conversation';document.body.dataset.browserView=value;replay.hidden=value!=='replay';if(value!=='replay')stop();
