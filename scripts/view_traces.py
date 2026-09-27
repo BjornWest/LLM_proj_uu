@@ -8,7 +8,8 @@ def main():
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--common-util', type=Path, default=root.parent / 'common_agent_util')
-    parser.add_argument('--runs', type=Path, default=root / 'runs')
+    parser.add_argument('--runs', type=Path, help='View only this directory (legacy single-source mode)')
+    parser.add_argument('--registry', type=Path, default=root / '.local/trace-viewer/sources.json', help='Trusted trace roots/patterns for the shared viewer')
     parser.add_argument('--port', type=int, default=8878)
     args = parser.parse_args()
     if (args.common_util / 'agent_trace/adapters/browsergym.py').is_file():
@@ -19,7 +20,19 @@ def main():
     except ImportError:
         parser.error('Use the common_agent_util checkout with BrowserGym support alongside this repo, '
                      'or specify --common-util PATH, or install that package.')
-    serve(['serve', '--runs', str(args.runs), '--port', str(args.port)])
+    if args.runs is not None:
+        serve(['serve', '--runs', str(args.runs), '--port', str(args.port)])
+    else:
+        import json
+        if not args.registry.exists():
+            args.registry.parent.mkdir(parents=True,exist_ok=True)
+            args.registry.write_text(json.dumps({'project_root':str(root),'roots':[str(root/'runs')],
+                'patterns':['.local/real-web-*/runs','.local/synthetic-*/live/runs']},indent=2))
+        try:
+            from .trace_hub import serve as serve_hub
+        except ImportError:
+            from trace_hub import serve as serve_hub
+        serve_hub(args.registry,args.port)
 
 
 if __name__ == '__main__':
