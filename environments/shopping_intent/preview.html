@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shopping task and memory generator</title>
+<style>
+body{font:16px/1.5 system-ui,sans-serif;max-width:1250px;margin:32px auto;padding:0 24px;background:#f5f6f8;color:#192431}h1{font-size:28px;margin-bottom:4px}h2{font-size:19px}p{max-width:1000px}form,.card{background:white;border:1px solid #d9dfe5;border-radius:10px;padding:20px;margin:18px 0}form{display:flex;gap:14px;flex-wrap:wrap;align-items:end}label{display:grid;gap:4px;font-size:14px}input,select,button{font:inherit;padding:8px;border:1px solid #a6b0bc;border-radius:5px}input{width:105px}button{cursor:pointer;background:#174f6c;color:white}button.secondary{background:white;color:#174f6c}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.55 ui-monospace,monospace}.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.grid .card{margin:0}.muted{color:#546376;font-size:14px}#error{color:#a01818}summary{cursor:pointer}#message{font:16px/1.65 system-ui}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}textarea{width:100%;box-sizing:border-box;min-height:200px;font:14px/1.5 monospace} @media(max-width:850px){.grid{grid-template-columns:1fr}}
+.stage{border-radius:3px;padding:1px 0;box-decoration-break:clone}.objective{background:#e4ddff;color:#382170}.product{background:#dceafa;color:#173d67}.requirement{background:#d9f1e2;color:#1a5131}.memory{background:#ffedc5;color:#674600}.override{background:#ffe0df;color:#7a2020}.constraint{background:#ffe2cd;color:#743a13}.scope{background:#e8eaf0;color:#384153}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;margin:12px 0}.legend span{padding:3px 6px}#message{white-space:normal}#hidden-reply{font-weight:600}.private-note{color:#665435}.hidden-row{border-top:1px solid #eee;padding:12px 0}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;vertical-align:top;padding:10px;border:1px solid #ddd}
+</style>
+<h1>Shopping task + memory generator</h1>
+<p>Choose a product family and a question, then inspect the user message and saved memories together. A seed reproduces the same task; a different wording seed varies supported phrasing without changing its meaning.</p>
+<p class="muted">Local authoring preview • Fictional catalog references • No model calls • These prompts are not yet connected to shopping websites. Structured task and oracle inputs are private authoring data.</p>
+<form id="controls">
+<label>Product family<select name="family" id="family"><option value="random">Random family</option></select></label>
+<label>Question<select name="query"><option value="cheapest">Cheapest item</option><option value="random">Sample question</option><option value="fastest">Fastest under budget</option><option value="basket">Three items, one retailer</option><option value="split_basket">Three items, split retailers allowed</option><option value="average">Average delivered price</option></select></label>
+<label>Memory scenario<select name="memory"><option value="auto">Sample scenario</option><option value="none">No relevant memory</option><option value="profile">Structured profile</option><option value="episodic">Prose memories</option><option value="mixed">Hybrid</option><option value="override">Temporary override</option></select></label>
+<label>Hidden user specification<select name="hidden"><option value="auto">Sometimes omit a blocker</option><option value="none">Everything available</option><option value="blocker">Omit a fit/compatibility fact</option></select></label>
+<label>Target<select name="target"><option value="category">Product requirements</option><option value="model">Exact fictional model</option></select></label>
+<label>Requirements per item<input name="requirements" type="number" min="1" max="6" value="3"></label>
+<label>Task seed<input name="seed" id="seed" type="number" value="0" required></label>
+<label>Wording seed<input name="prose_seed" type="number" placeholder="Same seed"></label>
+<label>Budget (SEK)<input name="budget_sek" type="number" min="1" placeholder="Sampled"></label>
+<button type="submit">Generate</button><button type="button" id="random" class="secondary">New random task</button>
+</form>
+<p class="muted">Basket questions use three distinct families; the selected family is the first item. Average-price questions use an exact fictional model and one cheapest eligible quote per retailer. An empty memory panel is intentional. Personal fit/compatibility fields are included before optional requirements. Logic checks may remove redundant requirements. Only eligible fit/compatibility facts can be withheld; colours and ingredient dislikes cannot.</p>
+<p id="error" role="alert"></p><p id="status" class="muted" aria-live="polite"></p>
+<div class="actions"><button id="copy" class="secondary">Copy prompt + memories</button><button id="download" class="secondary">Download full authoring JSON</button><button id="download-public" class="secondary">Download prompt + memories only</button></div>
+<div class="grid"><section class="card"><h2>User message</h2><div class="legend" aria-label="Generation stages"><span class="stage objective">Question</span><span class="stage product">Product</span><span class="stage requirement">Requirements</span><span class="stage memory">Saved context</span><span class="stage override">Exception</span><span class="stage constraint">Budget / delivery</span><span class="stage scope">Comparison scope</span></div><p id="message"></p><p class="muted">Colours show the source of each part. Copies and public downloads contain plain text.</p></section><section class="card"><h2>Saved memories</h2><div id="memories"></div></section></div>
+<section class="card"><h2>Hidden user specifications</h2><p class="muted private-note">Authoring view only. These values are absent from the initial message and memories. Try a targeted question below; this is a typed response preview, not a natural-language user simulator.</p><div id="hidden"></div></section>
+<details class="card"><summary>Shared environment conventions (outside the user message)</summary><p class="muted">These conventions accompany public exports and belong in the benchmark environment/instructions. They keep grading assumptions visible without making every user repeat them.</p><pre id="context"></pre></details>
+<details class="card"><summary>Requirement checks and removed redundancies</summary><pre id="logic"></pre></details>
+<details class="card"><summary>Structured oracle task and memory provenance</summary><p class="muted">Initial accessible requirements and complete intended requirements are separate. Hidden values enter through targeted clarification. This data belongs outside policy-visible websites.</p><pre id="structured"></pre></details>
+<details class="card"><summary>Available attributes for this task</summary><div id="attributes"></div></details>
+<script>
+let current=null, catalog=[];const form=document.querySelector('#controls');
+const pretty=x=>JSON.stringify(x,null,2);
+function download(data,name){const url=URL.createObjectURL(new Blob([pretty(data)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+let currentParams=null, semanticReview={};
+async function generate(){
+ document.querySelector('#error').textContent='';
+ try{
+  const params=new URLSearchParams(new FormData(form));
+  const response=await fetch('/api/generate?'+params);const data=await response.json();
+  if(!response.ok)throw new Error(data.error);
+  current=data;currentParams=params;
+  const message=document.querySelector('#message');message.replaceChildren();
+  for(const segment of data.authoring.message_segments){
+   const span=document.createElement('span');span.className='stage '+segment.stage;span.textContent=segment.text;
+   span.title=segment.stage+(segment.sources.length?': '+segment.sources.join(', '):'');message.append(span);
+  }
+  const panel=document.querySelector('#memories');panel.replaceChildren();const m=data.public.memories;
+  if(!m.profile.length&&!m.episodes.length)panel.textContent='No relevant memories generated.';
+  if(m.profile.length){const h=document.createElement('h3');h.textContent='Structured profile';const p=document.createElement('pre');p.textContent=pretty(m.profile);panel.append(h,p)}
+  for(const e of m.episodes){const p=document.createElement('p');p.textContent=e.text;panel.append(p)}
+  const hidden=document.querySelector('#hidden');hidden.replaceChildren();
+  if(!data.hidden_user_specifications.length)hidden.textContent='No hidden specifications in this sample.';
+  for(const spec of data.hidden_user_specifications){
+   const row=document.createElement('div');row.className='hidden-row';
+   const label=document.createElement('p');label.textContent=spec.line_id+' · '+spec.reason;
+   const button=document.createElement('button');button.className='secondary clarify';button.textContent=spec.example_question;
+   const reply=document.createElement('p');reply.className='clarification-reply';
+   button.onclick=async()=>{const p=new URLSearchParams(currentParams);p.set('line_id',spec.line_id);p.set('field',spec.predicate.field);
+    const r=await fetch('/api/clarify?'+p);const answer=await r.json();reply.textContent=answer.reply||'No matching specification.';};
+   row.append(label,button,reply);hidden.append(row);
+  }
+  document.querySelector('#context').textContent=pretty(data.public.environment_context);
+  document.querySelector('#structured').textContent=pretty({initial_accessible_task:data.initial_accessible_task,resolved_task:data.resolved_task,hidden_user_specifications:data.hidden_user_specifications,memory_facts:data.memory_facts,expected_memory_delta:data.expected_memory_delta});
+  document.querySelector('#logic').textContent=pretty({sampling:data.authoring.semantic_audit,family_rules:data.resolved_task.lines.map(l=>({family:l.family_id,...semanticReview[l.family_id]}))});
+  const attrs=document.querySelector('#attributes');attrs.replaceChildren();
+  for(const line of data.resolved_task.lines){const family=catalog.find(f=>f.id===line.family_id);const title=document.createElement('h3');title.textContent=family.label;attrs.append(title);
+   const table=document.createElement('table');const head=document.createElement('tr');
+   for(const text of ['Product-page selections','Description / filtering']){const th=document.createElement('th');th.textContent=text;head.append(th)}table.append(head);
+   const row=document.createElement('tr');for(const surface of ['selection','description']){const td=document.createElement('td');for(const a of family.attributes.filter(x=>x.surface===surface)){const p=document.createElement('p');p.textContent=a.label+': '+a.values.join(', ');td.append(p)}row.append(td)}table.append(row);attrs.append(table);
+  }
+  document.querySelector('#status').textContent='Seed '+data.seed+' · '+data.resolved_task.lines.length+' item line(s) · Memory: '+data.settings.resolved_memory_mode+' · Hidden blockers: '+data.hidden_user_specifications.length+' · Semantic hash: '+data.semantic_sha256.slice(0,12);
+  history.replaceState(null,'','/?'+params);
+ }catch(e){document.querySelector('#error').textContent=e.message}
+}
+form.addEventListener('submit',e=>{e.preventDefault();generate()});document.querySelector('#random').onclick=()=>{document.querySelector('#seed').value=crypto.getRandomValues(new Uint32Array(1))[0];generate()};
+document.querySelector('#copy').onclick=async()=>{if(current){try{await navigator.clipboard.writeText(current.public.user_message+'\n\nSaved memories:\n'+pretty(current.public.memories)+'\n\nEnvironment context (separate from user message):\n'+pretty(current.public.environment_context));document.querySelector('#status').textContent='Copied prompt and memories.'}catch(e){document.querySelector('#error').textContent='Clipboard unavailable; use the public JSON download.'}}};
+document.querySelector('#download').onclick=()=>current&&download(current,'shopping-intent-'+current.seed+'.json');document.querySelector('#download-public').onclick=()=>current&&download(current.public,'shopping-prompt-'+current.seed+'.json');
+(async()=>{try{const r=await fetch('/api/catalog');const data=await r.json();catalog=data.families;semanticReview=data.semantic_review;for(const f of catalog){const o=document.createElement('option');o.value=f.id;o.textContent=f.label;document.querySelector('#family').append(o)}for(const [k,v] of new URLSearchParams(location.search)){const input=form.elements.namedItem(k);if(input)input.value=v}await generate()}catch(e){document.querySelector('#error').textContent=e.message}})();
+</script></html>
