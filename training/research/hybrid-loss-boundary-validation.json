@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "scope": "CPU loss interface only; synthetic BF16 base and adapters",
+  "source": "https://raw.githubusercontent.com/huggingface/trl/a04ffd337108285002df29d9ae73ef7e855e03f1/trl/experimental/async_grpo/async_grpo_trainer.py",
+  "source_sha256": "15951bb122c4477ba82aeeb24ad85b35dd46fd8489f244364837dc958919af99",
+  "torch": "2.13.0+cu130",
+  "checks": [
+    "next-token alignment",
+    "environment token loss masking",
+    "accumulation scaling",
+    "zero advantages",
+    "positive/negative advantage gradients",
+    "clipped gradient",
+    "BF16 adapter gradients and updates",
+    "frozen base unchanged"
+  ],
+  "limitations": [
+    "No actual AsyncGRPOTrainer or rollout worker instantiated",
+    "No Megatron, TE, FP8, Bridge export, optimizer resume, or vLLM tested",
+    "Single sequence/rank, full vocabulary; not a production chunked logprob kernel",
+    "Synthetic advantages supplied; no reward grouping or browser episode tested"
+  ]
+}

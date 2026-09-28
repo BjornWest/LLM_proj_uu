@@ -1,0 +1,397 @@
+{
+  "date": "2026-09-16",
+  "container": "nvcr.io/nvidia/nemo-rl@sha256:9392cc2cc07140f6a4cbd30f31ebffd0a54de3ded25c5a3b49505407a779e4f9",
+  "commits": {
+    "nemo_rl": "19244a0949fb363326f71675223da75e09d14866",
+    "bridge": "151168f36372132c8fb8f926501f573019feb967"
+  },
+  "scope": "tiny real Qwen Bridge export; stop before vLLM on export failure",
+  "outcome": "Ordinary conversion tasks preserved nonzero LoRA in BF16 exports; explicit physical-FP8 export is blocked. No live vLLM refit or NeMo GRPO tested.",
+  "hardware": {
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "capability": [
+      9,
+      0
+    ],
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0"
+  },
+  "independent_fused_projections": [
+    {
+      "projection": "decoder.layers.0.mlp.linear_fc1",
+      "delta_norm": 10.413718223571777,
+      "hf_names": [
+        "model.layers.0.mlp.gate_proj.weight",
+        "model.layers.0.mlp.up_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.0.mlp.linear_fc2",
+      "delta_norm": 7.151288032531738,
+      "hf_names": [
+        "model.layers.0.mlp.down_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.0.self_attention.in_proj",
+      "delta_norm": 16.3944034576416,
+      "hf_names": [
+        "model.layers.0.linear_attn.in_proj_qkv.weight",
+        "model.layers.0.linear_attn.in_proj_z.weight",
+        "model.layers.0.linear_attn.in_proj_b.weight",
+        "model.layers.0.linear_attn.in_proj_a.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.00024390965700149536
+    },
+    {
+      "projection": "decoder.layers.0.self_attention.out_proj",
+      "delta_norm": 10.139451026916504,
+      "hf_names": [
+        "model.layers.0.linear_attn.out_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.1.mlp.linear_fc1",
+      "delta_norm": 10.315797805786133,
+      "hf_names": [
+        "model.layers.1.mlp.gate_proj.weight",
+        "model.layers.1.mlp.up_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.1.mlp.linear_fc2",
+      "delta_norm": 7.1996169090271,
+      "hf_names": [
+        "model.layers.1.mlp.down_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.1.self_attention.in_proj",
+      "delta_norm": 16.28095054626465,
+      "hf_names": [
+        "model.layers.1.linear_attn.in_proj_qkv.weight",
+        "model.layers.1.linear_attn.in_proj_z.weight",
+        "model.layers.1.linear_attn.in_proj_b.weight",
+        "model.layers.1.linear_attn.in_proj_a.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.00024405866861343384
+    },
+    {
+      "projection": "decoder.layers.1.self_attention.out_proj",
+      "delta_norm": 10.286835670471191,
+      "hf_names": [
+        "model.layers.1.linear_attn.out_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.2.mlp.linear_fc1",
+      "delta_norm": 10.32714557647705,
+      "hf_names": [
+        "model.layers.2.mlp.gate_proj.weight",
+        "model.layers.2.mlp.up_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.2.mlp.linear_fc2",
+      "delta_norm": 7.212372779846191,
+      "hf_names": [
+        "model.layers.2.mlp.down_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.2.self_attention.in_proj",
+      "delta_norm": 15.970070838928223,
+      "hf_names": [
+        "model.layers.2.linear_attn.in_proj_qkv.weight",
+        "model.layers.2.linear_attn.in_proj_z.weight",
+        "model.layers.2.linear_attn.in_proj_b.weight",
+        "model.layers.2.linear_attn.in_proj_a.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0004146993160247803
+    },
+    {
+      "projection": "decoder.layers.2.self_attention.out_proj",
+      "delta_norm": 10.030999183654785,
+      "hf_names": [
+        "model.layers.2.linear_attn.out_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.3.mlp.linear_fc1",
+      "delta_norm": 10.101365089416504,
+      "hf_names": [
+        "model.layers.3.mlp.gate_proj.weight",
+        "model.layers.3.mlp.up_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.3.mlp.linear_fc2",
+      "delta_norm": 7.128298282623291,
+      "hf_names": [
+        "model.layers.3.mlp.down_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.3.self_attention.linear_proj",
+      "delta_norm": 5.16817045211792,
+      "hf_names": [
+        "model.layers.3.self_attn.o_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    },
+    {
+      "projection": "decoder.layers.3.self_attention.linear_qkv",
+      "delta_norm": 10.124564170837402,
+      "hf_names": [
+        "model.layers.3.self_attn.q_proj.weight",
+        "model.layers.3.self_attn.k_proj.weight",
+        "model.layers.3.self_attn.v_proj.weight"
+      ],
+      "adapter_matmul_vs_fp32_max_abs": 0.0
+    }
+  ],
+  "ordinary_export": {
+    "adapted_tasks": 16,
+    "exceptions": 0,
+    "hf_tensors": 31,
+    "dtypes": [
+      "torch.bfloat16"
+    ],
+    "max_relative_l2_weight_error": 0.0022011755499988794,
+    "max_absolute_weight_error": 0.0006277859210968018
+  },
+  "physical_export": {
+    "adapted_weight_and_scale_tasks": 32,
+    "exceptions": 19,
+    "failures": [
+      {
+        "task": "decoder.layers.0.mlp.linear_fc1.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (2) must match the size of tensor b (256) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.0.mlp.linear_fc2.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (4) must match the size of tensor b (512) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.0.self_attention.in_proj.to_wrap.weight",
+        "error": "RuntimeError: Promotion for Float8 Types is not supported, attempted to promote Float8_e4m3fn and BFloat16"
+      },
+      {
+        "task": "decoder.layers.0.self_attention.in_proj.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: shape '[1, -1, 256]' is invalid for input of size 42"
+      },
+      {
+        "task": "decoder.layers.0.self_attention.out_proj.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (8) must match the size of tensor b (1024) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.1.mlp.linear_fc1.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (2) must match the size of tensor b (256) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.1.mlp.linear_fc2.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (4) must match the size of tensor b (512) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.1.self_attention.in_proj.to_wrap.weight",
+        "error": "RuntimeError: Promotion for Float8 Types is not supported, attempted to promote Float8_e4m3fn and BFloat16"
+      },
+      {
+        "task": "decoder.layers.1.self_attention.in_proj.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: shape '[1, -1, 256]' is invalid for input of size 42"
+      },
+      {
+        "task": "decoder.layers.1.self_attention.out_proj.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (8) must match the size of tensor b (1024) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.2.mlp.linear_fc1.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (2) must match the size of tensor b (256) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.2.mlp.linear_fc2.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (4) must match the size of tensor b (512) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.2.self_attention.in_proj.to_wrap.weight",
+        "error": "RuntimeError: Promotion for Float8 Types is not supported, attempted to promote Float8_e4m3fn and BFloat16"
+      },
+      {
+        "task": "decoder.layers.2.self_attention.in_proj.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: shape '[1, -1, 256]' is invalid for input of size 42"
+      },
+      {
+        "task": "decoder.layers.2.self_attention.out_proj.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (8) must match the size of tensor b (1024) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.3.mlp.linear_fc1.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (2) must match the size of tensor b (256) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.3.mlp.linear_fc2.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (4) must match the size of tensor b (512) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.3.self_attention.linear_proj.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (2) must match the size of tensor b (256) at non-singleton dimension 1"
+      },
+      {
+        "task": "decoder.layers.3.self_attention.linear_qkv.to_wrap.weight_scale_inv",
+        "error": "RuntimeError: The size of tensor a (2) must match the size of tensor b (256) at non-singleton dimension 1"
+      }
+    ]
+  },
+  "scale_merge": {
+    "scale_min": 5.858284930582158e-05,
+    "scale_max": 9.100777242565528e-05,
+    "intended_update_norm": 5.16817045211792,
+    "received_update_norm": 3.724037378560752e-05,
+    "update_relative_error": 0.9999995231628418,
+    "scope": "real TE weight + upstream merge helper; reconstructed receiver, not live vLLM",
+    "original_scale_control": {
+      "status": "NONFINITE",
+      "reason": "Merged weights exceeded the original scale range; this GPU control is invalid. A new-scale control was subsequently CPU-tested, not GPU-rerun."
+    }
+  },
+  "cpu_source_extracted_scale_control": {
+    "scope": "CPU source-extracted upstream methods, constant synthetic scale; not TE or worker execution",
+    "raw_scale": 0.000244140625,
+    "expected_update": 0.08015632629394531,
+    "received_update": 0.0,
+    "correct_scale_control_update": 0.078125,
+    "update_relative_error": 1.0
+  },
+  "frozen_base_unchanged": true,
+  "vllm_refit_run": false,
+  "runs": [
+    {
+      "run_id": "nemo-fp8-20260916-220748-e08033b6",
+      "app_id": "ap-A64ktjnxyy7JAIjw0R40gu",
+      "supervisor_status": "FAIL",
+      "probe_status": "FAIL",
+      "probe_error": "Traceback (most recent call last):\n  File \"/opt/probe/scripts/nemo_fp8_probe.py\", line 421, in main\n    result = {\"linear\": linear_experiment, \"hybrid\": hybrid_experiment, \"export\": export_experiment}[args.stage]()\n  File \"/opt/probe/scripts/nemo_fp8_probe.py\", line 252, in export_experiment\n    tasks = [t for t in bridge.get_conversion_tasks([model]) if t is not None]\n                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^\n  File \"/opt/nemo-rl/3rdparty/Megatron-Bridge-workspace/Megatron-Bridge/src/megatron/bridge/models/conversion/auto_bridge.py\", line 1636, in get_conversion_tasks\n    raise ValueError(\"hf_path is required when hf_pretrained is not a PreTrainedCausalLM instance\")\nValueError: hf_path is required when hf_pretrained is not a PreTrainedCausalLM instance\n",
+      "gpu_function_seconds": 68.85882520675659,
+      "submission_to_report_seconds": 179.16583156585693,
+      "source_sha256": {
+        "scripts/modal_nemo_fp8.py": "ece5a620b4aed1a4b60f01656ba2ead16cb9bdb679a8dd91440bacee57e1e022",
+        "scripts/nemo_fp8_probe.py": "85aae12909aea2a66afe7e22d8ed2741e3a0d782004ca6198be410987418a043",
+        "browser_training/processes.py": "854ec2ddbf1b8c7ab912cc69527154e5fc1820d1567a518ec591fc6c67b136e2"
+      },
+      "report_sha256": "56f894bf95e53cfb995de0a6930471f520dd6711db54f37461bc46a074b07eac"
+    },
+    {
+      "run_id": "nemo-fp8-20260916-221123-2d1bc4b9",
+      "app_id": "ap-N0F8404Ga2PoMYX60tVhat",
+      "supervisor_status": "FAIL",
+      "probe_status": "FAIL",
+      "probe_error": "Traceback (most recent call last):\n  File \"/opt/probe/scripts/nemo_fp8_probe.py\", line 424, in main\n    result = {\"linear\": linear_experiment, \"hybrid\": hybrid_experiment, \"export\": export_experiment}[args.stage]()\n  File \"/opt/probe/scripts/nemo_fp8_probe.py\", line 276, in export_experiment\n    torch.testing.assert_close(reference[name], value, atol=1e-6, rtol=1e-5)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/ray_venvs/nemo_rl.models.policy.workers.megatron_policy_worker.MegatronPolicyWorker/lib/python3.13/site-packages/torch/testing/_comparison.py\", line 1600, in assert_close\n    raise error_metas[0].to_error(msg)\nAssertionError: Tensor-likes are not close!\n\nMismatched elements: 358886 / 393216 (91.3%)\nGreatest absolute difference: 0.00024384260177612305 at index (1029, 50) (up to 1e-06 allowed)\nGreatest relative difference: 394.591552734375 at index (1106, 152) (up to 1e-05 allowed)\n",
+      "gpu_function_seconds": 81.10574913024902,
+      "submission_to_report_seconds": 110.47750949859619,
+      "source_sha256": {
+        "scripts/modal_nemo_fp8.py": "ece5a620b4aed1a4b60f01656ba2ead16cb9bdb679a8dd91440bacee57e1e022",
+        "scripts/nemo_fp8_probe.py": "4b0cce6b55cfce5023d9fb93f8b2345343a17c4a2f54c1d79e4dba42eda92d2e",
+        "browser_training/processes.py": "854ec2ddbf1b8c7ab912cc69527154e5fc1820d1567a518ec591fc6c67b136e2"
+      },
+      "report_sha256": "a25a4195a2b3520cc91a235c95f3733885a9c7f79b53d5874d16ee21c53df1ef"
+    },
+    {
+      "run_id": "nemo-fp8-20260916-221422-8d78f507",
+      "app_id": "ap-9rxSAyp2oMoJ4MhzArHQEz",
+      "supervisor_status": "FAIL",
+      "probe_status": "BLOCKED",
+      "probe_error": null,
+      "gpu_function_seconds": 77.85608267784119,
+      "submission_to_report_seconds": 123.68810081481934,
+      "source_sha256": {
+        "scripts/modal_nemo_fp8.py": "ece5a620b4aed1a4b60f01656ba2ead16cb9bdb679a8dd91440bacee57e1e022",
+        "scripts/nemo_fp8_probe.py": "5bfe1a78e12b2171545cf00fd079eae5d88aeed70f64d36d2f7661191a95f8d9",
+        "browser_training/processes.py": "854ec2ddbf1b8c7ab912cc69527154e5fc1820d1567a518ec591fc6c67b136e2"
+      },
+      "report_sha256": "480ab68989dfc6e7d637366a46db5d3b8adc8fecc99f83bb9f9c051e886ba358"
+    }
+  ],
+  "budget": {
+    "authorized_h100_seconds": 600,
+    "total_submission_to_report_seconds": 413.33144187927246,
+    "total_gpu_function_seconds": 227.8206570148468,
+    "billing_measurement": false
+  },
+  "app_cleanup": [
+    {
+      "app_id": "ap-9rxSAyp2oMoJ4MhzArHQEz",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 22:14:22+02:00",
+      "stopped_at": "2026-09-16 22:16:30+02:00"
+    },
+    {
+      "app_id": "ap-N0F8404Ga2PoMYX60tVhat",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 22:11:23+02:00",
+      "stopped_at": "2026-09-16 22:13:17+02:00"
+    },
+    {
+      "app_id": "ap-A64ktjnxyy7JAIjw0R40gu",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 22:07:48+02:00",
+      "stopped_at": "2026-09-16 22:10:51+02:00"
+    }
+  ],
+  "limitations": [
+    "Random ~5.17M model, manually nonzero adapters; no further training in this round.",
+    "BF16 exported weight comparison is not logprob agreement.",
+    "Pinned worker and newer main have different refit task selection.",
+    "Runtime numerical checks completed; negative qualification deliberately exits 1.",
+    "No newer upstream container, actual inference receiver, or 27B memory qualification."
+  ],
+  "native_receiver_quantization_cpu": {
+    "status": "PASS",
+    "scope": "source-extracted CPU arithmetic; no TE, transport, vLLM worker, or logprobs",
+    "torch": "2.13.0+cu130",
+    "sources": [
+      {
+        "url": "https://raw.githubusercontent.com/NVIDIA-NeMo/Megatron-Bridge/151168f36372132c8fb8f926501f573019feb967/src/megatron/bridge/peft/lora.py",
+        "sha256": "abc52742564abce608912e7fdddebc0373d7316d3a95f741c7cf43e98178724c",
+        "extracted": "LoRAMerge"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/NVIDIA-NeMo/Megatron-Bridge/151168f36372132c8fb8f926501f573019feb967/src/megatron/bridge/models/conversion/peft_bridge.py",
+        "sha256": "22a22cb1c1ea0d75cd15c04af8ebce70e1cb8db2960f6a5f9cfdcbc8dcc34bd2",
+        "extracted": "_merge_single_adapter_weight"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/NVIDIA-NeMo/RL/19244a0949fb363326f71675223da75e09d14866/nemo_rl/models/generation/vllm/quantization/fp8.py",
+        "sha256": "bc75b23a800a1245a6fb5dc4c1944d9894c73432b806fdab5302f1b63bc01e24",
+        "extracted": "cast_tensor_to_fp8_blockwise"
+      }
+    ],
+    "expected_update": 0.08015632629394531,
+    "raw_merge_received_update": 0.0,
+    "native_requantization_received_update": 0.0800781324505806,
+    "raw_merge_update_relative_error": 1.0,
+    "native_requantization_update_relative_error": 0.0009755264036357403
+  },
+  "local_validation": {
+    "launcher_tests": "5 passed; torch-only control skipped in lightweight launcher environment",
+    "new_scale_control": "1 passed separately in CPU PyTorch environment",
+    "python_compile": "passed",
+    "diff_whitespace": "passed"
+  }
+}

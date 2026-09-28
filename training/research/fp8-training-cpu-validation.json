@@ -1,0 +1,224 @@
+{
+  "status": "CPU_AUDIT_COMPLETE",
+  "native_fp8_training_guard_rejected": true,
+  "gpu_used": false,
+  "model_weights_downloaded": false,
+  "fp8_kernel_executed": false,
+  "fp8_backward_qualified": false,
+  "qwen_hybrid_or_async_grpo_forward_executed": false,
+  "qwen_meta_structure": {
+    "status": "META_STRUCTURE_ONLY",
+    "fp8_linears": 336,
+    "targeted_projection_counts": {
+      "linear_attn.out_proj": 48,
+      "linear_attn.in_proj_qkv": 48,
+      "linear_attn.in_proj_z": 48,
+      "mlp.gate_proj": 64,
+      "mlp.up_proj": 64,
+      "mlp.down_proj": 64,
+      "self_attn.q_proj": 16,
+      "self_attn.k_proj": 16,
+      "self_attn.v_proj": 16,
+      "self_attn.o_proj": 16
+    },
+    "dtypes": {
+      "base_parameter_elements": {
+        "torch.bfloat16": 8734018800,
+        "torch.float8_e4m3fn": 18622709760,
+        "torch.float32": 1136640
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 108789760
+      },
+      "gradient_tensors_checked": 0
+    },
+    "targeted_base_types": {
+      "FP8Linear": 336,
+      "Linear": 64
+    },
+    "targets_not_replaced_by_fp8": [
+      "base_model.model.model.language_model.layers.0.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.1.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.2.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.3.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.4.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.5.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.6.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.7.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.8.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.9.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.10.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.11.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.12.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.13.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.14.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.15.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.16.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.17.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.18.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.19.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.20.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.21.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.22.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.23.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.24.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.25.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.26.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.27.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.28.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.29.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.30.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.31.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.32.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.33.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.34.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.35.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.36.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.37.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.38.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.39.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.40.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.41.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.42.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.43.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.44.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.45.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.46.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.47.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.48.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.49.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.50.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.51.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.52.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.53.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.54.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.55.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.56.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.57.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.58.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.59.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.60.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.61.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.62.mlp.gate_proj",
+      "base_model.model.model.language_model.layers.63.mlp.gate_proj"
+    ],
+    "weights_loaded": false,
+    "forward_or_backward_executed": false
+  },
+  "synthetic_exclusion_loading": {
+    "status": "LOADER_BLOCKED_BEFORE_WEIGHT_LOAD",
+    "scope": "Tiny synthetic Qwen hybrid checkpoint; only hardware gate bypassed",
+    "hardware_gate_substituted": true,
+    "error": "'NoneType' object has no attribute 'get'",
+    "failure_frames": [
+      {
+        "file": "validate_fp8_training_cpu.py",
+        "function": "check_exclusion_loading"
+      },
+      {
+        "file": "modeling_utils.py",
+        "function": "from_pretrained"
+      },
+      {
+        "file": "auto.py",
+        "function": "get_hf_quantizer"
+      },
+      {
+        "file": "quantizer_finegrained_fp8.py",
+        "function": "update_tp_plan"
+      }
+    ],
+    "official_checkpoint_weights_loaded": false,
+    "scale_application_verified": false,
+    "forward_executed": false
+  },
+  "packages": {
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "peft": "0.20.0",
+    "trl": "1.14.0.dev0"
+  },
+  "cases": [
+    {
+      "autocast_adapter_dtype": true,
+      "initial_adapter_dtypes": [
+        "torch.float32"
+      ],
+      "after_explicit_bf16_cast": {
+        "base_parameter_elements": {
+          "torch.float8_e4m3fn": 16384,
+          "torch.float32": 1
+        },
+        "adapter_parameter_elements": {
+          "torch.bfloat16": 1024
+        },
+        "gradient_tensors_checked": 0
+      },
+      "base_bytes_unchanged": true,
+      "native_training_guard": {
+        "accepted": false,
+        "error": "The model you are trying to fine-tune is quantized with QuantizationMethod.FP8 but that quantization method do not support training. Please open an issue on GitHub: https://github.com/huggingface/transformers to request the support for training support for QuantizationMethod.FP8"
+      },
+      "guard_after_bf16_cast": {
+        "accepted": false,
+        "error": "The model you are trying to fine-tune is quantized with QuantizationMethod.FP8 but that quantization method do not support training. Please open an issue on GitHub: https://github.com/huggingface/transformers to request the support for training support for QuantizationMethod.FP8"
+      }
+    },
+    {
+      "autocast_adapter_dtype": false,
+      "initial_adapter_dtypes": [
+        "torch.float8_e4m3fn"
+      ],
+      "after_explicit_bf16_cast": {
+        "base_parameter_elements": {
+          "torch.float8_e4m3fn": 16384,
+          "torch.float32": 1
+        },
+        "adapter_parameter_elements": {
+          "torch.bfloat16": 1024
+        },
+        "gradient_tensors_checked": 0
+      },
+      "base_bytes_unchanged": true,
+      "native_training_guard": {
+        "accepted": false,
+        "error": "The model you are trying to fine-tune is quantized with QuantizationMethod.FP8 but that quantization method do not support training. Please open an issue on GitHub: https://github.com/huggingface/transformers to request the support for training support for QuantizationMethod.FP8"
+      },
+      "guard_after_bf16_cast": {
+        "accepted": false,
+        "error": "The model you are trying to fine-tune is quantized with QuantizationMethod.FP8 but that quantization method do not support training. Please open an issue on GitHub: https://github.com/huggingface/transformers to request the support for training support for QuantizationMethod.FP8"
+      }
+    }
+  ],
+  "cpu_loader_requests_bf16_dequantization": true,
+  "explicitly_dequantized_bf16_control": {
+    "input_gradient_nonzero": true,
+    "lora_b_gradient_nonzero": true,
+    "loss": 0.05870456248521805,
+    "dtypes": {
+      "base_parameter_elements": {
+        "torch.bfloat16": 16384,
+        "torch.float32": 1
+      },
+      "adapter_parameter_elements": {
+        "torch.bfloat16": 1024
+      },
+      "gradient_tensors_checked": 2
+    }
+  },
+  "source_hashes": {
+    "FP8Linear": {
+      "file": "finegrained_fp8.py",
+      "sha256": "b552bd54a772be08cb291d4501546597d3fa0d8ff4be2025bb93d3ce9446109e"
+    },
+    "FineGrainedFP8HfQuantizer": {
+      "file": "quantizer_finegrained_fp8.py",
+      "sha256": "bb2d770fd43f251af7b26e6ea5e6062bd721e0f34bfaff20a77a7f523fbc96bf"
+    },
+    "validate_quantization_for_training": {
+      "file": "trainer_utils.py",
+      "sha256": "c302000b28c6a38d728e38fed838eca21ed4430105815a0fddc5eea2e1a16620"
+    }
+  },
+  "probe_sha256": "2d18250cd05a9ea13a3feb94477660a2285c1e0feb1a2a45355f115d1618fdb1"
+}

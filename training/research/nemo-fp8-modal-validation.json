@@ -1,0 +1,291 @@
+{
+  "date": "2026-09-16",
+  "container": "nvcr.io/nvidia/nemo-rl@sha256:9392cc2cc07140f6a4cbd30f31ebffd0a54de3ded25c5a3b49505407a779e4f9",
+  "commits": {
+    "nemo_rl": "19244a0949fb363326f71675223da75e09d14866",
+    "bridge": "151168f36372132c8fb8f926501f573019feb967"
+  },
+  "worker_environment": {
+    "python": "/opt/ray_venvs/nemo_rl.models.policy.workers.megatron_policy_worker.MegatronPolicyWorker/bin/python",
+    "versions": {
+      "torch": "2.11.0+cu130",
+      "transformer-engine": "2.15.0+42b84005",
+      "megatron-core": "0.19.0+7b8495881",
+      "megatron-bridge": "0.0.0",
+      "transformers": "5.8.1",
+      "nemo-rl": "0.6.0+19244a094"
+    }
+  },
+  "hardware": {
+    "gpu": "NVIDIA H100 80GB HBM3",
+    "capability": [
+      9,
+      0
+    ],
+    "torch": "2.11.0+cu130",
+    "cuda": "13.0"
+  },
+  "driver": "580.95.05",
+  "container_cuda": "13.2 (minor compatibility mode)",
+  "outcome": "Primitive and hybrid assertions passed; second launch timed out after the hybrid report was written. No clean end-to-end NeMo run claimed.",
+  "linear_cases": [
+    {
+      "fp8": false,
+      "checkpointing": false,
+      "losses": [
+        0.09018589556217194,
+        0.09018498659133911,
+        0.09018228948116302
+      ],
+      "trainable_tensors": 4,
+      "adapter_dtypes": [
+        "torch.bfloat16"
+      ],
+      "gradient_dtypes": [
+        "torch.bfloat16"
+      ],
+      "minimum_final_adapter_gradient_norm": 5.722557034459896e-06,
+      "updated_adapter_tensors": 2,
+      "frozen_base_no_grad": true,
+      "fp8_weight_tensors": 0,
+      "fp8_weight_elements": 0,
+      "unique_quantized_storage_bytes": null,
+      "separate_row_column_allocations": null,
+      "retained_cpu_initialization_bytes": 0,
+      "input_gradient_norm": 9.187621617456898e-05,
+      "scope": "three stateless SGD updates on random small model; no convergence or logprob agreement claim"
+    },
+    {
+      "fp8": true,
+      "checkpointing": false,
+      "losses": [
+        0.09016567468643188,
+        0.09016485512256622,
+        0.09016257524490356
+      ],
+      "trainable_tensors": 4,
+      "adapter_dtypes": [
+        "torch.bfloat16"
+      ],
+      "gradient_dtypes": [
+        "torch.bfloat16"
+      ],
+      "minimum_final_adapter_gradient_norm": 4.240871021465864e-06,
+      "updated_adapter_tensors": 2,
+      "frozen_base_no_grad": true,
+      "fp8_weight_tensors": 2,
+      "fp8_weight_elements": 131072,
+      "unique_quantized_storage_bytes": null,
+      "separate_row_column_allocations": null,
+      "retained_cpu_initialization_bytes": 0,
+      "input_gradient_norm": 8.6796804680489e-05,
+      "scope": "three stateless SGD updates on random small model; no convergence or logprob agreement claim"
+    },
+    {
+      "fp8": true,
+      "checkpointing": true,
+      "losses": [
+        0.0902671068906784,
+        0.09026646614074707,
+        0.09026462584733963
+      ],
+      "trainable_tensors": 4,
+      "adapter_dtypes": [
+        "torch.bfloat16"
+      ],
+      "gradient_dtypes": [
+        "torch.bfloat16"
+      ],
+      "minimum_final_adapter_gradient_norm": 4.06666276830947e-06,
+      "updated_adapter_tensors": 2,
+      "frozen_base_no_grad": true,
+      "fp8_weight_tensors": 2,
+      "fp8_weight_elements": 131072,
+      "unique_quantized_storage_bytes": null,
+      "separate_row_column_allocations": null,
+      "retained_cpu_initialization_bytes": 0,
+      "input_gradient_norm": 8.77748170751147e-05,
+      "scope": "three stateless SGD updates on random small model; no convergence or logprob agreement claim"
+    }
+  ],
+  "hybrid_cases": [
+    {
+      "fp8": true,
+      "checkpointing": false,
+      "losses": [
+        0.21382562816143036,
+        0.2117384821176529,
+        0.2094578742980957
+      ],
+      "trainable_tensors": 32,
+      "adapter_dtypes": [
+        "torch.bfloat16"
+      ],
+      "gradient_dtypes": [
+        "torch.bfloat16"
+      ],
+      "minimum_final_adapter_gradient_norm": 2.7990618036710657e-05,
+      "updated_adapter_tensors": 30,
+      "frozen_base_no_grad": true,
+      "fp8_weight_tensors": 16,
+      "fp8_weight_elements": 4665344,
+      "unique_quantized_storage_bytes": 9334256,
+      "separate_row_column_allocations": true,
+      "retained_cpu_initialization_bytes": 9330688,
+      "input_gradient_norm": null,
+      "scope": "three stateless SGD updates on random small model; no convergence or logprob agreement claim"
+    },
+    {
+      "fp8": true,
+      "checkpointing": true,
+      "losses": [
+        0.21453416347503662,
+        0.21333780884742737,
+        0.21185365319252014
+      ],
+      "trainable_tensors": 32,
+      "adapter_dtypes": [
+        "torch.bfloat16"
+      ],
+      "gradient_dtypes": [
+        "torch.bfloat16"
+      ],
+      "minimum_final_adapter_gradient_norm": 2.2506399545818567e-05,
+      "updated_adapter_tensors": 24,
+      "frozen_base_no_grad": true,
+      "fp8_weight_tensors": 16,
+      "fp8_weight_elements": 4665344,
+      "unique_quantized_storage_bytes": 9334256,
+      "separate_row_column_allocations": true,
+      "retained_cpu_initialization_bytes": 9330688,
+      "input_gradient_norm": null,
+      "scope": "three stateless SGD updates on random small model; no convergence or logprob agreement claim"
+    }
+  ],
+  "hybrid_module_types": [
+    "ColumnParallelLinear",
+    "Conv1d",
+    "Dropout",
+    "FlashAttention",
+    "Float16Module",
+    "FusedAttention",
+    "FusedScaleMaskSoftmax",
+    "GPTModel",
+    "GatedDeltaNet",
+    "Identity",
+    "IdentityFuncOp",
+    "IdentityOp",
+    "LanguageModelEmbedding",
+    "LoRALinear",
+    "MLP",
+    "ModuleList",
+    "ParallelLinearAdapter",
+    "RMSNorm",
+    "RotaryEmbedding",
+    "RowParallelLinear",
+    "SelfAttention",
+    "TEDotProductAttention",
+    "TELayerNormColumnParallelLinear",
+    "TERowParallelLinear",
+    "TransformerBlock",
+    "TransformerLayer",
+    "UnfusedDotProductAttention",
+    "VocabParallelEmbedding"
+  ],
+  "runs": [
+    {
+      "run_id": "nemo-fp8-20260916-213454-664b3367",
+      "supervisor_status": "FAIL",
+      "gpu_function_seconds": 92.07558560371399,
+      "submission_to_local_report_seconds": 108.65796828269958,
+      "gpu_window_seconds": 600,
+      "source_sha256": {
+        "scripts/modal_nemo_fp8.py": "5f1ccaffb3099608db9cb37ef81ad46497452c60586690344b89353d3995904a",
+        "scripts/nemo_fp8_probe.py": "fefedd3dd3502660bb1f343546c0c1dde08f64fb3124cc17e20678c15fd6433e",
+        "browser_training/processes.py": "854ec2ddbf1b8c7ab912cc69527154e5fc1820d1567a518ec591fc6c67b136e2"
+      },
+      "result_sha256": "7e96bb507f7cca88acbd972781e4f290663e36d0c164f9ccfa20abfbebf15eb3"
+    },
+    {
+      "run_id": "nemo-fp8-20260916-214242-77bd7a1c",
+      "supervisor_status": "FAIL",
+      "gpu_function_seconds": 227.32933020591736,
+      "submission_to_local_report_seconds": 279.39741349220276,
+      "gpu_window_seconds": 360,
+      "source_sha256": {
+        "scripts/modal_nemo_fp8.py": "2c39c560bd9ec505cbdc50eb4cded264389b34f8f656c8139da36cf21eb7134f",
+        "scripts/nemo_fp8_probe.py": "34a773d5d01c11bb522d7580e678ce819be6bb6fc182a726712b6bf94cd8cb38",
+        "browser_training/processes.py": "854ec2ddbf1b8c7ab912cc69527154e5fc1820d1567a518ec591fc6c67b136e2"
+      },
+      "result_sha256": "3c5df4b612aaf5e57dda9dd7a8461e2d7dd79dcbbc0bb7a30f23ab2b9fbf3392"
+    }
+  ],
+  "modal_apps_after_tests": [
+    {
+      "app_id": "ap-RYStYBfsRcXgsrlaBAg4wQ",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 21:42:42+02:00",
+      "stopped_at": "2026-09-16 21:47:26+02:00"
+    },
+    {
+      "app_id": "ap-TMB1mOwKUpJqaJf3gvSD4J",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 21:39:56+02:00",
+      "stopped_at": "2026-09-16 21:42:04+02:00"
+    },
+    {
+      "app_id": "ap-mk72ou418ZAbVHlz3cGgOn",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 21:34:54+02:00",
+      "stopped_at": "2026-09-16 21:38:13+02:00"
+    },
+    {
+      "app_id": "ap-aU0lOkT2QP0SpvdjZ5PAq7",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 21:33:51+02:00",
+      "stopped_at": "2026-09-16 21:34:58+02:00"
+    },
+    {
+      "app_id": "ap-IljjSs6m1rUV2RwCdK9ZAl",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 21:29:48+02:00",
+      "stopped_at": "2026-09-16 21:32:52+02:00"
+    },
+    {
+      "app_id": "ap-nwQfDzRa1V9ve6ZdhvCm0j",
+      "description": "browser-training-nemo-fp8-probe",
+      "state": "stopped",
+      "tasks": "0",
+      "created_at": "2026-09-16 21:17:46+02:00",
+      "stopped_at": "2026-09-16 21:29:47+02:00"
+    }
+  ],
+  "unvalidated": [
+    "27B pretrained checkpoint import",
+    "numerical reference/backward agreement",
+    "NeMo GRPO optimizer and learning",
+    "FP8 plus LoRA export/refit",
+    "vLLM logprob agreement",
+    "multi-turn policy pinning",
+    "full-model VRAM"
+  ],
+  "test_harness_fixes": [
+    "included launcher in Modal source mount",
+    "GDN fused projection dimension aligned to 16",
+    "set Qwen SiLU activation",
+    "reuse successful inventory only for identical image digest",
+    "preserve probe result even if subsequent process exit times out"
+  ],
+  "combined_submission_to_report_seconds": 388.05538177490234,
+  "billing_note": "Submission-to-report includes scheduling/startup; not an invoice measurement. CPU build/import time is separate. No GPU calls remain running."
+}

@@ -1,0 +1,140 @@
+{
+  "date": "2026-09-16",
+  "scope": "Source-only upstream audit, no dependency installation or GPU execution",
+  "sources": {
+    "transformers": {
+      "repo": "huggingface/transformers",
+      "revision": "b22fe4624c55416fc0f122cd531695e03fc93561",
+      "commit_date": "2026-09-16T16:16:03Z",
+      "files": [
+        {
+          "path": "src/transformers/quantizers/quantizer_finegrained_fp8.py",
+          "sha256": "bdc826c0287d05823e5f3fee2b3a54203ecd598d47b90ffb4b4f6de34b0bda1c"
+        },
+        {
+          "path": "src/transformers/integrations/finegrained_fp8.py",
+          "sha256": "e86cb993a148ba7e1baffb2f8c892fa5afb31504e81992a27da75a505c914624"
+        },
+        {
+          "path": "src/transformers/quantizers/quantizer_compressed_tensors.py",
+          "sha256": "f8a637f41529cc9d691b289de410252b5d3a12521f0a88bb6027069bd812cd1d"
+        },
+        {
+          "path": "src/transformers/integrations/compressed_tensors.py",
+          "sha256": "973f2a9b7496bcaf768bd7a9e4585620f05944dabfc8a88c9fc522c3ffb84212"
+        },
+        {
+          "path": "src/transformers/trainer.py",
+          "sha256": "fb2d54457857d4a91107692803d774b2aedb84e9693ce1bf4d1880030a9aea2e"
+        },
+        {
+          "path": "src/transformers/quantizers/quantizers_utils.py",
+          "sha256": "93aaee39e2851b476550460fd1eee346356f3ef6c8bfe801fee1f7d129057f22"
+        }
+      ]
+    },
+    "peft": {
+      "repo": "huggingface/peft",
+      "revision": "db7d68a2dc4f734ba692a8b6b039da8eb25939ba",
+      "commit_date": "2026-09-16T17:24:20Z",
+      "files": [
+        {
+          "path": "src/peft/tuners/lora/model.py",
+          "sha256": "4c6f5940532b67d28ef658bb3caa5d997310513151b0822d279a1d53dbda94bd"
+        },
+        {
+          "path": "src/peft/tuners/lora/layer.py",
+          "sha256": "9a2688af69fd16cef94fdb08ab0e973b37d7b2a672e64ba2057a01df7e98b7d8"
+        },
+        {
+          "path": "src/peft/tuners/lora/te.py",
+          "sha256": "339b2a5d979997d3fb2d18f79b1ff36ea3ded94359dc537fbdb0acee9f453686"
+        }
+      ]
+    },
+    "trl": {
+      "repo": "huggingface/trl",
+      "revision": "b7df6a8f0562a26d25ac4324848a07f1bc40617d",
+      "commit_date": "2026-09-16T14:07:00Z",
+      "files": [
+        {
+          "path": "trl/experimental/async_grpo/async_grpo_trainer.py",
+          "sha256": "15951bb122c4477ba82aeeb24ad85b35dd46fd8489f244364837dc958919af99"
+        }
+      ]
+    },
+    "compressed-tensors": {
+      "repo": "vllm-project/compressed-tensors",
+      "revision": "857a970b9be84aebc527af86c39530e36799ae0e",
+      "commit_date": "2026-09-16T16:25:29Z",
+      "files": [
+        {
+          "path": "src/compressed_tensors/linear/compressed_linear.py",
+          "sha256": "98138a4626cc4c6fd6e2a74f33fb8bc13ed91470859b713abb99a2ac423092bc"
+        }
+      ]
+    },
+    "transformers-stable": {
+      "repo": "huggingface/transformers",
+      "revision": "v5.17.0",
+      "files": [
+        {
+          "path": "src/transformers/quantizers/quantizer_finegrained_fp8.py",
+          "sha256": "bdc826c0287d05823e5f3fee2b3a54203ecd598d47b90ffb4b4f6de34b0bda1c"
+        },
+        {
+          "path": "src/transformers/quantizers/quantizer_compressed_tensors.py",
+          "sha256": "f8a637f41529cc9d691b289de410252b5d3a12521f0a88bb6027069bd812cd1d"
+        },
+        {
+          "path": "src/transformers/trainer_utils.py",
+          "sha256": "c302000b28c6a38d728e38fed838eca21ed4430105815a0fddc5eea2e1a16620"
+        },
+        {
+          "path": "src/transformers/quantizers/quantizers_utils.py",
+          "sha256": "93aaee39e2851b476550460fd1eee346356f3ef6c8bfe801fee1f7d129057f22"
+        }
+      ]
+    },
+    "peft-stable": {
+      "repo": "huggingface/peft",
+      "revision": "v0.21.0",
+      "files": [
+        {
+          "path": "src/peft/tuners/tuners_utils.py",
+          "sha256": "ca8127d9108557c965d0870b3b0452daddc3e88ec9eaba2014b02296cfc3671f"
+        },
+        {
+          "path": "src/peft/tuners/lora/model.py",
+          "sha256": "387e8fcb70ea7df22abb3f94e91f57f0286f6b53ca141eb98386f2ddf52b55c4"
+        }
+      ]
+    }
+  },
+  "observations": {
+    "transformers_finegrained_fp8_is_trainable_false": true,
+    "transformers_compressed_fp8_inference_only": true,
+    "transformers-stable_finegrained_fp8_is_trainable_false": true,
+    "transformers-stable_compressed_fp8_inference_only": true,
+    "trl_main_default_peft_dtype_promotion": true,
+    "trl_main_calls_transformers_trainer": true,
+    "peft_main_has_te_dispatch": true,
+    "transformers_skip_match_uses_unanchored_regex": true,
+    "transformers-stable_skip_match_uses_unanchored_regex": true,
+    "transformers_has_empty_expert_tp_override_fallback": true,
+    "transformers-stable_has_empty_expert_tp_override_fallback": true
+  },
+  "limits": [
+    "Main revisions and newer stable releases were read, not installed or declared mutually compatible.",
+    "Source flags establish the supported training gate; no GPU FP8 backward or trainer/rollout numerical parity was measured.",
+    "PEFT adapter insertion and BF16 storage are tested separately in fp8-training-cpu-validation.json.",
+    "Meta replacement leaves 64 targeted MLP gate_proj layers as ordinary linears despite checkpoint scale entries; actual checkpoint tensor loading/forward was not executed."
+  ],
+  "official_checkpoint_index": {
+    "url": "https://huggingface.co/Qwen/Qwen3.8-27B-FP8/blob/017b9c7af6b5689d5dd426a76e0bc077eb5ca20a/model.safetensors.index.json",
+    "bytes": 137335,
+    "sha256": "f0838c766951bdfe76d6afbdb2771a8f67aaa2231dedb3d33cebd817729843a2",
+    "text_gate_proj_scale_entries": 64,
+    "example_scale_key": "model.language_model.layers.0.mlp.gate_proj.weight_scale_inv"
+  }
+}
