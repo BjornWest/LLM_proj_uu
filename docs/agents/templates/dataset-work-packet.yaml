@@ -1,0 +1,52 @@
+# Planning template, not an executable configuration or validated schema.
+work_id: null
+state: proposed
+owner: null
+assignment:
+  kind: established_family_instances  # or site_feasibility / new_family / review
+  objective: null
+  model: gpt-5.6-luna
+  reasoning_effort: medium
+  fork_turns: none
+  max_repair_attempts: 2
+  may_delegate: false
+scope:
+  dataset: null
+  site: null
+  family_id: null
+  template_ids: []
+  instance_ids: []
+  allowed_paths: []
+  excluded_work: [new_dark_patterns, shared_harness_edits, deployment]
+inputs:
+  contract_path: null
+  accepted_example_path: null
+  source_revision: null
+  environment_build: null
+  runtime_profile: null
+  reusable_evidence_ids: []
+environment:
+  allocated_lease_or_fixture: null
+  reset_owner: null
+  concurrent_with: []
+  model_calls_authorized: false
+  downloads_authorized: false
+acceptance:
+  commands: []
+  new_predicate_branches: []
+  browser_positive_instance_ids: []
+  browser_negative_branches: []
+  parameterized_negative_checks: []
+  independent_review_owner: null
+  # No expected answers in policy-visible fields; no null-to-pass conversion.
+output:
+  report_path: null
+  changed_paths: []
+  accepted_ids: []
+  held_ids: []
+  evidence_ids: []
+  attempted_repairs: []
+  actual_model: null
+  actual_reasoning_effort: null
+  usage: null
+  # Report unknown usage as null; include lead/reviewer usage in batch totals.

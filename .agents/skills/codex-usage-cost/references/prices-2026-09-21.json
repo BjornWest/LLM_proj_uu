@@ -1,0 +1,59 @@
+{
+  "schema": "codex-token-prices-v1",
+  "as_of": "2026-09-21",
+  "currency": "USD",
+  "source_url": "https://developers.openai.com/api/docs/pricing",
+  "description": "Pinned Standard API-equivalent rates, USD per million tokens. Reprices selected logs at this snapshot; not a Codex subscription invoice or historically effective price schedule. Exact model keys only.",
+  "tier_multipliers": {
+    "standard": "1",
+    "fast": "2",
+    "batch": "0.5",
+    "flex": "0.5"
+  },
+  "models": {
+    "gpt-6-astra": {
+      "input": "10",
+      "cached_input": "1",
+      "cache_write_input": "12.5",
+      "output": "50",
+      "long_context": {
+        "threshold_input_tokens": 272000,
+        "input_multiplier": "2",
+        "output_multiplier": "1.5"
+      }
+    },
+    "gpt-5.6-sol": {
+      "input": "4",
+      "cached_input": "0.4",
+      "cache_write_input": "5",
+      "output": "20",
+      "long_context": {
+        "threshold_input_tokens": 272000,
+        "input_multiplier": "2",
+        "output_multiplier": "1.5"
+      }
+    },
+    "gpt-5.6-terra": {
+      "input": "2",
+      "cached_input": "0.2",
+      "cache_write_input": "2.5",
+      "output": "12",
+      "long_context": {
+        "threshold_input_tokens": 272000,
+        "input_multiplier": "2",
+        "output_multiplier": "1.5"
+      }
+    },
+    "gpt-5.6-luna": {
+      "input": "0.2",
+      "cached_input": "0.02",
+      "cache_write_input": "0.25",
+      "output": "1.2",
+      "long_context": {
+        "threshold_input_tokens": 272000,
+        "input_multiplier": "2",
+        "output_multiplier": "1.5"
+      }
+    }
+  }
+}

@@ -30,6 +30,11 @@ definitions](external-task-examples.md): laptop purchase, appointment/privacy
 and music membership. They preserve the upstream prompts separately from our
 existing clarified instructions and document implementation coverage gaps.
 
+For future original shopping tasks, see the [offer-comparison challenge
+brief](shopping-comparison-challenges.md): exact variants, conditional prices,
+shipping deadlines, currency/fees and combinations drawn from a real shopping
+experience. These are design proposals, not runnable definitions.
+
 ## What scopes mean
 
 A scope says **when and over which evidence a requirement must hold**. It is
