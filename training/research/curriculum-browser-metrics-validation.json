@@ -1,0 +1,85 @@
+{
+  "status": "PASS",
+  "synthetic": true,
+  "real_browser": true,
+  "scripted_actions": true,
+  "gpu_used": false,
+  "training_performed": false,
+  "canonical_harness": false,
+  "imported_benchmark": false,
+  "upstream_openenv_commit": "da5929566e99c8eb376a47042b316cb13c0aae29",
+  "fixture_sha256": "53f58eca5f1ed60c046bc4f17c3dae8e867d72ddf573070704164f5727ec9ac7",
+  "packages": {
+    "openenv": "0.4.2",
+    "browsergym-core": "0.14.3",
+    "playwright": "1.44.0"
+  },
+  "run_id": "browser-metrics-23b8c8e2ad75",
+  "snapshot_id": "120a00ae7cc6fc67ca3df780babe60de05bfe6811b6e2cb907cf758215f52c52",
+  "concurrent_episodes": 2,
+  "episodes": 4,
+  "completion": 0.75,
+  "safe_completion": 0.75,
+  "unauthorized_effect": 0.25,
+  "valid_groups": 2,
+  "mixed_group_fraction": 0.5,
+  "total_actions": 7,
+  "generated_tokens": null,
+  "reward_by_episode": [
+    1.0,
+    0.0,
+    1.0,
+    1.0
+  ],
+  "duplicate_deliveries_ignored": true,
+  "observer_duration_measured": true,
+  "policy_version": "0 denotes a scripted fixture, not a trained policy",
+  "admission": "No trainer; all admission decisions remain pending",
+  "output": "/home/bjorn/code/LLM_proj_uu/training/outputs/browser-metrics/browser-metrics-23b8c8e2ad75",
+  "date": "2026-09-19",
+  "scope": "CPU curriculum accounting/resume plus real Chromium/OpenEnv observer plumbing under scripted actions; no model-driven learning",
+  "git_commit": "99155f133f689f34bb4275e35e504612b6e4ab8e",
+  "tests": {
+    "command": "cd training && .venv/bin/python -m pytest tests/test_curriculum.py tests/test_browser_metrics.py tests/test_outcome_metrics.py tests/test_monitoring_io.py tests/test_trainer_metrics.py tests/test_benchmark_reporting.py -q",
+    "passed": 50
+  },
+  "browser_command": "bash training/scripts/smoke_browser.sh --metrics",
+  "wandb_readback": {
+    "status": "PASS",
+    "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/browser-metrics-23b8c8e2ad75",
+    "snapshot_id": "120a00ae7cc6fc67ca3df780babe60de05bfe6811b6e2cb907cf758215f52c52",
+    "scalar_values_verified": 132,
+    "curriculum_table_verified": true,
+    "snapshot_parity": true,
+    "dashboard_created": false
+  },
+  "source_sha256": {
+    "training/browser_training/curriculum.py": "7b553fd2936dc05c366c0495d2fbeb3a16b0b34f2aa4cc02be9bcf1f0b01b4f1",
+    "training/browser_training/browser_metrics.py": "a04f38fb7d0da1181bd6dd81f962383ccbcdd73fecad611cf8f5268a6a4476f9",
+    "training/browser_training/outcomes.py": "741ed547a7680fd45fb2c2140289b2b42c02e7bf73801d045793b60d9b9ce877",
+    "training/browser_training/metric_catalog.py": "07c8f7747dcdda18742528b2986c743f771d3b5896893f9ab366cdec110c3440",
+    "training/browser_training/monitoring_io.py": "6820aa9a6d0c824945229d6fedb4dbb61b9c1b7d181d3ffbf7e63df42492b884",
+    "training/scripts/validate_browser_metrics.py": "638d60cd7c6799414281b793dbc7df5809678f7d9119a7cd0c81df755ffa8121",
+    "training/scripts/smoke_browser.sh": "813e6867121133ac112ea12108375b1e65df00918860b54edfd5e4de9dee7937",
+    "training/tests/test_curriculum.py": "b92e17b4a2e12119a2b0b52e80651e81cfe9481e636cb9210767e0da70f7de03",
+    "training/tests/test_browser_metrics.py": "a56703f9bf3c1409184dc401b3746c9e6ed2e11d6ee99abc243936e756d95619"
+  },
+  "resolved_issue": "Direct invocation bypassed the existing WSL libasound fallback. Added --metrics to smoke_browser.sh and reused cached libraries; no downloads or OS changes.",
+  "curriculum_validation": [
+    "Uniform default and optional intermediate-difficulty preference",
+    "Nonzero exploration/rehearsal probability",
+    "Verified recent RL-train complete groups only",
+    "Dev/test, old/future policies, unknowns and provenance mismatch excluded",
+    "Committed task/seed/policy per group, concurrent duplicate draw idempotence",
+    "Sampler state checksum and independent backup/resume draw parity",
+    "State ahead of restored ledger rejected",
+    "Requested vs realized group allocations exposed in snapshot and W&B"
+  ],
+  "limitations": [
+    "No canonical harness/imported-site verifier integration",
+    "No actual AsyncGRPO sampling/admission/checkpoint wiring",
+    "No model inference or GPU update in this probe",
+    "No GPU/browser resource collectors or production uploader recovery",
+    "No dashboard layout; will build together after remaining qualification"
+  ]
+}

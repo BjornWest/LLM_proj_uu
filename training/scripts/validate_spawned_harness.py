@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Installed TRL spawned worker + real BrowserGym + real tokenizer, scripted inference."""
 import asyncio
+import argparse
 from functools import partial
 import hashlib
 import inspect
@@ -24,7 +25,7 @@ def select_fixture(task, seed):
     return "mock"
 
 
-async def probe(client, browser_url):
+async def probe(client, browser_url, metrics_output=None):
     from accelerate import PartialState
     from aiohttp import web
     from datasets import Dataset
@@ -34,6 +35,9 @@ async def probe(client, browser_url):
     from browsergym_env.harness import BrowserGymSessionFactory, build_browsergym_action_tool_call
 
     PartialState(cpu=True)
+    monitored_files = [Path(__file__), *[Path("browser_training") / name for name in
+        ("runtime_metrics.py", "monitored_harness.py", "policy_sessions.py", "curriculum.py", "outcomes.py")]]
+    monitoring_sources = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in monitored_files}
     tokenizer = AutoTokenizer.from_pretrained(".cache/qwen38-tokenizer", local_files_only=True)
     requests = []
     initial_calls = 0
@@ -66,10 +70,29 @@ async def probe(client, browser_url):
     site = web.TCPSite(runner, "127.0.0.1", 0)
     await site.start()
     port = site._server.sockets[0].getsockname()[1]
-    factory = TaskSelectingSessionFactory(BrowserGymSessionFactory(
-        partial(client.BrowserGymEnv, base_url=browser_url), default_task="mock"), select_fixture)
-    worker = HarnessRolloutWorker(harness_session_factory=factory,
-        harness_adapter=MappingArgumentsHarnessAdapter(MCPHarnessAdapter()),
+    base_factory = BrowserGymSessionFactory(partial(client.BrowserGymEnv, base_url=browser_url), default_task="mock")
+    factory = TaskSelectingSessionFactory(base_factory, select_fixture)
+    adapter = MappingArgumentsHarnessAdapter(MCPHarnessAdapter())
+    metrics_manager = monitor = None
+    worker_class = HarnessRolloutWorker
+    if metrics_output is not None:
+        import multiprocessing
+        from browser_training.runtime_metrics import start_metrics
+        from browser_training.monitored_harness import MonitoredSessionFactory, MonitoredHarnessAdapter, plumbing_outcome
+        from browser_training.trl_monitoring import MonitoredHarnessWorker
+        worker_class = MonitoredHarnessWorker
+        source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+        tokenizer_hash = hashlib.sha256(Path(".cache/qwen38-tokenizer/tokenizer_config.json").read_bytes()).hexdigest()
+        pool = [dict(task_id="mock", task_family="local-plumbing", task_template="no-subscription",
+                     harness_revision=source_hash, verifier_revision=source_hash, environment_revision=source_hash,
+                     tokenizer_revision=f"Qwen3.8:tokenizer-config-sha256:{tokenizer_hash}", split="rl_train")]
+        metrics_manager, monitor = start_metrics(multiprocessing.get_context("spawn"), metrics_output,
+            run_id=metrics_output.name, synthetic=True, tasks=pool,
+            expected_producers=["browser", "orchestrator"])
+        factory = MonitoredSessionFactory(base_factory, monitor, group_size=2, extractor=plumbing_outcome)
+        adapter = MonitoredHarnessAdapter(adapter)
+    worker = worker_class(harness_session_factory=factory,
+        harness_adapter=adapter,
         model_name="mock", dataset=Dataset.from_list([
             {"prompt": [{"role": "user", "content": "Complete the browser task."}], "seed": 42}]),
         reward_funcs=[], processing_class=tokenizer, num_generations=2, max_inflight_tasks=2,
@@ -101,7 +124,34 @@ async def probe(client, browser_url):
         stop_start = time.monotonic()
         await asyncio.to_thread(worker.stop)
         assert child.exitcode == 0, f"Child required termination or failed: {child.exitcode}"
-        return {"status": "PASS", "installed_trl_harness_sha256": hashlib.sha256(
+        metrics_evidence = None
+        if monitor is not None:
+            from browser_training.outcomes import Ledger
+            value = monitor.emit_snapshot()
+            m = value["cohorts"]["rl_train"]["all"]["metrics"]
+            # The worker can start another group while the parent consumes the queue.
+            assert m["episodes"]["value"] >= 2
+            assert m["admitted"]["value"] == 0  # Queue consumption isn't optimizer use.
+            assert m["generated_tokens"]["value"] >= sum(sum(s.completion_mask) for s in samples)
+            episode_events = [r["event"]["payload"] for r in Ledger(
+                metrics_output / "events.sqlite", run_id=metrics_output.name, synthetic=True,
+                expected_producers=["browser", "orchestrator"]).records() if r["event"]["kind"] == "episode"]
+            first = [e for e in episode_events if e["group_id"].endswith(f":{samples[0].group_id}")]
+            assert len(first) == 2 and {e["reward"] for e in first} == {0, 1}
+            assert {e["policy_version"] for e in first} == {1}
+            assert len({(e["task_instance"], e["seed"]) for e in first}) == 1
+            assert sum(e["generated_tokens"] for e in first) == sum(sum(s.completion_mask) for s in samples)
+            for sample in samples:
+                identity = sample.metrics.row_identity
+                assert identity["episode_id"] in {e["episode_id"] for e in first}
+            assert value["training_rows"]["totals"]["rows"] >= 2
+            assert value["training_rows"]["totals"]["applied"] == 0
+            metrics_evidence = dict(snapshot_id=value["snapshot_id"], completed_group_records=first,
+                native_rewards_and_policy_versions_match=True, generated_token_count_matches=True,
+                output=str(metrics_output), admission="Pending: native queue rows were inspected, no optimizer ran")
+        assert monitoring_sources == {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in monitored_files}
+        return {"status": "PASS", "metrics": metrics_evidence, "monitoring_source_sha256": monitoring_sources,
+            "installed_trl_harness_sha256": hashlib.sha256(
                 Path(inspect.getfile(HarnessRolloutWorker)).read_bytes()).hexdigest(),
             "start_method": "spawn", "child_exitcode": child.exitcode,
             "samples": [{"reward": s.metrics["reward"], "policy_version": s.model_version,
@@ -116,14 +166,23 @@ async def probe(client, browser_url):
             "note": "Fixed policy; scripted success/subscription failure; native scoring but no trainer update"}
     finally:
         await asyncio.to_thread(worker.stop)
+        if metrics_manager is not None:
+            metrics_manager.shutdown()
         await runner.cleanup()
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--metrics-output", type=Path, help="New output directory for live sampled-session metrics")
+    args = parser.parse_args()
+    output = args.metrics_output.resolve() if args.metrics_output else None
+    if output:
+        output.mkdir(parents=True, exist_ok=False)
     with browser_service(Path(".cache/openenv-browser-source"),
                          python_executable=str(Path("envs/browser/.venv/bin/python").absolute())) as (client, _, url):
-        report = asyncio.run(probe(client, url))
-    Path("research/spawned-harness-validation.json").write_text(json.dumps(report, indent=2) + "\n")
+        report = asyncio.run(probe(client, url, output))
+    target = output / "report.json" if output else Path("research/spawned-harness-validation.json")
+    target.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))
 
 

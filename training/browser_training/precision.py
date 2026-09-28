@@ -1,4 +1,18 @@
 """Explicit adapter storage and optimizer checks, independent of autocast compute."""
+class BF16AdapterResumeMixin:
+    """Restore BF16 storage after HF's PEFT checkpoint loader promotes it to FP32.
+
+    The pinned HF Trainer does not forward autocast_adapter_dtype=False to
+    load_adapter. Delegate loading unchanged, then restore the project's explicit
+    storage policy before optimizer restore, native vLLM sync, or any forward.
+    This is intended for the single-process LoRA trainer, not sharded loading.
+    """
+    def _load_from_checkpoint(self, resume_from_checkpoint, model=None):
+        result = super()._load_from_checkpoint(resume_from_checkpoint, model=model)
+        enforce_bf16_lora(self.model if model is None else model)
+        return result
+
+
 def enforce_bf16_lora(model):
     import torch
     trainable = [(n, p) for n, p in model.named_parameters() if p.requires_grad]

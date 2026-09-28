@@ -7,7 +7,10 @@ if [[ -d "$browser_libs" ]]; then
 fi
 probe=validate_browser.py
 probe_python="$TRAINING_ROOT/envs/browser/.venv/bin/python"
-if [[ "${1:-}" == --harness ]]; then
+if [[ "${1:-}" == --metrics ]]; then
+  probe=validate_browser_metrics.py
+  shift
+elif [[ "${1:-}" == --harness ]]; then
   probe=validate_harness_worker.py
   shift
 elif [[ "${1:-}" == --spawned ]]; then

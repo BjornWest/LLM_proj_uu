@@ -1,6 +1,31 @@
 # Training infrastructure: findings, evidence and next deployment
 
-**Status at 16 September 2026: both SFT and the core asynchronous RL loop have demonstrated learning with the real 27B model on rented L40S GPUs.** Model-driven, multi-turn browser training is the next integration milestone. The remaining work is primarily task design, harness reliability and realistic-context validation; this is not yet a qualified sustained browser-training system.
+**Status at 16 September 2026: both SFT and the core asynchronous RL loop have demonstrated learning with the real 27B model on rented L40S GPUs.** The 19 September P11 follow-up connected real browser actions to two native GRPO optimizer steps and a BF16 checkpoint, but its final shutdown safety check failed; the fix is CPU-tested and awaits GPU requalification. Both applied reward groups had zero variance, so browser learning is still unproven. The remaining work is primarily task design, harness reliability and realistic-context validation; this is not yet a qualified sustained browser-training system.
+
+**19 September update:** monitored multi-turn synthetic GRPO now passes exact
+adapter/optimizer/scheduler checkpoint restoration and continued updates. Six
+updates account for exactly 24 applied rows; policy versions advance through v8
+without premature eviction. A PEFT resume path that promoted BF16 adapters to
+FP32 was caught and corrected. [Acceptance write-up](agents/training-gpu-acceptance.md).
+
+The [current experiment plan](training-plan.md) records the subsequent decisions
+on teacher data, splits, curriculum and evaluation; the [training recipe](training-recipe.md)
+provides a checklist and execution timeline. The selected working stack is
+NF4 training + BF16 LoRA + FP8 vLLM rollouts. Custom FP8/Megatron integration is
+paused because of implementation risk, memory cost and unresolved numerical
+alignment. The NF4 results below demonstrate the selected path, not FP8 training.
+
+A subsequent [isolated NeMo experiment on H100](../training/NOTES.md#hopper-experiment-results--16-september-2026)
+passed FP8-base/BF16-LoRA backward checks in a small Qwen hybrid model, with
+checkpointing off and on. However, TE retained two separate FP8 weight layouts,
+approximately matching BF16 weight memory, plus initialization copies on CPU.
+This supports further investigation of trainability, not a claim of halved trainer
+VRAM. The numerical report passed before a process-exit timeout. A subsequent
+[nonzero-adapter export check](../training/NOTES.md#follow-up-residency-and-export-qualification)
+preserved the update through the pinned worker's ordinary BF16 export, but found
+failures in explicit physical-FP8 export. NeMo's native BF16-to-FP8 receiver path
+was investigated as a possible refit path, but this line of work is now paused.
+The 27B model, NeMo GRPO and live inference refit remain unqualified on this backend.
 
 This is the consolidated project write-up. The [research notebook](../training/NOTES.md) retains upstream sources and the investigation history. The [operational handoff](agents/training-modal-preflight.md#ssh-deployment-handoff) contains the SSH migration commands and caveats. All completed test containers were stopped. No further GPU runs or recurring cloud work are scheduled by this handoff.
 
@@ -11,9 +36,12 @@ This is the consolidated project write-up. The [research notebook](../training/N
 | 27B NF4 Axolotl SFT | Real updates, BF16 adapters, FP32 optimizer moments, intermediate-checkpoint resume with a nonzero adapter change; tested examples up to 1,907 tokens | Long-context fit, sustained training or tuned throughput |
 | SFT behavior learning | 64 examples, 32 updates; held-out exact matches **0/16 → 16/16** after reloading the saved adapter | Browser competence, unseen vocabulary or arbitrary sentence lengths |
 | Two-GPU AsyncGRPO learning | Eight updates; rewarded answers **34/64 → 64/64** through the final natively synchronized vLLM policy | Multi-turn browser learning, broad generalization or numerical parity |
+| Monitored AsyncGRPO resume | Three real updates, exact BF16 adapter/FP32 optimizer/scheduler restore, three more updates; 24 applied rows and versioned two-turn sessions | Canonical browser harness, long context, unclean-crash recovery or deterministic replay |
 | Runtime LoRA lifecycle | Load, retain, replace and evict versions; same-rank identity checks; worker-cache removal | An exhaustive proof against every long-run leak or race |
 | BrowserGym/OpenEnv integration | Real local browser sessions, task rewards, official tokenizer/parser, native harness and spawned rollout worker, policy-session tests | Model-generated browser actions and trainer gradients in one combined run |
 | SM120 preparation | Attention source audit, optional FA2 wheel compilation/import and CPU configuration checks | Actual SM120 training kernels or MIG execution |
+| Isolated NeMo FP8 LoRA on H100 | Native TE/Megatron linear and reduced Qwen hybrid backward/update assertions passed, BF16 adapters/gradients, checkpointing off/on | 27B loading, GRPO, export/refit, halved base memory or clean hybrid process exit |
+| NeMo nonzero-adapter export on H100 | Ordinary export preserved all 16 adapted projections as BF16; explicit physical-FP8 export failed 19/32 weight/scale tasks | Live vLLM refit, logprob agreement or an end-to-end NeMo RL loop |
 
 Evidence: [SFT execution/resume](../training/research/modal-l40s-validation.json), [SFT learning](../training/research/modal-sft-learning-validation.json), [RL learning](../training/research/modal-e2e-validation.json), [adapter identity](../training/research/adapter-identity-validation.json), [browser integration](../training/research/browser-validation.json), [spawned harness](../training/research/spawned-harness-validation.json), [policy sessions](../training/research/policy-session-validation.json).
 
@@ -43,7 +71,7 @@ The run took **392.91 seconds per GPU (6m33s)** on two L40S GPUs, or 13.10 aggre
 
 The first forward/backward was slow (121 seconds versus roughly 4–6 seconds later). The resulting backlog caused **119 stale samples to be discarded**; accepted samples had recorded staleness at most two. This is a throughput-tuning concern, not evidence that stale samples were silently trained. The experiment does not resolve the effect of NF4/FP8 numerical differences on harder RL tasks.
 
-## The configuration to carry forward
+## The validated configuration to preserve
 
 ```text
 Teacher trajectories → Axolotl SFT → BF16 LoRA adapter
@@ -180,8 +208,22 @@ Device memory includes reservations and runtime allocations; the two columns are
 
 1. **Settle the task/reward and action contract.** Specify success, constraint adherence, unauthorized side effects, timeouts and invalid actions. Align teacher logs, SFT targets and the harness parser. Keep training and evaluation tasks/site variants distinct.
 2. **Make the harness dependable on CPU.** Test reset isolation, parallel sessions, slow tools, failed creation, cancellation, stale groups and cleanup. Preserve observations, action tokens, behavior logprobs, reward and policy version per trajectory.
-3. **Run one bounded model-driven BrowserGym learning iteration.** Combine the already-tested browser and GPU paths on a trivial local task before moving to project tasks. This is the main missing end-to-end integration.
+3. **Requalify browser shutdown, then test a task with reward variation.** P11 now connects real model actions to optimizer steps, checkpointing and native adapter publication. Its shutdown exposed the fixed 15-second worker join limit; the bounded-grace fix is CPU-tested only. All applied P11 reward groups succeeded, yielding zero gradients. See [P11 evidence](../training/research/modal-project-browser-grpo-validation.json).
 4. **Test actual AsyncGRPO resume.** Check restored optimizer/trainer/rollout state and a subsequent nonzero update. Checkpoint files alone are not proof of correct asynchronous restart.
 5. **Reproduce on the chosen SSH host, then benchmark realistic workloads.** Increase browser concurrency independently of optimizer batch size. Measure generation, environment, update and synchronization time, staleness/discards and both GPUs' utilization. Tune the bottleneck observed there.
 
 MTP with FP8/runtime LoRA, FP8 trainer storage, deterministic kernels, packing, multi-node orchestration and hyperparameter tuning remain optional later investigations. No NVFP4/QeRL, custom RL algorithm, preference reward model, final browser task suite or extended training run was added. We have enough evidence to pause infrastructure work and focus next on objectives and harness quality.
+
+### Optional after training: adapt a browser-specific DFlash2 drafter
+
+**Decision, 16 September 2026: retain this as a stretch goal only if time and budget remain after the main training/evaluation work.** RL duration is unknown. Drafter adaptation is not a prerequisite for SFT, RL or project completion; no implementation or GPU run is scheduled.
+
+Prefer adapting the existing [Qwen3.8-27B DFlash2 checkpoint](https://huggingface.co/z-lab/Qwen3.8-27B-DFlash2) to the final policy over training a drafter from scratch. There are two motivations: SFT/RL changes the target policy, and browser reasoning/action syntax differs from general-purpose workloads. Under correct speculative verification the adapted target still determines the output distribution; draft mismatch primarily costs acceptance and speed.
+
+If pursued, compare the generic drafter with an adaptation on representative browser observations and the final policy's own responses, including recovery states. Keep the target frozen and match the deployed adapter, prompt format and precision. Start with 2,000–10,000 model calls, expanding only if held-out results justify it. At 250–500 output tokens per call that is roughly 0.5–5 million unique output tokens, excluding potentially much larger observation/history inputs and repeated training passes. This is a proposed pilot, not an established DFlash2 data requirement or cost estimate. Hold out tasks/sites; measure acceptance, latency and throughput at intended concurrency, plus total browser-episode time.
+
+Evidence to revisit:
+
+- [Training Domain Draft Models](https://arxiv.org/html/2503.07807v1): conventional drafters improved function-calling acceptance from 60.3% to 82.6% with 2,000 in-domain examples. Relevant evidence for structured actions, not a DFlash2 result.
+- [Efficiently Aligning Draft Models](https://arxiv.org/html/2603.09527v1): a separate architecture's Qwen math adaptation beat retraining with less compute. Its hardware/time figures do not predict our 27B cost.
+- [Speculators DFlash2 training](https://docs.vllm.ai/projects/speculators/en/latest/user_guide/algorithms/dflash2/): the public training objective is experimental. Recheck checkpoint adaptation and exact FP8/LoRA serving support before allocating hardware; this combination has not been validated here.

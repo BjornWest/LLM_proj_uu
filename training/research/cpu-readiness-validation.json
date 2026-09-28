@@ -1,0 +1,300 @@
+{
+  "date": "2026-09-19",
+  "status": "PASS",
+  "scope": "CPU-only fixed evaluation, replay token accounting, resource relay and regression acceptance",
+  "cloud_gpu_allocated": false,
+  "model_weights_loaded": false,
+  "training_performed": false,
+  "lightweight_suite": {
+    "status": "PASS",
+    "shards": [
+      {
+        "shard": 0,
+        "exit_code": 0,
+        "files": 15,
+        "tests": 103,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "passed": 103
+      },
+      {
+        "shard": 1,
+        "exit_code": 0,
+        "files": 14,
+        "tests": 77,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 3,
+        "passed": 74
+      }
+    ],
+    "passed": 177,
+    "skipped": 3,
+    "output": "/home/bjorn/code/LLM_proj_uu/training/reports/cpu-suite-1789838510433362870"
+  },
+  "supplemental_framework_tests": {
+    "passed": 5,
+    "scope": "Existing RL environment, CPU torch LoRA dtypes/backward, OpenEnv harness and FP8 numeric unit test",
+    "pytest_source": "Existing lightweight test-runner path appended after pinned RL packages; no installation"
+  },
+  "unique_tests_passed": 182,
+  "fixed_evaluation": {
+    "comparisons_use_exact_suite": true,
+    "gpu_used": false,
+    "model_calls": 0,
+    "monitoring_import_verified": true,
+    "remote_readback_verified": true,
+    "resume_reused_results": true,
+    "run_id": "fixed-eval-123cc000a253",
+    "scalar_keys": 458,
+    "scheduled_suites": 2,
+    "status": "PASS",
+    "synthetic": true,
+    "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/fixed-eval-123cc000a253",
+    "worker_episodes": 4
+  },
+  "sft_mixture": {
+    "actual_replay_loss_fraction": 0.05077262693156733,
+    "available_replay_examples": 60,
+    "axolotl_version": "0.19.0",
+    "browser_exact_duplicates_removed": 0,
+    "browser_examples": 200,
+    "chat_template_kwargs": {
+      "enable_thinking": false,
+      "preserve_thinking": true
+    },
+    "limitations": "Exact content checks only; semantic duplicates and task/instance exposure require the data catalog. No packing or truncation.",
+    "loss_tokens": 1359,
+    "model": "Qwen/Qwen3.8-27B",
+    "model_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "output_sha256": "3e1a752262b97c08b23d4ba07ed9557de00ddabfb1bb7fc6700f9af2bba93239",
+    "processed_tokens": 13936,
+    "protected_examples_checked": 0,
+    "replay_exact_duplicates_removed": 0,
+    "replay_examples": 24,
+    "replay_processed_fraction": 0.04778989667049369,
+    "requested_replay_loss_fraction": 0.05,
+    "roles_to_train": [
+      "assistant"
+    ],
+    "schema_version": 1,
+    "seed": 42,
+    "sequence_len": 256,
+    "source_sha256": {
+      "outputs/sft-mixture-check/browser.jsonl": "4f5161c4b6a493f79953fa41511f22355c384fe00ac72d1a3ea5a924572caa0f",
+      "outputs/sft-mixture-check/replay.jsonl": "d220b3415f483c3e3c463fc91c7213c3baad572c49a390e969ca06a3d87cc61e"
+    },
+    "tokenizer_assets": {
+      "chat_template.jinja": "c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041",
+      "config.json": "191e0af232104ed8b65258cf3fb2b842e288008baca7633c11b82a1ac7203aab",
+      "tokenizer.json": "0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3",
+      "tokenizer_config.json": "b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27"
+    },
+    "tolerance": 0.005,
+    "train_on_eos": "turn",
+    "training_performed": false
+  },
+  "browser_only_baseline": {
+    "processed_tokens": 13270,
+    "loss_tokens": 1290,
+    "browser_examples": 200,
+    "output_sha256": "c8ea279c8b3b2dfaa67f36b96733705055047ea44bd63b3d7207320f9d7b319c"
+  },
+  "actual_tokenizer_overflow_rejected_before_output": true,
+  "tokenizer_api_finding": "Explicit return_dict=False is required before counting template token IDs with this pinned Transformers API.",
+  "resource_relay": {
+    "actual_local_rsync": true,
+    "duplicate_import_verified": true,
+    "ssh_argv_checked": true,
+    "live_ssh_tested": false
+  },
+  "installed_callback": {
+    "status": "PASS",
+    "callback_dispatch": "installed transformers CallbackHandler",
+    "model_loaded": false,
+    "trainer_executed": false,
+    "gpu_used": false,
+    "native_rollout_state": "fixture; not a real trainer checkpoint",
+    "checkpoint_sidecar_written": true,
+    "restored_values_match": true,
+    "publication_lineage_verified": true,
+    "inherited_health_masked_until_new_callback": true,
+    "evaluation_retention_guard_verified": true,
+    "logged_optimizer_step": 8,
+    "logged_actual_policy_version": 3
+  },
+  "installed_browser_worker": {
+    "status": "PASS",
+    "metrics": {
+      "snapshot_id": "653931d44c7dbbb8f6e701c70c135124d467767556afb30e00326fa06279ad20",
+      "completed_group_records": [
+        {
+          "attempt": 0,
+          "constraints_satisfied": false,
+          "duration_s": 1.8341267550131306,
+          "environment_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "episode_id": "fd2f0a1fa83d4604a0433392c9a854c4",
+          "generated_tokens": 26,
+          "goal_completed": false,
+          "group_id": "d8ba2acc00494b079266b1816d456855:0",
+          "group_size": 2,
+          "harness_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "interventions": null,
+          "member": 1,
+          "policy_version": 1,
+          "reward": 0.0,
+          "seed": 1280469557,
+          "split": "rl_train",
+          "status": "completed",
+          "steps": 1,
+          "task_family": "local-plumbing",
+          "task_instance": "mock:1280469557",
+          "task_template": "no-subscription",
+          "tokenizer_revision": "Qwen3.8:tokenizer-config-sha256:b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+          "unauthorized_effect": true,
+          "verifier_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db"
+        },
+        {
+          "attempt": 0,
+          "constraints_satisfied": true,
+          "duration_s": 4.635063573019579,
+          "environment_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "episode_id": "0259d557524f49e8a9aeed7068d19e02",
+          "generated_tokens": 63,
+          "goal_completed": true,
+          "group_id": "d8ba2acc00494b079266b1816d456855:0",
+          "group_size": 2,
+          "harness_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "interventions": null,
+          "member": 0,
+          "policy_version": 1,
+          "reward": 1.0,
+          "seed": 1280469557,
+          "split": "rl_train",
+          "status": "completed",
+          "steps": 2,
+          "task_family": "local-plumbing",
+          "task_instance": "mock:1280469557",
+          "task_template": "no-subscription",
+          "tokenizer_revision": "Qwen3.8:tokenizer-config-sha256:b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+          "unauthorized_effect": false,
+          "verifier_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db"
+        }
+      ],
+      "native_rewards_and_policy_versions_match": true,
+      "generated_token_count_matches": true,
+      "output": "/home/bjorn/code/LLM_proj_uu/training/outputs/cpu-readiness/spawned-01",
+      "admission": "Pending: native queue rows were inspected, no optimizer ran"
+    },
+    "monitoring_source_sha256": {
+      "/home/bjorn/code/LLM_proj_uu/training/scripts/validate_spawned_harness.py": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+      "browser_training/runtime_metrics.py": "69d2a02ef0b261c3d8f4bbf411c074674d6413fae2c4701a41e4b40ae09a8add",
+      "browser_training/monitored_harness.py": "3ba727382b693ad9195fd61e8e539e72e9c5f396126e47b60fe37c8f5f8b84d5",
+      "browser_training/policy_sessions.py": "671f7afa4cbc9e400f69b0d871cb666944e6f7d23092f3df47702860f970e2ef",
+      "browser_training/curriculum.py": "7b553fd2936dc05c366c0495d2fbeb3a16b0b34f2aa4cc02be9bcf1f0b01b4f1",
+      "browser_training/outcomes.py": "799090fc37b1d274227ba7e252b3ef98c49cef66a5043fbbae0fb05f258c816c"
+    },
+    "installed_trl_harness_sha256": "8b745cc0cb30977a7ad41458f1c85981b98fab0a5de01b80a41b7a88f656cc5f",
+    "start_method": "spawn",
+    "child_exitcode": 0,
+    "samples": [
+      {
+        "reward": 0.0,
+        "policy_version": 1,
+        "group_id": 0,
+        "advantage": -0.9999999800000003,
+        "generated_tokens": 26
+      },
+      {
+        "reward": 1.0,
+        "policy_version": 1,
+        "group_id": 0,
+        "advantage": 0.9999999800000003,
+        "generated_tokens": 63
+      }
+    ],
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0,
+        "tokens": 26
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0,
+        "tokens": 26
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1,
+        "tokens": 37
+      }
+    ],
+    "seconds": 31.77980523504084,
+    "stop_seconds": 2.5713359299697913,
+    "tokenizer": "Qwen3.8 official",
+    "parser": "installed TRL",
+    "import_substitutions": false,
+    "observations_masked": true,
+    "logprobs_aligned": true,
+    "gpu_used": false,
+    "trainer_executed": false,
+    "rl_ready": false,
+    "note": "Fixed policy; scripted success/subscription failure; native scoring but no trainer update"
+  },
+  "limitations": [
+    "Mock fixed-suite worker is not a task grader or policy-learning result",
+    "SFT mixture inputs are synthetic; no reviewed teacher/replay corpus exists in this test",
+    "No real model/optimizer checkpoint restore or GPU memory/throughput qualification",
+    "No live SSH network performance test; hosts not provisioned",
+    "Canonical harness/data adoption and joint dashboard layout remain separate work"
+  ],
+  "source_sha256": {
+    "browser_training/__init__.py": "4f43087bb867f6ec7e2caed5399d0453c1b7766b9fb59bfcdc5d566b2fb449c6",
+    "browser_training/runtime_metrics.py": "424b6632c720cc9f8bb6f4979719d3d9e06a1d1dc89afbd1ce1b8468de0c03a9",
+    "browser_training/row_accounting.py": "531dab3b1aff7bdc999bbeefc9c685d283a3e3ba8ed3e8b15a7b3ff4c2322134",
+    "browser_training/callbacks.py": "98b6b36bc15d20fa9ffdcb849823a1b9e3b372b30e38033a02104305339d6746",
+    "browser_training/openenv_bridge.py": "793a3790125d1c6d49ed1c4e5f1df043097c32349cd81c43acfd3650ccacd1f3",
+    "browser_training/environment.py": "a686ab24a68366799330bb9041c9e9fe65e5210792e6971d2076568c7fa5b0bd",
+    "browser_training/monitoring_files.py": "71f33745f3c0f4639ea5fe1d05d19da4df75aa67a9323b4eb14d14a988052206",
+    "browser_training/evaluation_runner.py": "c16ebfb117da8e44d1e151f054ebde618eedf7efc639a4fefcb41e4b137caa7d",
+    "browser_training/vllm_probe_worker.py": "ce6d5399bf06acbff1335b5d043a7cf2c7dd8226eccf1d6699a1697f4c7088bf",
+    "browser_training/resource_monitor.py": "ebd0ce9d42eacf1ce50d96cc7a4f9b88ce318a89208c5a05f75c55549b6b4b74",
+    "browser_training/publication.py": "8221ef06efba0649a9c0d5917e94d8bf76218bc8d176f720b04c9c2848c68cd3",
+    "browser_training/apple_probe.py": "a75f339dd5b47efeae9a51de8a7c8ec2675bdadd19a255e6271123a10aea6d6a",
+    "browser_training/provenance.py": "1f491db2bf21da6f250f9dc9a1c128a480f9bca17a000cee553e5e58b0f430a9",
+    "browser_training/native_metrics.py": "d6f87b1bce380d556d3f0cfa4d180f74f866f073c1b9f5c81c45550166a3acdc",
+    "browser_training/dataset.py": "ba07115d8d7248a16991d7a7366645e7128c734edab591f3d5357bdd52b8318b",
+    "browser_training/monitored_harness.py": "3ba727382b693ad9195fd61e8e539e72e9c5f396126e47b60fe37c8f5f8b84d5",
+    "browser_training/processes.py": "854ec2ddbf1b8c7ab912cc69527154e5fc1820d1567a518ec591fc6c67b136e2",
+    "browser_training/vllm_compat.py": "0f19fa9c02046b71921b9447dc1b704e289a4a19edbd1d4d2d9cc5130b8cf675",
+    "browser_training/attention_compat.py": "d4e2564e64c865a9982540dac993624dffb5315edf02873b4c11c579d38d1277",
+    "browser_training/trainer_metrics.py": "77c9e295505af2397691ac9fe956cb0740e6b9a62e7c65e043eb3bf082086105",
+    "browser_training/browser_metrics.py": "a04f38fb7d0da1181bd6dd81f962383ccbcdd73fecad611cf8f5268a6a4476f9",
+    "browser_training/monitoring_io.py": "8ca16a586f05d7f209ee1e74b6d43072b3771f51413e12c5d9f3ca26354dbb97",
+    "browser_training/metric_catalog.py": "369bb4eb99d3a859729e02b1c10dfc5b423ee35d3d383d59bece024263e114e1",
+    "browser_training/row_hooks.py": "a02c9284d64a08f07b305da193f33150c7e8ce5d127aee8ad03990abadf53346",
+    "browser_training/policy_sessions.py": "671f7afa4cbc9e400f69b0d871cb666944e6f7d23092f3df47702860f970e2ef",
+    "browser_training/apple_plugin.py": "063f420249362e537072eb2ffa295d5b757f54cd4e5f96c58c13ba7df5764a5d",
+    "browser_training/trl_monitoring.py": "a2a427d790939f7aafb11e9e9c62b833a803bc0d47f33859d3851451243165bc",
+    "browser_training/upload_worker.py": "f427a38efca841824381eb2fe2483bbbbf2613e33f167078211ed4be4c0ce903",
+    "browser_training/snapshot_uploader.py": "8527716a538b8d1095e0c08bd6952f0362907ae73ff8c416f331d3fe513eb63c",
+    "browser_training/launch.py": "fe0302414355b754327376308f773162c3aea0ea3a05b32dd60f613048592aef",
+    "browser_training/monitoring_callback.py": "d26b63707387297a14908a80828beb938918f4e59f014d6105d585bcf2d5c4fa",
+    "browser_training/outcomes.py": "799090fc37b1d274227ba7e252b3ef98c49cef66a5043fbbae0fb05f258c816c",
+    "browser_training/policy_compat.py": "cd090b26d244889746b3986cddb7753e1f397c271cc84cdfc2a3ecee8165b185",
+    "browser_training/curriculum.py": "7b553fd2936dc05c366c0495d2fbeb3a16b0b34f2aa4cc02be9bcf1f0b01b4f1",
+    "browser_training/evaluation.py": "e2e0cde30cfbb52bf73bc165913ea45e877185b1baf112e5e3f0c56ffd2b313f",
+    "browser_training/choice_probe.py": "8b4a999191cb966d50625ee75a259c7d59c2d6d9e5d4c5dd2b0ab52d177475fc",
+    "browser_training/qlora_compat.py": "e9853e69ab317836943be9a68b2328ffa50a74c81cbb965869991980709a5da4",
+    "browser_training/harness_bridge.py": "be720038e4560ed3b1f6f6d7c962b7388a3fa992cf0ece3a5b3d7e537ef6bfee",
+    "browser_training/sft_mixture.py": "ca55b724ec7304d0fc78d18db7dbb3b06c7c50433b58e2c0def908c1ca88b522",
+    "browser_training/precision.py": "0e41aea4ad5fda03e005ddfda5f87e823cdabff209a561eb3543cc5a49f1f5e6",
+    "browser_training/axolotl_plugin.py": "1312bbe2f546ca308d0ff38040a184b222e511b33deb51e48edc051f39b966a7",
+    "scripts/prepare_sft_mixture.py": "1997ef4e117c043794c78eef1f8f58bf2ffc4e9b8eb21a57728bffa2a6a76171",
+    "scripts/run_fixed_evaluation.py": "a340cca3c9703ddc011abb59e55314f3ecb03577d02e34a05ffc126d51ec7509",
+    "scripts/relay_resource_sample.py": "fdb01497463010deb4516dc830cb9151a9abea244ece588efd40feda1d71473b",
+    "scripts/check_cpu_suite.py": "135d29ee2ab0fb24371eaf0fe413f1b74066478e4e44672e79dc32c3b6c4095d"
+  }
+}

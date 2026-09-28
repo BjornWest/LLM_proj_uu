@@ -19,6 +19,8 @@ def main():
     p.add_argument("--output")
     p.add_argument("--resume")
     p.add_argument("--sft-adapter")
+    p.add_argument("--monitoring-dir", type=Path,
+                   help="Opt-in local live metrics and checkpoint sidecars; use a fresh directory, including on resume")
     p.add_argument("--attention", choices=["kernels-community/flash-attn3", "flash_attention_2"],
                    default=os.environ.get("RL_ATTENTION", "kernels-community/flash-attn3"))
     p.add_argument("--dry-run", action="store_true")
@@ -27,6 +29,10 @@ def main():
         p.error("Choose --resume or --sft-adapter, not both")
     if args.resume and not (Path(args.resume) / "rollout_state.json").is_file():
         p.error("Resume requires an AsyncGRPO checkpoint with rollout_state.json")
+    if args.monitoring_dir and args.monitoring_dir.exists():
+        p.error("Use a fresh --monitoring-dir, including on resume; existing evidence is never overwritten")
+    if args.monitoring_dir and args.resume and not (Path(args.resume) / "monitoring/state.json").is_file():
+        p.error("Monitored resume requires a matching monitoring checkpoint sidecar")
     cfg = dict(runpy.run_path(args.config)["CONFIG"])
     for key, value in {"max_steps": args.steps, "max_inflight_tasks": args.inflight,
                        "num_generations": args.group_size, "gradient_accumulation_steps": args.grad_accum,
@@ -39,7 +45,8 @@ def main():
         p.error("Use group size >=2 and inflight >= group size")
     cfg["output_dir"] = str(Path(cfg["output_dir"]).resolve())
     if args.dry_run:
-        print(json.dumps({**cfg, "attention": args.attention}, indent=2))
+        print(json.dumps({**cfg, "attention": args.attention,
+                          "monitoring_dir": str(args.monitoring_dir) if args.monitoring_dir else None}, indent=2))
         return
     if cfg["environment"] != "one-turn-mock":
         p.error("BLOCKED: policy reservations pass local tests, but GPU/vLLM qualification and a production browser harness factory are still required. See NOTES.md.")
@@ -106,13 +113,34 @@ def main():
     trainer.optimizer = make_optimizer(trainer.model, cfg["learning_rate"])
     capture(cfg["output_dir"], {**cfg, "model": model, "revision": revision, "rank": rank, "alpha": alpha,
                                "sft_adapter": args.sft_adapter, "resume_from_checkpoint": args.resume,
+                               "monitoring_dir": str(args.monitoring_dir) if args.monitoring_dir else None,
                                "attention": args.attention,
                                "trl_policy_sources": {name: hashlib.sha256((trl_folder / name).read_bytes()).hexdigest()
                                                       for name in HASHES},
                                "trl_trainer_sha256": hashlib.sha256(
                                    Path(inspect.getfile(AsyncGRPOTrainer)).read_bytes()).hexdigest()})
-    trainer.train(resume_from_checkpoint=args.resume)
-    trainer.save_model(str(Path(cfg["output_dir"]) / "adapter-final"))
+    monitoring_manager = None
+    if args.monitoring_dir:
+        if trainer.accelerator.num_processes != 1:
+            raise ValueError("Metrics service currently supports one trainer process on one orchestrator host")
+        from browser_training.runtime_metrics import start_metrics
+        from browser_training.monitoring_callback import MonitoringCallback
+        import multiprocessing
+        import uuid
+        run_id = uuid.uuid4().hex
+        if args.resume:
+            run_id = json.loads((Path(args.resume) / "monitoring/state.json").read_text())["run_id"]
+        monitoring_manager, monitor = start_metrics(multiprocessing.get_context("spawn"), args.monitoring_dir,
+            run_id=run_id, synthetic=True, resume=args.resume, expected_producers=["trainer"])
+        callback = MonitoringCallback(monitor)
+        callback.trainer = trainer
+        trainer.add_callback(callback)
+    try:
+        trainer.train(resume_from_checkpoint=args.resume)
+        trainer.save_model(str(Path(cfg["output_dir"]) / "adapter-final"))
+    finally:
+        if monitoring_manager is not None:
+            monitoring_manager.shutdown()
     checkpoints = list(Path(cfg["output_dir"]).glob("checkpoint-*/adapter_model.safetensors"))
     if not checkpoints:
         raise RuntimeError("Training returned without an adapter checkpoint")

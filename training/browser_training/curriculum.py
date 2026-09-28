@@ -1,0 +1,216 @@
+"""Optional CPU task-family sampler. TRL still owns GRPO and rollout admission.
+
+Call refresh once per desired curriculum update, draw once per GRPO group.
+Draws are committed before return. Randomness is keyed by run/seed/group rather
+than process-local RNG consumption, so retries cannot advance the random stream.
+"""
+from collections import Counter, defaultdict
+from dataclasses import asdict, dataclass
+import hashlib
+import json
+import math
+import random
+
+from .outcomes import canonical, fields, number, require, safe
+
+ALGORITHM = "family-beta-signal-v1"
+TASK_FIELDS = {"task_id", "task_family", "task_template", "harness_revision", "verifier_revision",
+               "environment_revision", "tokenizer_revision", "split"}
+PROVENANCE = ("harness_revision", "verifier_revision", "environment_revision", "tokenizer_revision")
+
+
+@dataclass(frozen=True)
+class SamplerConfig:
+    mode: str = "uniform"
+    seed: int = 42
+    exploration: float = 0.2
+    min_groups: int = 8
+    window_s: float = 3600
+    max_policy_age: int = 2
+
+    def __post_init__(self):
+        require(self.mode in {"uniform", "adaptive"}, "Unknown sampler mode")
+        number(self.seed, "seed", integer=True)
+        number(self.min_groups, "min_groups", integer=True)
+        number(self.max_policy_age, "max_policy_age", integer=True)
+        number(self.window_s, "window_s")
+        number(self.exploration, "exploration")
+        require(0 < self.exploration <= 1 and self.window_s > 0 and self.min_groups > 0, "Invalid sampler bounds")
+
+
+def digest(value):
+    return hashlib.sha256(canonical(value).encode()).hexdigest()
+
+
+def validate_draw(p):
+    fields(p, TASK_FIELDS | {"group_id", "group_size", "policy_version", "task_instance", "seed",
+                            "pool_revision", "sampler_revision", "sampler_config", "probabilities",
+                            "task_probability", "evidence", "excluded", "evidence_watermark", "evidence_at"})
+    for key in TASK_FIELDS | {"group_id", "task_instance", "pool_revision", "sampler_revision"}:
+        require(isinstance(p[key], str) and p[key], f"Missing draw identity: {key}")
+    require(p["split"] == "rl_train", "Curriculum must not select dev/test tasks")
+    require(p["sampler_revision"] == ALGORITHM, "Unsupported sampler algorithm")
+    SamplerConfig(**p["sampler_config"])
+    for key in ("group_size", "policy_version", "seed", "evidence_watermark"):
+        number(p[key], key, integer=True)
+    require(p["group_size"] >= 2, "Draw a complete GRPO group")
+    number(p["evidence_at"], "evidence_at")
+    probs = p["probabilities"]
+    require(isinstance(probs, dict) and p["task_family"] in probs, "Selected family absent from probabilities")
+    require(all(isinstance(k, str) and k for k in probs), "Invalid family names")
+    for value in probs.values():
+        number(value, "probability")
+        require(value > 0, "Every family must retain exploration probability")
+    require(math.isclose(sum(probs.values()), 1, abs_tol=1e-9), "Probabilities must sum to one")
+    number(p["task_probability"], "task_probability")
+    require(0 < p["task_probability"] <= probs[p["task_family"]], "Invalid task probability")
+    require(isinstance(p["evidence"], dict) and isinstance(p["excluded"], dict), "Evidence counters required")
+    require(p["evidence"].keys() == probs.keys(), "Evidence family set differs from probabilities")
+    for stats in p["evidence"].values():
+        fields(stats, {"successes", "episodes", "groups", "smoothed_pass_rate"})
+        for key in ("successes", "episodes", "groups"):
+            number(stats[key], key, integer=True)
+        require(stats["successes"] <= stats["episodes"] and 2*stats["groups"] <= stats["episodes"],
+                "Inconsistent evidence counts")
+        number(stats["smoothed_pass_rate"], "smoothed_pass_rate")
+        require(math.isclose(stats["smoothed_pass_rate"], (stats["successes"]+1)/(stats["episodes"]+2)),
+                "Invalid smoothed rate")
+    for key, value in p["excluded"].items():
+        require(isinstance(key, str) and key, "Invalid exclusion reason")
+        number(value, key, integer=True)
+
+
+class FamilySampler:
+    def __init__(self, tasks, config=SamplerConfig()):
+        require(bool(tasks), "Empty task pool")
+        self.config = config
+        self.tasks = sorted((dict(t) for t in tasks), key=lambda t: t["task_id"])
+        for task in self.tasks:
+            fields(task, TASK_FIELDS)
+            require(task["split"] == "rl_train", "Dev/test task in training pool")
+            require(all(isinstance(v, str) and v for v in task.values()), "Task metadata must be nonempty strings")
+        require(len({t["task_id"] for t in tasks}) == len(tasks), "Duplicate task id")
+        require(len({(t["task_family"], t["task_template"]) for t in tasks}) == len(tasks),
+                "One entry per family/template; procedural instances are generated by seed")
+        self.pool_revision = digest(self.tasks)
+        self.families = sorted({t["task_family"] for t in tasks})
+        self.distribution = None
+
+    def refresh(self, ledger, *, policy_version, now):
+        number(policy_version, "policy_version", integer=True)
+        number(now, "now")
+        records = ledger.records()
+        known = {(t["task_family"], t["task_template"]): t for t in self.tasks}
+        latest, excluded, groups = {}, Counter(), defaultdict(list)
+        for row in records:
+            e = row["event"]
+            if e["kind"] != "episode":
+                continue
+            p = e["payload"]
+            key = p["group_id"], p["member"]
+            if key not in latest or p["attempt"] > latest[key]["payload"]["attempt"]:
+                latest[key] = e
+        for e in latest.values():
+            p = e["payload"]
+            task = known.get((p["task_family"], p["task_template"]))
+            reason = None
+            if p["split"] != "rl_train": reason = "nontraining_slots"
+            elif task is None: reason = "unknown_task_slots"
+            elif any(p[k] != task[k] for k in PROVENANCE): reason = "provenance_mismatch_slots"
+            elif e["occurred_at"] > now: reason = "future_timestamp_slots"
+            elif e["occurred_at"] < now-self.config.window_s: reason = "expired_slots"
+            elif p["policy_version"] > policy_version: reason = "future_policy_slots"
+            elif policy_version-p["policy_version"] > self.config.max_policy_age: reason = "old_policy_slots"
+            elif p["status"] != "completed": reason = "execution_error_slots"
+            elif safe(p) is None or p["reward"] is None: reason = "unverified_slots"
+            if reason:
+                excluded[reason] += 1
+            else:
+                groups[p["group_id"]].append(p)
+        evidence = {family: dict(successes=0, episodes=0, groups=0) for family in self.families}
+        for group in groups.values():
+            if len(group) != group[0]["group_size"]:
+                excluded["incomplete_groups"] += 1
+                continue
+            stats = evidence[group[0]["task_family"]]
+            stats["groups"] += 1
+            stats["episodes"] += len(group)
+            stats["successes"] += sum(safe(p) for p in group)
+        scores = {}
+        for family, stats in evidence.items():
+            posterior = (stats["successes"]+1)/(stats["episodes"]+2)
+            stats["smoothed_pass_rate"] = posterior
+            # Sparse/unknown families remain exploratory; evidence never comes from dev/test.
+            scores[family] = 1 if self.config.mode == "uniform" or stats["groups"] < self.config.min_groups else 4*posterior*(1-posterior)
+        total = sum(scores.values())
+        probabilities = {f: self.config.exploration/len(scores) + (1-self.config.exploration)*score/total
+                         for f, score in scores.items()}
+        self.distribution = dict(run_id=ledger.metadata["run_id"], policy_version=policy_version,
+                                 probabilities=probabilities, evidence=evidence, excluded=dict(excluded),
+                                 evidence_watermark=records[-1]["seq"] if records else 0, evidence_at=now)
+        return json.loads(canonical(self.distribution))
+
+    def state_dict(self):
+        state = dict(algorithm=ALGORITHM, pool_revision=self.pool_revision,
+                     config=asdict(self.config), distribution=self.distribution)
+        return json.loads(canonical({**state, "state_sha256": digest(state)}))
+
+    def load_state_dict(self, state):
+        require(state.get("state_sha256") == digest({k: v for k, v in state.items() if k != "state_sha256"}),
+                "Sampler checkpoint checksum mismatch")
+        require(state["algorithm"] == ALGORITHM and state["pool_revision"] == self.pool_revision
+                and state["config"] == asdict(self.config), "Sampler checkpoint config/pool mismatch")
+        self.distribution = json.loads(canonical(state["distribution"]))
+
+    def draw(self, ledger, *, group_id, group_size, policy_version, now):
+        require(isinstance(group_id, str) and group_id, "Stable group ID required")
+        identity = "draw-" + digest([ledger.metadata["run_id"], group_id])
+        existing = ledger.event(identity)
+        if existing is not None:
+            p = existing["payload"]
+            require(p["pool_revision"] == self.pool_revision and p["sampler_config"] == asdict(self.config)
+                    and p["group_size"] == group_size and p["policy_version"] == policy_version,
+                    "Existing draw intent changed")
+            return p
+        d = self.distribution
+        require(d is not None and d["run_id"] == ledger.metadata["run_id"] and d["policy_version"] == policy_version,
+                "Refresh sampler for this run/policy before drawing")
+        require(d["evidence_watermark"] <= ledger.watermark(), "Sampler evidence is ahead of restored ledger")
+        require(d["evidence_at"] <= now < d["evidence_at"] + self.config.window_s,
+                "Sampler evidence expired or clock moved backwards; refresh")
+        rng = random.Random(int(digest([ALGORITHM, ledger.metadata["run_id"], self.config.seed,
+                                      self.pool_revision, group_id]), 16))
+        family = rng.choices(self.families, weights=[d["probabilities"][f] for f in self.families], k=1)[0]
+        candidates = [t for t in self.tasks if t["task_family"] == family]
+        task = rng.choice(candidates)
+        seed = rng.randrange(2**31)
+        p = {**task, "group_id": group_id, "group_size": group_size, "policy_version": policy_version,
+             "task_instance": f"{task['task_id']}:{seed}", "seed": seed, "pool_revision": self.pool_revision,
+             "sampler_revision": ALGORITHM, "sampler_config": asdict(self.config),
+             "task_probability": d["probabilities"][family]/len(candidates),
+             **{key: d[key] for key in ("probabilities", "evidence", "excluded", "evidence_watermark", "evidence_at")}}
+        event = dict(id=identity, kind="task_draw", producer="orchestrator", occurred_at=now, payload=p)
+        try:
+            ledger.append(event)
+        except ValueError:
+            # A concurrent publisher may have committed the same stable group first.
+            if ledger.event(identity) is not None:
+                return self.draw(ledger, group_id=group_id, group_size=group_size, policy_version=policy_version, now=now)
+            raise
+        return json.loads(canonical(p))
+
+
+def summarize_draws(events, *, now, window_s):
+    draws = [e for e in events if e["kind"] == "task_draw"]
+    if not draws:
+        return None
+    result = {}
+    for window, lower in (("all", 0), ("recent", now-window_s)):
+        selected = [e for e in draws if e["occurred_at"] >= lower]
+        counts = Counter(e["payload"]["task_family"] for e in selected)
+        latest = max(selected, key=lambda e: (e["occurred_at"], e["id"]), default=None)
+        result[window] = dict(draws=len(selected), family_draws=dict(counts),
+                              realized_fractions={k: v/len(selected) for k, v in counts.items()},
+                              latest=None if latest is None else latest["payload"],
+                              latest_at=None if latest is None else latest["occurred_at"])
+    return result

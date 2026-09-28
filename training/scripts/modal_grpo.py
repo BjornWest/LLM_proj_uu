@@ -29,6 +29,7 @@ image=(modal.Image.debian_slim(python_version='3.12')
         'VLLM_CACHE_ROOT':'/model-cache/compiled/rl-vllm028-torch213-sm89/vllm',
         'VLLM_NO_USAGE_STATS':'1','VLLM_SERVER_DEV_MODE':'1','VLLM_ALLOW_RUNTIME_LORA_UPDATING':'1',
         'VLLM_WORKER_MULTIPROC_METHOD':'spawn','WANDB_MODE':'disabled','TOKENIZERS_PARALLELISM':'false'}))
+dependency_image = image
 for source in SOURCES:
     image=image.add_local_file(source,'/opt/training/'+str(source.relative_to(ROOT)))
 cache=modal.Volume.from_name('browser-training-model-cache',create_if_missing=True)

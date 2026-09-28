@@ -1,6 +1,6 @@
 # Training validation and remote deployment handoff
 
-**Latest status (2026-09-16): SFT and core RL learning passed; all test containers stopped.** Read the [consolidated findings](../training-findings.md) and [SSH handoff](#ssh-deployment-handoff) first. The entries below retain earlier tests and expired authorizations as history; they do not authorize another run.
+**Latest status (2026-09-19): SFT/core RL learning and monitored synthetic AsyncGRPO resume passed; all test containers stopped.** The [new acceptance runbook](training-gpu-acceptance.md) records a real BF16-resume fix and portable CLI. Read the [consolidated findings](../training-findings.md) and [SSH handoff](#ssh-deployment-handoff) first. The entries below retain earlier tests and expired authorizations as history; they do not authorize another run.
 
 ## Initial Modal qualification (historical)
 
@@ -669,3 +669,135 @@ sample counts and synchronization timings. `tmux` preserves a terminal session,
 not a spending cap or coordinated shutdown. Provider instance lifetime, persistent
 storage charges, driver configuration and MIG administration become operator
 responsibilities when leaving the SDK.
+
+## Isolated NeMo FP8 qualification
+
+`training/scripts/modal_nemo_fp8.py` is separate from the working NF4/TRL
+environment. It imports NVIDIA's NeMo-RL v0.7.0 amd64 container by manifest
+digest and records the actual worker environment versions and source commits.
+The first import is large and can take several minutes on Modal; this happens
+before GPU allocation. No image or model weights are downloaded to the workstation.
+
+From the repository root:
+
+```bash
+training/.venv/bin/python training/scripts/modal_nemo_fp8.py --dry-run
+training/.venv/bin/python training/scripts/modal_nemo_fp8.py --prepare-only
+# Starts paid compute; use only within an authorized experiment budget:
+training/.venv/bin/python training/scripts/modal_nemo_fp8.py
+```
+
+CPU preparation selects a preinstalled Megatron/TE interpreter. The full command
+then allows one H100 allocation within a 600-second window, with a 60-second
+startup limit, a 510-second function timeout, no automatic retries and explicit
+container cancellation. A persistent start marker rejects replay. Queue time
+consumes the same window. Source snapshots, inventory and reports are saved under
+`training/outputs/modal/nemo-fp8-*`; detailed GPU logs also live in the existing
+`browser-training-results` Modal volume.
+
+The elementary experiment uses two native MCore TE linear layers and Bridge
+rank-16 BF16 adapters: BF16 control, physical blockwise FP8 parameters, then FP8
+with TE checkpointing. It checks actual quantized storage, unchanged frozen
+weights/scales, adapter dtype and updates, and early-adapter/input gradients.
+Only after that passes does the launcher attempt a four-layer random dense Qwen
+hybrid model with Gated DeltaNet and full attention, checkpointing off/on.
+Stateless SGD isolates backward correctness; this is not a production optimizer
+or a learning/convergence experiment. These tests do not qualify the 27B checkpoint,
+NeMo GRPO, adapter export/refit, BrowserGym, or trainer/rollout logprob agreement.
+
+The first Hopper experiments passed the linear and hybrid numerical assertions;
+the corrected hybrid process hit its exit deadline after writing its complete
+PASS report, so its supervisor result remains FAIL. TE retained distinct rowwise
+and columnwise FP8 weights (approximately two GPU bytes per GEMM weight), plus
+BF16 initialization copies on CPU. See [recorded results](../../training/NOTES.md#hopper-experiment-results--16-september-2026).
+
+For an authorized follow-up, `--stage hybrid --gpu-seconds 360` restricts the
+scope and reduces the outer time allowance. `--prepared-inventory PATH` reuses
+a successful `inventory.json` alongside its original `plan.json` only if the
+container digest matches and it checked the regular Megatron policy worker.
+This avoids repeating slow CPU imports when only the probe changes. A stored
+probe PASS and a supervisor timeout are separate facts; never rewrite the
+supervisor result to PASS solely because the numerical assertions completed.
+
+`--stage export` is the next isolated gate. It creates the same tiny hybrid with
+deliberately nonzero BF16 adapters, checks the logical merged weights against
+independent `W + (alpha/r) BA` calculations for all 16 adapted projections, then
+examines the pinned worker's ordinary conversion tasks and explicit Bridge FP8
+tasks separately. A temporary tiny HF checkpoint supplies real source metadata;
+no pretrained checkpoint is fetched. A scale-control comparison separates normal
+FP8 rounding from a merge performed in the wrong units. `BLOCKED` is a completed
+negative qualification and exits nonzero. The probe stops before launching vLLM
+if export fails; it does not claim a live refit check.
+
+The worker now prints a compact completion line and saves the detailed JSON to
+the volume. This avoids streaming the entire storage/gradient report during
+process teardown. The image, dependency environment and production trainer
+remain unchanged.
+
+The completed export probe preserved 31 BF16 tensors from 16 adapted projections
+through the pinned ordinary-task path (worst relative L2 weight error 0.2202%).
+Explicit physical-FP8 tasks produced 19/32 exceptions. Ordinary BF16 merged-weight
+export followed by NeMo's existing inference-side FP8 quantizer remains a
+technically plausible alternative, but differs from the requested adapter-only
+design. Before another GPU test, qualify native adapter-only publication and
+episode version retention in the chosen NeMo stack. Bridge adapter checkpoint
+export alone does not establish that integration. Do not treat full-model refit
+as a drop-in replacement for the existing TRL session mechanism or the requested
+fixed rollout base. See [export evidence](../../training/research/nemo-fp8-export-validation.json).
+
+Cheap arithmetic reproduction, using the already installed CPU-capable PyTorch
+environment (downloads three small pinned official source files):
+
+```bash
+training/envs/rl/.venv/bin/python training/scripts/nemo_fp8_export_cpu.py \
+  --output training/outputs/nemo-fp8-export-cpu.json
+```
+
+This extracts upstream methods to avoid importing the distributed stack. Its
+constant-matrix control recovered the intended update within 0.098% through
+BF16 transfer and native requantization, while raw-unit merging lost the update.
+That is a math check, not evidence that a live vLLM worker accepted the policy.
+
+## W&B dashboard connection
+
+W&B Academic is selected for one human-facing training dashboard. The bounded
+connection check uploads only four synthetic scalar records and one four-row
+outcome table. It performs no training, model download, cloud GPU allocation or
+browser-trace upload. This is SDK integration evidence, not qualification of a
+Trainer callback or the eventual curriculum/dashboard layout.
+
+From the repository root:
+
+```bash
+uv sync --project training --extra tracking --extra modal
+training/.venv/bin/python training/scripts/check_wandb.py          # offline
+training/.venv/bin/python training/scripts/check_wandb.py --online # hosted test
+```
+
+The optional `tracking` extra pins `wandb==0.30.0`; the GPU training environment
+locks are unchanged. Offline mode is the default. Online mode reads only these
+settings from the ignored root `.env` or the process environment:
+
+```dotenv
+WANDB_API_KEY=<personal API key; never commit or paste into chat>
+WANDB_ENTITY=<academic TEAM slug>
+WANDB_PROJECT=browser-training
+```
+
+Use the team slug in a project URL, not the academic organization slug. The first
+online attempt was rejected because the configured organization ended in `-org`;
+an authenticated read showed one team, also the default entity, and `.env` was
+corrected to that team. The second attempt completed successfully. Keys were not
+printed or committed. The optional project setting defaults to `browser-training`.
+
+All test runs are named `Connection check — SYNTHETIC DATA`, tagged `smoke-test`,
+`synthetic` and `exclude-from-model-results`, and use `job_type=connection-check`.
+Filter them out of experiment comparisons. No code/weights are uploaded; automatic
+system-stat logging is disabled for this probe. Metadata and raw SDK files stay in
+ignored `training/outputs/wandb-check/`. The check finishes the run, independently
+reads back its summary and downloads the table to verify its four records.
+
+Current evidence: [W&B connection check](../../training/research/wandb-connection-validation.json).
+The full outcome ledger, task summaries, curriculum controls and remote-node
+resource collection remain planned work. Trainer launchers still default to
+`report_to="none"`; this check does not silently enable uploads in real runs.

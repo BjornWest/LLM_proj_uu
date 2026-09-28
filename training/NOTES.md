@@ -1,10 +1,14 @@
 # Infrastructure research — 2026-09-15
 
-**Current status (2026-09-16): actual 27B NF4/BF16-LoRA SFT and core AsyncGRPO learning both passed on L40S.** SFT held-out apple-format accuracy rose 0/16 → 16/16 after saved-adapter reload; eight RL updates improved the rewarded choice from 34/64 → 64/64 through the final natively synchronized FP8 vLLM policy. SFT intermediate-checkpoint resume, runtime adapter lifecycle/identity, and CPU BrowserGym/OpenEnv policy-session checks also passed. All test containers stopped. Model-driven multi-turn browser RL, actual AsyncGRPO resume, sustained/long-context training, SM120 GPU execution, MTP and numerical parity remain unqualified.
+**Current status (2026-09-19): actual 27B NF4/BF16-LoRA SFT and core AsyncGRPO learning both passed on L40S.** SFT held-out apple-format accuracy rose 0/16 → 16/16 after saved-adapter reload; eight RL updates improved the rewarded choice from 34/64 → 64/64 through the final natively synchronized FP8 vLLM policy. Monitored AsyncGRPO now also passes three updates → exact checkpoint restoration → three further updates on a two-turn synthetic task, with 24 applied rows. The test found and fixed PEFT's FP32 adapter promotion on resume; [details and source links](../docs/agents/training-gpu-acceptance.md). SFT intermediate-checkpoint resume, runtime adapter lifecycle/identity, and CPU BrowserGym/OpenEnv policy-session checks also passed. All test containers stopped. The first model-driven P11 browser/GRPO test now completed two optimizer steps, BF16 checkpointing and native adapter publication, but failed the final shutdown guard; a CPU-tested drain fix still needs GPU requalification. Its applied groups had zero reward variance, so it demonstrates no browser learning. [P11 evidence](research/modal-project-browser-grpo-validation.json). Sustained/long-context training, SM120 GPU execution, MTP and numerical parity remain unqualified.
 
 Start with the [consolidated findings and forward plan](../docs/training-findings.md) and [SSH deployment handoff](../docs/agents/training-modal-preflight.md#ssh-deployment-handoff). Latest evidence: [SFT learning](research/modal-sft-learning-validation.json), [RL learning](research/modal-e2e-validation.json).
 
+**Updated experiment decisions:** [training plan](../docs/training-plan.md). The desired representation is now explicitly FP8 frozen base + BF16 LoRA throughout, conditional on a supported training path. The [FP8 recheck below](#fp8-trainer-recheck--16-september-2026) still finds a native trainer blocker; NF4 remains the demonstrated fallback. Proposed 16k contexts, ranks and learning rates are experimental settings, not new validated defaults.
+
 **Historical scope:** the numbered answers below record the initial FP8/BF16 investigation. Their candidate/fallback choices and CPU-only status statements are superseded where indicated by the dated follow-ups and current summary. The GPU-tested trainer now uses NF4, not the original BF16 fallback or unqualified FP8 trainer candidate. Numerical investigations remain paused; no extended experiment or published deployment image exists.
+
+**NeMo alternative:** [isolated Hopper experiments](#hopper-experiment-results--16-september-2026) now pass FP8-base/BF16-LoRA backward checks in native TE/Megatron linear layers and a reduced Qwen hybrid model, including checkpointing. They also show two distinct FP8 weight orientations occupying approximately BF16-sized GPU storage. The hybrid assertions completed before a process-exit timeout; full 27B NeMo GRPO/export remains unqualified.
 
 ## 1. Cleanest supported BF16 LoRA on a frozen FP8 base?
 
@@ -1073,3 +1077,508 @@ and `scripts/sft_learning_probe.py`. Local tests: 65 passed, 2 skipped. This add
 actual learned-generation evidence for SFT; browser task quality, arbitrary
 format generalization and FP8 serving of this particular adapter remain untested.
 No further GPU work was started.
+
+## FP8 trainer recheck — 16 September 2026
+
+**Conclusion: the official checkpoint is already qualified for vLLM inference,
+but there is still no clean stock Transformers/PEFT/AsyncGRPO route that keeps its base in
+FP8 and provides a supported training backward.** More VRAM does not remove
+this software blocker. Retain FP8 as the desired representation and NF4 as the
+working fallback; do not change the successful dependency locks on the basis of
+source inspection alone.
+
+Checked the installed Transformers 5.16.1 / PEFT 0.20.0 / pinned TRL stack,
+Transformers **5.17.0** source, PEFT **0.21.0** source, and current upstream main
+revisions. Transformers main was `b22fe4624c55416fc0f122cd531695e03fc93561`,
+PEFT main `db7d68a2dc4f734ba692a8b6b039da8eb25939ba`, TRL main
+`b7df6a8f0562a26d25ac4324848a07f1bc40617d`. Newer packages were not installed.
+[Source revisions and hashes](research/fp8-upstream-audit.json),
+[actual CPU/meta probe](research/fp8-training-cpu-validation.json).
+
+### 1. Can the official FP8 checkpoint be the trainer policy directly?
+
+Its `quant_method: fp8`, E4M3, dynamic activations and 128×128 weight blocks
+select Transformers' **FineGrainedFP8HfQuantizer / FP8Linear**, not
+compressed-tensors or Transformer Engine. The pinned version, 5.17.0 and inspected
+main all return `is_trainable=False`. The Transformers training validator rejects
+the PEFT-wrapped quantized model; AsyncGRPO calls that parent Trainer initializer.
+The CPU probe reproduces this exact validation error without loading 27B weights.
+[Checkpoint config](https://huggingface.co/Qwen/Qwen3.8-27B-FP8/blob/017b9c7af6b5689d5dd426a76e0bc077eb5ca20a/config.json),
+[5.17 quantizer](https://github.com/huggingface/transformers/blob/v5.17.0/src/transformers/quantizers/quantizer_finegrained_fp8.py),
+[training validator](https://github.com/huggingface/transformers/blob/v5.17.0/src/transformers/trainer_utils.py).
+
+On CPU/unsupported hardware the loader may request BF16 dequantization. Our probe
+confirms that CPU fallback; a successful CPU forward after it would not establish
+FP8 storage or FP8 training. `dequantize=True` is a different, higher-memory path.
+
+A tiny synthetic Qwen hybrid checkpoint additionally exposes a **5.16.1 loader
+bug**: with only hardware validation bypassed to inspect the FP8 load path on
+CPU, `update_tp_plan` raises an AttributeError from an absent expert-override
+mapping before weights load. The 5.17.0/main source adds a default empty mapping
+and addresses that particular error. We did not patch around it or install a
+new stack. This version-specific loader fix does not change `is_trainable=False`.
+
+### 2. Why does freezing the base not fix its backward?
+
+For `y = W x + B A x`, freezing W removes its parameter gradient, but earlier
+adapters still need the input-gradient contribution through W. LoRA's own branch
+can have gradients while the frozen-base branch lacks a supported backward.
+Even nonzero adapter gradients or one decreasing loss are insufficient proof
+of a correct multilayer gradient path.
+
+The native FP8 forward dispatches to DeepGEMM on eligible hardware/formats or
+the finegrained Triton kernel. This is an inference implementation, not a
+registered training backend. Changing the validator flag or using an adapter API
+that bypasses it does not supply missing gradient support. We did not execute
+these kernels locally. [Native linear dispatch](https://github.com/huggingface/transformers/blob/b22fe4624c55416fc0f122cd531695e03fc93561/src/transformers/integrations/finegrained_fp8.py),
+[upstream training request](https://github.com/huggingface/transformers/issues/46295),
+[LoRA-specific report](https://github.com/huggingface/transformers/issues/46736).
+
+### 3. Does AsyncGRPO make this work without custom modifications?
+
+No. The inspected upstream trainer loads the model, calls
+`get_peft_model(model, peft_config)` and then initializes Transformers Trainer.
+It supplies no native FP8 backward integration, and its PEFT call uses default
+adapter promotion. Our existing BF16 enforcement and policy-session patches
+serve other purposes; they do not make FP8 training supported. The VLM text-only
+initialization and attention override also remain relevant if introducing a new
+quantization backend. [Audited AsyncGRPO source](https://github.com/huggingface/trl/blob/b7df6a8f0562a26d25ac4324848a07f1bc40617d/trl/experimental/async_grpo/async_grpo_trainer.py).
+
+### 4. Can PEFT insert BF16 adapters in the right Qwen modules?
+
+**Insertion is possible; BF16 storage needs explicit handling.** FP8Linear is an
+`nn.Linear` subclass, so PEFT's ordinary dispatcher matches it. The CPU test uses
+an actual FP8Linear and the native PEFT wrapper, with these results:
+
+| Operation | Actual trainable parameter dtype |
+| --- | --- |
+| Default PEFT autocast | FP32 |
+| `autocast_adapter_dtype=False` alone | FP8, inherited from the base layer |
+| Explicit cast of trainable LoRA parameters | BF16; frozen FP8 bytes unchanged |
+
+The metadata-only full Qwen architecture probe also checks native FP8 replacement
+and all 400 targeted text projections: full attention q/k/v/o, MLP gate/up/down,
+Gated DeltaNet in_proj_qkv/in_proj_z/out_proj. Rank 16 yields 108,789,760 BF16
+trainable parameters. Vision/head/MTP remain untargeted. No model weights or
+hybrid forward/backward are involved in this structural check.
+
+**Additional loader concern:** with the official exclusion list, native replacement
+produces 336 targeted FP8Linear modules and 64 ordinary BF16 `mlp.gate_proj`
+modules. The list includes names ending in `mlp.gate`; Transformers' unanchored
+regex matching also matches `mlp.gate_proj`. The official weight index contains
+64 corresponding `gate_proj.weight_scale_inv` entries. This is a concrete
+configuration/replacement mismatch, not yet a demonstrated numerical failure:
+actual tensor loading must verify scale application, unexpected keys and module
+dtypes. Do not blindly delete exclusions, which also protect vision and GDN
+components. The same matching expression remains in 5.17.0 and inspected main.
+[Matching helper](https://github.com/huggingface/transformers/blob/v5.17.0/src/transformers/quantizers/quantizers_utils.py),
+[official weight index](https://huggingface.co/Qwen/Qwen3.8-27B-FP8/blob/017b9c7af6b5689d5dd426a76e0bc077eb5ca20a/model.safetensors.index.json).
+
+Continue using `enforce_bf16_lora` **before constructing the optimizer**, then
+verify parameters, gradients, FP32 optimizer moments and saved/reloaded tensors.
+Do not call `.to(bfloat16)` on the entire quantized model. The dtype fix does not
+change the native FP8 training rejection. [Precision helper](browser_training/precision.py),
+[PEFT dtype movement](https://github.com/huggingface/peft/blob/v0.21.0/src/peft/tuners/tuners_utils.py).
+
+Reproduce the local audit, with existing dependencies and no network/weights/GPU:
+
+```bash
+cd training
+PYTHONPATH=. envs/rl/.venv/bin/python scripts/validate_fp8_training_cpu.py
+```
+
+The explicit BF16-dequantized tiny control has finite input/adapter gradients.
+It is labelled separately; it is not a persistent-FP8 backward result. The
+synthetic checkpoint-loading diagnostic bypasses only the hardware availability
+check and records the native loader failure, with no FP8 forward executed.
+
+### 5. Would FP8 trainer and rollout logprobs be sufficiently consistent?
+
+**Not established.** Identical checkpoint/adapter values remove one source of
+NF4/FP8 mismatch, but activation scaling, dequantization, GEMM/attention/GDN
+kernels, accumulation, batching and sampling processors can still differ.
+Axolotl's FP8-storage/BF16-compute route is not numerically identical to vLLM's
+FP8 activation/weight execution merely because both load the same checkpoint.
+
+After a candidate passes backward qualification, compare selected-token logprobs
+on identical token histories under zero and trained adapters. Fix model/adapter
+revisions, tokenizer, chat template and sampling/logprob convention. Record
+median/tails/max differences, repeated-serving noise, sequence log-ratio drift,
+importance-weight tails/clipping and actual held-out learning behaviour. There
+is no universal scalar tolerance that certifies RL stability. The previous
+identity/noise experiments did not establish this parity. No new GPU numerical
+run was performed; the user's pause on that investigation remains respected.
+
+### 6. Attention, checkpointing, Gated DeltaNet and serving limits
+
+Gradient checkpointing recomputes forward operations; it cannot repair a missing
+backward. Retain non-reentrant checkpointing and `use_cache=False`, with a test
+that reaches early-layer adapters. Full-attention FlashAttention does not supply
+Gated DeltaNet kernels or guarantee packed-sequence state isolation. Keep the
+qualified unpacked microbatch-one / `token_budget=0` path until both attention
+and recurrent boundaries are validated. L40S/SM89, Hopper/SM90 and Blackwell/SM120
+kernel combinations require separate checks; SM100 support is not proof of SM120
+support. The earlier FA2 wheel build remains only build/import evidence.
+
+vLLM adapter synchronization transfers adapter snapshots, not the trainer's
+frozen base or its backward implementation. It can remain unchanged if a new
+backend preserves adapter names, shapes, scaling and checkpoint format. Existing
+runtime version leases still apply. Test old and new policy versions explicitly
+before declaring a converted backend compatible. SFT r32 → RL r16 also requires
+a policy-preserving handoff; our current loader refuses rank/target mismatch.
+
+### 7. Are compressed-tensors or Transformer Engine cleaner alternatives?
+
+| Route | What is supported | Consequence for this project |
+| --- | --- | --- |
+| Native official FP8 | FP8 inference; training guard rejects | Not a stock trainer solution |
+| Axolotl frozen FP8 + fused LoRA | SFT-specific FP8 storage, dequantized BF16 autograd kernels | Existing unqualified candidate; not an AsyncGRPO integration |
+| compressed-tensors regular training | Decompressed weights / quantization-aware paths | PEFT support does not guarantee persistent 8-bit base storage |
+| compressed-tensors optimized FP8 | FP8 kernel inference, `is_trainable=False` | Does not solve the desired backward |
+| Transformer Engine | Training-aware FP8 compute and PEFT TE-layer adapters | Most credible FP8-backward building blocks, but a new integration to qualify |
+| Proven NF4/BF16-LoRA | Actual SFT and AsyncGRPO learning | Preserve as fallback |
+
+**compressed-tensors:** the current Transformers quantizer documents eager
+decompression or decompression on first forward for its regular path. Its
+`use_optimized_inference=True` FP8 path returns non-trainable. An FP8 checkpoint
+that can be fine-tuned after decompression does not meet the frozen-FP8-memory
+requirement. The official Qwen checkpoint is not in this backend's format;
+renaming `quant_method` is not a conversion. [Current quantizer source](https://github.com/huggingface/transformers/blob/b22fe4624c55416fc0f122cd531695e03fc93561/src/transformers/quantizers/quantizer_compressed_tensors.py),
+[compressed-tensors documentation](https://huggingface.co/docs/transformers/main/quantization/compressed_tensors).
+
+**Transformer Engine:** PEFT has native adapters for TE Linear/LayerNormLinear/
+LayerNormMLP. TE's experimental `quantized_model_init` can retain only quantized
+parameters and explicitly names frozen-base LoRA as a use case. This is stronger
+than simply setting mixed precision to FP8, which can retain higher-precision
+weights. However, the official 128×128 checkpoint scales are not automatically
+imported into TE by Accelerate's generic layer conversion. Starting from BF16
+and quantizing to TE's recipe is also not necessarily the same frozen base as
+the official serving checkpoint. Adapter conversion order, keeping LoRA BF16,
+Qwen's hybrid projections, checkpoint recomputation, train/eval precision and
+export names all need validation. PEFT TE adapter merge/unmerge is unsupported.
+No clean Qwen3.8 official-FP8 → TE → AsyncGRPO example was established in this
+audit. [PEFT TE source](https://github.com/huggingface/peft/blob/v0.21.0/src/peft/tuners/lora/te.py),
+[TE quantized initialization](https://docs.nvidia.com/deeplearning/transformer-engine/user-guide/api/pytorch.html#transformer_engine.pytorch.quantized_model_init),
+[Accelerate precision guide](https://huggingface.co/docs/accelerate/en/usage_guides/low_precision_training),
+[Accelerate converter](https://github.com/huggingface/accelerate/blob/v1.13.0/src/accelerate/utils/transformer_engine.py).
+
+Axolotl explicitly limits its fused LoRA kernels to SFT/FSDP2, not RLHF; using
+them inside TRL would be integration work, not a supported configuration toggle.
+[Support matrix](https://docs.axolotl.ai/docs/support-matrix.html).
+
+### Next decision, before renting hardware
+
+Keep the successful NF4 stack intact. If FP8 investigation is prioritized, first
+choose an upstream training backend and a supported import/conversion route.
+Resolve the exclusion-list/load mapping concern as part of that route.
+Then qualify a tiny two-layer frozen-FP8 + BF16-LoRA input-gradient test against
+a dequantized reference, with checkpointing on/off; require early-adapter
+gradients, finite updates and unchanged base storage. Only then progress to Qwen
+hybrid forward/backward, native AsyncGRPO construction, adapter sync and matched
+logprobs. A native-loader rental now would mostly reproduce a rejection we can
+already demonstrate on CPU. No dependencies, training defaults or cloud resources
+were changed by this recheck.
+
+## NeMo-RL / Megatron alternative — 16 September 2026
+
+**Decision: worth a bounded feasibility test, not yet a replacement for the
+validated NF4 trainer.** The preceding audit established a stock HF/TRL loading
+and backward limitation; it did not exhaustively evaluate NeMo-RL's Megatron
+backend. NVIDIA now documents Qwen3.8-27B text-only GRPO with Megatron Bridge and
+vLLM, including loading, refit, logprobs and optimizer updates. That makes this
+a substantially stronger candidate than assembling a custom TE integration.
+[Qwen3.8 support](https://docs.nvidia.com/nemo/rl/nightly/guides/models/qwen/qwen3-8.html).
+
+The key distinctions from a demonstrated exact recipe are:
+
+- MCore's `fp8_param=true` genuinely requests FP8 parameter storage for eligible
+  GEMM weights; biases and other excluded parameters stay in higher precision.
+  It is distinct from FP8 compute. This flag alone does not establish total
+  residency: inspect TE storage, retained copies and optimizer membership.
+  [MCore configuration](https://docs.nvidia.com/megatron-core/developer-guide/latest/apidocs/core/core.transformer.transformer_config.html#core.transformer.transformer_config.TransformerConfig.fp8_param).
+- Bridge exposes an independent `lora_dtype`, and NeMo documents Megatron LoRA
+  SFT/GRPO. Still verify actual adapter storage and gradients: the inspected
+  Bridge LoRA transform passes `lora_dtype` to the ordinary Linear adapter,
+  whereas its parallel adapter branch receives the model configuration.
+  A dtype setting in documentation is not a substitute for checking the
+  modules used by Qwen. [LoRA guide](https://docs.nvidia.com/nemo/rl/nightly/guides/lora.html),
+  [Bridge transform source](https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/6821931f8ed82f9d2f228a4dd537fab26775cdde/src/megatron/bridge/peft/lora.py).
+- The documented Qwen3.5 FP8 training/rollout recipes use **`fp8_param=false`**.
+  Bridge's verified Qwen3.8 LoRA/SFT configurations are BF16. Neither establishes
+  Qwen3.8 + physically FP8 frozen weights + BF16 LoRA + GRPO end to end.
+  [Qwen3.5 FP8 details](https://docs.nvidia.com/nemo/rl/nightly/guides/models/qwen/qwen3-5.html#fp8-rollout-and-training),
+  [Qwen3.8 Bridge guide](https://docs.nvidia.com/nemo/megatron-bridge/nightly/models/qwen/qwen3.8-27b.html).
+- NeMo's FP8 guidance recommends Hopper for its DeepSeek-style training recipe;
+  it explicitly cautions that this recipe with FP32 scales is unsupported for
+  Blackwell training. This is a recipe-specific limitation, not a statement
+  that Blackwell cannot train in FP8. Prefer Hopper for the first qualification.
+  [FP8 guidance](https://docs.nvidia.com/nemo/rl/nightly/fp8.html).
+
+**Refit and browser episodes need their own qualification.** The inspected
+Megatron worker calls Bridge's HF export, whose default merges adapters, and
+has a separate physical FP8 weight/scale export path. Correct composition of
+those paths is still unverified; adapter-only runtime synchronization must not
+be assumed. Export a deliberately nonzero adapter and compare the refitted
+policy before trusting learning results. Starting from BF16 and converting to
+TE also need not recreate the official FP8 checkpoint's effective weights.
+Matched FP8 names do not guarantee matched logprobs.
+[Worker source](https://github.com/NVIDIA-NeMo/RL/blob/1cef394359aeddf1eaf4f1d209208be7b6ec0b1a/nemo_rl/models/policy/workers/megatron_policy_worker.py),
+[Bridge export source](https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/6821931f8ed82f9d2f228a4dd537fab26775cdde/src/megatron/bridge/models/conversion/model_bridge.py).
+
+NeMo supports trajectory-age tracking and draining pending generation before
+refit with `in_flight_weight_updates=false`. Its optional in-flight update mode
+can pause and resume requests across a weight change; it does not provide our
+desired unchanged policy throughout an episode. Start with draining and verify
+that the unit drained is the entire browser episode, including all tool calls.
+Our TRL session leases cannot be assumed to transfer to this orchestration.
+[Async guide](https://docs.nvidia.com/nemo/rl/nightly/guides/async-grpo.html),
+[Collector source](https://github.com/NVIDIA-NeMo/RL/blob/1cef394359aeddf1eaf4f1d209208be7b6ec0b1a/nemo_rl/algorithms/async_utils/trajectory_collector.py).
+
+Next test sequence: select one NeMo checkout/container with its own matching
+Bridge/MCore/TE dependencies; qualify a small Qwen hybrid model with physical
+FP8 base storage, BF16 adapters, frozen-base checks and nonzero early-layer
+gradients; repeat with checkpointing; validate nonzero-adapter export/refit and
+fixed-history logprobs; then attempt a short 27B update and a mock multi-turn
+episode spanning a requested refit. Measure peak memory and synchronization
+cost before choosing hardware or migrating BrowserGym. The shipped 27B recipe
+uses 16 GPUs; that is a tested topology, not an established minimum.
+
+This was a documentation/source review, not a NeMo runtime test. Source snapshots
+were NeMo-RL `1cef394359aeddf1eaf4f1d209208be7b6ec0b1a` and Bridge
+`6821931f8ed82f9d2f228a4dd537fab26775cdde`; they were inspected independently,
+not validated as a compatible installation. No paid compute or large dependency
+downloads were started, and the working training configurations are unchanged.
+
+### Hopper experiment results — 16 September 2026
+
+**The isolated FP8/BF16-LoRA backward tests passed, including a reduced Qwen
+hybrid model. FP8 parameter storage did not halve resident GEMM-weight memory in
+this configuration.** Evidence is in
+[`research/nemo-fp8-modal-validation.json`](research/nemo-fp8-modal-validation.json).
+This advances the NeMo alternative beyond a documentation-only hypothesis;
+it does not yet qualify a production trainer or the exact 27B checkpoint.
+
+We used the NVIDIA NeMo-RL v0.7.0 amd64 container pinned by digest, on an H100
+80GB (SM90). Its actual policy-worker environment contained PyTorch
+2.11.0+cu130, TE 2.15.0+42b84005, MCore 0.19.0+7b8495881 and Transformers 5.8.1.
+The source identities matter more than editable package version strings:
+NeMo-RL `19244a0949fb363326f71675223da75e09d14866`, Bridge
+`151168f36372132c8fb8f926501f573019feb967`, MCore
+`7b8495881dee1689db9d5ed636d8b6b48eacf260`. The image's NeMo distribution metadata
+reports `0.6.0+19244a094` despite the release tag; we did not substitute packages.
+Modal supplied driver 580.95.05, running the CUDA 13.2 base image in minor
+compatibility mode. The exercised kernels worked in that combination.
+
+| Isolated check | Result |
+| --- | --- |
+| Two MCore/TE linear layers + Bridge BF16 LoRA, BF16 base control | Passed |
+| Same module types with physical blockwise FP8 base storage | Passed |
+| FP8 linear test with TE activation checkpointing | Passed |
+| Four-layer dense GDN/full-attention model, FP8 base + BF16 LoRA | Assertions passed |
+| Same reduced hybrid architecture with full activation checkpointing | Assertions passed |
+
+Each case performed three stateless SGD updates against a synthetic squared-error
+objective. Adapter parameters and gradients stayed BF16; early adapter gradients
+were finite/nonzero; frozen parameters acquired no gradients; frozen dense
+weights and FP8 rowwise weights/scales were unchanged. The linear test also
+verified input gradients through the frozen layers. The hybrid model had
+5,174,960 parameters, 16 adapted modules and 32 adapter matrices. Loss fell from
+0.2138 to 0.2095 without checkpointing and 0.2145 to 0.2119 with checkpointing.
+These are plumbing measurements, not task-learning or convergence evidence.
+The cases use separate random initializations, so they are not a numerical
+equivalence comparison between precision/checkpointing settings. Production
+optimizer state/master-weight handling remains untested here.
+
+**Memory surprise:** the hybrid's 4,665,344 FP8 GEMM-weight elements occupied
+9,334,256 bytes of distinct quantized GPU allocations, including scales. TE
+retained separate rowwise and columnwise uint8 storage; storage pointers proved
+these were not aliases. Bridge/MCore also retained 9,330,688 bytes of BF16
+initialization values on CPU. Thus `fp8_param=true` was real, but the two FP8
+orientations together cost approximately BF16-sized GPU weight storage. This
+does not support a ~27 GB base-residency estimate for a 27B trainer. Full-model
+peak memory, workspaces and supported ways to avoid unnecessary retained copies
+need a separate check before selecting a smaller training GPU.
+
+**Supervisor qualification:** the first GPU launch stopped on a test-configuration
+mistake in the hybrid case (generic GPT GELU instead of Qwen SiLU). The corrected
+hybrid run wrote its complete PASS report at 206.9 seconds, but had not exited at
+the 210-second subprocess deadline. The supervisor killed it and correctly
+recorded FAIL. We recovered the complete report from the result volume; its
+assertions passed, but this was not a clean process-exit test. The launcher now
+preserves completed JSON evidence even when process exit times out, and allows
+more subprocess headroom for an isolated stage within the same outer cap; those
+launcher changes were checked locally, not rerun on GPU.
+
+The two GPU calls together took 388 seconds from submission to local report,
+including queue/startup, within the authorized ten-minute envelope. This is not
+an invoice measurement. All six preparation/test apps were verified stopped with
+zero tasks afterward. The large first container import and one repeated CPU
+import timeout consumed preparation time, not GPU allocations. Successful import
+inventories can now be reused only for the exact same container digest and policy
+worker. No pretrained weights were downloaded and no 27B training ran.
+
+Next gates remain memory residency and nonzero-adapter export/refit, then an
+actual NeMo GRPO update and multi-turn policy consistency. The hybrid probe uses
+Bridge's fused GDN `in_proj` (including b/a projections), rather than exactly
+our existing HF adapter target subset; target mapping and adapter handoff remain
+part of export qualification. Keep the validated NF4/TRL setup unchanged.
+
+### Follow-up: residency and export qualification
+
+**Synchronization architecture clarification:** the intended project design is
+an unchanged FP8 rollout base plus versioned BF16 adapters, transferring only
+adapters after updates. The existing TRL runtime path follows that design. The
+NeMo probes instead inspected its native merged-weight export/refit path; no
+actual full-model transfer was run. Failures in that path are not blockers for
+adapter-only synchronization in principle. Before further merged-refit GPU
+tests, determine whether the chosen NeMo version can natively export and publish
+adapter versions while preserving episode leases. Bridge's
+`export_adapter_weights` API exists, but an adapter checkpoint exporter alone is
+not an integrated asynchronous synchronization mechanism. Also verify that
+Megatron's fused projection adapters map to supported vLLM targets and that the
+two engines start from compatible effective base weights. Do not silently replace
+the requested synchronization design with full-model refit or implement a custom
+synchronization system as part of this qualification.
+
+**Experiment provenance and objective:** policy alignment is the primary reason
+to investigate FP8 on both sides; memory fit remains a constraint. We did not run
+an upstream end-to-end RL recipe unchanged. We used the pinned NVIDIA container
+and native TE/MCore/Bridge APIs in custom small probes, combining physical FP8
+parameters (`fp8_param=true`) with frozen-base BF16 LoRA. The documented Qwen3.5
+FP8 GRPO recipes use `fp8_param=false`, while Qwen3.8 has a separate functional
+GRPO recipe. No validated exact Qwen3.8 + physical-FP8-base + BF16-LoRA + GRPO
+recipe was found. The export failures therefore do not establish failure of an
+as-shipped end-to-end recipe. Nor do our weight checks establish policy/logprob
+alignment. FP8 storage, FP8 compute and inference quantization remain separate
+choices.
+
+The duplicate layout is an intentional TE implementation choice, documented
+explicitly in its blockwise-scaling guide: Hopper requires a physical transpose
+for columnwise access. With 2D weight scaling, this is another layout of the same
+quantized values and scales, not a separately learned backward policy. The
+guide distinguishes this from 1D scaling, where the two orientations can have
+different quantization error. TE's performance documentation also explains that
+layout sharing depends on the hardware and quantization recipe; the observed
+duplication must not be generalized to all FP8 implementations or Blackwell.
+These are current TE 2.19 explanatory docs; our runtime remains pinned to TE
+2.15, whose source and measured storage confirm the Hopper behavior.
+[TE transpose handling](https://docs.nvidia.com/deeplearning/transformer-engine/features/low_precision_training/fp8_blockwise_scaling/fp8_blockwise_scaling.html#handling-transposes),
+[TE performance considerations](https://docs.nvidia.com/deeplearning/transformer-engine/features/low_precision_training/performance_considerations/performance_considerations.html).
+
+The runtime image and the newer upstream source review have different refit
+paths. In the pinned NeMo `19244a094` worker, `_calculate_refit_param_info` builds
+ordinary Bridge conversion tasks, then `_iter_params_with_optional_kv_scales`
+passes those tasks to `export_hf_weights`. It does **not** contain the newer
+`_is_fp8_export`/physical-FP8 refit selection inspected above. Test the pinned
+path separately from explicit Bridge FP8 export; support in newer source is not
+evidence that the container uses it.
+[Pinned worker](https://github.com/NVIDIA-NeMo/RL/blob/19244a0949fb363326f71675223da75e09d14866/nemo_rl/models/policy/workers/megatron_policy_worker.py),
+[pinned Bridge exporter](https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/151168f36372132c8fb8f926501f573019feb967/src/megatron/bridge/models/conversion/auto_bridge.py).
+
+The duplicate GPU orientations have a purpose: TE's backward explicitly requests
+columnwise weight storage for input gradients. Earlier LoRA layers need those
+gradients even when the intervening base weights are frozen. The blockwise tensor
+API can discard an orientation with `update_usage`, and for 2D scaling recreate
+the columnwise form from the rowwise form. Discarding it between steps therefore
+does not establish a lower training peak; no custom memory scheduler is being
+implemented. CPU initialization copies have a documented
+`clear_high_precision_init_val()` API. They exist to initialize higher-precision
+optimizer master weights and can be released when no longer needed; the prior
+probe did not clear them. This is a source finding, not a new measured memory
+improvement.
+[TE backward](https://github.com/NVIDIA/TransformerEngine/blob/42b84005/transformer_engine/pytorch/module/linear.py),
+[orientation storage](https://github.com/NVIDIA/TransformerEngine/blob/42b84005/transformer_engine/pytorch/tensor/storage/float8_blockwise_tensor_storage.py),
+[initialization-copy API](https://github.com/NVIDIA/TransformerEngine/blob/42b84005/transformer_engine/pytorch/quantization.py).
+
+**Hopper follow-up outcome:** ordinary BF16 export preserved the nonzero adapter;
+explicit physical-FP8 export failed. The final probe completed and deliberately
+returned `BLOCKED`/exit 1, rather than timing out. See
+[`research/nemo-fp8-export-validation.json`](research/nemo-fp8-export-validation.json).
+
+The same random 5.17M-parameter hybrid received deliberately nonzero rank-16 BF16
+adapter matrices. Independent `W + 2BA` calculations before fused-projection
+splitting agreed with Bridge's logical merge across all 16 adapted projections.
+The GDN merge multiplies adapters in BF16, whereas other branches promote to
+FP32; the reference explicitly matches that arithmetic and records its deviation
+from FP32. This was not another learning run.
+
+| Export check | Measured result |
+| --- | --- |
+| Ordinary conversion tasks, as selected by the pinned worker | 16 adapted tasks, 31 HF tensors, no exceptions; all outputs BF16 |
+| Ordinary export versus logical higher-precision merge | Worst relative L2 weight error 0.2202%; max element error 0.000628 |
+| Explicit physical-FP8 tasks + default LoRA merge | 19 exceptions among 32 weight/scale tasks |
+| Frozen base rowwise data and scales | Unchanged after export checks |
+| Actual vLLM refit / inference / logprobs | Not run |
+
+The physical export failures included trying to combine full-sized adapter
+updates with block-scale matrices, invalid GDN scale reshaping, and unsupported
+FP8/BF16 promotion in GDN merges. An additional isolated test fed actual TE raw
+FP8 values into the upstream merge helper and reconstructed the receiver's
+scaled values. The intended update norm was 5.168; the received update norm was
+0.0000372, with 99.99995% relative update error. The helper added a logical update
+to raw quantized-number units. This is an explicit-physical-export/helper result,
+**not** a claim that the pinned ordinary worker silently loses its updates.
+
+One comparison control reused the original weight scales after a deliberately
+large update and produced nonfinite values. That GPU control is invalid and is
+preserved as such in the evidence; it does not quantify normal FP8 rounding.
+The probe now recomputes control scales, checked locally for increased ranges,
+zero blocks and partial blocks, but that amended control was not rerun on GPU.
+The two earlier attempts stopped on probe issues: a config-only wrapper API
+restriction and an FP32 reference that did not match GDN's BF16 multiplication.
+
+**Promising supported route to test next:** the pinned NeMo inference loader
+already quantizes ordinary merged weights with fresh scales before calling
+vLLM's `model.load_weights`. Thus the tested BF16 export can potentially feed an
+FP8 inference policy without using the broken direct physical-FP8 export.
+BF16 here describes transient export/transfer tensors; it does not change the
+trainer's persistent TE base representation. This is full merged-weight refit,
+not our TRL runtime adapter-version synchronization. It still requires a live
+receiver test, matched-history logprobs and episode-safe update scheduling.
+[Pinned native receiver](https://github.com/NVIDIA-NeMo/RL/blob/19244a0949fb363326f71675223da75e09d14866/nemo_rl/models/generation/vllm/quantization/fp8.py).
+
+The small CPU reproducer `scripts/nemo_fp8_export_cpu.py` extracts the pinned
+upstream merge and receiver-quantization functions without importing the GPU
+frameworks. It distinguishes incorrect raw-unit merging from BF16 merged-weight
+transfer followed by native requantization. This is arithmetic evidence, not
+live vLLM refit qualification.
+
+That CPU check passed: an intended update of 0.0801563 became 0.0800781 after
+BF16 export and native requantization (0.0976% relative update error), whereas
+raw-unit merging delivered zero. This constant-matrix example establishes the
+arithmetic distinction; it is not a model-wide error estimate.
+
+The three attempts consumed 413 seconds in total from submission to report,
+including startup/queue time, and 228 seconds inside GPU functions. Both figures
+are timing measurements, not invoices. All three apps were verified stopped
+with zero tasks. No further GPU runs were started. Retain the tested NF4/TRL
+configuration while qualifying the ordinary-export path; the failed physical
+export composition does not rule out NeMo as a whole.
+
+### Adapter-only hybrid feasibility follow-up (2026-09-16)
+
+The next experiment is now **adapter-only export**, not more merged full-base
+refit testing. See the [source-level comparison of hybrids A/B](../docs/agents/training-fp8-hybrid-feasibility.md)
+for exact revisions, call paths, version-lifetime requirements and probe commands.
+
+Neither proposal is an existing recipe. A has the smaller next isolated probe
+and preserves our rollout/session work, but TRL has no Megatron training-backend
+plug-in: a service/controller would own backward, optimizer and checkpoints.
+B preserves NeMo's Megatron training machinery but needs changes through refit,
+request routing and episode lifetimes. PR #3964 replaces one fixed adapter ID;
+it does not supply the required simultaneous immutable policy versions.
+
+Local validation reused pinned TRL's unchanged loss with a synthetic BF16 model
+and BF16 adapters: masking, clipping, accumulation and gradients passed. This
+does not establish Megatron/FP8 integration. A tiny real Megatron update/export
+probe is prepared and syntax-checked, **not GPU-executed**. No rental was started.
+The tested older Bridge saver promotes exported adapters to FP32, while inspected
+current Bridge preserves dtype; the probe explicitly verifies BF16 export and
+serialization. Frozen-base numerical alignment remains an independent gate.
+
+**Subsequent decision:** retain NF4 training + BF16 adapters + FP8 vLLM rollouts;
+pause the custom Megatron integration and its proposed GPU probe. The user judged
+the maintenance/correctness burden unjustified given the timeline and unresolved
+FP8 numerical mismatch. Research remains available for a future upstream-supported
+path. The [training plan](../docs/training-plan.md) records this decision and the
+next proposed work on task-level observability and curriculum sampling.

@@ -3,7 +3,7 @@ source "$(dirname -- "${BASH_SOURCE[0]}")/common.sh"
 stage="${1:-static}"
 case "$stage" in static|tiny|model|all) ;; *) echo 'Usage: preflight.sh [static|tiny|model|all]' >&2; exit 2;; esac
 mkdir -p reports
-"$TRAINING_ROOT/.venv/bin/python" -m pytest -q
+"$TRAINING_ROOT/.venv/bin/python" scripts/check_cpu_suite.py --workers 2
 for script in scripts/*.sh; do bash -n "$script"; done
 if [[ "$stage" == static ]]; then
   echo 'Static checks passed. No CUDA/model/optimizer/serving checks were run.'

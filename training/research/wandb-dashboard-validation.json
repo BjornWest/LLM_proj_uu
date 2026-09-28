@@ -1,0 +1,163 @@
+{
+  "status": "PASS_API_READBACK",
+  "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/reports/Browser-training-\u2014-progress-and-health--VmlldzoxNzk2ODA0Ng==",
+  "focus": [
+    {
+      "run_id": "l40s-browser-20260919-231004-f1053f6d",
+      "state": "finished",
+      "synthetic": true,
+      "snapshot_id": "0d5b550a98fd3542beafbe498c2abb77953b2eebe161d127608ac1f36498050b",
+      "watermark": 83,
+      "checked_scalars": 238,
+      "plotted_keys_available": [
+        "monitoring/future_events",
+        "monitoring/snapshot_at",
+        "monitoring/unmatched_admissions",
+        "outcomes/rl_train/all/attempts/value",
+        "outcomes/rl_train/all/cancelled_attempts/value",
+        "outcomes/rl_train/all/episodes/value",
+        "outcomes/rl_train/all/generated_tokens/value",
+        "outcomes/rl_train/all/infra_error_attempts/value",
+        "outcomes/rl_train/all/interventions/measured_attempts",
+        "outcomes/rl_train/all/interventions/missing_attempts",
+        "outcomes/rl_train/all/steps/value",
+        "outcomes/rl_train/recent/all_failure_groups/value",
+        "outcomes/rl_train/recent/all_success_groups/value",
+        "outcomes/rl_train/recent/cancelled/value",
+        "outcomes/rl_train/recent/completion/ci95_high",
+        "outcomes/rl_train/recent/completion/ci95_low",
+        "outcomes/rl_train/recent/completion/denominator",
+        "outcomes/rl_train/recent/completion/value",
+        "outcomes/rl_train/recent/infra_error/value",
+        "outcomes/rl_train/recent/mixed_groups/ci95_high",
+        "outcomes/rl_train/recent/mixed_groups/ci95_low",
+        "outcomes/rl_train/recent/mixed_groups/value",
+        "outcomes/rl_train/recent/policy_age/maximum",
+        "outcomes/rl_train/recent/policy_age/value",
+        "outcomes/rl_train/recent/safe_completion/ci95_high",
+        "outcomes/rl_train/recent/safe_completion/ci95_low",
+        "outcomes/rl_train/recent/safe_completion/denominator",
+        "outcomes/rl_train/recent/safe_completion/value",
+        "outcomes/rl_train/recent/unauthorized_effect/ci95_high",
+        "outcomes/rl_train/recent/unauthorized_effect/ci95_low",
+        "outcomes/rl_train/recent/unauthorized_effect/denominator",
+        "outcomes/rl_train/recent/unauthorized_effect/value",
+        "outcomes/rl_train/recent/unknown_safe/value",
+        "outcomes/rl_train/recent/valid_groups/value",
+        "telemetry/rl/behavior_kl",
+        "telemetry/rl/clipped_token_fraction",
+        "telemetry/rl/entropy",
+        "telemetry/rl/loss",
+        "telemetry/rollout/gpu_utilization_pct",
+        "telemetry/rollout/vram_gib",
+        "telemetry/trainer/adapter_sync_s",
+        "telemetry/trainer/compute_s",
+        "telemetry/trainer/cpu_cores",
+        "telemetry/trainer/forwarded_tokens_per_step",
+        "telemetry/trainer/gpu_utilization_pct",
+        "telemetry/trainer/grad_norm",
+        "telemetry/trainer/learning_rate",
+        "telemetry/trainer/rollout_wait_s",
+        "telemetry/trainer/step_s",
+        "telemetry/trainer/trained_tokens_per_s",
+        "telemetry/trainer/trained_tokens_per_step",
+        "telemetry/trainer/update_s",
+        "telemetry/trainer/vram_gib",
+        "telemetry_available/browser/episodes_per_min",
+        "telemetry_available/rollout/generated_tokens_per_s",
+        "telemetry_available/rollout/gpu_utilization_pct",
+        "telemetry_available/rollout/vram_gib",
+        "telemetry_available/trainer/gpu_utilization_pct",
+        "telemetry_available/trainer/trained_tokens_per_s",
+        "telemetry_available/trainer/vram_gib",
+        "telemetry_time/rollout/vram_gib",
+        "telemetry_time/trainer/grad_norm",
+        "telemetry_time/trainer/vram_gib",
+        "training_rows/totals/abandoned",
+        "training_rows/totals/admitted",
+        "training_rows/totals/applied",
+        "training_rows/totals/backward",
+        "training_rows/totals/discarded",
+        "training_rows/totals/pending",
+        "training_rows/totals/skipped"
+      ],
+      "plotted_keys_absent": [
+        "outcomes/rl_train/all/interventions/value",
+        "telemetry/browser/cpu_cores",
+        "telemetry/browser/episodes_per_min",
+        "telemetry/browser/ram_gib",
+        "telemetry/policy/publication_s",
+        "telemetry/rollout/cpu_cores",
+        "telemetry/rollout/generated_tokens_per_s",
+        "telemetry/rollout/ram_gib",
+        "telemetry/trainer/peak_allocated_gib",
+        "telemetry/trainer/ram_gib"
+      ],
+      "missing_telemetry": [
+        "Browser CPU usage",
+        "Browser throughput",
+        "Browser memory",
+        "Adapter publication duration",
+        "Rollout process cpu_cores",
+        "Rollout generation throughput",
+        "Rollout process ram_gib",
+        "SFT training loss",
+        "SFT validation loss",
+        "Peak PyTorch allocation",
+        "Trainer process ram_gib"
+      ]
+    }
+  ],
+  "panel_count": 56,
+  "checked_at": "2026-09-19T22:12:32.211928+00:00",
+  "limits": [
+    "Browser rendering requires the user's signed-in W&B session; API checks do not establish visual rendering.",
+    "Historical runs have sparse uploaded snapshots; no intermediate history was synthesized.",
+    "Availability text is as of report publication; charts query W&B history."
+  ],
+  "chart_history_validation": {
+    "expected_xy_pairs": 100,
+    "missing": [],
+    "sources": [
+      {
+        "run_id": "l40s-browser-20260919-231004-f1053f6d",
+        "synthetic": true,
+        "snapshot_id": "0d5b550a98fd3542beafbe498c2abb77953b2eebe161d127608ac1f36498050b",
+        "history_rows": 1,
+        "chart_xy_pairs": 70,
+        "tables_verified": {
+          "families": 2,
+          "curriculum": 2
+        }
+      },
+      {
+        "run_id": "metrics-9ddb4ae330fb",
+        "synthetic": true,
+        "snapshot_id": "9632e243153b035f6427faf8eafb60c09bd0de4a7965efcc0aacc364866f8cec",
+        "history_rows": 2,
+        "chart_xy_pairs": 75,
+        "tables_verified": {
+          "families": 8
+        }
+      },
+      {
+        "run_id": "fixed-eval-123cc000a253",
+        "synthetic": true,
+        "snapshot_id": "222b76b1d63c73e9d174fb5bf5dd4deec13492eff6ab5c8cb02089c6f0ee77f6",
+        "history_rows": 1,
+        "chart_xy_pairs": 55,
+        "tables_verified": {
+          "families": 6,
+          "curriculum": 2
+        }
+      }
+    ]
+  },
+  "current_eligible_experiments": 0,
+  "http": {
+    "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/reports/Browser-training-%E2%80%94-progress-and-health--VmlldzoxNzk2ODA0Ng==",
+    "status": 200,
+    "scope": "HTML route only; no signed-in visual validation"
+  },
+  "tests": "4 dashboard tests passed; separate synthetic fixtures validate absent metric paths without entering experiment comparisons"
+}

@@ -1,10 +1,39 @@
 # Browser-agent training preparation
 
+Open the [W&B training dashboard](https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/reports/Browser-training-%E2%80%94-progress-and-health--VmlldzoxNzk2ODA0Ng==)
+for explained charts of browser outcomes, GRPO signal and infrastructure health.
+It currently shows the P11 infrastructure test; model-quality panels exclude
+synthetic tests. The [reading guide](../docs/training-monitoring.md) explains
+missing measurements and how to interpret the results.
+
 Start with the [consolidated findings and next-deployment plan](../docs/training-findings.md). The [SSH handoff](../docs/agents/training-modal-preflight.md#ssh-deployment-handoff) maps the successful Modal probes to direct commands; older generic launchers below are not yet a unified NF4 browser-training entry point.
+
+The [training experiment plan](../docs/training-plan.md) records the current data
+splits, frozen-harness workflow, curriculum, evaluation and hyperparameter
+candidates. **The selected working baseline is NF4 training + BF16 LoRA + FP8
+vLLM rollouts. Custom FP8 trainer integration is paused.**
+See the [source and CPU recheck](NOTES.md#fp8-trainer-recheck--16-september-2026).
 
 **The two-GPU RL learning smoke passed: eight real AsyncGRPO updates raised the rewarded answer from 34/64 to 64/64 on a simple choice task.** The trainer used a frozen 27B NF4 base with BF16 adapters, synchronized through TRL's native LoRA publication path to FP8 vLLM. Checkpoints and safe session eviction were verified. See [learning evidence](research/modal-e2e-validation.json), [research answers and limits](NOTES.md), and [remote validation status](#remote-preflight).
 
-The [SFT behavior test](research/modal-sft-learning-validation.json) also learned a simple apple-insertion rule: 0/16 → 16/16 exact held-out answers after reloading the saved adapter. Earlier L40S tests qualify NF4 SFT with BF16 adapters, FP32 optimizer moments and intermediate-checkpoint resume. Browser checks use real BrowserGym/OpenEnv sessions with scripted inference; model-driven browser RL remains untested. The SM120 FA2 wheel compiles and imports locally, but its GPU kernels remain unqualified; Modal exposed no usable MIG slices. Sustained RL, AsyncGRPO resume and exact trainer/rollout numerical parity remain unqualified.
+The [SFT behavior test](research/modal-sft-learning-validation.json) also learned a simple apple-insertion rule: 0/16 → 16/16 exact held-out answers after reloading the saved adapter. Earlier L40S tests qualify NF4 SFT with BF16 adapters, FP32 optimizer moments and intermediate-checkpoint resume. The first real-model P11 browser/GRPO test completed two optimizer steps and checkpointing, but failed its shutdown safety check; details below. The SM120 FA2 wheel compiles and imports locally, but its GPU kernels remain unqualified; Modal exposed no usable MIG slices. Sustained RL and exact trainer/rollout numerical parity remain unqualified.
+
+**19 September: monitored GRPO checkpoint resume also passed.** A real two-turn
+synthetic task completed three updates, restored the exact adapter/optimizer/
+scheduler state in a fresh process, then completed three more. The test caught
+and fixed PEFT promoting BF16 adapters to FP32 on resume. Applied-row accounting,
+policy retention and separate GPU resource measurements passed. See the
+[acceptance record](../docs/agents/training-gpu-acceptance.md). This is still a
+synthetic infrastructure check, not model-driven browser training.
+
+**P11 browser follow-up: partial qualification.** Real model actions, native
+rewards, eight applied rows, BF16 checkpointing and LoRA publication v1–v3 worked.
+The applied reward groups were all successful, giving zero gradients; this does
+not demonstrate browser learning. Shutdown exceeded TRL's 15-second wait and
+correctly triggered the unsafe-worker guard. A bounded drain fix passes a
+22-second delayed-response CPU test; GPU requalification remains pending.
+All containers stopped. [Evidence](research/modal-project-browser-grpo-validation.json)
+and [details](../docs/agents/training-gpu-acceptance.md#real-p11-gpu-outcome-partial-qualification-shutdown-failure).
 
 Evidence: [SFT GPU](research/modal-l40s-validation.json), [browser](research/browser-validation.json), [tokenization](research/tokenization-validation.json), [deployment runbook](../docs/agents/training-modal-preflight.md).
 
@@ -401,6 +430,53 @@ For RL use the native `rollout/generated_tok_s`, `tools/*_latency_s`, `rollout/d
 
 Every actual launch writes a config, git commit/dirty flag, source hashes, Python/package versions and model revision. Native checkpoint Trainer state plus `metrics.jsonl` preserve loss, reward and throughput. WandB is unnecessary; SFT can enable its normal `wandb_project` config, and RL can later set `report_to="wandb"` explicitly. The patched worker preserves group policy versions and writes episode/request/version lifecycle events to `policy-events.jsonl`. Registry reservations are runtime state: they are not restored from a checkpoint; resume starts a fresh worker and vLLM server.
 
+W&B Academic is the selected human-facing dashboard. Its optional SDK connection
+and synthetic metric accounting/readback have been verified. The
+[metrics runbook](../docs/agents/training-metrics.md) covers the durable episode
+ledger, local/W&B agent reader and saved-trainer-log import. Live producer wiring
+is qualified for the bounded tests described above. The annotated dashboard is
+now published; a joint visual walkthrough remains open.
+
+`bash training/scripts/smoke_browser.sh --metrics` from the repository root checks
+real local Chromium/OpenEnv outcomes, recorded group draws and retry-safe metric
+accounting using scripted fixture actions. The optional uniform/adaptive family
+sampler is CPU-tested; canonical-harness/TRL integration remains pending.
+
+`training/.venv/bin/python training/scripts/validate_project_browser_metrics.py`
+from the repository root checks the complete imported P07 shopping site with
+fresh scripted clean/warranty episodes and the existing native verifier. It
+freezes its source/site inputs and uses isolated sessions; `--online` also checks
+W&B parity. The [runbook](../docs/agents/training-metrics.md#full-site-p07-accounting-probe)
+explains required local assets and the distinction from model-driven learning.
+
+Opt-in session sampling/metrics passed the installed TRL spawned browser worker;
+trainer logging and checkpoint sidecars passed CPU callback/restore checks.
+`run_async_grpo.py --monitoring-dir NEW_DIRECTORY` enables trainer-only monitoring
+on its existing gated mock path. Real optimizer/resume qualification, canonical
+browser adoption and remote-resource logging remain open. Opt-in row admission,
+optimizer-use accounting and a conservative resume cursor passed native-code CPU
+checks; see the [row-accounting runbook](../docs/agents/training-metrics.md#row-admission-optimizer-use-and-checkpoint-cursor).
+Local CPU/PSS/device resource sidecars and a separate retrying W&B uploader now
+pass fault tests and remote readback, including lost-acknowledgment recovery.
+[Resource/upload commands and limits](../docs/agents/training-metrics.md#resource-sidecars-and-recoverable-wb-publication)
+cover explicit device selection, missing readings, sampled history and restart.
+No GPU compute or cloud rental was used for this check.
+Checkpoint restores now publish to a linked W&B continuation, preserving the
+original execution's later history. Uploader-only restarts retain their existing
+run. [Continuation behavior](../docs/agents/training-metrics.md#checkpoint-continuation-history)
+passed local, installed-callback and real W&B checks; model/optimizer restoration
+still requires the real GRPO test.
+See the
+[logging setup](../docs/agents/training-modal-preflight.md#wb-dashboard-connection)
+for credentials and the CPU-only test. Local evidence remains available without W&B.
+
+Fixed-suite evaluation scheduling/comparisons and token-accounted SFT replay
+preparation are now CPU-tested. The [data/evaluation guide](../docs/agents/training-data-and-evaluation.md)
+includes commands, the evaluator worker contract and resource-file relay. The
+real suites/corpora remain inputs from data curation; the mock workers are not
+model-quality evidence. `scripts/preflight.sh static` runs the lightweight checks
+in bounded parallel shards and preserves their reports.
+
 ## Short Modal hardware test
 
 For a bounded one-L40S test of the actual 27B NF4 trainer, see the
@@ -431,6 +507,9 @@ The planned training process has two stages:
 **Verified teacher demonstrations → supervised fine-tuning (SFT) → practice in
 the browser with verifiable rewards (RLVR).**
 
+The [training recipe](../docs/training-recipe.md) separates the data/equipment
+checklist from the timeline, including teacher selection, replay and final testing.
+
 ### SFT: learn from examples of good browser behavior
 
 **Supervised fine-tuning** trains the model to produce the demonstrated answer
@@ -443,6 +522,13 @@ We will select a teacher by benchmarking a sweep of larger, frontier open models
 on the tasks and data we intend to use, measuring both completion and adherence
 to user constraints. If none outperforms our Qwen baseline by a meaningful margin,
 we may skip SFT and proceed directly to RLVR from the existing Qwen model.
+
+Offline SFT lets us reuse one expensive teacher dataset across student
+experiments. RLVR then supplies practice on the student's own attempts.
+On-policy distillation would need repeated teacher supervision as the student
+changes, so it remains an optional later experiment. We will freeze the
+canonical harness before teacher selection and keep selection tasks out of
+training; the [experiment plan](../docs/training-plan.md) defines the splits.
 
 For example, a future shopping demonstration might show the teacher noticing
 that an optional warranty was selected, removing it because the user declined
@@ -506,8 +592,8 @@ website source files is not yet a complete SFT dataset. The
 
 We should include both authorized and unauthorized versions of similar actions,
 so the model learns to follow the user's intent—for example, whether to keep a
-warranty. Evaluation should hold out complete tasks and site variants, rather
-than randomly separating steps from the same recorded episode. Hidden answers
+warranty. Evaluation should hold out complete tasks and entire sites/codebases,
+with novel variants on known sites reported separately. Hidden answers
 and verifier metadata must stay out of the model's observations.
 
 ### Keeping the training affordable—and interpreting our results
@@ -517,6 +603,9 @@ The tested trainer stores much of the base in four-bit NF4 format, an approach
 called **QLoRA**, with higher-precision adapters. SFT has run on one L40S GPU;
 our RL test used a second GPU for FP8 vLLM inference while the first trained.
 These choices reduce memory needs without changing the basic SFT/RLVR data flow.
+We would prefer FP8 for both training and inference if its backward path is
+qualified; the current native loader remains inference-only. Enough GPU memory
+alone does not resolve that software limitation.
 
 Both training paths have learned deliberately simple test tasks: SFT learned
 to insert “apple” after each input word, and RL learned to favor a rewarded

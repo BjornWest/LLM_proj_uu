@@ -1,0 +1,207 @@
+{
+  "status": "PASS",
+  "date": "2026-09-19",
+  "git_commit": "99155f133f689f34bb4275e35e504612b6e4ab8e",
+  "native": {
+    "status": "PASS",
+    "totals": {
+      "rows": 4,
+      "admitted": 3,
+      "discarded": 1,
+      "pending": 0,
+      "backward": 2,
+      "applied": 1,
+      "skipped": 1,
+      "abandoned": 0
+    },
+    "native_queue_stale_rows": 1,
+    "native_collator_counts_prefetched_group_as_trained": true,
+    "monitoring_applied_rows": 1,
+    "native_collated_tensors_unchanged": true,
+    "pickle_identity_preserved": true,
+    "accelerate_dispatch_preserves_batch_identity": true,
+    "native_checkpoint_cursor_method_executed": true,
+    "model_checkpoint_saver": "stubbed",
+    "checkpoint_cursor_excludes_unapplied_groups": true,
+    "unused_prefetch_counted_as_applied": false,
+    "scalar_cpu_sgd_changed_parameter": true,
+    "gpu_used": false,
+    "model_loaded": false,
+    "grpo_optimizer_executed": false,
+    "backward_boundary": "scalar torch backward stub; native TRL queue/collator and installed callback dispatch",
+    "native_source_sha256": "8eb2b73d19015a674dfa5850ce94aea947cdf592805999577c7cdd45642f1e3b",
+    "snapshot_id": "881241a7e445907daf901e9afd1494cb0e16e28e70a1119065e16df830f4b6cb"
+  },
+  "browser_worker": {
+    "status": "PASS",
+    "metrics": {
+      "snapshot_id": "515969e7bac9d6e69bf2f14cabd5bf18b2ec2ae4865ef864159ae7bb321bb10b",
+      "completed_group_records": [
+        {
+          "attempt": 0,
+          "constraints_satisfied": false,
+          "duration_s": 1.3946749240276404,
+          "environment_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "episode_id": "c7c93ee4cbfa476aa9667baf21d777e8",
+          "generated_tokens": 26,
+          "goal_completed": false,
+          "group_id": "7d4e90d8b60b45d5aa91a77320555dec:0",
+          "group_size": 2,
+          "harness_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "interventions": null,
+          "member": 1,
+          "policy_version": 1,
+          "reward": 0.0,
+          "seed": 474849650,
+          "split": "rl_train",
+          "status": "completed",
+          "steps": 1,
+          "task_family": "local-plumbing",
+          "task_instance": "mock:474849650",
+          "task_template": "no-subscription",
+          "tokenizer_revision": "Qwen3.8:tokenizer-config-sha256:b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+          "unauthorized_effect": true,
+          "verifier_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db"
+        },
+        {
+          "attempt": 0,
+          "constraints_satisfied": true,
+          "duration_s": 2.637725276988931,
+          "environment_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "episode_id": "e59fc381eed84d638a5fe3d63a6896b8",
+          "generated_tokens": 63,
+          "goal_completed": true,
+          "group_id": "7d4e90d8b60b45d5aa91a77320555dec:0",
+          "group_size": 2,
+          "harness_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+          "interventions": null,
+          "member": 0,
+          "policy_version": 1,
+          "reward": 1.0,
+          "seed": 474849650,
+          "split": "rl_train",
+          "status": "completed",
+          "steps": 2,
+          "task_family": "local-plumbing",
+          "task_instance": "mock:474849650",
+          "task_template": "no-subscription",
+          "tokenizer_revision": "Qwen3.8:tokenizer-config-sha256:b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+          "unauthorized_effect": false,
+          "verifier_revision": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db"
+        }
+      ],
+      "native_rewards_and_policy_versions_match": true,
+      "generated_token_count_matches": true,
+      "output": "/home/bjorn/code/LLM_proj_uu/training/outputs/row-accounting/browser-01",
+      "admission": "Pending: native queue rows were inspected, no optimizer ran"
+    },
+    "monitoring_source_sha256": {
+      "/home/bjorn/code/LLM_proj_uu/training/scripts/validate_spawned_harness.py": "822cb4e96e74b752b113b909d4cad7618e8407de8ca5d8852853a2e92460f3db",
+      "browser_training/runtime_metrics.py": "957a44b021d00ec4c38c7292703d144c60cbff14734b5d1a10ec3b3a0cb50eb4",
+      "browser_training/monitored_harness.py": "3ba727382b693ad9195fd61e8e539e72e9c5f396126e47b60fe37c8f5f8b84d5",
+      "browser_training/policy_sessions.py": "671f7afa4cbc9e400f69b0d871cb666944e6f7d23092f3df47702860f970e2ef",
+      "browser_training/curriculum.py": "7b553fd2936dc05c366c0495d2fbeb3a16b0b34f2aa4cc02be9bcf1f0b01b4f1",
+      "browser_training/outcomes.py": "824d9355352678112d746ca65a1e57db1c815acf25d93849ceefabd45a54420b"
+    },
+    "installed_trl_harness_sha256": "8b745cc0cb30977a7ad41458f1c85981b98fab0a5de01b80a41b7a88f656cc5f",
+    "start_method": "spawn",
+    "child_exitcode": 0,
+    "samples": [
+      {
+        "reward": 0.0,
+        "policy_version": 1,
+        "group_id": 0,
+        "advantage": -0.9999999800000003,
+        "generated_tokens": 26
+      },
+      {
+        "reward": 1.0,
+        "policy_version": 1,
+        "group_id": 0,
+        "advantage": 0.9999999800000003,
+        "generated_tokens": 63
+      }
+    ],
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0,
+        "tokens": 26
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0,
+        "tokens": 26
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1,
+        "tokens": 37
+      }
+    ],
+    "seconds": 13.882839573023375,
+    "stop_seconds": 2.2913061269791797,
+    "tokenizer": "Qwen3.8 official",
+    "parser": "installed TRL",
+    "import_substitutions": false,
+    "observations_masked": true,
+    "logprobs_aligned": true,
+    "gpu_used": false,
+    "trainer_executed": false,
+    "rl_ready": false,
+    "note": "Fixed policy; scripted success/subscription failure; native scoring but no trainer update"
+  },
+  "wandb_readback": {
+    "status": "PASS",
+    "snapshot_identical": true,
+    "scalar_count": 145,
+    "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/native-02",
+    "row_scalars": {
+      "training_rows/totals/abandoned": 0,
+      "training_rows/totals/admitted": 3,
+      "training_rows/totals/applied": 1,
+      "training_rows/totals/backward": 2,
+      "training_rows/totals/discarded": 1,
+      "training_rows/totals/pending": 0,
+      "training_rows/totals/rows": 4,
+      "training_rows/totals/skipped": 1,
+      "training_rows/episode_states/admitted": 1,
+      "training_rows/episode_states/mixed": 1,
+      "training_rows/episode_states/no_rows": 2
+    }
+  },
+  "tests": {
+    "unique_passed": 97,
+    "parallel_shards": [
+      40,
+      56
+    ],
+    "additional_new_test_passed": 1,
+    "final_row_suite_passed": 10,
+    "note": "Final row suite includes the new terminal-stage ordering case; other tests were run in two independent concurrent processes."
+  },
+  "initial_attempt": {
+    "status": "failed before backward",
+    "reason": "Native Accelerate logger required CPU state initialization before queue iteration",
+    "fix": "Initialize Accelerator(cpu=True) before exercising native queue; corrected attempts passed"
+  },
+  "source_sha256": {
+    "training/browser_training/row_accounting.py": "531dab3b1aff7bdc999bbeefc9c685d283a3e3ba8ed3e8b15a7b3ff4c2322134",
+    "training/browser_training/row_hooks.py": "a02c9284d64a08f07b305da193f33150c7e8ce5d127aee8ad03990abadf53346",
+    "training/browser_training/trl_monitoring.py": "a2a427d790939f7aafb11e9e9c62b833a803bc0d47f33859d3851451243165bc",
+    "training/browser_training/runtime_metrics.py": "fe38753a1711d2f599bfa34615cd1f291b72ce5e7dc3bee259356ae2cc96234b",
+    "training/browser_training/monitoring_callback.py": "7765004f458b05b25536f52698cd1565a8559fe0fabe97bd831375d8a950139f",
+    "training/browser_training/outcomes.py": "824d9355352678112d746ca65a1e57db1c815acf25d93849ceefabd45a54420b",
+    "training/browser_training/monitoring_io.py": "af37a5120a2bda8b3a60d34bfc40efa9c340bb0351753d86da26ddd21042d4ff",
+    "training/browser_training/metric_catalog.py": "66bd9889b9a366ede9abb841d8025476a4224ecd25d879179af89e4985333110"
+  },
+  "qualification_limits": [
+    "No GRPO model/optimizer training",
+    "CPU scalar SGD boundary only",
+    "Native checkpoint cursor executed with model saver stubbed",
+    "One trainer process",
+    "NF4 constructor + row mixin composition needs GPU qualification",
+    "W&B readback is from native-02 before the independent checkpoint cursor extension tested in native-03"
+  ],
+  "artifacts": "training/outputs/row-accounting"
+}

@@ -242,6 +242,19 @@ def episode_id():
     return value[2] if value else uuid.uuid4().hex
 
 
+def current_episode():
+    """Read-only identity for observers running inside a reserved harness session."""
+    value = _episode.get()
+    return None if value is None else dict(group_id=value[1], episode_id=value[2], policy_version=value[3])
+
+
+def fail_current_episode(reason):
+    """Stop safely if a trusted observer cannot persist its reserved episode."""
+    value = _episode.get()
+    if value is not None:
+        value[0].fail(reason)
+
+
 def request_model(loop):
     value = _episode.get()
     if loop.policy_registry is not None:

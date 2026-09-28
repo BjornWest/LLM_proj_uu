@@ -1,0 +1,166 @@
+{
+  "date": "2026-09-19",
+  "status": "PASS",
+  "git_commit": "99155f133f689f34bb4275e35e504612b6e4ab8e",
+  "scope": "Local metrics/sampler/session/checkpoint infrastructure; no model, optimizer or GPU. Historical P07 and this OpenEnv mock are separate qualification paths.",
+  "worker": {
+    "status": "PASS",
+    "metrics": {
+      "snapshot_id": "ce93ac6ac9a5e54713b7eb9d2d73907b017698647edb8a0d5a6aefe041358514",
+      "completed_group_records": [
+        {
+          "attempt": 0,
+          "constraints_satisfied": false,
+          "duration_s": 1.3996819640160538,
+          "environment_revision": "e4eac8d8ca9e586065c2a8144f44d77d91a241c1d76374bd862d1dc5fe6a7637",
+          "episode_id": "b3cfdfb2fff24e27ab1a10290f47d333",
+          "generated_tokens": 26,
+          "goal_completed": false,
+          "group_id": "b7120b72407e44aba31571a5b5d3cfdc:0",
+          "group_size": 2,
+          "harness_revision": "e4eac8d8ca9e586065c2a8144f44d77d91a241c1d76374bd862d1dc5fe6a7637",
+          "interventions": null,
+          "member": 1,
+          "policy_version": 1,
+          "reward": 0.0,
+          "seed": 1521451938,
+          "split": "rl_train",
+          "status": "completed",
+          "steps": 1,
+          "task_family": "local-plumbing",
+          "task_instance": "mock:1521451938",
+          "task_template": "no-subscription",
+          "tokenizer_revision": "Qwen3.8:tokenizer-config-sha256:b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+          "unauthorized_effect": true,
+          "verifier_revision": "e4eac8d8ca9e586065c2a8144f44d77d91a241c1d76374bd862d1dc5fe6a7637"
+        },
+        {
+          "attempt": 0,
+          "constraints_satisfied": true,
+          "duration_s": 2.738290451990906,
+          "environment_revision": "e4eac8d8ca9e586065c2a8144f44d77d91a241c1d76374bd862d1dc5fe6a7637",
+          "episode_id": "e02eb14bc2a2442bb51397236e4b3f4f",
+          "generated_tokens": 63,
+          "goal_completed": true,
+          "group_id": "b7120b72407e44aba31571a5b5d3cfdc:0",
+          "group_size": 2,
+          "harness_revision": "e4eac8d8ca9e586065c2a8144f44d77d91a241c1d76374bd862d1dc5fe6a7637",
+          "interventions": null,
+          "member": 0,
+          "policy_version": 1,
+          "reward": 1.0,
+          "seed": 1521451938,
+          "split": "rl_train",
+          "status": "completed",
+          "steps": 2,
+          "task_family": "local-plumbing",
+          "task_instance": "mock:1521451938",
+          "task_template": "no-subscription",
+          "tokenizer_revision": "Qwen3.8:tokenizer-config-sha256:b11349aafa7cdc6a320767cf7ceb29ed82f7eda5d65e8e0819e76f0ce947bf27",
+          "unauthorized_effect": false,
+          "verifier_revision": "e4eac8d8ca9e586065c2a8144f44d77d91a241c1d76374bd862d1dc5fe6a7637"
+        }
+      ],
+      "native_rewards_and_policy_versions_match": true,
+      "generated_token_count_matches": true,
+      "output": "/home/bjorn/code/LLM_proj_uu/training/outputs/runtime-metrics/native-worker-02",
+      "admission": "Pending: native queue rows were inspected, no optimizer ran"
+    },
+    "monitoring_source_sha256": {
+      "/home/bjorn/code/LLM_proj_uu/training/scripts/validate_spawned_harness.py": "e4eac8d8ca9e586065c2a8144f44d77d91a241c1d76374bd862d1dc5fe6a7637",
+      "browser_training/runtime_metrics.py": "33c69ac6d56c17369320cbfd4bab9e32da664e4763017c766a641bbff4421d34",
+      "browser_training/monitored_harness.py": "3ba727382b693ad9195fd61e8e539e72e9c5f396126e47b60fe37c8f5f8b84d5",
+      "browser_training/policy_sessions.py": "671f7afa4cbc9e400f69b0d871cb666944e6f7d23092f3df47702860f970e2ef",
+      "browser_training/curriculum.py": "7b553fd2936dc05c366c0495d2fbeb3a16b0b34f2aa4cc02be9bcf1f0b01b4f1",
+      "browser_training/outcomes.py": "741ed547a7680fd45fb2c2140289b2b42c02e7bf73801d045793b60d9b9ce877"
+    },
+    "installed_trl_harness_sha256": "8b745cc0cb30977a7ad41458f1c85981b98fab0a5de01b80a41b7a88f656cc5f",
+    "start_method": "spawn",
+    "child_exitcode": 0,
+    "samples": [
+      {
+        "reward": 0.0,
+        "policy_version": 1,
+        "group_id": 0,
+        "advantage": -0.9999999800000003,
+        "generated_tokens": 26
+      },
+      {
+        "reward": 1.0,
+        "policy_version": 1,
+        "group_id": 0,
+        "advantage": 0.9999999800000003,
+        "generated_tokens": 63
+      }
+    ],
+    "requests": [
+      {
+        "model": "trl-policy-v1",
+        "turn": 0,
+        "tokens": 26
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 0,
+        "tokens": 26
+      },
+      {
+        "model": "trl-policy-v1",
+        "turn": 1,
+        "tokens": 37
+      }
+    ],
+    "seconds": 15.726283376978245,
+    "stop_seconds": 3.0312870540074073,
+    "tokenizer": "Qwen3.8 official",
+    "parser": "installed TRL",
+    "import_substitutions": false,
+    "observations_masked": true,
+    "logprobs_aligned": true,
+    "gpu_used": false,
+    "trainer_executed": false,
+    "rl_ready": false,
+    "note": "Fixed policy; scripted success/subscription failure; native scoring but no trainer update"
+  },
+  "callback": {
+    "status": "PASS",
+    "callback_dispatch": "installed transformers CallbackHandler",
+    "model_loaded": false,
+    "trainer_executed": false,
+    "gpu_used": false,
+    "native_rollout_state": "fixture; not a real trainer checkpoint",
+    "checkpoint_sidecar_written": true,
+    "restored_values_match": true,
+    "logged_optimizer_step": 8,
+    "logged_actual_policy_version": 3
+  },
+  "tests": {
+    "passed": 87,
+    "command": "training/.venv/bin/python -m pytest training/tests/test_runtime_metrics.py training/tests/test_policy_sessions.py training/tests/test_curriculum.py training/tests/test_browser_metrics.py training/tests/test_native_metrics.py training/tests/test_outcome_metrics.py training/tests/test_monitoring_io.py training/tests/test_trainer_metrics.py training/tests/test_configs.py -q"
+  },
+  "additional_source_sha256": {
+    "training/browser_training/monitoring_callback.py": "23f9dfbeedcb24e673624bc9ab985af067ae679d0f19c263345a5aa5b1ca6397",
+    "training/scripts/validate_monitoring_callback.py": "731ea0d5c28e5345b3cc61c6c1e4b874f24784270c75631582a2f4436368218c",
+    "training/scripts/run_async_grpo.py": "d736216ba40edd6f5dc97a4f685c3beb7b790f6cc0b76b88a1a6f0d6948a32e0",
+    "training/tests/test_runtime_metrics.py": "43ecf47f878a1fa9ab66a6cab6a2bf93aa389fb0126c7cb150c78d08cb712c5e"
+  },
+  "checks": [
+    "Same reserved policy/task/seed for group members",
+    "Actual generated token IDs match native returned samples",
+    "Native rewards unchanged",
+    "Spawned child exits normally",
+    "Consistent ledger backup and sampler restore",
+    "Cancelled in-flight sessions remain unknown on resume",
+    "New generation namespaces avoid native group ID collisions",
+    "Changed pool/native checkpoint/state checksum rejected",
+    "Close waits for inference drain before recording",
+    "Local persistence failure cannot be swallowed by native close handling"
+  ],
+  "remaining": [
+    "Per-row versus per-episode admission and optimizer-use accounting",
+    "Canonical harness/task bridge and qualification",
+    "Real optimizer checkpoint/resume with monitoring enabled",
+    "Cross-host resource collectors and asynchronous W&B uploader",
+    "Joint dashboard layout with user"
+  ]
+}

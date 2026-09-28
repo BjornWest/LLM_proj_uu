@@ -1,0 +1,67 @@
+{
+  "ambiguous_remote_retry_verified": true,
+  "bounded_remote_attempts": 2,
+  "cpu_cores": 0.9833358381104967,
+  "dashboard_created": false,
+  "gpu": {
+    "trainer/gpu_utilization_pct": {
+      "axis": "measurement",
+      "checkpoint_id": null,
+      "context": "{\"device_selector\": \"0\", \"gpu_scope\": \"whole physical device\", \"gpu_uuid\": \"GPU-2cd5b20e-65a8-d7b8-c4c3-2b7a7555dff7\", \"host\": \"DESKTOP-A2QIC27\", \"role\": \"trainer\", \"root_pid\": null, \"root_start_ticks\": null, \"scope\": \"root process + observed descendants; CPU surviving identities; memory PSS\", \"source\": \"linux-resource-sampler-v1\"}",
+      "occurred_at": 1789836404.4836564,
+      "policy_version": null,
+      "producer": "trainer",
+      "step": 0,
+      "value": 0.0
+    },
+    "trainer/vram_gib": {
+      "axis": "measurement",
+      "checkpoint_id": null,
+      "context": "{\"device_selector\": \"0\", \"gpu_scope\": \"whole physical device\", \"gpu_uuid\": \"GPU-2cd5b20e-65a8-d7b8-c4c3-2b7a7555dff7\", \"host\": \"DESKTOP-A2QIC27\", \"role\": \"trainer\", \"root_pid\": null, \"root_start_ticks\": null, \"scope\": \"root process + observed descendants; CPU surviving identities; memory PSS\", \"source\": \"linux-resource-sampler-v1\"}",
+      "occurred_at": 1789836404.4836564,
+      "policy_version": null,
+      "producer": "trainer",
+      "step": 0,
+      "value": 0.0
+    }
+  },
+  "gpu_compute_performed": false,
+  "pss_gib": 0.004685401916503906,
+  "remote_readback_verified": true,
+  "run_id": "resources-3751c7259551",
+  "scalar_count": 46,
+  "snapshot_id": "a52bf5815cbfe8766e273e1da79cec475dadded7d4135d73f602b6f62b442c9d",
+  "status": "PASS",
+  "synthetic": true,
+  "training_performed": false,
+  "unavailable": {},
+  "uploader_restart_verified": true,
+  "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/resources-3751c7259551",
+  "watermark": 2,
+  "date": "2026-09-19",
+  "scope": "Optional Linux resource sidecars and independent W&B snapshot delivery; no browser/model/GPU compute",
+  "focused_tests_passed": 107,
+  "parallel_test_shards": [
+    53,
+    54
+  ],
+  "cli_confirmed_restart_no_network": true,
+  "fixtures": [
+    "missing NVIDIA executable and unsupported counters",
+    "PID reuse and partial PSS",
+    "late/duplicate telemetry delivery and clearing unavailable measurements",
+    "local writer locks",
+    "upload timeout process-group termination (fault-injected)",
+    "transport failure and persisted pending snapshot",
+    "remote identity mismatch and publication rollback rejection"
+  ],
+  "raw_report": "training/outputs/resource-upload/resources-3751c7259551/report.json",
+  "limitations": [
+    "Whole physical GPU readings only, no MIG qualification",
+    "Idle WSL GPU responses do not validate loaded-device accuracy",
+    "One resource scope per role/run; no cross-node transport",
+    "Latest samples and unsent intermediate snapshots coalesce",
+    "Real GRPO and older model-checkpoint rollback remain unqualified",
+    "A partial W&B upload repair may duplicate history; deduplicate by snapshot identity"
+  ]
+}

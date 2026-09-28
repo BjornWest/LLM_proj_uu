@@ -1,0 +1,317 @@
+{
+  "status": "PASS",
+  "date": "2026-09-19",
+  "recorded_at": "2026-09-19T18:12:00.035573+00:00",
+  "scope": "27B NF4 trainer / BF16 rank16 LoRA / FP8 vLLM, native TRL two-turn synthetic harness, monitored accumulation and checkpoint resume",
+  "attempts": [
+    {
+      "run_id": "l40s-acceptance-20260919-194945-6f356272",
+      "status": "FAIL",
+      "elapsed_seconds": 290.99102449417114,
+      "allowance_per_gpu_seconds": 900.0,
+      "app": {
+        "app_id": "ap-PSctukMJjKYY9XIxoINS2c",
+        "url": "https://modal.com/id/ap-PSctukMJjKYY9XIxoINS2c"
+      },
+      "shutdown": {
+        "app_id": "ap-PSctukMJjKYY9XIxoINS2c",
+        "running_containers": []
+      },
+      "physical_peak_used_gib": {
+        "0": 37.86328125,
+        "1": 29.6171875
+      },
+      "plan_sha256": "484f466546c33e8cdf13d6f4f8896d867dda33ce2743537ae2bf3a0d89bbc1ac"
+    },
+    {
+      "run_id": "l40s-acceptance-20260919-195700-0d063e77",
+      "status": "FAIL",
+      "elapsed_seconds": 140.22967553138733,
+      "allowance_per_gpu_seconds": 540.0,
+      "app": {
+        "app_id": "ap-He2uOrROS0Acl14Ka13QFp",
+        "url": "https://modal.com/id/ap-He2uOrROS0Acl14Ka13QFp"
+      },
+      "shutdown": {
+        "app_id": "ap-He2uOrROS0Acl14Ka13QFp",
+        "running_containers": []
+      },
+      "physical_peak_used_gib": {
+        "0": 37.859375,
+        "1": 28.99609375
+      },
+      "plan_sha256": "211e414aa3f18f3a9a74c336691af7c4c864069dfb35c8493b56c36f3bbf2f2c"
+    },
+    {
+      "run_id": "l40s-acceptance-20260919-200308-0c59fb20",
+      "status": "PASS",
+      "elapsed_seconds": 205.32379412651062,
+      "allowance_per_gpu_seconds": 330.0,
+      "app": {
+        "app_id": "ap-RoaZ2Tkt81Lq8EiRseaovK",
+        "url": "https://modal.com/id/ap-RoaZ2Tkt81Lq8EiRseaovK"
+      },
+      "shutdown": {
+        "app_id": "ap-RoaZ2Tkt81Lq8EiRseaovK",
+        "running_containers": []
+      },
+      "physical_peak_used_gib": {
+        "0": 37.8779296875,
+        "1": 29.6337890625
+      },
+      "plan_sha256": "7d5fa0f507bfc8ba3d725a04775e400ab810740e2fefe1a0e0b2d4a682ff9454"
+    }
+  ],
+  "failures": [
+    {
+      "attempt": 1,
+      "cause": "Test fingerprint did not recurse into nested optimizer tensors; initial training/checkpoint passed"
+    },
+    {
+      "attempt": 2,
+      "cause": "Actual Transformers/PEFT resume promoted BF16 adapters to FP32; stopped before resumed updates"
+    }
+  ],
+  "fix": {
+    "path": "browser_training/precision.py:BF16AdapterResumeMixin",
+    "used_by": "browser_training.qlora_compat.candidate_module",
+    "description": "After native model checkpoint load, restore trainable LoRA dtype before optimizer restore and publication; frozen base unchanged",
+    "cpu_regression": "Actual installed HF Trainer + PEFT on tiny random Qwen3: reproduce FP32 promotion, verify BF16 fix, exact bytes and unchanged optimizer parameter references"
+  },
+  "initial": {
+    "status": "PASS",
+    "global_step": 3,
+    "policy": {
+      "published": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "evicted": [
+        1
+      ],
+      "completed_multiturn_episodes": 91,
+      "no_premature_evictions": true,
+      "no_remaining_reservations": true
+    },
+    "checkpoint": "/__modal/volumes/vo-B2dABuw99BekJAHN1u5Iym/l40s-acceptance-20260919-194945-6f356272/initial/checkpoint-3",
+    "applied_rows_by_step": {
+      "1": 4,
+      "2": 4,
+      "3": 4
+    },
+    "row_totals": {
+      "rows": 20,
+      "admitted": 13,
+      "discarded": 0,
+      "pending": 7,
+      "backward": 12,
+      "applied": 12,
+      "skipped": 0,
+      "abandoned": 0
+    },
+    "evidence": {
+      "dtypes": {
+        "base_parameter_elements": {
+          "torch.float32": 3006172400,
+          "torch.uint8": 12175278080
+        },
+        "adapter_parameter_elements": {
+          "torch.bfloat16": 108789760
+        },
+        "gradient_tensors_checked": 0
+      },
+      "nf4": {
+        "quantized_linears": 496,
+        "compute_dtype": "bfloat16",
+        "double_quant": true,
+        "vision_head_mtp_unquantized": true
+      },
+      "begin_global_step": 0,
+      "begin_adapter_sha256": "2ae99c8052530d8a97a84cc7806cc7c0ce6bec6f9fb86a5fcc7dd33037cb6412",
+      "optimizer_moment_tensors": 1600
+    },
+    "final_adapter_sha256": "06e03fe2b52116c1f4b9d8114e19f5548517bdd7b49c9f8d495d5472f0036bcb",
+    "snapshot_id": "d288d76d7400cdc420794f24ec8a2a54a7c2c88315569590094d495394693ddc",
+    "train_metrics": {
+      "train_runtime": 99.5656,
+      "train_samples_per_second": 0.121,
+      "train_steps_per_second": 0.03,
+      "total_flos": 115032917407104.0,
+      "train_loss": -0.01866429050763448,
+      "epoch": 1.0
+    },
+    "elapsed_seconds": 123.908135109,
+    "peak_allocated_gib": 25.27882146835327,
+    "limitations": "Synthetic task; no learning-effect/generalization claim, no browser, no crash mid-optimizer"
+  },
+  "resumed": {
+    "status": "PASS",
+    "global_step": 6,
+    "policy": {
+      "published": [
+        5,
+        6,
+        7,
+        8
+      ],
+      "evicted": [
+        5
+      ],
+      "completed_multiturn_episodes": 56,
+      "no_premature_evictions": true,
+      "no_remaining_reservations": true
+    },
+    "checkpoint": "/__modal/volumes/vo-B2dABuw99BekJAHN1u5Iym/l40s-acceptance-20260919-200308-0c59fb20/resumed/checkpoint-6",
+    "applied_rows_by_step": {
+      "4": 4,
+      "5": 4,
+      "6": 4
+    },
+    "row_totals": {
+      "rows": 40,
+      "admitted": 26,
+      "discarded": 7,
+      "pending": 7,
+      "backward": 24,
+      "applied": 24,
+      "skipped": 0,
+      "abandoned": 1
+    },
+    "evidence": {
+      "dtypes": {
+        "base_parameter_elements": {
+          "torch.float32": 3006172400,
+          "torch.uint8": 12175278080
+        },
+        "adapter_parameter_elements": {
+          "torch.bfloat16": 108789760
+        },
+        "gradient_tensors_checked": 0
+      },
+      "nf4": {
+        "quantized_linears": 496,
+        "compute_dtype": "bfloat16",
+        "double_quant": true,
+        "vision_head_mtp_unquantized": true
+      },
+      "restored_optimizer_sha256": "24b9e03b5c553b2656564c6c229eba10d0f774fe4e950c20f6314547f960daeb",
+      "begin_global_step": 3,
+      "begin_adapter_sha256": "06e03fe2b52116c1f4b9d8114e19f5548517bdd7b49c9f8d495d5472f0036bcb",
+      "restored_scheduler": {
+        "base_lrs": [
+          0.0001
+        ],
+        "last_epoch": 3,
+        "_step_count": 4,
+        "_is_initial": false,
+        "_get_lr_called_within_step": false,
+        "_last_lr": [
+          0.0001
+        ],
+        "lr_lambdas": [
+          null
+        ]
+      },
+      "optimizer_moment_tensors": 1600
+    },
+    "final_adapter_sha256": "59ab475de2a0a1d47127999b5142e9e695fce8bc4d858e0e62a61eb1d3503a10",
+    "snapshot_id": "2d2430ad0e0a63731ec6c6795c1048c41e9b36b850cd071cc608186d08370d74",
+    "train_metrics": {
+      "train_runtime": 67.8396,
+      "train_samples_per_second": 0.354,
+      "train_steps_per_second": 0.088,
+      "total_flos": 230065834814208.0,
+      "train_loss": -0.0038799618681271872,
+      "rollout/duration_s": 2.0369440412499955,
+      "rollout/turns_max": 2.0,
+      "rollout/drift_tokens_max": 0.0,
+      "completions/max_length": 4.0,
+      "completions/min_length": 4.0,
+      "completions/mean_length": 4.0,
+      "rollout/samples_per_rollout": 1.0,
+      "rollout/turns_mean": 2.0,
+      "completions/clipped_ratio": 0.0,
+      "rollout/fork_frac": 0.0,
+      "rollout/realign_frac": 0.0,
+      "rollout/drift_tokens_mean": 0.0,
+      "epoch": 0.5
+    },
+    "elapsed_seconds": 99.08237606899999,
+    "peak_allocated_gib": 25.27882146835327,
+    "limitations": "Synthetic task; no learning-effect/generalization claim, no browser, no crash mid-optimizer"
+  },
+  "wandb": [
+    {
+      "status": "PASS",
+      "snapshot_id": "d288d76d7400cdc420794f24ec8a2a54a7c2c88315569590094d495394693ddc",
+      "scalar_keys": 237,
+      "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/l40s-acceptance-20260919-194945-6f356272"
+    },
+    {
+      "status": "PASS",
+      "snapshot_id": "2d2430ad0e0a63731ec6c6795c1048c41e9b36b850cd071cc608186d08370d74",
+      "scalar_keys": 238,
+      "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/resume-ad676e27f9ea4f368a85e2c697931be2",
+      "lineage": {
+        "checkpoint_name": "checkpoint-3",
+        "checkpoint_policy_version": 4,
+        "checkpoint_snapshot_id": "0b9214ae4ad52cc7940374f7e09b9068904d28a0332a7f95a887a8a6c8a9fe8e",
+        "checkpoint_state_sha256": "7365bc88c5913bb17e9c4811eff1b1b7a9544e54e34844a5d45c64822e03ce4e",
+        "inherited_watermark": 180,
+        "parent_run_id": "l40s-acceptance-20260919-194945-6f356272",
+        "resumed_at": 1789841174.3058171,
+        "run_id": "resume-ad676e27f9ea4f368a85e2c697931be2"
+      }
+    }
+  ],
+  "checks": {
+    "exact_adapter_restore": true,
+    "exact_optimizer_moments_and_counters_restore": true,
+    "exact_scheduler_restore": true,
+    "bf16_after_resume": true,
+    "applied_rows_match_accumulation": true,
+    "checkpoint_6_written": true,
+    "whole_episode_policy_pinning": true,
+    "no_premature_evictions": true,
+    "no_remaining_reservations": true,
+    "independent_trainer_rollout_gpu_telemetry": true,
+    "local_wandb_snapshot_and_scalar_parity": true,
+    "all_containers_stopped": true
+  },
+  "budget": {
+    "gpu": "L40S:2",
+    "function_seconds_per_gpu": 636.5444941520691,
+    "function_gpu_minutes_total": 21.21814980506897,
+    "startup_allowance_seconds_per_attempt": 60,
+    "conservative_seconds_per_gpu_including_startup": 816.5444941520691,
+    "maximum_announced_seconds_per_gpu": 900,
+    "within_announced_limit": true,
+    "automatic_retries": 0,
+    "note": "Function times measured; startup allowance is an upper bound, not an invoice. Two manually diagnosed continuations used the original checkpoint."
+  },
+  "local_validation": {
+    "focused_lightweight_tests": "20 passed, 2 framework-dependent skips",
+    "rl_environment_tests": "5 passed: three acceptance and two precision tests",
+    "cpu_spawned_harness": {
+      "status": "PASS",
+      "scripted_inference": true,
+      "gpu_used": false,
+      "model_loaded": false,
+      "native_spawned_worker": true,
+      "two_turn_rows": 4,
+      "calls": 16,
+      "snapshot_id": "4f407535ba9383d3c4e04cab412a8b7a671c81de792abafd21a007e7c974c8fd"
+    },
+    "compileall": true,
+    "diff_check": true
+  },
+  "limitations": [
+    "Synthetic two-turn task, not canonical-browser learning or new learning-effect evidence",
+    "Very short requests (native rows typically 61 tokens with Qwen tokenizer); 2048 is only the vLLM cap, not a trained context benchmark",
+    "Restart is orderly from a completed checkpoint; successful continuation used a freshly started vLLM server after failed attempts",
+    "No mid-optimizer crash, bitwise continuation, multi-node/SSH transfer, SM120, MTP or quantization parity qualification",
+    "Dashboard layout still to be built with user; W&B readback used final snapshots, not a sustained live dashboard test"
+  ]
+}

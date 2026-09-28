@@ -1,0 +1,66 @@
+{
+  "checkpoint_kind": "monitoring sidecar plus synthetic native rollout_state; no model checkpoint",
+  "child_history_points": 2,
+  "child_scalar_count": 37,
+  "child_url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/resume-3e5968505c19484a8ff457d17958d4ff",
+  "gpu_used": false,
+  "inherited_health_masked": true,
+  "inherited_scalar_count": 34,
+  "inherited_watermark": 1,
+  "lineage": {
+    "checkpoint_name": "checkpoint-8",
+    "checkpoint_policy_version": 3,
+    "checkpoint_snapshot_id": "a1077d44365253915f71bf7b3698a66c004a1cd2406146dc4efe0975180e9e4a",
+    "checkpoint_state_sha256": "d8cbbed753af930c00a3782ee84443ede606ee38ceb956adc777b615eb20573c",
+    "inherited_watermark": 1,
+    "parent_run_id": "resume-check-3e34cbc594f6",
+    "resumed_at": 1789837010.3697717,
+    "run_id": "resume-3e5968505c19484a8ff457d17958d4ff"
+  },
+  "model_loaded": false,
+  "parent_history_unchanged": true,
+  "parent_later_watermark": 2,
+  "parent_url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/resume-check-3e34cbc594f6",
+  "publication_run_id": "resume-3e5968505c19484a8ff457d17958d4ff",
+  "remote_readback_verified": true,
+  "run_id": "resume-check-3e34cbc594f6",
+  "source_sha256": {
+    "monitoring_io.py": "a1d5f16c5cd69cb9e588f963bd1121b6fb037391f2c0d71aac09d756beb68ebb",
+    "outcomes.py": "fa6bdd5ecb690e990eadfcb86730411190259857c4cab4ede497f374954e6696",
+    "publication.py": "8221ef06efba0649a9c0d5917e94d8bf76218bc8d176f720b04c9c2848c68cd3",
+    "runtime_metrics.py": "da5edd6e5854c7675c44a1468fffdce550083aec40c30bf58db5ead50f8d4a9f",
+    "snapshot_uploader.py": "fcc9facaa9c90c9aaabb3332777439925902c13425ac604a2d27f6c59e907559",
+    "upload_worker.py": "f427a38efca841824381eb2fe2483bbbbf2613e33f167078211ed4be4c0ce903"
+  },
+  "status": "PASS",
+  "synthetic": true,
+  "training_performed": false,
+  "date": "2026-09-19",
+  "focused_tests_passed": 114,
+  "parallel_test_shards": [
+    60,
+    54
+  ],
+  "installed_callback": {
+    "status": "PASS",
+    "callback_dispatch": "installed transformers CallbackHandler",
+    "model_loaded": false,
+    "trainer_executed": false,
+    "gpu_used": false,
+    "native_rollout_state": "fixture; not a real trainer checkpoint",
+    "checkpoint_sidecar_written": true,
+    "restored_values_match": true,
+    "publication_lineage_verified": true,
+    "inherited_health_masked_until_new_callback": true,
+    "logged_optimizer_step": 8,
+    "logged_actual_policy_version": 3
+  },
+  "legacy_uploader_readback_verified": true,
+  "raw_report": "training/outputs/publication-resume/resume-check-3e34cbc594f6/report.json",
+  "limitations": [
+    "No model or optimizer loaded/restored",
+    "Native rollout checkpoint metadata was a fixture",
+    "Cumulative branch totals share an inherited prefix and must not be summed",
+    "Cross-node collection and real NF4 GRPO accumulation/resume remain unqualified"
+  ]
+}

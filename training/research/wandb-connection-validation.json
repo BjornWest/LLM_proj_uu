@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "scope": "W&B SDK authentication, synthetic scalar upload, summary readback and exact table download; no Trainer/browser integration",
+  "wandb_version": "0.30.0",
+  "run_id": "connection-a4678469f126",
+  "url": "https://wandb.ai/bjorn-westerlund-3326-uppsala-universitet/browser-training/runs/connection-a4678469f126",
+  "fixture_episodes": 4,
+  "training_performed": false,
+  "remote_readback_verified": true,
+  "remote_table_verified": true,
+  "date": "2026-09-17",
+  "notes": [
+    "First attempt rejected organization entity; corrected to the single authenticated default team.",
+    "Table body was verified by a separate read-only follow-up after the successful run; the reusable script now includes that check.",
+    "Four synthetic episodes; no model weights, source code or real browser traces uploaded.",
+    "No GPU, cloud compute allocation or production logging enabled."
+  ],
+  "prepared_script_sha256": "b4bc3b452b2fbe7cae633b7391950d0ad30f628ecdd7b86a70f6685226242c23"
+}

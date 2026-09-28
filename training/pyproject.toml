@@ -6,6 +6,8 @@ dependencies = ["PyYAML==6.0.3", "pytest==8.4.2"]
 
 [project.optional-dependencies]
 modal = ["modal==1.5.1", "python-dotenv==1.2.2"]
+tracking = ["wandb==0.30.0", "python-dotenv==1.2.2"]
+dashboard = ["wandb==0.30.0", "python-dotenv==1.2.2", "wandb-workspaces==0.4.11"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
