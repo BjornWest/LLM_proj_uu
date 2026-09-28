@@ -36,6 +36,9 @@ class ChatCompletionsBackend:
     No automatic retries: each request is visible in the episode budget.
     Optional token/logprob fields are retained verbatim when supplied by a server.
     """
+    # Subclasses must explicitly redeclare after auditing their hooks: a wrapper
+    # may otherwise use Playwright or a thread-bound budget database.
+    supports_background_completion = True
 
     def __init__(self, base_url: str, model: str, api_key: str | None = None,
                  timeout: float = 90, max_tokens: int | None = None, *, request_options=None,
@@ -56,9 +59,10 @@ class ChatCompletionsBackend:
         if session_routing and (urlparse(self.base_url).hostname != 'openrouter.ai'
                                 or 'preset' in self.request_options or model.startswith('@preset/')):
             raise ValueError('Session routing requires an OpenRouter model slug, without a preset')
-        if session_routing and ('session_id' in self.request_options or
-                                'order' in (self.request_options.get('provider') or {})):
-            raise ValueError('Session routing owns session_id and must not specify provider.order')
+        if session_routing and 'session_id' in self.request_options:
+            raise ValueError('Session routing owns session_id')
+        # provider.order may explicitly prioritize availability over OpenRouter's
+        # automatic sticky routing. session_id still groups the trace requests.
         if set(self.request_options) & {"model", "messages", "temperature", "max_tokens", "stream"}:
             raise ValueError("request_options cannot override core generation settings")
         self.client = httpx.Client(

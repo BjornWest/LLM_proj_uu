@@ -35,7 +35,7 @@ class ReasoningDefaultsTests(unittest.TestCase):
                 backend = self.backend(response, request_options=options)
                 backend.complete([{'role': 'user', 'content': 'Page'}])
                 self.assertEqual(self.requests[0]['reasoning'], {'enabled': True})
-                self.assertEqual(self.requests[0]['max_tokens'], 4096)
+                self.assertEqual(self.requests[0]['max_tokens'], 16384)
                 self.assertNotIn('offline-secret', json.dumps(self.requests[0]))
 
     def test_explicit_experiment_overrides_are_preserved(self):
@@ -74,7 +74,7 @@ class ReasoningDefaultsTests(unittest.TestCase):
         self.assertEqual(len(self.requests), 1)
 
     def test_token_setting_is_positive_integer(self):
-        self.assertEqual(completion_token_limit(), 4096)
+        self.assertEqual(completion_token_limit(), 16384)
         self.assertEqual(completion_token_limit('8192'), 8192)
         for value in [0, -1, True, 4.5, '', '1e3', 'oops']:
             with self.subTest(value=value), self.assertRaises(ValueError):
@@ -82,7 +82,7 @@ class ReasoningDefaultsTests(unittest.TestCase):
 
     def test_cli_token_default_env_file_and_explicit_override(self):
         from intent_browser import cli
-        for env_value, explicit, expected in [(None, None, 4096), ('8192', None, 8192), ('8192', '1024', 1024)]:
+        for env_value, explicit, expected in [(None, None, 16384), ('8192', None, 8192), ('8192', '1024', 1024)]:
             with self.subTest(env_value=env_value, explicit=explicit), tempfile.TemporaryDirectory() as directory:
                 config = Path(directory) / '.env'
                 config.write_text('MODEL_BASE_URL=https://openrouter.ai/api/v1\nMODEL_NAME=fixture\n' +

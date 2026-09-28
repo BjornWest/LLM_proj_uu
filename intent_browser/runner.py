@@ -12,6 +12,8 @@ from .trace import Trace, write_json
 from .openrouter import routing_record
 from .observation import refresh_observation
 from .policy_delivery import PolicyDelivery
+from .input_budget import DEFAULT_MAX_STEPS, QwenInputCounter, OpaqueReasoningInputCounter
+from .batching import DocumentScanInvalidated, interrupted_step_feedback
 
 
 DEFAULT_TERMINAL_RESPONSE_INSTRUCTION = "After the goal is complete, use send_msg_to_user('Done')."
@@ -24,18 +26,24 @@ def messages_digest(messages):
 
 def observation_text(obs, limit=16000):
     tree = (flatten_axtree_to_str(obs["axtree_object"])
-            if obs["axtree_object"].get("nodes") else "[No browser assigned]")
+            if obs["axtree_object"].get("nodes") else
+            "[AX capture deferred; page contents are unknown]" if obs.get('observation_capture',{}).get('deferred')
+            else "[No browser assigned]")
     if len(tree) > limit:
         tree = tree[:limit] + "\n[Accessibility tree truncated]"
     return f"URL: {obs['url']}\nLast action error: {obs['last_action_error']}\nAccessibility tree:\n{tree}"
 
 
-def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, seed=0,
+def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT_MAX_STEPS, seed=0,
                 record_video=False, hold_seconds=0, search_backend=None, episode_task=None,
                 before_observation=None, *, terminal_response_instruction=None,
                 observation_text_limit=16000, harness_profile=None, action_timeout_ms=None,
                 retry_policy=None, helper_env_factory=None, agent_runtime=None, agent_actor=None,
-                delegated_instructions=None, delegated_goal=None, decision_wait=None):
+                delegated_instructions=None, delegated_goal=None, decision_wait=None,
+                max_input_tokens=None, input_counter=None,
+                clarification_callback=None, clarification_audit_id=None,
+                observation_pipeline="auto", human_handover=None, human_handover_ui=None,
+                trace_screenshots=None, async_recording=True, debug_timings=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
@@ -43,17 +51,100 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
     truncation marker; callers must budget the actual serialized request bytes.
     Neither option repairs model output or changes parsing or verification.
     """
+    from .debug_timings import resolve_debug_timings
+    debug_timings=resolve_debug_timings(debug_timings)
+    if type(async_recording) is not bool:
+        raise ValueError('async_recording must be boolean')
+    if trace_screenshots is not None and type(trace_screenshots) is not bool:
+        raise ValueError('trace_screenshots must be boolean or None')
+    from .runtime_defaults import select_observation_pipeline
+    observation_pipeline, runtime_selection = select_observation_pipeline(observation_pipeline,
+        profile=harness_profile,backend=backend,task=episode_task,trace_screenshots=trace_screenshots)
+    handover_enabled = bool(harness_profile and getattr(harness_profile.tools,'human_handover_tools',False))
+    if handover_enabled:
+        from .human_handover import HumanHandoverController
+        if harness_profile.capture_timeout_mode not in ('bounded','diagnostic'):
+            raise ValueError('capture_timeout_mode must be bounded or diagnostic')
+        if (not isinstance(human_handover,HumanHandoverController) or
+                not harness_profile.tools.open_internet or harness_profile.tools.batch_size<2 or
+                harness_profile.agent_limits or agent_runtime is not None or
+                observation_pipeline is None or not observation_pipeline.full_capture_only):
+            raise ValueError('Human handover requires a controller, native full-capture open-internet batches, and no helpers')
+        if human_handover.snapshot()['tabs']:
+            raise ValueError('Human handover controller must be fresh for each episode')
+        if not harness_profile.delivery_tracking:
+            raise ValueError('Human handover requires exact policy delivery tracking')
+    elif human_handover is not None:
+        raise ValueError('Human handover controller requires the opt-in tool profile')
+    if human_handover_ui is not None and (not handover_enabled or
+            getattr(human_handover_ui,'controller',None) is not human_handover or
+            not callable(getattr(human_handover_ui,'attach_chat',None))):
+        raise ValueError('Human handover UI must share the episode controller and support attach_chat')
+    if observation_pipeline is not None:
+        from .observation_pipeline import ObservationPipelineConfig
+        if not isinstance(observation_pipeline, ObservationPipelineConfig):
+            raise ValueError('observation_pipeline requires ObservationPipelineConfig')
+        if trace_screenshots is not None:
+            from dataclasses import replace
+            observation_pipeline=replace(observation_pipeline,trace_screenshots=trace_screenshots)
+        if (not harness_profile or not harness_profile.ax_config or not harness_profile.ax_config.incremental
+                or not hasattr(harness_profile.tools,'parse_completion') or harness_profile.agent_limits
+                or agent_runtime is not None):
+            raise ValueError('Observation pipeline currently requires incremental native tools without helpers')
+        if harness_profile.tools.open_internet and not observation_pipeline.full_capture_only:
+            raise ValueError('Open-internet observation integration requires full_capture_only=True')
+        if observation_pipeline.dynamic_preview and (not handover_enabled or
+                not harness_profile.tools.stable_frame_capture):
+            raise ValueError('Dynamic preview requires human-handover profile with stable frame capture')
+        if (observation_pipeline.dynamic_preview and episode_task is not None and
+                not getattr(episode_task,'supports_dynamic_preview',False)):
+            raise ValueError('Task adapter must explicitly adopt dynamic decision previews')
+        if observation_pipeline.targeted_actions:
+            if episode_task is not None and not getattr(episode_task,'supports_targeted_observations',False):
+                raise ValueError('Task adapter must explicitly adopt targeted guards and deferred post-action observations')
+            if (type(backend).__dict__.get('supports_background_completion') is not True
+                    or getattr(backend,'requires_browser_thread',False)):
+                raise ValueError('Targeted actions require a background-capable backend')
+        adoption=getattr(episode_task,'supports_observation_pipeline',False)
+        if episode_task is not None and not (adoption is True or
+                (adoption=='native_full_only' and observation_pipeline.full_capture_only)):
+            raise ValueError('Task adapter must explicitly adopt partial observation and deferred full capture')
+    trace_screenshots = (observation_pipeline.trace_screenshots if observation_pipeline is not None else True) if trace_screenshots is None else trace_screenshots
+    clarification_enabled = bool(harness_profile and
+        getattr(harness_profile.tools, 'clarification_tools', False))
+    if clarification_enabled:
+        if not callable(clarification_callback):
+            raise ValueError('Clarification tools require a callable clarification_callback')
+        if clarification_audit_id is not None and (
+                not isinstance(clarification_audit_id, str) or not clarification_audit_id.strip()):
+            raise ValueError('clarification_audit_id must be a nonempty string or None')
+    elif clarification_callback is not None or clarification_audit_id is not None:
+        raise ValueError('Clarification callback requires an opt-in clarification tool profile')
+    if type(max_steps) is not int or max_steps < 1:
+        raise ValueError('max_steps must be a positive integer')
+    if max_input_tokens is not None and (type(max_input_tokens) is not int or max_input_tokens < 1):
+        raise ValueError('max_input_tokens must be a positive integer or None')
+    if max_input_tokens is not None and input_counter is None:
+        if not harness_profile or not harness_profile.ax_config:
+            raise ValueError('Input limit requires a model input counter or configured local AX tokenizer')
+        input_counter = OpaqueReasoningInputCounter(QwenInputCounter(harness_profile.ax_config.tokenizer_path))
     if harness_profile is not None and harness_profile.agent_limits and agent_runtime is None:
         from .delegation import AgentRuntime
         runtime=AgentRuntime(backend,harness_profile.agent_limits,harness_profile,before_observation,helper_env_factory,
             {'search_backend':search_backend,'action_timeout_ms':action_timeout_ms,'retry_policy':retry_policy,
-             'observation_text_limit':observation_text_limit,'decision_wait':decision_wait})
+             'observation_text_limit':observation_text_limit,'decision_wait':decision_wait,
+             'trace_screenshots':trace_screenshots,'async_recording':async_recording,
+             'max_input_tokens':max_input_tokens,'input_counter':input_counter,
+             'clarification_callback':clarification_callback,'clarification_audit_id':clarification_audit_id})
         return runtime.run(lambda actor: run_episode(env_factory,actor['backend'],metadata,output,max_steps,seed,
             record_video,hold_seconds,search_backend,episode_task,lambda:runtime.before_observation(actor),
             terminal_response_instruction=terminal_response_instruction,observation_text_limit=observation_text_limit,
             harness_profile=harness_profile,action_timeout_ms=action_timeout_ms,retry_policy=retry_policy,
             agent_runtime=runtime,agent_actor=actor,delegated_instructions=delegated_instructions,
-            delegated_goal=delegated_goal,decision_wait=decision_wait))
+            delegated_goal=delegated_goal,decision_wait=decision_wait,
+            max_input_tokens=max_input_tokens,input_counter=input_counter,
+            clarification_callback=clarification_callback,clarification_audit_id=clarification_audit_id,
+            trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings))
     no_browser=agent_actor is not None and agent_actor['browser']=='none'
     if action_timeout_ms is not None:
         validate_action_timeout(action_timeout_ms)
@@ -77,6 +168,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         raise ValueError('Incremental AX context and its tool controls must be configured together')
     if harness_profile and bool(harness_profile.vision_config) != bool(getattr(harness_profile.tools, "vision_tools", False)):
         raise ValueError("Vision tools and image context must be configured together")
+    if harness_profile and bool(harness_profile.data_config) != bool(getattr(harness_profile.tools, 'data_tools', False)):
+        raise ValueError('Data tool configuration and native definitions must match')
+    data_session = None
     batching = native_tools and harness_profile.tools.batch_size > 1
     execution_index = 0
     vision = None
@@ -88,6 +182,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         if not isinstance(retry_policy, DecisionRetryPolicy) or not native_tools:
             raise ValueError('Decision retries require a native-tool profile and DecisionRetryPolicy')
     retries_used = 0
+    consecutive_retries_used = 0
     pending_retry = None
     native_options = None
     if native_tools:
@@ -110,6 +205,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             from .harness import SemanticFeedback
             feedback=SemanticFeedback()
         else:feedback = harness_profile.feedback_factory()
+        if observation_pipeline is not None:
+            from .harness import SemanticFeedback
+            from .observation_pipeline import PartialFeedback
+            if not isinstance(feedback,SemanticFeedback):
+                raise ValueError('Observation pipeline requires reviewed semantic/browser-event feedback')
+            feedback = PartialFeedback(feedback)
         if harness_profile.ax_config is not None:
             from .ax_explorer import AXExplorer
             if harness_profile.ax_config.incremental:
@@ -117,13 +218,59 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 ax_explorer = AXContext(harness_profile.ax_config)
             else: ax_explorer = AXExplorer(harness_profile.ax_config)
             render_observation = ax_explorer.overview
+    if harness_profile and harness_profile.tools.open_internet and not no_browser:
+        from .open_internet import tab_observation
+        from .tab_context import TabContext
+        tab_context = TabContext() if harness_profile.tools.compact_tab_context else None
+        base_render = render_observation
+        render_observation = lambda obs: tab_observation(obs, base_render(obs), tab_context)
     profile_metadata = ({'harness_profile': harness_profile.describe()} if harness_profile else {})
+    if observation_pipeline is not None:
+        profile_metadata['observation_pipeline'] = observation_pipeline.describe()
+    if handover_enabled:
+        from .native_capture import CAPTURE_SECONDS, TARGET_SECONDS, SOURCE_HASH
+        profile_metadata['human_handover']={'version':'human-tabs-v1','target':'stable_tab_id',
+            'capture_timeout_mode':harness_profile.capture_timeout_mode,
+            'capture_deadlines_enforced':harness_profile.capture_timeout_mode=='bounded',
+            'capture':('native full with explicit stable-document projection' if harness_profile.tools.stable_frame_capture else 'active-tab native full'),
+            'completion':'human assertion, not a verifier',
+            'chat_delivery':'private-callback-v1', 'embedded_ui_requested':human_handover_ui is not None,
+            'content_guard':'localized-proceed-once-v1',
+            'wait_for_human':harness_profile.tools.human_handover_wait,
+            'tab_context':'append-only-deltas-v1' if harness_profile.tools.compact_tab_context else 'full',
+            'frame_capture':'stable-frame-projection-v1' if harness_profile.tools.stable_frame_capture else 'whole-tree',
+            **({'native_child_rpc_budget_seconds':0.5,'native_child_quarantine':'frame-lifetime-v1',
+                'native_frame_cleanup':'marked-frames-direct-v1',
+                'guard_rpc_budget_seconds':2.0,'guard_identity':'single-scan-v1',
+                'resource_shutdown':'native-owned-resources-v1',
+                'ax_query_capture':'reuse-captured-snapshot-v1',
+                'screenshot_capture':'guarded-viewport-only-v1',
+                'immutable_data_capture':'no-native-recapture-v1'} if harness_profile.tools.stable_frame_capture else {}),
+            'capture_recovery':{'version':'pinned-tab-observation-v1','max_attempts':3,
+                'scope':'DocumentScanInvalidated only; complete native recapture; no action replay'},
+            'native_capture':{'version':'overlapped-marking-deadline-v1','budget_seconds':CAPTURE_SECONDS,
+                'deadline_enforced':harness_profile.capture_timeout_mode=='bounded',
+                'overrun_monitoring':'pending-rpc-timer-v1',
+                'target_seconds':TARGET_SECONDS,'upstream_marker_sha256':SOURCE_HASH,
+                'cleanup_budget_seconds':1,'browser_stepped_scope':'env.step returned a complete observation; '
+                    'false does not mean the action was not executed; see action_execution'},
+            'defaults_changed':False}
+    if clarification_enabled:
+        profile_metadata['clarification'] = {
+            'version': 'user-clarification-v1', 'audit_id': clarification_audit_id,
+            'reply_source': 'trusted caller callback', 'batch_boundary': True,
+            'helpers': 'inherit the explicitly supplied callback; separate episode evidence',
+        }
     if retry_policy is not None:
         profile_metadata['decision_retry_policy'] = retry_policy.describe()
     if native_tools:
         profile_metadata['native_tool_request_options'] = native_options
-    trace = Trace(output, {**metadata, **profile_metadata, "seed": seed, "max_steps": max_steps,
+    trace = Trace(output, {**metadata, **profile_metadata, "runtime_selection": runtime_selection, "seed": seed, "max_steps": max_steps,
+                           "max_input_tokens": max_input_tokens,
+                           "input_limit_scope": "next complete input before dispatch; no cumulative or output-token limit",
                            "observation_text_limit": observation_text_limit,
+                           "trace_screenshots": trace_screenshots,
+                           "screenshot_policy": "automatic observations only; explicit screenshot tool and video configured separately",
                            "observation_text_limit_scope": "flattened_axtree_characters_before_truncation_marker",
                            **({'observation_text_limit_applied': False,
                                'observation_budget': harness_profile.ax_config.describe()} if ax_explorer else {}),
@@ -137,10 +284,21 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                            "timing_semantics": {"pacing_seconds": "before_observation hook wall time",
                                "request_seconds": "backend.complete wall time including validation/reservation; not isolated HTTP latency",
                                "inference_seconds": "legacy alias for request_seconds; legacy wrappers may still pace internally",
-                               "browser_step_seconds": "env.step wall time including BrowserGym observation extraction"}})
+                               "browser_step_seconds": "env.step wall time including BrowserGym observation extraction"}}, async_recording=async_recording, debug_timings=debug_timings)
+    if getattr(feedback,'collector',None) is not None:
+        feedback.collector.debug=trace.timings
+    if observation_pipeline is not None:
+        trace.metadata['timing_semantics'].update(
+            request_seconds='Barrier until completion and prefetch settle; may overlap. See observation_pipeline.backend_completion_seconds for backend wall time.',
+            inference_seconds='Legacy alias for request_seconds; not isolated inference latency.',
+            background_capture='Per-phase timing in observation_capture_phase lifecycle events; includes native BID marking and cleanup.')
+        write_json(trace.directory/'metadata.json',trace.metadata)
     if agent_runtime:agent_runtime.bind(agent_actor,trace)
     delivery = PolicyDelivery(trace) if harness_profile and harness_profile.delivery_tracking else None
     env = None
+    pipeline = None
+    human_browser = None
+    human_chat = None
     navigation = None
     reward = 0.0
     terminated = truncated = False
@@ -160,6 +318,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
     search_text = ""
     info = {}
     reset_complete = False
+    screenshot_capture_original = None
     try:
         if hasattr(backend, 'begin_episode'):
             routing = backend.begin_episode(trace.episode_id)
@@ -189,9 +348,39 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         trace.metadata['browser_action_execution'] = (action_set.timeout_metadata()
             if isinstance(action_set, BrowserActionSet) else {'action_timeout_ms': None, 'scope': 'External/factory mapping; deadline not controlled here'})
         write_json(trace.directory / 'metadata.json', trace.metadata)
+        if observation_pipeline is not None:
+            from .observation_pipeline import ObservationPipeline
+            pipeline = ObservationPipeline(base_env, observation_pipeline, trace)
+        elif not trace_screenshots and not no_browser:
+            from browsergym.core.env import BrowserEnv
+            from .cdp_json import capture_json
+            if (not isinstance(base_env,BrowserEnv) or
+                    getattr(base_env._get_obs,'__func__',None) is not BrowserEnv._get_obs):
+                raise ValueError('Disabling automatic screenshots requires native BrowserGym capture or the reviewed observation pipeline')
+            screenshot_capture_original=base_env._get_obs
+            base_env._get_obs=lambda:capture_json(screenshot_capture_original,screenshots=False)
+        if handover_enabled:
+            from .human_browser import HumanBrowser, CONTROL_TOOLS
+            from .human_browser import CONTENT_INDEPENDENT_TOOLS
+            human_browser = HumanBrowser(base_env,human_handover,trace,pipeline,
+                wait_for_human=harness_profile.tools.human_handover_wait,
+                compact_tabs=harness_profile.tools.compact_tab_context,
+                stable_frames=harness_profile.tools.stable_frame_capture,
+                capture_timeout_mode=harness_profile.capture_timeout_mode)
         trace.event("environment_reset_started", seed=seed)
         obs, info = env.reset(seed=seed)
         reset_complete = True
+        if human_browser is not None:
+            from .human_chat import HumanChat
+            human_chat = HumanChat(base_env.chat,trace)
+            if human_handover_ui is not None:
+                attachment = human_handover_ui.attach_chat(base_env.chat.page)
+                trace.event('human_chat_controls_attached',
+                    **{k:attachment[k] for k in ('version','attached','already_attached') if k in attachment})
+            human_browser.start()
+            obs = refresh_observation(env,complete=True)
+            if hasattr(feedback,'collector'):
+                feedback.collector.page_filter = human_browser.is_agent_active
         if agent_runtime and agent_actor['parent'] is None:agent_runtime.root_goal=obs['goal']
         if delegated_goal is not None:
             obs['goal']=delegated_goal
@@ -267,17 +456,21 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             from .vision import VisionSession
             vision = VisionSession(harness_profile.vision_config, trace.directory)
 
-        def present_feedback(value,event,kind):
-            if kind == "vision_result": return value
-            if harness_profile and harness_profile.feedback_presentation:
-                artifact=f"{kind}-raw-{event.get('execution_index',event['step']):03d}.json"
-                write_json(trace.directory/artifact,value)
-                event[kind+'_raw_artifact']=artifact
-                value=harness_profile.feedback_presentation(value,kind=kind)
-                if hasattr(ax_explorer,'feedback'):value=ax_explorer.feedback(value,kind=kind)
-                return value
-            return value
+        if harness_profile and harness_profile.data_config:
+            from .data_tools import DataSession
+            data_session = DataSession(harness_profile.data_config, trace.directory, ax_explorer)
 
+        def present_feedback(value,event,kind):
+            with trace.timings.span('feedback.presentation',step=event['step'],kind=kind):
+                if kind in ("vision_result", "data_result", "clarification_result", "human_tab_result"): return value
+                if harness_profile and harness_profile.feedback_presentation:
+                    artifact=f"{kind}-raw-{event.get('execution_index',event['step']):03d}.json"
+                    write_json(trace.directory/artifact,value)
+                    event[kind+'_raw_artifact']=artifact
+                    value=harness_profile.feedback_presentation(value,kind=kind)
+                    if hasattr(ax_explorer,'feedback'):value=ax_explorer.feedback(value,kind=kind)
+                    return value
+                return value
         def record_feedback(output, value, event, kind):
             if event.get('batch_call') is not None and kind == 'browser_feedback':
                 from .batching import batch_result
@@ -297,7 +490,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             if delivery is not None:
                 source_id=delivery.register(kind,json.dumps(value,ensure_ascii=False,sort_keys=True),
                     step=event['step'],provenance={'after_action':event['action'],
-                                                  'observation_before_action':event['observation']})
+                        'observation_before_action':event['observation'],
+                        **({'context_observation':event['context_observation']}
+                           if event.get('context_observation') else {}),
+                        **({'clarification_artifact':event['clarification_artifact']}
+                           if kind == 'clarification_result' else {})})
                 conversation.record(output,value,feedback_source=source_id,
                     **({'assistant_message':event['assistant_tool_message']} if native_tools else {}))
             else:
@@ -310,11 +507,57 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             if agent_runtime:agent_runtime.guard(agent_actor)
             if agent_actor is not None and decision.name=='send_msg_to_user':agent_actor['answer']=decision.arguments['text']
             from .delegation import TOOLS as AGENT_TOOLS
-            if agent_runtime and decision.name in AGENT_TOOLS:
+            if human_browser is not None and decision.name in CONTROL_TOOLS:
+                result=human_browser.execute(decision)
+                obs=refresh_observation(env,complete=True)
+                if ax_explorer is not None:ax_explorer.capture(obs)
+                final_ref=trace.observation(index+1,obs,render_observation(obs))
+                event.update(kind='human_tab_control',reward=None,browser_stepped=False,
+                    tool_output=result,tool_error=result.get('error'),next_observation=final_ref)
+                record_feedback(completion.text,result,event,'human_tab_result')
+                trace.event('human_tab_control_completed',step=event['step'],tool_call_id=event.get('tool_call_id'),
+                    tool=decision.name,result=result,observation=final_ref)
+            elif clarification_enabled and decision.name == 'ask_user':
+                from .clarification import execute_clarification
+                phase = 'clarification_callback'
+                artifact = f'clarification-{index:03d}.json'
+                event.update(kind='clarification', reward=None, browser_stepped=False,
+                    clarification_artifact=artifact, next_observation=final_ref)
+                trace.event('tool_started', call_id=f'tool-{index:03d}',
+                    tool=decision.name, arguments=decision.arguments)
+                started = time.monotonic()
+                try:
+                    result, _ = execute_clarification(trace, index,
+                        decision.arguments['question'], clarification_callback,
+                        audit_id=clarification_audit_id)
+                except BaseException as exc:
+                    trace.event('tool_failed', call_id=f'tool-{index:03d}',
+                        tool=decision.name, artifact=artifact,
+                        error=f'{type(exc).__name__}: {exc}', browser_stepped=False)
+                    raise
+                finally:
+                    event['clarification_seconds'] = time.monotonic() - started
+                event['tool_output'] = result
+                record_feedback(completion.text, result, event, 'clarification_result')
+                trace.event('tool_completed', call_id=f'tool-{index:03d}',
+                    tool=decision.name, artifact=artifact, browser_stepped=False)
+            elif agent_runtime and decision.name in AGENT_TOOLS:
                 phase='delegation_tool'
                 result=agent_runtime.execute(agent_actor,decision.name,decision.arguments,env,harness_profile,output)
                 event.update(kind='delegation',reward=None,tool_output=result,tool_error=result.get('error'),browser_stepped=False)
                 record_feedback(completion.text,result,event,'delegation_result')
+            elif data_session is not None and decision.name in ('extract_page','run_python'):
+                phase = 'data_tool'
+                trace.event('tool_started',call_id=f'tool-{index:03d}',tool=decision.name,arguments=decision.arguments)
+                started=time.monotonic()
+                result, artifact = data_session.execute(decision.name,decision.arguments,index,
+                    observation_ref=event.get('context_observation',event.get('observation')),no_browser=no_browser)
+                event.update(kind='data',reward=None,tool_output=result,tool_error=result.get('error'),
+                    data_result_artifact=artifact,data_tool_seconds=time.monotonic()-started,
+                    next_observation=final_ref,browser_stepped=False)
+                record_feedback(completion.text,result,event,'data_result')
+                trace.event('tool_completed',call_id=f'tool-{index:03d}',tool=decision.name,
+                    artifact=artifact,error=result.get('error'),browser_stepped=False)
             elif no_browser and decision.name != 'web_search':
                 if decision.name=='send_msg_to_user':
                     agent_actor['answer']=decision.arguments['text']
@@ -328,10 +571,19 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 if decision.name == 'screenshot':
                     from browsergym.core.observation import extract_screenshot
                     started=time.monotonic()
-                    pixels=extract_screenshot(env.unwrapped.page)
+                    def take_pixels():
+                        if pipeline is not None:return pipeline.screenshot(index)
+                        return extract_screenshot(env.unwrapped.page),None,None
+                    if human_browser is not None and human_browser.stable_frames:
+                        pixels,visual,visual_artifact=human_browser.capture_viewport(event['tab_target'],take_pixels)
+                    else:pixels,visual,visual_artifact=take_pixels()
+                    if visual_artifact is not None:event['visual_readiness_artifact']=visual_artifact
                     event['screenshot_capture_seconds']=time.monotonic()-started
                     result=vision.capture({'screenshot':pixels}, conversation, index)
                     result['url_at_capture']=env.unwrapped.page.url
+                    if pipeline is not None:
+                        result['visual_readiness'] = {'status':visual['status'],'reason':visual['reason'],
+                            'scope':'Viewport assets and sampled layout only; not task readiness or success.'}
                 else:
                     result=vision.release(conversation=conversation, **decision.arguments)
                 artifact=f'vision-result-{index:03d}.json'
@@ -365,6 +617,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                                                 'error': result.error}
                     record_feedback(completion.text,event['policy_feedback'],event,'search_result')
             else:
+                if ax_explorer is not None and getattr(ax_explorer.config,'agent_overview',False):
+                    ax_explorer.request_overview(decision.ax_overview_tokens)
+                    event['requested_ax_overview_tokens']=decision.ax_overview_tokens
                 before_action = None
                 if feedback is not None:
                     phase = 'feedback_before_action'
@@ -373,14 +628,19 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                         before_action = feedback.before_action(env, obs)
                     finally:
                         event['feedback_seconds'] = event.get('feedback_seconds',0) + time.monotonic() - feedback_started
+                        trace.timings.record('decision.feedback_before_action',feedback_started,step=index)
                 phase = "browser_step"
                 trace.event("tool_started", call_id=f"tool-{index:03d}",
                             tool=decision.name, arguments=decision.arguments)
                 started = time.monotonic()
+                if human_browser is not None:human_browser.last_action_execution=None
                 try:
                     obs, reward, terminated, truncated, info = env.step(action)
                 finally:
                     event['browser_step_seconds'] = time.monotonic() - started
+                    trace.timings.record('action.env_step',started,step=index,tool=decision.name)
+                    if human_browser is not None and human_browser.last_action_execution is not None:
+                        event['action_execution']=dict(human_browser.last_action_execution)
                 browser_steps += 1
                 if agent_runtime:
                     agent_runtime.action_notice(agent_actor,decision.name,obs.get('url'),obs.get('last_action_error'))
@@ -394,7 +654,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 action_errors += bool(obs["last_action_error"])
                 if vision is not None and decision.name == 'scroll_into_view':
                     from .vision import positioning
-                    event['positioning'] = positioning(obs, decision.arguments['bid'])
+                    event['positioning'] = (pipeline.positioning(decision.arguments['bid']) if pipeline is not None
+                                            else positioning(obs, decision.arguments['bid']))
                 if feedback is not None:
                     phase = 'feedback_after_action'
                     feedback_started = time.monotonic()
@@ -404,6 +665,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                         record_feedback(completion.text,event['policy_feedback'],event,'browser_feedback')
                     finally:
                         event['feedback_seconds'] += time.monotonic() - feedback_started
+                        trace.timings.record('decision.feedback_after_action',feedback_started,step=index)
                 history.append({"action": action, "error": obs["last_action_error"]})
                 final_ref = trace.observation(index + 1, obs, render_observation(obs))
                 if episode_task and hasattr(episode_task, 'after_step'):
@@ -418,6 +680,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
 
         final_ref = trace.observation(0, obs, render_observation(obs))
         for index in range(max_steps):
+            if agent_runtime and agent_runtime.calls >= agent_runtime.limits.total_model_calls:
+                break  # Shared call guard includes parent and helpers.
             event = {"step": index, "observation": None, "transition_observation": final_ref, "messages": None,
                      "model_output": None, "model_request": None, "model_response": None,
                      "action": None, "reward": None, "pacing_seconds": 0.0,
@@ -432,6 +696,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             action = ''
             model_called = False
             phase = "before_observation"
+            if human_browser is not None:human_browser.association={'step':index,'phase':phase}
             captured_at = None
             try:
                 if agent_runtime:agent_runtime.guard(agent_actor)
@@ -454,14 +719,25 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                         event['pacing_seconds'] = time.monotonic() - started
                         trace.event("observation_wait_finished", step=index, seconds=event['pacing_seconds'])
                     phase = "observation_capture"
+                    if human_browser is not None:human_browser.association={'step':index,'phase':phase}
                     trace.event("decision_observation_started", step=index)
                     started = time.monotonic()
                     try:
-                        obs = refresh_observation(env)
+                        obs = (pipeline.decision_capture(human_browser,backend,obs)
+                               if pipeline is not None and observation_pipeline.dynamic_preview
+                               else refresh_observation(env))
                     finally:
                         captured_at = time.monotonic()
                         event['observation_capture_seconds'] = captured_at - started
-                    text = ax_explorer.prepare_observation(obs) if hasattr(ax_explorer,'prepare_observation') else render_observation(obs)
+                    with trace.timings.span('decision.format_preview',step=index):
+                        text = ax_explorer.prepare_observation(obs) if hasattr(ax_explorer,'prepare_observation') else render_observation(obs)
+                    if harness_profile and harness_profile.tools.open_internet and not no_browser:
+                        from .open_internet import tab_observation
+                        if hasattr(ax_explorer, 'prepare_observation'):
+                            text = tab_observation(obs, text, tab_context)
+                        note = (event.get('observation_wait_details') or {}).get('human_intervention_note')
+                        if note:
+                            text = 'HUMAN SUPERVISOR INTERVENTION NOTE: ' + str(note) + '\n' + text
                     final_ref = trace.observation(index, obs, text, phase="decision")
                     trace.event("decision_observation_completed", step=index, observation=final_ref,
                                 seconds=event['observation_capture_seconds'])
@@ -482,7 +758,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                             conversation.add_evidence(update,source_id=source_id)
                     finally:
                         event['feedback_seconds']=time.monotonic()-feedback_started
+                        trace.timings.record('decision.feedback_before_request',feedback_started,step=index)
                 phase = "prompt"
+                prompt_started=time.monotonic()
                 if agent_runtime and delivery is not None:
                     notice=agent_runtime.notices(agent_actor)
                     if notice:
@@ -501,16 +779,47 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     messages = [{"role": "system", "content": system}, {"role": "user", "content":
                         f"USER GOAL: {obs['goal']}\nRecent actions: {history[-4:]}\n{text}{search_context}"}]
                 elif delivery is not None:
+                    if human_chat is not None:
+                        if human_chat.pending:human_browser.confirmations.clear()
+                        human_chat.enqueue(conversation,delivery,index)
                     source_id=delivery.register('page_observation',text,step=index,provenance={'observation':final_ref})
                     messages=conversation.request(system,obs['goal'],text,search_context,observation_source=source_id)
                     event['policy_bindings']=conversation.bindings()
                 else:
                     messages = conversation.request(system, obs['goal'], text, search_context)
+                if handover_enabled and tab_context is not None:
+                    context_record=tab_context.commit(obs['human_tabs'])
+                    trace.event('tab_context_constructed',step=index,projection=context_record,
+                        observation=final_ref,controller_revision=obs['human_tabs']['revision'],
+                        scope='Entered constructed append-only history; HTTP acknowledgment is separate')
                 event.update(messages=messages, messages_sha256=messages_digest(messages))
+                trace.timings.record('decision.build_prompt',prompt_started,step=index)
+                dynamic_pending = bool(pipeline is not None and pipeline.dynamic is not None
+                                       and pipeline.dynamic.pending is not None)
+                if dynamic_pending:
+                    event['preview_target'] = pipeline.dynamic.pending['identity']
+                if human_browser is not None and not dynamic_pending:
+                    event['tab_target']=human_browser.ticket(obs)
+                if max_input_tokens is not None:
+                    phase = 'input_budget'
+                    with trace.timings.span('decision.input_token_count',step=index):
+                        count = input_counter(messages, (native_options or {}).get('tools', []))
+                    if not isinstance(count, dict) or type(count.get('input_tokens')) is not int or count['input_tokens'] < 0:
+                        raise ValueError('Input counter must return a nonnegative input_tokens integer')
+                    event['input_budget'] = {**count, 'limit': max_input_tokens,
+                                             'exceeded': count['input_tokens'] > max_input_tokens}
+                    trace.event('input_budget_checked', step=index, **event['input_budget'])
+                    if event['input_budget']['exceeded']:
+                        stop_reason = 'max_input_tokens'
+                        event['kind'] = 'input_limit'
+                        event['model_dispatch_skipped'] = True
+                        # No HTTP call, reservation, action or policy acknowledgment.
+                        break
                 trace.event("model_started", call_id=f"model-{index:03d}", messages=messages,
                             observation=final_ref, messages_sha256=event['messages_sha256'])
                 previous_request = getattr(backend, 'last_request', None)
                 phase = "model"
+                if human_browser is not None:human_browser.association={'step':index,'phase':'model','model_call_id':f'model-{index:03d}'}
                 if navigation is not None:
                     navigation.check_active()
                 started = time.monotonic()
@@ -518,14 +827,18 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     event['observation_age_lower_bound_seconds_at_model_call'] = started - captured_at
                 model_called = True
                 try:
-                    completion = backend.complete(messages)
+                    completion = (pipeline.complete(backend,messages,event) if pipeline is not None
+                                  else backend.complete(messages))
                 finally:
                     event['request_seconds'] = event['inference_seconds'] = time.monotonic() - started
+                    trace.timings.record('decision.completion_barrier',started,step=index)
                 event.update(model_output=completion.text, model_response=completion.raw,
                              model_request=completion.request)
                 trace.event("model_completed", call_id=f"model-{index:03d}",
                             model_output=completion.text, model_response=completion.raw,
                             model_request=completion.request)
+                if callable(getattr(input_counter, 'observe_completion', None)):
+                    input_counter.observe_completion(completion.request, completion.raw)
                 phase = "policy_input_evidence"
                 if delivery is not None:
                     event['policy_delivery']=delivery.record(event,event['policy_bindings'],acknowledged=True)
@@ -537,7 +850,25 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                 if episode_task and hasattr(episode_task, 'on_policy_input'):
                     event['privileged_policy_evidence'] = episode_task.on_policy_input(
                         env, trace, event, acknowledged=True)
+                if pipeline is not None:
+                    phase = 'background_observation'
+                    if (event['observation_pipeline']['background_error'] and
+                            not event['observation_pipeline'].get('invalidated')):
+                        raise RuntimeError(event['observation_pipeline']['background_error'])
+                    full_obs = pipeline.full_after_completion()
+                    if full_obs is not None:
+                        obs = full_obs
+                        ax_explorer.capture(obs)
+                        event['context_observation'] = event['observation_pipeline'].get('artifact') or event['observation']
+                        if dynamic_pending and not event['observation_pipeline'].get('invalidated'):
+                            event['tab_target']=human_browser.ticket(obs)
+                            event['tab_target_scope']='Validated background snapshot; full tree not delivered as the preview. Fresh action guards retained.'
                 phase = "action_parse"
+                from .completion_diagnostics import completion_diagnostic
+                diagnostic=completion_diagnostic(completion.raw,completion.request)
+                if diagnostic is not None:
+                    event['completion_diagnostic']=diagnostic
+                    trace.event('completion_classified',step=index,diagnostic=diagnostic)
                 if native_tools:
                     parsed, assistant = (harness_profile.tools.parse_batch if batching else harness_profile.tools.parse_completion)(
                         completion, allow_search=search_backend is not None)
@@ -559,58 +890,178 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                     from .batching import document_signature, target_signature, batch_events
                     from copy import deepcopy
                     phase = 'batch_execution'
-                    initial_document = [] if no_browser else document_signature(env)
+                    guard_document = (lambda e: human_browser.document_identity()) if human_browser is not None else document_signature
+                    tab_ticket=event.get('tab_target')
                     initial_targets = {d.arguments['bid']: target_signature(obs,d.arguments['bid'])
                                        for d in decisions if 'bid' in d.arguments}
                     records, results = [], []
-                    batch_stop = None
+                    batch_stop = ('background_preview_invalidated' if
+                        event.get('observation_pipeline',{}).get('invalidated') else None)
                     fatal = None
                     root_event = event
                     root_event['batch_calls'] = records
+                    # Retain every valid proposal even if the initial read-only
+                    # frame scan fails. A transient invalidation consumes this
+                    # proposal; only a new model decision may try again.
+                    try:
+                        if human_browser is not None and batch_stop is None:
+                            human_browser.emit(step=index,phase='post_model')
+                            batch_stop=human_browser.guard(tab_ticket)
+                            if human_chat.pending:
+                                batch_stop=batch_stop or 'human_message_pending'
+                        initial_document = [] if no_browser or batch_stop else guard_document(env)
+                    except DocumentScanInvalidated as exc:
+                        batch_stop = 'document_scan_invalidated'
+                        root_event['batch_guard_error'] = exc.detail
+                    except Exception as exc:
+                        batch_stop = 'batch_guard_failed'
+                        root_event['batch_guard_error'] = getattr(exc, 'document_scan_detail',
+                            {'error': f'{type(exc).__name__}: {exc}'})
+                        fatal = exc
                     for ordinal, decision in enumerate(decisions):
+                        confirmation=None
                         call_id = assistant['tool_calls'][ordinal]['id']
                         member = {'step':index,'batch_call':ordinal,'execution_index':execution_index,
                                   'tool_call_id':call_id,'action':decision.code,'observation':final_ref,
-                                  'reward':None,'browser_stepped':False}
+                                  'reward':None,'browser_stepped':False,'action_dispatch_started':False}
                         execution_index += 1
                         records.append(member)
+                        if human_browser is not None:
+                            if decision.name=='proceed_action':
+                                cid=decision.arguments['confirmation_id']
+                                confirmation=human_browser.take_confirmation(cid)
+                                member['proposed_action']=decision.code
+                                if confirmation is None:
+                                    batch_stop=batch_stop or 'confirmation_unknown_expired_or_consumed'
+                                else:
+                                    decision=confirmation['decision']
+                                    member['confirmation']={'confirmation_id':cid,'original_step':confirmation['step'],
+                                        'original_tool_call_id':confirmation['tool_call_id'],
+                                        'change_artifact':confirmation['artifact'],'resolved_action':decision.code,
+                                        'scope':'One exact action attempt; content changes bypassed, identity/custody preserved'}
+                            member['tab_target']=deepcopy(tab_ticket)
+                            human_browser.association={'step':index,'phase':'batch_guard','tool_call_id':call_id}
                         if batch_stop is None:
                             try:
                                 # Observe again, never insert a hidden noop or replay an action.
+                                if human_browser is not None:batch_stop=human_browser.guard(tab_ticket)
                                 started = time.monotonic()
-                                obs = refresh_observation(env)
+                                cached_ax_read=(human_browser is not None and human_browser.stable_frames
+                                    and decision.name in ('ax_search','ax_read','ax_changes'))
+                                viewport_read=(human_browser is not None and human_browser.stable_frames
+                                    and decision.name=='screenshot')
+                                immutable_data_read=(data_session is not None and decision.name=='run_python')
+                                targeted_check=None
+                                if (batch_stop is None and pipeline is not None and pipeline.config.targeted_actions
+                                        and confirmation is None and not (cached_ax_read or viewport_read or immutable_data_read)):
+                                    from .targeted_guard import check as check_target
+                                    targeted_check=check_target(human_browser,tab_ticket,obs,decision)
+                                    if targeted_check is not None:
+                                        member['targeted_guard']=targeted_check
+                                        member['observation_reused']={'scope':'Background/full batch snapshot retained; live targeted guard recorded separately.'}
+                                        trace.event('targeted_action_guard',step=index,tool_call_id=call_id,**targeted_check)
+                                        batch_stop=targeted_check['reason']
+                                if batch_stop is None and immutable_data_read:
+                                    member['observation_reused']={'scope':
+                                        'Immutable saved datasets/literals only; no fresh page extraction. Document/custody guards retained.'}
+                                    trace.event('immutable_data_query',step=index,tool_call_id=call_id,tool=decision.name,
+                                        datasets=list(decision.arguments.get('datasets',[])),
+                                        scope='Saved dataset hashes validated by DataSession; no browser observation refresh')
+                                if batch_stop is None and (cached_ax_read or viewport_read):
+                                    member['observation_reused']={'scope':('Existing AX reference only; tool captures fresh viewport pixels'
+                                        if viewport_read else 'Query of captured AX; no fresh page extraction'),
+                                        'document':deepcopy(obs['human_tab_capture']['document'])}
+                                    trace.event('viewport_only_guard' if viewport_read else 'captured_ax_query',step=index,tool_call_id=call_id,tool=decision.name,
+                                        scope='Custody/main-document checks retained; subsequent browser actions still refresh')
+                                if batch_stop is None and not (cached_ax_read or viewport_read or immutable_data_read or targeted_check is not None):
+                                    obs = (refresh_observation(env,complete=True) if pipeline is not None
+                                           else refresh_observation(env))
                                 member['observation_capture_seconds'] = time.monotonic()-started
                                 member['observation'] = trace.observation(member['execution_index'],obs,
                                     observation_text(obs),phase='batch_guard')
-                                if not no_browser and document_signature(env) != initial_document:
+                                if human_browser is not None:
+                                    if human_chat.pending:
+                                        batch_stop=batch_stop or 'human_message_pending'
+                                    if confirmation is not None:
+                                        batch_stop=batch_stop or human_browser.confirmation_guard(confirmation,obs)
+                                    else:
+                                        batch_stop=batch_stop or human_browser.guard(tab_ticket,
+                                            None if targeted_check is not None else obs,decision=decision)
+                                        if batch_stop=='tab_content_changed_since_decision':
+                                            review=human_browser.content_review(tab_ticket,obs,decision,step=index,call_id=call_id)
+                                            batch_stop=review['reason'] if review is not None else None
+                                            if review is not None:member['policy_feedback']=review
+                                    if human_chat.pending:
+                                        batch_stop=batch_stop or 'human_message_pending'
+                                if batch_stop is None and not no_browser and guard_document(env) != initial_document:
                                     batch_stop = 'document_or_navigation_changed'
                                 bid = decision.arguments.get('bid')
-                                if not no_browser and bid is not None and (initial_targets[bid] is None or
-                                        target_signature(obs,bid) != initial_targets[bid]):
+                                if not no_browser and bid is not None and confirmation is None and (initial_targets.get(bid) is None or
+                                        target_signature(obs,bid) != initial_targets.get(bid)):
                                     batch_stop = batch_stop or 'target_removed_or_changed'
                                 if batch_stop is None:
                                     if ax_explorer is not None: ax_explorer.capture(obs)
                                     conversation._active_tool_call_id = call_id
-                                    execute_decision(decision, member, member['execution_index'])
+                                    member['action_dispatch_started'] = True
+                                    if human_browser is not None:human_browser.association['phase']='tool_execution'
+                                    # Preserve intermediate batch observations; only the last
+                                    # call may defer its full post-action capture to the next
+                                    # fresh preview/background cycle.
+                                    if pipeline is not None:
+                                        pipeline.defer_next_step=(pipeline.config.targeted_actions and ordinal==len(decisions)-1)
+                                    try:execute_decision(decision, member, member['execution_index'])
+                                    finally:
+                                        if pipeline is not None:pipeline.defer_next_step=False
+                                    if (human_browser is not None and member.get('browser_stepped')
+                                            and decision.name not in CONTENT_INDEPENDENT_TOOLS):
+                                        human_browser.confirmations.clear()
                                     action = decision.code
                                     if member.get('action_error') or member.get('tool_error'):
                                         batch_stop = 'tool_error_inspect_effects_before_retry'
+                                    elif decision.name == 'ask_user':
+                                        batch_stop = 'clarification_boundary'
+                                    elif human_browser is not None and decision.name in CONTROL_TOOLS:
+                                        batch_stop = 'tab_control_boundary'
                                     elif terminated or truncated or decision.name == 'send_msg_to_user':
                                         batch_stop = 'episode_finished'
-                                    elif not no_browser and document_signature(env) != initial_document:
+                                    elif not no_browser and guard_document(env) != initial_document:
                                         batch_stop = 'document_or_navigation_changed'
+                                    if human_browser is not None and batch_stop is None and not (
+                                            pipeline is not None and pipeline.config.targeted_actions and ordinal==len(decisions)-1):
+                                        tab_ticket=human_browser.ticket(obs)
+                            except DocumentScanInvalidated as exc:
+                                member['batch_guard_error'] = exc.detail
+                                batch_stop = 'document_scan_invalidated'
+                                # After a completed action, preserve its result;
+                                # the invalidated guard only stops later calls.
+                                if member['action_dispatch_started'] and not member.get('browser_stepped'):
+                                    member['policy_feedback']=interrupted_step_feedback(member,exc)
                             except Exception as exc:
                                 member['error'] = f'{type(exc).__name__}: {exc}'
-                                member['policy_feedback'] = {'execution':'failed_effects_unknown','error':member['error']}
+                                if hasattr(exc, 'document_scan_detail'):
+                                    member['batch_guard_error'] = exc.document_scan_detail
+                                if not member['action_dispatch_started']:
+                                    member['not_executed'] = True
+                                    member['policy_feedback'] = {'execution':'not_executed','error':member['error']}
+                                elif 'policy_feedback' not in member:
+                                    member['policy_feedback'] = interrupted_step_feedback(member,member['error'])
                                 fatal = exc
-                                batch_stop = 'execution_exception_effects_unknown'
+                                batch_stop = ('execution_exception_effects_unknown' if member['action_dispatch_started']
+                                              else 'batch_guard_failed')
                         if 'policy_feedback' not in member:
-                            member['policy_feedback'] = {'execution':'not_executed','reason':batch_stop}
+                            if member['action_dispatch_started']:
+                                member['policy_feedback']=interrupted_step_feedback(member,batch_stop)
+                            else:
+                                member['policy_feedback'] = {'execution':'not_executed','reason':batch_stop}
+                                member['not_executed'] = True
+                        elif not member['action_dispatch_started']:
                             member['not_executed'] = True
                         value = member['policy_feedback']
                         source = delivery.register(member.get('feedback_kind','batch_result'),
                             json.dumps(value,ensure_ascii=False,sort_keys=True), step=index,
-                            provenance={'batch_call':ordinal,'tool_call_id':call_id}) if delivery else None
+                            provenance={'batch_call':ordinal,'tool_call_id':call_id,
+                                **({'clarification_artifact':member['clarification_artifact']}
+                                   if member.get('feedback_kind') == 'clarification_result' else {})}) if delivery else None
                         results.append((value,source))
                         trace.event('batch_call_completed', step=index, call_kind=member.get('kind'),
                             **{k:v for k,v in member.items() if k not in ('step','kind','_batch_feedback')})
@@ -631,9 +1082,14 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                         root_event[key] = (root_event.get(key) or 0) + sum(r.get(key) or 0 for r in records)
                     phase = 'batch_execution'
                     if fatal is not None: raise fatal
+                consecutive_retries_used = 0
             except (Exception, KeyboardInterrupt) as exc:
+                trace.timings.exception(exc,step=index,phase=phase)
                 event["error"] = f"{type(exc).__name__}: {exc}"
                 event['failure_phase'] = phase
+                scan_detail = getattr(exc, 'document_scan_detail', None)
+                if isinstance(exc, DocumentScanInvalidated):scan_detail = exc.detail
+                if scan_detail is not None:event['document_scan_detail'] = scan_detail
                 if model_called and getattr(exc, 'http_status', None) is not None:
                     event['model_error_http_status'] = exc.http_status
                     event['model_error_retry_after'] = exc.retry_after
@@ -656,17 +1112,30 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
                             env, trace, event, acknowledged=False)
                     except (Exception, KeyboardInterrupt) as evidence_error:
                         event['policy_evidence_error'] = f'{type(evidence_error).__name__}: {evidence_error}'
-                trace.event("decision_error", step=index, error=event["error"])
+                trace.event("decision_error", step=index, error=event["error"],
+                    failure_phase=phase, **({'document_scan_detail':scan_detail} if scan_detail is not None else {}))
                 retry = (retry_policy.select(exc, phase, event, used=retries_used,
+                            consecutive_used=consecutive_retries_used,
                             remaining_calls=max_steps-index-1) if retry_policy is not None else None)
                 if retry is not None:
                     conversation.recover(event.get('model_response'), retry['notice'],
                         preserve_reasoning=harness_profile.tools.reasoning_replay == 'preserve')
                     retries_used += 1
+                    consecutive_retries_used += 1
                     pending_retry = {**retry, 'step': index}
                     event['decision_retry'] = {**retry, 'ordinal': retries_used, 'next_step': index+1}
+                    if retry_policy.scope == 'failure_chain':
+                        event['decision_retry']['chain_ordinal'] = consecutive_retries_used
                     trace.event('decision_retry_scheduled', step=index, **event['decision_retry'])
                     continue  # finally persists this failed attempt before any further request
+                if retry_policy is not None and retry_policy.scope == 'failure_chain':
+                    event['decision_retry_unavailable'] = {
+                        'reason': ('episode_call_limit' if max_steps-index-1 <= 0 else
+                                   'failure_chain_limit' if consecutive_retries_used >= retry_policy.max_retries else
+                                   'failure_not_recoverable'),
+                        'remaining_calls': max(0, max_steps-index-1),
+                        'consecutive_retries_used': consecutive_retries_used,
+                        'failure_phase': phase}
                 raise
             finally:
                 request = event.get('model_request')
@@ -690,11 +1159,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
         if hold_seconds:
             env.unwrapped.page.wait_for_timeout(hold_seconds * 1000)
     except (Exception, KeyboardInterrupt) as exc:
+        trace.timings.exception(exc,phase='episode')
         stop_reason = "error" if isinstance(exc, Exception) else "interrupted"
         error = f"{type(exc).__name__}: {exc}"
     finally:
         if agent_runtime and agent_actor['parent'] is None:agent_runtime.finish_children()
-        outcome = {"terminated": terminated, "truncated": truncated or stop_reason == "max_steps",
+        outcome = {"terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens"),
                    "stop_reason": stop_reason, "error": error, "final_reward": reward}
         trace.event("evaluation_started", reset_complete=reset_complete)
         try:
@@ -715,29 +1185,82 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=12, see
             evaluation_data = Evaluation("evaluation-error", "1", technical_error=error).to_dict()
         write_json(trace.directory / "evaluation.json", evaluation_data)
         trace.event("evaluation_completed", artifact="evaluation.json", error=evaluation_data["technical_error"])
+        execution_error=error
+        cleanup_errors=[]
+        write_json(trace.directory / 'evaluation-before-close.json',evaluation_data)
         if env is not None:
-            if navigation is not None:
+            trace.event('environment_close_started',scope='Inference ended; cleanup/teardown in progress')
+            def cleanup_phase(name,callback,seconds=2.0):
+                started=time.monotonic();failure=None
+                trace.event('cleanup_phase_started',phase=name)
                 try:
-                    navigation.close()
+                    if human_browser is not None:
+                        from .native_capture import CaptureBudget
+                        limit=CaptureBudget(env.unwrapped.page,trace,seconds=seconds,scope='browser_cleanup')
+                        limit.phase='teardown_'+name
+                        with limit.rpc_deadline():return callback()
+                    return callback()
+                except Exception as exc:
+                    failure=f'{type(exc).__name__}: {exc}'
+                    cleanup_errors.append({'phase':name,'error':failure})
+                    raise
+                finally:
+                    trace.event('cleanup_phase_completed',phase=name,seconds=time.monotonic()-started,
+                        error=failure,rpc_budget_seconds=seconds if human_browser is not None else None)
+            if navigation is not None:
+                try:cleanup_phase('navigation',navigation.close)
                 except Exception as exc:
                     trace.event('navigation_cleanup_failed', error=f'{type(exc).__name__}: {exc}')
             if feedback is not None:
                 try:
-                    feedback.close(env)
+                    shutdown=getattr(feedback,'close_for_context_shutdown',None)
+                    cleanup_phase('feedback',lambda:shutdown(env) if shutdown is not None else feedback.close(env))
                 except Exception as exc:
                     trace.event('feedback_cleanup_failed', error=f'{type(exc).__name__}: {exc}')
-            trace.event("environment_close_started")
+            if human_chat is not None:
+                try:cleanup_phase('human_chat',human_chat.close)
+                except Exception as exc:
+                    trace.event('human_chat_cleanup_failed',error=f'{type(exc).__name__}: {exc}')
+            if human_browser is not None:
+                try:cleanup_phase('human_tabs',human_browser.close)
+                except Exception as exc:
+                    trace.event('human_tab_cleanup_failed',error=f'{type(exc).__name__}: {exc}')
+            if pipeline is not None:
+                try:cleanup_phase('observation_pipeline',pipeline.close)
+                except Exception as exc:
+                    trace.event('observation_pipeline_cleanup_failed',error=f'{type(exc).__name__}: {exc}')
+            if screenshot_capture_original is not None:
+                base_env._get_obs=screenshot_capture_original
             try:
-                env.close()
+                from .browser_shutdown import supported,close_resources
+                if human_browser is not None and human_browser.stable_frames and supported(env):
+                    failures=close_resources(env,cleanup_phase)
+                    if failures:raise RuntimeError('; '.join(f"{f['phase']}: {f['error']}" for f in failures))
+                else:cleanup_phase('browsergym_close',env.close,seconds=5.0)
             except Exception as exc:
                 error = error or f"Close failed: {exc}"
                 evaluation_data["technical_error"] = error
                 evaluation_data["safe_success"] = None
                 write_json(trace.directory / "evaluation.json", evaluation_data)
+                # A failed task/chat/context cleanup must not leave the owned
+                # Chromium alive merely because the remaining close was skipped.
+                browser=getattr(env.unwrapped,'browser',None)
+                if human_browser is not None and browser is not None:
+                    try:cleanup_phase('browser_close_fallback',browser.close)
+                    except Exception as close_exc:
+                        trace.event('browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
+                chat=getattr(env.unwrapped,'chat',None)
+                if human_browser is not None and chat is not None and getattr(chat,'browser',None) is not None:
+                    try:cleanup_phase('chat_browser_close_fallback',chat.browser.close)
+                    except Exception as close_exc:
+                        trace.event('chat_browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
             trace.event("environment_close_completed", error=error)
         summary = {"final_reward": reward, "success": bool(reward > 0) if metadata.get("verifier") and terminated and not error else None,
-                   "terminated": terminated, "truncated": truncated or stop_reason == "max_steps",
+                   "terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens"),
                    "stop_reason": stop_reason, "error": error, "step_count": steps,
+                   "execution_error":execution_error,"cleanup_errors":cleanup_errors,
+                   "evaluation_before_close_file":"evaluation-before-close.json",
+                   "max_input_tokens": max_input_tokens,
                    "browser_step_count": browser_steps,
                    "action_error_count": action_errors, "timing_totals": timing_totals,
                    "search_request_count": search_backend.calls if search_backend else 0,

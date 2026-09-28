@@ -90,7 +90,7 @@ class StandardTests(unittest.TestCase):
     def test_composable_standard(self):
         from intent_browser.standard_profile import standard_profile
         p=standard_profile(navigation_origins=('http://localhost:9000',))
-        self.assertEqual(p.name,'core-tools-v10-agents')
+        self.assertEqual(p.name,'core-tools-v12-ax-reuse')
         self.assertEqual(p.tools.batch_size,8)
         self.assertEqual(p.tools.reasoning_replay,'preserve')
         self.assertTrue(p.ax_config.incremental)

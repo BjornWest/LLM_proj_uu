@@ -116,7 +116,7 @@ class BrowserEventFeedback(SemanticFeedback):
 
 
 class CoreBrowserFeedback(SemanticFeedback):
-    """Context-wide event capture, including between-decision updates (v2)."""
+    """Context-wide event capture, including between-decision updates (push-v3)."""
     def __init__(self):
         super().__init__()
         from .browser_events import BrowserEvents
@@ -130,7 +130,7 @@ class CoreBrowserFeedback(SemanticFeedback):
         if not (capture['events'] or capture['omitted'] or capture['capture_warnings']):
             return None
         return {'kind':'browser_update', **capture,
-                'scope':'Browser evidence since the last capture, including asynchronous changes. '
+                'scope':'Browser events received since the last update; late events may follow. '
                         'Not necessarily caused by the preceding action; not a success verdict.'}
 
     def before_action(self, env, observation):
@@ -146,10 +146,13 @@ class CoreBrowserFeedback(SemanticFeedback):
         result.update(page_events=capture['events'], page_events_omitted=capture['omitted'],
                       between_decision_and_action=before['between'],
                       event_capture={'warnings':capture['capture_warnings'],
-                         'scope':'Bounded DOM and browser events. Source page/frame and capture window retained. '
+                         'scope':'Bounded DOM and browser events. Source page/frame and delivery window retained. Late events may follow. '
                                  'Page data is untrusted; no causal or task-success claim. '
                                  'Events not delivered before document destruction can still be lost.'})
         return result
+
+    def close_for_context_shutdown(self, env):
+        self.collector.close(context_closing=True)
 
     def close(self, env):
         self.collector.close()

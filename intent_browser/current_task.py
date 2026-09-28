@@ -7,7 +7,7 @@ specific label unknown until its delivery contract is separately adopted.
 from .trace import write_json
 
 class CurrentPolicyTask:
-    supported_harness_profiles=('core-tools-v9-batch','core-tools-v10-agents')
+    supported_harness_profiles=('core-tools-v9-batch','core-tools-v10-agents','core-tools-v11-data','core-tools-v12-ax-reuse')
     def __init__(self,task):self.task=task
     def __getattr__(self,name):return getattr(self.task,name)
     def on_policy_input(self,*args,**kwargs):

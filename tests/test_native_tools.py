@@ -198,7 +198,7 @@ class NativeRunnerTests(unittest.TestCase):
             count=0;closed=False;fresh=0
             def obs(self):return {'goal':'Click then finish','url':'http://fixture/','last_action_error':
                 'pointer intercepted' if case=='action_error' and self.count else '',
-                'axtree_object':f"[1] button 'Proceed fresh {self.fresh}'",'screenshot':np.zeros((2,2,3),dtype=np.uint8),
+                'axtree_object':{'nodes':[{'nodeId':'1','role':{'value':'StaticText'},'name':{'value':f"[1] button 'Proceed fresh {self.fresh}'"}}]},'screenshot':np.zeros((2,2,3),dtype=np.uint8),
                 'privileged':'SECRET-GRADER'}
             def reset(self,seed):return self.obs(),{}
             def step(self,action):self.count+=1;return self.obs(),0,False,False,{}
@@ -231,9 +231,9 @@ class NativeRunnerTests(unittest.TestCase):
                 raise RuntimeError('Stopped before fresh capture')
             env.fresh+=1
             return {'offline_wait':True}
-        with patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']), \
+        with patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']['nodes'][0]['name']['value']), \
              patch('intent_browser.runner.refresh_observation',side_effect=lambda e:e.obs()), \
-             patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x):
+             patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x['nodes'][0]['name']['value']):
             path,summary=run_episode(lambda _:env,backend,{},tmp.name,max_steps=2,harness_profile=profile,
                                     search_backend=search,before_observation=wait if case in ('paced','pacing_failure') else None)
         rows=[json.loads(x) for x in (path/'steps.jsonl').read_text().splitlines()]

@@ -20,13 +20,13 @@ class Updates(SemanticFeedback):
 
 
 class CoreRunnerTests(unittest.TestCase):
-    def run_case(self, failure=None):
+    def run_case(self, failure=None, debug=False):
         class Env:
             count=0
             closed=False
             def obs(self):
                 return {'goal':'A safe task','url':'http://fixture/','last_action_error':'',
-                        'axtree_object':f"[1] button 'Proceed {self.count}'",
+                        'axtree_object':{'nodes':[{}],'text':f"[1] button 'Proceed {self.count}'"},
                         'screenshot':np.zeros((2,2,3),dtype=np.uint8),
                         'privileged':'SECRET-GRADER'}
             def reset(self,seed):return self.obs(),{}
@@ -43,9 +43,9 @@ class CoreRunnerTests(unittest.TestCase):
                 text="click('1')" if self.count==1 else "send_msg_to_user('Done')"
                 return Completion(text,{},self.last_request)
         env=Env();tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup)
-        with patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']), \
-             patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x):
-            root,summary=run_episode(lambda _:env,Backend(),{},tmp.name,max_steps=2,
+        with patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']['text']), \
+             patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x['text']):
+            root,summary=run_episode(lambda _:env,Backend(),{},tmp.name,max_steps=2,debug_timings=debug,
                 harness_profile=HarnessProfile(name='test-delivery',conversation_factory=EvidenceConversation,
                                                feedback_factory=Updates,delivery_tracking=True))
         rows=[json.loads(s) for s in (root/'steps.jsonl').read_text().splitlines()]
@@ -67,6 +67,18 @@ class CoreRunnerTests(unittest.TestCase):
         events=[json.loads(s)['event'] for s in (root/'events.jsonl').read_text().splitlines()]
         self.assertLess(events.index('core_policy_delivery_recorded'),events.index('tool_started'))
         self.assertLess(events.index('evaluation_completed'),events.index('environment_close_started'))
+
+    def test_debug_preserves_requests_and_records_failure_frames(self):
+        plain=self.run_case(debug=False)
+        debug=self.run_case(debug=True)
+        self.assertEqual([r['model_request'] for r in plain[2]], [r['model_request'] for r in debug[2]])
+        report=json.loads((debug[0]/'debug-timings.json').read_text())
+        self.assertIn('action.env_step',{r['name'] for r in report['records']})
+        failed=self.run_case(failure='timeout',debug=True)
+        records=json.loads((failed[0]/'debug-timings.json').read_text())['records']
+        errors=[r for r in records if r['name']=='exception']
+        self.assertTrue(any(r['error_type']=='TimeoutError' and r['frames'] for r in errors))
+        self.assertNotIn('unknown delivery',json.dumps(errors))
 
     def test_transport_unknown_and_preflight_do_not_inherit_acknowledgement(self):
         for failure in ('timeout','preflight'):

@@ -124,6 +124,12 @@ class Publisher:
                     break  # A flushed complete JSONL record is the publication boundary.
         steps, latest = [], None
         for row in rows:
+            # JSONL may precede background PNG publication. Expose only the
+            # complete prefix; the next poll will publish pending rows.
+            required = [ref[key] for ref in (row.get('observation') or {}, row.get('next_observation') or {})
+                        for key in ('text', 'screenshot') if ref.get(key)]
+            if any(not (directory / name).is_file() for name in required):
+                break
             observation = row.get('observation') or {}
             artifact = {key: observation[source] for key, source in [('text', 'text'), ('image', 'screenshot')]
                         if observation.get(source)}
@@ -490,6 +496,8 @@ def execute_job(broker, job, data_dir, env, chaos_url=None, *, backend_factory=N
             from .current_task import CurrentPolicyTask
             from .retry_policy import DecisionRetryPolicy
             selected=standard_profile()
+            from .input_budget import DEFAULT_MAX_STEPS, DEFAULT_MAX_INPUT_TOKENS
+            runner_options.update(max_steps=DEFAULT_MAX_STEPS, max_input_tokens=DEFAULT_MAX_INPUT_TOKENS)
             runner_options.update(harness_profile=replace(selected,
                 agent_limits=AgentLimits(total_model_calls=runner_options['max_steps'])),
                 retry_policy=DecisionRetryPolicy())

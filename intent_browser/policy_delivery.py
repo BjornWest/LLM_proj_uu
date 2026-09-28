@@ -24,7 +24,7 @@ class PolicyDelivery:
         self.confirmed = set()
 
     def register(self, kind, text, *, step, provenance=None):
-        if kind not in {'page_observation','browser_feedback','browser_update','search_result','ax_result','vision_result','batch_result','delegation_result','helper_result'}:
+        if kind not in {'page_observation','browser_feedback','browser_update','search_result','ax_result','vision_result','data_result','batch_result','delegation_result','helper_result','clarification_result', 'human_tab_result', 'human_message'}:
             raise ValueError('Unsupported policy evidence kind')
         key = f'content-{len(self.sources):04d}'
         filename=f'policy-{key}.json'

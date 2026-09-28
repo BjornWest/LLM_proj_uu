@@ -15,6 +15,7 @@ from uuid import uuid4
 from greenlet import greenlet, getcurrent
 
 from .trace import write_json
+from .input_budget import DEFAULT_MAX_STEPS
 
 TOOLS=('spawn_agent','get_agent','wait_agent','cancel_agent')
 
@@ -24,7 +25,7 @@ class AgentLimits:
     max_launches: int = 4
     child_steps: int = 10
     child_seconds: float = 180
-    total_model_calls: int = 40
+    total_model_calls: int = DEFAULT_MAX_STEPS
     def __post_init__(self):
         for name in ('max_active','max_launches','child_steps','total_model_calls'):
             if type(getattr(self,name)) is not int or getattr(self,name)<1:raise ValueError('Positive agent limit required: '+name)
@@ -145,7 +146,7 @@ class AgentRuntime:
                 actor['result']=fn(actor)
                 summary=actor['result'][1] if isinstance(actor['result'],tuple) and len(actor['result'])==2 else {}
                 actor['error']=summary.get('error') if isinstance(summary,dict) else None
-                actor['state']='cancelled' if actor['cancelled'] else 'error' if actor['error'] else 'incomplete' if summary.get('stop_reason')=='max_steps' else 'finished'
+                actor['state']='cancelled' if actor['cancelled'] else 'error' if actor['error'] else 'incomplete' if summary.get('stop_reason') in ('max_steps','max_input_tokens') else 'finished'
             except BaseException as e:actor.update(state='error',error=f'{type(e).__name__}: {e}')
             finally:
                 if self.slot==ident:self.slot=None

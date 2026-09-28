@@ -4,12 +4,13 @@ Presentation is staged until the runner acknowledges matching policy spans. Full
 raw observations remain separate. No task/grader state is read here.
 """
 from copy import deepcopy
-from collections import Counter, deque
+from collections import Counter, deque, OrderedDict
 import hashlib
 import json
 import re
 
 from .ax_explorer import AXExplorer, encoded
+from .feedback_presentation import summarize_action_error
 
 CONTEXT_TOOLS = ('ax_search','ax_read','ax_changes')
 class AXContext(AXExplorer):
@@ -25,11 +26,21 @@ class AXContext(AXExplorer):
         self._page_pending=None
         self.visits=[]
         self.feedback_metadata=None
+        self._revisit_cache=OrderedDict()
+        self._reuse={}
+        self._semantic_key=None
+        self._next_overview=None
 
     def reset_delivery(self):
         """Required when a caller removes context. Current runner never prunes."""
         self.seen.clear();self.pending.clear()
         self._page_seen=self._page_pending=None
+        self._revisit_cache.clear();self._reuse={}
+
+    def request_overview(self,tokens):
+        if tokens is not None and (type(tokens) is not int or tokens not in (0,512,1000,2000,4000)):
+            raise ValueError('ax_overview_tokens must be 0, 512, 1000, 2000 or 4000')
+        self._next_overview=tokens
 
     def discard_pending(self):
         """No automatic retry: callers abandoning an unconfirmed request can
@@ -45,7 +56,9 @@ class AXContext(AXExplorer):
         key=(self.url,encoded(roots),encoded(list(observation.get('open_pages_urls',[]))))
         if key!=self._document_key:
             self.document+=1;self._document_key=key;self._identity_refs={};self._next_ref=0
-            self.reset_delivery()
+            # Navigation invalidates live handles, but not acknowledged history.
+            self.seen.clear();self.pending.clear()
+            self._page_seen=self._page_pending=None
         identities=[]
         for n in self.nodes:
             parent=identities[n['parent']] if n['parent'] is not None else 'root'
@@ -77,6 +90,15 @@ class AXContext(AXExplorer):
             self._states[self.ref(i)]={'ref':self.ref(i),'parent':self.ref(n['parent']) if n['parent'] is not None else None,
                 'position':siblings.index(i),'role':n['role'],'name':n['name'],'value':n['value'],'bid':n['bid'],
                 'properties':deepcopy(n['properties']),'children':[self.ref(c) for c in n['children']]}
+        if self.config.revisit_reuse:
+            # Exclude only volatile handles; preserve complete semantic values,
+            # topology/order and URL. Matching URLs alone never permit reuse.
+            semantic=[{k:n[k] for k in ('role','name','value','properties','parent','children')}
+                      for n in self.nodes]
+            self._semantic_key=hashlib.sha256(encoded([self.url,semantic]).encode()).hexdigest()
+            cached=self._revisit_cache.get(self._semantic_key,{})
+            self._reuse={self.ref(i):record for i,record in cached.items()
+                         if record['state']['ref'].split('n')[0]!=f'd{self.document}'}
 
     def ref(self,index):return self._refs[index]
 
@@ -128,6 +150,16 @@ class AXContext(AXExplorer):
 
     def _item(self,ref,verbose,repeat,*,known=None):
         current=self._states[ref];known=self._known().get(ref) if known is None else known
+        previous=self._reuse.get(ref)
+        if previous and not known and not repeat and not verbose:
+            # The referenced preview was acknowledged in this conversation.
+            # Explicit current handles/location avoid silently reusing old BIDs.
+            item={k:current[k] for k in ('ref','parent','position','bid')}
+            item['reused_from']=previous['state']['ref']
+            record=self._record(ref,False)
+            record['text_ranges']=deepcopy(previous.get('text_ranges',[]))
+            record['matches']=deepcopy(previous.get('matches',[]))
+            return item,record
         if known and not repeat:
             old=known['state']
             if old==current and (not verbose or known['verbose']):return {'ref':ref,'unchanged':True},None
@@ -159,6 +191,16 @@ class AXContext(AXExplorer):
         if verbose and tool=='ax_changes' and self.feedback_metadata is not None:
             out['metadata']['recent_action_capture']=deepcopy(self.feedback_metadata)
         return out
+
+    def _envelope_text(self,text,cap):
+        # Measure the JSON representation too: control characters can expand
+        # when escaped even when their plain text fits the tokenizer budget.
+        allowance=cap
+        value,partial=self._clip(text,allowance)
+        while self.tokens(encoded(value))>cap:
+            allowance=max(1,allowance//2)
+            value,partial=self._clip(text,allowance)
+        return value,partial
 
     def feedback(self,value,*,kind,verbose=None,repeat=None):
         """Same metadata convention for historical browser feedback. Distinct
@@ -235,19 +277,51 @@ class AXContext(AXExplorer):
 
     def page_update(self,observation=None,*,verbose=None,repeat=None,offset=0,stage=True,budget=None):
         if observation is not None:self.capture(observation)
-        verbose,repeat=self.controls(verbose,repeat);budget=budget or self.config.overview_tokens
+        verbose,repeat=self.controls(verbose,repeat)
+        budget=self.config.overview_tokens if budget is None else budget
+        if budget==0:
+            # Acknowledge only the page header, never node fields. Do not spring
+            # an unsolicited full overview on the next targeted query. Known
+            # node changes still remain pending; unknown content is searchable.
+            output={**self._envelope('ax_changes',verbose),'ax_nodes_omitted':True,
+                    'requested_tokens':0,'items':[],
+                    'inspect_with':'ax_search, ax_read or ax_changes; omission does not mean unchanged'}
+            output['url'],partial=self._envelope_text(self.url,128)
+            if partial:output['url_partial']=True
+            error=str((observation or {}).get('last_action_error',getattr(self,'_last_error','')))
+            if error:output['last_action_error']=self._envelope_text(summarize_action_error(error),192)[0]
+            self._last_error=error
+            if stage:self._page_pending={'url':self.url,'error':error}
+            self.last_overview={'snapshot':self.snapshot,'shown':0,'total':len(self.nodes),
+                'tokens':self.tokens(encoded(output)),'complete':False,'requested_tokens':0,
+                'presentation':'incremental-ax-v2'}
+            return output
         entries,initial=self._page_entries(verbose,repeat)
         # Tombstones are tracked privately; _known consumers treat None as absent.
         state={'url':self.url,'error':str((observation or {}).get('last_action_error',getattr(self,'_last_error','')))}
         self._last_error=state['error']
         output=self._envelope('ax_changes',verbose)
+        if self._reuse and not repeat:
+            output['reuse_scope']='Exact captured public AX match; reused_from references earlier delivered descriptions. Use current ref/bid.'
         if initial or repeat:output.update(url=self.url,roots=[self.ref(i) for i in self.roots[:8]],initial_overview=True)
         prior=self._page_pending or self._page_seen
         if prior and prior['url']!=state['url']:output['url']=state['url']
-        if state['error'] and (not prior or prior['error']!=state['error'] or repeat):output['last_action_error']=state['error']
+        if state['error'] and (not prior or prior['error']!=state['error'] or repeat):
+            summary=summarize_action_error(state['error'])
+            output['last_action_error'],_=self._envelope_text(summary,min(192,budget//4))
+            if output['last_action_error']!=state['error']:output['last_action_error_details_omitted']=True
         if prior and prior['error'] and not state['error']:output['last_action_error_cleared']=True
-        if not initial and not entries:output['visited_content_unchanged']=True
+        if not initial and not entries:
+            output['visited_content_unchanged']=True
+            if not self._known():output['no_nodes_visited']=True
         if initial:output['coverage']='Structural overview; expand nodes or search for omitted content.'
+        # Envelope text is not pageable like AX entries. Bound it before packing
+        # so an error or long URL cannot consume the entire overview budget.
+        if 'url' in output:
+            output['url'],partial=self._envelope_text(output['url'],min(192,budget//4))
+            if partial:output['url_partial']=True
+        if 'metadata' in output and self.tokens(encoded(output))>budget-128:
+            output.pop('metadata');output['metadata_omitted']=True
         result=self._pack(output,entries[offset:],offset,len(entries),budget,stage=stage)
         # For delta updates, delivered changes leave the pending set. Continue
         # remaining updates from offset0; offsets are only stable within a view.
@@ -258,20 +332,79 @@ class AXContext(AXExplorer):
         if stage:self._page_pending=state
         self.last_overview={'snapshot':self.snapshot,'shown':len(result['items']),'total':len(self.nodes),
             'tokens':self.tokens(encoded(result)),'complete':initial and result['next_offset'] is None,
-            'presentation':'incremental-ax-v1'}
+            'presentation':'incremental-ax-v2' if self.config.revisit_reuse or self.config.agent_overview else 'incremental-ax-v1'}
+        if self.config.revisit_reuse:
+            self.last_overview.update(semantic_sha256=self._semantic_key,
+                reused_nodes=sum('reused_from' in item for item in result['items']))
         return result
 
     def overview(self,observation):
         # Trace-only transition rendering MUST NOT mark content delivered.
+        if observation.get('observation_capture',{}).get('coverage')=='partial':
+            return self.partial_overview(observation)
         return encoded(self.page_update(observation,stage=False))
 
-    def prepare_observation(self,observation):return encoded(self.page_update(observation,stage=True))
+    def partial_overview(self,observation,budget=None):
+        """Preview only: never prune/acknowledge the full-tree visit ledger."""
+        if not hasattr(self,'_preview_explorer'):
+            self._preview_explorer=AXExplorer(self.config)
+        preview=self._preview_explorer
+        preview.capture(observation)
+        budget=self.config.overview_tokens if budget is None else budget
+        output={'coverage':'partial','url':self._clip(observation['url'],100)[0],
+            'items':[], 'notice':'Depth-limited preview, not a full tree or removal report. '
+                'BIDs are browser targets. Use ax_search for omitted content; full capture finishes before tools execute.',
+            'ax_references':'Only full-tree query results provide ax_read references.',
+            'preview_nodes_omitted':len(preview.nodes)}
+        if observation.get('observation_capture',{}).get('version') in ('dynamic-main-preview-v1','dynamic-main-preview-v2'):
+            output['notice']='Shallow main-document orientation, not a full tree or removal report. Child frames are omitted. No clickable BIDs are provided here; ax_search can find targets after background capture finishes.'
+            if observation['observation_capture'].get('preview_bids'):
+                output['notice']='Shallow main-document preview; child frames and omitted nodes remain unknown. Shown BIDs target visible elements; full capture validates identity before actions execute. Use AX tools for omitted content.'
+            output['capture_node_limit']=observation['observation_capture']['node_limit']
+            output['capture_nodes_omitted']=observation['observation_capture']['preview_nodes_omitted']
+        if observation.get('last_action_error'):
+            output['last_action_error']=self._clip(summarize_action_error(observation['last_action_error']),100)[0]
+        if budget:
+            for n in preview.nodes:
+                item={'role':n['role'],'name':self._clip(n['name'],40)[0],
+                    **({'bid':n['bid']} if n['bid'] is not None else {}),
+                    **({'value':self._clip(n['value'],32)[0]} if n['value'] else {})}
+                output['items'].append(item)
+                output['preview_nodes_omitted']=len(preview.nodes)-len(output['items'])
+                if self.tokens(encoded(output))>budget:
+                    output['items'].pop()
+                    output['preview_nodes_omitted']=len(preview.nodes)-len(output['items'])
+                    break
+        output['preview_nodes_omitted']=len(preview.nodes)-len(output['items'])
+        self.last_overview={'presentation':'partial-preview-v1','complete':False,
+            'shown':len(output['items']),'tokens':self.tokens(encoded(output)),'requested_tokens':budget}
+        return encoded(output)
+
+    def prepare_observation(self,observation):
+        budget=self._next_overview if self.config.agent_overview else None
+        if observation.get('observation_capture',{}).get('coverage')=='partial':
+            self._next_overview=None
+            return self.partial_overview(observation,budget)
+        result=self.page_update(observation,stage=True,budget=budget)
+        if self.config.agent_overview:
+            result['automatic_budget_tokens']=self.config.overview_tokens if budget is None else budget
+            self.last_overview['automatic_budget_tokens']=result['automatic_budget_tokens']
+            self.last_overview['tokens']=self.tokens(encoded(result))
+        self._next_overview=None
+        return encoded(result)
 
     def acknowledge(self):
         self.seen.update(self.pending);self.seen={k:v for k,v in self.seen.items() if v is not None}
         self.pending.clear()
         if self._page_pending is not None:self._page_seen=self._page_pending
         self._page_pending=None
+        if self.config.revisit_reuse and self._semantic_key is not None:
+            records={self._indices[ref]:deepcopy(record) for ref,record in self.seen.items()
+                     if ref in self._indices and record['state']==self._states[ref]}
+            if records:
+                self._revisit_cache[self._semantic_key]=records
+                self._revisit_cache.move_to_end(self._semantic_key)
+                while len(self._revisit_cache)>64:self._revisit_cache.popitem(last=False)
 
     def search(self,query,role=None,limit=5,context=0,offset=0,scope_ref=None,verbose=None,repeat=None,match='any'):
         verbose,repeat=self.controls(verbose,repeat)

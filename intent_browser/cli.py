@@ -16,6 +16,7 @@ from .retry_policy import DecisionRetryPolicy
 from .search import ParallelSearch, run_search, validate_search_query
 from .preview import ensure_preview
 from .openrouter import completion_token_limit
+from .input_budget import DEFAULT_MAX_STEPS, DEFAULT_MAX_INPUT_TOKENS
 
 
 SMOKE_HTML = """<!doctype html><html lang="en"><title>BrowserGym smoke test</title>
@@ -62,7 +63,7 @@ def main():
     library_dir = Path(__file__).resolve().parents[1] / ".local/system-libs/usr/lib/x86_64-linux-gnu"
     if library_dir.is_dir():
         os.environ["LD_LIBRARY_PATH"] = str(library_dir) + (":" + os.environ["LD_LIBRARY_PATH"] if os.getenv("LD_LIBRARY_PATH") else "")
-    parser = argparse.ArgumentParser(description="Small, local-site-only BrowserGym loop")
+    parser = argparse.ArgumentParser(description="BrowserGym loop; local sites by default, explicit opt-in open internet")
     parser.add_argument("mode", choices=["smoke", "run", "manual", "development", "search"])
     parser.add_argument("--env-file", type=Path, help="Load credentials/settings from an explicit dotenv file")
     parser.add_argument("--search", choices=["disabled", "parallel"], default="disabled")
@@ -70,7 +71,16 @@ def main():
     parser.add_argument("--search-timeout", type=float, default=25)
     parser.add_argument("--query", help="Query for standalone search mode (one HTTP request)")
     parser.add_argument("--task", default="openended", help="openended or miniwob.<task>")
-    parser.add_argument("--url", type=local_url)
+    parser.add_argument("--url")
+    parser.add_argument('--open-internet', action='store_true',
+                        help='Opt-in current-harness live HTTP(S) browsing with fresh context and tabs; no task grader')
+    parser.add_argument('--shoe-search', action='store_true', help='Open internet: original New Balance request plus Sweden comparison context')
+    parser.add_argument('--step-through', action='store_true', help='Open internet: pause before each fresh observation for human intervention')
+    parser.add_argument('--human-handover', action='store_true',
+        help='Open internet: yield tabs to a local human panel while the agent works in other tabs; requires --headful --no-subagents')
+    parser.add_argument('--capture-timeout-mode',choices=['diagnostic','bounded'],default=None,
+        help='Human-handover capture/guard deadlines: diagnostic logs overruns without aborting (default); bounded enforces deadlines')
+    parser.add_argument('--record-har', action='store_true', help='Open internet: save private network archive; may contain sensitive site/session data')
     parser.add_argument("--chaos-base-url", help="Chaos agent origin; creates a fresh session per episode")
     parser.add_argument("--chaos-task", help="Stable Chaos task ID, e.g. confirmshaming")
     parser.add_argument("--pilot-task", choices=['P07','P10','P11'], help="Local Tricky shopping, privacy or membership fixture")
@@ -84,7 +94,7 @@ def main():
                         help='core-tools profiles only: request provider-side strict argument schemas')
     parser.add_argument('--reasoning-replay', choices=['preserve','strip'], default=None,
                         help='core-tools profiles: preserve returned reasoning (default), or strip for an ablation')
-    parser.add_argument('--harness-profile', choices=['legacy', 'append-feedback-v1', 'append-events-v1', 'core-feedback-v2', 'core-tools-v1', 'core-tools-v2', 'core-tools-v3', 'core-tools-v4-navigation', 'core-tools-v5-feedback', 'core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch','core-tools-v10-agents'],
+    parser.add_argument('--harness-profile', choices=['legacy', 'append-feedback-v1', 'append-events-v1', 'core-feedback-v2', 'core-tools-v1', 'core-tools-v2', 'core-tools-v3', 'core-tools-v4-navigation', 'core-tools-v5-feedback', 'core-tools-v6-ax','core-tools-v7-context','core-tools-v8-vision','core-tools-v9-batch','core-tools-v10-agents','core-tools-v11-data','core-tools-v12-ax-reuse'],
                         default=None, help='Live runs default to the combined current harness; explicit historical profiles remain available')
     parser.add_argument('--no-subagents',action='store_true',help='Current harness ablation: omit helper tools for the whole conversation')
     parser.add_argument('--navigation-origin', action='append', default=[],
@@ -103,10 +113,12 @@ def main():
     parser.add_argument("--api-key-env", default="MODEL_API_KEY")
     parser.add_argument("--preset", help="Legacy explicit preset; cannot combine with provider allowlist")
     parser.add_argument("--providers", help="Comma-separated OpenRouter allowlist (or OPENROUTER_PROVIDERS)")
-    parser.add_argument("--max-steps", type=int, default=12)
+    parser.add_argument("--max-steps", type=int, default=DEFAULT_MAX_STEPS)
+    parser.add_argument('--max-input-tokens', type=int, default=DEFAULT_MAX_INPUT_TOKENS,
+                        help='Current AX harness: estimated next input ceiling, checked before inference (default 100000)')
     parser.add_argument("--timeout", type=float, default=90)
     parser.add_argument("--max-tokens", type=int, default=None,
-                        help="Combined reasoning/answer ceiling; OpenRouter defaults to OPENROUTER_MAX_TOKENS or 4096, local endpoints to 128")
+                        help="Combined reasoning/answer ceiling; OpenRouter defaults to OPENROUTER_MAX_TOKENS or 16384, local endpoints to 128")
     parser.add_argument("--seed", type=int, default=0)
     display = parser.add_mutually_exclusive_group()
     display.add_argument("--headless", dest="headless", action="store_true", help="Default: browser runs without desktop windows")
@@ -115,10 +127,50 @@ def main():
     parser.add_argument("--no-preview", action="store_true", help="Do not start/reuse the localhost screenshot viewer")
     parser.add_argument("--preview-port", type=int, default=8877)
     parser.add_argument("--video", action="store_true")
+    parser.add_argument("--observation-mode", choices=("auto","native"), default="auto",
+                        help="Auto: reviewed live-web preview/overlap when compatible; native: full observations")
+    capture_images=parser.add_mutually_exclusive_group()
+    capture_images.add_argument("--screenshots", dest="trace_screenshots", action="store_true", default=None,
+                        help="Retain automatic screenshots; disables deferred post-action capture")
+    capture_images.add_argument("--no-screenshots", dest="trace_screenshots", action="store_false", default=None,
+                        help="Skip automatic observation screenshots; explicit screenshot tool and --video remain independent")
     parser.add_argument("--hold-seconds", type=int, default=0)
     parser.add_argument("--output", default="runs")
     args = parser.parse_args()
-    current_profile=args.harness_profile=='core-tools-v10-agents' or (args.harness_profile is None and args.mode=='run')
+    if args.open_internet:
+        if args.mode != 'run' or args.task != 'openended' or args.chaos_task or args.pilot_task or args.navigation_origin:
+            parser.error('--open-internet requires run/openended without a fixture or fixed navigation origins')
+        if args.harness_profile not in (None, 'core-tools-v10-agents', 'core-tools-v11-data', 'core-tools-v12-ax-reuse'):
+            parser.error('--open-internet uses the current harness; historical profiles stay unchanged')
+        if args.shoe_search and args.goal != 'Click the Finish button.':
+            parser.error('Choose --shoe-search or --goal')
+        from .open_internet import SHOE_GOAL
+        if args.shoe_search:
+            args.goal = SHOE_GOAL
+        if not args.url or args.goal == 'Click the Finish button.':
+            parser.error('--open-internet requires --url and --goal (or --shoe-search)')
+        try:
+            from .navigation import origin
+            origin(args.url)
+        except ValueError as exc:
+            parser.error(str(exc))
+        if args.step_through and args.headless:
+            parser.error('--step-through requires --headful so the human can inspect/intervene')
+    else:
+        if args.shoe_search or args.step_through or args.record_har:
+            parser.error('--shoe-search/--step-through/--record-har require --open-internet')
+        if args.url:
+            try:
+                args.url = local_url(args.url)
+            except argparse.ArgumentTypeError as exc:
+                parser.error(str(exc))
+    if args.human_handover and (not args.open_internet or args.headless or args.step_through or not args.no_subagents):
+        parser.error('--human-handover requires --open-internet --headful --no-subagents, without --step-through')
+    if args.capture_timeout_mode is not None and not args.human_handover:
+        parser.error('--capture-timeout-mode requires --human-handover')
+    enable_data=args.harness_profile!='core-tools-v10-agents'
+    adaptive_ax=args.harness_profile in (None,'core-tools-v12-ax-reuse')
+    current_profile=args.harness_profile in ('core-tools-v10-agents','core-tools-v11-data','core-tools-v12-ax-reuse') or (args.harness_profile is None and args.mode=='run')
     if current_profile:
         from .standard_profile import tokenizer_path
         args.harness_profile='core-tools-v9-batch'
@@ -197,7 +249,7 @@ def main():
         return
     if args.mode == "run" and (not args.model or not args.base_url):
         parser.error("run requires --model and --base-url (or MODEL_NAME and MODEL_BASE_URL)")
-    if args.max_steps < 1 or args.timeout <= 0 or args.max_tokens < 1 or not 0 <= args.hold_seconds <= 60:
+    if args.max_steps < 1 or args.max_input_tokens < 1 or args.timeout <= 0 or args.max_tokens < 1 or not 0 <= args.hold_seconds <= 60:
         parser.error("Budgets must be positive; --hold-seconds must be 0..60")
     if args.mode == "smoke":
         args.task, args.url, args.goal = "openended", None, "Click the Finish button."
@@ -274,6 +326,13 @@ def main():
                 from .harness import with_subagents
                 harness_profile=replace(harness_profile,navigation_from_reset=not bool(args.navigation_origin))
                 if not args.no_subagents:harness_profile=with_subagents(harness_profile)
+                if enable_data:
+                    from .harness import with_data_tools
+                    from .data_tools import DataConfig
+                    harness_profile=with_data_tools(harness_profile,DataConfig(image=os.getenv('HARNESS_PYTHON_IMAGE','intent-browser-python:stdlib-v1')))
+                if adaptive_ax:
+                    from .standard_profile import with_adaptive_ax
+                    harness_profile=with_adaptive_ax(harness_profile)
         elif args.harness_profile == 'core-feedback-v2':
             from .harness import core_feedback_profile
             harness_profile=core_feedback_profile()
@@ -282,9 +341,21 @@ def main():
             harness_profile = HarnessProfile(name='append-events-v1', feedback_factory=BrowserEventFeedback)
         else:
             harness_profile = HarnessProfile()
+    if args.open_internet:
+        from .open_internet import OpenInternetTask, open_profile
+        harness_profile = open_profile(harness_profile)
+        if args.human_handover:
+            from .open_internet import with_human_handover
+            harness_profile = with_human_handover(harness_profile,
+                compact_tabs=adaptive_ax,stable_frames=adaptive_ax,
+                capture_timeout_mode=args.capture_timeout_mode or 'diagnostic')
+        episode_task = OpenInternetTask(args.url, args.goal, headless=args.headless, har=args.record_har)
+        episode_task.supported_harness_profiles = (harness_profile.name,)
     action_set = make_action_set()
 
     def env_factory(video_dir):
+        if args.open_internet:
+            return episode_task.make_env(video_dir, action_mapping=action_set.to_python_code)
         if args.pilot_task:
             return episode_task.make_env(video_dir, action_mapping=action_set.to_python_code, headless=args.headless)
         if episode_task:
@@ -300,7 +371,7 @@ def main():
                ) if args.mode in ("manual", "development")
                else ChatCompletionsBackend(args.base_url, args.model, os.getenv(args.api_key_env),
                                            args.timeout, args.max_tokens,
-                                           supports_images=args.harness_profile in ("core-tools-v8-vision","core-tools-v9-batch"),
+                                           supports_images=bool(harness_profile and harness_profile.vision_config),
                                            request_options=request_options, session_routing=session_routing))
     metadata = {"task": args.task, "goal": args.goal if args.task == "openended" else None,
                 "start_url": args.url or ("built-in smoke fixture" if args.task == "openended" else None),
@@ -321,20 +392,45 @@ def main():
     if args.mode == "development":
         metadata["driver"] = "external-development-assistant"
         metadata["context_note"] = "Actions supplied through stdin by the development assistant; its full context is not captured by the harness messages. Not a controlled model evaluation."
+    if args.open_internet:
+        metadata.update(source='open-internet-v1', training_eligible=False, verifier='none',
+                        original_query=__import__('intent_browser.open_internet', fromlist=['SHOE_QUERY']).SHOE_QUERY if args.shoe_search else args.goal,
+                        supervision='step-through' if args.step_through else 'continuous')
+    handover_ui = None
+    handover_options = {'observation_pipeline':args.observation_mode}
     try:
+        if args.human_handover:
+            from .human_handover import HumanHandoverController
+            from .human_handover_ui import HumanHandoverUI
+            controller=HumanHandoverController()
+            handover_ui=HumanHandoverUI(controller)
+            print(f'Handover controls will appear in the conversation window. Diagnostic panel: {handover_ui.origin}',flush=True)
+            metadata['supervision']='human-tabs-v1'
+            handover_options.update(human_handover=controller,human_handover_ui=handover_ui)
         _, summary = run_episode(env_factory, backend, metadata, args.output, args.max_steps,
                                  args.seed, args.video, args.hold_seconds, search_backend, episode_task,
                                  action_timeout_ms=args.action_timeout_ms,
+                                 trace_screenshots=args.trace_screenshots,
+                                 max_input_tokens=args.max_input_tokens if args.mode=='run' and harness_profile and harness_profile.ax_config else None,
                                  retry_policy=(DecisionRetryPolicy()
                                                if args.retry_policy == 'bounded-v1' else None),
                                  **({'harness_profile': harness_profile} if harness_profile else {}),
+                                 **handover_options,
                                  **({'helper_env_factory': __import__('intent_browser.helper_browser',fromlist=['openended_helper_factory']).openended_helper_factory}
-                                    if current_profile and episode_task is None and args.task=='openended' else {}))
+                                    if current_profile and episode_task is None and args.task=='openended' else
+                                    {'helper_env_factory': __import__('intent_browser.open_internet',fromlist=['helper_factory']).helper_factory}
+                                    if args.open_internet else {}),
+                                 **({'before_observation': episode_task.supervised_wait,
+                                     'terminal_response_instruction': 'Answer the user with findings, sources and uncertainties using send_msg_to_user.'}
+                                    if args.open_internet and args.step_through else
+                                    {'terminal_response_instruction': 'Answer the user with findings, sources and uncertainties using send_msg_to_user.'}
+                                    if args.open_internet else {}))
     finally:
+        if handover_ui is not None:handover_ui.close()
         backend.close()
         if search_backend:
             search_backend.close()
-        if episode_task:
+        if episode_task and not args.open_internet:
             if args.pilot_task:
                 episode_task.close()
             else:

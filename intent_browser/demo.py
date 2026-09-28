@@ -20,6 +20,7 @@ from .evaluation import Evaluation
 from .openrouter import provider_options, completion_token_limit
 from .trace import write_json
 from .demo_rooms import book, public_rooms, first_available, minutes
+from .input_budget import DEFAULT_MAX_STEPS, DEFAULT_MAX_INPUT_TOKENS
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'environments/demo'
@@ -198,7 +199,7 @@ class DemoBackend(ChatCompletionsBackend):
 
 
 class DemoTask:
-    supported_harness_profiles=('core-tools-v9-batch','core-tools-v10-agents')
+    supported_harness_profiles=('core-tools-v9-batch','core-tools-v10-agents','core-tools-v11-data','core-tools-v12-ax-reuse')
     def __init__(self,app,job): self.app,self.job=app,job
     def prepare(self,trace):
         self.trace=trace;self.job['episode']=trace.episode_id
@@ -304,7 +305,7 @@ class DemoApp:
                 from .retry_policy import DecisionRetryPolicy
                 from .helper_browser import openended_helper_factory
                 options={'harness_profile':standard_profile(), 'retry_policy':DecisionRetryPolicy(),
-                         'helper_env_factory':openended_helper_factory}
+                         'helper_env_factory':openended_helper_factory,'max_input_tokens':DEFAULT_MAX_INPUT_TOKENS}
             _,summary=run_episode(factory,backend,{'task':'daylight.'+job['area'],'source':'daylight-local-demo',
                 'goal':job['goal'],'model':backend.model if job['mode']=='live' else 'scripted-rehearsal',
                 'backend':backend.base_url if job['mode']=='live' else 'scripted-rehearsal',
@@ -312,7 +313,7 @@ class DemoApp:
                 'demo_action_format_reminder':job['mode']=='live',
                 'episode_boundary':'first_accepted_reservation' if job['area']=='booking' else 'agent_finished',
                 'training_eligible':False,'generation':{'max_tokens':backend.max_tokens,**backend.request_options} if job['mode']=='live' else None},
-                max_steps=12,record_video=True,episode_task=task,output=ROOT/'runs',**options)
+                max_steps=DEFAULT_MAX_STEPS,record_video=True,episode_task=task,output=ROOT/'runs',**options)
             job['summary']=summary;job['error']=summary['error']
         except BaseException as exc: job['error']=f'{type(exc).__name__}: {exc}'
         finally:

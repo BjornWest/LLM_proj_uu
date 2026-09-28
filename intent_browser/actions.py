@@ -13,6 +13,7 @@ from .search import validate_search_query
 ACTION_NAMES = ("click", "fill", "check", "uncheck", "select_option", "press", "scroll", "noop", "send_msg_to_user")
 VISION_ACTION_NAMES = ('scroll_into_view',)
 NAVIGATION_NAMES = ("go_back", "go_forward", "reload", "goto")
+TAB_NAMES = ("new_tab", "tab_focus", "tab_close")
 
 
 def action_function(name):
@@ -82,6 +83,7 @@ class Decision:
     name: str
     arguments: dict
     code: str
+    ax_overview_tokens: int | None = None
 
 
 def parse_action(text: str) -> str:

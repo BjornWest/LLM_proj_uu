@@ -25,10 +25,14 @@ class AXConfig:
     incremental: bool = False
     verbose: bool = False
     repeat: bool = False
+    revisit_reuse: bool = False
+    agent_overview: bool = False
 
     def __post_init__(self):
-        for value in (self.incremental, self.verbose, self.repeat):
+        for value in (self.incremental, self.verbose, self.repeat, self.revisit_reuse, self.agent_overview):
             if type(value) is not bool: raise ValueError('AX presentation controls must be boolean')
+        if (self.revisit_reuse or self.agent_overview) and not self.incremental:
+            raise ValueError('AX reuse and agent overview require incremental presentation')
         for value in (self.overview_tokens, self.result_tokens):
             if type(value) is not int or not 512 <= value <= 8192:
                 raise ValueError('AX token budgets must be integers between 512 and 8192')
@@ -36,7 +40,10 @@ class AXConfig:
             raise ValueError('AX requires an existing local tokenizer.json; no automatic download')
 
     def describe(self):
-        return {'version': 'incremental-ax-v1' if self.incremental else 'progressive-ax-v1', 'overview_tokens': self.overview_tokens,
+        return {**({'revisit_reuse':'exact-public-tree-v1', 'revisit_cache_entries':64} if self.revisit_reuse else {}),
+                **({'agent_overview_tokens':[0,512,1000,2000,4000],
+                    'overview_control':'one next automatic observation; last executed browser call wins'} if self.agent_overview else {}),
+                'version': 'incremental-ax-v1' if self.incremental else 'progressive-ax-v1', 'overview_tokens': self.overview_tokens,
                 'result_tokens': self.result_tokens, 'tokenizer_path': self.tokenizer_path,
                 'tokenizer_sha256': hashlib.sha256(Path(self.tokenizer_path).read_bytes()).hexdigest(),
                 'scope': 'Token counts cover selected AX text/tool JSON, not complete model requests',

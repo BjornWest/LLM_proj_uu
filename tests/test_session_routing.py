@@ -14,6 +14,17 @@ from scripts.smoke_session_routing import RoutingBudgetBackend
 
 
 class SessionRoutingTests(unittest.TestCase):
+    def test_default_prefers_akash_with_fallbacks_and_explicit_pins_work(self):
+        self.assertEqual(DEFAULT_PROVIDERS[0], 'akashml')
+        self.assertNotIn('dekallm', DEFAULT_PROVIDERS)
+        default=provider_options(DEFAULT_PROVIDERS)['provider']
+        self.assertEqual(default['only'], list(DEFAULT_PROVIDERS))
+        self.assertEqual(default['order'], ['akashml'])
+        self.assertTrue(default['allow_fallbacks'])
+        self.assertFalse(provider_options(['akashml'])['provider']['allow_fallbacks'])
+        self.assertNotIn('order',provider_options(['akashml'])['provider'])
+        self.assertTrue(provider_options(['dekallm','chutes'])['provider']['allow_fallbacks'])
+
     def backend(self, status=200):
         backend = ChatCompletionsBackend('https://openrouter.ai/api/v1', 'qwen/qwen3.8-27b',
             'offline-secret', session_routing=True, request_options=provider_options(DEFAULT_PROVIDERS))
@@ -53,7 +64,7 @@ class SessionRoutingTests(unittest.TestCase):
             self.assertEqual([r['session_id'] for r in self.requests], [ids[0],ids[0],ids[1],ids[1]])
         for request in self.requests:
             self.assertEqual(request['provider']['only'], list(DEFAULT_PROVIDERS))
-            self.assertNotIn('order', request['provider'])
+            self.assertEqual(request['provider']['order'], ['akashml'])
             self.assertNotIn('preset', request)
             self.assertNotIn('offline-secret', json.dumps(request))
 
@@ -71,7 +82,7 @@ class SessionRoutingTests(unittest.TestCase):
         self.assertEqual(self.requests, [])
         for kwargs in [{'model':'@preset/old'}, {'base_url':'http://localhost:8000/v1'},
                        {'request_options':{'preset':'@preset/old'}},
-                       {'request_options':{'provider':{'order':['parasail']}}}]:
+                       {'request_options':{'session_id':'conflicting'}}]:
             args={'model':'qwen/qwen3.8-27b','base_url':'https://openrouter.ai/api/v1','session_routing':True}
             with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
                 ChatCompletionsBackend(**(args|kwargs))

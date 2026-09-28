@@ -26,7 +26,7 @@ def entry(task_id):
 
 
 class PrislyktanTask:
-    supported_harness_profiles = ('core-tools-v10-agents',)
+    supported_harness_profiles = ('core-tools-v10-agents','core-tools-v11-data','core-tools-v12-ax-reuse')
 
     def __init__(self, task_id, revision=None):
         self.row = entry(task_id)

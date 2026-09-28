@@ -6,9 +6,12 @@ from dataclasses import replace
 from unittest.mock import patch
 import httpx
 import numpy as np
+from jsonschema import Draft202012Validator, ValidationError
 from intent_browser.backend import ChatCompletionsBackend, BackendResponseError
 from intent_browser.harness import native_tools_profile, SemanticFeedback
-from intent_browser.retry_policy import DecisionRetryPolicy, retry_after_seconds
+from intent_browser.retry_policy import DecisionRetryPolicy, retry_after_seconds, argument_diagnostic
+from intent_browser.native_tools import NativeBrowserTools
+from tests.test_native_tools import response, completion
 from intent_browser.runner import run_episode
 
 
@@ -25,7 +28,7 @@ class DecisionRetryTests(unittest.TestCase):
         class Env:
             count=0;fresh=0
             def obs(self):return {'goal':'Finish','url':'http://fixture/','last_action_error':'',
-                'axtree_object':f'[1] button fresh-{self.fresh}','screenshot':np.zeros((2,2,3),dtype=np.uint8)}
+                'axtree_object':{'nodes':[{'nodeId':'1','role':{'value':'StaticText'},'name':{'value':f'[1] button fresh-{self.fresh}'}}]},'screenshot':np.zeros((2,2,3),dtype=np.uint8)}
             def reset(self,seed):return self.obs(),{}
             def step(self,action):
                 order.append('action');self.count+=1
@@ -44,6 +47,10 @@ class DecisionRetryTests(unittest.TestCase):
             if case=='refusal':raw['choices'][0]['message']['refusal']='No'
             if case=='multiple' and n==1:
                 raw=reply();raw['choices'][0]['message']['tool_calls']*=2
+            if case=='bad_options' and n==1:
+                raw=response('select_option', {'bid':'1','options':50})
+            if case=='invalid_json' and n==1:
+                raw=reply();raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']='{"text":'
             return httpx.Response(200,json=raw)
         class BudgetBackend(ChatCompletionsBackend):
             supports_native_tools=True
@@ -59,7 +66,7 @@ class DecisionRetryTests(unittest.TestCase):
         def fresh(e):order.append('fresh');e.fresh+=1;return e.obs()
         def sleep(n):order.append('sleep:'+str(n))
         temp=tempfile.TemporaryDirectory();self.addCleanup(temp.cleanup)
-        with patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']),patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x),patch('intent_browser.runner.refresh_observation',side_effect=fresh),patch('intent_browser.runner.time.sleep',side_effect=sleep):
+        with patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']['nodes'][0]['name']['value']),patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x['nodes'][0]['name']['value']),patch('intent_browser.runner.refresh_observation',side_effect=fresh),patch('intent_browser.runner.time.sleep',side_effect=sleep):
             path,summary=run_episode(lambda _:env,backend,{},temp.name,max_steps=max_steps,harness_profile=replace(native_tools_profile(),feedback_factory=SemanticFeedback),before_observation=wait,retry_policy=DecisionRetryPolicy() if enabled else None)
         rows=[json.loads(x) for x in (path/'steps.jsonl').read_text().splitlines()]
         return env,requests,rows,summary,order
@@ -79,6 +86,24 @@ class DecisionRetryTests(unittest.TestCase):
         env,reqs,rows,s,_=self.run_case('multiple');self.assertIsNone(s['error']);self.assertEqual(env.count,1)
         prior=reqs[1]['messages'][-2];self.assertNotIn('tool_calls',prior);self.assertIn('Rejected, unexecuted',prior['content'])
         self.assertEqual(len(rows[0]['model_response']['choices'][0]['message']['tool_calls']),2)
+
+    def test_exact_argument_diagnostic_reaches_next_request_and_trace(self):
+        for case in ('bad_options','invalid_json'):
+            with self.subTest(case=case):
+                env,reqs,rows,s,_=self.run_case(case)
+                self.assertIsNone(s['error']);self.assertEqual(env.count,1)
+                self.assertEqual(len(reqs),2);self.assertEqual(s['decision_retry_count'],1)
+                notice=reqs[1]['messages'][-1]['content']
+                diagnostic=rows[0]['decision_retry']['argument_diagnostic']
+                self.assertIn(json.dumps(diagnostic,ensure_ascii=False,sort_keys=True),notice)
+                self.assertIn('Double-check the parameter names, types and allowed values',notice)
+                self.assertEqual(reqs[0]['tools'],reqs[1]['tools'])
+                self.assertEqual(reqs[1]['messages'][:len(reqs[0]['messages'])],reqs[0]['messages'])
+                if case=='bad_options':
+                    self.assertEqual(diagnostic['parameter'],'/options')
+                    self.assertEqual(diagnostic['received_type'],'integer')
+                    self.assertIn('string or array of string',diagnostic['requirement'])
+                else:self.assertEqual(diagnostic['problem'],'Arguments are not valid JSON')
 
     def test_backoff_before_fresh_observation_and_retained_http_failure(self):
         _,reqs,rows,s,order=self.run_case('429');self.assertIsNone(s['error']);self.assertEqual(rows[0]['model_error_http_status'],429)
@@ -105,5 +130,37 @@ class DecisionRetryTests(unittest.TestCase):
         self.assertIsNone(retry_after_seconds('NaN'));self.assertEqual(retry_after_seconds('12'),12)
         for value in [-1,2,True]:
             with self.assertRaises(ValueError):DecisionRetryPolicy(max_retries=value)
+
+
+class ArgumentDiagnosticTests(unittest.TestCase):
+    def test_both_saved_failure_shapes_against_actual_tool_schemas(self):
+        tools=NativeBrowserTools(ax_tools=True,incremental_ax=True)
+        for name,args,path,requirement in [
+            ('select_option',{'bid':'1276','options':50},'/options','string or array of string'),
+            ('ax_read',{'node_ref':'d8n106','view':'subtree','depth':6,'limit':60},'/limit','maximum is 50'),
+        ]:
+            with self.subTest(tool=name):
+                raw=response(name,args)
+                with self.assertRaises(ValidationError) as caught:
+                    tools.parse_completion(completion(raw))
+                selected=DecisionRetryPolicy().select(caught.exception,'action_parse',
+                    {'model_response':raw},used=0,remaining_calls=1)
+                d=selected['argument_diagnostic']
+                self.assertEqual(d['parameter'],path)
+                self.assertIn(requirement,d['requirement'])
+                self.assertIsNone(DecisionRetryPolicy().select(caught.exception,'action_parse',
+                    {'model_response':raw},used=1,remaining_calls=1))
+
+    def test_nested_paths_unknown_constraints_and_no_raw_value_echo(self):
+        schema={'type':'object','properties':{'items':{'type':'array','items':{
+            'type':'object','properties':{'a/b~c':{'type':'integer'}}}}}}
+        value={'items':[{'a/b~c':'PRIVATE-VALUE'*10000}]}
+        exc=next(Draft202012Validator(schema).iter_errors(value))
+        d=argument_diagnostic(exc)
+        self.assertEqual(d['parameter'],'/items/0/a~1b~0c')
+        self.assertNotIn('PRIVATE-VALUE',json.dumps(d));self.assertLess(len(json.dumps(d)),600)
+        exc=next(Draft202012Validator({'pattern':'^expected$'}).iter_errors('PRIVATE-VALUE'))
+        self.assertIn('Check this parameter',argument_diagnostic(exc)['requirement'])
+        self.assertIsNone(argument_diagnostic(RuntimeError('not a validator error')))
 
 if __name__=='__main__':unittest.main()

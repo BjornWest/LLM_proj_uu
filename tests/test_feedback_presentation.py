@@ -65,7 +65,7 @@ class PresentationTests(unittest.TestCase):
                 return raw
         class Env:
             def obs(self):return {'goal':'Inspect','url':'http://fixture/','last_action_error':'',
-                'axtree_object':"[1] button 'Go'",'screenshot':np.zeros((2,2,3),dtype=np.uint8)}
+                'axtree_object':{"nodes":[{}], "text":"[1] button 'Go'"},'screenshot':np.zeros((2,2,3),dtype=np.uint8)}
             def reset(self,seed):return self.obs(),{}
             def step(self,action):return self.obs(),0,False,False,{}
             def close(self):pass
@@ -77,8 +77,8 @@ class PresentationTests(unittest.TestCase):
         profile=HarnessProfile(name='compact-test',conversation_factory=EvidenceConversation,feedback_factory=Feedback,
             delivery_tracking=True,feedback_presentation=CompactFeedback())
         with tempfile.TemporaryDirectory() as temp, \
-             patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']), \
-             patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x):
+             patch('intent_browser.runner.observation_text',side_effect=lambda o:o['axtree_object']['text']), \
+             patch('intent_browser.harness.flatten_axtree_to_str',side_effect=lambda x:x['text']):
             path,summary=run_episode(lambda _:Env(),Backend(),{},temp,max_steps=2,harness_profile=profile)
             self.assertIsNone(summary['error'])
             rows=[json.loads(x) for x in (path/'steps.jsonl').read_text().splitlines()]

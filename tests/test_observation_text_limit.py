@@ -16,10 +16,10 @@ class ObservationLimitTests(unittest.TestCase):
         for length in (0, 15999, 16000, 16001, 48001):
             with self.subTest(length=length):
                 tree = "å" * length
-                obs = {"url": "http://local/", "last_action_error": "prior error", "axtree_object": tree}
+                obs = {"url": "http://local/", "last_action_error": "prior error", "axtree_object": {"nodes":[{"fixture_text":tree}]}}
                 expected_tree = tree if length <= 16000 else tree[:16000] + "\n[Accessibility tree truncated]"
                 expected = f"URL: http://local/\nLast action error: prior error\nAccessibility tree:\n{expected_tree}"
-                with patch("intent_browser.runner.flatten_axtree_to_str", side_effect=lambda x: x):
+                with patch("intent_browser.runner.flatten_axtree_to_str", side_effect=lambda x: x["nodes"][0]["fixture_text"]):
                     self.assertEqual(observation_text(obs).encode(), expected.encode())
                     self.assertEqual(observation_text(obs, limit=16000), expected)
                     enlarged = observation_text(obs, limit=48000)
@@ -40,7 +40,7 @@ class ObservationLimitTests(unittest.TestCase):
             def obs(self, stage):
                 return {"url": "http://local/", "goal": "Inspect the assigned user",
                         "last_action_error": "", "screenshot": np.zeros((2, 2, 3), dtype=np.uint8),
-                        "axtree_object": "x" * 38528 + f"[a1109] combobox 'Choose option' {stage}\n[a1446] option 'Assigned to'"}
+                        "axtree_object": {"nodes":[{"fixture_text": "x" * 38528 + f"[a1109] combobox 'Choose option' {stage}\n[a1446] option 'Assigned to'"}]}}
 
             def reset(self, seed):
                 return self.obs("initial"), {}
@@ -66,7 +66,7 @@ class ObservationLimitTests(unittest.TestCase):
 
         env = Env()
         with tempfile.TemporaryDirectory() as root, \
-             patch("intent_browser.runner.flatten_axtree_to_str", side_effect=lambda x: x), \
+             patch("intent_browser.runner.flatten_axtree_to_str", side_effect=lambda x: x["nodes"][0]["fixture_text"]), \
              patch("intent_browser.runner.refresh_observation", side_effect=lambda _: env.fresh()):
             directory, summary = run_episode(
                 lambda video: env, Backend(), {"observation_text_limit": 999}, root,
@@ -88,7 +88,7 @@ class ObservationLimitTests(unittest.TestCase):
                 with gzip.open(path.with_suffix(".json.gz"), "rt") as handle:
                     raw = json.load(handle)
                 text = path.read_text()
-                self.assertIn("Choose option", raw["axtree_object"])
+                self.assertIn("Choose option", raw["axtree_object"]["nodes"][0]["fixture_text"])
                 self.assertEqual(text, observation_text(raw, limit=limit))
                 self.assertEqual("Choose option" in text, limit == 48000)
             for index, row in enumerate(rows):

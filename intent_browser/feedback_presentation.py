@@ -15,13 +15,57 @@ IMPORTANT = {'page_announcement','invalid','submit','control_state','input','cha
 def size(value): return len(json.dumps(value,ensure_ascii=False,sort_keys=True))
 
 
+def summarize_action_error(error):
+    """Public execution diagnostic, not a success/effects verdict.
+
+    Keep the exception headline and up to two distinct actionability blockers.
+    Playwright's repeated retry log stays in the raw observation/feedback trace.
+    The character ceiling here is a transport bound; AX applies its tokenizer
+    budget separately. Never modify the caller's raw error.
+    """
+    text = str(error or '')
+    if not text:
+        return ''
+    lines = text.splitlines()
+    headline = lines[0][:320]
+    if len(lines[0]) > 320:
+        headline += '…'
+    blockers = []
+    for line in lines[1:]:
+        line = line.strip().removeprefix('-').strip()
+        if any(marker in line for marker in (
+            'intercepts pointer events', 'element is not visible',
+            'element is not enabled', 'element is not stable',
+            'element was detached', 'Element is not attached',
+        )):
+            # Preserve the reason at the end as well as the target at the start.
+            compact = line if len(line) <= 140 else line[:90] + '…' + line[-49:]
+            if compact not in blockers:
+                blockers.append(compact)
+            if len(blockers) == 2:
+                break
+    return '\n'.join([headline, *blockers])
+
+
+def present_action_error(result):
+    """Replace only policy error text; preserve status and uncertainty."""
+    raw = result.get('error')
+    if not raw:
+        return
+    result['error'] = summarize_action_error(raw)
+    if result['error'] != raw:
+        result['error_details_omitted'] = True
+    if 'Timeout' in str(raw).split('\n', 1)[0]:
+        result['recovery_hint'] = 'Action effects are not confirmed. Inspect current state before choosing another action.'
+
+
 class CompactFeedback:
     def __init__(self,max_chars=6000,max_events=10,max_generic=3):
         if max_chars<2400 or max_events<1 or max_generic<0:raise ValueError('Invalid feedback limits')
         self.max_chars,self.max_events,self.max_generic=max_chars,max_events,max_generic
 
     def describe(self):
-        return {'version':'compact-feedback-v1','max_chars':self.max_chars,
+        return {'version':'compact-feedback-v1','error_presentation':'bounded-action-error-v1','max_chars':self.max_chars,
                 'max_events':self.max_events,'max_generic_text_events':self.max_generic,
                 'raw_capture':'retained separately; not replayed to policy',
                 'selection':'important events first, exact generic duplicates removed within source/window; bounded AX changes'}
@@ -34,14 +78,15 @@ class CompactFeedback:
             if isinstance(text,str) and len(text)>limit:
                 counts['truncated_fields']+=1;return text[:limit]+'…'
             return text
-        out={'scope':'Historical public page evidence; not proof of success. Use current observation IDs.',
+        out={'scope':'Historical public page evidence; not proof of success. Events can arrive late; groups indicate delivery, not which action caused them. Use current observation IDs.',
              'selection':counts}
         if kind=='browser_update':
             out['kind']='browser_update';groups=[('between_actions',value.get('events',[]))]
             counts['capture_omitted']+=value.get('omitted',0)
             warnings=list(value.get('capture_warnings',[]))
         else:
-            out['execution']=value.get('execution');out['error']=clip((value.get('error') or '').split('\n')[0],320) or None
+            out['execution']=value.get('execution');out['error']=value.get('error') or None
+            present_action_error(out)
             if 'timeout_context' in value:
                 out['timeout_context']=deepcopy(value['timeout_context'])
             for key in ('tool','url_before','url_after'):

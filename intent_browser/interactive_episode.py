@@ -14,6 +14,7 @@ from .actions import parse_decision
 from .runner import run_episode
 from .standard_profile import standard_profile
 from .retry_policy import DecisionRetryPolicy
+from .input_budget import DEFAULT_MAX_STEPS, DEFAULT_MAX_INPUT_TOKENS
 
 class BorrowedEnvironment:
     """Borrow one exclusively leased browser; never reset or close the site."""
@@ -68,7 +69,7 @@ class ExternalBackend:
 
 class InteractiveEpisode:
     """One Ask conversation. observe/accept alternate; cancel never replays actions."""
-    def __init__(self,env,goal,output,*,on_step=lambda code,result:None,max_steps=12,metadata=None,public_history=None,navigation_origins=(),interrupted=lambda:False):
+    def __init__(self,env,goal,output,*,on_step=lambda code,result:None,max_steps=DEFAULT_MAX_STEPS,max_input_tokens=DEFAULT_MAX_INPUT_TOKENS,metadata=None,public_history=None,navigation_origins=(),interrupted=lambda:False):
         self.interrupted=interrupted
         self.owner=getcurrent();self.pending=None;self.result=None;self.error=None
         self.answer=None;self.actions=[];self.closed=False;self.parked=None;self.cancel_requested=False
@@ -89,13 +90,14 @@ class InteractiveEpisode:
                 self.result=run_episode(lambda _:self.borrowed,self.backend,
                     {'task':'shared-browser-ask','interaction_kind':'ask','goal':goal,'training_eligible':False,
                      'scope':'Existing user-controlled browser; no task reset or automatic task grading',**(metadata or {})},
-                    output=output,max_steps=max_steps,harness_profile=standard_profile(navigation_origins=navigation_origins),retry_policy=DecisionRetryPolicy(),
+                    output=output,max_steps=max_steps,max_input_tokens=max_input_tokens,harness_profile=standard_profile(navigation_origins=navigation_origins),retry_policy=DecisionRetryPolicy(),
                     before_observation=before_observation,decision_wait=decision_wait,
                     delegated_instructions=('Recorded previous activity is context, not permission to repeat completed actions.\n'+json.dumps(public_history,ensure_ascii=False)) if public_history else None,
                     terminal_response_instruction='Answer the current user request accurately using send_msg_to_user. Questions authorize inspection, not purchases or account changes.')
             except Exception as exc:self.error=f'{type(exc).__name__}: {exc}'
             finally:self.closed=True
             return {'kind':'finished','answer':self.answer,'error':self.error or (self.result[1].get('error') if self.result else None),
+                'stop_reason':self.result[1].get('stop_reason') if self.result else None,
                 'trace':str(self.result[0]) if self.result else None}
         self.fiber=greenlet(run,parent=self.owner)
     def park(self,value):
