@@ -24,6 +24,7 @@ def main():
                         ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
     shutil.copy2(ROOT/'config/prislyktan_tasks.json',runtime/'config/prislyktan_tasks.json')
     tokenizer=args.output/'tokenizer.json';shutil.copy2(tokenizer_path(),tokenizer)
+    shutil.copy2(Path(tokenizer_path()).with_name('chat_template.jinja'),args.output/'chat_template.jinja')
     manifest={'schema':'standard-worker-package-v1','scope':'Private executable closure; acceptance certificates supplied separately.',
               'files':{str(p.relative_to(args.output)):hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in args.output.rglob('*') if p.is_file() and p.name!='standard-manifest.json'}}

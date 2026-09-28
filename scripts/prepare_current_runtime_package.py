@@ -44,6 +44,7 @@ def main():
     tokenizer = runtime / 'tokenizers/qwen/tokenizer.json'
     tokenizer.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(tokenizer_path(), tokenizer)
+    shutil.copy2(Path(tokenizer_path()).with_name('chat_template.jinja'),tokenizer.with_name('chat_template.jinja'))
     manifest = copy.deepcopy(original)
     manifest['derivation'] = {
         'base_manifest_sha256': hashlib.sha256((args.base / 'manifest.json').read_bytes()).hexdigest(),

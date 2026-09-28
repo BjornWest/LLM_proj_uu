@@ -7,7 +7,7 @@ name = "intent-browser"
 version = "0.1.0"
 description = "Small BrowserGym loop for intent-preserving browser experiments"
 requires-python = ">=3.11,<3.14"
-dependencies = ["browsergym-core==0.14.3", "httpx>=0.27,<1", "Pillow>=10", "python-dotenv>=1,<2", "jsonschema>=4.18,<5", "tokenizers==0.23.2", "greenlet>=3,<4"]
+dependencies = ["browsergym-core==0.14.3", "httpx>=0.27,<1", "Pillow>=10", "python-dotenv>=1,<2", "jsonschema>=4.18,<5", "tokenizers==0.23.2", "greenlet>=3,<4", "jinja2>=3.1,<4"]
 
 [project.optional-dependencies]
 miniwob = ["browsergym-miniwob==0.14.3"]

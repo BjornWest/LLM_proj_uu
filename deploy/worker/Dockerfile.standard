@@ -3,11 +3,12 @@
 ARG RUNTIME_IMAGE=intent-browser-worker:expanded-candidate-v3
 FROM ${RUNTIME_IMAGE}
 USER root
-RUN python -m pip install --no-cache-dir tokenizers==0.23.2
+RUN python -m pip install --no-cache-dir tokenizers==0.23.2 'jinja2>=3.1,<4'
 COPY runtime/ /app/
 COPY runtime/ /opt/expanded/runtime/
 COPY registry.json /opt/expanded/registry.json
 COPY standard-manifest.json /opt/harness/manifest.json
 COPY tokenizer.json /opt/harness/tokenizer.json
+COPY chat_template.jinja /opt/harness/chat_template.jinja
 ENV HARNESS_AX_TOKENIZER=/opt/harness/tokenizer.json
 USER 10001:10001
