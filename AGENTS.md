@@ -1,5 +1,30 @@
 # Repository guidance
 
+## Test-suite execution
+
+- Run independent suite cases in parallel by default, with separate browser sessions,
+  traces and concurrency-safe budget accounting. Use bounded concurrency appropriate
+  to local resources. Run sequentially only for an explicit isolation experiment or
+  a demonstrated shared-state/resource dependency; explain that exception.
+
+## Model-run authorization and costs
+
+- An explicitly agreed finite episode list is sufficient spending authorization
+  for those runs. Do not ask for a separate dollar cap or impose an arbitrary
+  per-episode monetary ceiling. Enforce the agreed episode, turn and context
+  limits, track actual provider charges, and flag unexpected cost increases.
+- Request an explicit spending limit for open-ended or iterative unsupervised
+  experimentation. Historical dollar-capped cohorts retain their original rules;
+  do not silently rerun cases or expand an approved episode list.
+
+## Context-size reporting
+
+- Report model context sizes and formatting/compression comparisons in tokens,
+  naming the tokenizer/model and distinguishing message text from complete requests.
+- If only characters or bytes are known, label that measurement explicitly; do not
+  present it as token usage or infer token savings from it. API limits and conservative
+  byte-based budget bounds may still use their actual units.
+
 ## Imported website fidelity
 
 - Import complete upstream sites, including their original navigation, surrounding pages, styling and distractions. Do not remove content because it is unrelated to the selected task, inconvenient to grade, or absent from a partial source cache.
@@ -29,3 +54,10 @@
 - Human-oriented explanations may live in `docs/` and be linked from the root README. Keep command-heavy operational detail out of the introductory README; link to the relevant guide instead.
 - Distinguish implemented local capabilities from deployed capabilities, scripted validation from model results, and adapted fixtures from full upstream benchmarks. Describe training preparation as preparation until supported by actual training evidence.
 - `docs/agents/legacy-readme.md` preserves the previous root README as a historical reference. Do not treat its older status notes as current instructions or keep it synchronized with the new introduction.
+
+## Human-readable report presentation
+
+- When sharing a report over HTTP, render Markdown into proper HTML, including tables, headings, lists, links and code blocks. Do not wrap the whole Markdown document in `<pre>` or serve raw Markdown as the human-facing report. Keep the source Markdown or raw JSON available separately when useful.
+- Use a Markdown renderer with table support and readable styling; wide tables should scroll on narrow screens. Preserve literal formatting inside actual code blocks. Treat raw HTML in report inputs as untrusted rather than executing it by default.
+- Verify presentation as well as HTTP availability before sharing: a 200 response alone is insufficient. Check that tables become real table elements and Markdown syntax is rendered; inspect the browser when layout is uncertain.
+- Apply this to new reports and existing reports when actively updating or sharing them. Fix presentation without rewriting historical trace/evaluation evidence; a display fix does not require rerunning experiments.

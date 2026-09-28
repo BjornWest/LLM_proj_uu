@@ -1,0 +1,9 @@
+# Model correction after a rejected decision
+
+`run_episode(..., retry_policy=DecisionRetryPolicy(scope="failure_chain"))` opts into bounded-decision-retry-v3. The policy grants one correction after a recoverable pre-dispatch model/tool-format failure, then restores that allowance after a successfully processed decision. Repeated invalid corrections stop. Existing episode request, input-context and spending rules still apply to every attempt. Defaults are unchanged: no policy means disabled; `DecisionRetryPolicy()` retains one retry per episode.
+
+All members of a native batch are parsed before any execute. Validation failures retain the exact response and structured parameter feedback. Recovery appends a notice and obtains fresh observation; it does not coerce arguments. Executed tool errors retain normal tool feedback. Failures after dispatch do not enter this retry path, so an uncertain mutation is never automatically repeated. Truncation at the output ceiling, refusals, repeated call identities and guard failures remain excluded.
+
+Native `scroll` now accepts either axis, defaulting the omitted one to zero at runtime. At least one must be supplied; malformed and nonfinite values remain rejected. The raw response and conversation keep the original argument JSON. Strict provider-schema mode continues requiring all properties as before.
+
+Offline acceptance: `python -m pytest -q tests/test_retry_failure_chain.py tests/test_decision_retry.py tests/test_native_tools.py tests/test_completion_limits.py tests/test_native_batch.py tests/test_batch_guard.py` — 53 tests, 69 subtests. Includes two separate corrected failures, bad corrections, exhausted call allowance, rejected batches, unchanged request prefixes/tools, and uncertain-action no-replay. No live inference or deployment claimed.

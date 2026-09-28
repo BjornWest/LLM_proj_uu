@@ -1,5 +1,26 @@
 # Model recovery and provider-health review
 
+## Local argument-feedback update (2026-09-21)
+
+The policy descriptor is now `bounded-decision-retry-v2`; the existing CLI
+selection and one-retry limit are unchanged. Recovery explicitly asks the model
+to double-check parameter names, types and allowed values. JSON Schema errors
+include a bounded diagnostic derived from the validator's structured path and
+constraint, for example `/options`: expected string or array of string values,
+received integer; `/limit`: maximum is 50. Invalid JSON supplies line/column.
+Unknown constraints fall back to checking the named field's schema. No raw
+argument value or unbounded exception dump is added to the notice.
+
+The diagnostic is saved in `decision_retry.argument_diagnostic` and included in
+the next request. Rejected arguments are not coerced or executed. Nine offline
+retry tests pass, including both suite failure shapes against actual tool
+schemas, nested paths, exact next-request delivery, unchanged schemas/prefixes,
+raw-attempt retention and retry stop boundaries. This increment has not been
+deployed or evaluated with new inference. The sections below retain the original
+policy/acceptance history.
+
+## Original implementation
+
 The new opt-in runner argument `retry_policy=DecisionRetryPolicy()` and CLI
 `--retry-policy bounded-v1` permit **one additional model request per episode**.
 Existing callers default to no recovery; historical profiles and the deployed
