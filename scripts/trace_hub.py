@@ -13,6 +13,10 @@ import os
 from pathlib import Path
 import threading
 from urllib.parse import urlsplit,parse_qs,unquote
+try:
+    from .trace_grades import project_grade, FILENAME
+except ImportError:
+    from trace_grades import project_grade, FILENAME
 
 
 def source_key(root):return hashlib.sha256(str(Path(root).resolve()).encode()).hexdigest()[:16]
@@ -78,6 +82,7 @@ def initial_summary(directory):
     model_label=compact(model.rsplit('/',1)[-1]) if isinstance(model,str) else ''
     driver_label=(model_label or 'Model not recorded') if driver=='llm' else compact(driver) or model_label
     label='safe success' if evaluation.get('safe_success') is True else 'unsafe / incomplete' if evaluation.get('safe_success') is False else 'outcome unknown'
+    if (directory/FILENAME).exists():label+=' · derived grade available'
     case=(metadata.get('calibration_case') or {}).get('case_id')
     return dict(id=hashlib.sha256(('browsergym:'+directory.name).encode()).hexdigest()[:20],
         title=' · '.join(str(v) for v in (case,title,driver_label,label) if v),
@@ -105,7 +110,7 @@ class Hub:
         # Invalidate derived summaries if the shared adapter changes.
         from agent_trace import sessions
         package=Path(sessions.__file__).parent
-        self.version=hashlib.sha256(Path(__file__).read_bytes()+b''.join(
+        self.version=hashlib.sha256(Path(__file__).read_bytes()+Path(__file__).with_name('trace_grades.py').read_bytes()+b''.join(
             p.read_bytes() for p in sorted(package.rglob('*.py')))).hexdigest()
 
     def roots(self):
@@ -203,11 +208,14 @@ class Hub:
             if not entry['directory'].resolve().is_relative_to(entry['root']):raise ValueError('Trace escaped root')
             group=browsergym.project(entry['directory'],artifact_prefix=str(entry['directory'].relative_to(entry['root'])))
             if group is None:raise ValueError('Trace unavailable')
+            group=project_grade(group,entry['directory'])
             group=media_prefix(group,entry['key'])
             body=json.dumps(group).encode()
-            # Do not publish data read across a writer's update as a stable revision.
+            # Live writers need not stop for a readable projection to be useful.
+            # Give a racing read its own ETag, never the stable file fingerprint,
+            # so the next poll will still fetch any events that arrived meanwhile.
             after=self.revision(entry['directory'],entry['key'])
-            if after!=revision:raise ValueError('Trace changed during loading; retry shortly')
+            if after!=revision:return body,'live-'+hashlib.sha256(body).hexdigest()
             compressed=gzip.compress(body,compresslevel=1,mtime=0)
             with self.body_lock:
                 weight=len(body)+len(compressed)
@@ -256,7 +264,7 @@ def make_handler(registry):
                     uncompressed_length=len(body)
                     compressed='gzip' in self.headers.get('Accept-Encoding','')
                     if compressed:body=hub.encoded(body,revision)
-                    self.send_response(200);self.send_header('ETag','"'+revision+'"');self.send_header('Cache-Control','private, no-cache');self.send_header('Vary','Accept-Encoding');self.send_header('X-Trace-Bytes',str(uncompressed_length))
+                    self.send_response(200);self.send_header('ETag','"'+revision+'"');self.send_header('Cache-Control','no-store' if revision.startswith('live-') else 'private, no-cache');self.send_header('Vary','Accept-Encoding');self.send_header('X-Trace-Bytes',str(uncompressed_length))
                     if compressed:self.send_header('Content-Encoding','gzip')
                     self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body);return
                 elif url.path.startswith('/artifacts/'):
@@ -277,6 +285,7 @@ def viewer_html():
     loader=Path(__file__).with_name('trace_hub_client.js').read_text()
     html=html[:start]+loader+'\n'+html[end:]
     replacements={
+        "list();const query=el('search').value.toLowerCase(),filter=el('filter').value;":"renderDerivedGrade();list();const query=el('search').value.toLowerCase(),filter=el('filter').value;",
         '<option value="newest">Recently updated</option>':'<option value="newest">Newest run first</option>',
         "s.message_count+' events · '+s.decision_count+' decisions'":"s.summary_pending?'Open trace to load totals':s.message_count+' events · '+s.decision_count+' decisions'",
         "function islLabel(session){return ":"function islLabel(session){if(session.summary_pending)return 'Max ISL: load trace to view';return ",

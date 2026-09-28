@@ -53,6 +53,9 @@ The browser retains up to four traces within a 128 MiB serialized-size budget,
 uses ETags on revisits, and fetches only the selected trace when switching.
 Background polling skips an active load; user navigation cancels the previous
 request. The shared renderer's bottom-following/message-anchor behavior remains.
+If files change during projection, the hub serves the readable live snapshot
+with a separate, non-persistent ETag instead of rejecting it. The next poll
+still fetches newer events; only a stable projection enters the server cache.
 An individual trace's first open still reads its complete recording, including
 diagnostics; lazy loading individual diagnostic messages is not implemented.
 

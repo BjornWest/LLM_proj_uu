@@ -213,7 +213,7 @@ def test_removed_root_not_served_from_cache(setup):
     assert trace_id('new') not in entries
 
 
-def test_racing_write_does_not_cache_partial_revision(setup,monkeypatch):
+def test_racing_write_returns_readable_snapshot_without_stable_cache(setup,monkeypatch):
     from agent_trace.adapters import browsergym
     h,a,b=setup;original=browsergym.project
     def project(directory,**kwargs):
@@ -222,15 +222,49 @@ def test_racing_write_does_not_cache_partial_revision(setup,monkeypatch):
         return group
     monkeypatch.setattr(browsergym,'project',project)
     _,entries=h.snapshot()
-    with pytest.raises(ValueError,match='changed during loading'):entries[trace_id('new')]
+    body,revision=entries[trace_id('new')]
+    assert json.loads(body)['id']==trace_id('new')
+    assert revision.startswith('live-')
+    assert revision!=entries.entries[trace_id('new')]['revision']
     assert not h.bodies
+    assert entries.entries[trace_id('new')]['summary']['summary_pending']
+    monkeypatch.setattr(browsergym,'project',original)
+    entry=h.lookup(trace_id('new'));body,settled_revision=h.load(entry)
+    assert settled_revision!=revision and not settled_revision.startswith('live-')
+    assert json.loads(body)['evaluation_label']=='safe success'
+    assert settled_revision in h.bodies
 
 
-def test_http_etag_skips_projection_and_gzip_roundtrips(setup,monkeypatch):
+def test_continuously_appending_trace_loads_on_every_request(setup,monkeypatch):
+    from agent_trace.adapters import browsergym
+    h,a,b=setup;original=browsergym.project
+    def project(directory,**kwargs):
+        group=original(directory,**kwargs)
+        path=directory/'steps.jsonl'
+        rows=[json.loads(line) for line in path.read_text().splitlines()]
+        with path.open('a') as stream:stream.write(json.dumps({'step':len(rows),'action':None})+'\n')
+        return group
+    monkeypatch.setattr(browsergym,'project',project)
+    for expected in range(1,5):
+        entry=h.lookup(trace_id('new'));body,revision=h.load(entry)
+        assert json.loads(body)['model_turn_count']==expected
+        assert revision.startswith('live-')
+        assert not h.bodies
+
+
+@pytest.mark.parametrize('racing',[False,True])
+def test_http_etag_skips_projection_and_gzip_roundtrips(setup,monkeypatch,racing):
     import gzip,io
     from scripts.trace_hub import make_handler
     from agent_trace.adapters import browsergym
     h,a,b=setup;handler=make_handler(h.registry)
+    original=browsergym.project
+    if racing:
+        def project(directory,**kwargs):
+            group=original(directory,**kwargs)
+            (directory/'evaluation.json').write_text('{"safe_success":true}')
+            return group
+        monkeypatch.setattr(browsergym,'project',project)
     def get(path,headers=None):
         request=object.__new__(handler);request.path=path;request.headers=headers or {}
         request.wfile=io.BytesIO();status=[];response_headers={}
@@ -244,7 +278,17 @@ def test_http_etag_skips_projection_and_gzip_roundtrips(setup,monkeypatch):
     status,headers,body=get('/api/sessions/'+ident,{'Accept-Encoding':'gzip'})
     assert status==200 and headers['Content-Encoding']=='gzip'
     assert json.loads(gzip.decompress(body))['id']==ident
-    assert headers['ETag']=='"'+rows[0]['revision']+'"'
+    if racing:
+        assert headers['ETag'].startswith('"live-')
+        assert headers['Cache-Control']=='no-store'
+        monkeypatch.setattr(browsergym,'project',original)
+        # A live snapshot must never suppress delivery of the newer stable data.
+        status,new_headers,body=get('/api/sessions/'+ident,{'If-None-Match':headers['ETag']})
+        assert status==200
+        assert json.loads(body)['evaluation_label']=='safe success'
+        headers=new_headers
+    else:
+        assert headers['ETag']=='"'+rows[0]['revision']+'"'
     monkeypatch.setattr(browsergym,'project',lambda *a,**kw:pytest.fail('ETag revalidation projected trace'))
     status,_,body=get('/api/sessions/'+ident,{'If-None-Match':headers['ETag']})
     assert status==304 and body==b''
