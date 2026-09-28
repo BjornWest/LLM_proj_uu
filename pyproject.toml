@@ -19,3 +19,6 @@ intent-browser = "intent_browser.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["intent_browser*"]
+
+[tool.setuptools.package-data]
+intent_browser = ["observation_revision.js"]
