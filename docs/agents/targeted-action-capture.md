@@ -1,5 +1,20 @@
 # Targeted action checks and deferred observation
 
+## Commit-review correction (2026-09-28)
+
+The integrated review found that the partial target lookup itself did not share
+the surrounding browser-guard deadline. It now runs inside the same owner-thread
+guard mechanism, including cleanup: bounded mode stops the check at two seconds,
+while diagnostic mode reports an overrun and continues waiting. No browser action
+is dispatched or replayed by this check.
+
+`scripts/verify_target_guard_deadline.py` reproduces a finite busy page in two
+independent Chromium sessions. Bounded mode stopped at 2.004 seconds; diagnostic
+mode waited for the page and completed successfully, with an overrun event.
+All 17 targeted-action regression cases passed again, as did 35 focused unit
+tests. Evidence is under `.local/coordination/backend-performance-commits/`.
+The measurements below remain historical and were not rewritten by this fix.
+
 This opt-in path removes the full pre-action guard capture and full final-action post-capture from the dynamic-preview loop. It is implemented locally; no new paid episode or deployment is claimed.
 
 ## Lifecycle

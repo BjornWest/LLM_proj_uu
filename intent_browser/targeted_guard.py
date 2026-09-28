@@ -10,6 +10,7 @@ from uuid import uuid4
 from playwright.sync_api import Error as PlaywrightError
 from .cdp_json import send_json
 from .dynamic_preview import semantics
+from .native_capture import CaptureDeadlineExceeded
 
 VERSION='targeted-main-action-v1'
 NO_TARGET_TOOLS=frozenset(('goto','go_back','go_forward','reload','scroll','noop','send_msg_to_user','extract_page','release_image'))
@@ -42,6 +43,13 @@ def _chain(nodes,target):
 
 def check(human,ticket,observation,decision):
     """None means unsupported/fall back; a result always records check scope."""
+    # Each pre-dispatch RPC, including resource cleanup, shares the existing
+    # owner-thread guard deadline. Diagnostic mode observes overruns instead.
+    return human._guard_operation('targeted_action',
+        lambda budget: _check(human,ticket,observation,decision))
+
+
+def _check(human,ticket,observation,decision):
     bid=decision.arguments.get('bid')
     if bid is None:
         if decision.name not in NO_TARGET_TOOLS:return None
@@ -84,7 +92,7 @@ def check(human,ticket,observation,decision):
     finally:
         if cdp is not None:
             try:cdp.send('Runtime.releaseObjectGroup',{'objectGroup':group})
-            except PlaywrightError:pass
+            except (PlaywrightError,CaptureDeadlineExceeded):pass
             try:cdp.detach()
-            except PlaywrightError:pass
+            except (PlaywrightError,CaptureDeadlineExceeded):pass
         result['seconds']=time.monotonic()-started
