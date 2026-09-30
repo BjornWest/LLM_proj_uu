@@ -17,7 +17,7 @@ from browser_training.vllm_speed import (residency_plan, residency_server_comman
                                          residency_cases, residency_bench_command)
 from browser_training.vllm_capacity import read_capacity
 from browser_training.vllm_phases import Sampler, parse_metrics, summarize_phases
-from browser_training.launch import FP8, REVISIONS
+from browser_training.launch import FP8, MODEL_CACHE_PATTERNS, REVISIONS
 
 
 def fetch(url, method="GET"):
@@ -58,7 +58,8 @@ def main():
         return
     # Heavy imports only on the rented worker; tokenizer pinned to the loaded revision.
     from huggingface_hub import snapshot_download
-    tokenizer = snapshot_download(FP8, revision=REVISIONS[FP8], local_files_only=True)
+    tokenizer = snapshot_download(FP8, revision=REVISIONS[FP8], local_files_only=True,
+                                  allow_patterns=MODEL_CACHE_PATTERNS)
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / "plan.json").write_text(json.dumps(config, indent=2))
     started = time.monotonic()

@@ -36,7 +36,7 @@ def interrupt(signum, frame):
     raise KeyboardInterrupt(f"signal {signum}")
 
 
-def ssh_options(target, port, output, password):
+def ssh_options(target, port, output, password, identity=None):
     options = ["-o", "ConnectTimeout=10", "-o", "ServerAliveInterval=15",
                "-o", "ServerAliveCountMax=2", "-o", "StrictHostKeyChecking=accept-new",
                "-o", f"UserKnownHostsFile={output / 'known_hosts'}",
@@ -51,8 +51,24 @@ def ssh_options(target, port, output, password):
                    PACKET_SSH_PASSWORD=password)
     else:
         options += ["-o", "BatchMode=yes"]
+    if identity:
+        options += ["-i", str(identity), "-o", "IdentitiesOnly=yes"]
     return (["ssh", *options, "-p", str(port), target],
             ["scp", *options, "-P", str(port)], env)
+
+
+def wait_for_operator(output, deadline):
+    """Keep SSH available until an explicit finish marker or cleanup deadline."""
+    marker = output / "manual-finished.json"
+    while time.monotonic() < deadline:
+        if marker.exists():
+            result = json.loads(marker.read_text())
+            code = result.get("exit_code")
+            if type(code) is not int or not 0 <= code <= 255:
+                raise ValueError("manual-finished.json needs an integer exit_code 0..255")
+            return code
+        time.sleep(min(2, max(0, deadline - time.monotonic())))
+    raise TimeoutError("Manual session deadline reached; collecting results and deleting pod")
 
 
 def run_instance(client, offer, args, output, secret):
@@ -61,6 +77,7 @@ def run_instance(client, offer, args, output, secret):
     connected = None
     started = time.monotonic()
     deadline = started + args.minutes * 60
+    provider = getattr(args, "provider", "Packet")
     state = {"offer": offer, "name": args.name, "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
              "minutes_limit": args.minutes, "termination_confirmed": False}
     save(output / "allocation.json", state)
@@ -82,7 +99,8 @@ def run_instance(client, offer, args, output, secret):
             connection = data.get("connection") or {}
             if connection.get("ssh_command"):
                 target, port = parse_connection(connection["ssh_command"])
-                ssh, scp, env = ssh_options(target, port, output, connection.get("password"))
+                ssh, scp, env = ssh_options(target, port, output, connection.get("password"),
+                                          getattr(args, "ssh_key", None))
                 check = subprocess.run([*ssh, "true"], env=env, capture_output=True, timeout=20)
                 if check.returncode == 0:
                     connected = (ssh, scp, env, target)
@@ -98,16 +116,35 @@ def run_instance(client, offer, args, output, secret):
         remaining = int(deadline - time.monotonic()) - 90
         if remaining <= 0:
             raise TimeoutError("Insufficient time remaining for bootstrap and cleanup")
-        remote = ("cd ~/packet-training && tar -xzf upload.tar.gz && "
-                  f"timeout --signal=TERM --kill-after=10s {remaining}s "
-                  f"bash scripts/packet_vllm_worker.sh {shlex.quote(args.preset)} {min(900, remaining)}")
-        with (output / "worker.log").open("w") as log:
-            run = subprocess.run([*ssh, remote], env=env, input=secret + "\n", text=True,
-                                 stdout=log, stderr=subprocess.STDOUT,
-                                 timeout=max(1, deadline - time.monotonic() - 90))
-        state["worker_exit_code"] = run.returncode
-        if run.returncode:
-            raise RuntimeError(f"Remote worker exited {run.returncode}; inspect collected worker.log")
+        if getattr(args, "manual", False):
+            subprocess.run([*ssh, "cd ~/packet-training && tar -xzf upload.tar.gz"],
+                           env=env, check=True, timeout=30)
+            # Public endpoint/SSH argv only: never serialize password or HF/API keys.
+            if "PACKET_SSH_PASSWORD" in env:
+                raise ValueError("Manual mode requires key-based SSH")
+            receipt = {"instance_id": instance_id, "ssh": ssh, "scp": scp,
+                       "target": target, "workspace": "~/packet-training",
+                       "operator_deadline_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                           time.gmtime(time.time() + deadline - time.monotonic() - 90))}
+            save(output / "connection.json", receipt)
+            state["manual_ready"] = True
+            save(output / "allocation.json", state)
+            print(f"Manual SSH ready: {output / 'connection.json'}; finish via manual-finished.json", flush=True)
+            code = wait_for_operator(output, deadline - 90)
+            state["manual_exit_code"] = code
+            if code:
+                raise RuntimeError(f"Operator ended manual session with exit code {code}")
+        else:
+            remote = ("cd ~/packet-training && tar -xzf upload.tar.gz && "
+                      f"timeout --signal=TERM --kill-after=10s {remaining}s "
+                      f"bash scripts/packet_vllm_worker.sh {shlex.quote(args.preset)} {min(900, remaining)}")
+            with (output / "worker.log").open("w") as log:
+                run = subprocess.run([*ssh, remote], env=env, input=secret + "\n", text=True,
+                                     stdout=log, stderr=subprocess.STDOUT,
+                                     timeout=max(1, deadline - time.monotonic() - 90))
+            state["worker_exit_code"] = run.returncode
+            if run.returncode:
+                raise RuntimeError(f"Remote worker exited {run.returncode}; inspect collected worker.log")
     finally:
         # Prevent a second ordinary Ctrl-C from interrupting deletion in progress.
         previous = {sig: signal.signal(sig, signal.SIG_IGN) for sig in (signal.SIGINT, signal.SIGTERM)}
@@ -137,7 +174,7 @@ def run_instance(client, offer, args, output, secret):
                 except Exception:
                     state["cleanup_failed"] = True
                 if not state["termination_confirmed"]:
-                    print(f"CHECK PACKET DASHBOARD: termination unconfirmed for {instance_id}", file=sys.stderr)
+                    print(f"CHECK {provider.upper()} DASHBOARD: termination unconfirmed for {instance_id}", file=sys.stderr)
             else:
                 state["allocation_outcome_unknown"] = True
                 print("Create outcome may be ambiguous: inspect dashboard; do not retry automatically", file=sys.stderr)
@@ -149,7 +186,7 @@ def run_instance(client, offer, args, output, secret):
             for sig, handler in previous.items():
                 signal.signal(sig, handler)
     if not state["termination_confirmed"]:
-        raise RuntimeError("Instance termination not confirmed; check Packet dashboard now")
+        raise RuntimeError(f"Instance termination not confirmed; check {provider} dashboard now")
 
 
 def main():

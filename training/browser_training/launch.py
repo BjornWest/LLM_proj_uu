@@ -9,6 +9,10 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 FP8 = "Qwen/Qwen3.8-27B-FP8"
+# Use the same subset for online preparation and strict offline snapshot lookup.
+# Newer huggingface_hub checks its cached repository tree for completeness.
+MODEL_CACHE_PATTERNS = ["*.json", "*.safetensors", "*.jinja", "*.txt", "*.model",
+                        ".gitattributes", "LICENSE*", "README*"]
 REVISIONS = {
     FP8: "017b9c7af6b5689d5dd426a76e0bc077eb5ca20a",
     "Qwen/Qwen3.8-27B": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
