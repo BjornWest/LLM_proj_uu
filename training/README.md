@@ -8,6 +8,10 @@ missing measurements and how to interpret the results.
 
 Start with the [consolidated findings and next-deployment plan](../docs/training-findings.md). The [SSH handoff](../docs/agents/training-modal-preflight.md#ssh-deployment-handoff) maps the successful Modal probes to direct commands; older generic launchers below are not yet a unified NF4 browser-training entry point.
 
+For the inexpensive shared RTX PRO offer, the [Packet inference runbook](../docs/agents/training-packet-vllm.md)
+provides a bounded SSH launcher and native vLLM speed tests. Its local preparation
+is validated; Packet GPU performance and compatibility still need a live test.
+
 The [training experiment plan](../docs/training-plan.md) records the current data
 splits, frozen-harness workflow, curriculum, evaluation and hyperparameter
 candidates. **The selected working baseline is NF4 training + BF16 LoRA + FP8
