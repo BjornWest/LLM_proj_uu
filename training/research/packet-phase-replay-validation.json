@@ -1,0 +1,17 @@
+{
+  "validation": "CPU reanalysis of prior real RTX PRO FP8 result; no new inference",
+  "prior_run": "20260914-233252-qwen38-fp8-mtp0-3b0ca029",
+  "model": "Qwen/Qwen3.8-27B-FP8",
+  "model_revision": "017b9c7af6b5689d5dd426a76e0bc077eb5ca20a",
+  "prior_vllm": "0.29.0",
+  "input_tokens": 5000,
+  "concurrency": 172,
+  "original_guarded_decode_tokens_per_second": 2044.444597782248,
+  "ported_guarded_decode_tokens_per_second": 2044.4729804177919,
+  "relative_difference": 1.388280982261847e-05,
+  "sampled_seconds": 72.26703478849959,
+  "active_kv_fraction_min": 0.9966887417218543,
+  "active_kv_fraction_max": 0.9966887417218543,
+  "source_metrics_sha256": "a8c622a7d5cd0b94d09ca2c48441de69a4a6939dc3f9470dc9f7c8b74b5340de",
+  "interpretation": "Near-identical counter-derived rate; midpoint versus start-of-scrape timing. Native future streams store chunk timings, not per-token GPU timings."
+}

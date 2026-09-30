@@ -29,4 +29,4 @@ envs/rl/.venv/bin/python scripts/verify_gpu.py --min-gpus 1 > outputs/packet/gpu
 envs/rl/.venv/bin/python scripts/download_models.py fp8 > outputs/packet/model.txt
 unset HF_TOKEN  # Public checkpoint already cached; inference needs no credentials.
 envs/rl/.venv/bin/python scripts/benchmark_vllm_native.py \
-  --preset "${1:-baseline}" --seconds "${2:-900}" --output outputs/packet/benchmark
+  --suite residency --preset "${1:-baseline}" --seconds "${2:-900}" --output outputs/packet/benchmark

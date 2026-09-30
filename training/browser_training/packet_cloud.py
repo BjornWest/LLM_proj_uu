@@ -19,6 +19,8 @@ UPLOAD_FILES = (
     "envs/rl/pyproject.toml", "envs/rl/uv.lock",
     "browser_training/__init__.py", "browser_training/launch.py",
     "browser_training/vllm_speed.py", "scripts/packet_vllm_worker.sh",
+    "browser_training/browser_benchmark_prompts.py", "browser_training/vllm_capacity.py",
+    "browser_training/vllm_phases.py", "scripts/vllm_benchmark_server.py",
     "scripts/benchmark_vllm_native.py", "scripts/download_models.py",
     "scripts/verify_gpu.py",
 )

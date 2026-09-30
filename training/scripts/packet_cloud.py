@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from browser_training.packet_cloud import Client, bundle, choose_offer, parse_connection
+from browser_training.vllm_speed import residency_plan
 
 
 def credentials():
@@ -193,6 +194,7 @@ def main():
     output = (args.output or ROOT / "outputs/packet" / args.name).resolve()
     output.mkdir(parents=True, exist_ok=False)
     manifest = {"offer": offer, "wallet": financial, "minutes_limit": args.minutes,
+                "benchmark": residency_plan("envs/rl/.venv/bin/vllm", preset=args.preset),
                 "estimated_compute_usd": offer["hourly_usd"] * args.minutes / 60,
                 "pricing_caveat": "Quote only; API create accepts pool_id, not a binding product price cap",
                 "files": bundle(ROOT, output / "upload.tar.gz")}

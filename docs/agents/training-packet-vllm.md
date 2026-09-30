@@ -178,46 +178,113 @@ the cache. The public checkpoint requires no token. An optional HF token grants
 not a guaranteed increase in sustained download bandwidth. No new token is needed
 to prepare this test; `HF_TOKEN` already exists locally.
 
-## Finite speed test
+## Finite speed test: active-cache residency profile
 
-The worker starts a localhost-only server with the FP8 checkpoint, BF16 compute
-dtype, 65,536-token context, maximum sixteen sequences, 8,192 scheduled tokens
-per batch and 85% memory utilization. KV cache dtype is `auto` initially;
-`--kv-dtype fp8` is separately available in the native benchmark script.
-Prefix caching is explicit, with `mamba_cache_mode=align` for hybrid attention.
-There is no adapter or synchronization layer in this first base-model test.
-Dev mode is enabled only for the localhost cache-reset endpoint.
-The `mtp` preset adds native MTP with three speculative tokens. It does not
-qualify runtime LoRA+MTP or represent DFlash performance.
+The default is now `--suite residency`, following the user's request to replicate
+methods from `/home/bjorn/code/inference_stuff`. The original small random suite
+remains available as `--suite smoke`; it is no longer Packet's default worker
+workload. The user's later instruction replaces the original 185-request shape;
+the approved thirty-minute whole-attempt limit and no allocation retries remain.
+No additional MTP run or paid time extension is implied.
 
-The client invokes the pinned **`vllm bench serve`**, not our own timing loop:
+The prior exact-model suite is recorded in
+`inference_stuff/docs/experiments/qwen38-browser-suite-v1.md`. We freeze its
+synthetic browser-history generator in `browser_benchmark_prompts.py` and port
+its capacity and guarded-decode methods. Source SHA256 is in the module.
+No source file in that repository was modified. These are synthetic browser
+observations, not captured traffic or task-success evidence.
 
-| Case | New input | Shared prefix | Output | Concurrency | Measured requests |
-|---|---:|---:|---:|---:|---:|
-| Decode c1 | 512 | 0 | 512 | 1 | 16 |
-| Decode c4 | 512 | 0 | 512 | 4 | 32 |
-| Decode c16 | 512 | 0 | 512 | 16 | 64 |
-| Cold prefill | 8,192 | 0 | 16 | 4 | 32 |
-| Cached prefix | 256 | 8,192 | 256 | 4 | 32 |
-| Longer context | 32,768 | 0 | 128 | 4 | 8 |
+The target server uses the same checkpoint/tokenizer revision, FP8 E4M3 attention
+KV, BF16 convolution state, FP32 recurrent state, Triton GDN prefill, CUDA graphs,
+95% memory utilization, scheduler ceiling 256 and 8,192 batched tokens. Context
+capacity is 31,008 tokens: 30,000 input + 1,000 output + eight lookahead tokens.
+Prefix caching defaults **off**, with Mamba cache mode `none`, matching the old
+cold-prefix capacity recipe. Pass `--prefix-caching` to the benchmark script for
+an explicitly separate APC/`align` experiment; pass `--kv-dtype auto` to compare
+BF16 attention KV. FP8 KV speed does not establish task-quality equivalence.
+Our version remains locked vLLM **0.28.0**, while the earlier Modal suite used
+**0.29.0**: this is a replication of workload/methods, not an isolated provider
+comparison. Host CPU count also differs.
 
-These are requested lengths in the **Qwen3.8 tokenizer**, not characters. Native
-results preserve the actual token lengths. Prefix length is **additive**:
-the cached case has 8,448 total input tokens. Native initial checks are disabled,
-and cold cases have zero warmups; the cached case alone has one
-warmup: **185 total model requests** across the six cases. Native default initial
-requests would populate the first measured prompt's cache, so we explicitly
-disable them after the external health check. Fixed lengths, ignore-EOS, distinct seeds and
-explicit cache resets make the experiment small and interpretable. The benchmark
-allows up to fifteen minutes including server load within the outer attempt.
-It aborts on unsuccessful cache reset, failed requests or an incomplete result.
+The read-only startup probe calls vLLM's own group-aware cache-capacity helper
+on copied model/draft configurations. It includes hybrid state, page padding,
+output growth, speculative state and the reserved null block. It does not modify
+live allocation, scheduling or forward computation. Select maximum integer
+concurrency that fits a complete 30K or 5K request, bounded by 256. Re-profile
+for each engine/preset instead of recycling previous numerical concurrency.
+The plan records predicted reservation, whether the scheduler ceiling limited
+capacity, and observed active-cache usage. Near-full cache is a target for the
+maximum-concurrency decode cases, not a promised outcome for every phase.
 
-Native random prompts are a hardware/kernel check, not representative browser
-trajectories. MTP acceptance and throughput on these prompts may differ sharply
-from browser actions. Once this works, test realistic contexts and tool calls
-before substituting the result into a broad-evaluation cost estimate. An eager
-fallback exists as `--eager` on the native worker script, but is never retried
-automatically: record CUDA graph failure first.
+| Case | Exact Qwen3.8 input tokens | Output tokens | Concurrent requests |
+|---|---:|---:|---|
+| Long-context decode | 30,000 | 1,000 | Complete-request maximum for 31,008-token reservation |
+| Short-context decode | 5,000 | 1,000 | Complete-request maximum for 6,008-token reservation |
+| Long prefill probe | 30,000 | 1 | Same concurrency as long decode |
+| Short prefill probe | 5,000 | 1 | Same concurrency as short decode |
+| Short decode comparison | 5,000 | 1,000 | Half the short maximum |
+
+Each arm submits **one cohort of C distinct requests**, with request count equal
+to concurrency, no oversampling, no preliminary model request, no warmup and no
+turnover. At most five arms and 1,152 model requests; actual concurrency is
+resolved on the GPU and recorded before execution. There is one repeat, not an
+open-ended search. Maximum-residency decode cases run first. Partial coverage
+under the existing deadline is preserved and explicitly marked incomplete;
+time limits are not extended to finish the last case. The half-capacity point
+checks whether peak throughput occurs below the memory ceiling. Short-input
+results bound performance only over the tested grid, not all possible settings.
+
+The client still uses **`vllm bench serve`**, now with custom JSONL browser
+prompts, greedy sampling and ignore-EOS. The model's chat prefix and final task/
+generation suffix are preserved. Token IDs decoded to text can merge again at
+history boundaries, so prompt preparation verifies exact lengths with the
+pinned tokenizer and adjusts only that boundary. Native server-reported input
+and output lengths must then match every reserved request exactly.
+
+Cases deliberately run sequentially on one shared GPU: concurrent arms would
+contaminate occupancy and phase counters. Requests within each case are concurrent.
+Every case preserves 500 ms server metric samples and native detailed stream
+chunk timings. Measurements follow the prior guarded-window method:
+
+1. Wait until the latest first-chunk arrival among all C streams; add one second.
+2. End one second before the earliest final-chunk arrival.
+3. Keep only consecutive, timely scrapes entirely inside that window, with
+   running=C, waiting=0, no new computed prompt tokens and no preemption.
+4. Divide generation-counter deltas by durations between those same snapshots.
+   Require at least five seconds of clean overlap; otherwise report decode rate
+   unavailable rather than substituting whole-batch throughput.
+5. Record active KV fraction during those decode intervals. Persistent inactive
+   cache, allocated pool bytes, active occupancy and total VRAM are different
+   quantities; configured client concurrency is not actual forward batch size.
+
+Prefill is measured independently with one-output-token cold cohorts. Report
+whole-case input processing rate as **prefill-dominated service throughput**.
+Also recover fresh-prefill counter rates from sampled intervals with positive
+computed-prompt increments and zero generation increments. These are observed
+server intervals, not isolated GPU kernel timings, and may be absent when
+prefill/decode overlap or sampling is too coarse. Do not reinterpret a mixed
+interval or a median TTFT as pure prefill speed. MTP stream bursts are not
+individual forward timings.
+
+The `mtp` preset adds three native speculative tokens and profiles its own
+changed memory capacity. A maximum-capacity baseline/MTP comparison can have
+different C; it does not isolate the effect of speculation at fixed C. Runtime
+LoRA+MTP and DFlash remain outside this base-model qualification.
+
+### CPU replay of the previous RTX PRO result
+
+Reanalysis of archived FP8/MTP-off run
+`20260914-233252-qwen38-fp8-mtp0-3b0ca029` recovered **2,044.47 decode tokens/s**
+at **5K input / concurrency 172**, versus the original analysis's **2,044.44**:
+about **0.0014%** difference from midpoint versus scrape-start timing.
+The clean window covers **72.27 seconds**, with sampled active KV occupancy
+**99.67%**. Whole-workload output throughput was about **1,005.8 tokens/s**.
+These are prior real RTX results, not new Packet measurements. Pure-prefill
+intervals were unavailable in that replay and are not invented from TTFT.
+The concise replay receipt is
+`training/research/packet-phase-replay-validation.json`; raw evidence remains
+in the inference repository. This validates the ported accounting on real
+saved traces before paying for another GPU.
 
 ## Results and interpretation
 
@@ -238,11 +305,12 @@ where exposed. Counters may be asynchronously published; inspect them together
 with server logs rather than assuming a perfect instantaneous boundary.
 
 **Logical input tokens/s is not fresh prefill tokens/s in a cached workload.**
-The cached case's warmup appears in the Prometheus delta but not the measured
+The optional smoke suite's cached warmup appears in the Prometheus delta but not the measured
 benchmark duration; do not divide that whole delta by the native measured
 duration. Short-output, cold-input cases approximate prefill-dominated throughput,
-not a pure isolated prefill kernel benchmark. Decode c1 also measures per-user
-latency, while c16 measures aggregate throughput. Both matter for browser loops.
+not a pure isolated prefill kernel benchmark. The optional smoke suite's c1
+point also measures per-user latency. The residency grid targets saturation;
+neither replaces realistic browser-loop latency measurements.
 
 The historical cost heuristic assumes 1,000 aggregate decode tokens/s and
 5,000 fresh prefill tokens/s with context retained. This shared offer has to
@@ -255,16 +323,21 @@ long-context decoding still consume resources.
 ## Local validation
 
 ```bash
-training/.venv/bin/python -m pytest -q training/tests/test_packet_cloud.py
+training/.venv/bin/python -m pytest -q training/tests/test_packet_cloud.py training/tests/test_vllm_residency.py
 bash -n training/scripts/packet_vllm_worker.sh
 ```
 
 Tests cover hourly/monthly price selection, absent capacity/price limits, strict
 SSH command parsing, secret-free upload archives, context sizing, failure and
 interrupt cleanup, ambiguous allocation handling, and refusal to run without
-`--execute`. All six benchmark commands and both server presets were additionally
-parsed against the installed vLLM 0.28.0 argparse implementations without model
-loading or CUDA execution. Live SSH transport, provisioning, deletion and
+`--execute`. New tests cover copied-config capacity probes, output reservations,
+scheduler-limited memory claims, guarded intervals, missing overlap, counter resets
+and preemption. All five residency commands and baseline/MTP server flags with
+APC on/off were parsed against installed vLLM 0.28.0 argparse; the older six
+smoke commands had passed the same check. Cached tokenizer/template checksums
+match the exact FP8 revision, and four distinct 5K plus four 30K prompts passed
+the official tokenizer and native CustomDataset path on CPU. No model was
+loaded or CUDA executed. Live SSH transport, provisioning, deletion and
 CUDA-proxy behavior still require the paid qualification attempt.
 
 References: [native vLLM 0.28.0 serving benchmark](https://docs.vllm.ai/en/v0.28.0/cli/bench/serve/),
