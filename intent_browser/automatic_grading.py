@@ -183,9 +183,13 @@ class GradingGate:
         self.check(force=True)
         value=self.contract.project(self.native,self.binding)
         if not isinstance(value,Evaluation):raise ValueError('Missing supported canonical Evaluation projection')
-        if (value.trust in ('unknown','ungraded','none','explicitly_ungraded','auxiliary','pending_external')
-                or not isinstance(value.trust,str) or value.trust.startswith('manual')
-                or value.verifier in ('none','manual-review')):
+        for name in ('verifier','verifier_version','trust'):
+            declaration=getattr(value,name)
+            if not isinstance(declaration,str) or not declaration.strip():
+                raise ValueError('Automatic grade requires a nonempty '+name+' declaration')
+        trust=value.trust.strip().lower();verifier=value.verifier.strip().lower()
+        if (trust in ('unknown','ungraded','none','explicitly_ungraded','auxiliary','pending_external')
+                or trust.startswith('manual') or verifier in ('none','manual-review')):
             raise ValueError('Manual/ungraded projection is not an automatic grade')
         value=value.to_dict()
         if value['task_completed'] is None and not value['technical_error'] and not value['limitations']:
@@ -213,7 +217,7 @@ class GradingGate:
         try:
             self.collect(env,outcome)
             return self.publish(outcome)
-        except Exception as exc:
+        except (Exception, KeyboardInterrupt) as exc:
             self.fail(f'{type(exc).__name__}: {exc}');raise
 
 
@@ -244,8 +248,9 @@ def finalize_external(directory,contract):
         if summary.get('trace_complete') is not True:raise ValueError('Cannot grade an incomplete browser trace')
         value=gate.finish(None,summary)
         summary.update(evaluation=value,grading=gate.record,grading_error=None,
-            infrastructure_completed=gate.record['infrastructure_complete'],success=value['safe_success'])
-    except Exception as exc:
+            infrastructure_completed=gate.record['infrastructure_complete'],success=value['safe_success'],
+            error=summary.get('error') or value['technical_error'])
+    except (Exception, KeyboardInterrupt) as exc:
         error=f'Automatic grading failed: {type(exc).__name__}: {exc}'
         gate.fail(error)
         value=failure_evaluation(error)

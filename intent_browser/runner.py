@@ -1218,7 +1218,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         grading_error = None
         if automatic_grading is not None and automatic_grading.phase == 'before_close':
             try:grading_gate.collect(env,outcome)
-            except Exception as exc:
+            except (Exception, KeyboardInterrupt) as exc:
                 grading_error=f'Automatic grading failed: {type(exc).__name__}: {exc}'
                 grading_gate.fail(grading_error)
 
@@ -1304,7 +1304,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     if automatic_grading.phase == 'after_close':grading_gate.collect(env,final_outcome)
                     evaluation_data=grading_gate.publish(final_outcome)
                     error=error or evaluation_data['technical_error']
-            except Exception as exc:
+            except (Exception, KeyboardInterrupt) as exc:
                 grading_error=f'Automatic grading failed: {type(exc).__name__}: {exc}'
                 grading_gate.fail(grading_error)
         if grading_error:
@@ -1331,14 +1331,27 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         if retry_policy is not None:
             summary['decision_retry_count'] = retries_used
         try:trace.finish(summary)
-        except Exception as exc:
+        except (Exception, KeyboardInterrupt) as exc:
             failure=f'Trace finalization failed: {type(exc).__name__}: {exc}'
             grading_gate.fail(failure)
             summary.update(error=summary.get('error') or failure,grading_error=failure,
                 grading=grading_gate.record,infrastructure_completed=False,success=None,trace_complete=False)
             summary['evaluation']=failure_evaluation(failure)
             write_json(trace.directory/'evaluation.json',summary['evaluation'])
-            saved=json.loads((trace.directory/'episode.json').read_text())
+            try:
+                saved=json.loads((trace.directory/'episode.json').read_text())
+                if not isinstance(saved,dict):saved={}
+            except (FileNotFoundError,json.JSONDecodeError):
+                saved={}
+            saved={**trace.metadata,'steps_file':'steps.jsonl','events_file':'events.jsonl',
+                'videos':[str(p.relative_to(trace.directory)) for p in trace.directory.rglob('*.webm')],**saved}
+            # finish() may fail before closing the streams or saving episode.json.
+            if trace.writer is not None:
+                try:trace.writer.close()
+                except (Exception,KeyboardInterrupt):pass
+            for stream in (trace.events,trace.lifecycle):
+                try:stream.close()
+                except (Exception,KeyboardInterrupt):pass  # Preserve the original finalization failure.
             write_json(trace.directory/'episode.json',{**saved,**summary})
     print(f"Trace: {trace.directory}\nResult: {summary}", flush=True)
     return trace.directory, summary

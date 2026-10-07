@@ -7,6 +7,55 @@
   to local resources. Run sequentially only for an explicit isolation experiment or
   a demonstrated shared-state/resource dependency; explain that exception.
 
+## Independent code review before handoff
+
+- All commits must receive an independent subagent review before adoption handoff
+  or integration into dev/prod. Multiple commits may be reviewed together when
+  they belong to the same goal; identify every included commit explicitly. This
+  is standing authorization: run the review without asking whether it is wanted.
+- Scope the review to the exact commits made for the task, with their hashes,
+  parent/base, changed paths, requirements and validation evidence.
+  Use `git show COMMIT` for individual/noncontiguous commits, or an exact
+  `git diff BASE..TIP` only when that range contains the intended commits.
+- Spawn a separate reviewer with its own review task. Empower it to inspect
+  surrounding code, trace actual execution paths and run focused reproductions;
+  do not ask it merely to confirm the implementation summary. Prioritize
+  correctness, regressions, concurrency, failure handling and missing coverage.
+  Request concrete findings with severity, file/line references and evidence.
+  Keep source/Git edits out of the review unless explicitly delegated; tests
+  still obey resource limits and existing model/cloud authorization.
+- Wait for the review and assess each finding. Fix confirmed defects and test
+  the correction; have the reviewer examine fixes and the final candidate.
+  Handle specific implementation mistakes directly without presenting them to
+  the user. Escalate only findings that reveal a flaw in the approach itself and
+  require a design decision; retain technical findings in the review record.
+  A passing test suite does not replace review, and a review does not replace
+  required integration/acceptance tests. Record the reviewed commit(s), report
+  and disposition of findings in the handoff. Unresolved blockers prevent an
+  adoption-ready handoff; a clearly labeled request for help is still allowed.
+
+## Shared dev integration and prod promotion
+
+- Keep one shared integration baseline ("dev"; currently shared `main` unless
+  the coordinated publisher explicitly designates another branch) and one
+  accepted evaluation release ("prod"). Prod here means the fixed evaluation
+  runtime, not an automatic Vercel deployment.
+- Bring reviewed, approved implementation commits and their required dependencies
+  into dev promptly through the coordinated integrator. Do not leave approved
+  work indefinitely on agent-specific trees. Check exact commit ancestry to avoid
+  duplicate cherry-picks, preserve other agents' dirty work and record the
+  integrated commit. An approval must identify its exact reviewed commit.
+- When Evaluation requested the change, also hand the reviewed candidate to
+  Evaluation for integration into prod and the required acceptance/promotion.
+  Dev integration alone is not prod readiness. Keep a specific unresolved
+  dependency, review finding or failed acceptance visible rather than silently
+  leaving the change stranded on a private branch.
+- Agent branches/worktrees are temporary isolation tools. Prefer reusing the
+  established dev/prod environments; create another tree only for a concrete
+  ownership conflict, exact-commit review or frozen running suite. Retire temporary
+  trees after integration when no agent/run uses them and no uncommitted work
+  remains. Preserve historical evidence and commits; never disrupt an active run.
+
 ## Model-run authorization and costs
 
 - An explicitly agreed finite episode list is sufficient spending authorization

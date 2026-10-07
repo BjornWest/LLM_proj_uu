@@ -226,6 +226,56 @@ class GradingTests(unittest.TestCase):
         self.assertIn('native grader crashed',s['grading_error']);self.assertIsNone(s['evaluation']['task_completed'])
         self.assertEqual(events.count('grade'),1);self.assertEqual(m.calls,1)
 
+    def test_interrupted_native_grading_closes_and_records_failure_without_regrading(self):
+        def interrupted_grade(env,trace,outcome):
+            raise KeyboardInterrupt('native grading interrupted')
+        for phase in ('before_close','after_close','external'):
+            with self.subTest(phase=phase):
+                p,s,events,m,e,c=self.episode(replace(self.contract,grade=interrupted_grade,phase=phase))
+                if phase=='external':s=finalize_external(p,c)
+                self.assertTrue(e.closed);self.assertEqual(events.count('close'),1)
+                self.assertEqual(events.count('grade'),1);self.assertEqual(m.calls,1)
+                self.assertIn('KeyboardInterrupt',s['grading_error'])
+                self.assertEqual(s['grading']['status'],'failed');self.assertIsNone(s['success'])
+                self.assertFalse(s['infrastructure_completed'])
+                self.assertEqual(json.loads((p/'episode.json').read_text())['evaluation'],s['evaluation'])
+
+    def test_automatic_projection_requires_nonempty_string_declarations(self):
+        for name in ('verifier','verifier_version','trust'):
+            for invalid in (None,'','   ',42,[]):
+                def invalid_project(raw,bound):
+                    result=project(raw,bound);setattr(result,name,invalid);return result
+                with self.subTest(field=name,value=invalid):
+                    p,s,*_=self.episode(replace(self.contract,project=invalid_project))
+                    self.assertIn(name+' declaration',s['grading_error'])
+                    self.assertIsNone(s['success']);self.assertFalse(s['infrastructure_completed'])
+                    self.assertTrue((p/'automatic-grade.json').is_file())
+
+    def test_whitespace_and_case_do_not_disguise_manual_projection(self):
+        for name,invalid in (('trust','  Manual_browser_phase  '),('verifier',' Manual-Review ')):
+            def invalid_project(raw,bound):
+                result=project(raw,bound);setattr(result,name,invalid);return result
+            with self.subTest(field=name):
+                _,s,*_=self.episode(replace(self.contract,project=invalid_project))
+                self.assertIn('Manual/ungraded',s['grading_error']);self.assertIsNone(s['success'])
+
+    def test_external_native_technical_error_reaches_summary_without_losing_original_grade(self):
+        def error_project(raw,bound):
+            value=project(raw,bound);value.technical_error='native grading database unavailable';return value
+        for provider_failure in (False,True):
+            with self.subTest(provider_failure=provider_failure):
+                p,s,events,m,e,c=self.episode(replace(self.contract,project=error_project,phase='external'),
+                    provider_failure=provider_failure)
+                after=finalize_external(p,c)
+                self.assertEqual(after['error'],s['error'] or 'native grading database unavailable')
+                self.assertEqual(after['evaluation']['technical_error'],after['error'])
+                self.assertEqual(after['execution_error'],s['execution_error'])
+                self.assertIsNone(after['grading_error']);self.assertIsNone(after['success'])
+                self.assertFalse(after['infrastructure_completed']);self.assertEqual(events.count('grade'),1)
+                self.assertEqual(json.loads((p/'automatic-grade.json').read_text())['raw_grade']['done'],
+                    not provider_failure)
+                self.assertEqual(json.loads((p/'episode.json').read_text())['error'],after['error'])
+
     def test_recording_failure_cannot_publish_success_even_if_grader_passes(self):
         from intent_browser.trace import Trace
         original=Trace.finish
@@ -238,6 +288,43 @@ class GradingTests(unittest.TestCase):
         self.assertEqual(s['grading']['status'],'failed')
         self.assertFalse(json.loads((p/'episode.json').read_text())['trace_complete'])
         self.assertIsNone(json.loads((p/'evaluation.json').read_text())['safe_success'])
+
+    def test_early_trace_finish_failure_still_saves_a_discoverable_episode(self):
+        from intent_browser.trace import Trace
+        original_event=Trace.event
+        traces=[]
+        def failed_event(trace,kind,**data):
+            if kind=='episode_finished':
+                traces.append(trace)
+                raise RuntimeError('lifecycle finalization failed')
+            return original_event(trace,kind,**data)
+        with patch.object(Trace,'event',failed_event):
+            p,s,*_=self.episode(self.contract)
+        saved=json.loads((p/'episode.json').read_text())
+        self.assertIn('lifecycle finalization failed',s['grading_error'])
+        self.assertFalse(saved['trace_complete']);self.assertIsNone(saved['success'])
+        self.assertFalse(saved['infrastructure_completed']);self.assertEqual(saved['episode_id'],p.name)
+        self.assertEqual(saved['steps_file'],'steps.jsonl');self.assertEqual(saved['events_file'],'events.jsonl')
+        self.assertEqual(saved['evaluation'],json.loads((p/'evaluation.json').read_text()))
+        self.assertEqual(saved['grading']['status'],'failed');self.assertTrue((p/'automatic-grade.json').is_file())
+        self.assertTrue(traces[0].events.closed);self.assertTrue(traces[0].lifecycle.closed)
+
+    def test_interrupted_trace_finish_closes_writer_and_preserves_failure(self):
+        from intent_browser.observation_writer import ObservationWriter
+        original_close=ObservationWriter.close
+        writers=[]
+        def interrupted_close(writer):
+            if not writers:
+                writers.append(writer)
+                raise KeyboardInterrupt('recording close interrupted')
+            return original_close(writer)
+        with patch.object(ObservationWriter,'close',interrupted_close):
+            p,s,*_=self.episode(self.contract)
+        saved=json.loads((p/'episode.json').read_text())
+        self.assertTrue(writers[0].closed);self.assertFalse(writers[0].pending)
+        self.assertIn('KeyboardInterrupt: recording close interrupted',saved['grading_error'])
+        self.assertFalse(saved['trace_complete']);self.assertIsNone(saved['success'])
+        self.assertEqual(saved['evaluation'],s['evaluation'])
 
     def test_concurrent_external_claim_rejects_second_without_regrading(self):
         p,s,events,m,e,c=self.episode(replace(self.contract,phase='external'))
