@@ -316,3 +316,55 @@ guessing JavaScript output with Python `str`. This work is offline/audit-only an
 adds no browser Harness bookkeeping. Native arbitrary-precision integers beyond
 JavaScript's exact integer range remain unresolved. Numeric JSON representation
 may change between int/float; booleans and strings never coerce into numbers.
+
+
+## Explicit private installation for the retailer/review pilot
+
+`fact_recording_installation.py` is an additive caller helper, separate from the
+reviewed 23-file recording source. It is not native/browser acceptance. The
+helper writes uniquely named copies and rejects exact source-seam or hash drift.
+The copy must execute against the approved frozen dependency root: a different
+imported `adapter.ROOT` is rejected rather than falling back to the live tree.
+
+Create the private review mount with the reviewed `copied_review_mount`,
+then `copied_runtime` over the frozen Runtime source. It binds the copied
+`mount_surrounding` before construction and overlays the final served retailer
+asset bytes immediately before asset hashes and HTTP handlers are created.
+No shared Website or Harness module/global is replaced. Original and copied
+Runtime bytes and the recorder library must be in the caller's trusted closure.
+
+`copied_execution` applies five exact seams to a separately approved compound
+consumer: the constructor selects the private Runtime; extra hashed sources join
+the existing task binding without overwriting conflicting pins; the runner uses
+`recording_env_factory`; the observation pipeline is explicitly `None` with the
+released provider/observe options; and user options cannot override those fields.
+It preserves external automatic grading, post-cleanup finalization and native
+answer semantics. Source and implementation/helper pins are checked again before
+policy dispatch. The private consumer's actual written bytes join its task files;
+its original approved source is also retained. No authored viewer double may
+stand in for deployed viewer acceptance.
+
+The environment factory installs the enabled provider on BrowserGym's actual
+policy page before the inherited task setup navigates and before its first
+observation. It keeps the existing LocalWorldStart origin-bridge setup. Provider
+CDP cleanup runs before browser close; browser close still runs if detach fails. If both fail, both messages are retained
+in the error text persisted by the runner; a single cleanup failure remains unchanged.
+An incompatible entrypoint closes its created environment and fails explicitly.
+Disabled installation returns the original bound factory unchanged. This helper
+does not retry setup, produce a second AX capture, change policy context or relax
+automatic grading. Nine finite source/ordering controls are preparation only;
+actual native imports, rendering, capture, viewer and prefix delivery remain held.
+
+
+`FactPilotPublicAudit` is the bounded source-availability caller for this pilot.
+Its route plan uses every carried retailer page for the two native model IDs and
+all existing independent review bindings. It does not select pages by price,
+world truth or expected model success and does not invent absent routes. One
+private browser/context walks those native-bound transport URLs sequentially;
+the model browser is separate. Each page must yield a settled paired render
+export and its actual DOM/AX capture. Files, native IDs, rendered URLs and hashes
+remain in a private manifest. The auditor verifies all supported roles against
+these captures after browser/CDP cleanup. These source files never count as
+policy delivery and are never appended to model context. Actual browser/CSP and
+public sufficiency remain unqualified until the separately authorized integrated
+check; four authored route/cleanup controls do not establish those capabilities.
