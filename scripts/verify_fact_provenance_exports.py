@@ -10,14 +10,16 @@ from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 from types import SimpleNamespace
 
 ROOT=Path(__file__).resolve().parents[1]
-sys.path[:0]=[str(ROOT),str(ROOT/'training')]
+sys.path[:0]=[str(ROOT),os.environ.get('FACT_PROVENANCE_CONSUMER_ROOT',str(ROOT/'training'))]
 from browser_training.fact_render_capture import harness_source_packet
 from browser_training.fact_exposure import projected_text
+from browser_training import fact_render_capture, fact_exposure, website_projection
 from intent_browser.ax_context import AXContext
 from intent_browser.ax_explorer import AXConfig
 from intent_browser.fact_provenance import FactRecorder, encoded, object_digest, slice16
@@ -113,13 +115,13 @@ def main():
     assert len(paths)==receipt['recording_captures'],'Incomplete capture set'
     before={str(path):sha(path) for path in paths}
     sources=[ROOT/p for p in ('intent_browser/fact_provenance.py','intent_browser/ax_context.py',
-        'intent_browser/policy_delivery.py','training/browser_training/fact_render_capture.py',
-        'training/browser_training/fact_exposure.py','scripts/verify_fact_provenance_exports.py')]
-    source_pins={str(p.relative_to(ROOT)):sha(p) for p in sources}
+        'intent_browser/policy_delivery.py','scripts/verify_fact_provenance_exports.py')]
+    sources += [Path(m.__file__) for m in (fact_render_capture,fact_exposure,website_projection)]
+    source_pins={str(p.resolve()):sha(p) for p in sources}
     with ThreadPoolExecutor(max_workers=2) as pool:
         results=list(pool.map(lambda p:verify_case(p,args.output,args.tokenizer),paths))
     assert all(sha(Path(p))==pin for p,pin in pins.items()),'Inputs changed during acceptance'
-    assert all(sha(ROOT/p)==pin for p,pin in source_pins.items()),'Source changed during acceptance'
+    assert all(sha(Path(p))==pin for p,pin in source_pins.items()),'Source changed during acceptance'
     result={'passed':True,'scope':'Saved browser captures / real formatter / synthetic delivery only',
         'cases':results,'input_sha256':before,'source_sha256':source_pins,'case_workers':2,
         'browser_launches':0,'network_calls':0,'model_requests':0,'website_edits':0,

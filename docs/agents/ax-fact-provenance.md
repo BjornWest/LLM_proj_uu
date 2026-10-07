@@ -167,3 +167,21 @@ insufficient. This is a coverage gap, not native pipeline certification. The
 source callback API is otherwise unchanged. Every new runner diagnostic also
 requires the [automatic grading contract](automatic-grading.md) or an explicit
 ungraded reason. Existing saved acceptance hashes remain historical.
+
+## Isolated source dependencies
+
+Core recording imports only `intent_browser` modules. The offline consumer checks
+and saved-export verifier additionally require the separately owned Inspect
+`browser_training.fact_exposure`, `website_projection` and `fact_render_capture`
+modules. Set `FACT_PROVENANCE_CONSUMER_ROOT` to a trusted immutable `training/`
+source directory when those modules have not yet been integrated into the test
+checkout. The verifier hashes the actual loaded modules in its receipt; do not
+use mutable development imports as a release dependency. The source-root override
+is test/verification tooling only and never changes episode policy or execution.
+
+The current core commit is based on the reviewed automatic-grading runtime.
+Its unit fixtures explicitly select an ungraded diagnostic; this does not authorize
+an ungraded model episode. Importing this feature into another release still
+requires combined runtime acceptance. Retain that release's explicit rejection
+of fact recording with checkpoint restoration; no restored-ledger contract is
+provided here.
