@@ -43,6 +43,22 @@ class CaptureBoundaryTests(unittest.TestCase):
                 self.assertEqual(calls,['capture'])
                 boundary.close();self.assertNotIn('_get_obs',vars(env))
 
+    def test_observer_diagnostic_write_failure_never_changes_native_capture(self):
+        for after in (False,True):
+            with self.subTest(after=after):
+                calls=[]
+                class Env:
+                    def _get_obs(self):
+                        calls.append('native');return {'axtree_object':{'nodes':[]}}
+                def observer(op):
+                    if after:op()
+                    raise RuntimeError('observer failed')
+                def failed_sink(*args,**kwargs):raise OSError('private event sink unavailable')
+                env=Env();boundary=FactCaptureBoundary(env,observer,SimpleNamespace(event=failed_sink))
+                result=env._get_obs()
+                self.assertEqual(calls,['native']);self.assertFalse(boundary.confirmed(result))
+                boundary.close();self.assertNotIn('_get_obs',vars(env))
+
     def test_existing_instance_override_is_restored(self):
         env=SimpleNamespace(_get_obs=lambda:{})
         original=env._get_obs

@@ -109,8 +109,11 @@ class FactCaptureBoundary:
             accepted=True
         except Exception as exc:
             if browser_error is not None:raise browser_error
-            self.trace.event('fact_capture_unknown',error_type=type(exc).__name__,
-                scope='Native capture observer; no action or capture replay')
+            try:
+                self.trace.event('fact_capture_unknown',error_type=type(exc).__name__,
+                    scope='Native capture observer; no action or capture replay')
+            except Exception:
+                pass  # Private diagnostics must not suppress ordinary capture.
         # Even an observer failing before operation must leave ordinary capture intact.
         result=operation()
         self.pairs[id(result)]=(result,accepted)
@@ -377,6 +380,7 @@ class FactRecorder:
                     if 'normalized_match' in ex:
                         diagnostics.append({'reason':'normalized_match_not_identity','ref':ref});continue
                     term = ex.get('term'); shown = ex.get('match')
+                    if isinstance(term,str):term=term.strip()  # Same normalization as AXContext.search.
                     if not isinstance(term,str) or not isinstance(shown,str): continue
                     source = n['source_text']; hit = re.search(re.escape(term),source,re.IGNORECASE)
                     if not hit:continue

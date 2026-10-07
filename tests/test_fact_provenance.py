@@ -121,6 +121,19 @@ class ProvenanceTests(unittest.TestCase):
         self.assertEqual(main['items'][0]['references'][0]['acknowledged_content_ids'],[cid])
         self.assertEqual(helper['items'][0]['references'][0]['acknowledged_content_ids'],[])
 
+    def test_padded_scalar_query_maps_the_actual_first_repeated_neighborhood(self):
+        term='TARGET '+'x '*110+'END'
+        text=('lead '*25)+term+'X '+('gap '*150)+('lead '*25)+term+' '
+        x,obs,r=self.fixture(text);x.capture(obs)
+        result=x.search(term+' ',repeat=True);selected,sources=self.mapped(r,result)
+        matches=[p for p in selected['record']['projections']
+                 if p['output_path']==['items',0,'match']]
+        self.assertTrue(matches)
+        # AXContext strips the padded query and selects its first occurrence.
+        first=text.index(term);second=text.index(term,first+len(term))
+        self.assertTrue(all(p['source_start']<second for p in matches))
+        self.assertEqual(min(p['source_start'] for p in matches),first-48)
+
     def test_exact_search_neighborhood_maps_only_emitted_slices(self):
         x,obs,r=self.fixture('x '*180+'TARGET'+' y'*180);x.capture(obs)
         out=x.search('TARGET',repeat=True);sel,sources=self.mapped(r,out)
