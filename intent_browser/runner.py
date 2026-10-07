@@ -44,7 +44,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 clarification_callback=None, clarification_audit_id=None,
                 observation_pipeline="auto", human_handover=None, human_handover_ui=None,
                 trace_screenshots=None, async_recording=True, debug_timings=None,
-                automatic_grading=None, allow_ungraded=False, ungraded_reason=None):
+                automatic_grading=None, allow_ungraded=False, ungraded_reason=None,
+                record_fact_provenance=False, fact_source_provider=None, fact_capture_observer=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
@@ -145,6 +146,18 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         if not harness_profile or not harness_profile.ax_config:
             raise ValueError('Input limit requires a model input counter or configured local AX tokenizer')
         input_counter = OpaqueReasoningInputCounter(QwenInputCounter(harness_profile.ax_config.tokenizer_path))
+    if type(record_fact_provenance) is not bool:
+        raise ValueError('record_fact_provenance must be boolean')
+    if record_fact_provenance and fact_capture_observer is not None:
+        if fact_source_provider is None or not callable(fact_capture_observer):
+            raise ValueError('Fact capture observer requires opt-in fact recording, source provider and callable observer')
+        if observation_pipeline is not None:
+            raise ValueError('Fact capture observer currently supports native observations only; deferred pipeline captures require a separate accepted boundary')
+    if record_fact_provenance:
+        if not harness_profile or not harness_profile.ax_config or not harness_profile.ax_config.incremental or not harness_profile.delivery_tracking:
+            raise ValueError('Fact provenance requires incremental AX and policy delivery tracking')
+        if fact_source_provider is not None and not callable(fact_source_provider):
+            raise ValueError('fact_source_provider must be a trusted callable or None')
     if harness_profile is not None and harness_profile.agent_limits and agent_runtime is None:
         from .delegation import AgentRuntime
         runtime=AgentRuntime(backend,harness_profile.agent_limits,harness_profile,before_observation,helper_env_factory,
@@ -152,7 +165,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
              'observation_text_limit':observation_text_limit,'decision_wait':decision_wait,
              'trace_screenshots':trace_screenshots,'async_recording':async_recording,
              'max_input_tokens':max_input_tokens,'input_counter':input_counter,
-             'clarification_callback':clarification_callback,'clarification_audit_id':clarification_audit_id})
+             'clarification_callback':clarification_callback,'clarification_audit_id':clarification_audit_id,
+             **({'record_fact_provenance':True,'fact_source_provider':fact_source_provider,'fact_capture_observer':fact_capture_observer} if record_fact_provenance else {})})
         return runtime.run(lambda actor: run_episode(env_factory,actor['backend'],metadata,output,max_steps,seed,
             record_video,hold_seconds,search_backend,episode_task,lambda:runtime.before_observation(actor),
             terminal_response_instruction=terminal_response_instruction,observation_text_limit=observation_text_limit,
@@ -162,7 +176,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             max_input_tokens=max_input_tokens,input_counter=input_counter,
             clarification_callback=clarification_callback,clarification_audit_id=clarification_audit_id,
             trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings,
-            automatic_grading=automatic_grading,allow_ungraded=allow_ungraded,ungraded_reason=ungraded_reason))
+            automatic_grading=automatic_grading,allow_ungraded=allow_ungraded,ungraded_reason=ungraded_reason,
+            record_fact_provenance=record_fact_provenance,fact_source_provider=fact_source_provider,
+            fact_capture_observer=fact_capture_observer))
     no_browser=agent_actor is not None and agent_actor['browser']=='none'
     if action_timeout_ms is not None:
         validate_action_timeout(action_timeout_ms)
@@ -319,6 +335,14 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     if agent_runtime and agent_actor['parent'] is None:agent_runtime.grading_gate=grading_gate
     if agent_runtime:agent_runtime.bind(agent_actor,trace)
     delivery = PolicyDelivery(trace) if harness_profile and harness_profile.delivery_tracking else None
+    fact_recorder = None
+    if record_fact_provenance:
+        from .fact_provenance import FactRecorder
+        fact_recorder = FactRecorder(trace,fact_source_provider,fact_capture_observer)
+        fact_recorder.attach(ax_explorer)
+        delivery.fact_recorder = fact_recorder
+        trace.metadata['fact_recording'] = fact_recorder.describe()
+        write_json(trace.directory/'metadata.json',trace.metadata)
     env = None
     pipeline = None
     human_browser = None
@@ -357,6 +381,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             trace.event("task_prepare_completed", artifact="task.json")
         trace.event("environment_create_started")
         env = env_factory(str(trace.directory / "video") if record_video else None)
+        if fact_recorder is not None:fact_recorder.env=env
         base_env = getattr(env, 'unwrapped', env)
         action_set = getattr(getattr(base_env, 'action_mapping', None), '__self__', None)
         if harness_profile and (harness_profile.tools.navigation_origins or harness_profile.vision_config):
@@ -391,6 +416,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 compact_tabs=harness_profile.tools.compact_tab_context,
                 stable_frames=harness_profile.tools.stable_frame_capture,
                 capture_timeout_mode=harness_profile.capture_timeout_mode)
+        if fact_recorder is not None:fact_recorder.install_capture_boundary(base_env)
         trace.event("environment_reset_started", seed=seed)
         obs, info = env.reset(seed=seed)
         reset_complete = True
@@ -496,6 +522,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     return value
                 return value
         def record_feedback(output, value, event, kind):
+            fact_output=fact_recorder.select(value) if fact_recorder is not None else None
+            if fact_output is not None:event['fact_output_artifact']=fact_output['artifact']
             if event.get('batch_call') is not None and kind == 'browser_feedback':
                 from .batching import batch_result
                 event['_batch_feedback'] = value
@@ -513,7 +541,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 return
             if delivery is not None:
                 source_id=delivery.register(kind,json.dumps(value,ensure_ascii=False,sort_keys=True),
-                    step=event['step'],provenance={'after_action':event['action'],
+                    step=event['step'],fact_output=fact_output,provenance={'after_action':event['action'],
                         'observation_before_action':event['observation'],
                         **({'context_observation':event['context_observation']}
                            if event.get('context_observation') else {}),
@@ -705,6 +733,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         grading_gate.bind(env,obs)
         final_ref = trace.observation(0, obs, render_observation(obs))
         for index in range(max_steps):
+            if fact_recorder is not None: fact_recorder.step=index
+            fact_observation_output=None
             if agent_runtime and agent_runtime.calls >= agent_runtime.limits.total_model_calls:
                 break  # Shared call guard includes parent and helpers.
             event = {"step": index, "observation": None, "transition_observation": final_ref, "messages": None,
@@ -756,6 +786,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         event['observation_capture_seconds'] = captured_at - started
                     with trace.timings.span('decision.format_preview',step=index):
                         text = ax_explorer.prepare_observation(obs) if hasattr(ax_explorer,'prepare_observation') else render_observation(obs)
+                    if fact_recorder is not None: fact_observation_output=fact_recorder.select(text)
                     if harness_profile and harness_profile.tools.open_internet and not no_browser:
                         from .open_internet import tab_observation
                         if hasattr(ax_explorer, 'prepare_observation'):
@@ -807,7 +838,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     if human_chat is not None:
                         if human_chat.pending:human_browser.confirmations.clear()
                         human_chat.enqueue(conversation,delivery,index)
-                    source_id=delivery.register('page_observation',text,step=index,provenance={'observation':final_ref})
+                    source_id=delivery.register('page_observation',text,step=index,fact_output=fact_observation_output,
+                        provenance={'observation':final_ref})
                     messages=conversation.request(system,obs['goal'],text,search_context,observation_source=source_id)
                     event['policy_bindings']=conversation.bindings()
                 else:
@@ -1086,6 +1118,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         value = member['policy_feedback']
                         source = delivery.register(member.get('feedback_kind','batch_result'),
                             json.dumps(value,ensure_ascii=False,sort_keys=True), step=index,
+                            fact_output=fact_recorder.lookup(member.get('fact_output_artifact')) if fact_recorder else None,
                             provenance={'batch_call':ordinal,'tool_call_id':call_id,
                                 **({'clarification_artifact':member['clarification_artifact']}
                                    if member.get('feedback_kind') == 'clarification_result' else {})}) if delivery else None
@@ -1190,6 +1223,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         stop_reason = "error" if isinstance(exc, Exception) else "interrupted"
         error = f"{type(exc).__name__}: {exc}"
     finally:
+        if fact_recorder is not None: fact_recorder.close()
         if agent_runtime and agent_actor['parent'] is None:agent_runtime.finish_children()
         outcome = {"terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens"),
                    "stop_reason": stop_reason, "error": error, "final_reward": reward}

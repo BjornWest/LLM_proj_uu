@@ -81,6 +81,8 @@ def main():
     parser.add_argument('--capture-timeout-mode',choices=['diagnostic','bounded'],default=None,
         help='Human-handover capture/guard deadlines: diagnostic logs overruns without aborting (default); bounded enforces deadlines')
     parser.add_argument('--record-har', action='store_true', help='Open internet: save private network archive; may contain sensitive site/session data')
+    parser.add_argument('--record-fact-provenance', action='store_true',
+        help='Private AX output/delivery sidecars; missing trusted source exports remain unknown')
     parser.add_argument('--grading-factory', help='Trusted MODULE:CALLABLE taking (episode_task,args), returning AutomaticGrading')
     parser.add_argument('--allow-ungraded', action='store_true', help='Explicit diagnostic escape; requires --ungraded-reason')
     parser.add_argument('--ungraded-reason', help='Recorded reason for intentionally ungraded diagnostic')
@@ -433,6 +435,7 @@ def main():
                                  args.seed, args.video, args.hold_seconds, search_backend, episode_task,
                                  action_timeout_ms=args.action_timeout_ms,
                                  trace_screenshots=args.trace_screenshots,
+                                 record_fact_provenance=args.record_fact_provenance,
                                  automatic_grading=automatic_grading,allow_ungraded=args.allow_ungraded,
                                  ungraded_reason=args.ungraded_reason,
                                  max_input_tokens=args.max_input_tokens if args.mode=='run' and harness_profile and harness_profile.ax_config else None,

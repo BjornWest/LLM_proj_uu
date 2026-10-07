@@ -23,7 +23,7 @@ class PolicyDelivery:
         self.sources = {}
         self.confirmed = set()
 
-    def register(self, kind, text, *, step, provenance=None):
+    def register(self, kind, text, *, step, provenance=None, fact_output=None):
         if kind not in {'page_observation','browser_feedback','browser_update','search_result','ax_result','vision_result','data_result','batch_result','delegation_result','helper_result','clarification_result', 'human_tab_result', 'human_message'}:
             raise ValueError('Unsupported policy evidence kind')
         key = f'content-{len(self.sources):04d}'
@@ -31,6 +31,9 @@ class PolicyDelivery:
         record={'id':key, 'kind':kind, 'text':text, 'sha256':text_hash(text),
                 'created_step':step, 'created_at':datetime.now(timezone.utc).isoformat(),
                 'provenance':deepcopy(provenance or {}), 'artifact':filename}
+        recorder=getattr(self,'fact_recorder',None)
+        if recorder is not None:
+            record['provenance']['fact_projection_artifact']=recorder.observe(recorder.register,record,fact_output)
         self.sources[key]=record
         write_json(self.trace.directory/filename, record)
         return key
@@ -69,4 +72,6 @@ class PolicyDelivery:
         with (self.trace.directory/filename).open('a',encoding='utf-8') as file:
             file.write(json.dumps(record,ensure_ascii=False)+'\n')
         self.trace.event('core_policy_delivery_recorded',step=event['step'],artifact=filename,scope=scope)
+        recorder=getattr(self,'fact_recorder',None)
+        if recorder is not None:recorder.observe(recorder.delivery,record)
         return record
