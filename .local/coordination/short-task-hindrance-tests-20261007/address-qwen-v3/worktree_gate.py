@@ -1,6 +1,7 @@
 """No project imports or provider calls until the exact Git build is accepted."""
 from hashlib import sha256
 import importlib.util
+import importlib.metadata
 import json
 from pathlib import Path
 import subprocess
@@ -34,7 +35,6 @@ def require_promoted_worktree(plan):
     environment = json.loads(Path(ready['environment']['path']).read_bytes())
     # Same external interpreter/dependency versions; editable project imports are
     # separately rejected by the dispatcher before each provider request.
-    import importlib.metadata
     import sys
     actual = sorted([{'name': d.metadata['Name'], 'version': d.version}
                      for d in importlib.metadata.distributions()],
