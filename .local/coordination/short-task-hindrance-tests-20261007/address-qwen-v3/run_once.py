@@ -37,6 +37,24 @@ def execute(case, preflight=False):
     for entry in ready['inputs']:
         if pin(entry['path']) != entry:
             raise ValueError('Changed bound input: '+entry['path'])
+    if not preflight:
+        from supervise import verify_ready
+        verify_ready(ready)
+        claim = json.loads((OUT/'supervisor-start.json').read_bytes())
+        if claim['ready'] != pin(OUT/'ready.json'):
+            raise ValueError('Case was not claimed by this accepted supervisor')
+        import sqlite3
+        with sqlite3.connect('file:'+str(OUT/'completion.sqlite')+'?mode=ro', uri=True) as db:
+            state = db.execute('SELECT state FROM episodes WHERE suite=? AND id=?',
+                               (plan['suite_id'], case)).fetchone()
+            subscriptions = db.execute('SELECT episode,final FROM subscriptions WHERE suite=? AND recipient=?',
+                (plan['suite_id'], 'codex:'+plan['thread_id'])).fetchall()
+        if (state != ('running',) or (case, 0) not in subscriptions
+                or (None, 1) not in subscriptions):
+            raise ValueError('Episode/completion subscriptions not registered before dispatch')
+        entry = json.loads((OUT/(case+'-bounded/entry.json')).read_bytes())
+        if entry['pid'] != os.getpid():
+            raise ValueError('Case must execute in its own verified bounded scope')
     recovery = json.loads(Path(plan['recovery_receipt']['path']).read_text())
     if archive != Path(recovery['source_archive']).resolve():
         raise ValueError('Unexpected isolated source ROOT')

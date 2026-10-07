@@ -54,6 +54,12 @@ def process_state(code, result, visible, resource, interrupted):
             or visible.get('status') != 'verified_automatic_native_grade_visible'
             or visible.get('native_verdict') != result['state_grading']['verdict']):
         return 'failed'
+    summary = result.get('policy_summary')
+    if (not isinstance(summary, dict) or summary.get('error')
+            or summary.get('execution_error') or summary.get('cleanup_errors')
+            or summary.get('stop_reason') == 'error'
+            or (summary.get('evaluation') or {}).get('technical_error')):
+        return 'failed'
     return 'succeeded'
 
 
@@ -96,11 +102,15 @@ def main():
         code = 125
         try:
             verify_ready(ready)
+            if interruptions:
+                raise InterruptedError('Cancelled before case dispatch')
             command = [sys.executable, str(ROOT/'scripts/run_bounded_job.py'),
                        '--memory-mib', '6144', '--receipt', str(OUT/(case+'-bounded')),
                        '--', str(ROOT/'.venv/bin/python'), str(OUT/'run_once.py'), '--case', case]
             with (OUT/(case+'-bounded.log')).open('x') as log:
                 current = subprocess.Popen(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
+                if interruptions:
+                    current.send_signal(signal.SIGTERM)
                 code = current.wait()
                 current = None
         except Exception as error:
