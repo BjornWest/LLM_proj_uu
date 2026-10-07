@@ -352,6 +352,7 @@ class ContextTests(unittest.TestCase):
         for version in ('core-tools-v6-ax','core-tools-v7-context'):
             with self.subTest(version=version), patch.dict('os.environ',{},clear=True), patch('sys.argv',[
                 'intent-browser','run','--model','scripted','--base-url','http://localhost:1/v1','--no-preview',
+                '--allow-ungraded','--ungraded-reason','Offline CLI context-profile fixture',
                 '--harness-profile',version,'--ax-tokenizer-file',str(TOKENIZER)]), \
                 patch.object(cli,'ChatCompletionsBackend'),patch.object(cli,'run_episode',return_value=(None,{'error':None})) as runner:
                 cli.main()

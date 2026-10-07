@@ -218,8 +218,8 @@ class ProvenanceTests(unittest.TestCase):
         self.assertTrue(all(p['source_end']<u16('Word '*300) for p in sel['record']['projections'] if p['source_start']==0 and p['source_end']>4))
 
     def test_real_normalizer_packet_preserves_native_part_binding(self):
-        import sys
-        training=str(Path(__file__).resolve().parents[1]/'training')
+        import os, sys
+        training=os.environ.get('FACT_PROVENANCE_CONSUMER_ROOT',str(Path(__file__).resolve().parents[1]/'training'))
         sys.path.insert(0,training);self.addCleanup(lambda:sys.path.remove(training))
         from browser_training.website_projection import direct_sources
         from browser_training.fact_render_capture import harness_source_packet

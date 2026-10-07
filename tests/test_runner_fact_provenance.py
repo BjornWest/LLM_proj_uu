@@ -100,8 +100,8 @@ class RunnerFactTests(unittest.TestCase):
 
     def test_existing_offline_consumer_rechecks_actual_retained_request(self):
         # Offline training consumer is a test-only dependency, not a runtime import.
-        import sys
-        training=str(Path(__file__).resolve().parents[1]/'training')
+        import os, sys
+        training=os.environ.get('FACT_PROVENANCE_CONSUMER_ROOT',str(Path(__file__).resolve().parents[1]/'training'))
         sys.path.insert(0,training);self.addCleanup(lambda:sys.path.remove(training))
         from browser_training.fact_exposure import extract, object_digest, utf16_length
         path,s,rows,req,_,_=self.execute(True)
