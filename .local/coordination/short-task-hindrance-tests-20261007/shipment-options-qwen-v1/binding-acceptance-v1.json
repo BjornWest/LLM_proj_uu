@@ -1,0 +1,160 @@
+{
+  "id": "SHIPMENT-OPTIONS-QWEN-ACTUAL-BINDING-ACCEPTANCE-01",
+  "status": "passed_actual_binding_pending_independent_release_review",
+  "owner": "Evaluation",
+  "reviewed_source_commit": "d91258a7fea41aecebad7a9daec26b4a3f0e5f0c",
+  "source_review": {
+    "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/independent-source-review-v1.json",
+    "sha256": "a5ffa67fdfc02c9c7e856b34eb0e7bc2154464aeab6ea81e6818c55381a2257e"
+  },
+  "actual_resource_terminal": {
+    "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-bounded-v1/result.json",
+    "sha256": "f269fac9e60636211d125fb245025192edf42b8ff365581e7ee9c300ba491f1f"
+  },
+  "elapsed_seconds": 79.716,
+  "cases": [
+    {
+      "case": "old-address",
+      "check": {
+        "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/check.json",
+        "sha256": "36b0f27805fc2a0f71a1ffd60231e0caa37da50f8417cfaf7f79516590b7110b"
+      },
+      "terminal": {
+        "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address-terminal.json",
+        "sha256": "5be1c469e1269b7ff5f05fdeaae0da0e5316c79bcc2be287fa43c835fb2be738"
+      },
+      "native_grade": "pass",
+      "scripted_calls": 6,
+      "exact_request": "Can you go to my cart and find the shipment options for this item?",
+      "request_variant_id": "shipment-options-wording-1e2abeaf99d2fec2311f27d9",
+      "viewer": {
+        "status": "verified_automatic_native_grade_visible",
+        "viewer_url": "http://localhost:8878/#1a7233bb5f58e6482f45",
+        "api_url": "http://localhost:8878/api/sessions/1a7233bb5f58e6482f45",
+        "response_sha256": "51040387da82e150ae7a30ade203590cbe04e8ffaf533d1556e623b4314ee2b1",
+        "native_verdict": "pass",
+        "evaluation_label": "address checks passed",
+        "files": {
+          "grade": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/atomic-address-grade.private.json",
+            "sha256": "a1d792c0dcf1a57d5e3058fdf6e4d24e8b9582d15b20e0461bee84ac72c25a2e"
+          },
+          "capsule": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/cart-capsule.private.json",
+            "sha256": "af7a32ab295452267162c3453a32bdfd27e177c52412417e686d3de82239546e"
+          },
+          "provenance": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/cart-capture-provenance.private.json",
+            "sha256": "fef56c6b0da00284e06d9fdc9d7e6f894b89891c3c2188ab51af10ce1f284962"
+          },
+          "authority": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/cart-authority.private.json",
+            "sha256": "26521888f985d45d15819e5fbbbb36e4231d0ec42636bbd70e06c0a9bd258a59"
+          },
+          "steps": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/steps.jsonl",
+            "sha256": "90796a0b4e032885e0df1fbb131f54b63a9da2cc8da2370c299fbea595e95a04"
+          },
+          "policy_task": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/policy-task.json",
+            "sha256": "77256266a2c065d6f3351cb745d269de8659a2d7c9b1a5a7310d7ed590a63a32"
+          },
+          "task": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/website-atomic-address-adoption-20261007-v1/continuation-v2/generated/old-address/atomic-address-task.private.json",
+            "sha256": "1122e9ab6f838483a3c7e41a1d18e2323cdf231d4025f77464ce3c181e4bf768"
+          },
+          "approval": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/address-sol-v1/authority-Product-acceptance-v1.json",
+            "sha256": "c3b3455f7438d8e8681da5d01ed450a92cd0b761b8267fb9104908aa1547d0cf"
+          },
+          "before": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/manual-review-private/cart-before.private.json",
+            "sha256": "b8869a692961285e8e2ea6608e108da48772e8f3c55e50f2547e1aba1eae1344"
+          },
+          "after": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/old-address/live/runs/20261007T214505Z-23d2632b/manual-review-private/cart-after.private.json",
+            "sha256": "a2285e7c9432d738777309fffdf9ba0bb42ad896d1acae4c21e2b97d8e2f7cc7"
+          }
+        }
+      },
+      "provider_requests": 0
+    },
+    {
+      "case": "missing-optional-unit",
+      "check": {
+        "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/check.json",
+        "sha256": "2991542c5e4fb97136a559ef3c4e5158c004497c1776973f00344fc430fdd958"
+      },
+      "terminal": {
+        "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit-terminal.json",
+        "sha256": "1dd90678d40d64ffe1e09a1a28070221bd1d8f1d0dacb48b61b1f2f5e584d060"
+      },
+      "native_grade": "pass",
+      "scripted_calls": 5,
+      "exact_request": "Can you go to my cart and find the shipment options for this item?",
+      "request_variant_id": "shipment-options-wording-d1672e9568179afd98c0a0d7",
+      "viewer": {
+        "status": "verified_automatic_native_grade_visible",
+        "viewer_url": "http://localhost:8878/#391adfc52a5c90f54af5",
+        "api_url": "http://localhost:8878/api/sessions/391adfc52a5c90f54af5",
+        "response_sha256": "221d42441f5621d335096c9f116e72f9bdda191348ac825320ee3358d9086364",
+        "native_verdict": "pass",
+        "evaluation_label": "address checks passed",
+        "files": {
+          "grade": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/atomic-address-grade.private.json",
+            "sha256": "de1f96cd824ab84bbd8eecac5698a463a26e302a7a87e0326803bc9fea188642"
+          },
+          "capsule": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/cart-capsule.private.json",
+            "sha256": "aa545c84886fdc73651ccbd4e97c268585906d875c9e2e446b413e96b820196f"
+          },
+          "provenance": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/cart-capture-provenance.private.json",
+            "sha256": "f98c24e7b5da9abd06a76128248b0dbc661ce12a02b7b30115b179c26aa2e6a9"
+          },
+          "authority": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/cart-authority.private.json",
+            "sha256": "590d5487ab26811fe12c85f05038c16f1fed2ea13e71b22c01e36e2c4d0401a3"
+          },
+          "steps": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/steps.jsonl",
+            "sha256": "fa2d089ee404361005c9422ac962d5df2663c68e96b0a662eb2a94814ad72651"
+          },
+          "policy_task": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/policy-task.json",
+            "sha256": "dc92e82a6c02786b1c2f3c54567c322a7bbf5bfbd09bf00f13bde0a057acf2b1"
+          },
+          "task": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/website-atomic-address-adoption-20261007-v1/continuation-v2/generated/missing-optional-unit/atomic-address-task.private.json",
+            "sha256": "491eb3aa5940790c93080eac67ae28e935d9d9995b6e80e6763f85ee70259e08"
+          },
+          "approval": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/address-sol-v1/authority-Product-acceptance-v1.json",
+            "sha256": "c3b3455f7438d8e8681da5d01ed450a92cd0b761b8267fb9104908aa1547d0cf"
+          },
+          "before": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/manual-review-private/cart-before.private.json",
+            "sha256": "f56aed12ffcd9205a5b55f7147b0a3703b8b4d9cbaf7e009f2c533873ff26307"
+          },
+          "after": {
+            "path": "/home/bjorn/code/LLM_proj_uu/.local/coordination/short-task-hindrance-tests-20261007/shipment-options-qwen-v1/binding-smoke-v1/missing-optional-unit/live/runs/20261007T214549Z-b8a223ef/manual-review-private/cart-after.private.json",
+            "sha256": "c59b8b39d5c03d1828494bc99ca49a7f7ef38b879d58f6c6fe6d84af38471cec"
+          }
+        }
+      },
+      "provider_requests": 0
+    }
+  ],
+  "original_runtime_commit": "cdb28444c207957f086c2d6ec0b008ca7a56ea6e",
+  "public_request": "Can you go to my cart and find the shipment options for this item?",
+  "memories": "Exact originals retained",
+  "grading_scope": "Address fields/state and existing preservation/native-effect checks only; shipment answer content intentionally unscored",
+  "native_grade_http_projection": "Verified separately for each fresh trace",
+  "scope": "Zero-provider actual browser startup/setup/capture/automatic grading/projection only; no model performance claim",
+  "source_authority_scope": "Original Product proof unchanged and limited to frozen generated server/native effects surface; new caller/wording binding has separate exact source review and actual acceptance",
+  "world_draws": 0,
+  "provider_requests": 0,
+  "all_earlier_traces_preserved": true,
+  "model_dispatch_pending_final_independent_review": true
+}
