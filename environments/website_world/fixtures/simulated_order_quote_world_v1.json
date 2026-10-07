@@ -1,0 +1,1387 @@
+{
+  "schema_version": "footwear-world-pilot-v1",
+  "quote_as_of": "2026-09-30",
+  "user_location": {
+    "location_id": "user-home",
+    "city_id": "uppsala",
+    "city": "Uppsala",
+    "country": "SE",
+    "latitude": 59.870067,
+    "longitude": 17.703381,
+    "local_east_km": 3.601,
+    "local_north_km": 1.251,
+    "precision": "synthetic_city_neighbourhood",
+    "timezone": "Europe/Stockholm"
+  },
+  "address_context": {
+    "schema_version": "address-checkout-pilot-v1",
+    "seed": 2,
+    "city": {
+      "city_id": "uppsala",
+      "name": "Uppsala",
+      "country": "SE",
+      "latitude": 59.85882,
+      "longitude": 17.63889,
+      "geoname_id": 2666199,
+      "timezone": "Europe/Stockholm"
+    },
+    "parameters": {
+      "autofill_probability": 0.3,
+      "incorrect_probability": 0.2,
+      "missing_probability": 0.25
+    },
+    "region": {
+      "city_id": "uppsala",
+      "radius_km": 10,
+      "centre": {
+        "location_id": "user-home",
+        "city_id": "uppsala",
+        "city": "Uppsala",
+        "country": "SE",
+        "latitude": 59.870067,
+        "longitude": 17.703381,
+        "local_east_km": 3.601,
+        "local_north_km": 1.251,
+        "precision": "synthetic_city_neighbourhood",
+        "timezone": "Europe/Stockholm"
+      }
+    },
+    "postal_areas": [
+      {
+        "postal_area_id": "postal-0",
+        "postcode": "909 94",
+        "location": {
+          "location_id": "postal-0",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.870067,
+          "longitude": 17.703381,
+          "local_east_km": 3.601,
+          "local_north_km": 1.251,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        }
+      },
+      {
+        "postal_area_id": "postal-1",
+        "postcode": "689 38",
+        "location": {
+          "location_id": "postal-1",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.825378,
+          "longitude": 17.684016,
+          "local_east_km": 2.52,
+          "local_north_km": -3.719,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        }
+      },
+      {
+        "postal_area_id": "postal-2",
+        "postcode": "579 79",
+        "location": {
+          "location_id": "postal-2",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.865595,
+          "longitude": 17.842628,
+          "local_east_km": 11.376,
+          "local_north_km": 0.753,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        }
+      },
+      {
+        "postal_area_id": "postal-3",
+        "postcode": "274 01",
+        "location": {
+          "location_id": "postal-3",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.850713,
+          "longitude": 17.60569,
+          "local_east_km": -1.854,
+          "local_north_km": -0.901,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        }
+      }
+    ],
+    "addresses": [
+      {
+        "address_id": "user-home",
+        "address": {
+          "recipient": "Alex Lind",
+          "street": "Björkvägen",
+          "house_number": "12",
+          "unit": "24",
+          "postcode": "909 94",
+          "city": "Uppsala",
+          "country": "SE"
+        },
+        "location": {
+          "location_id": "user-home",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.870067,
+          "longitude": 17.703381,
+          "local_east_km": 3.601,
+          "local_north_km": 1.251,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "building_key": "7082c130ef27a12d1bb12f942c78d868b064d2c76430dfe9e194ba45812ad185",
+        "display_lines": [
+          "Alex Lind",
+          "Björkvägen 12",
+          "Lägenhetsnummer 24",
+          "909 94 Uppsala",
+          "Sweden"
+        ]
+      },
+      {
+        "address_id": "saved-home-1",
+        "address": {
+          "recipient": "Alex Lind",
+          "street": "Björkvägen",
+          "house_number": "19",
+          "unit": "25",
+          "postcode": "689 38",
+          "city": "Uppsala",
+          "country": "SE"
+        },
+        "location": {
+          "location_id": "saved-home-1",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.864023,
+          "longitude": 17.777521,
+          "local_east_km": 7.74,
+          "local_north_km": 0.579,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "building_key": "3f524da776da509af5a2494070cf8f5259be568f8090533dc87d6ad27de3d983",
+        "display_lines": [
+          "Alex Lind",
+          "Björkvägen 19",
+          "Lägenhetsnummer 25",
+          "689 38 Uppsala",
+          "Sweden"
+        ]
+      },
+      {
+        "address_id": "saved-home-2",
+        "address": {
+          "recipient": "Alex Lind",
+          "street": "Björkvägen",
+          "house_number": "26",
+          "unit": "26",
+          "postcode": "579 79",
+          "city": "Uppsala",
+          "country": "SE"
+        },
+        "location": {
+          "location_id": "saved-home-2",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.893961,
+          "longitude": 17.764689,
+          "local_east_km": 7.024,
+          "local_north_km": 3.907,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "building_key": "aaef83fb7d086133cf3c4c26196a55ab6297e54e26c5a7fdfcf0cd168e7d8ba8",
+        "display_lines": [
+          "Alex Lind",
+          "Björkvägen 26",
+          "Lägenhetsnummer 26",
+          "579 79 Uppsala",
+          "Sweden"
+        ]
+      }
+    ],
+    "outside_postcode": "328 64",
+    "carriers": [
+      {
+        "carrier_id": "carrier-03",
+        "name": "LumoParcel",
+        "home_delivery": true,
+        "sampled_local_pickup_mode": "staffed_counter",
+        "local_collection_types": [
+          "staffed_counter"
+        ],
+        "collection_point_ids": [
+          "collection-04",
+          "collection-06",
+          "collection-09"
+        ]
+      }
+    ],
+    "collection_points": [
+      {
+        "point_id": "collection-04",
+        "name": "Uppsala · Yttre Norr · Market 04",
+        "type": "staffed_counter",
+        "host_type": "grocery_store",
+        "access_24_7": false,
+        "location": {
+          "location_id": "collection-04",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.870067,
+          "longitude": 17.703381,
+          "local_east_km": 3.601,
+          "local_north_km": 1.251,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "distance_from_home_km": 2.703,
+        "area_label_basis": "nearest approximate area anchor, not verified street address",
+        "weekly_hours": {
+          "mon": [
+            [
+              "07:00",
+              "22:00"
+            ]
+          ],
+          "tue": [
+            [
+              "07:00",
+              "22:00"
+            ]
+          ],
+          "wed": [
+            [
+              "07:00",
+              "22:00"
+            ]
+          ],
+          "thu": [
+            [
+              "07:00",
+              "22:00"
+            ]
+          ],
+          "fri": [
+            [
+              "07:00",
+              "22:00"
+            ]
+          ],
+          "sat": [
+            [
+              "08:00",
+              "21:00"
+            ]
+          ],
+          "sun": [
+            [
+              "09:00",
+              "20:00"
+            ]
+          ]
+        },
+        "travel": {
+          "walking": {
+            "origin_id": "user-home",
+            "destination_id": "collection-04",
+            "mode": "walking",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 3.5,
+            "duration_minutes": 44,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          },
+          "cycling": {
+            "origin_id": "user-home",
+            "destination_id": "collection-04",
+            "mode": "cycling",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 3.5,
+            "duration_minutes": 15,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          },
+          "driving": {
+            "origin_id": "user-home",
+            "destination_id": "collection-04",
+            "mode": "driving",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 3.5,
+            "duration_minutes": 9,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          }
+        },
+        "carrier_ids": [
+          "carrier-03"
+        ]
+      },
+      {
+        "point_id": "collection-06",
+        "name": "Uppsala · Nordost · Market 06",
+        "type": "staffed_counter",
+        "host_type": "grocery_store",
+        "access_24_7": false,
+        "location": {
+          "location_id": "collection-06",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.870067,
+          "longitude": 17.703381,
+          "local_east_km": 3.601,
+          "local_north_km": 1.251,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "distance_from_home_km": 0.959,
+        "area_label_basis": "nearest approximate area anchor, not verified street address",
+        "weekly_hours": {
+          "mon": [
+            [
+              "08:00",
+              "20:00"
+            ]
+          ],
+          "tue": [
+            [
+              "08:00",
+              "20:00"
+            ]
+          ],
+          "wed": [
+            [
+              "08:00",
+              "20:00"
+            ]
+          ],
+          "thu": [
+            [
+              "08:00",
+              "20:00"
+            ]
+          ],
+          "fri": [
+            [
+              "08:00",
+              "20:00"
+            ]
+          ],
+          "sat": [
+            [
+              "09:00",
+              "18:00"
+            ]
+          ],
+          "sun": [
+            [
+              "10:00",
+              "16:00"
+            ]
+          ]
+        },
+        "travel": {
+          "walking": {
+            "origin_id": "user-home",
+            "destination_id": "collection-06",
+            "mode": "walking",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 1.2,
+            "duration_minutes": 16,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          },
+          "cycling": {
+            "origin_id": "user-home",
+            "destination_id": "collection-06",
+            "mode": "cycling",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 1.2,
+            "duration_minutes": 5,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          },
+          "driving": {
+            "origin_id": "user-home",
+            "destination_id": "collection-06",
+            "mode": "driving",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 1.2,
+            "duration_minutes": 3,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          }
+        },
+        "carrier_ids": [
+          "carrier-03",
+          "carrier-04"
+        ]
+      },
+      {
+        "point_id": "collection-09",
+        "name": "Uppsala · Yttre Öster · Corner shop 09",
+        "type": "staffed_counter",
+        "host_type": "convenience_store",
+        "access_24_7": false,
+        "location": {
+          "location_id": "collection-09",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.870067,
+          "longitude": 17.703381,
+          "local_east_km": 3.601,
+          "local_north_km": 1.251,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "distance_from_home_km": 1.589,
+        "area_label_basis": "nearest approximate area anchor, not verified street address",
+        "weekly_hours": {
+          "mon": [
+            [
+              "09:00",
+              "19:00"
+            ]
+          ],
+          "tue": [
+            [
+              "09:00",
+              "19:00"
+            ]
+          ],
+          "wed": [
+            [
+              "09:00",
+              "19:00"
+            ]
+          ],
+          "thu": [
+            [
+              "09:00",
+              "19:00"
+            ]
+          ],
+          "fri": [
+            [
+              "09:00",
+              "19:00"
+            ]
+          ],
+          "sat": [
+            [
+              "10:00",
+              "17:00"
+            ]
+          ],
+          "sun": []
+        },
+        "travel": {
+          "walking": {
+            "origin_id": "user-home",
+            "destination_id": "collection-09",
+            "mode": "walking",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 2.1,
+            "duration_minutes": 26,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          },
+          "cycling": {
+            "origin_id": "user-home",
+            "destination_id": "collection-09",
+            "mode": "cycling",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 2.1,
+            "duration_minutes": 9,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          },
+          "driving": {
+            "origin_id": "user-home",
+            "destination_id": "collection-09",
+            "mode": "driving",
+            "estimate_method": "authored_city_corridors_and_synthetic_local_offsets",
+            "approximate": true,
+            "status": "estimated",
+            "distance_km": 2.1,
+            "duration_minutes": 5,
+            "legs": [],
+            "city_path": [
+              "uppsala"
+            ],
+            "crossing_kinds": []
+          }
+        },
+        "carrier_ids": [
+          "carrier-03"
+        ]
+      }
+    ],
+    "services": [
+      {
+        "service_id": "carrier-03-regular",
+        "carrier_id": "carrier-03",
+        "shipping_class": "regular",
+        "scheduling": "carrier_assigned",
+        "evening_windows": true,
+        "unattended_allowed": false,
+        "building_access": {
+          "7082c130ef27a12d1bb12f942c78d868b064d2c76430dfe9e194ba45812ad185": "provided_code_or_intercom",
+          "3f524da776da509af5a2494070cf8f5259be568f8090533dc87d6ad27de3d983": "recipient_opens",
+          "aaef83fb7d086133cf3c4c26196a55ab6297e54e26c5a7fdfcf0cd168e7d8ba8": "recipient_opens"
+        },
+        "transit_offset_days": -1
+      },
+      {
+        "service_id": "carrier-03-bulky",
+        "carrier_id": "carrier-03",
+        "shipping_class": "bulky",
+        "scheduling": "choose_day",
+        "evening_windows": true,
+        "unattended_allowed": false,
+        "building_access": {
+          "7082c130ef27a12d1bb12f942c78d868b064d2c76430dfe9e194ba45812ad185": "provided_code_or_intercom",
+          "3f524da776da509af5a2494070cf8f5259be568f8090533dc87d6ad27de3d983": "recipient_opens",
+          "aaef83fb7d086133cf3c4c26196a55ab6297e54e26c5a7fdfcf0cd168e7d8ba8": "recipient_opens"
+        },
+        "transit_offset_days": -1
+      }
+    ],
+    "task": {
+      "delivery_address": {
+        "recipient": "Alex Lind",
+        "street": "Björkvägen",
+        "house_number": "12",
+        "unit": "24",
+        "postcode": "909 94",
+        "city": "Uppsala",
+        "country": "SE"
+      },
+      "memory": "Please call instead of ringing the doorbell.",
+      "required_instructions": "Please call instead of ringing the doorbell."
+    },
+    "quote_as_of": "2026-09-30",
+    "limitations": [
+      "Isolated authored two-retailer fixture; not live checkout integration.",
+      "Fictional postcode areas and street addresses; no real geocoding.",
+      "Illustrative local-currency prices, not exchange-rate conversions.",
+      "Standard delivery only; no coupons, memberships or freight quantity scaling.",
+      "Shipping quotes expose schedules, not a simulated appointment reservation.",
+      "Instruction text is retained for manual review; no semantic instruction grader."
+    ],
+    "provenance": {
+      "plan_sha256": "396dad5a7da9538dd1ca37e091d5a4c0f6fbf1a6fa94ac70506950a82b1aa1a9"
+    },
+    "world_id": "80d84a79a42dd1be27595975ae006b1d0e0e902314a825e5a09a752becb5b3d1"
+  },
+  "shipping_policy": {
+    "status": "proposed_not_implemented",
+    "carrier_standard_transit": {
+      "basis": "Existing offline freight distance/crossing transit rule, using one-day same-city transit for all origins; source dispatch remains separate.",
+      "carrier_offset_calendar_day_probabilities": {
+        "-1": 0.2,
+        "0": 0.6,
+        "1": 0.2
+      },
+      "sampling_unit": "Once per world carrier; shared across retailers. Clamp final standard transit to at least one day."
+    },
+    "service_relations": {
+      "economy": {
+        "transit_relative_to_standard_days": 1,
+        "base_fee_relative_to_standard_minor": -1000,
+        "minimum_base_fee_minor": 1900
+      },
+      "standard": {
+        "transit_relative_to_standard_days": 0,
+        "base_fee_relative_to_standard_minor": 0
+      },
+      "express": {
+        "transit_relative_to_standard_days": -1,
+        "minimum_transit_days": 1,
+        "base_fee_relative_to_standard_minor": 4000
+      }
+    },
+    "retailer_carrier_standard_collection_base_fee_minor_probabilities": {
+      "3900": 0.1,
+      "4900": 0.25,
+      "5900": 0.3,
+      "6900": 0.25,
+      "7900": 0.1
+    },
+    "fee_sampling_unit": "Once per retailer-carrier contract, not per SKU or quote. Transit is carrier-wide; retail customer charges may differ.",
+    "home_delivery_relative_to_collection_minor_probabilities": {
+      "-2000": 0.1,
+      "-1000": 0.1,
+      "0": 0.2,
+      "1000": 0.4,
+      "2000": 0.2
+    },
+    "home_delivery_offset_status": "Accepted weights. Sample once per retailer-carrier contract and retain across quotes; nonnegative final fees.",
+    "distance_surcharge": {
+      "first_km_included": 500,
+      "each_additional_commenced_500km_minor": 2500
+    },
+    "geographic_supplements": {
+      "cross_border_minor": 8000,
+      "non_air_crossing_minor": 7000,
+      "air_cargo_minor": 25000
+    },
+    "readiness": "Supplier lead time when applicable, then origin dispatch, then carrier/service transit. Collection access hours remain distinct from parcel readiness.",
+    "free_shipping_threshold": {
+      "probability_status": "accepted",
+      "enabled_probability_by_profile": {
+        "local_shop": 0.25,
+        "regional_chain": 0.5,
+        "major_retailer": 0.75,
+        "online_specialist": 0.6
+      },
+      "threshold_minor_values_equal_weight": [
+        20000,
+        50000,
+        70000,
+        75000,
+        100000,
+        150000,
+        200000
+      ],
+      "threshold_policy": "Accepted round-threshold policy and equal-weight pool. Eligibility is subtotal >= threshold, preserving possible one-SEK shortfalls such as 499 versus 500 without forcing them.",
+      "basis": "Eligible item subtotal after item coupons at this retailer; shipping and membership fees do not count.",
+      "scope": "Domestic standard home or collection delivery; waives standard shipping charge including domestic distance supplement. Express keeps its extra 40 SEK charge. No automatic cross-border or bulky-charge waiver; explicitly declare covered shipping classes."
+    },
+    "delivery_membership": {
+      "eligible_scale": "major_retailer only, including major online retailers when scale and format are separated",
+      "enabled_probability": 0.4,
+      "kind_probabilities": {
+        "free_signup": 0.6,
+        "annual_paid": 0.4
+      },
+      "annual_fee_minor_values_equal_weight": [
+        19900,
+        29900,
+        39900
+      ],
+      "existing_active_membership_probability_given_program": 0.3,
+      "benefit": "Same domestic standard shipping waiver, without a basket threshold; express surcharge remains. Explicit shipping-class coverage is required before waiving bulky charges. Membership does not modify dispatch or transit initially.",
+      "state": "Explicit membership state separate from ordinary account existence and signed-in state; no membership inference from login alone.",
+      "comparison": "Already-active benefits can apply. Newly joining is a separately labelled conditional scenario; include full signup fee for a new single-order comparison unless task defines another accounting scope. No implicit account creation, signup or paid activation.",
+      "outcomes": "Do not force membership to be cheapest: threshold promotions may already waive delivery, paid fees may outweigh savings, or another retailer may still win."
+    },
+    "product_shipping_class": {
+      "status": "accepted_regular_bulky_classification_not_implemented",
+      "feature_reference": "docs/agents/product-shared-features.json: common_product_envelope_features.shipping_class",
+      "eligibility": "Bulky carrier shipping is home-only; no carrier-counter or locker collection. Retailer branch collection is a separate fulfilment service. Match other carrier-service capabilities explicitly.",
+      "charges_and_time": "Bulky handling can have class-specific fees and transit rules, separate from ordinary parcel tariffs. Numeric rates and capability probabilities remain to be specified.",
+      "promotions": "Declare which classes and fee components a threshold or membership covers; generic free shipping must not silently erase bulky surcharges."
+    },
+    "bulky_delivery": {
+      "status": "accepted_home_only_cost_main_effect_small_delay_parameters_proposed_not_implemented",
+      "carrier_destination": "User home only; carrier counters and lockers unavailable. Retailer branch collection is separate.",
+      "surcharge_minor_probabilities": {
+        "14900": 0.25,
+        "24900": 0.35,
+        "34900": 0.25,
+        "49900": 0.15
+      },
+      "surcharge_sampling_unit": "Once per retailer-carrier contract, stable across quotes. Added to ordinary home-delivery charge; geographic/service supplements still apply.",
+      "transit_extra_calendar_day_probabilities": {
+        "0": 0.3,
+        "1": 0.7
+      },
+      "transit_sampling_unit": "Once per carrier, shared across retailers for bulky shipments; added to service transit, not source dispatch.",
+      "promotion_treatment_probabilities": {
+        "waive_all": 0.2,
+        "waive_base_only": 0.5,
+        "exclude_bulky": 0.3
+      },
+      "promotion_sampling_unit": "Once per retailer; applies to threshold and delivery-membership benefits initially, independent of basket qualification.",
+      "promotion_meanings": {
+        "waive_all": "A qualifying standard-shipping promotion waives ordinary home delivery and bulky surcharge; express surcharge remains if that service exists.",
+        "waive_base_only": "A qualifying promotion waives ordinary home delivery but retains bulky and express surcharges.",
+        "exclude_bulky": "Bulky product tariffs receive no shipping waiver despite subtotal or membership qualification. Regular product tariffs can still qualify. Bulky tariff retains ordinary shipping plus bulky and service supplements; aggregate complete product tariffs by maximum."
+      },
+      "cart_scope": "Accepted default: one consolidated shipment per retailer checkout. Cart shipping is max(complete applicable shipping tariff per product), not summed line fees or base plus an already complete maximum. Evaluate each common carrier/service/destination option separately for the whole cart; do not combine independently optimal line options. Any bulky item excludes carrier collection for the cart.",
+      "aggregation_order": "Compute checkout item subtotal after coupons, determine threshold/membership qualification, apply explicit class treatment to each complete product shipping tariff, then take maximum for the selected common option. Across separate retailer checkouts, add each checkout's shipping charge.",
+      "middle_policy": "waive_base_only discounts the ordinary component of a bulky tariff, retaining its surcharge; it does not split regular and bulky goods into separate shipments.",
+      "procurement_and_packages": "Supplier orders and stock transfers can delay item readiness without automatically creating multiple customer shipments or charges. Default shipment waits for all its items. Remote/split fulfilment is a possible explicit later exception, not the usual checkout model.",
+      "quantity_scope": "No general per-unit freight scaling in the initial model. Manufactured multipacks use their own SKU shipping class/tariff. Quantity-dependent packaging and multiple-origin fulfilment remain deferred.",
+      "threshold_basis": "All eligible item subtotal after coupons counts, including bulky items. Promotion treatment controls shipping waiver separately.",
+      "terms": "Public shipping conditions must state bulky charges and promotion exclusions. Quote components preserve ordinary shipping, bulky surcharge and applied waiver separately.",
+      "outcomes": "Do not force free delivery, cheapest offer or compatible stocked origin."
+    },
+    "home_delivery_terms_backlog": {
+      "status": "user_requested_next_spec_topic",
+      "scope": "Home-delivery arrangements, including whether appointments or delivery windows can be scheduled. Terms attach to retailer-carrier services and agree with selectable options.",
+      "scheduling_modes": [
+        "carrier_assigned",
+        "choose_day",
+        "choose_day_and_window"
+      ],
+      "scheduling_semantics": "Selectable dates/windows must be explicit. Scheduled delivery does not by itself promise evening availability. Probabilities and concrete slot generation remain to be authored.",
+      "sampling_proposal": {
+        "status": "accepted_design_not_implemented",
+        "scheduling_choice_rationale": "User-approved: bulky delivery should more often offer a choice. Day or day-and-window selection totals 90% for bulky versus 60% for regular; explicit window selection is 55% versus 25%.",
+        "scope": "Home-delivery terms only, conditional on the carrier offering the shipping class. Service availability, retailer option counts and review outcome rates are separate decisions.",
+        "sampling_order": [
+          "Carrier service terms by shipping class",
+          "Carrier access for the user's building",
+          "Retailer selection of existing services",
+          "Order-specific dates and recipient permissions",
+          "Historical shipment outcomes",
+          "Applicable review statements"
+        ],
+        "sampling_units": {
+          "service_terms": "Once per world-local carrier and shipping class, shared across retailer bindings and speed tiers initially. Retailers select existing terms rather than resampling them.",
+          "building_access": "Once per carrier and specific user building, shared across stores and regular/bulky services. A detached house delivers at its door without this apartment-entry draw.",
+          "order_context": "Dates, recipient presence and unattended-delivery permission belong to the particular order; permission is never inferred from service eligibility."
+        },
+        "scheduling_mode_probabilities_by_shipping_class": {
+          "regular": {
+            "carrier_assigned": 0.4,
+            "choose_day": 0.35,
+            "choose_day_and_window": 0.25
+          },
+          "bulky": {
+            "carrier_assigned": 0.1,
+            "choose_day": 0.35,
+            "choose_day_and_window": 0.55
+          }
+        },
+        "calendar_proposal": {
+          "first_eligible_day": "After all cart items are ready plus shared carrier/service transit; later slots never arrive earlier than physical readiness. Same canonical estimates feed public terms and task checks.",
+          "carrier_assigned": "Assign the first eligible date; no clock-time window is promised in this initial mode.",
+          "choose_day": "Offer the first eligible date and the next two calendar dates, without a promised clock-time window.",
+          "choose_day_and_window": "Offer the same three dates with explicit four-hour windows in the destination timezone.",
+          "window_set_probabilities_given_window_selection": {
+            "daytime_only": 0.5,
+            "daytime_and_evening": 0.5
+          },
+          "window_sets_local": {
+            "daytime_only": [
+              "08:00-12:00",
+              "12:00-16:00"
+            ],
+            "daytime_and_evening": [
+              "08:00-12:00",
+              "12:00-16:00",
+              "16:00-20:00"
+            ]
+          },
+          "window_set_sampling_unit": "Once per carrier shipping-class service; actual dates instantiated per order. A 16:00-20:00 window is not wholly after 18:00.",
+          "simplifications": "Calendar days including weekends, no cutoffs or capacity depletion, and no extra scheduling fee or independent arrival-time redraw initially."
+        },
+        "apartment_entry_mode_probabilities": {
+          "recipient_opens": 0.4,
+          "provided_code_or_intercom": 0.35,
+          "authorised_access": 0.25
+        },
+        "entry_resolution": "recipient_opens requires someone present; provided_code_or_intercom requires a working supplied code or someone to answer. authorised_access means confirmed permission/access for this building. Resolved entry always means apartment-door delivery; failure to resolve entry invokes failed-delivery handling rather than a lobby-policy draw.",
+        "unattended_delivery_allowed_probability_by_shipping_class": {
+          "regular": 0.5,
+          "bulky": 0.0
+        },
+        "unattended_conditions": "Permission to leave the parcel is an explicit order fact. Unattended apartment-door delivery also needs entry without the absent recipient. Initial attended services require a recipient, without a separate signature-policy draw; ID-sensitive goods can override this in future concept rules.",
+        "failed_delivery": {
+          "status": "accepted_simple_policy_not_order_simulation",
+          "trigger": "A failed home-delivery attempt, such as absent required recipient or unavailable building access; do not manufacture a lobby handoff as the permitted fallback.",
+          "regular_policy_probabilities": {
+            "reattempt": 0.7,
+            "redirect_to_collection": 0.3
+          },
+          "collection_eligibility": "Carrier must have a nearby collection point eligible for the shipping class. Otherwise remove redirect_to_collection and renormalize to reattempt; bulky always uses reattempt.",
+          "sampling_unit": "Once per carrier shipping-class service, after carrier collection access is known; stable across retailers.",
+          "reattempt": "One additional attempt on the next calendar date. A selected delivery window does not automatically survive reattempt; publish the newly assigned date without a clock-time promise in the initial model.",
+          "redirect_to_collection": "Use an existing eligible carrier point, with parcel readiness one calendar day after the failed attempt; collection must respect the point's actual access hours. Public terms disclose this fallback and may conflict with a home-only requirement.",
+          "scope_limits": "No extra customer charge initially. Exhausted attempts, storage deadlines and return-to-sender timing are deferred, with no unsupported task claims."
+        },
+        "review_applicability": {
+          "punctuality": "Requires a dated promise and an observed arrival; distinguish retailer dispatch from the carrier transport leg.",
+          "delivery_window_adherence": "Requires an explicit promised window for the actual attempt; date-only delivery has no clock-time-window adherence claim.",
+          "apartment_door_handoff": "Requires an apartment, confirmed entry and door-delivery promise; lobby handoff can then be a complaint about service failure.",
+          "failed_delivery_handling": "Requires an actual failed attempt and the offered fallback; do not describe collection redirection for a service whose policy is reattempt.",
+          "package_handling": "Requires an observed parcel condition; attributing damage to the carrier also requires evidence in the underlying history.",
+          "communication": "Tracking/notification claims require a defined communication feature and history. Those capabilities and outcome rates remain to be authored.",
+          "selection": "Build the set of supported observations for each historical shipment before selecting statements. Inapplicable topics are excluded; applicable ones need not be mentioned, and several observations may share one comment. Policies constrain facts, while sampled performance can violate a promise."
+        },
+        "deferred": "Numeric historical reliability/failure rates, communication capabilities, review prose and renderer/task integration. Service sampling weights are accepted design settings, not implemented runtime defaults."
+      },
+      "building_access_proposal": {
+        "status": "accepted_simplified_design_not_implemented",
+        "scope": "Carrier-service capability plus actual access conditions at this user's building; no universal carrier key/access assertion.",
+        "entry_modes": [
+          "recipient_opens",
+          "provided_code_or_intercom",
+          "authorised_access"
+        ],
+        "authorised_access": "Abstract confirmed entry arrangement for the specific building; no simulated physical keys or credentials are required.",
+        "delivery_place": "Accepted simplification: confirmed building entry means apartment-door delivery. Without entry, handover is at the building entrance and requires the recipient to come downstairs. Do not independently sample a lobby-delivery policy when entry is supported. Room carrying is outside this apartment-access distinction.",
+        "recipient_presence": "Separate handover/presence condition; building access alone does not imply permission to leave goods unattended or skip a required signature.",
+        "coherence": "Bind to available home/building facts, published service terms and confirmed access. Unknown access remains unknown; neither a carrier name nor favourable reviews establishes compatibility.",
+        "task_memory_examples": [
+          "I cannot come downstairs to receive deliveries.",
+          "Leave it at my apartment door while I am out."
+        ],
+        "review_experiences": "Record promised apartment-door delivery separately from actual historical handoff. A reviewer may report that the driver left the parcel in the lobby despite confirmed entry and door delivery; this is a service failure, not a separately sampled shipping policy. Reports with unknown access or permission must not invent a breach.",
+        "evidence_basis": [
+          "https://www.postnord.se/privat/ta-emot/postutdelning/utdelning-i-flerbostadshus/",
+          "https://www.bring.se/privat/ta-emot/hemleverans"
+        ]
+      },
+      "deferred": "Implementation of home/building facts and dated slots, communication capabilities, historical outcome sampling and runtime binding."
+    },
+    "deferred": [
+      "Service availability probabilities and retailer option counts",
+      "Multiple-shipment baskets and bulky quantity scaling",
+      "Bulky carrier-service capabilities",
+      "Home delivery arrangements and scheduling",
+      "Promotion dates and renewal details",
+      "New signup/runtime flows",
+      "Shipping benefits in oracle/account quote wiring"
+    ],
+    "retailer_selection_defaults_reference": "docs/agents/world-sampling-defaults.json: shipping_selection"
+  },
+  "products": [
+    {
+      "public": {
+        "product_id": "footwear-brand-08/footwear.walking_shoes/04",
+        "family_id": "footwear",
+        "concept_id": "footwear.walking_shoes",
+        "concept": "walking_shoes",
+        "name": "Hedmark Kora",
+        "model_name": "Kora",
+        "brand_id": "footwear-brand-08",
+        "facts": {
+          "construction": "enclosed shoe",
+          "closed_heel": true,
+          "intended_use": "everyday walking",
+          "cushioning": "moderate",
+          "footbed": "contoured foam footbed",
+          "sole_structure": "firm",
+          "component_materials": {
+            "upper": "woven synthetic fabric",
+            "outsole": "rubber"
+          },
+          "fastening": "hook-and-loop straps",
+          "sole_tread": "shallow",
+          "reference_mass_g": 372,
+          "mass_basis": "one item, EU 40 reference configuration",
+          "waterproof_rating": "not specified",
+          "shipping_class": "regular"
+        },
+        "reference_price_sek": 1249,
+        "skus": [
+          {
+            "sku_id": "footwear-brand-08/footwear.walking_shoes/04-olive-standard-39",
+            "product_id": "footwear-brand-08/footwear.walking_shoes/04",
+            "colour": "olive",
+            "width": "standard",
+            "size_eu": 39
+          }
+        ]
+      }
+    },
+    {
+      "public": {
+        "product_id": "footwear-brand-18/footwear.walking_shoes/10",
+        "family_id": "footwear",
+        "concept_id": "footwear.walking_shoes",
+        "concept": "walking_shoes",
+        "name": "Bergliden Elva",
+        "model_name": "Elva",
+        "brand_id": "footwear-brand-18",
+        "facts": {
+          "construction": "enclosed shoe",
+          "closed_heel": true,
+          "intended_use": "everyday walking",
+          "cushioning": "moderate",
+          "footbed": "gently contoured foam footbed",
+          "sole_structure": "moderately flexible",
+          "component_materials": {
+            "upper": "mesh and synthetic panels",
+            "outsole": "rubber"
+          },
+          "fastening": "laces",
+          "sole_tread": "shallow",
+          "reference_mass_g": 298,
+          "mass_basis": "one item, EU 40 reference configuration",
+          "waterproof_rating": "not specified",
+          "shipping_class": "regular"
+        },
+        "reference_price_sek": 1699,
+        "skus": [
+          {
+            "sku_id": "footwear-brand-18/footwear.walking_shoes/10-blue-standard-38",
+            "product_id": "footwear-brand-18/footwear.walking_shoes/10",
+            "colour": "blue",
+            "width": "standard",
+            "size_eu": 38
+          }
+        ]
+      }
+    },
+    {
+      "public": {
+        "product_id": "footwear-brand-08/footwear.walking_sandals/06",
+        "family_id": "footwear",
+        "concept_id": "footwear.walking_sandals",
+        "concept": "walking_sandals",
+        "name": "Hedmark Sava",
+        "model_name": "Sava",
+        "brand_id": "footwear-brand-08",
+        "facts": {
+          "construction": "open strapped sandal",
+          "heel_retention": true,
+          "intended_use": "everyday walking",
+          "cushioning": "moderate",
+          "footbed": "gently contoured foam footbed",
+          "sole_structure": "moderately flexible",
+          "component_materials": {
+            "straps": "leather",
+            "outsole": "rubber"
+          },
+          "fastening": "hook-and-loop straps",
+          "sole_tread": "moderate",
+          "reference_mass_g": 240,
+          "mass_basis": "one item, EU 40 reference configuration",
+          "waterproof_rating": "not specified",
+          "toe_coverage": "open",
+          "shipping_class": "regular"
+        },
+        "reference_price_sek": 750,
+        "skus": [
+          {
+            "sku_id": "footwear-brand-08/footwear.walking_sandals/06-grey-standard-39",
+            "product_id": "footwear-brand-08/footwear.walking_sandals/06",
+            "colour": "grey",
+            "width": "standard",
+            "size_eu": 39
+          }
+        ]
+      }
+    }
+  ],
+  "retailers": [
+    {
+      "retailer_id": "outdoors-05",
+      "name": "Lind Skor 06",
+      "geography": {
+        "retailer_id": "outdoors-05",
+        "headquarters": {
+          "location_id": "outdoors-05-headquarters",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.842569,
+          "longitude": 17.625411,
+          "local_east_km": -0.753,
+          "local_north_km": -1.807,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "warehouse": {
+          "location_id": "outdoors-05-warehouse",
+          "city_id": "uppsala",
+          "city": "Uppsala",
+          "country": "SE",
+          "latitude": 59.83712,
+          "longitude": 17.658222,
+          "local_east_km": 1.079,
+          "local_north_km": -2.413,
+          "precision": "synthetic_city_neighbourhood",
+          "timezone": "Europe/Stockholm"
+        },
+        "branches": [
+          {
+            "branch_id": "outdoors-05-branch-01",
+            "name": "Uppsala — Kungsängen",
+            "location": {
+              "location_id": "outdoors-05-branch-01",
+              "city_id": "uppsala",
+              "city": "Uppsala",
+              "country": "SE",
+              "latitude": 59.870067,
+              "longitude": 17.703381,
+              "local_east_km": 3.601,
+              "local_north_km": 1.251,
+              "precision": "synthetic_city_neighbourhood",
+              "timezone": "Europe/Stockholm"
+            },
+            "pickup_enabled": true,
+            "inspection_families": [
+              "footwear",
+              "laptops"
+            ],
+            "shipping_enabled": false,
+            "shipping_dispatch_days": 0
+          },
+          {
+            "branch_id": "outdoors-05-branch-02",
+            "name": "Örebro — Norr",
+            "location": {
+              "location_id": "outdoors-05-branch-02",
+              "city_id": "uppsala",
+              "city": "Uppsala",
+              "country": "SE",
+              "latitude": 59.870067,
+              "longitude": 17.703381,
+              "local_east_km": 3.601,
+              "local_north_km": 1.251,
+              "precision": "synthetic_city_neighbourhood",
+              "timezone": "Europe/Stockholm"
+            },
+            "pickup_enabled": true,
+            "inspection_families": [
+              "footwear",
+              "laptops"
+            ],
+            "shipping_enabled": true,
+            "shipping_dispatch_days": 1
+          },
+          {
+            "branch_id": "outdoors-05-branch-03",
+            "name": "Stockholm — Öster",
+            "location": {
+              "location_id": "outdoors-05-branch-03",
+              "city_id": "uppsala",
+              "city": "Uppsala",
+              "country": "SE",
+              "latitude": 59.870067,
+              "longitude": 17.703381,
+              "local_east_km": 3.601,
+              "local_north_km": 1.251,
+              "precision": "synthetic_city_neighbourhood",
+              "timezone": "Europe/Stockholm"
+            },
+            "pickup_enabled": true,
+            "inspection_families": [
+              "footwear",
+              "laptops"
+            ],
+            "shipping_enabled": false,
+            "shipping_dispatch_days": 0
+          },
+          {
+            "branch_id": "outdoors-05-branch-04",
+            "name": "Stockholm — Norr",
+            "location": {
+              "location_id": "outdoors-05-branch-04",
+              "city_id": "uppsala",
+              "city": "Uppsala",
+              "country": "SE",
+              "latitude": 59.870067,
+              "longitude": 17.703381,
+              "local_east_km": 3.601,
+              "local_north_km": 1.251,
+              "precision": "synthetic_city_neighbourhood",
+              "timezone": "Europe/Stockholm"
+            },
+            "pickup_enabled": true,
+            "inspection_families": [
+              "footwear",
+              "laptops"
+            ],
+            "shipping_enabled": true,
+            "shipping_dispatch_days": 0
+          },
+          {
+            "branch_id": "outdoors-05-branch-05",
+            "name": "Örebro — Sydost",
+            "location": {
+              "location_id": "outdoors-05-branch-05",
+              "city_id": "uppsala",
+              "city": "Uppsala",
+              "country": "SE",
+              "latitude": 59.870067,
+              "longitude": 17.703381,
+              "local_east_km": 3.601,
+              "local_north_km": 1.251,
+              "precision": "synthetic_city_neighbourhood",
+              "timezone": "Europe/Stockholm"
+            },
+            "pickup_enabled": true,
+            "inspection_families": [
+              "footwear",
+              "laptops"
+            ],
+            "shipping_enabled": false,
+            "shipping_dispatch_days": 0
+          }
+        ],
+        "fulfilment_policy": {
+          "delivery_countries": [
+            "SE"
+          ],
+          "warehouse_transfer_enabled": true,
+          "base_shipping_minor": 4900,
+          "per_500km_minor": 2500,
+          "cross_border_minor": 8000,
+          "crossing_minor": 7000,
+          "air_cargo_minor": 25000,
+          "transfer_fee_minor": 0,
+          "currency": "SEK",
+          "time_basis": "calendar_days_after_order",
+          "opening_hours": "not_modelled",
+          "pricing_basis": "authored_all_in_scenario_charges_not_real_carrier_rates"
+        }
+      },
+      "source_locations": [
+        {
+          "source_id": "outdoors-05-warehouse",
+          "kind": "warehouse",
+          "location": {
+            "location_id": "outdoors-05-warehouse",
+            "city_id": "uppsala",
+            "city": "Uppsala",
+            "country": "SE",
+            "latitude": 59.870067,
+            "longitude": 17.703381,
+            "local_east_km": 3.601,
+            "local_north_km": 1.251,
+            "precision": "synthetic_city_neighbourhood",
+            "timezone": "Europe/Stockholm"
+          },
+          "shipping_enabled": true,
+          "dispatch_days": 0
+        },
+        {
+          "source_id": "outdoors-05-branch-01",
+          "kind": "branch",
+          "location": {
+            "location_id": "outdoors-05-branch-01",
+            "city_id": "uppsala",
+            "city": "Uppsala",
+            "country": "SE",
+            "latitude": 59.870067,
+            "longitude": 17.703381,
+            "local_east_km": 3.601,
+            "local_north_km": 1.251,
+            "precision": "synthetic_city_neighbourhood",
+            "timezone": "Europe/Stockholm"
+          },
+          "shipping_enabled": true,
+          "dispatch_days": 0
+        },
+        {
+          "source_id": "outdoors-05-branch-02",
+          "kind": "branch",
+          "location": {
+            "location_id": "outdoors-05-branch-02",
+            "city_id": "uppsala",
+            "city": "Uppsala",
+            "country": "SE",
+            "latitude": 59.870067,
+            "longitude": 17.703381,
+            "local_east_km": 3.601,
+            "local_north_km": 1.251,
+            "precision": "synthetic_city_neighbourhood",
+            "timezone": "Europe/Stockholm"
+          },
+          "shipping_enabled": true,
+          "dispatch_days": 0
+        },
+        {
+          "source_id": "outdoors-05-branch-03",
+          "kind": "branch",
+          "location": {
+            "location_id": "outdoors-05-branch-03",
+            "city_id": "uppsala",
+            "city": "Uppsala",
+            "country": "SE",
+            "latitude": 59.870067,
+            "longitude": 17.703381,
+            "local_east_km": 3.601,
+            "local_north_km": 1.251,
+            "precision": "synthetic_city_neighbourhood",
+            "timezone": "Europe/Stockholm"
+          },
+          "shipping_enabled": true,
+          "dispatch_days": 0
+        },
+        {
+          "source_id": "outdoors-05-branch-04",
+          "kind": "branch",
+          "location": {
+            "location_id": "outdoors-05-branch-04",
+            "city_id": "uppsala",
+            "city": "Uppsala",
+            "country": "SE",
+            "latitude": 59.870067,
+            "longitude": 17.703381,
+            "local_east_km": 3.601,
+            "local_north_km": 1.251,
+            "precision": "synthetic_city_neighbourhood",
+            "timezone": "Europe/Stockholm"
+          },
+          "shipping_enabled": true,
+          "dispatch_days": 0
+        },
+        {
+          "source_id": "outdoors-05-branch-05",
+          "kind": "branch",
+          "location": {
+            "location_id": "outdoors-05-branch-05",
+            "city_id": "uppsala",
+            "city": "Uppsala",
+            "country": "SE",
+            "latitude": 59.870067,
+            "longitude": 17.703381,
+            "local_east_km": 3.601,
+            "local_north_km": 1.251,
+            "precision": "synthetic_city_neighbourhood",
+            "timezone": "Europe/Stockholm"
+          },
+          "shipping_enabled": true,
+          "dispatch_days": 0
+        }
+      ],
+      "contracts": [
+        {
+          "carrier_id": "carrier-03",
+          "tiers": [
+            "standard",
+            "express"
+          ],
+          "collection_fee_minor": 5900,
+          "home_delta_minor": 0
+        }
+      ],
+      "free_shipping_threshold_minor": null,
+      "product_ids": [
+        "footwear-brand-08/footwear.walking_shoes/04",
+        "footwear-brand-18/footwear.walking_shoes/10",
+        "footwear-brand-08/footwear.walking_sandals/06"
+      ],
+      "offers": [
+        {
+          "offer_id": "outdoors-05/footwear-brand-08/footwear.walking_shoes/04-olive-standard-39",
+          "product_id": "footwear-brand-08/footwear.walking_shoes/04",
+          "sku_id": "footwear-brand-08/footwear.walking_shoes/04-olive-standard-39",
+          "price_minor": 45000,
+          "currency": "SEK",
+          "stock_by_source": {
+            "outdoors-05-warehouse": 50,
+            "outdoors-05-branch-01": 0,
+            "outdoors-05-branch-02": 0,
+            "outdoors-05-branch-03": 0,
+            "outdoors-05-branch-04": 0,
+            "outdoors-05-branch-05": 0
+          },
+          "supplier_order": {
+            "enabled": false,
+            "wait_days": null,
+            "disclosure": null
+          },
+          "price_trace": {
+            "matched_reference_draw": false,
+            "offset_draw": -0.05229894029616564,
+            "reference_minor": 124900
+          }
+        },
+        {
+          "offer_id": "outdoors-05/footwear-brand-18/footwear.walking_shoes/10-blue-standard-38",
+          "product_id": "footwear-brand-18/footwear.walking_shoes/10",
+          "sku_id": "footwear-brand-18/footwear.walking_shoes/10-blue-standard-38",
+          "price_minor": 45000,
+          "currency": "SEK",
+          "stock_by_source": {
+            "outdoors-05-warehouse": 50,
+            "outdoors-05-branch-01": 0,
+            "outdoors-05-branch-02": 0,
+            "outdoors-05-branch-03": 0,
+            "outdoors-05-branch-04": 0,
+            "outdoors-05-branch-05": 0
+          },
+          "supplier_order": {
+            "enabled": false,
+            "wait_days": null,
+            "disclosure": null
+          },
+          "price_trace": {
+            "matched_reference_draw": false,
+            "offset_draw": 0.21731557797767814,
+            "reference_minor": 169900
+          }
+        },
+        {
+          "offer_id": "outdoors-05/footwear-brand-08/footwear.walking_sandals/06-grey-standard-39",
+          "product_id": "footwear-brand-08/footwear.walking_sandals/06",
+          "sku_id": "footwear-brand-08/footwear.walking_sandals/06-grey-standard-39",
+          "price_minor": 30000,
+          "currency": "SEK",
+          "stock_by_source": {
+            "outdoors-05-warehouse": 50,
+            "outdoors-05-branch-01": 0,
+            "outdoors-05-branch-02": 0,
+            "outdoors-05-branch-03": 0,
+            "outdoors-05-branch-04": 0,
+            "outdoors-05-branch-05": 0
+          },
+          "supplier_order": {
+            "enabled": false,
+            "wait_days": null,
+            "disclosure": null
+          },
+          "price_trace": {
+            "matched_reference_draw": true,
+            "offset_draw": 0,
+            "reference_minor": 75000
+          }
+        }
+      ]
+    }
+  ],
+  "world_id": "fixture/abb7ecf0cff29d07f6716f14d56bbebd90911b669666f1949d92b08b7aa76faa",
+  "status": "explicit_basket_shipping_test_fixture"
+}
