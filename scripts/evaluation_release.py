@@ -100,14 +100,21 @@ def write_candidate(repo, *, files, metadata, ref, worktree, receipt, base=None)
     git(repo, 'check-ref-format', ref)
     if Path(worktree).exists() or Path(receipt).exists():
         raise ValueError('Worktree and receipt must be new paths')
-    for name in REQUIRED_ASSETS:
-        if name not in files or files[name] is None:
-            raise ValueError('Required browser asset omitted: ' + name)
+    if not base:
+        for name in REQUIRED_ASSETS:
+            if name not in files or files[name] is None:
+                raise ValueError('Required browser asset omitted: ' + name)
     with temporary_index(repo, base) as env:
         hashes = {}
         if base:
             old = json.loads(git(repo, 'show', commit_id(repo, base) + ':' + MANIFEST))
             hashes.update(old['source_sha256'])
+            # Inherit exact Git blobs, never reload undeclared files from a mutable
+            # or intentionally partial development root. Verify required base assets.
+            for name in REQUIRED_ASSETS:
+                content = git(repo, 'show', commit_id(repo, base) + ':' + name)
+                if not content or sha256(content).hexdigest() != hashes.get(name):
+                    raise ValueError('Invalid inherited browser asset: ' + name)
         updates = []
         for name, record in sorted(files.items()):
             relative_name(name)
@@ -285,11 +292,6 @@ def main():
                 files[name] = None
             else:
                 raise ValueError('Missing declared source path: ' + name)
-        # Carry both mandatory assets through; they are never silently removable.
-        for name in REQUIRED_ASSETS:
-            if name not in files:
-                files[name] = {'source': str(Path(args.source_root).resolve() / name),
-                               'sha256': old['source_sha256'][name]}
         result = write_candidate(args.repo, files=files,
                                  metadata={'parent': old['metadata'], 'changed_paths': paths},
                                  ref=args.ref, worktree=args.worktree, receipt=args.receipt, base=base)

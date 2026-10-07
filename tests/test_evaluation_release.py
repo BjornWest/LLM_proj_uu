@@ -129,6 +129,25 @@ class ReleaseTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             release.verify_worktree(self.worktree)
 
+    def test_partial_source_root_inherits_undeclared_git_assets(self):
+        first = self.build()
+        partial = self.root / 'partial'
+        partial.mkdir()
+        (partial / 'package.py').write_text('owned feature')
+        paths = self.root / 'paths.json'
+        paths.write_text(json.dumps(['package.py']))
+        output = self.root / 'partial-receipt.json'
+        subprocess.run(['python3', str(Path(release.__file__)), 'candidate',
+            '--repo', str(self.repo), '--base', first['commit'],
+            '--source-root', str(partial), '--paths', str(paths),
+            '--ref', 'refs/heads/dev/partial', '--worktree', str(self.root / 'partial-worktree'),
+            '--receipt', str(output)], check=True, capture_output=True)
+        second = json.loads(output.read_bytes())
+        release.verify_worktree(second['worktree'], second['commit'])
+        for name in release.REQUIRED_ASSETS:
+            self.assertEqual((self.worktree / name).read_bytes(),
+                             (Path(second['worktree']) / name).read_bytes())
+
     def test_promotion_requires_exact_acceptance(self):
         result = self.build()
         release.save_new(self.root / 'proof.json', self.proof(result['commit']))

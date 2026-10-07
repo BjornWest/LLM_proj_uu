@@ -39,6 +39,8 @@ For a fix or feature, create a JSON list of owned repository-relative paths.
 The base must be an exact prior release candidate commit, never mutable `main`.
 Include every new required asset/module and test. A missing declared existing path
 is an explicit deletion; a missing new path fails. Shell globs are not accepted.
+Undeclared files, including existing chat assets, are inherited directly from the
+base Git blobs; a partial source root only needs the owner's declared changes.
 
 ```bash
 python3 scripts/run_bounded_job.py --memory-mib 2048 -- \
