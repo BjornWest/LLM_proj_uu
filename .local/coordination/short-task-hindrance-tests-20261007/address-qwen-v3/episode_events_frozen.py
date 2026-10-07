@@ -219,14 +219,11 @@ def codex_sender(notice, *, run=subprocess.run):
                f"Evidence and task grades: {notice['registry']}.{grade_text} Inspect this subscribed result; process completion does not imply task success.")
     if phase == 'active' and status.get('canAcceptDirectInput'):
         command = [sys.executable, str(ROOT/'scripts/agent_coordination.py'), 'steer', '--thread', thread, '--message', message]
-    elif phase == 'idle':
-        command = ['codex', 'queue', '--remote', 'unix:///home/bjorn/.codex/app-server-control/app-server-control.sock',
-                   '--thread', thread, '--message', message]
     else:
-        return {'state': 'pending', 'reason': 'Unreachable/notLoaded is not proof of an idle agent', 'status': status}
+        return {'state': 'pending', 'reason': 'Steering-only delivery: idle/unreachable notifications remain in durable outbox', 'status': status}
     sent = run(command, capture_output=True, text=True, timeout=30)
     return {'state': 'accepted' if sent.returncode == 0 else 'delivery_unknown',
-            'transport': 'steer' if phase == 'active' else 'queue',
+            'transport': 'steer',
             'returncode': sent.returncode, 'stdout': sent.stdout, 'stderr': sent.stderr}
 
 
