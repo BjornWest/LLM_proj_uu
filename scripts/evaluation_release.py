@@ -161,6 +161,10 @@ def verify_worktree(worktree, expected_commit=None):
         raise ValueError('Unexpected evaluation commit')
     if git(root, 'status', '--porcelain', '--untracked-files=all').strip():
         raise ValueError('Evaluation worktree has modified/untracked files')
+    # Python -B prevents cache writes but still reads existing .pyc files.
+    # An exact runtime must also reject ignored additions outside its inventory.
+    if git(root, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z'):
+        raise ValueError('Evaluation worktree has ignored untracked files')
     manifest = json.loads((root / MANIFEST).read_bytes())
     tracked = set(git(root, 'ls-files', '-z').decode().rstrip('\0').split('\0'))
     if tracked != set(manifest['source_sha256']) | {MANIFEST}:

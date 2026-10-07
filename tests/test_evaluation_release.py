@@ -1,6 +1,7 @@
 """Small temporary Git fixtures; no real ledger, browser, model or source writes."""
 import importlib.util
 import json
+import py_compile
 from pathlib import Path
 import subprocess
 import tempfile
@@ -106,6 +107,29 @@ class ReleaseTest(unittest.TestCase):
         release.require_ready(self.worktree, self.root / 'ready.json')
         (self.root / 'scripted-fixture.json').write_text('changed')
         with self.assertRaisesRegex(ValueError, 'Changed evidence'):
+            release.require_ready(self.worktree, self.root / 'ready.json')
+
+    def test_ignored_executable_bytecode_invalidates_readiness(self):
+        source = self.sources / 'package.py'
+        source.write_text('RESULT = "committed"\n')
+        ignore = self.sources / '.gitignore'
+        ignore.write_text('__pycache__/\n*.pyc\n')
+        self.files['package.py'] = {'source': str(source), 'sha256': release.digest(source)}
+        self.files['.gitignore'] = {'source': str(ignore), 'sha256': release.digest(ignore)}
+        result = self.build()
+        release.save_new(self.root / 'proof.json', self.proof(result['commit']))
+        release.certify(self.worktree, self.root / 'proof.json', self.root / 'ready.json')
+        cached_source = self.root / 'foreign.py'
+        cached_source.write_text('RESULT = "uncommitted-bytecode"\n')
+        cache = Path(importlib.util.cache_from_source(str(self.worktree / 'package.py')))
+        cache.parent.mkdir()
+        py_compile.compile(str(cached_source), cfile=str(cache), doraise=True,
+            invalidation_mode=py_compile.PycInvalidationMode.UNCHECKED_HASH)
+        self.assertFalse(release.git(self.worktree, 'status', '--porcelain').strip())
+        observed = subprocess.run(['python3', '-B', '-c', 'import package; print(package.RESULT)'],
+            cwd=self.worktree, capture_output=True, text=True, check=True)
+        self.assertEqual(observed.stdout.strip(), 'uncommitted-bytecode')
+        with self.assertRaisesRegex(ValueError, 'ignored untracked'):
             release.require_ready(self.worktree, self.root / 'ready.json')
 
     def test_candidate_change_only_updates_declared_source(self):
