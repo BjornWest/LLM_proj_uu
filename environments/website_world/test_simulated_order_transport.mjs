@@ -1,0 +1,44 @@
+// Authored native-response fixtures. No real network/browser/provider/world draw.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const text=readFileSync(new URL('./simulated_order_transport.js',import.meta.url),'utf8');
+const m=await import('data:text/javascript;base64,'+Buffer.from(text).toString('base64'));
+const draft={revision:1,basketSelection:null,instructions:'Apartment door',address:{name:'Person',street:'Street',unit:'4',postcode:'12345',city:'City'}};
+const data={simulatedOrders:true};
+const payload=d=>({revision:d.revision,world_id:'world',plan_id:'plan',lines:[{line_id:'line',offer_id:'offer',quantity:1}],address:{...d.address},selections:d.basketSelection,split:false,coupon_code:null});
+const inquiryKey=d=>JSON.stringify(payload(d));
+const selected={id:'option',selection:{line:'choice'},totalMinor:100};
+const original={revision:1,quoteId:'quote',requestId:'implicit-request',status:'quoted',selectionReset:false,selected};
+const explicit={...original,requestId:'explicit-request'};
+let calls=[];
+globalThis.fetch=async(path,options)=>{calls.push({path,body:JSON.parse(options.body)});return {ok:true,json:async()=>structuredClone(explicit)}};
+const bound=await m.explicitOrderQuote(original,draft,{data,payload,inquiryKey,expectedKey:inquiryKey(draft)});
+assert.deepEqual(bound.selection,{line:'choice'});assert.equal(calls.length,1);assert.deepEqual(calls[0].body.selections,{line:'choice'});
+draft.basketSelection=bound.selection;
+const requests=new Map([[inquiryKey(draft),{value:bound.value}]]);
+const methods=m.orderMethods({data,payload,requests,inquiryKey});
+const shown={errors:[],quoteId:'quote',total:1};
+const identity=methods.orderIdentity(draft,shown);
+draft.pendingOrder={key:'saved-key',identity};
+assert.equal(methods.orderIdentity(draft,shown),identity);
+const receipt={simulated:true,id:'SIM1'};
+globalThis.fetch=async(path,options)=>{calls.push({path,body:JSON.parse(options.body)});return {ok:true,json:async()=>({confirmation:receipt})}};
+assert.deepEqual(await methods.placeOrder(draft,shown,'saved-key'),receipt);
+assert.equal(calls.at(-1).path,'/api/order');assert.deepEqual(Object.keys(calls.at(-1).body).sort(),['delivery_instructions','displayed_quote','idempotency_key','quote_request','terms_accepted']);
+assert.deepEqual(calls.at(-1).body.displayed_quote,{request_id:'explicit-request',quote_id:'quote',option_id:'option',total_minor:100,currency:'SEK'});
+assert.equal(calls.at(-1).body.quote_request.address.unit,'4');
+for(const bad of [{...shown,total:2},{...shown,quoteId:'stale'},{...shown,errors:['pending']}])assert.throws(()=>methods.orderIdentity(draft,bad));
+requests.get(inquiryKey(draft)).value.selectionReset=true;assert.throws(()=>methods.orderIdentity(draft,shown));
+requests.get(inquiryKey(draft)).value.selectionReset=false;
+const changed={...draft,basketSelection:null};
+globalThis.fetch=async()=>({ok:true,json:async()=>({...explicit,selected:{...selected,totalMinor:200}})});
+await assert.rejects(m.explicitOrderQuote(original,changed,{data,payload,inquiryKey,expectedKey:inquiryKey(changed)}),/quote changed/);
+// A response belonging to an older draft cannot modify the current selection.
+globalThis.fetch=async()=>{changed.revision++;return {ok:true,json:async()=>explicit}};
+assert.equal(await m.explicitOrderQuote(original,changed,{data,payload,inquiryKey,expectedKey:inquiryKey(changed)}),null);
+assert.equal(changed.basketSelection,null);
+// Ordinary reset/default previews establish a fresh explicit displayed selection.
+changed.revision=1;changed.basketSelection={line:'stale'};
+globalThis.fetch=async()=>({ok:true,json:async()=>explicit});
+assert.deepEqual((await m.explicitOrderQuote({...original,selectionReset:true},changed,{data,payload,inquiryKey,expectedKey:inquiryKey(changed)})).selection,{line:'choice'});
+console.log(JSON.stringify({checks:'pass',kind:'authored quoted identity/selection/amount and stale-response controls',browser_requests:0,provider_requests:0,world_draws:0}));
