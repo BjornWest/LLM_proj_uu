@@ -10,7 +10,7 @@ import numpy as np
 from intent_browser.backend import Completion
 from intent_browser.chaos import ChaosClient
 from intent_browser.evaluation import Evaluation
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 
 
 class EvaluationTests(unittest.TestCase):
@@ -97,7 +97,8 @@ class EvaluationTests(unittest.TestCase):
             directory, summary = run_episode(lambda video: env, model, {}, root, episode_task=Task())
             self.assertTrue(env.closed)
             self.assertIsNone(summary['success'])
-            self.assertFalse(summary['evaluation']['safe_success'])
+            self.assertIsNone(summary['evaluation']['safe_success'])
+            self.assertFalse(json.loads((directory/'evaluation-before-close.json').read_text())['safe_success'])
             self.assertNotIn('secret', json.dumps(model.messages))
             self.assertNotIn('original source prompt', json.dumps(model.messages))
             events = [json.loads(row)['event'] for row in (directory / 'events.jsonl').read_text().splitlines()]

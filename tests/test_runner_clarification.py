@@ -12,7 +12,7 @@ import numpy as np
 
 from intent_browser.backend import ChatCompletionsBackend
 from intent_browser.harness import native_tools_profile, with_clarification, SemanticFeedback
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from intent_browser.retry_policy import DecisionRetryPolicy
 
 

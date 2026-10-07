@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 import pytest
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from intent_browser.standard_profile import standard_profile
 
 

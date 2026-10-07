@@ -81,6 +81,9 @@ def main():
     parser.add_argument('--capture-timeout-mode',choices=['diagnostic','bounded'],default=None,
         help='Human-handover capture/guard deadlines: diagnostic logs overruns without aborting (default); bounded enforces deadlines')
     parser.add_argument('--record-har', action='store_true', help='Open internet: save private network archive; may contain sensitive site/session data')
+    parser.add_argument('--grading-factory', help='Trusted MODULE:CALLABLE taking (episode_task,args), returning AutomaticGrading')
+    parser.add_argument('--allow-ungraded', action='store_true', help='Explicit diagnostic escape; requires --ungraded-reason')
+    parser.add_argument('--ungraded-reason', help='Recorded reason for intentionally ungraded diagnostic')
     parser.add_argument("--chaos-base-url", help="Chaos agent origin; creates a fresh session per episode")
     parser.add_argument("--chaos-task", help="Stable Chaos task ID, e.g. confirmshaming")
     parser.add_argument("--pilot-task", choices=['P07','P10','P11'], help="Local Tricky shopping, privacy or membership fixture")
@@ -247,6 +250,15 @@ def main():
         if summary["error"]:
             parser.exit(1, summary["error"] + "\n")
         return
+    if args.allow_ungraded and args.grading_factory:
+        parser.error('Choose --grading-factory or --allow-ungraded')
+    if not args.grading_factory:
+        try:
+            from .automatic_grading import validate_options
+            validate_options(None,args.allow_ungraded,args.ungraded_reason)
+        except ValueError as exc:parser.error(str(exc))
+    elif args.ungraded_reason is not None:
+        parser.error('--ungraded-reason requires --allow-ungraded')
     if args.mode == "run" and (not args.model or not args.base_url):
         parser.error("run requires --model and --base-url (or MODEL_NAME and MODEL_BASE_URL)")
     if args.max_steps < 1 or args.max_input_tokens < 1 or args.timeout <= 0 or args.max_tokens < 1 or not 0 <= args.hold_seconds <= 60:
@@ -366,6 +378,16 @@ def main():
                         wait_for_user_message=False, record_video_dir=video_dir,
                         action_mapping=action_set.to_python_code)
 
+    automatic_grading = None
+    if args.grading_factory:
+        try:
+            from importlib import import_module
+            from .automatic_grading import validate_options
+            module, name = args.grading_factory.split(':',1)
+            factory=getattr(import_module(module),name)
+            automatic_grading=factory(episode_task,args)
+            validate_options(automatic_grading,False,None)
+        except (ValueError,TypeError,ImportError,AttributeError) as exc:parser.error(f'Invalid grading factory: {exc}')
     backend = (SmokeBackend() if args.mode == "smoke" else ManualBackend(
                    "development-session" if args.mode == "development" else "human"
                ) if args.mode in ("manual", "development")
@@ -411,6 +433,8 @@ def main():
                                  args.seed, args.video, args.hold_seconds, search_backend, episode_task,
                                  action_timeout_ms=args.action_timeout_ms,
                                  trace_screenshots=args.trace_screenshots,
+                                 automatic_grading=automatic_grading,allow_ungraded=args.allow_ungraded,
+                                 ungraded_reason=args.ungraded_reason,
                                  max_input_tokens=args.max_input_tokens if args.mode=='run' and harness_profile and harness_profile.ax_config else None,
                                  retry_policy=(DecisionRetryPolicy()
                                                if args.retry_policy == 'bounded-v1' else None),

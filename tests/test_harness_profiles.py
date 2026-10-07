@@ -9,14 +9,14 @@ import numpy as np
 from intent_browser.backend import Completion
 from intent_browser.evaluation import Evaluation
 from intent_browser.harness import AppendConversation, BrowserTools, HarnessProfile, SemanticFeedback
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 
 
 class Env:
     def __init__(self): self.actions = []; self.closed = False
     def observation(self, tree):
         return {'goal': 'Test public page', 'url': 'http://local.test/',
-                'axtree_object': tree, 'last_action_error': '',
+                'axtree_object': {'nodes':[{'nodeId':'0'}], 'fixture_text':tree}, 'last_action_error': '',
                 'privileged': 'SECRET-GRADER', 'screenshot': np.zeros((2, 2, 3), dtype=np.uint8)}
     def reset(self, seed): return self.observation("[1] button 'Add'\n[2] status 'Count 0'"), {}
     def step(self, action):
@@ -40,8 +40,8 @@ class HarnessTests(unittest.TestCase):
         profile = profile or HarnessProfile()
         env = env or Env()
         tmp = tempfile.TemporaryDirectory(); self.addCleanup(tmp.cleanup)
-        with patch('intent_browser.harness.flatten_axtree_to_str', side_effect=lambda x: x), \
-             patch('intent_browser.runner.observation_text', side_effect=lambda obs: obs['axtree_object']), \
+        with patch('intent_browser.harness.flatten_axtree_to_str', side_effect=lambda x: x['fixture_text']), \
+             patch('intent_browser.runner.observation_text', side_effect=lambda obs: obs['axtree_object']['fixture_text']), \
              patch('intent_browser.runner.refresh_observation', side_effect=lambda _: env.observation("[1] button 'Add'\n[2] status 'Current'")):
             root, summary = run_episode(lambda _: env, backend, {}, tmp.name, max_steps=8,
                 harness_profile=profile, episode_task=task, before_observation=(lambda: None) if paced else None)
@@ -103,7 +103,7 @@ class HarnessTests(unittest.TestCase):
         _, summary, rows, _, env = self.run_case(profile=profile)
         self.assertEqual(env.actions, [])
         self.assertEqual(rows[0]['failure_phase'], 'action_parse')
-        self.assertIn('disabled', summary['error'])
+        self.assertIn('Unsupported action', summary['error'])
 
     def test_transport_timeout_keeps_current_attempt(self):
         class TimeoutBackend(Backend):
@@ -143,7 +143,7 @@ class HarnessTests(unittest.TestCase):
 
     def test_diff_retains_duplicate_counts_and_bounds_large_changes(self):
         env = Env(); feedback = SemanticFeedback(max_lines=2, max_line_chars=20)
-        with patch('intent_browser.harness.flatten_axtree_to_str', side_effect=lambda x: x):
+        with patch('intent_browser.harness.flatten_axtree_to_str', side_effect=lambda x: x['fixture_text']):
             before = feedback.before_action(env, env.observation("[1] button 'x'"))
             result = feedback.after_action(env, before, env.observation("[1] button 'x'\n[2] button 'x'\n[3] status '"+'a'*100+"'\n[4] status 'z'"))
         self.assertEqual(result['added_or_changed'][0], "button 'x'")

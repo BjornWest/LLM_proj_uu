@@ -165,3 +165,5 @@ maintained copies as part of this transition.
 - [Gemini nonblocking-feedback trial](gemini-nonblocking-feedback-benchmark.md): clean 20-turn real-web probe, feedback and debug timing measurements, and remaining serial identity checks.
 
 - [Current runtime defaults](runtime-defaults.md): automatic capture selection, adapter/backend compatibility gates and explicit native/screenshot controls.
+
+- [Required automatic episode grading](automatic-grading.md): prospective dispatch contract, explicit diagnostics and post-close native grading.

@@ -9,7 +9,7 @@ import numpy as np
 
 from intent_browser.backend import BackendResponseError, ChatCompletionsBackend
 from intent_browser.openrouter import DEFAULT_PROVIDERS, provider_options, routing_record
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from scripts.smoke_session_routing import RoutingBudgetBackend
 
 

@@ -15,7 +15,7 @@ from intent_browser.backend import Completion
 from intent_browser.observation_pipeline import (ObservationPipeline, ObservationPipelineConfig,
     ObservationChanged, PartialFeedback, ax_node_signature)
 from intent_browser.harness import SemanticFeedback, native_tools_profile
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from intent_browser.trace import Trace
 
 

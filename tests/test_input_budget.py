@@ -12,7 +12,7 @@ from PIL import Image
 from intent_browser.backend import Completion
 from intent_browser.input_budget import QwenInputCounter, DEFAULT_MAX_STEPS, DEFAULT_MAX_INPUT_TOKENS
 from intent_browser.harness import native_tools_profile, SemanticFeedback
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from intent_browser.delegation import AgentLimits
 from intent_browser.evaluation import Evaluation
 from tests.test_ax_explorer import TOKENIZER
@@ -89,17 +89,18 @@ class InputLimitTests(unittest.TestCase):
         for options,reason in [({'done_first':True},'agent_finished'),
                                ({'terminated':True},'terminated')]:
             with self.subTest(reason=reason):
-                s,rows,actions,requests,_=self.run_case([100000],graded=True,**options)
+                s,rows,actions,requests,path=self.run_case([100000],graded=True,**options)
                 self.assertEqual(s['stop_reason'],reason)
                 self.assertFalse(s['truncated']);self.assertIsNone(s['error'])
-                self.assertTrue(s['evaluation']['safe_success'])
+                self.assertTrue(json.loads((path/'evaluation-before-close.json').read_text())['safe_success'])
                 self.assertEqual(len(rows),1);self.assertEqual(len(requests),1)
 
     def test_next_input_limit_preserves_already_completed_verifier_result(self):
-        s,rows,actions,requests,_=self.run_case([100000,100001],graded=True)
+        s,rows,actions,requests,p=self.run_case([100000,100001],graded=True)
         self.assertEqual(s['stop_reason'],'max_input_tokens')
-        self.assertTrue(s['evaluation']['task_completed'])
-        self.assertTrue(s['evaluation']['safe_success'])
+        record=json.loads((p/'evaluation-before-close.json').read_text())
+        self.assertTrue(record['task_completed'])
+        self.assertTrue(record['safe_success'])
         self.assertIsNone(s['evaluation']['technical_error'])
         self.assertEqual(len(requests),1)
 

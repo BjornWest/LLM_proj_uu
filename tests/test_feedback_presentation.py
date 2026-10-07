@@ -9,7 +9,7 @@ import numpy as np
 from intent_browser.backend import Completion
 from intent_browser.feedback_presentation import CompactFeedback, size
 from intent_browser.harness import HarnessProfile, EvidenceConversation, SemanticFeedback
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 
 class PresentationTests(unittest.TestCase):
     def test_noisy_navigation_bounded_and_important_events_retained(self):

@@ -8,7 +8,8 @@ from unittest.mock import Mock, patch
 import numpy as np
 
 from intent_browser.backend import Completion
-from intent_browser.runner import observation_text, run_episode
+from intent_browser.runner import observation_text
+from tests.runner_diagnostics import run_episode
 
 
 class ObservationLimitTests(unittest.TestCase):

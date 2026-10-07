@@ -43,7 +43,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 max_input_tokens=None, input_counter=None,
                 clarification_callback=None, clarification_audit_id=None,
                 observation_pipeline="auto", human_handover=None, human_handover_ui=None,
-                trace_screenshots=None, async_recording=True, debug_timings=None):
+                trace_screenshots=None, async_recording=True, debug_timings=None,
+                automatic_grading=None, allow_ungraded=False, ungraded_reason=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
@@ -51,6 +52,22 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     truncation marker; callers must budget the actual serialized request bytes.
     Neither option repairs model output or changes parsing or verification.
     """
+    from .automatic_grading import GradingGate, validate_options, failure_evaluation
+    auxiliary_grading = None
+    if agent_actor is not None and agent_actor.get('parent') is not None:
+        parent_gate = getattr(agent_runtime, 'grading_gate', None)
+        if (parent_gate is None or agent_runtime.actors.get(agent_actor['id']) is not agent_actor
+                or parent_gate.record['status'] not in ('attached','explicitly_ungraded')):
+            raise ValueError('Auxiliary episode requires an attached root grading declaration')
+        if automatic_grading is not None or allow_ungraded or ungraded_reason is not None:
+            raise ValueError('Auxiliary episodes inherit root grading scope, not independent task grading')
+        parent_gate.check()
+        auxiliary_grading = {'root_episode_id': parent_gate.trace.episode_id,
+            'contract_id': parent_gate.record['contract_id'],
+            'binding_sha256': parent_gate.record['binding_sha256'],
+            'scope': 'Auxiliary conversation; task verdict belongs to root episode'}
+    else:
+        validate_options(automatic_grading, allow_ungraded, ungraded_reason)
     from .debug_timings import resolve_debug_timings
     debug_timings=resolve_debug_timings(debug_timings)
     if type(async_recording) is not bool:
@@ -144,7 +161,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             delegated_goal=delegated_goal,decision_wait=decision_wait,
             max_input_tokens=max_input_tokens,input_counter=input_counter,
             clarification_callback=clarification_callback,clarification_audit_id=clarification_audit_id,
-            trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings))
+            trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings,
+            automatic_grading=automatic_grading,allow_ungraded=allow_ungraded,ungraded_reason=ungraded_reason))
     no_browser=agent_actor is not None and agent_actor['browser']=='none'
     if action_timeout_ms is not None:
         validate_action_timeout(action_timeout_ms)
@@ -293,6 +311,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             inference_seconds='Legacy alias for request_seconds; not isolated inference latency.',
             background_capture='Per-phase timing in observation_capture_phase lifecycle events; includes native BID marking and cleanup.')
         write_json(trace.directory/'metadata.json',trace.metadata)
+    grading_gate = GradingGate(trace,automatic_grading,allow_ungraded=allow_ungraded,
+        reason=ungraded_reason,auxiliary=auxiliary_grading)
+    trace.metadata['automatic_grading'] = {key: grading_gate.record[key]
+        for key in ('schema','contract_id','phase','reason','auxiliary_parent')}
+    write_json(trace.directory/'metadata.json',trace.metadata)
+    if agent_runtime and agent_actor['parent'] is None:agent_runtime.grading_gate=grading_gate
     if agent_runtime:agent_runtime.bind(agent_actor,trace)
     delivery = PolicyDelivery(trace) if harness_profile and harness_profile.delivery_tracking else None
     env = None
@@ -678,6 +702,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     phase = 'navigation_boundary'
                     navigation.check_active()
 
+        grading_gate.bind(env,obs)
         final_ref = trace.observation(0, obs, render_observation(obs))
         for index in range(max_steps):
             if agent_runtime and agent_runtime.calls >= agent_runtime.limits.total_model_calls:
@@ -825,6 +850,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 started = time.monotonic()
                 if captured_at is not None:
                     event['observation_age_lower_bound_seconds_at_model_call'] = started - captured_at
+                grading_gate.check()
+                if auxiliary_grading is not None:agent_runtime.grading_gate.check()
                 model_called = True
                 try:
                     completion = (pipeline.complete(backend,messages,event) if pipeline is not None
@@ -1188,6 +1215,14 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         execution_error=error
         cleanup_errors=[]
         write_json(trace.directory / 'evaluation-before-close.json',evaluation_data)
+        grading_error = None
+        if automatic_grading is not None and automatic_grading.phase == 'before_close':
+            try:grading_gate.collect(env,outcome)
+            except Exception as exc:
+                grading_error=f'Automatic grading failed: {type(exc).__name__}: {exc}'
+                grading_gate.fail(grading_error)
+
+
         if env is not None:
             trace.event('environment_close_started',scope='Inference ended; cleanup/teardown in progress')
             def cleanup_phase(name,callback,seconds=2.0):
@@ -1255,7 +1290,34 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     except Exception as close_exc:
                         trace.event('chat_browser_close_fallback_failed',error=f'{type(close_exc).__name__}: {close_exc}')
             trace.event("environment_close_completed", error=error)
-        summary = {"final_reward": reward, "success": bool(reward > 0) if metadata.get("verifier") and terminated and not error else None,
+        if cleanup_errors and not error:
+            error = 'Cleanup failed: ' + '; '.join(f"{item['phase']}: {item['error']}" for item in cleanup_errors)
+        if automatic_grading is not None and grading_error is None:
+            try:
+                if automatic_grading.phase == 'external':
+                    grading_gate.check(force=True)
+                    grading_gate.pending_external()
+                    evaluation_data = Evaluation('automatic-grading-pending','1',trust='pending_external',
+                        technical_error=error,limitations=['Native automatic grading is pending external finalization.']).to_dict()
+                else:
+                    final_outcome={**outcome,'error':error,'cleanup_errors':cleanup_errors}
+                    if automatic_grading.phase == 'after_close':grading_gate.collect(env,final_outcome)
+                    evaluation_data=grading_gate.publish(final_outcome)
+                    error=error or evaluation_data['technical_error']
+            except Exception as exc:
+                grading_error=f'Automatic grading failed: {type(exc).__name__}: {exc}'
+                grading_gate.fail(grading_error)
+        if grading_error:
+            error=error or grading_error
+            evaluation_data=failure_evaluation(grading_error)
+        elif automatic_grading is None:
+            # Keep browser-phase evidence separately; no implicit grade for diagnostics/helpers.
+            evaluation_data=Evaluation('none','1',trust='auxiliary' if auxiliary_grading else 'explicitly_ungraded',
+                technical_error=error,limitations=[auxiliary_grading['scope'] if auxiliary_grading else ungraded_reason]).to_dict()
+        write_json(trace.directory/'evaluation.json',evaluation_data)
+        summary = {"final_reward": reward, "success": evaluation_data['safe_success'],
+                   "grading": grading_gate.record, "grading_error": grading_error,
+                   "infrastructure_completed": grading_gate.record['infrastructure_complete'],
                    "terminated": terminated, "truncated": truncated or stop_reason in ("max_steps", "max_input_tokens"),
                    "stop_reason": stop_reason, "error": error, "step_count": steps,
                    "execution_error":execution_error,"cleanup_errors":cleanup_errors,
@@ -1268,6 +1330,15 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                    "evaluation": evaluation_data, "evaluation_file": "evaluation.json"}
         if retry_policy is not None:
             summary['decision_retry_count'] = retries_used
-        trace.finish(summary)
+        try:trace.finish(summary)
+        except Exception as exc:
+            failure=f'Trace finalization failed: {type(exc).__name__}: {exc}'
+            grading_gate.fail(failure)
+            summary.update(error=summary.get('error') or failure,grading_error=failure,
+                grading=grading_gate.record,infrastructure_completed=False,success=None,trace_complete=False)
+            summary['evaluation']=failure_evaluation(failure)
+            write_json(trace.directory/'evaluation.json',summary['evaluation'])
+            saved=json.loads((trace.directory/'episode.json').read_text())
+            write_json(trace.directory/'episode.json',{**saved,**summary})
     print(f"Trace: {trace.directory}\nResult: {summary}", flush=True)
     return trace.directory, summary

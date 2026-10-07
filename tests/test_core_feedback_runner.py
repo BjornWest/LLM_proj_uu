@@ -11,7 +11,7 @@ import numpy as np
 
 from intent_browser.backend import Completion
 from intent_browser.harness import EvidenceConversation, HarnessProfile, SemanticFeedback
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 
 
 class Updates(SemanticFeedback):

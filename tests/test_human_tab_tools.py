@@ -52,7 +52,8 @@ class HumanTabToolsTests(unittest.TestCase):
         from intent_browser.cli import main
         argv=['intent-browser','run','--open-internet','--human-handover','--headful','--no-subagents',
               '--url','https://example.test/','--goal','Information only','--no-preview',
-              '--model','offline','--base-url','http://localhost:9990/v1']
+              '--model','offline','--base-url','http://localhost:9990/v1',
+              '--allow-ungraded','--ungraded-reason','Offline CLI attachment diagnostic']
         with patch('sys.argv',argv),patch.dict(os.environ,{},clear=True), \
              patch('intent_browser.cli.ChatCompletionsBackend'), \
              patch('intent_browser.human_handover_ui.HumanHandoverUI') as panel, \
@@ -99,7 +100,7 @@ class HumanTabToolsTests(unittest.TestCase):
         self.assertNotIn(HUMAN_VERIFICATION_RECOGNITION_POLICY,base.instructions)
 
     def test_runner_rejects_missing_or_disabled_controller_before_browser(self):
-        from intent_browser.runner import run_episode
+        from tests.runner_diagnostics import run_episode
         from intent_browser.human_handover import HumanHandoverController
         from intent_browser.observation_pipeline import ObservationPipelineConfig
         from intent_browser.ax_explorer import AXConfig

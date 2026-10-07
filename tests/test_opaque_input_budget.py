@@ -8,7 +8,7 @@ import httpx
 import numpy as np
 from intent_browser.input_budget import OpaqueReasoningInputCounter, QwenInputCounter
 from intent_browser.backend import ChatCompletionsBackend
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from intent_browser.harness import native_tools_profile, SemanticFeedback
 from tests.test_native_tools import response
 from tests.test_ax_explorer import TOKENIZER

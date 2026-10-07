@@ -7,7 +7,7 @@ import numpy as np
 
 from intent_browser.actions import make_action_set
 from intent_browser.backend import Completion
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 
 
 LEGACY_PREFIX = (

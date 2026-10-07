@@ -13,7 +13,7 @@ from intent_browser.ax_explorer import AXConfig, encoded
 from intent_browser.batching import batch_result
 from intent_browser.feedback_presentation import CompactFeedback, summarize_action_error
 from intent_browser.harness import SemanticFeedback, native_tools_profile
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from tests.test_ax_explorer import TOKENIZER, node, observation
 from tests.test_native_batch import response
 

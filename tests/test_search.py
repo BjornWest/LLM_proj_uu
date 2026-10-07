@@ -9,7 +9,7 @@ import numpy as np
 
 from intent_browser.actions import parse_decision
 from intent_browser.backend import Completion
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from intent_browser.search import ParallelSearch, format_results, run_search
 
 
@@ -131,7 +131,8 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(steps[0]["observation"], steps[0]["next_observation"])
             self.assertEqual(summary["browser_step_count"], 1)
             self.assertEqual(summary["search_request_count"], 1)
-            self.assertTrue(summary["success"])
+            self.assertIsNone(summary["success"])
+            self.assertEqual(summary["final_reward"],1.0)
             self.assertTrue(env.closed)
             self.assertIn("browser observations", model.messages[1][1]["content"])
             self.assertNotIn("not-for-model", json.dumps(model.messages))

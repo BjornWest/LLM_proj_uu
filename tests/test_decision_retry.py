@@ -12,7 +12,7 @@ from intent_browser.harness import native_tools_profile, SemanticFeedback
 from intent_browser.retry_policy import DecisionRetryPolicy, retry_after_seconds, argument_diagnostic
 from intent_browser.native_tools import NativeBrowserTools
 from tests.test_native_tools import response, completion
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 
 
 def reply(bad=False, reason='tool_calls'):

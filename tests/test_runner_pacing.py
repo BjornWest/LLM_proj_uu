@@ -11,7 +11,8 @@ import numpy as np
 from intent_browser.backend import Completion
 from intent_browser.evaluation import Evaluation
 from intent_browser.observation import refresh_observation
-from intent_browser.runner import messages_digest, run_episode
+from intent_browser.runner import messages_digest
+from tests.runner_diagnostics import run_episode
 
 
 class Clock:

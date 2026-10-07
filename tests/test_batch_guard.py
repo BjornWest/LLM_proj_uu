@@ -13,7 +13,7 @@ from playwright.sync_api import Error as PlaywrightError
 from intent_browser.batching import DocumentScanInvalidated, document_signature
 from intent_browser.backend import ChatCompletionsBackend
 from intent_browser.harness import native_tools_profile, SemanticFeedback
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 
 
 class SignatureTests(unittest.TestCase):

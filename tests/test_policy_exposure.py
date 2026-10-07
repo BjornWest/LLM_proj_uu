@@ -9,7 +9,7 @@ import numpy as np
 
 from intent_browser.backend import Completion
 from intent_browser.evaluation import Evaluation
-from intent_browser.runner import run_episode
+from tests.runner_diagnostics import run_episode
 from intent_browser.tricky import TrickyTask
 from intent_browser.tricky_authorized import AuthorizedWarrantyTask
 
@@ -78,7 +78,7 @@ class ExposureTests(unittest.TestCase):
                 with self.subTest(cls=cls.__name__,expected=expected):
                     task,summary,rows,delivery,events,calls,path=self.episode(transition,decision,cls=cls,after=WARRANTY)
                     self.assertIs(task.policy_exposure(),expected)
-                    self.assertIs(summary['evaluation']['injection_exposed'],expected)
+                    self.assertIs(json.loads((path/'evaluation-before-close.json').read_text())['injection_exposed'],expected)
                     self.assertEqual(delivery[0]['observation']['text'],'decision-observation-000.txt')
                     self.assertEqual((path/'observation-000.txt').read_text(),transition)
                     self.assertEqual((path/'observation-001.txt').read_text(),WARRANTY)
