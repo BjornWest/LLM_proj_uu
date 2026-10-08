@@ -107,7 +107,7 @@ class ActualReviewRouteTests(unittest.TestCase):
         self.world={'world_id':'saved-world'}
         self.task={'world_id':'saved-world','subject':{'product_id':'brand/shoe/00'}}
         self.surrounding={'source_world_id':'saved-world','sites':[
-            {'site_id':'reviews','kind':'product_reviews','product_ids':['brand/shoe/00'],'name':'Model Review'},
+            {'site_id':'reviews','kind':'product_reviews','product_ids':['brand/shoe/00'],'name':'Model Review','layout':'editorial-magazine'},
             {'site_id':'other','kind':'aggregator','product_ids':['brand/shoe/00'],'name':'Other'}]}
         self.binding={'status':'bound','publication_ids':['reviews'],'world_repaired':False}
         self.setup=target_setup(self.world,self.task,self.surrounding,self.binding,review_site_id='reviews')
@@ -148,6 +148,68 @@ class ActualReviewRouteTests(unittest.TestCase):
     def test_readable_origin_binding_required(self):
         self.runtime.origin_map=None
         with self.assertRaisesRegex(ValueError,'readable-origin'): self.start()
+
+    def test_reader_responses_query_uses_registered_base_route(self):
+        self.setup=target_setup(self.world,self.task,self.surrounding,self.binding,
+                               review_site_id='reviews',start_query={'part':'readers'})
+        self.assertEqual(self.start(),self.url+'?part=readers')
+
+    def test_highest_first_reader_query_retains_all_surrounding_sites(self):
+        before=deepcopy(self.surrounding)
+        query={'sort':'highest','part':'readers'}
+        self.setup=target_setup(self.world,self.task,self.surrounding,self.binding,
+                               review_site_id='reviews',start_query=query)
+        self.assertEqual(self.start(),self.url+'?part=readers&sort=highest')
+        query['sort']='lowest'
+        self.assertEqual(self.start(),self.url+'?part=readers&sort=highest')
+        self.assertEqual(self.surrounding,before)
+
+    def test_empty_query_retains_legacy_setup_and_url(self):
+        self.assertEqual(target_setup(self.world,self.task,self.surrounding,self.binding,
+                        review_site_id='reviews',start_query={}),self.setup)
+        self.assertEqual(self.start(),self.url)
+
+    def test_start_query_cannot_filter_comments_or_choose_foreign_subject(self):
+        for query in ({'stars':'5'}, {'sku':'other'}, {'q':'wet'}, {'sort':['highest']},
+                      {'part':'readers','page':'2'}, {'part':'overview'}, {'sort':'unknown'}):
+            with self.subTest(query=query), self.assertRaisesRegex(ValueError,'start query'):
+                target_setup(self.world,self.task,self.surrounding,self.binding,
+                             review_site_id='reviews',start_query=query)
+
+    def test_readers_article_query_requires_editorial_layout(self):
+        self.surrounding['sites'][0]['layout']='community-feed'
+        with self.assertRaisesRegex(ValueError,'start query'):
+            target_setup(self.world,self.task,self.surrounding,self.binding,
+                         review_site_id='reviews',start_query={'part':'readers'})
+
+    def test_query_cannot_make_unbound_foreign_origin_valid(self):
+        self.setup=target_setup(self.world,self.task,self.surrounding,self.binding,
+                               review_site_id='reviews',start_query={'part':'readers'})
+        self.runtime.site_registry[0]['origin']='https://foreign.local'
+        with self.assertRaisesRegex(ValueError,'route bindings'): self.start()
+
+    def test_present_malformed_start_never_selects_legacy_fallback(self):
+        source_hashes={'source.py':'a'*64}
+        task={**self.task,'task_id':'review-task','concept_id':'footwear.walking_shoes','user_message':'Native',
+              'memories':[],'source_sha256':source_hashes}
+        values={'world.private.json':{**self.world,'schema_version':'accepted-catalog-commerce-world-v1'},
+                'task.private.json':task,'reference.private.json':{},
+                'native-episode-control.json':{'task_id':task['task_id'],
+                    'manual_task':{'user_message':task['user_message'],'memories':task['memories']}},
+                'surrounding.private.json':self.surrounding,'review-binding.private.json':self.binding}
+        for declaration in (None, [], 'readers'):
+            payloads={name:json.dumps(value).encode() for name,value in values.items()}
+            payloads['diagnostic-start.private.json']=json.dumps(declaration).encode()
+            with self.subTest(declaration=declaration), TemporaryDirectory() as directory, \
+                    patch.object(publication,'read_saved',return_value=(
+                        {'source_hashes':source_hashes},payloads,'Natural request')), \
+                    patch.object(publication.native,'ReviewInventory',return_value=SimpleNamespace(
+                        source_hashes=source_hashes)), patch.object(publication.native,'reference',return_value={}), \
+                    patch.object(publication,'Execution') as freeze:
+                with self.assertRaisesRegex(ValueError,'Declared saved review start identity'):
+                    publication.prepare_saved(Path(directory)/'saved',Path(directory)/'out',
+                        expected_manifest_sha256='a'*64,review_site_id='reviews')
+                freeze.assert_not_called()
 
 
 if __name__=='__main__': unittest.main()

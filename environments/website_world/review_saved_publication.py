@@ -48,8 +48,19 @@ def prepare_saved(saved, output, *, expected_manifest_sha256, review_site_id):
     if (original['task_id'] != task['task_id'] or original['manual_task'] != {
             'user_message': task['user_message'], 'memories': task['memories']}):
         raise ValueError('Original saved public/native identity or memories changed')
-    setup = target_setup(world, task, read('surrounding.private.json'),
-        read('review-binding.private.json'), review_site_id=review_site_id)
+    surrounding = read('surrounding.private.json')
+    declared_start = read('diagnostic-start.private.json') if 'diagnostic-start.private.json' in payloads else None
+    if 'diagnostic-start.private.json' in payloads:
+        selected = next((site for site in surrounding['sites'] if site['site_id'] == review_site_id), None)
+        if (type(declared_start) is not dict or selected is None
+                or declared_start.get('site_id') != review_site_id
+                or declared_start.get('product_id') != task['subject']['product_id']
+                or declared_start.get('layout') != selected['layout']
+                or type(declared_start.get('query')) is not dict):
+            raise ValueError('Declared saved review start identity changed')
+    setup = target_setup(world, task, surrounding,
+        read('review-binding.private.json'), review_site_id=review_site_id,
+        start_query=declared_start['query'] if declared_start is not None else None)
     episode = {'start': {'kind': 'directory'}, 'readable_origins': True,
         'task_id': task['task_id'], 'manual_task': {
             'user_message': message, 'memories': deepcopy(task['memories'])},

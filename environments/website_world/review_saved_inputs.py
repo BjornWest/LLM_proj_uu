@@ -44,7 +44,7 @@ def read_saved(saved, *, expected_manifest_sha256):
     return manifest, payloads, request
 
 
-def target_setup(world, task, surrounding, binding, *, review_site_id):
+def target_setup(world, task, surrounding, binding, *, review_site_id, start_query=None):
     """Select an existing publication of the native subject, without resampling."""
     product_id = task['subject']['product_id']
     covered = [s['site_id'] for s in surrounding['sites']
@@ -57,7 +57,16 @@ def target_setup(world, task, surrounding, binding, *, review_site_id):
         raise ValueError('Select one existing review site covering the native subject')
     if (task['world_id'] != world['world_id'] or surrounding['source_world_id'] != world['world_id']):
         raise ValueError('Saved review world identity changed')
-    return {'schema': 'website-saved-review-setup-v1',
+    query = {} if start_query is None else start_query
+    if (type(query) is not dict or set(query) - {'sort', 'part'}
+            or ('sort' in query and query['sort'] not in ('identity', 'lowest', 'highest'))
+            or ('part' in query and (query['part'] != 'readers'
+                                    or sites[0].get('layout') != 'editorial-magazine'))):
+        raise ValueError('Unsupported saved review start query')
+    setup = {'schema': 'website-saved-review-setup-v1',
         'start': {'kind': 'review_product', 'site_id': review_site_id, 'product_id': product_id},
         'site_name': sites[0]['name'], 'world_draws': 0,
         'surrounding_sites': 'all_retained', 'effects': 'unknown'}
+    if query:
+        setup['start']['query'] = dict(query)
+    return setup
