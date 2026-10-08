@@ -68,6 +68,27 @@ class OfficialAssetTests(unittest.TestCase):
         self.assertGreater(measured['input_tokens'], 0)
         self.assertNotEqual(measured['tokenizer_sha256'], self.qwen(messages, [])['tokenizer_sha256'])
 
+    def test_qwen_actual_reasoning_modes_match_official_template(self):
+        messages = [{'role': 'user', 'content': 'Hello'}]
+        official = self.qwen.visible_counter.template.template
+        tokenizer = self.qwen.visible_counter.tokenizer
+        for reasoning in [{'enabled': True}, {'enabled': True, 'effort': 'low'},
+                          {'enabled': True, 'effort': 'medium'}, {'enabled': False}, {'effort': 'none'}]:
+            with self.subTest(reasoning=reasoning):
+                selected = backend('qwen/qwen3.8-27b'); selected.request_options['reasoning'] = reasoning
+                counter = model_matched_input_counter(selected, assets_root=ASSETS)
+                enabled = reasoning.get('enabled', reasoning.get('effort') != 'none')
+                expected = official.render(messages=messages, tools=[], add_generation_prompt=True,
+                                           enable_thinking=enabled, preserve_thinking=True,
+                                           reasoning_effort=reasoning.get('effort', 'xhigh') if enabled else 'xhigh')
+                self.assertEqual(counter(messages, [])['input_tokens'],
+                                 len(tokenizer.encode(expected, add_special_tokens=False).ids))
+
+    def test_qwen_unknown_reasoning_mode_rejects_without_guessing(self):
+        selected = backend('qwen/qwen3.8-27b'); selected.request_options['reasoning']['effort'] = 'unsupported'
+        with self.assertRaisesRegex(ValueError, 'official template supports'):
+            model_matched_input_counter(selected, assets_root=ASSETS)
+
     def test_reasoning_tools_and_originals_are_preserved(self):
         messages = [{'role': 'user', 'content': 'Inspect'},
                     {'role': 'assistant', 'content': None,

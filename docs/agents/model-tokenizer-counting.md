@@ -28,6 +28,10 @@ to the registry, verifies its template against retained provider-reported usage,
 and records any discrepancy before dispatch. Model aliases require explicit
 bindings rather than guessed tokenizer families.
 
+The Qwen counter renders the actual enabled/disabled reasoning setting and
+the model's supported effort (`xhigh`, `medium`, `low`); unsupported effort
+settings fail rather than silently sizing the default mode.
+
 Counts cover the full next input, tools, retained reasoning and supported image
 content. They are not cumulative episode usage and do not reserve output tokens.
 Hosted providers can alter templates or image processing, so local counts remain

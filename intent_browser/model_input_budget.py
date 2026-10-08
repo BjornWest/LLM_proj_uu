@@ -19,6 +19,32 @@ from .input_budget import OpaqueReasoningInputCounter, QwenInputCounter
 REGISTRY = Path(__file__).with_name('model_tokenizers.json')
 
 
+class _ConfiguredTemplate:
+    def __init__(self, template, **settings):
+        self.template = template
+        self.settings = settings
+
+    def render(self, **values):
+        return self.template.render(**{**values, **self.settings})
+
+
+class OfficialQwenInputCounter(QwenInputCounter):
+    """Keep legacy image/history handling, render the actual reasoning mode."""
+    def __init__(self, tokenizer_path, reasoning):
+        super().__init__(tokenizer_path)
+        effort = reasoning.get('effort', 'xhigh')
+        enabled = reasoning.get('enabled', effort != 'none')
+        if type(enabled) is not bool:
+            raise ValueError('Qwen reasoning.enabled must be boolean')
+        if enabled and effort not in ('xhigh', 'medium', 'low'):
+            raise ValueError('Qwen official template supports xhigh, medium or low reasoning effort')
+        self.template = _ConfiguredTemplate(self.template, enable_thinking=enabled,
+                                            reasoning_effort=effort if enabled else 'xhigh',
+                                            preserve_thinking=True)
+        self.provenance.update(reasoning_enabled=enabled,
+                               reasoning_effort=effort if enabled else None)
+
+
 def _assets(model, assets_root):
     registry = json.loads(REGISTRY.read_text())
     if model not in registry['models']:
@@ -155,12 +181,12 @@ def model_matched_input_counter(backend, *, ax_tokenizer_path=None, assets_root=
             raise ValueError('Input limit requires an explicit counter or local tokenizer')
         return OpaqueReasoningInputCounter(QwenInputCounter(ax_tokenizer_path))
     entry, bundle = _assets(model, assets_root)
+    reasoning = getattr(backend, 'request_options', {}).get('reasoning') or {}
     if entry['counter'] == 'qwen':
-        counter = QwenInputCounter(bundle / 'tokenizer.json')
+        counter = OfficialQwenInputCounter(bundle / 'tokenizer.json', reasoning)
         counter.provenance.update(model=model, repository=entry['repository'], revision=entry['revision'],
                                   registry_sha256=hashlib.sha256(REGISTRY.read_bytes()).hexdigest())
     elif entry['counter'] == 'glm':
-        reasoning = getattr(backend, 'request_options', {}).get('reasoning') or {}
         counter = GlmInputCounter(model, entry, bundle, reasoning_effort=reasoning.get('effort'))
     else:
         raise ValueError('Unsupported registered input counter: ' + entry['counter'])
