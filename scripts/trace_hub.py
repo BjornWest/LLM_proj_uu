@@ -41,7 +41,18 @@ def media_prefix(value,key):
 
 def summary_fields(group):
     """The sidebar does not need per-turn records or message bodies."""
-    return {k:v for k,v in group.items() if k not in ('messages','turns')}
+    return {k:v for k,v in group.items() if k not in ('messages','turns','value_ledger')}
+
+
+def retain_summary_counts(summary, previous):
+    """Keep last loaded counters while metadata/revision advances independently."""
+    if not previous or previous.get('model_turn_count') is None:
+        return summary
+    fields = ('model_turn_count', 'tool_call_count', 'message_count', 'decision_count',
+              'visible_message_count', 'unparsed_tool_proposal_count', 'max_isl_tokens',
+              'total_osl_tokens', 'input_token_usage_count', 'output_token_usage_count')
+    return {**summary, **{key: previous[key] for key in fields if key in previous},
+            'summary_pending': True, 'summary_stale': True}
 
 
 def fingerprint(directory):
@@ -89,7 +100,7 @@ def initial_summary(directory):
         started_at=started,updated_at=max(known) if known else '',
         state='recorded' if episode else 'incomplete',environment='browsergym',
         summary_pending=True,message_count=None,decision_count=0,
-        model_turn_count=None,tool_call_count=None,max_isl_tokens=None)
+        model_turn_count=None,tool_call_count=None,max_isl_tokens=None,total_osl_tokens=None)
 
 
 class LazySessions(Mapping):
@@ -102,16 +113,19 @@ class LazySessions(Mapping):
 
 
 class Hub:
-    def __init__(self,registry,mode='auto',*,cache_bytes=256*1024*1024):
+    def __init__(self,registry,mode='auto',*,cache_bytes=256*1024*1024,ledger=True):
+        from scripts.trace_suites import SuiteCatalog
+        self.suites=SuiteCatalog(registry);self.suite_memberships={}
         self.registry=Path(registry);self.mode=mode;self.caches={};self.lock=threading.Lock()
         self.entries={};self.bodies=OrderedDict();self.body_lock=threading.Lock()
         self.cache_bytes=cache_bytes;self.body_bytes=0
-        self.cache_directory=self.registry.parent/'summary-cache'
+        self.ledger=ledger
+        self.cache_directory=self.registry.parent/('summary-cache-ledger' if ledger else 'summary-cache')
         # Invalidate derived summaries if the shared adapter changes.
         from agent_trace import sessions
         package=Path(sessions.__file__).parent
-        self.version=hashlib.sha256(Path(__file__).read_bytes()+Path(__file__).with_name('trace_grades.py').read_bytes()+b''.join(
-            p.read_bytes() for p in sorted(package.rglob('*.py')))).hexdigest()
+        self.version=hashlib.sha256(Path(__file__).read_bytes()+Path(__file__).with_name('trace_grades.py').read_bytes()+Path(__file__).with_name('trace_suites.py').read_bytes()+b''.join(
+            p.read_bytes() for p in sorted(package.rglob('*.py')))+str(ledger).encode()).hexdigest()
 
     def roots(self):
         config=json.loads(self.registry.read_text());base=Path(config['project_root']).resolve()
@@ -122,7 +136,7 @@ class Hub:
         return {source_key(p):p for p in sorted(set(roots)) if p.is_dir()}
 
     def revision(self,directory,key):
-        return hashlib.sha256(json.dumps((self.version,key,self.mode,str(directory),fingerprint(directory))).encode()).hexdigest()
+        return hashlib.sha256(json.dumps((self.version,key,self.mode,str(directory),fingerprint(directory),self.suite_memberships.get(directory.resolve()))).encode()).hexdigest()
 
     def describe(self,directory,root,key):
         revision=self.revision(directory,key)
@@ -131,12 +145,19 @@ class Hub:
         if old and old.get('revision')==revision:return old
         cache_path=self.cache_directory/(key+'-'+ident+'-'+self.mode+'.json')
         summary=None
+        previous=old.get('summary') if old else None
         try:
             cached=json.loads(cache_path.read_text())
-            if cached.get('revision')==revision and isinstance(cached.get('summary'),dict):summary=cached['summary']
+            if isinstance(cached.get('summary'),dict):
+                if previous is None:previous=cached['summary']
+                if cached.get('revision')==revision:summary=cached['summary']
         except (OSError,ValueError,KeyError,AttributeError):pass
-        if summary is None:summary=initial_summary(directory)
+        if summary is None:
+            summary=initial_summary(directory)
+            if summary is not None:summary=retain_summary_counts(summary,previous)
         if summary is None:return None
+        member=self.suite_memberships.get(directory.resolve())
+        if member:summary={**summary,'suite':member}
         entry=dict(directory=directory,root=root,key=key,revision=revision,
                    summary={**summary,'revision':revision},cache_path=cache_path,lock=threading.Lock())
         self.persist_summary(entry)
@@ -155,6 +176,7 @@ class Hub:
     def snapshot(self):
         from agent_trace.sessions import CatalogCache
         with self.lock:
+            self.suite_memberships=self.suites.memberships()
             entries={};groups=[]
             for key,root in self.roots().items():
                 # Historical portable/Civ5 groups retain their existing parser.
@@ -184,6 +206,7 @@ class Hub:
     def lookup(self,ident):
         """Revalidate only the selected trace, without rebuilding its siblings."""
         with self.lock:
+            self.suite_memberships=self.suites.memberships()
             old=self.entries.get(ident)
             if old and 'directory' in old:
                 roots=self.roots()
@@ -204,18 +227,23 @@ class Hub:
                 if revision in self.bodies:
                     self.bodies.move_to_end(revision)
                     return self.bodies[revision][0],revision
-            from agent_trace.adapters import browsergym
             if not entry['directory'].resolve().is_relative_to(entry['root']):raise ValueError('Trace escaped root')
-            group=browsergym.project(entry['directory'],artifact_prefix=str(entry['directory'].relative_to(entry['root'])))
+            group=self.project(entry)
             if group is None:raise ValueError('Trace unavailable')
             group=project_grade(group,entry['directory'])
+            member=entry['summary'].get('suite')
+            if member:group={**group,'suite':member}
             group=media_prefix(group,entry['key'])
             body=json.dumps(group).encode()
             # Live writers need not stop for a readable projection to be useful.
             # Give a racing read its own ETag, never the stable file fingerprint,
             # so the next poll will still fetch any events that arrived meanwhile.
             after=self.revision(entry['directory'],entry['key'])
-            if after!=revision:return body,'live-'+hashlib.sha256(body).hexdigest()
+            if after!=revision:
+                entry['summary']={**summary_fields(group),'revision':revision,
+                                  'summary_pending':True,'summary_stale':True}
+                self.persist_summary(entry)
+                return body,'live-'+hashlib.sha256(body).hexdigest()
             compressed=gzip.compress(body,compresslevel=1,mtime=0)
             with self.body_lock:
                 weight=len(body)+len(compressed)
@@ -226,6 +254,10 @@ class Hub:
             entry['summary']={**summary_fields(group),'revision':revision}
             self.persist_summary(entry)
             return body,revision
+
+    def project(self,entry):
+        from agent_trace.adapters import browsergym
+        return browsergym.project(entry['directory'],artifact_prefix=str(entry['directory'].relative_to(entry['root'])),ledger=self.ledger)
 
     def encoded(self,body,revision):
         with self.body_lock:
@@ -240,9 +272,9 @@ class Hub:
         return asset(self.roots()[key],path)
 
 
-def make_handler(registry):
+def make_handler(registry, *, hub_class=Hub, html_factory=None):
     from agent_trace.adapters import MODES
-    hubs={mode:Hub(registry,mode) for mode in MODES}
+    hubs={mode:hub_class(registry,mode) for mode in MODES}
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
             url=urlsplit(self.path);mode=parse_qs(url.query).get('parser',['auto'])[0]
@@ -250,9 +282,17 @@ def make_handler(registry):
             hub=hubs[mode]
             try:
                 if url.path=='/':
-                    body=viewer_html()
+                    body=(html_factory or viewer_html)()
                     mime='text/html; charset=utf-8'
                 elif url.path=='/api/sessions':body,_=hub.snapshot();mime='application/json'
+                elif url.path=='/api/suites':
+                    summaries={k:v['summary'] for k,v in hub.entries.items() if 'summary' in v}
+                    body=json.dumps(hub.suites.index(summaries)).encode();mime='application/json'
+                elif url.path.startswith('/api/suites/'):
+                    ident=unquote(url.path.removeprefix('/api/suites/'))
+                    try:result=hub.suites.detail(ident,summaries={k:v['summary'] for k,v in hub.entries.items() if 'summary' in v})
+                    except KeyError:self.send_error(404);return
+                    body=json.dumps(result).encode();mime='application/json'
                 elif url.path.startswith('/api/sessions/'):
                     ident=url.path.removeprefix('/api/sessions/')
                     try:descriptor=hub.lookup(ident)
@@ -276,7 +316,7 @@ def make_handler(registry):
     return Handler
 
 
-def viewer_html():
+def viewer_html(*, preview=False):
     """Install the hub loader while retaining the shared renderer and scroll logic."""
     from agent_trace import sessions
     html=Path(sessions.__file__).with_name('session_viewer.html').read_text()
@@ -288,13 +328,30 @@ def viewer_html():
         "list();const query=el('search').value.toLowerCase(),filter=el('filter').value;":"renderDerivedGrade();list();const query=el('search').value.toLowerCase(),filter=el('filter').value;",
         '<option value="newest">Recently updated</option>':'<option value="newest">Newest run first</option>',
         "s.message_count+' events · '+s.decision_count+' decisions'":"s.summary_pending?'Open trace to load totals':s.message_count+' events · '+s.decision_count+' decisions'",
-        "function islLabel(session){return ":"function islLabel(session){if(session.summary_pending)return 'Max ISL: load trace to view';return ",
         "window.onhashchange=()=>{refresh()};":"window.onhashchange=()=>{refresh({navigate:true})};",
         "setInterval(async()=>{if(el('live').checked&&!refreshing){refreshing=true;try{await refresh()}finally{refreshing=false}}},3000);refresh();":"setInterval(()=>{if(el('live').checked)refresh({background:true})},3000);refresh();",
     }
     for before,after in replacements.items():
         if html.count(before)!=1:raise ValueError('Shared viewer integration anchor changed: '+before[:80])
         html=html.replace(before,after)
+    suite_client=Path(__file__).with_name('trace_suite_client.js').read_text()
+    before = """list=function(){
+ originalList();const items=[...sessions];if(el('order').value==='oldest')items.reverse();
+ [...el('sessions').children].forEach((button,index)=>{
+  if(document.querySelector('main').dataset.suiteMode==='true')button.classList.remove('selected');
+  const member=items[index]?.suite;if(!member)return;
+  const badge=node('a','suite-badge',member.title+' · '+member.case_id);badge.href='#suite/'+encodeURIComponent(member.id);
+  badge.title=(member.tags||[]).join(' · ');badge.onclick=event=>{event.stopPropagation()};button.append(badge);
+ });
+};"""
+    if suite_client.count(before)!=1:raise ValueError('Shared suite sidebar anchor changed')
+    suite_client=suite_client.replace(before,'list=function(){originalList();renderSidebarSuiteBadges()};')
+    suite_client+='\n'+Path(__file__).with_name('trace_sidebar_suite.js').read_text()
+    html=html.replace('</script>',suite_client+'\n</script>',1)
+    from agent_trace.viewer import enhance_viewer
+    html=enhance_viewer(html)
+    if preview:
+        html=html.replace('Agent · Session traces','Agent · Ledger preview').replace('Agent / Session traces','Agent / Ledger preview')
     return html.encode()
 
 
