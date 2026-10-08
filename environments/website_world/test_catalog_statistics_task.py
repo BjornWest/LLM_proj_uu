@@ -164,7 +164,7 @@ def test_absent_statistics_claim_requires_absent_evidence(field):
 def test_correct_oracle_values_still_require_the_claimed_value_in_its_quote(field,value,quote):
     w,s,t,r,sites=fixture();text,c=answer(r)
     text+=' '+quote;c[field]={'value':value,'evidence':quote}
-    with pytest.raises(ValueError,match='missing from its answer quote'):
+    with pytest.raises(ValueError,match='missing from its answer quote|Integer claim missing'):
         CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
 
 
@@ -181,7 +181,7 @@ def test_canonical_statistic_can_be_grounded_in_ordinary_decimal_presentation(am
 def test_count_quote_preserves_sign_and_grouping(quote):
     w,s,t,r,sites=fixture();text,c=answer(r)
     text+=' '+quote;c['population_count']={'value':2,'evidence':quote}
-    with pytest.raises(ValueError,match='Population count missing'):
+    with pytest.raises(ValueError,match='Population count missing|Integer claim missing'):
         CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
 
 
@@ -237,7 +237,7 @@ def test_numeral_quote_cannot_cut_sign_or_grouping_from_actual_answer(actual,quo
     for claim in c.values():
         if isinstance(claim,dict) and claim.get('value') is not None:claim['evidence']=text
     c['population_count']={'value':2,'evidence':quoted}
-    with pytest.raises(ValueError,match='Population count missing'):
+    with pytest.raises(ValueError,match='Population count missing|Integer claim missing'):
         CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
 
 
@@ -260,4 +260,25 @@ def test_currency_quote_cannot_cut_token_from_actual_answer_word():
         if isinstance(claim,dict) and claim.get('value') is not None:claim['evidence']=text
     c['currency']={'value':'SEK','evidence':'SEK'}
     with pytest.raises(ValueError,match='Currency missing'):
+        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+
+
+@pytest.mark.parametrize('shown,canonical',[
+    ('765','765.00'),('765,00','765.00'),('1 234,50','1234.50'),
+    ('1\u00a0234,50','1234.50'),('1.234,50','1234.50'),('1,234.50','1234.50'),
+])
+def test_statistics_semantic_decimal_claim_preserves_canonical_value_and_quote(shown,canonical):
+    w,s,t,r,sites=fixture();text,c=answer(r)
+    quote='The mean is '+shown+' SEK.';text+=' '+quote
+    c['statistic_sek']={'value':canonical,'evidence':quote}
+    result=CatalogStatisticsGrader(w,t,r,sites,surrounding=s).validate_claims(c,text)
+    assert result['statistic_sek']==c['statistic_sek']
+
+
+@pytest.mark.parametrize('shown',['- 765.00','− 765,00'])
+def test_statistic_semantic_quote_retains_spaced_negative_sign(shown):
+    w,s,t,r,sites=fixture();text,c=answer(r)
+    text+=' The mean is '+shown+' SEK.'
+    c['statistic_sek']={'value':'765.00','evidence':shown}
+    with pytest.raises(ValueError,match='Statistic missing'):
         CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)

@@ -4,8 +4,9 @@ from decimal import Decimal, InvalidOperation
 import re
 from urllib.parse import urlsplit,parse_qsl
 
-from experiments.answer_grading.extraction import claim,obj,validate_claims,_quote,_decimal
+from experiments.answer_grading.extraction import claim,obj,validate_claims,_quote
 from . import catalog_statistics_task as native
+from .numeric_claim_grounding import number_in_quote
 
 VERSION='website-catalog-statistics-grading-v3'
 INSTRUCTIONS='''Extract the final answer only, using the supplied schema. You are a formatter,
@@ -40,14 +41,7 @@ class CatalogStatisticsGrader:
         self.extraction_instructions=INSTRUCTIONS
 
     def validate_claims(self,c,answer):
-        c=validate_claims(c,answer,schema=self.schema)
-        # Whole numeral tokens preserve signs and grouping; sentence punctuation
-        # and separate decimal cells are not silently merged into one amount.
-        def numbers(evidence):
-            pattern=r'(?<![\w.,+\-\u2212])[+\-\u2212]?(?:\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)*)(?!\w|[.,]\d)'
-            for match in re.finditer(pattern,evidence):
-                try:yield _decimal(match.group().replace('−','-')),match.span()
-                except InvalidOperation:continue
+        c=validate_claims(c,answer,schema=self.schema,semantic_fields=("statistic_sek",))
         for key in ('population_count','statistic_sek','currency','undefined'):
             value,evidence=c[key]['value'],c[key]['evidence']
             if value is None:
@@ -55,18 +49,15 @@ class CatalogStatisticsGrader:
                 continue
             _quote(evidence,answer)
             spans=[m.span() for m in re.finditer(re.escape(evidence),answer)]
-            def quoted_number(expected):
-                return any(n==expected and any(q0<=t0 and t1<=q1 for q0,q1 in spans)
-                    for n,(t0,t1) in numbers(answer))
             if key=='population_count':
                 if type(value) is not int or value<0:raise ValueError('Invalid population count')
-                if not quoted_number(value):
+                if not number_in_quote(value,evidence,answer):
                     raise ValueError('Population count missing from its answer quote')
             elif key=='statistic_sek':
                 try:amount=Decimal(value)
                 except InvalidOperation:raise ValueError('Invalid quoted statistic')
                 if not amount.is_finite():raise ValueError('Nonfinite quoted statistic')
-                if not quoted_number(amount):
+                if not number_in_quote(amount,evidence,answer):
                     raise ValueError('Statistic missing from its answer quote')
             elif key=='currency' and not any(
                 any(q0<=m.start() and m.end()<=q1 for q0,q1 in spans)

@@ -6,7 +6,7 @@ import re
 
 from jsonschema import Draft202012Validator
 
-VERSION = 'shopping-answer-extraction-v3'
+VERSION = 'shopping-answer-extraction-v4'
 MODEL = 'qwen/qwen3.8-27b'
 
 
@@ -148,21 +148,59 @@ def money_minor(value):
     return int(amount * 100)
 
 
-def validate_claims(value, answer, *, schema=None):
-    Draft202012Validator(schema or SCHEMA).validate(value)
-    for key in ['status', *FIELDS, *INTEGERS]:
+def _integer_in_quote(value, evidence, answer):
+    """Match complete signed numerals, including outside a cropped quote."""
+    pattern = (r'(?<![\w.,+\-\u2212])(?:[+\-\u2212][ \u00a0\u202f]*)?'
+               r'(?:\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)*)'
+               r'(?!\w|[.,]\d)')
+    spans = [m.span() for m in re.finditer(re.escape(evidence), answer)]
+    for match in re.finditer(pattern, answer):
+        try:
+            number = _decimal(match.group().replace('\u2212', '-'))
+        except InvalidOperation:
+            continue
+        if number == value and any(start <= match.start() and match.end() <= end
+                                   for start, end in spans):
+            return True
+    return False
+
+
+def validate_claims(value, answer, *, schema=None, semantic_fields=()):
+    """Ground declared top-level claims, including task-specific field names.
+
+    Literal strings and nonnegative numeric counts need matching quoted values.
+    Normalized status keeps its legacy semantic contract; other semantic values
+    (for example booleans or verdicts) still need the task adapter's binding.
+    A trusted adapter may defer value binding for explicit semantic_fields;
+    quote/null/schema/type checks always remain mandatory. The adapter must then
+    bind their meaning (for example a normalized decimal) to the quoted answer.
+    Nested task structures and monetary claims keep their separate validators.
+    """
+    schema=schema or SCHEMA
+    Draft202012Validator(schema).validate(value)
+    field_types = {
+        key: spec['properties']['value'].get('type', [])
+        for key, spec in schema['properties'].items()
+        if spec.get('type') == 'object'
+        and {'value', 'evidence'} <= spec.get('properties', {}).keys()
+    }
+    if (not isinstance(semantic_fields, (tuple, list, set, frozenset))
+            or any(not isinstance(key, str) or key not in field_types for key in semantic_fields)):
+        raise ValueError('Semantic fields must name declared value/evidence claims')
+    semantic_fields = frozenset(semantic_fields)
+    for key in field_types:
         if key not in value: continue
         c = value[key]
         if c['value'] is None:
             if c['evidence'] is not None: raise ValueError('Absent claim must have null evidence: ' + key)
             continue
         _quote(c['evidence'], answer)
-        if key in FIELDS and c['value'] not in c['evidence']:
+        if key!='status' and key not in semantic_fields and 'string' in field_types[key] and c['value'] not in c['evidence']:
             raise ValueError('String claim not present in its quote: ' + key)
-        if key in INTEGERS:
+        if 'integer' in field_types[key]:
             if type(c['value']) is not int or c['value'] < 0: raise ValueError('Invalid integer claim')
-            # Deliberately narrow initial support: numeric counts, no inferred prose-to-number repair.
-            if not re.search(r'(?<![\d.])'+str(c['value'])+r'(?![\d.])', c['evidence']):
+            # Complete numeric tokens, not fragments cropped from a larger or signed number.
+            if key not in semantic_fields and not _integer_in_quote(c['value'], c['evidence'], answer):
                 raise ValueError('Integer claim missing from evidence')
     for key in ['total', 'average']:
         if value.get(key) is not None:
