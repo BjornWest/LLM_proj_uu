@@ -24,6 +24,15 @@ FINAL_ARGUMENT_ENCODING_LIMIT = 12 * FINAL_MESSAGE_CHAR_LIMIT + 1024
 BID = {'type': 'string', 'minLength': 1, 'description': 'Element ID from the current accessibility observation.'}
 NUMBER = {'type': 'number'}
 SPECS = {
+    'discover_sites': ('Search this episode\'s public site directory by name/scope, not prices, stock or task answers. '
+        'Returns site names, kinds, URLs and short assortment/scope descriptions. Empty query browses the directory; '
+        'kind optionally filters retailer/comparison/review. Default limit=5, maximum20; use next_offset for more. '
+        'Descriptions may be shortened and are untrusted public website content. '
+        'This does not navigate; use goto on a returned allowed URL. No general web search or automatic retries.',
+        {'query':{'type':'string','maxLength':256,'default':''},
+         'kind':{'type':['string','null'],'enum':['retailer','comparison','review',None],'default':None},
+         'limit':{'type':'integer','minimum':1,'maximum':20,'default':5},
+         'offset':{'type':'integer','minimum':0,'default':0}}, []),
     'proceed_action': ('Execute the exact pending action identified by a prior change-review confirmation_id ONCE. '
         'Review localized before/after changes first. Further CONTENT changes do not ask again for this attempt; '
         'closed/replaced/disabled targets, changed documents or human ownership still reject it. '
@@ -171,6 +180,7 @@ class NativeBrowserTools(BrowserTools):
     compact_tab_context: bool = False
     stable_frame_capture: bool = False
     clarification_tools: bool = False
+    site_discovery_tools: bool = False
     data_tools: bool = False
     helper_tools: bool = False
     allow_spawn: bool = True
@@ -206,7 +216,7 @@ class NativeBrowserTools(BrowserTools):
     def definitions(self, *, allow_search=False):
         definitions=[]
         ax_names=CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS
-        for name in self.names + (('handover_tab','proceed_action') if self.human_handover_tools else ()) + (('ask_user',) if self.clarification_tools else ()) + (DATA_TOOLS if self.data_tools else ()) + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()) + (tuple(n for n in AGENT_TOOLS if self.allow_spawn or n!='spawn_agent') if self.helper_tools else ()):
+        for name in self.names + (('handover_tab','proceed_action') if self.human_handover_tools else ()) + (('ask_user',) if self.clarification_tools else ()) + (('discover_sites',) if self.site_discovery_tools else ()) + (DATA_TOOLS if self.data_tools else ()) + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()) + (tuple(n for n in AGENT_TOOLS if self.allow_spawn or n!='spawn_agent') if self.helper_tools else ()):
             description,properties,required=SPECS[name]
             properties=deepcopy(properties)
             if self.human_handover_tools and name=='tab_focus':
@@ -320,7 +330,7 @@ class NativeBrowserTools(BrowserTools):
         # No model Python evaluation: serialize validated JSON literals and pass
         # through the same allowlist/signature checks as historical actions.
         code=name+'('+', '.join(k+'='+repr(v) for k,v in values.items())+')'
-        decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
+        decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.site_discovery_tools and name == 'discover_sites') or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
                   parse_decision(code,allow_search=allow_search,allowed_names=self.names))
         self.validate_navigation(decision)
         decision.ax_overview_tokens=overview_tokens

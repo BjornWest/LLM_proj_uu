@@ -42,6 +42,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 delegated_instructions=None, delegated_goal=None, decision_wait=None,
                 max_input_tokens=None, input_counter=None,
                 clarification_callback=None, clarification_audit_id=None,
+                site_discovery=None, site_discovery_audit_id=None,
                 observation_pipeline="auto", human_handover=None, human_handover_ui=None,
                 trace_screenshots=None, async_recording=True, debug_timings=None,
                 automatic_grading=None, allow_ungraded=False, ungraded_reason=None,
@@ -138,6 +139,18 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             raise ValueError('clarification_audit_id must be a nonempty string or None')
     elif clarification_callback is not None or clarification_audit_id is not None:
         raise ValueError('Clarification callback requires an opt-in clarification tool profile')
+    discovery_enabled = bool(harness_profile and getattr(harness_profile.tools,'site_discovery_tools',False))
+    if discovery_enabled:
+        if not callable(site_discovery):
+            raise ValueError('Site discovery tools require a task-scoped callable')
+        if not harness_profile.ax_config or not hasattr(harness_profile.tools,'parse_completion'):
+            raise ValueError('Site discovery requires native tools and an AX tokenizer')
+        if site_discovery_audit_id is not None and (
+                not isinstance(site_discovery_audit_id,str) or not site_discovery_audit_id.strip()):
+            raise ValueError('site_discovery_audit_id must be a nonempty string or None')
+    elif site_discovery is not None or site_discovery_audit_id is not None:
+        raise ValueError('Site discovery callback requires an opt-in tool profile')
+    discovery_session = None
     if type(max_steps) is not int or max_steps < 1:
         raise ValueError('max_steps must be a positive integer')
     if max_input_tokens is not None and (type(max_input_tokens) is not int or max_input_tokens < 1):
@@ -167,6 +180,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
              'trace_screenshots':trace_screenshots,'async_recording':async_recording,
              'max_input_tokens':max_input_tokens,'input_counter':input_counter,
              'clarification_callback':clarification_callback,'clarification_audit_id':clarification_audit_id,
+             'site_discovery':site_discovery,'site_discovery_audit_id':site_discovery_audit_id,
              **({'record_fact_provenance':True,'fact_source_provider':fact_source_provider,'fact_capture_observer':fact_capture_observer} if record_fact_provenance else {})})
         return runtime.run(lambda actor: run_episode(env_factory,actor['backend'],metadata,output,max_steps,seed,
             record_video,hold_seconds,search_backend,episode_task,lambda:runtime.before_observation(actor),
@@ -176,6 +190,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             delegated_goal=delegated_goal,decision_wait=decision_wait,
             max_input_tokens=max_input_tokens,input_counter=input_counter,
             clarification_callback=clarification_callback,clarification_audit_id=clarification_audit_id,
+            site_discovery=site_discovery,site_discovery_audit_id=site_discovery_audit_id,
             trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings,
             automatic_grading=automatic_grading,allow_ungraded=allow_ungraded,ungraded_reason=ungraded_reason,
             record_fact_provenance=record_fact_provenance,fact_source_provider=fact_source_provider,
@@ -296,6 +311,12 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             'reply_source': 'trusted caller callback', 'batch_boundary': True,
             'helpers': 'inherit the explicitly supplied callback; separate episode evidence',
         }
+    if discovery_enabled:
+        profile_metadata['site_discovery'] = {
+            'version':'public-site-discovery-v1','audit_id':site_discovery_audit_id,
+            'source':'trusted task-scoped public directory','default_limit':5,'maximum_limit':20,
+            'helpers':'inherit the supplied directory; separate callback artifacts',
+            'scope':'Public names, kinds, URLs and descriptions only; no task answer or grading evidence.'}
     if retry_policy is not None:
         profile_metadata['decision_retry_policy'] = retry_policy.describe()
     if native_tools:
@@ -511,9 +532,14 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             from .data_tools import DataSession
             data_session = DataSession(harness_profile.data_config, trace.directory, ax_explorer)
 
+        if discovery_enabled:
+            from .site_discovery import SiteDiscoverySession
+            discovery_session = SiteDiscoverySession(site_discovery,trace.directory,ax_explorer.tokenizer,
+                audit_id=site_discovery_audit_id)
+
         def present_feedback(value,event,kind):
             with trace.timings.span('feedback.presentation',step=event['step'],kind=kind):
-                if kind in ("vision_result", "data_result", "clarification_result", "human_tab_result"): return value
+                if kind in ("vision_result", "data_result", "clarification_result", "human_tab_result", "site_discovery_result"): return value
                 if harness_profile and harness_profile.feedback_presentation:
                     artifact=f"{kind}-raw-{event.get('execution_index',event['step']):03d}.json"
                     write_json(trace.directory/artifact,value)
@@ -547,7 +573,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         **({'context_observation':event['context_observation']}
                            if event.get('context_observation') else {}),
                         **({'clarification_artifact':event['clarification_artifact']}
-                           if kind == 'clarification_result' else {})})
+                           if kind == 'clarification_result' else {}),
+                        **({'site_discovery_artifact':event['site_discovery_artifact']}
+                           if kind == 'site_discovery_result' else {})})
                 conversation.record(output,value,feedback_source=source_id,
                     **({'assistant_message':event['assistant_tool_message']} if native_tools else {}))
             else:
@@ -570,6 +598,17 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 record_feedback(completion.text,result,event,'human_tab_result')
                 trace.event('human_tab_control_completed',step=event['step'],tool_call_id=event.get('tool_call_id'),
                     tool=decision.name,result=result,observation=final_ref)
+            elif discovery_session is not None and decision.name == 'discover_sites':
+                phase='site_discovery_callback'
+                trace.event('tool_started',call_id=f'tool-{index:03d}',tool=decision.name,arguments=decision.arguments)
+                started=time.monotonic()
+                result,artifact=discovery_session.execute(decision.arguments,index)
+                event.update(kind='site_discovery',reward=None,browser_stepped=False,
+                    site_discovery_artifact=artifact,next_observation=final_ref,
+                    tool_output=result,tool_error=result.get('error'),site_discovery_seconds=time.monotonic()-started)
+                record_feedback(completion.text,result,event,'site_discovery_result')
+                trace.event('tool_completed',call_id=f'tool-{index:03d}',tool=decision.name,
+                    artifact=artifact,error=result.get('error'),browser_stepped=False)
             elif clarification_enabled and decision.name == 'ask_user':
                 from .clarification import execute_clarification
                 phase = 'clarification_callback'
@@ -1122,7 +1161,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                             fact_output=fact_recorder.lookup(member.get('fact_output_artifact')) if fact_recorder else None,
                             provenance={'batch_call':ordinal,'tool_call_id':call_id,
                                 **({'clarification_artifact':member['clarification_artifact']}
-                                   if member.get('feedback_kind') == 'clarification_result' else {})}) if delivery else None
+                                   if member.get('feedback_kind') == 'clarification_result' else {}),
+                                **({'site_discovery_artifact':member['site_discovery_artifact']}
+                                   if member.get('feedback_kind') == 'site_discovery_result' else {})}) if delivery else None
                         results.append((value,source))
                         trace.event('batch_call_completed', step=index, call_kind=member.get('kind'),
                             **{k:v for k,v in member.items() if k not in ('step','kind','_batch_feedback')})
