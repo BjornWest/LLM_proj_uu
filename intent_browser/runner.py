@@ -12,7 +12,7 @@ from .trace import Trace, write_json
 from .openrouter import routing_record
 from .observation import refresh_observation
 from .policy_delivery import PolicyDelivery
-from .input_budget import DEFAULT_MAX_STEPS, QwenInputCounter, OpaqueReasoningInputCounter
+from .input_budget import DEFAULT_MAX_STEPS
 from .batching import DocumentScanInvalidated, interrupted_step_feedback
 
 
@@ -143,9 +143,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     if max_input_tokens is not None and (type(max_input_tokens) is not int or max_input_tokens < 1):
         raise ValueError('max_input_tokens must be a positive integer or None')
     if max_input_tokens is not None and input_counter is None:
-        if not harness_profile or not harness_profile.ax_config:
-            raise ValueError('Input limit requires a model input counter or configured local AX tokenizer')
-        input_counter = OpaqueReasoningInputCounter(QwenInputCounter(harness_profile.ax_config.tokenizer_path))
+        from .model_input_budget import model_matched_input_counter
+        ax_config = getattr(harness_profile, 'ax_config', None)
+        input_counter = model_matched_input_counter(
+            backend, ax_tokenizer_path=getattr(ax_config, 'tokenizer_path', None))
     if type(record_fact_provenance) is not bool:
         raise ValueError('record_fact_provenance must be boolean')
     if record_fact_provenance and fact_capture_observer is not None:
