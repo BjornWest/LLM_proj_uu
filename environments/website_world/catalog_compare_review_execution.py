@@ -41,6 +41,23 @@ def check_saved_public_task(trace, public):
         raise ValueError('Saved public task identity, request, memories or context changed')
 
 
+def check_policy_outcome(returned, saved):
+    """Trace.finish may add completeness only to the persisted summary.
+
+    A missing successful runner-return field is valid only when the saved trace
+    explicitly completed. An explicit returned failure or persisted recording
+    failure must never be treated as a successful finish.
+    """
+    if type(returned) is not dict or type(saved) is not dict:
+        raise ValueError('Require returned and saved policy outcome objects')
+    if (saved.get('trace_complete') is not True or saved.get('recording_error')
+            or ('trace_complete' in returned and returned['trace_complete'] is not True)):
+        raise ValueError('Returned policy outcome or saved browser trace is incomplete')
+    if any(saved.get(key) != returned.get(key) for key in
+           ('stop_reason', 'error', 'execution_error', 'cleanup_errors')):
+        raise ValueError('Returned policy outcome differs from its saved browser trace')
+
+
 def extract_saved_deferred(*, trace, inputs, output, grader_factory, backend_factory,
                            source_paths, before_model_dispatch):
     """One shared extraction, keeping publication after canonical finalization.
@@ -90,6 +107,17 @@ def extract_saved_deferred(*, trace, inputs, output, grader_factory, backend_fac
 
 def publish_finalized_answer(deferred, *, contract_id):
     """Publish once against final artifacts, preserving the declared transition."""
+    if deferred.get('kind') == 'missing_answer':
+        from .compound_missing_output_v1 import publish
+        from scripts.trace_grades import read_grade
+        path = publish(trace=deferred['trace'], source_directory=deferred['output'], contract_id=contract_id)
+        if read_grade(deferred['trace'])['binding_status'] != 'verified':
+            raise ValueError('Final missing-output sidecar is not bound to the final trace')
+        marker = Path(deferred['output'])/'completed.json'
+        with marker.open('x', encoding='utf-8') as stream:
+            json.dump({'status':'graded_and_published','requests':0,
+                'outcome_kind':'required_answer_not_delivered','sidecar':str(path)}, stream, indent=2)
+        return deferred['grade']
     from experiments.answer_grading import listed_offer
     from scripts.trace_grades import read_grade
     trace, output = Path(deferred['trace']), Path(deferred['output'])
@@ -194,9 +222,28 @@ class AcceptedPublicRequestGrader:
         self.extraction_instructions = native_grader.extraction_instructions
         self.contract = native_grader.contract
         self.reference = native_grader.reference
+        from .compound_missing_answer_native_v1 import input_digest
+        self._missing_answer_public = deepcopy(original_public_task)
+        self._missing_answer_public.update(task_id=self.task['task_id'],
+                                          user_message=self.task['user_message'])
+        self._missing_answer_adapted_inputs = {
+            'public_declaration': input_digest(declaration),
+            'public_acceptance': input_digest(acceptance),
+            'original_public_task': input_digest(original_public_task),
+            'public_instance_binding': input_digest(binding)}
 
     def grade(self, claims, answer):
         return self.native_grader.grade(claims, answer)
+
+    def grade_missing_answer(self, terminal_evidence):
+        if (type(terminal_evidence) is not dict or type(terminal_evidence.get('binding')) is not dict
+                or type(terminal_evidence['binding'].get('source_files')) is not dict
+                or str(Path(__file__).absolute()) not in terminal_evidence['binding']['source_files']):
+            raise ValueError('Accepted public adapter absent from actual source union')
+        return self.native_grader._grade_missing_answer(terminal_evidence,
+            expected_public=self._missing_answer_public,
+            adapted_input_digests=self._missing_answer_adapted_inputs)
+
 
 
 def load_public_request(record):
@@ -366,14 +413,26 @@ class CatalogCompareReviewEpisode(lifecycle.ComparisonStockEpisode):
 
 def run(output, run_directory, *, policy_session, metadata, runner_options, viewer_projection,
         readiness_auditor, readiness_sources, quota_guard=None, extraction_backend_factory=None, runner=None,
-        public_request=None):
-    """Prospective external grading, finalized after policy and Runtime cleanup."""
+        public_request=None, missing_answer_reader_sha256=None):
+    """Prospective external grading, finalized after policy and Runtime cleanup.
+
+    A fresh adopted recipe explicitly pins its reviewed missing-output reader.
+    The default retains the earlier complete-answer-only path.
+    """
     from intent_browser.automatic_grading import AutomaticGrading, finalize_external, canonical_viewer_check
     from intent_browser.evaluation import Evaluation
     from intent_browser.connected_world_task import policy_goal
     if not all(callable(f) for f in (policy_session, viewer_projection)):
         raise ValueError('Attach policy and viewer projection before dispatch')
     public_request = deepcopy(public_request)
+    if missing_answer_reader_sha256 is not None:
+        if (type(missing_answer_reader_sha256) is not str or len(missing_answer_reader_sha256) != 64
+                or any(c not in '0123456789abcdef' for c in missing_answer_reader_sha256)):
+            raise ValueError('Require the exact adopted missing-output reader source pin')
+        from scripts import trace_grades
+        reader = Path(trace_grades.__file__).resolve()
+        if sha256(reader.read_bytes()).hexdigest() != missing_answer_reader_sha256:
+            raise ValueError('Missing-output reader differs from the explicitly adopted source')
     readiness_sources = deepcopy(readiness_sources)
     check_auditor_source(readiness_auditor, readiness_sources)
     if extraction_backend_factory is not None and not callable(extraction_backend_factory):
@@ -405,6 +464,10 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
         runner = run_episode
     shared.save(destination/'execution-plan.private.json', {'schema': VERSION, 'runner_options': runner_options,
         'source_sha256': manifest['source_sha256'], 'automatic_grading_retries': 0, 'extraction_requests_max': 1})
+    execution_plan_pin = None
+    if missing_answer_reader_sha256 is not None:
+        plan = destination/'execution-plan.private.json'
+        execution_plan_pin = {'path':str(plan), 'sha256':sha256(plan.read_bytes()).hexdigest()}
     state = {'policy_closed': False, 'runtime_closed': False, 'grade': None, 'projection': None}
     trace = None; summary = None
     try:
@@ -427,6 +490,16 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
             episode.task.files[str(destination/'public-readiness.private.json')] = sha256(
                 (destination/'public-readiness.private.json').read_bytes()).hexdigest()
             expected_public = deepcopy(episode.public)
+            if missing_answer_reader_sha256 is not None:
+                plan_path = execution_plan_pin['path']
+                if (plan_path in episode.task.files
+                        and episode.task.files[plan_path] != execution_plan_pin['sha256']):
+                    raise ValueError('Execution plan conflicts with retained source union')
+                episode.task.files[plan_path] = execution_plan_pin['sha256']
+                checked_files({plan_path:execution_plan_pin['sha256']})
+                native = getattr(episode.answer_grader, 'native_grader', episode.answer_grader)
+                if not callable(getattr(native, 'grade_missing_answer', None)):
+                    raise ValueError('Reviewed native missing-answer callable must be installed before dispatch')
             inputs = {
                 'world': output/'pin/world.private.json',
                 'task': output/'catalog-compare-review-task.private.json',
@@ -451,9 +524,19 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
             def bind(env, actual_trace, observation):
                 if observation['goal'] != policy_goal(expected_public):
                     raise ValueError('Displayed compound goal differs from the bound public task')
-                return {'task_id': expected_public['task_id'],
+                if missing_answer_reader_sha256 is not None:
+                    from .compound_terminal_capture_v1 import bind_capture_artifacts
+                    bind_capture_artifacts(source_files=episode.task.files,
+                        execution_plan_pin=execution_plan_pin,
+                        policy_task_path=Path(actual_trace.directory)/'policy-task.json',
+                        expected_public=expected_public)
+                value = {'task_id': expected_public['task_id'],
                     'goal_sha256': sha256(observation['goal'].encode()).hexdigest(),
                     'reference_files': deepcopy(reference_files), 'source_files': deepcopy(episode.task.files)}
+                if missing_answer_reader_sha256 is not None:
+                    value['initial_chat_messages_excluded'] = len(episode.task.initial_chat_messages)
+                    state['captured_binding'] = deepcopy(value)
+                return value
             def native_grade(env, actual_trace, outcome):
                 if not state['policy_closed'] or not state['runtime_closed']:
                     raise ValueError('Compound grading requires policy and Runtime cleanup first')
@@ -461,6 +544,27 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
                     raise ValueError('Policy/setup/cleanup failed; automatic grade unavailable')
                 checked_files(episode.task.files)
                 check_saved_public_task(actual_trace.directory, expected_public)
+                if missing_answer_reader_sha256 is not None:
+                    from .compound_answer_delivery_v1 import select_answer_path
+                    natural = json.loads((actual_trace.directory/'natural-answer.json').read_bytes())
+                    if select_answer_path(natural, outcome) == 'missing_answer':
+                        from .compound_terminal_capture_v1 import capture_terminal
+                        checked_files(reference_files)
+                        captured = state['captured_binding']
+                        evidence = capture_terminal(trace=actual_trace.directory, run_root=destination,
+                            native_task_id=episode.native_task['task_id'], public_task_id=expected_public['task_id'],
+                            contract_id=contract.contract_id, input_files=inputs, source_files=episode.task.files,
+                            actual_goal_sha256=captured['goal_sha256'],
+                            actual_initial_count=captured['initial_chat_messages_excluded'])
+                        grader = grader_factory(**{key:json.loads(Path(path).read_bytes()) for key,path in inputs.items()})
+                        grade = grader.grade_missing_answer(evidence)
+                        checked_files(episode.task.files); checked_files(reference_files)
+                        with (destination/'native-grade.json').open('x', encoding='utf-8') as stream:
+                            json.dump(grade, stream, indent=2, ensure_ascii=False, allow_nan=False)
+                        state['deferred'] = {'kind':'missing_answer','grade':grade,
+                            'output':str(destination),'trace':str(actual_trace.directory)}
+                        state['grade'] = grade
+                        return {'task_id':expected_public['task_id'],'native_grade':grade}
                 factory = extraction_backend_factory or task_answer.SubscriptionTaskExtractor(quota_guard=quota_guard,
                     model=grading['model'], reasoning_effort=grading['reasoning_effort']).backend
                 deferred = extract_saved_deferred(trace=actual_trace.directory, inputs=inputs,
@@ -476,7 +580,8 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
                 grade = raw['native_grade']
                 return Evaluation('catalog-compare-review-native', VERSION, trust='native_reference',
                     task_completed=grade['structured_claims_correct'],
-                    evidence=[str(destination/'answer-grading/completed.json')],
+                    evidence=[str(destination/('native-grade.json' if grade.get('outcome_kind') ==
+                        'required_answer_not_delivered' else 'answer-grading/completed.json'))],
                     limitations=[*grade.get('limitations', []),
                         'Whole-run effect authorization is not established by answer grading'])
             def viewer_check(actual_trace, evaluation):
@@ -492,6 +597,20 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
                 if str(source) in episode.task.files and episode.task.files[str(source)] != pin:
                     raise ValueError('Automatic grading integration source differs from frozen binding')
                 episode.task.files[str(source)] = pin
+            if missing_answer_reader_sha256 is not None:
+                from scripts import trace_grades
+                from . import compound_answer_delivery_v1, compound_missing_output_v1, compound_terminal_capture_v1
+                from . import compound_missing_answer_native_v1, catalog_compare_review_grading
+                for module in (trace_grades, compound_answer_delivery_v1, compound_missing_output_v1,
+                               compound_terminal_capture_v1, compound_missing_answer_native_v1,
+                               catalog_compare_review_grading):
+                    source = Path(module.__file__).resolve()
+                    pin = sha256(source.read_bytes()).hexdigest()
+                    if module is trace_grades and pin != missing_answer_reader_sha256:
+                        raise ValueError('Explicitly adopted missing-output reader changed before bind')
+                    if str(source) in episode.task.files and episode.task.files[str(source)] != pin:
+                        raise ValueError('Missing-output source differs from retained fresh recipe')
+                    episode.task.files[str(source)] = pin
             if not contract.callable_sources() <= episode.task.files.keys():
                 raise ValueError('Automatic compound callbacks are absent from the source union')
             def before_dispatch():
@@ -514,9 +633,7 @@ def run(output, run_directory, *, policy_session, metadata, runner_options, view
             checked_files(episode.task.files)  # No post-policy quota check suppresses a native grade.
         state['runtime_closed'] = True
         saved_summary = json.loads((trace/'episode.json').read_bytes())
-        if any(saved_summary.get(key) != summary.get(key) for key in
-               ('stop_reason', 'error', 'execution_error', 'cleanup_errors', 'trace_complete')):
-            raise ValueError('Returned policy outcome differs from its saved browser trace')
+        check_policy_outcome(summary, saved_summary)
         summary = finalize_external(trace, contract)
         if summary.get('grading_error') or not summary.get('infrastructure_completed'):
             raise ValueError('External automatic grading failed: '+str(summary.get('grading_error')))

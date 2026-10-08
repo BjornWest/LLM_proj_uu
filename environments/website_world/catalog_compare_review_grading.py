@@ -23,6 +23,11 @@ class CatalogCompareReviewGrader:
         if reference != expected:
             raise ValueError('Compound native reference changed')
         self.task, self.reference = deepcopy(task), deepcopy(expected)
+        from .compound_missing_answer_native_v1 import input_digest
+        self._missing_answer_inputs = {
+            'world': task['world_sha256'], 'task': input_digest(task),
+            'reference': input_digest(reference), 'bindings': input_digest(bindings),
+            'site_registry': input_digest(site_registry), 'surrounding': input_digest(surrounding)}
         self.comparison = CatalogComparisonGrader(world, task['comparison_task'], expected['comparison'],
                                                   bindings, inventory=inventory)
         self.reviews = {role: ReviewSummaryGrader(world, t, expected['reviews'][role],
@@ -42,6 +47,21 @@ class CatalogCompareReviewGrader:
             'comparison': deepcopy(self.comparison.contract),
             'reviews': {role: deepcopy(g.contract) for role, g in self.reviews.items()},
             'visits_exposure_attention': 'not_inferred'}
+
+    def grade_missing_answer(self, terminal_evidence):
+        return self._grade_missing_answer(terminal_evidence)
+
+    def _grade_missing_answer(self, terminal_evidence, *, expected_public=None,
+                              adapted_input_digests=None):
+        from pathlib import Path
+        from .compound_missing_answer_native_v1 import grade_missing_answer
+        if (type(terminal_evidence) is not dict or type(terminal_evidence.get('binding')) is not dict
+                or type(terminal_evidence['binding'].get('source_files')) is not dict
+                or str(Path(__file__).absolute()) not in terminal_evidence['binding']['source_files']):
+            raise ValueError('Native compound grader absent from actual source union')
+        return grade_missing_answer(terminal_evidence, task=self.task, reference=self.reference,
+            response_contract=self.contract, expected_input_digests=self._missing_answer_inputs,
+            expected_public=expected_public, adapted_input_digests=adapted_input_digests)
 
     def grade(self, claims, answer):
         # Let each existing parent perform its own complete validation, including
