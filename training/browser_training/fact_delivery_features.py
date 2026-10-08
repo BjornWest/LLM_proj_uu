@@ -18,7 +18,7 @@ def _artifact(trace, name):
     return json.loads(path.read_text())
 
 
-def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifacts=None):
+def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifacts=None, strict_render=False):
     """Union exact spans, including repeat reads and equivalent render snapshots."""
     require(type(step) is int and step >= 0, 'Nonnegative prefix step required')
     require(isinstance(recipient, str) and recipient, 'Recipient required')
@@ -84,6 +84,7 @@ def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifa
         for occurrence in capture['private_context']['occurrences']:
             try:
                 state_id = object_digest(occurrence['effective_state'])
+                render_scopes = set(); source_spans = []
                 parts = defaultdict(lambda: {'length': 0, 'ranges': [], 'text': [], 'mapped': True,
                                               'content_ids': set(), 'steps': set()})
                 for part in occurrence['parts']:
@@ -102,6 +103,16 @@ def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifa
                                               part=part['part'], start=start, end=end)
                                     for p in source['opaque_binding']['parts']), 'Part join mismatch')
                         target['text'].append(utf16_slice(source['text'], start, end))
+                        if strict_render:
+                            binding = source['binding']
+                            revision = source['opaque_binding'].get('render_revision')
+                            require(type(revision) is int and revision >= 0, 'Unknown render revision')
+                            require(all(isinstance(binding.get(k), str) and binding[k]
+                                        for k in ('document_id', 'frame_id')), 'Unknown document/frame')
+                            render_scopes.add((binding['document_id'], binding['frame_id'], revision))
+                            source_spans.append({'part': part['part'], 'source_id': source['id'],
+                                'export_id': source['export_id'], 'source_sha256': source['sha256'],
+                                'binding': binding, 'start': start, 'end': end})
                         for a, b in ranges[source['id']]:
                             a, b = max(a, start), min(b, end)
                             if a < b:
@@ -115,6 +126,12 @@ def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifa
                 # Missing mappings isolate the occurrence rather than guessing.
                 identity = {'binding': occurrence['binding'], 'state': occurrence['effective_state'],
                             'parts': {name: ''.join(p['text']) for name, p in sorted(parts.items())}}
+                if strict_render:
+                    require(len(render_scopes) == 1 and all(p['mapped'] for p in parts.values()),
+                            'Ambiguous or missing strict occurrence scope')
+                    doc, frame, revision = next(iter(render_scopes))
+                    identity['render_scope'] = {'document_id': doc, 'frame_id': frame,
+                                                'render_revision': revision}
                 if not all(p['mapped'] for p in parts.values()):
                     identity['unmapped_occurrence'] = [capture['id'], occurrence['id']]
                 key = object_digest(identity)
@@ -122,7 +139,12 @@ def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifa
                     groups[key] = {'id': key, 'binding': occurrence['binding'],
                                    'effective_state': occurrence['effective_state'], 'state_id': state_id,
                                    'occurrence_ids': [], 'parts': parts}
+                    if strict_render:
+                        groups[key]['render_scope'] = identity['render_scope']
+                        groups[key]['source_spans'] = source_spans
                 else:
+                    if strict_render:
+                        groups[key]['source_spans'].extend(source_spans)
                     for name, part in parts.items():
                         target = groups[key]['parts'][name]
                         target['ranges'].extend(part['ranges'])
@@ -140,6 +162,8 @@ def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifa
             parts[name] = {'status': status, 'observed_utf16': seen, 'required_utf16': part['length'],
                            'observed_fraction_lower_bound': seen / part['length'],
                            'source_mapping_complete': part['mapped']}
+            if strict_render and status == 'complete':
+                parts[name]['observed_text'] = ''.join(part['text'])
             content_ids.update(part['content_ids']); steps.update(part['steps'])
         statuses = [p['status'] for p in parts.values()]
         group.update(parts=parts, status='complete' if all(s == 'complete' for s in statuses) else
@@ -155,6 +179,7 @@ def extract(trace, *, step, recipient='main', receipt_index=None, capture_artifa
             'capture_boundary': ('explicit_request_inventory' if capture_artifacts is not None
                                  else 'step_grouped_diagnostic_not_exact_request_inventory'),
             'scope': 'renderer_native_text_transport_not_semantic_sufficiency_or_recall',
+            'strict_render_scope': strict_render,
             'inventory_complete': False, 'producer_qualified': False,
             'features': {'native_state_binding_count': len(results),
                          **{f'native_{s}_count': counts[s] for s in ('complete', 'partial', 'unknown')},

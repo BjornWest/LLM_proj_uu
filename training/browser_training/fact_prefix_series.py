@@ -37,7 +37,7 @@ def _boundaries(trace):
     return {k:v for k,v in boundaries.items() if k[0] not in ambiguous}
 
 
-def extract_prefixes(trace, *, recipient='main'):
+def extract_prefixes(trace, *, recipient='main', strict_render=False):
     trace=Path(trace).resolve(); path=trace/'policy-delivery.jsonl'
     if not path.is_file():
         return {'schema':'native-fact-prefix-series-v1','recipient':recipient,
@@ -54,7 +54,7 @@ def extract_prefixes(trace, *, recipient='main'):
         boundary=boundaries.get((f'model-{step:03d}',record.get('messages_sha256'))) if recipient=='main' else None
         artifacts=boundary[1] if boundary is not None else frozenset()
         result=extract(trace,step=step,recipient=recipient,receipt_index=index,
-                       capture_artifacts=artifacts)
+                       capture_artifacts=artifacts, strict_render=strict_render)
         if boundary is None:result['diagnostics']['request_capture_boundary_unknown']=1
         prefixes.append({'step':step,'receipt_index':index,
             'messages_sha256':record.get('messages_sha256'),'scope':record.get('scope'),
