@@ -44,6 +44,14 @@ def runtime_provenance():
 
 class Trace:
     def __init__(self, root, metadata, *, async_recording=False, recording_max_bytes=128 * 1024 * 1024, recording_max_pending=8, debug_timings=False):
+        if metadata.get('collection') is None and Path(root).name=='children':
+            parent=Path(root).parent/'metadata.json'
+            if parent.is_file():
+                collection=json.loads(parent.read_text()).get('collection')
+                if collection is not None:metadata={**metadata,'collection':collection}
+        if metadata.get('collection') is not None:
+            from agent_trace.collections import normalize_collection
+            metadata={**metadata,'collection':normalize_collection(metadata['collection'])}
         self.timings = DebugTimings(debug_timings)
         self.episode_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid4().hex[:8]
         self.directory = Path(root) / self.episode_id

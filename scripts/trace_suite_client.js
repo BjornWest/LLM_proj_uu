@@ -85,10 +85,11 @@ refresh=async function(options={}){
  const own=++suiteGeneration;
  try{
   const route=hash==='suites'?'/api/suites':'/api/suites/'+encodeURIComponent(hash.slice(6));
-  const [response,catalog]=await Promise.all([fetch(route),changed||!sessions.length?fetch('/api/sessions'):Promise.resolve(null)]);
+  const [response,catalog]=await Promise.all([fetch(route),changed||!sessions.length?fetch('/api/sessions'):Promise.resolve(null),refreshCollections(undefined,()=>own===suiteGeneration)]);
   if(!response.ok)throw Error('Suite unavailable ('+response.status+')');
   const data=await response.json();if(own!==suiteGeneration)return;
-  if(catalog?.ok){const items=await catalog.json();if(own!==suiteGeneration)return;sessions=items;list()}
+  if(catalog?.ok){const items=await catalog.json();if(own!==suiteGeneration)return;sessions=items;}
+  list();
   const signature=hash+JSON.stringify(data);
   if(signature!==suiteSignature){suiteSignature=signature;hash==='suites'?renderSuiteIndex(data):renderSuiteDetail(data)}
   if(changed||options.navigate){document.querySelector('main').scrollTop=0;if(getComputedStyle(document.querySelector('main')).overflowY==='visible')window.scrollTo(0,0)}

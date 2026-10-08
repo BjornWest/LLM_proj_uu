@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import threading
 from urllib.parse import urlsplit,parse_qs,unquote
+from agent_trace.collections import CollectionStore, collection_post, declared_collection, normalize_collection, parent_ids
 try:
     from .trace_grades import project_grade, FILENAME
 except ImportError:
@@ -99,6 +100,7 @@ def initial_summary(directory):
         title=' · '.join(str(v) for v in (case,title,driver_label,label) if v),
         started_at=started,updated_at=max(known) if known else '',
         state='recorded' if episode else 'incomplete',environment='browsergym',
+        **({'collection': declared_collection(metadata)} if declared_collection(metadata) else {}),
         summary_pending=True,message_count=None,decision_count=0,
         model_turn_count=None,tool_call_count=None,max_isl_tokens=None,total_osl_tokens=None)
 
@@ -116,6 +118,7 @@ class Hub:
     def __init__(self,registry,mode='auto',*,cache_bytes=256*1024*1024,ledger=True):
         from scripts.trace_suites import SuiteCatalog
         self.suites=SuiteCatalog(registry);self.suite_memberships={}
+        self.collections=CollectionStore(Path(registry).parent/'collections.json');self.collection_roots={}
         self.registry=Path(registry);self.mode=mode;self.caches={};self.lock=threading.Lock()
         self.entries={};self.bodies=OrderedDict();self.body_lock=threading.Lock()
         self.cache_bytes=cache_bytes;self.body_bytes=0
@@ -129,11 +132,17 @@ class Hub:
 
     def roots(self):
         config=json.loads(self.registry.read_text());base=Path(config['project_root']).resolve()
+        self.collection_roots={str(Path(p).resolve()):normalize_collection(label) for p,label in config.get('collection_roots',{}).items()}
+        self.collection_base=base
         roots=[Path(p).resolve() for p in config.get('roots',[])]
         for pattern in config.get('patterns',[]):
             if Path(pattern).is_absolute() or '..' in Path(pattern).parts:raise ValueError('Root patterns must stay inside project')
             roots.extend(p.resolve() for p in base.glob(pattern) if p.is_dir())
         return {source_key(p):p for p in sorted(set(roots)) if p.is_dir()}
+
+    def folder_label(self,root):
+        root=Path(root).resolve()
+        return self.collection_roots.get(str(root)) or (str(root.relative_to(self.collection_base)) if root.is_relative_to(self.collection_base) and root!=self.collection_base else root.name)
 
     def revision(self,directory,key):
         return hashlib.sha256(json.dumps((self.version,key,self.mode,str(directory),fingerprint(directory),self.suite_memberships.get(directory.resolve()))).encode()).hexdigest()
@@ -177,7 +186,7 @@ class Hub:
         from agent_trace.sessions import CatalogCache
         with self.lock:
             self.suite_memberships=self.suites.memberships()
-            entries={};groups=[]
+            entries={};groups=[];folders=self.collections.read()
             for key,root in self.roots().items():
                 # Historical portable/Civ5 groups retain their existing parser.
                 # BrowserGym-only roots never enter this eager compatibility path.
@@ -189,7 +198,8 @@ class Hub:
                         ident=item['id']
                         if ident in entries:raise ValueError('Duplicate trace ID in configured sources: '+ident)
                         entries[ident]={'legacy':legacy[ident],'key':key}
-                        groups.append(summary_fields(item))
+                        item={**summary_fields(item),'viewer_collection':CollectionStore.folder(folders,ident,item.get('collection'),self.folder_label(root))}
+                        groups.append(item)
                 paths=sorted([*root.glob('*/metadata.json'),*root.glob('*/children/*/metadata.json'),*root.glob('*/children/*/children/*/metadata.json')])
                 for path in paths:
                     directory=path.parent
@@ -198,7 +208,15 @@ class Hub:
                     if entry is None:continue
                     ident=entry['summary']['id']
                     if ident in entries:raise ValueError('Duplicate trace ID in configured sources: '+ident)
+                    entry['summary']={**entry['summary'],'viewer_collection':CollectionStore.folder(folders,ident,entry['summary'].get('collection'),self.folder_label(root),parent_ids(directory))}
                     entries[ident]=entry;groups.append(entry['summary'])
+            for index,item in enumerate(groups):
+                entry=entries[item['id']]
+                if 'directory' not in entry:continue
+                parents=parent_ids(entry['directory'])
+                declared=item.get('collection') or next((entries[p]['summary'].get('collection') for p in parents if p in entries and entries[p].get('summary',{}).get('collection')),None)
+                entry['summary']={**item,'viewer_collection':CollectionStore.folder(folders,item['id'],declared,self.folder_label(entry['root']),parents)}
+                groups[index]=entry['summary']
             self.entries=entries
             groups.sort(key=lambda g:(started_key(g),g['id']),reverse=True)
             return json.dumps(groups).encode(),LazySessions(self,entries)
@@ -240,7 +258,7 @@ class Hub:
             # so the next poll will still fetch any events that arrived meanwhile.
             after=self.revision(entry['directory'],entry['key'])
             if after!=revision:
-                entry['summary']={**summary_fields(group),'revision':revision,
+                entry['summary']={**summary_fields(group),'viewer_collection':entry['summary'].get('viewer_collection'),'revision':revision,
                                   'summary_pending':True,'summary_stale':True}
                 self.persist_summary(entry)
                 return body,'live-'+hashlib.sha256(body).hexdigest()
@@ -251,7 +269,7 @@ class Hub:
                     while self.bodies and self.body_bytes+weight>self.cache_bytes:
                         _,removed=self.bodies.popitem(last=False);self.body_bytes-=len(removed[0])+len(removed[1])
                     self.bodies[revision]=(body,compressed);self.body_bytes+=weight
-            entry['summary']={**summary_fields(group),'revision':revision}
+            entry['summary']={**summary_fields(group),'viewer_collection':entry['summary'].get('viewer_collection'),'revision':revision}
             self.persist_summary(entry)
             return body,revision
 
@@ -276,6 +294,9 @@ def make_handler(registry, *, hub_class=Hub, html_factory=None):
     from agent_trace.adapters import MODES
     hubs={mode:hub_class(registry,mode) for mode in MODES}
     class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            collection_post(self,hubs['auto'].collections,lambda:hubs['auto'].snapshot()[1])
+
         def do_GET(self):
             url=urlsplit(self.path);mode=parse_qs(url.query).get('parser',['auto'])[0]
             if mode not in hubs:self.send_error(400,'Unknown parsing mode');return
@@ -284,6 +305,7 @@ def make_handler(registry, *, hub_class=Hub, html_factory=None):
                 if url.path=='/':
                     body=(html_factory or viewer_html)()
                     mime='text/html; charset=utf-8'
+                elif url.path=='/api/collections':body=json.dumps(hub.collections.index()).encode();mime='application/json'
                 elif url.path=='/api/sessions':body,_=hub.snapshot();mime='application/json'
                 elif url.path=='/api/suites':
                     summaries={k:v['summary'] for k,v in hub.entries.items() if 'summary' in v}

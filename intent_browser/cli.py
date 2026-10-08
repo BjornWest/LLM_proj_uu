@@ -141,7 +141,12 @@ def main():
                         help="Skip automatic observation screenshots; explicit screenshot tool and --video remain independent")
     parser.add_argument("--hold-seconds", type=int, default=0)
     parser.add_argument("--output", default="runs")
+    parser.add_argument("--collection", help="Viewer folder, e.g. Integration/checkout or RL/experiment-1; independent of --output")
     args = parser.parse_args()
+    if args.collection is not None:
+        from agent_trace.collections import normalize_collection
+        try:args.collection=normalize_collection(args.collection)
+        except ValueError as error:parser.error(str(error))
     if args.open_internet:
         if args.mode != 'run' or args.task != 'openended' or args.chaos_task or args.pilot_task or args.navigation_origin:
             parser.error('--open-internet requires run/openended without a fixture or fixed navigation origins')
@@ -405,6 +410,7 @@ def main():
                 "headless": args.headless, "verifier": "miniwob" if args.task.startswith("miniwob.") else None,
                 "generation": {"temperature": 0, "max_tokens": args.max_tokens,
                                **(request_options if args.mode == 'run' else {})}}
+    if args.collection is not None:metadata['collection']=args.collection
     metadata["environment"] = {"slow_mo_ms": 100 if args.pilot_task else 250, "record_video": args.video,
                                "miniwob_url": os.getenv("MINIWOB_URL") if args.task.startswith("miniwob.") else None}
     if args.chaos_task:

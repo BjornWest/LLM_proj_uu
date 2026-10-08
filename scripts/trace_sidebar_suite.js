@@ -3,7 +3,7 @@ const sidebarSuiteBadges=new WeakMap();
 function renderSidebarSuiteBadges(){
   const enabled=document.querySelector('main').dataset.suiteMode==='true';
   for(const session of sessions){
-    const button=sessionCards.get(session.id).button;
+    const button=sessionCards.get(session.id)?.button;if(!button)continue;
     if(enabled){
       if(button.classList.contains('selected'))button.classList.remove('selected');
       if(button.hasAttribute('aria-current'))button.removeAttribute('aria-current');
