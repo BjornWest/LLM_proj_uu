@@ -141,9 +141,9 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
             checked_files(episode.task.files)  # No post-policy quota check suppresses native grading.
         state['runtime_closed'] = True
         saved = json.loads((trace/'episode.json').read_bytes())
-        if any(saved.get(key) != summary.get(key) for key in
-                ('stop_reason', 'error', 'execution_error', 'cleanup_errors', 'trace_complete')):
-            raise ValueError('Returned ordering outcome differs from the saved browser trace')
+        from .catalog_compare_review_execution import check_policy_outcome
+        # Trace.finish adds completeness to saved bytes, not the returned dict.
+        check_policy_outcome(summary, saved)
         summary = finalize_external(trace, contract)
         if summary.get('grading_error') or not summary.get('infrastructure_completed'):
             raise ValueError('Automatic ordering grade failed: '+str(summary.get('grading_error')))
