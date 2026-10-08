@@ -188,6 +188,10 @@ def model_matched_input_counter(backend, *, ax_tokenizer_path=None, assets_root=
                                   registry_sha256=hashlib.sha256(REGISTRY.read_bytes()).hexdigest())
     elif entry['counter'] == 'glm':
         counter = GlmInputCounter(model, entry, bundle, reasoning_effort=reasoning.get('effort'))
+    elif entry['counter'] == 'mimo':
+        from .mimo_input_budget import MimoInputCounter
+        counter = MimoInputCounter(model, entry, bundle, reasoning)
+        counter.provenance['registry_sha256'] = hashlib.sha256(REGISTRY.read_bytes()).hexdigest()
     else:
         raise ValueError('Unsupported registered input counter: ' + entry['counter'])
     return OpaqueReasoningInputCounter(counter)

@@ -48,3 +48,12 @@ all20 completed provider prompt counts exactly. Its blocked next request is
 29,132 GLM tokens; the historical Qwen proxy estimated32,749. Historical trace,
 grade and guard decisions remain unchanged. Counter qualification does not
 authorize another model episode.
+
+MiMo V2.6 Pro uses the official XiaomiMiMo/MiMo-V2.6-Pro-RL tokenizer, chat
+template and Qwen2VL processor configuration. Its explicit registry entry supports
+text, function tools, retained reasoning, and local PNG/JPEG images. Remote images,
+audio/video and mixed content-part shapes reject locally. Install with
+`python3 scripts/fetch_model_tokenizer.py xiaomi/mimo-v2.6-pro`.
+Hosted prompt counts remain authoritative; local MiMo counts are qualified estimates
+until compared with the selected provider. The evaluation case retains the original
+18-comment world and tools, with a 32,000-token official-MiMo input guard.
