@@ -52,6 +52,11 @@ class Trace:
         if metadata.get('collection') is not None:
             from agent_trace.collections import normalize_collection
             metadata={**metadata,'collection':normalize_collection(metadata['collection'])}
+        from agent_trace.collections import is_scripted_run, normalize_tags
+        if 'tags' in metadata or is_scripted_run(metadata):
+            tags=normalize_tags(metadata.get('tags', []))
+            if is_scripted_run(metadata) and 'scripted' not in tags:tags=normalize_tags([*tags,'scripted'])
+            metadata={**metadata,'tags':tags}
         self.timings = DebugTimings(debug_timings)
         self.episode_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid4().hex[:8]
         self.directory = Path(root) / self.episode_id

@@ -7,6 +7,14 @@
   to local resources. Run sequentially only for an explicit isolation experiment or
   a demonstrated shared-state/resource dependency; explain that exception.
 
+## Episode classification
+
+- Tag every scripted browser episode or integration run with `scripted` in
+  `metadata.tags`, preserving other tags. A real model episode launched by a
+  script is a model run, not a scripted episode. Custom drivers must declare
+  the tag explicitly. Do not rewrite historical recordings to add tags;
+  use separate viewer classification metadata for existing episodes.
+
 ## Independent code review before handoff
 
 - All commits must receive an independent subagent review before adoption handoff

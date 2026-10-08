@@ -72,11 +72,23 @@ groups show every source trace file, including groups combining multiple files.
 Logical moves do not alter these locations. Older external catalogs without
 location metadata omit the path rather than guessing one.
 
-Tags combine with the selected folder scope. Open **Tags** to select labels;
-multiple selected labels require all matches. Selection is preserved as repeated
-`tag` URL parameters. **Select episodes → Edit tags** adds or removes comma-
+Tags combine with the selected folder scope. Open **Tags** and click a label to cycle neutral → green
+(include) → red (exclude) → neutral. Green keeps traces with the tag; red hides
+traces with the tag. Multiple include filters all must match and every exclude
+filter must be absent, within the selected folder. Filters are preserved as
+repeated `tag` and `exclude_tag` URL parameters. Clear tags resets both modes;
+explicit episode links clear incompatible include/exclude filters. **Select episodes → Edit tags** adds or removes comma-
 separated labels in bulk, preserving other labels. Sidebar badges show episode
 tags. Recorded metadata may declare `tags` as a list of strings. Viewer edits
 store additions/removals in the same separate metadata file, preserve folder
 assignments and body caches, and can suppress a declared label without rewriting
 the recording. Tags are independent per episode (no implicit helper inheritance).
+
+Every scripted episode must declare `metadata.tags` including `scripted`.
+New `Trace` recordings normalize caller tags and add the default for explicit
+scripted driver labels (scripted as a hyphen/underscore/space-delimited token),
+CLI smoke runs, or `model=scripted`. The viewer applies the same default to
+recognized historical recordings without rewriting them; a viewer tag removal
+can suppress it. Custom scripted drivers must pass the tag explicitly. Missing
+models/zero counters and real model episodes launched by Python do not establish
+scripted behavior and are not automatically tagged.
