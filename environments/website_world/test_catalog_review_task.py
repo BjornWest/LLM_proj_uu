@@ -313,3 +313,85 @@ def test_empty_review_mean_retains_affirmative_phrases_and_clause_scope(shown,qu
     args=empty_ratings_fixture();text,c=claims_for(args[1],args[2])
     text+=' '+shown;c['mean_undefined']={'value':True,'evidence':quote}
     assert grader(*args).grade(c,text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('verdict',[None,'tie'])
+def test_complete_topic_table_does_not_require_an_enum_label(verdict):
+    args=fixture();text,c=claims_for(args[1],args[2])
+    c['verdict']={'value':verdict,'evidence':text if verdict else None}
+    result=grader(*args).grade(c,text)
+    assert result['structured_claims_correct']
+    assert result['claims']['verdict']['value']==verdict
+
+
+def test_missing_verdict_does_not_repair_wrong_counts_or_insufficient_evidence():
+    args=fixture();text,c=claims_for(args[1],args[2]);c['verdict']={'value':None,'evidence':None}
+    c['positive']={'value':2,'evidence':text}
+    assert not grader(*args).grade(c,text)['structured_claims_correct']
+    args=fixture(min_assessed=5);text,c=claims_for(args[1],args[2]);c['verdict']={'value':None,'evidence':None}
+    assert not grader(*args).grade(c,text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('comparison',['1 negative versus 1 positive','1 are negative versus 1 positive'])
+def test_review_verdict_binds_ordinary_explicit_numeric_comparison(comparison):
+    args=fixture();text,c=claims_for(args[1],args[2]);text+=' '+comparison
+    c['verdict']={'value':'tie','evidence':comparison}
+    assert grader(*args).grade(c,text)['structured_claims_correct']
+
+
+def test_review_numeric_comparison_does_not_justify_opposite_direction():
+    args=fixture();text,c=claims_for(args[1],args[2]);text+=' 1 negative versus 1 positive'
+    c['verdict']={'value':'more_negative','evidence':'1 negative versus 1 positive'}
+    with pytest.raises(ValueError,match='supported comparison'):
+        grader(*args).grade(c,text)
+
+
+@pytest.mark.parametrize('shown,quote',[
+    ('-1 negative versus 1 positive','1 negative versus 1 positive'),
+    ('−1 negative versus 1 positive','1 negative versus 1 positive'),
+    ('2 negative versus 1 positive; 1 negative','2 negative versus 1 positive; 1 negative'),
+    ('It is not true that there are 1 negative versus 1 positive.','1 negative versus 1 positive'),
+    ('Not 1 negative versus 1 positive.','1 negative versus 1 positive'),
+])
+def test_review_numeric_comparison_rejects_cropped_duplicate_or_negated_counts(shown,quote):
+    args=fixture();text,c=claims_for(args[1],args[2]);text+=' '+shown
+    c['verdict']={'value':'tie','evidence':quote}
+    with pytest.raises(ValueError,match='supported comparison'):
+        grader(*args).grade(c,text)
+
+
+@pytest.mark.parametrize('shown,quote',[
+    ('1 001 negative versus 1 positive','1 001 negative versus 1 positive'),
+    ('-\u00a01 negative versus 1 positive','1 negative versus 1 positive'),
+    ('−\u202f1 negative versus 1 positive','1 negative versus 1 positive'),
+    ('Not a tie; more negative','Not a tie; more negative'),
+    ('It is not true that the counts tie.','It is not true that the counts tie.'),
+])
+def test_review_verdict_retains_grouping_sign_and_marker_negation(shown,quote):
+    args=fixture();text,c=claims_for(args[1],args[2]);text+=' '+shown
+    c['verdict']={'value':'tie','evidence':quote}
+    with pytest.raises(ValueError,match='supported comparison'):
+        grader(*args).grade(c,text)
+
+
+def test_review_verdict_scope_exclusion_does_not_negate_numeric_comparison():
+    args=fixture();text,c=claims_for(args[1],args[2])
+    quote='1 negative versus 1 positive'
+    text+=' '+quote+', not including rating-only entries.'
+    c['verdict']={'value':'tie','evidence':quote}
+    assert grader(*args).grade(c,text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('shown,quote',[
+    ('Not a **tie**','tie'),
+    ('Not **1 negative versus 1 positive**','1 negative versus 1 positive'),
+    ('**tie** is false','tie'),
+])
+def test_review_verdict_markdown_does_not_hide_outer_denial(shown,quote):
+    args=fixture();text,c=claims_for(args[1],args[2]);text=text.replace('tie','unspecified')
+    for value in c.values():
+        if isinstance(value,dict) and value.get('value') is not None:value['evidence']=text
+    text+='; '+shown
+    c['verdict']={'value':'tie','evidence':quote}
+    with pytest.raises(ValueError,match='supported comparison'):
+        grader(*args).grade(c,text)
