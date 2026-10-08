@@ -122,7 +122,7 @@ def test_common_once_only_formatter_receives_public_task_not_observations(tmp_pa
         def close(self):pass
     kw=dict(trace=trace,inputs=inputs,output=tmp_path/'grading',grader_factory=CatalogStatisticsGrader,backend_factory=lambda _:Backend(),source_paths=[])
     result=grade_saved_once(**kw);assert result['structured_claims_correct'] and len(calls)==1
-    assert json.loads((trace/FILENAME).read_text())['grading_version']=='website-catalog-statistics-grading-v3'
+    assert json.loads((trace/FILENAME).read_text())['grading_version']=='website-catalog-statistics-grading-v4'
     assert read_grade(trace)['binding_status'] == 'verified'
     with pytest.raises(FileExistsError):grade_saved_once(**kw)
     assert len(calls)==1
@@ -282,3 +282,45 @@ def test_statistic_semantic_quote_retains_spaced_negative_sign(shown):
     c['statistic_sek']={'value':'765.00','evidence':shown}
     with pytest.raises(ValueError,match='Statistic missing'):
         CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+
+def rich_citation_fixture(operation='mean',grain='model',empty=False):
+    from . import rich_ecosystem
+    w,_,t,_,_=fixture(operation,grain,empty)
+    for item in w['products']:
+        item['public']['family_id']='footwear'
+        item['public']['facts']={}
+    s=rich_ecosystem.generate(w,{'comparison_count':1,'review_count':0,
+        'model_probability':0 if empty else 1,'retailer_pair_probability':1,
+        'scope_weights':{'general':1,'specialist':0},'price_ceiling_probability':1,'sorting_probability':1})
+    t=task.make(w,s,{k:t[k] for k in ('kind','concept_id','comparison_site_id','operation','grain')})
+    r=task.reference(w,s,t)
+    sites=[{'site_id':x['site_id'],'kind':x['kind'],'name':x['name'],'origin':'https://compare.test'} for x in s['sites']]
+    return w,s,t,r,sites
+
+
+@pytest.mark.parametrize('query',[
+    'category=footwear','category=footwear&q=&max_price=&sort=name',
+    'sort=price_desc','max_price=1000000','page=2',
+])
+def test_population_preserving_catalog_queries_are_valid_citations(query):
+    w,s,t,r,sites=rich_citation_fixture();text,c=answer(r,'https://compare.test/search?'+query)
+    assert CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('query',[
+    'q=Second','category=tablets','max_price=700','stock=in_stock',
+    'sort=foreign','category=footwear&category=tablets','page=0','page=01',
+])
+def test_population_losing_or_unsupported_queries_do_not_repair_a_correct_aggregate(query):
+    w,s,t,r,sites=rich_citation_fixture();text,c=answer(r,'https://compare.test/search?'+query)
+    assert not CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)['structured_claims_correct']
+
+
+def test_filtered_citation_preserves_all_models_for_listing_grain_too():
+    w,s,t,r,sites=rich_citation_fixture(grain='listing');text,c=answer(r,'https://compare.test/search?category=footwear&max_price=900')
+    assert CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)['structured_claims_correct']
+
+
+def test_empty_population_does_not_credit_an_unrelated_filtered_empty_search():
+    w,s,t,r,sites=rich_citation_fixture(empty=True);text,c=answer(r,'https://compare.test/search?q=foreign')
+    assert not CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)['structured_claims_correct']
