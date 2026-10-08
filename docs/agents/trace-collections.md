@@ -3,7 +3,10 @@
 The standard local viewer supports logical folder paths independent of episode
 storage. Selecting a folder includes episodes assigned to it and to its
 descendants, with exact segment boundaries (`Integration` excludes
-`Integration-other`). The chosen folder is kept in the URL. Explicit episode
+`Integration-other`). Folders are shown as a tree with nested branches collapsed by default. Use
+the arrow to expand a branch and the folder name to filter episodes. Expansion
+is retained during refreshes; a selected deep link reveals its ancestors.
+The chosen folder is kept in the URL. Explicit episode
 links reveal their folder; `#latest` selects the latest episode in the current
 folder.
 
@@ -61,3 +64,19 @@ recordings, metadata files and browser sessions. It checks parent filtering,
 prefix boundaries, persisted empty folders, bulk moves, cached card identity,
 deep links, edit conflicts, invalid paths, mobile rendering and unchanged
 recordings. No model or evaluation episode is dispatched.
+
+The sidebar shows the last three recording-path segments below each episode
+name, with the absolute location on hover. The trace heading shows the complete
+absolute location. BrowserGym episodes show their recording directory; portable
+groups show every source trace file, including groups combining multiple files.
+Logical moves do not alter these locations. Older external catalogs without
+location metadata omit the path rather than guessing one.
+
+Tags combine with the selected folder scope. Open **Tags** to select labels;
+multiple selected labels require all matches. Selection is preserved as repeated
+`tag` URL parameters. **Select episodes → Edit tags** adds or removes comma-
+separated labels in bulk, preserving other labels. Sidebar badges show episode
+tags. Recorded metadata may declare `tags` as a list of strings. Viewer edits
+store additions/removals in the same separate metadata file, preserve folder
+assignments and body caches, and can suppress a declared label without rewriting
+the recording. Tags are independent per episode (no implicit helper inheritance).

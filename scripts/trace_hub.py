@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 import threading
 from urllib.parse import urlsplit,parse_qs,unquote
-from agent_trace.collections import CollectionStore, collection_post, declared_collection, normalize_collection, parent_ids
+from agent_trace.collections import CollectionStore, collection_post, declared_collection, declared_tags, normalize_collection, parent_ids
 try:
     from .trace_grades import project_grade, FILENAME
 except ImportError:
@@ -100,6 +100,7 @@ def initial_summary(directory):
         title=' · '.join(str(v) for v in (case,title,driver_label,label) if v),
         started_at=started,updated_at=max(known) if known else '',
         state='recorded' if episode else 'incomplete',environment='browsergym',
+        recording_locations=[str(directory.resolve())+'/'],tags=declared_tags(metadata),
         **({'collection': declared_collection(metadata)} if declared_collection(metadata) else {}),
         summary_pending=True,message_count=None,decision_count=0,
         model_turn_count=None,tool_call_count=None,max_isl_tokens=None,total_osl_tokens=None)
@@ -198,7 +199,7 @@ class Hub:
                         ident=item['id']
                         if ident in entries:raise ValueError('Duplicate trace ID in configured sources: '+ident)
                         entries[ident]={'legacy':legacy[ident],'key':key}
-                        item={**summary_fields(item),'viewer_collection':CollectionStore.folder(folders,ident,item.get('collection'),self.folder_label(root))}
+                        item={**summary_fields(item),'viewer_tags':CollectionStore.tags(folders,ident,item.get('tags', [])),'viewer_collection':CollectionStore.folder(folders,ident,item.get('collection'),self.folder_label(root))}
                         groups.append(item)
                 paths=sorted([*root.glob('*/metadata.json'),*root.glob('*/children/*/metadata.json'),*root.glob('*/children/*/children/*/metadata.json')])
                 for path in paths:
@@ -215,7 +216,7 @@ class Hub:
                 if 'directory' not in entry:continue
                 parents=parent_ids(entry['directory'])
                 declared=item.get('collection') or next((entries[p]['summary'].get('collection') for p in parents if p in entries and entries[p].get('summary',{}).get('collection')),None)
-                entry['summary']={**item,'viewer_collection':CollectionStore.folder(folders,item['id'],declared,self.folder_label(entry['root']),parents)}
+                entry['summary']={**item,'viewer_tags':CollectionStore.tags(folders,item['id'],item.get('tags', [])),'viewer_collection':CollectionStore.folder(folders,item['id'],declared,self.folder_label(entry['root']),parents)}
                 groups[index]=entry['summary']
             self.entries=entries
             groups.sort(key=lambda g:(started_key(g),g['id']),reverse=True)

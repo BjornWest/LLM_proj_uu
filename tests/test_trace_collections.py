@@ -26,12 +26,17 @@ def test_declared_folder_root_fallback_and_assignment_priority(tmp_path,monkeypa
     hub=Hub(registry);rows=json.loads(hub.snapshot()[0]);by_id={row['id']:row for row in rows}
     assert sorted(row['viewer_collection'] for row in rows)==['Historical','Integration/checkout','Integration/checkout']
     parent=next(row['id'] for row in rows if row.get('collection'))
+    assert by_id[parent]['recording_locations']==[str(run.resolve())+'/']
+    assert by_id[parent]['summary_pending']
     before=hub.load(hub.lookup(parent))
+    assert json.loads(before[0])['recording_locations']==[str(run.resolve())+'/']
     store=hub.collections
     store.update(dict(action='move',path='RL/experiment',episode_ids=[parent]),store.index()['revision'],set(by_id))
-    monkeypatch.setattr(hub,'project',lambda *a:pytest.fail('Folder move reprojected trace'))
+    store.update(dict(action='tag_add',tags=['reviewed'],episode_ids=[parent]),store.index()['revision'],set(by_id))
+    monkeypatch.setattr(hub,'project',lambda *a:pytest.fail('Folder/tag edit reprojected trace'))
     rows=json.loads(hub.snapshot()[0])
     assert sum(row['viewer_collection']=='RL/experiment' for row in rows)==2
+    assert sum('reviewed' in row['viewer_tags'] for row in rows)==1
     assert hub.load(hub.lookup(parent))==before
     assert json.loads((run/'metadata.json').read_text())['collection']=='Integration/checkout'
     assert len(json.loads(Hub(registry).snapshot()[0]))==3
