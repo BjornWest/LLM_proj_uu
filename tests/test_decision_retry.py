@@ -51,6 +51,8 @@ class DecisionRetryTests(unittest.TestCase):
                 raw=response('select_option', {'bid':'1','options':50})
             if case=='invalid_json' and n==1:
                 raw=reply();raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']='{"text":'
+            for ordinal, call in enumerate(raw['choices'][0]['message'].get('tool_calls', [])):
+                call['id']=f'fixture-{n}-{ordinal}'
             return httpx.Response(200,json=raw)
         class BudgetBackend(ChatCompletionsBackend):
             supports_native_tools=True
@@ -92,11 +94,11 @@ class DecisionRetryTests(unittest.TestCase):
             with self.subTest(case=case):
                 env,reqs,rows,s,_=self.run_case(case)
                 self.assertIsNone(s['error']);self.assertEqual(env.count,1)
-                self.assertEqual(len(reqs),2);self.assertEqual(s['decision_retry_count'],1)
+                self.assertEqual(len(reqs),2);self.assertEqual(s['decision_retry_count'],0)
                 notice=reqs[1]['messages'][-1]['content']
-                diagnostic=rows[0]['decision_retry']['argument_diagnostic']
+                diagnostic=rows[0]['batch_calls'][0]['policy_feedback']['argument_error']
                 self.assertIn(json.dumps(diagnostic,ensure_ascii=False,sort_keys=True),notice)
-                self.assertIn('Double-check the parameter names, types and allowed values',notice)
+                self.assertIn('Correct the identified arguments',notice)
                 self.assertEqual(reqs[0]['tools'],reqs[1]['tools'])
                 self.assertEqual(reqs[1]['messages'][:len(reqs[0]['messages'])],reqs[0]['messages'])
                 if case=='bad_options':

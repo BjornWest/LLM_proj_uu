@@ -321,6 +321,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         profile_metadata['decision_retry_policy'] = retry_policy.describe()
     if native_tools:
         profile_metadata['native_tool_request_options'] = native_options
+        profile_metadata['invalid_argument_feedback'] = {
+            'version':'native-argument-rejection-v1','whole_batch_rejected':True,
+            'browser_action_replay':False,'argument_clamping':False,
+            'counts_toward_max_steps':True,'provider_retry_policy_unchanged':True,
+            'malformed_json_history':'inert controller notice; exact response retained'}
     trace = Trace(output, {**metadata, **profile_metadata, "runtime_selection": runtime_selection, "seed": seed, "max_steps": max_steps,
                            "max_input_tokens": max_input_tokens,
                            "input_limit_scope": "next complete input before dispatch; no cumulative or output-token limit",
@@ -969,16 +974,42 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     event['completion_diagnostic']=diagnostic
                     trace.event('completion_classified',step=index,diagnostic=diagnostic)
                 if native_tools:
-                    parsed, assistant = (harness_profile.tools.parse_batch if batching else harness_profile.tools.parse_completion)(
-                        completion, allow_search=search_backend is not None)
-                    decisions = parsed if batching else [parsed]
-                    decision = decisions[0]
-                    # Reject every reused response identity before any mutation.
-                    call_id = assistant['tool_calls'][0]['id']
-                    if any(conversation.has_call_id(c['id']) for c in assistant['tool_calls']):
-                        raise ValueError('Repeated native tool call ID')
+                    decisions, assistant, argument_results, argument_channel = harness_profile.tools.parse_for_dispatch(
+                        completion, batching=batching, allow_search=search_backend is not None,
+                        has_call_id=conversation.has_call_id)
                     event['assistant_tool_message'] = assistant
-                    event['tool_call_id'] = call_id
+                    event['tool_call_id'] = assistant['tool_calls'][0]['id']
+                    if argument_results is not None:
+                        records, results = [], []
+                        for ordinal, (call, value) in enumerate(zip(assistant['tool_calls'], argument_results)):
+                            member = {'step':index,'batch_call':ordinal,'execution_index':execution_index,
+                                'tool_call_id':call['id'],'action':None,'kind':'argument_rejection',
+                                'policy_feedback':value,'not_executed':True,'browser_stepped':False,
+                                'action_dispatch_started':False,'observation':final_ref,'reward':None}
+                            execution_index += 1
+                            records.append(member)
+                            source = delivery.register('batch_result',json.dumps(value,ensure_ascii=False,sort_keys=True),
+                                step=index,provenance={'batch_call':ordinal,'tool_call_id':call['id'],
+                                'scope':'Pre-dispatch argument rejection; no browser or helper effect'}) if delivery and argument_channel=='native' else None
+                            results.append((value,source))
+                            trace.event('batch_call_completed',call_kind='argument_rejection',
+                                **{k:v for k,v in member.items() if k!='kind'})
+                        if argument_channel == 'native':
+                            conversation.record_batch(assistant,results)
+                        else:
+                            notice=json.dumps({'execution':'not_executed','results':argument_results},ensure_ascii=False,sort_keys=True)
+                            source=delivery.register('batch_result',notice,step=index,
+                                provenance={'scope':'Malformed argument proposal; no call dispatched'}) if delivery else None
+                            conversation.recover(completion.raw,notice,
+                                preserve_reasoning=harness_profile.tools.reasoning_replay=='preserve',notice_source=source,
+                                rejected_call_ids=[call['id'] for call in assistant['tool_calls']])
+                        event.update(kind='batch',batch_calls=records,actions=[],browser_stepped=False,
+                            batch_stop_reason='invalid_tool_arguments',next_observation=final_ref,
+                            argument_feedback_channel=argument_channel)
+                        trace.event('tool_arguments_rejected',step=index,channel=argument_channel,
+                            tool_call_ids=[call['id'] for call in assistant['tool_calls']])
+                        continue  # finally persists the rejected attempt; next normal turn may correct it.
+                    decision = decisions[0]
                 else:
                     decision = (harness_profile.tools.parse if harness_profile else parse_decision)(
                         completion.text, allow_search=search_backend is not None)

@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import json
 import math
 
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 
 from .actions import parse_decision, Decision
 from .ax_explorer import AX_TOOLS
@@ -104,7 +104,8 @@ SPECS = {
         {'node_ref': {'type':'string','maxLength':80},
          'view': {'type':'string','enum':['children','subtree','ancestors','neighborhood','node'],'default':'children'},
          'depth': {'type':'integer','minimum':1,'maximum':8,'default':1},
-         'limit': {'type':'integer','minimum':1,'maximum':50,'default':20},
+         'limit': {'type':'integer','minimum':1,'maximum':50,'default':20,
+                   'description':'Maximum returned AX nodes, not reviews or tokens. Default 20, maximum 50. Token budgets or pagination may return fewer; follow next_offset for more.'},
          'offset': {'type':'integer','minimum':0,'default':0},
          'context': {'type':'integer','minimum':0,'maximum':20,'default':2},
          'text_offset': {'type':'integer','minimum':0,'default':0}}, ['node_ref']),
@@ -154,19 +155,23 @@ SPECS.update({
 })
 
 
+class NativeArgumentError(ValueError):
+    """Bounded argument encoding/JSON diagnostics, distinct from envelope errors."""
+
+
 def _object(pairs):
     result={}
     for key,value in pairs:
-        if key in result: raise ValueError('Duplicate tool argument key')
+        if key in result: raise NativeArgumentError('Duplicate tool argument key')
         result[key]=value
     return result
 
 
-def _invalid_constant(value): raise ValueError('Non-finite tool argument')
+def _invalid_constant(value): raise NativeArgumentError('Non-finite tool argument')
 
 
 def _finite(value):
-    if isinstance(value,float) and not math.isfinite(value): raise ValueError('Non-finite tool argument')
+    if isinstance(value,float) and not math.isfinite(value): raise NativeArgumentError('Non-finite tool argument')
     if isinstance(value,dict):
         for v in value.values(): _finite(v)
     if isinstance(value,list):
@@ -317,7 +322,8 @@ class NativeBrowserTools(BrowserTools):
         if not isinstance(name,str) or name not in definitions: raise ValueError('Unsupported native tool')
         encoding_limit=(FINAL_ARGUMENT_ENCODING_LIMIT if name=='send_msg_to_user' else
                         100000 if name in DATA_TOOLS else 20000 if name in AGENT_TOOLS else 4096)
-        if not isinstance(arguments,str) or len(arguments)>encoding_limit: raise ValueError('Invalid native argument encoding or size')
+        if not isinstance(arguments,str): raise ValueError('Native arguments must be an encoded JSON string')
+        if len(arguments)>encoding_limit: raise NativeArgumentError('Tool argument encoding exceeds its size limit')
         values=json.loads(arguments,object_pairs_hook=_object,parse_constant=_invalid_constant)
         _finite(values)
         Draft202012Validator(definitions[name]['parameters']).validate(values)
@@ -341,6 +347,97 @@ class NativeBrowserTools(BrowserTools):
             assistant.update(reasoning_for_replay(message))
         return decision, assistant
 
+
+    def parse_for_dispatch(self, completion, *, batching=False, allow_search=False,
+                           has_call_id=lambda _: False):
+        """Return bounded argument errors only after validating the whole envelope.
+
+        Strict parsers stay unchanged for validators/offline callers. A rejected
+        batch runs no member. Malformed identities, unsupported tools, navigation
+        policy errors and incomplete generations remain hard failures.
+        """
+        from .completion_diagnostics import completion_diagnostic
+        from .backend import Completion
+        from .retry_policy import argument_diagnostic
+        try:
+            parsed, assistant = (self.parse_batch if batching else self.parse_completion)(
+                completion, allow_search=allow_search)
+        except (ValidationError, json.JSONDecodeError, NativeArgumentError):
+            diagnostic = completion_diagnostic(completion.raw, completion.request)
+            if diagnostic and diagnostic['retry_unchanged'] is False:
+                raise  # A probable output cutoff is not an argument correction.
+            raw = completion.raw
+            choices = raw.get('choices') if isinstance(raw, dict) else None
+            if (not isinstance(choices, list) or len(choices) != 1
+                    or not isinstance(choices[0], dict)):
+                raise ValueError('Expected one completion choice')
+            choice = choices[0]; message = choice.get('message')
+            if (choice.get('finish_reason') not in ('tool_calls', 'stop')
+                    or not isinstance(message, dict) or message.get('role') != 'assistant'
+                    or message.get('refusal')):
+                raise ValueError('Native response is not a complete assistant action')
+            calls = message.get('tool_calls')
+            maximum = self.batch_size if batching else 1
+            if not isinstance(calls, list) or not 1 <= len(calls) <= maximum:
+                raise ValueError('Invalid native batch size')
+            content = message.get('content')
+            if content is not None and not isinstance(content, str):
+                raise ValueError('Unsupported assistant content shape')
+            assistant = {'role':'assistant', 'content':content, 'tool_calls':deepcopy(calls)}
+            if self.reasoning_replay == 'preserve':
+                assistant.update(reasoning_for_replay(message))
+            definitions = {d['function']['name'] for d in self.definitions(allow_search=allow_search)}
+            ids, names = set(), []
+            for call in calls:
+                if (not isinstance(call, dict) or call.get('type') != 'function'
+                        or not isinstance(call.get('id'), str) or not call['id']):
+                    raise ValueError('Invalid native tool call identity')
+                if call['id'] in ids or has_call_id(call['id']):
+                    raise ValueError('Repeated native tool call ID')
+                ids.add(call['id'])
+                function = call.get('function')
+                if not isinstance(function, dict): raise ValueError('Invalid native function')
+                name = function.get('name')
+                if not isinstance(name, str) or name not in definitions:
+                    raise ValueError('Unsupported native tool')
+                if not isinstance(function.get('arguments'), str):
+                    raise ValueError('Native arguments must be an encoded JSON string')
+                names.append(name)
+            if any(name in ('send_msg_to_user','ask_user','handover_tab') for name in names[:-1]):
+                raise ValueError('Terminal or yielding tool must be last in a batch')
+            if 'proceed_action' in names and len(names) != 1:
+                raise ValueError('proceed_action must be the only call in a batch')
+            invalid, native_history_safe = {}, True
+            for ordinal, call in enumerate(calls):
+                single = deepcopy(raw)
+                single['choices'][0]['message']['tool_calls'] = [call]
+                try:
+                    self.parse_completion(Completion(completion.text, single), allow_search=allow_search)
+                except (ValidationError, json.JSONDecodeError, NativeArgumentError) as error:
+                    detail = argument_diagnostic(error)
+                    if detail is None:
+                        detail = {'parameter':'(arguments)', 'requirement':str(error)}
+                    invalid[ordinal] = detail
+                    # Local templates require well-formed object-valued arguments.
+                    # Keep malformed JSON inert instead of repairing history.
+                    try:
+                        value = json.loads(call['function']['arguments'], object_pairs_hook=_object,
+                                           parse_constant=_invalid_constant)
+                        _finite(value)
+                        native_history_safe &= isinstance(value, dict)
+                    except (ValueError, RecursionError):
+                        native_history_safe = False
+            if not invalid: raise ValueError('Argument rejection has no parameter diagnostic')
+            results = [{'execution':'not_executed', 'reason':('invalid_tool_arguments' if i in invalid
+                        else 'batch_rejected_invalid_arguments'), 'tool':name,
+                        'batch_call':i, **({'argument_error':invalid[i]} if i in invalid else {}),
+                        'correction':'Correct the identified arguments and resubmit the calls you still want. '
+                                     'No call in this response ran; do not assume its effects occurred.'}
+                       for i, name in enumerate(names)]
+            return None, assistant, results, ('native' if native_history_safe else 'controller')
+        if any(has_call_id(call['id']) for call in assistant['tool_calls']):
+            raise ValueError('Repeated native tool call ID')
+        return (parsed if batching else [parsed]), assistant, None, None
 
     def parse_batch(self, completion, *, allow_search=False):
         """Validate every member before execution; reuse the single-call schema path."""
@@ -436,11 +533,12 @@ class NativeConversation(EvidenceConversation):
         # tool result, assembled AFTER the runner's pacing/fresh capture.
         recovering = self._pending_retry is not None
         if recovering:
-            assistant, notice = self._pending_retry
+            assistant, notice, *notice_sources = self._pending_retry
             if assistant is not None:
                 self._messages.append(assistant)
             index = len(self._messages)
             message = {'role': 'user', 'content': notice}
+            self._bind(notice_sources[0] if notice_sources else None, index, 0, len(notice))
         elif self._requested:
             assistant, results = self._pending_result
             self._messages.append(assistant)
@@ -483,7 +581,7 @@ class NativeConversation(EvidenceConversation):
         self._pending_human=[]
         return deepcopy(self._messages)
 
-    def recover(self, raw, notice, *, preserve_reasoning=True):
+    def recover(self, raw, notice, *, preserve_reasoning=True, notice_source=None, rejected_call_ids=()):
         """Append a marked controller notice, never invent an executed tool result.
 
         Invalid tool-call objects remain exact in the trace. On the wire their
@@ -491,6 +589,9 @@ class NativeConversation(EvidenceConversation):
         """
         if not self._requested or self._pending_result is not None or self._pending_retry is not None:
             raise ValueError('Recovery requires one outstanding model decision')
+        if (len(set(rejected_call_ids)) != len(rejected_call_ids)
+                or any(not isinstance(i,str) or not i or i in self._call_ids for i in rejected_call_ids)):
+            raise ValueError('Repeated or invalid native tool call ID')
         assistant = None
         choices = raw.get('choices') if isinstance(raw, dict) else None
         message = choices[0].get('message') if isinstance(choices, list) and len(choices) == 1 else None
@@ -504,7 +605,8 @@ class NativeConversation(EvidenceConversation):
             assistant = {'role': 'assistant', 'content': content or '[No executable action returned]'}
             if preserve_reasoning:
                 assistant.update(reasoning_for_replay(message))
-        self._pending_retry = (assistant, notice)
+        self._pending_retry = ((assistant, notice) if notice_source is None else (assistant, notice, notice_source))
+        self._call_ids.update(rejected_call_ids)
 
     def has_call_id(self, call_id):
         return call_id in self._call_ids

@@ -75,27 +75,29 @@ class FailureChainTests(unittest.TestCase):
         return summary,rows,requests,actions
     def test_allowance_replenishes_and_entire_invalid_batch_skipped(self):
         summary,rows,requests,actions=self.episode(['wait+bad','wait','bad','finish'])
-        self.assertIsNone(summary['error']);self.assertEqual(summary['decision_retry_count'],2)
+        self.assertIsNone(summary['error']);self.assertEqual(summary['decision_retry_count'],0)
         self.assertEqual(len(requests),4);self.assertEqual(len(actions),2)
-        self.assertEqual([r['decision_retry']['chain_ordinal'] for r in rows if 'decision_retry' in r],[1,1])
+        self.assertEqual([r['batch_stop_reason'] for r in rows if r.get('batch_stop_reason')=='invalid_tool_arguments'],['invalid_tool_arguments','invalid_tool_arguments'])
         self.assertEqual(rows[0]['model_response']['choices'][0]['message']['tool_calls'][0]['function']['name'],'noop')
-        self.assertEqual(rows[0]['decision_retry']['reason'],'invalid_tool_arguments')
-        self.assertIn('value',rows[0]['decision_retry']['argument_diagnostic']['requirement'])
+        self.assertEqual(rows[0]['batch_calls'][1]['policy_feedback']['reason'],'invalid_tool_arguments')
+        self.assertIn('value',rows[0]['batch_calls'][1]['policy_feedback']['argument_error']['requirement'])
         for a,b in zip(requests,requests[1:]):
             self.assertEqual(a['tools'],b['tools']);self.assertEqual(a['messages'],b['messages'][:len(a['messages'])])
         self.assertTrue(all(x['confirmed'] for x in rows[1]['policy_delivery']['items']))
-    def test_consecutive_bad_correction_stops(self):
+    def test_consecutive_argument_errors_allow_fresh_valid_response(self):
         summary,rows,requests,actions=self.episode(['bad','bad','finish'])
-        self.assertIsNotNone(summary['error']);self.assertEqual(len(requests),2);self.assertEqual(actions,[])
-        self.assertEqual(summary['decision_retry_count'],1)
-        self.assertEqual(rows[-1]['decision_retry_unavailable']['reason'],'failure_chain_limit')
-    def test_original_episode_limit_remains(self):
+        self.assertIsNone(summary['error']);self.assertEqual(len(requests),3);self.assertEqual(len(actions),1)
+        self.assertEqual(summary['decision_retry_count'],0)
+        self.assertTrue(all(row['batch_stop_reason']=='invalid_tool_arguments' for row in rows[:2]))
+    def test_argument_feedback_does_not_consume_transport_retry_allowance(self):
         summary,rows,requests,actions=self.episode(['bad','wait','bad','finish'],scope='episode')
-        self.assertIsNotNone(summary['error']);self.assertEqual(len(requests),3);self.assertEqual(len(actions),1)
+        self.assertIsNone(summary['error']);self.assertEqual(len(requests),4);self.assertEqual(len(actions),2)
+        self.assertEqual(summary['decision_retry_count'],0)
     def test_final_call_exhaustion_has_no_extra_request(self):
         summary,rows,requests,actions=self.episode(['bad'],max_steps=1)
-        self.assertIsNotNone(summary['error']);self.assertEqual(len(requests),1);self.assertEqual(actions,[])
-        self.assertEqual(rows[-1]['decision_retry_unavailable']['reason'],'episode_call_limit')
+        self.assertIsNone(summary['error']);self.assertEqual(summary['stop_reason'],'max_steps')
+        self.assertEqual(len(requests),1);self.assertEqual(actions,[])
+        self.assertEqual(summary['decision_retry_count'],0)
     def test_uncertain_executed_action_is_not_replayed(self):
         summary,rows,requests,actions=self.episode(['wait','finish'],fail_action=True)
         self.assertIsNotNone(summary['error']);self.assertEqual(len(requests),1);self.assertEqual(len(actions),1)
