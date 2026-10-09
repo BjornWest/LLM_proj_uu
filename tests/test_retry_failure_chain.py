@@ -110,6 +110,11 @@ class FailureChainTests(unittest.TestCase):
         self.assertEqual(summary['stop_reason'],'error')
         self.assertEqual(rows[-1]['decision_retry_unavailable']['reason'],'episode_call_limit')
         self.assertEqual(len(requests),1);self.assertEqual(actions,[])
+    def test_argument_rejection_does_not_reset_unresolved_failure_chain(self):
+        summary,rows,requests,actions=self.episode(['missing','bad','missing','finish'])
+        self.assertEqual(summary['stop_reason'],'error')
+        self.assertEqual(rows[-1]['decision_retry_unavailable']['reason'],'failure_chain_limit')
+        self.assertEqual(len(requests),3);self.assertEqual(actions,[])
     def test_uncertain_executed_action_is_not_replayed(self):
         summary,rows,requests,actions=self.episode(['wait','finish'],fail_action=True)
         self.assertIsNotNone(summary['error']);self.assertEqual(len(requests),1);self.assertEqual(len(actions),1)

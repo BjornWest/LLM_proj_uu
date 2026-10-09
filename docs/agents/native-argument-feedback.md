@@ -34,3 +34,9 @@ Oversized/deep JSON uses bounded inert history; exact originals remain in the tr
 Rejected proposal replay is limited to 4096 characters; feedback names encoding
 bounds in characters, independently of model token limits. Skipped calls are counted
 as proposals in the viewer, with no execution lifecycle events or effects.
+
+Argument rejection does not reset an existing transport/structural failure chain:
+only a successfully validated decision does. It also does not consume an additional
+retry allowance. Rejected display strings are explicitly inert proposals, not
+serialized executable browser calls. Overlong JSON integer literals return bounded
+argument feedback without weakening Python's integer-conversion protection.

@@ -340,3 +340,23 @@ def test_same_call_invalid_schema_cannot_navigate_outside_origin():
     assert decisions is None and results[0]['execution']=='not_executed'
     with pytest.raises(ValueError):
         parsed(reply([('goto',{'url':'https://outside.invalid/'})]),tools)
+
+
+def test_overlong_integer_literal_remains_recoverable(tmp_path):
+    arguments='{"text":'+'9'*5000+'}'
+    raw=reply([('send_msg_to_user',arguments)],raw_arguments=True)
+    _,_,results,channel=parsed(raw)
+    assert channel=='controller' and 'digit limit' in results[0]['argument_error']['requirement']
+    _,summary,_,requests,_,actions=exercise(tmp_path,[raw,reply([('send_msg_to_user',{'text':'Done'})])],repeat_ids=True)
+    assert summary['error'] is None and len(requests)==2 and len(actions)==1
+    assert summary['evaluation']['task_completed'] is True
+
+
+def test_rejected_proposal_display_is_inert_not_a_different_python_call(tmp_path):
+    import ast
+    _,_,rows,_,_,_=exercise(tmp_path,[reply([('ax_read',{'node_ref':'d1n0','limit':52})]),
+        reply([('send_msg_to_user',{'text':'Done'})])])
+    member=rows[0]['batch_calls'][0]
+    assert member['action'].startswith('[Rejected, unexecuted proposal] ')
+    assert member['not_executed'] is True
+    with pytest.raises(SyntaxError):ast.parse(member['action'],mode='eval')

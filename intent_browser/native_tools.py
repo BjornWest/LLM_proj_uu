@@ -176,6 +176,13 @@ def _object(pairs):
 def _invalid_constant(value): raise NativeArgumentError('Non-finite tool argument')
 
 
+def _integer_literal(value):
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise NativeArgumentError('Integer tool argument exceeds supported digit limit; use a bounded integer', force_controller=True) from exc
+
+
 def _finite(value, depth=0):
     if depth > 32:
         raise NativeArgumentError('Tool arguments exceed maximum nesting depth 32', force_controller=True)
@@ -351,7 +358,7 @@ class NativeBrowserTools(BrowserTools):
         if len(arguments)>encoding_limit:
             raise NativeArgumentError(f'Tool argument encoding or size exceeds maximum {encoding_limit} characters; shorten the arguments', force_controller=True)
         try:
-            values=json.loads(arguments,object_pairs_hook=_object,parse_constant=_invalid_constant)
+            values=json.loads(arguments,object_pairs_hook=_object,parse_constant=_invalid_constant,parse_int=_integer_literal)
         except RecursionError as exc:
             raise NativeArgumentError('Tool arguments exceed supported JSON nesting depth', force_controller=True) from exc
         _finite(values)
@@ -461,7 +468,7 @@ class NativeBrowserTools(BrowserTools):
                         continue
                     try:
                         value = json.loads(call['function']['arguments'], object_pairs_hook=_object,
-                                           parse_constant=_invalid_constant)
+                                           parse_constant=_invalid_constant,parse_int=_integer_literal)
                         _finite(value)
                         native_history_safe &= isinstance(value, dict)
                     except (ValueError, RecursionError):

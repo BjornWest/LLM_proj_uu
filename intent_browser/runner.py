@@ -985,7 +985,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                             proposal = call['function']['name']+'('+call['function']['arguments']+')'
                             display = proposal if len(proposal) <= 4096 else call['function']['name']+'([oversized rejected arguments; see model_response])'
                             member = {'step':index,'batch_call':ordinal,'execution_index':execution_index if batching else index,
-                                'tool_call_id':call['id'],'action':display,'kind':'argument_rejection',
+                                'tool_call_id':call['id'],'action':'[Rejected, unexecuted proposal] '+display,'kind':'argument_rejection',
                                 'policy_feedback':value,'not_executed':True,'browser_stepped':False,
                                 'action_dispatch_started':False,'observation':final_ref,'reward':None}
                             execution_index += 1
