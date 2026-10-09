@@ -51,8 +51,6 @@ class DecisionRetryTests(unittest.TestCase):
                 raw=response('select_option', {'bid':'1','options':50})
             if case=='invalid_json' and n==1:
                 raw=reply();raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']='{"text":'
-            for ordinal, call in enumerate(raw['choices'][0]['message'].get('tool_calls', [])):
-                call['id']=f'fixture-{n}-{ordinal}'
             return httpx.Response(200,json=raw)
         class BudgetBackend(ChatCompletionsBackend):
             supports_native_tools=True

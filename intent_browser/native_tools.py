@@ -18,6 +18,7 @@ from .data_tools import TOOLS as DATA_TOOLS
 from .harness import BrowserTools, EvidenceConversation
 
 STRING = {'type': 'string'}
+REJECTED_ARGUMENT_HISTORY_CHAR_LIMIT = 4096
 FINAL_MESSAGE_CHAR_LIMIT = 65536
 # JSON may escape an astral code point as two six-character UTF-16 escapes.
 FINAL_ARGUMENT_ENCODING_LIMIT = 12 * FINAL_MESSAGE_CHAR_LIMIT + 1024
@@ -105,7 +106,7 @@ SPECS = {
          'view': {'type':'string','enum':['children','subtree','ancestors','neighborhood','node'],'default':'children'},
          'depth': {'type':'integer','minimum':1,'maximum':8,'default':1},
          'limit': {'type':'integer','minimum':1,'maximum':50,'default':20,
-                   'description':'Maximum returned AX nodes, not reviews or tokens. Default 20, maximum 50. Token budgets or pagination may return fewer; follow next_offset for more.'},
+                   'description':'Maximum returned AX nodes, not tokens. Default 20, maximum 50. Token budgets or pagination may return fewer; follow next_offset for more.'},
          'offset': {'type':'integer','minimum':0,'default':0},
          'context': {'type':'integer','minimum':0,'maximum':20,'default':2},
          'text_offset': {'type':'integer','minimum':0,'default':0}}, ['node_ref']),
@@ -158,6 +159,11 @@ SPECS.update({
 class NativeArgumentError(ValueError):
     """Bounded argument encoding/JSON diagnostics, distinct from envelope errors."""
 
+    def __init__(self, message, *, diagnostic=None, force_controller=False):
+        super().__init__(message)
+        self.diagnostic = diagnostic
+        self.force_controller = force_controller
+
 
 def _object(pairs):
     result={}
@@ -170,12 +176,31 @@ def _object(pairs):
 def _invalid_constant(value): raise NativeArgumentError('Non-finite tool argument')
 
 
-def _finite(value):
+def _finite(value, depth=0):
+    if depth > 32:
+        raise NativeArgumentError('Tool arguments exceed maximum nesting depth 32', force_controller=True)
     if isinstance(value,float) and not math.isfinite(value): raise NativeArgumentError('Non-finite tool argument')
     if isinstance(value,dict):
-        for v in value.values(): _finite(v)
+        for v in value.values(): _finite(v, depth+1)
     if isinstance(value,list):
-        for v in value: _finite(v)
+        for v in value: _finite(v, depth+1)
+
+
+def _integer_types(value, schema, path=''):
+    # JSON Schema permits 50.0 as an integer; Python indexing requires int.
+    # Reject rather than normalize so retained arguments remain exact.
+    if schema.get('type') == 'integer' and type(value) is not int:
+        raise NativeArgumentError('Use an integer JSON value without a decimal point',
+            diagnostic={'parameter':path or '(arguments)', 'received_type':'number',
+                        'requirement':'Use an integer JSON value without a decimal point.'})
+    if isinstance(value, dict):
+        for key, item in value.items():
+            child = schema.get('properties', {}).get(key)
+            if child:
+                _integer_types(item, child, path+'/'+key.replace('~','~0').replace('/','~1'))
+    elif isinstance(value, list) and isinstance(schema.get('items'), dict):
+        for i, item in enumerate(value):
+            _integer_types(item, schema['items'], path+'/'+str(i))
 
 
 @dataclass(frozen=True)
@@ -323,10 +348,15 @@ class NativeBrowserTools(BrowserTools):
         encoding_limit=(FINAL_ARGUMENT_ENCODING_LIMIT if name=='send_msg_to_user' else
                         100000 if name in DATA_TOOLS else 20000 if name in AGENT_TOOLS else 4096)
         if not isinstance(arguments,str): raise ValueError('Native arguments must be an encoded JSON string')
-        if len(arguments)>encoding_limit: raise NativeArgumentError('Tool argument encoding exceeds its size limit')
-        values=json.loads(arguments,object_pairs_hook=_object,parse_constant=_invalid_constant)
+        if len(arguments)>encoding_limit:
+            raise NativeArgumentError(f'Tool argument encoding or size exceeds maximum {encoding_limit} characters; shorten the arguments', force_controller=True)
+        try:
+            values=json.loads(arguments,object_pairs_hook=_object,parse_constant=_invalid_constant)
+        except RecursionError as exc:
+            raise NativeArgumentError('Tool arguments exceed supported JSON nesting depth', force_controller=True) from exc
         _finite(values)
         Draft202012Validator(definitions[name]['parameters']).validate(values)
+        _integer_types(values, definitions[name]['parameters'])
         if name == 'scroll':
             # Schema defaults describe this contract but do not populate JSON.
             # Raw arguments remain unchanged in completion and assistant history.
@@ -337,7 +367,7 @@ class NativeBrowserTools(BrowserTools):
         # through the same allowlist/signature checks as historical actions.
         code=name+'('+', '.join(k+'='+repr(v) for k,v in values.items())+')'
         decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.site_discovery_tools and name == 'discover_sites') or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
-                  parse_decision(code,allow_search=allow_search,allowed_names=self.names))
+                  self._parse_browser_action(code, allow_search=allow_search))
         self.validate_navigation(decision)
         decision.ax_overview_tokens=overview_tokens
         content=message.get('content')
@@ -348,13 +378,19 @@ class NativeBrowserTools(BrowserTools):
         return decision, assistant
 
 
+    def _parse_browser_action(self, code, *, allow_search):
+        if len(code) > 4096:
+            raise NativeArgumentError('Serialized browser action exceeds maximum 4096 characters; shorten the argument text')
+        return parse_decision(code, allow_search=allow_search, allowed_names=self.names)
+
+
     def parse_for_dispatch(self, completion, *, batching=False, allow_search=False,
                            has_call_id=lambda _: False):
         """Return bounded argument errors only after validating the whole envelope.
 
         Strict parsers stay unchanged for validators/offline callers. A rejected
         batch runs no member. Malformed identities, unsupported tools, navigation
-        policy errors and incomplete generations remain hard failures.
+        policy errors on schema-valid calls and incomplete generations remain hard failures.
         """
         from .completion_diagnostics import completion_diagnostic
         from .backend import Completion
@@ -407,19 +443,22 @@ class NativeBrowserTools(BrowserTools):
                 raise ValueError('Terminal or yielding tool must be last in a batch')
             if 'proceed_action' in names and len(names) != 1:
                 raise ValueError('proceed_action must be the only call in a batch')
-            invalid, native_history_safe = {}, True
+            invalid, native_history_safe = {}, len(json.dumps(calls, ensure_ascii=False)) <= REJECTED_ARGUMENT_HISTORY_CHAR_LIMIT
             for ordinal, call in enumerate(calls):
                 single = deepcopy(raw)
                 single['choices'][0]['message']['tool_calls'] = [call]
                 try:
                     self.parse_completion(Completion(completion.text, single), allow_search=allow_search)
                 except (ValidationError, json.JSONDecodeError, NativeArgumentError) as error:
-                    detail = argument_diagnostic(error)
+                    detail = getattr(error, 'diagnostic', None) or argument_diagnostic(error)
                     if detail is None:
                         detail = {'parameter':'(arguments)', 'requirement':str(error)}
                     invalid[ordinal] = detail
                     # Local templates require well-formed object-valued arguments.
                     # Keep malformed JSON inert instead of repairing history.
+                    if getattr(error, 'force_controller', False):
+                        native_history_safe = False
+                        continue
                     try:
                         value = json.loads(call['function']['arguments'], object_pairs_hook=_object,
                                            parse_constant=_invalid_constant)
@@ -581,7 +620,7 @@ class NativeConversation(EvidenceConversation):
         self._pending_human=[]
         return deepcopy(self._messages)
 
-    def recover(self, raw, notice, *, preserve_reasoning=True, notice_source=None, rejected_call_ids=()):
+    def recover(self, raw, notice, *, preserve_reasoning=True, notice_source=None):
         """Append a marked controller notice, never invent an executed tool result.
 
         Invalid tool-call objects remain exact in the trace. On the wire their
@@ -589,9 +628,6 @@ class NativeConversation(EvidenceConversation):
         """
         if not self._requested or self._pending_result is not None or self._pending_retry is not None:
             raise ValueError('Recovery requires one outstanding model decision')
-        if (len(set(rejected_call_ids)) != len(rejected_call_ids)
-                or any(not isinstance(i,str) or not i or i in self._call_ids for i in rejected_call_ids)):
-            raise ValueError('Repeated or invalid native tool call ID')
         assistant = None
         choices = raw.get('choices') if isinstance(raw, dict) else None
         message = choices[0].get('message') if isinstance(choices, list) and len(choices) == 1 else None
@@ -601,12 +637,11 @@ class NativeConversation(EvidenceConversation):
                 raise ValueError('Unsupported recovery content shape')
             if message.get('tool_calls'):
                 proposal = json.dumps(message['tool_calls'], ensure_ascii=False)
-                content += '\n[Rejected, unexecuted tool proposal]\n' + (proposal if len(proposal) <= 4096 else '[See exact retained response; proposal exceeds recovery context bound]')
+                content += '\n[Rejected, unexecuted tool proposal]\n' + (proposal if len(proposal) <= REJECTED_ARGUMENT_HISTORY_CHAR_LIMIT else '[See exact retained response; proposal exceeds recovery context bound]')
             assistant = {'role': 'assistant', 'content': content or '[No executable action returned]'}
             if preserve_reasoning:
                 assistant.update(reasoning_for_replay(message))
         self._pending_retry = ((assistant, notice) if notice_source is None else (assistant, notice, notice_source))
-        self._call_ids.update(rejected_call_ids)
 
     def has_call_id(self, call_id):
         return call_id in self._call_ids

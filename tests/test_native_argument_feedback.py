@@ -76,11 +76,11 @@ def test_unreplayable_arguments_use_inert_channel(arguments):
     conversation=NativeConversation()
     first=conversation.request('System','Goal','First')
     notice=json.dumps({'execution':'not_executed','results':feedback},sort_keys=True)
-    conversation.recover(raw,notice,notice_source='diagnostic',rejected_call_ids=['call-0'])
+    conversation.recover(raw,notice,notice_source='diagnostic')
     second=conversation.request('System','Goal','Fresh')
     assert second[:len(first)]==first
     assert not any('tool_calls' in message for message in second)
-    assert conversation.has_call_id('call-0')
+    assert not conversation.has_call_id('call-0')
     binding=next(b for b in conversation.bindings() if b['content_id']=='diagnostic')
     assert second[binding['message_index']]['content'][binding['start']:binding['end']]==notice
 
@@ -203,9 +203,9 @@ def test_real_runner_rejects_then_corrects_and_publishes_automatic_grade(tmp_pat
     assert json.loads((path/'metadata.json').read_text())['invalid_argument_feedback']['version']=='native-argument-rejection-v1'
 
 
-def test_real_runner_malformed_json_feedback_is_delivered_and_ids_consumed(tmp_path):
+def test_real_runner_malformed_json_feedback_allows_corrected_same_id(tmp_path):
     raw=reply([('fill','{"bid":')],raw_arguments=True)
-    path,summary,rows,requests,_,actions=exercise(tmp_path,[raw,reply([('send_msg_to_user',{'text':'Done'})])])
+    path,summary,rows,requests,_,actions=exercise(tmp_path,[raw,reply([('send_msg_to_user',{'text':'Done'})])],repeat_ids=True)
     assert summary['error'] is None and summary['infrastructure_completed'] is True and len(actions)==1
     assert rows[0]['argument_feedback_channel']=='controller'
     assert not any('tool_calls' in m for m in requests[1]['messages'])
@@ -253,9 +253,90 @@ def test_mimo_can_count_rejected_history_without_argument_repair(arguments):
     _,assistant,results,channel=parsed(raw,tools)
     conversation=NativeConversation();conversation.request('System','Goal','Initial')
     if channel=='native':conversation.record_batch(assistant,[(value,None) for value in results])
-    else:conversation.recover(raw,json.dumps(results),rejected_call_ids=['call-0'])
+    else:conversation.recover(raw,json.dumps(results))
     history=conversation.request('System','Goal','Fresh')
     backend=SimpleNamespace(model='xiaomi/mimo-v2.6-pro',base_url='https://openrouter.ai/api/v1',request_options={})
     count=model_matched_input_counter(backend,assets_root=root)(history,tools.definitions())
     assert count['input_tokens']>0
     assert raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']==arguments
+
+
+@pytest.mark.parametrize('tool,args,parameter',[
+    ('ax_read',{'node_ref':'d1n0','limit':50.0},'/limit'),
+    ('ax_read',{'node_ref':'d1n0','offset':0.0},'/offset'),
+    ('ax_search',{'query':'Fixture','limit':5.0},'/limit'),
+])
+def test_decimal_integer_arguments_reject_without_cast(tool,args,parameter):
+    raw=reply([(tool,args)]);saved=deepcopy(raw)
+    decisions,assistant,feedback,channel=parsed(raw)
+    assert decisions is None and channel=='native' and raw==saved
+    assert feedback[0]['argument_error']['parameter']==parameter
+    assert 'without a decimal point' in feedback[0]['argument_error']['requirement']
+
+
+@pytest.mark.parametrize('batch_size',[1,8])
+def test_actual_runner_decimal_limit_can_be_corrected(tmp_path,batch_size):
+    invalid=reply([('ax_read',{'node_ref':'d1n0','limit':50.0})])
+    valid=reply([('ax_read',{'node_ref':'d1n0','limit':50})])
+    _,summary,rows,_,_,actions=exercise(tmp_path,[invalid,valid,reply([('send_msg_to_user',{'text':'Done'})])],batch_size=batch_size)
+    assert summary['error'] is None and summary['evaluation']['task_completed'] is True
+    assert rows[0]['batch_calls'][0]['policy_feedback']['argument_error']['parameter']=='/limit'
+    assert len(actions)==1
+
+
+@pytest.mark.parametrize('arguments',[
+    json.dumps({'bid':'1','value':'x'*60000}),
+    json.dumps({'bid':'1','value':'x'*300000}),
+    '['*1100+'0'+']'*1100,
+    '{"bid":"1","value":'+ '['*40+'0'+']'*40 + '}',
+])
+def test_oversized_or_deep_proposals_get_bounded_inert_history(arguments):
+    raw=reply([('fill',arguments)],raw_arguments=True)
+    _,assistant,results,channel=parsed(raw)
+    assert channel=='controller'
+    conversation=NativeConversation();conversation.request('System','Goal','First')
+    conversation.recover(raw,json.dumps(results))
+    history=conversation.request('System','Goal','Next')
+    assert not any('tool_calls' in m for m in history)
+    assert len(json.dumps(history)) < 7000
+    assert raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']==arguments
+
+
+def test_encoding_bound_is_actionable_and_actual_runner_continues(tmp_path):
+    raw=reply([('fill',{'bid':'1','value':'x'*60000})])
+    _,summary,rows,requests,_,actions=exercise(tmp_path,[raw,reply([('send_msg_to_user',{'text':'Done'})])],repeat_ids=True)
+    assert summary['error'] is None and summary['evaluation']['task_completed'] is True
+    assert len(actions)==1 and rows[0]['argument_feedback_channel']=='controller'
+    assert 'maximum 4096 characters' in requests[1]['messages'][-1]['content']
+    assert len(json.dumps(requests[1]['messages'])) < 9000
+
+
+@pytest.mark.parametrize('value',['x'*4074,'\u200b'*700],ids=['ascii','escaped'])
+def test_expanded_python_literal_size_is_recoverable(value):
+    raw=reply([('fill',{'bid':'1','value':value})])
+    # Ensure this exercises the serialized-action bound, not JSON encoding size.
+    raw['choices'][0]['message']['tool_calls'][0]['function']['arguments']=json.dumps({'bid':'1','value':value},ensure_ascii=False,separators=(',',':'))
+    _,_,results,_=parsed(raw)
+    assert 'Serialized browser action exceeds maximum 4096 characters' in results[0]['argument_error']['requirement']
+
+
+def test_rejected_single_call_viewer_count_and_timing_do_not_alias_click(tmp_path):
+    from agent_trace.adapters.browsergym import project
+    _,summary,rows,_,_,actions=exercise(tmp_path,[reply([('click',{'bid':'1'})]),
+        reply([('ax_read',{'node_ref':'d1n0','limit':52})]),
+        reply([('send_msg_to_user',{'text':'Done'})])],batch_size=1)
+    assert summary['error'] is None and len(actions)==2
+    assert rows[1]['batch_calls'][0]['execution_index']==1
+    path=next((tmp_path/'runs').iterdir());projection=project(path)
+    assert json.loads(next(m['text'] for m in projection['messages'] if m['title']=='Recorded execution summary'))['recorded_tool_calls']['skipped']==1
+    skipped=[e for e in projection['messages'] if e.get('kind')=='tool' and e.get('execution_status')=='skipped']
+    assert len(skipped)==1 and skipped[0].get('at') is None
+
+
+def test_same_call_invalid_schema_cannot_navigate_outside_origin():
+    tools=NativeBrowserTools(names=('goto',),navigation_origins=('https://inside.invalid',),batch_size=8)
+    raw=reply([('goto',{'url':'https://outside.invalid/','extra':1})])
+    decisions,_,results,_=parsed(raw,tools)
+    assert decisions is None and results[0]['execution']=='not_executed'
+    with pytest.raises(ValueError):
+        parsed(reply([('goto',{'url':'https://outside.invalid/'})]),tools)

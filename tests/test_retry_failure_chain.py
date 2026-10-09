@@ -54,6 +54,8 @@ class FailureChainTests(unittest.TestCase):
             kinds=sequence[len(requests)-1]
             calls=[]
             for ordinal, kind in enumerate(kinds.split('+')):
+                if kind == 'missing':
+                    continue
                 name,args=({'bad':('fill',{'bid':'1'}),'wait':('noop',{'wait_ms':0}),
                             'finish':('send_msg_to_user',{'text':'Done'})}[kind])
                 call=response(name,args)['choices'][0]['message']['tool_calls'][0]
@@ -98,6 +100,16 @@ class FailureChainTests(unittest.TestCase):
         self.assertIsNone(summary['error']);self.assertEqual(summary['stop_reason'],'max_steps')
         self.assertEqual(len(requests),1);self.assertEqual(actions,[])
         self.assertEqual(summary['decision_retry_count'],0)
+    def test_true_failure_chain_still_stops_after_second_missing_response(self):
+        summary,rows,requests,actions=self.episode(['missing','missing','finish'])
+        self.assertEqual(summary['stop_reason'],'error')
+        self.assertEqual(rows[-1]['decision_retry_unavailable']['reason'],'failure_chain_limit')
+        self.assertEqual(len(requests),2);self.assertEqual(actions,[])
+    def test_true_missing_response_at_final_call_has_no_hidden_retry(self):
+        summary,rows,requests,actions=self.episode(['missing'],max_steps=1)
+        self.assertEqual(summary['stop_reason'],'error')
+        self.assertEqual(rows[-1]['decision_retry_unavailable']['reason'],'episode_call_limit')
+        self.assertEqual(len(requests),1);self.assertEqual(actions,[])
     def test_uncertain_executed_action_is_not_replayed(self):
         summary,rows,requests,actions=self.episode(['wait','finish'],fail_action=True)
         self.assertIsNotNone(summary['error']);self.assertEqual(len(requests),1);self.assertEqual(len(actions),1)

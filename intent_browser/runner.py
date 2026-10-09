@@ -982,8 +982,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     if argument_results is not None:
                         records, results = [], []
                         for ordinal, (call, value) in enumerate(zip(assistant['tool_calls'], argument_results)):
-                            member = {'step':index,'batch_call':ordinal,'execution_index':execution_index,
-                                'tool_call_id':call['id'],'action':None,'kind':'argument_rejection',
+                            proposal = call['function']['name']+'('+call['function']['arguments']+')'
+                            display = proposal if len(proposal) <= 4096 else call['function']['name']+'([oversized rejected arguments; see model_response])'
+                            member = {'step':index,'batch_call':ordinal,'execution_index':execution_index if batching else index,
+                                'tool_call_id':call['id'],'action':display,'kind':'argument_rejection',
                                 'policy_feedback':value,'not_executed':True,'browser_stepped':False,
                                 'action_dispatch_started':False,'observation':final_ref,'reward':None}
                             execution_index += 1
@@ -1001,8 +1003,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                             source=delivery.register('batch_result',notice,step=index,
                                 provenance={'scope':'Malformed argument proposal; no call dispatched'}) if delivery else None
                             conversation.recover(completion.raw,notice,
-                                preserve_reasoning=harness_profile.tools.reasoning_replay=='preserve',notice_source=source,
-                                rejected_call_ids=[call['id'] for call in assistant['tool_calls']])
+                                preserve_reasoning=harness_profile.tools.reasoning_replay=='preserve',notice_source=source)
                         event.update(kind='batch',batch_calls=records,actions=[],browser_stepped=False,
                             batch_stop_reason='invalid_tool_arguments',next_observation=final_ref,
                             argument_feedback_channel=argument_channel)
