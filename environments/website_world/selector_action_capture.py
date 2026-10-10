@@ -22,10 +22,12 @@ def options(value=None):
     if type(value) is not dict or not value: raise ValueError('Declare nonempty recorder retailer targets')
     result = {}
     for rid, row in value.items():
-        if (type(rid) is not str or not rid or type(row) is not dict or set(row) != {'page_id', 'control_token'}
+        if (type(rid) is not str or not rid or type(row) is not dict or not {'page_id', 'control_token'} <= set(row) or set(row) - {'page_id', 'control_token', 'task_actions'}
                 or type(row['page_id']) is not str or not row['page_id']
                 or type(row['control_token']) is not str or not re.fullmatch(r'[0-9a-f]{32}', row['control_token'])):
             raise ValueError('Recorder needs an existing page and private control token per retailer')
+        if 'task_actions' in row and row['task_actions'] is not True:
+            raise ValueError('Task action recording must be explicitly enabled')
         result[rid] = dict(row)
     return result
 
@@ -62,7 +64,7 @@ def project_assets(assets, *, expected_source_sha256, settings):
         '  let __failed=false;\n  try {' + body + '\n  } catch(__error) {__failed=true;throw __error;}\n'
         '  finally {__selectorJournal?.after(__event,state.selection[__page],__failed);}\n}')
     tail = (IMPORT + 'const __selectorSettings=' + json.dumps(settings, ensure_ascii=True, sort_keys=True) + '[site];\n'
-            'const __selectorJournal=__selectorSettings?selectorJournal(__selectorSettings.control_token):null;\n'
+            'const __selectorJournal=__selectorSettings?selectorJournal(__selectorSettings.control_token,256,__selectorSettings.task_actions===true):null;\n'
             'if(__selectorJournal)Object.defineProperty(window,"__websiteSelectorActionsV1",{value:Object.freeze({\n'
             '  begin:__selectorJournal.begin,seal:__selectorJournal.seal\n'
             '}),configurable:false,enumerable:false});\n')
@@ -71,11 +73,29 @@ def project_assets(assets, *, expected_source_sha256, settings):
     # Initialize before registering any selector/change/hash/storage listener
     # or entering the renderer's top-level asynchronous refresh.
     changed = (text[:start] + initialization + replacement + text[end:]).encode()
+    action_hooks = []
+    if any(row.get('task_actions') for row in settings.values()):
+        add = "  if(form.dataset.form==='add'){"
+        remove = "  if(target.dataset.remove){"
+        submit = "  if(form.dataset.form==='purchase'){"
+        hooks = {
+            add: add + "\n    if(__selectorSettings?.task_actions)__selectorJournal?.observeTaskAction(()=>{const {variant}=byVariant(form.dataset.key);return {kind:'cart_add',offer_id:variant.offerId,quantity:Number(values.quantity)};});",
+            remove: remove + "\n    if(__selectorSettings?.task_actions)__selectorJournal?.observeTaskAction(()=>{const __line=state.cart.find(line=>line.id===target.dataset.remove);if(!__line)throw new Error('Cart removal identity unavailable');const {variant}=byVariant(__line.key);return {kind:'cart_remove',offer_id:variant.offerId,quantity:__line.quantity};});",
+            submit: submit + "\n    if(__selectorSettings?.task_actions)__selectorJournal?.observeTaskAction(()=>({kind:'order_submit'}));",
+        }
+        changed_text = changed.decode()
+        for old, new in hooks.items():
+            if changed_text.count(old) != 1:
+                raise ValueError('Task action renderer seam absent or ambiguous: '+old)
+            changed_text = changed_text.replace(old, new)
+            action_hooks.append({'original': old, 'replacement': new})
+        changed = changed_text.encode()
     helper = Path(__file__).with_suffix('.js').read_bytes()
     evidence = {'schema': VERSION, 'before_sha256': expected_source_sha256,
                 'after_sha256': sha256(changed).hexdigest(), 'original_function': original,
                 'replacement_function': replacement, 'tail': tail, 'initialization': initialization,
                 'helper_sha256': sha256(helper).hexdigest(), 'settings': settings,
+                'action_hooks': action_hooks,
                 'scope': 'Retained-document ordinary selector-handler calls; setup excluded; authority pending'}
     if restore_source(changed, evidence) != source: raise ValueError('Observer has no exact renderer inverse')
     return {**assets, 'shop.js': changed, 'selector-action-capture.js': helper}, evidence
@@ -85,6 +105,9 @@ def restore_source(source, evidence):
     if evidence.get('schema') != VERSION or sha256(source).hexdigest() != evidence['after_sha256']:
         raise ValueError('Selector evidence differs from complete copied source')
     text = source.decode()
+    for hook in reversed(evidence.get('action_hooks', [])):
+        if text.count(hook['replacement']) != 1: raise ValueError('Task action inverse is not unique')
+        text = text.replace(hook['replacement'], hook['original'])
     tail, replacement = evidence['tail'], evidence['replacement_function']
     initialization = evidence.get('initialization', '')
     if initialization:
@@ -137,11 +160,15 @@ from .catalog_cart_execution import save_new
 class SelectorCapture(AddressCapture):
     """Read-only actual callbacks; journal is sealed before context teardown.
 
-    Same-document product URL updates are retained. Leaving the product,
-    changing the active page/document, or losing callbacks never produces a
+    Same-document product URL updates are retained. Opt-in task actions permit
+    cart hash navigation. Document departure, new pages or lost callbacks never produce a
     complete native journal. No events are reconstructed from expected tuples.
     """
-    def __init__(self, runtime, task, *, authority=None, authority_approval=None):
+    def __init__(self, runtime, task, *, authority=None, authority_approval=None,
+                 task_action_schema="website-variant-task-action-journal-v1"):
+        if task_action_schema not in ("website-variant-task-action-journal-v1", "website-atomic-task-action-journal-v1"):
+            raise ValueError("Unknown native task action journal schema")
+        self.task_action_schema = task_action_schema
         super().__init__(runtime, task, authority=authority, authority_approval=authority_approval)
         evidence = runtime.selector_capture_evidence
         if (type(evidence) is not dict or evidence.get('schema') != VERSION
@@ -166,6 +193,11 @@ class SelectorCapture(AddressCapture):
         origin = urlsplit(self.runtime.origins[self.task['retailer_id']])
         return (actual.scheme, actual.netloc, actual.path) == (origin.scheme, origin.netloc, '/') and actual.fragment.partition('?')[0] == '/product/' + self.task['page_id']
 
+    def _same_origin(self, url):
+        from urllib.parse import urlsplit
+        actual, origin = urlsplit(url), urlsplit(self.runtime.origins[self.task['retailer_id']])
+        return (actual.scheme, actual.netloc) == (origin.scheme, origin.netloc)
+
     def _selection(self, page):
         return page.evaluate('''({key,id})=>{
           const raw=localStorage.getItem(key);
@@ -183,6 +215,8 @@ class SelectorCapture(AddressCapture):
         page = env.unwrapped.page
         self.selector_page, self.selector_context = page, page.context
         self.selector_phase = 'baseline'
+        from urllib.parse import urldefrag
+        self.selector_document_url = urldefrag(page.url)[0]
         initial, begin = None, None
         try:
             if not self._target_url(page.url): raise ValueError('Selector baseline is outside target product')
@@ -208,7 +242,11 @@ class SelectorCapture(AddressCapture):
             if len(self.selector_navigation) >= 256:
                 self._fault('Navigation journal overflow');return
             self.selector_navigation.append({'url': frame.url})
-            if not self._target_url(frame.url): self._fault('Navigation left target product')
+            from urllib.parse import urldefrag
+            if urldefrag(frame.url)[0] != self.selector_document_url:
+                self._fault('Document URL changed during policy')
+            if not (self._same_origin(frame.url) if self.target.get('task_actions') else self._target_url(frame.url)):
+                self._fault('Navigation left recorder scope')
         def new_page(_):
             if self.selector_phase == 'policy': self._fault('Another page opened during policy')
         page.on('framenavigated', navigation)
@@ -224,7 +262,8 @@ class SelectorCapture(AddressCapture):
         try:
             if page is not self.selector_page or page.context is not self.selector_context:
                 raise ValueError('Active product page/context changed')
-            if not self._target_url(page.url): raise ValueError('Terminal page is outside target product')
+            if not (self._same_origin(page.url) if self.target.get('task_actions') else self._target_url(page.url)):
+                raise ValueError('Terminal page is outside recorder scope')
             final = self._selection(page)
             raw = page.evaluate('''({token,selection})=>
               window.__websiteSelectorActionsV1.seal(token,selection)''',
@@ -249,12 +288,27 @@ class SelectorCapture(AddressCapture):
         journal = None
         if set(records) == {'before', 'after'} and not records['before']['errors'] and not records['after']['errors']:
             begin = records['before']['begin']
-            journal = native_projection(records['after']['raw_journal'], task=self.task,
+            selector_raw = deepcopy(records['after']['raw_journal'])
+            if self.target.get('task_actions') and type(selector_raw) is dict:
+                selector_raw.pop('taskEvents', None)
+            journal = native_projection(selector_raw, task=self.task,
                 main_trace_sha256=capsule['main_trace_sha256'], document_token=begin['documentToken'],
                 page_retained=True, initial_selection=records['before']['selection'],
                 final_selection=records['after']['selection'])
-        save_new(path / 'selector-interaction.private.json', {'schema': VERSION, 'interaction': journal,
-            'captures': self.selector_artifacts, 'main_trace_sha256': capsule['main_trace_sha256'],
+        task_actions = None
+        if self.target.get('task_actions') and set(records) == {'before', 'after'}:
+            raw, begin = records['after']['raw_journal'], records['before']['begin']
+            if (type(raw) is dict and type(begin) is dict
+                    and raw.get('documentToken') == begin.get('documentToken')
+                    and raw.get('pageId') == self.task['page_id']
+                    and type(raw.get('taskEvents')) is list):
+                task_actions = {'schema_version': self.task_action_schema,
+                    'task_sha256': digest(self.task), 'main_trace_sha256': capsule['main_trace_sha256'],
+                    'retailer_id': self.task['retailer_id'],
+                    'complete': raw.get('complete') is True and not records['before']['errors'] and not records['after']['errors'],
+                    'events': deepcopy(raw['taskEvents'])}
+        save_new(path / 'selector-interaction.private.json' , {'schema': VERSION, 'interaction': journal,
+            'task_actions': task_actions, 'captures': self.selector_artifacts, 'main_trace_sha256': capsule['main_trace_sha256'],
             'scope': 'Actual retained-document handler transitions only; no reading or external-effect claim'})
         self.interaction = deepcopy(journal)
         return capsule, completed

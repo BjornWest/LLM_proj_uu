@@ -15,6 +15,13 @@ from .generation_configs import execution_options
 
 VERSION = 'website-variant-reset-publication-v1'
 CAPTURE_CONTAINER = 'website-catalog-cart-publication-v1'
+SCOPES = ('whole_run', 'observed_variant_cart_state')
+
+
+def checked_scope(value):
+    if type(value) is not str or value not in SCOPES:
+        raise ValueError('Unknown reset scoring scope')
+    return value
 
 
 def recipe_marker():
@@ -22,7 +29,7 @@ def recipe_marker():
 
 
 def compile_packet(world, spec, *, catalog, bindings, checkout_domain,
-                   runtime_options, asset_sha256):
+                   runtime_options, asset_sha256, scoring_scope="whole_run"):
     from .page_option_order import options as order_options
     from .selector_action_capture import options as recorder_options
     if type(runtime_options) is not dict or not {'page_option_order', 'selector_capture'} <= set(runtime_options) or set(runtime_options) - {'page_option_order', 'selector_capture', 'review_presentation'}:
@@ -35,6 +42,9 @@ def compile_packet(world, spec, *, catalog, bindings, checkout_domain,
             or ordering[rid][pid] != {'colour_key': spec['change_axis'], 'size_key': spec['preserve_axis']}
             or recorder is None or set(recorder) != {rid} or recorder[rid]['page_id'] != pid):
         raise ValueError('Reset presentation must target this exact native page and axes')
+    checked_scope(scoring_scope)
+    if scoring_scope != 'whole_run' and recorder[rid].get('task_actions') is not True:
+        raise ValueError('Scoped reset requires actual task action capture')
     page = next(p for p in catalog['products'] if p['id'] == pid)
     axes = [a['key'] for a in page['options']]
     if axes.index(spec['change_axis']) > axes.index(spec['preserve_axis']):
@@ -48,7 +58,8 @@ def compile_packet(world, spec, *, catalog, bindings, checkout_domain,
 
 
 def prepare_saved(saved, output, *, spec, catalog, bindings,
-                  expected_world_sha256, runtime_options, asset_sha256, prepared_cart=None, answer_grading=None):
+                  expected_world_sha256, runtime_options, asset_sha256, prepared_cart=None, answer_grading=None,
+                  scoring_scope="whole_run", user_message=None):
     """Fresh isolated recipe, literal saved world, no sampling or live repair.
 
     catalog/bindings must come from the saved composition's actual runtime;
@@ -62,8 +73,11 @@ def prepare_saved(saved, output, *, spec, catalog, bindings,
         raise ValueError('Saved world bytes changed')
     read = lambda name: json.loads((saved / name).read_bytes())
     world, domain = read('world.private.json'), read('checkout-domain.private.json')
-    packet = compile_packet(world, spec, catalog=catalog, bindings=bindings, checkout_domain=domain, runtime_options=runtime_options, asset_sha256=asset_sha256)
+    packet = compile_packet(world, spec, catalog=catalog, bindings=bindings, checkout_domain=domain, runtime_options=runtime_options, asset_sha256=asset_sha256, scoring_scope=scoring_scope)
     task = packet['task']
+    public_message = task['user_message'] if user_message is None else user_message
+    if type(public_message) is not str or not public_message.strip():
+        raise ValueError('Require a nonempty public request')
     options = execution_options({'lazy_publication': True,
         'answer_grading': answer_grading or {'mode': 'off'}})
     if options['answer_grading']['mode'] != 'subscription-post-run':
@@ -106,6 +120,7 @@ def prepare_saved(saved, output, *, spec, catalog, bindings,
              'selected_offer_id': task['setup']['selected_offer_id'],
              'prepared_cart': deepcopy(prepared_cart or [])}
     records.update({'variant-reset-runtime-options.private.json': packet['runtime_options'],
+        'variant-reset-scoring-scope.private.json': scoring_scope,
         'variant-reset-assets.private.json': packet['served_asset_sha256'],
         'variant-reset-task.private.json': task,
         'variant-reset-reference.private.json': packet['reference'],
@@ -113,9 +128,10 @@ def prepare_saved(saved, output, *, spec, catalog, bindings,
         'variant-reset-bindings.private.json': packet['bindings'],
         'variant-reset-setup.private.json': setup, 'execution.private.json': options,
         'episode.json': {'task_id': task['task_id'], 'readable_origins': True,
-            'start': task['start'], 'manual_task': {k: task[k] for k in ('user_message', 'memories')}},
+            'start': task['start'], 'manual_task': {'user_message': public_message, 'memories': task['memories']}},
         'request.json': {'schema': VERSION, 'spec': deepcopy(spec), 'setup': setup,
-            'original_inputs': original, 'world_draws': 0}})
+            'original_inputs': original, 'world_draws': 0, 'scoring_scope': scoring_scope,
+            'public_request': {'user_message': public_message, 'memories': task['memories']}}})
     for name, value in records.items(): shared.save(output / name, value)
     for name in source_names:
         target = output / 'original-inputs' / name
@@ -129,7 +145,8 @@ def prepare_saved(saved, output, *, spec, catalog, bindings,
         'world_id': world['world_id'], 'source_sha256': sources, 'files': files,
         'automatic_grader_supported': True, 'source_world_sha256': expected_world_sha256,
         'execution_policy': options, 'world_draws': 0,
-        'effect_authority': 'exact_new_consumer_union_acceptance_required',
+        'effect_authority': ('unknown_broader_effects' if scoring_scope != 'whole_run'
+                             else 'exact_new_consumer_union_acceptance_required'),
         'config_sha256': digest(records['request.json'])}
     shared.save(output / 'manifest.json', manifest)
     return manifest

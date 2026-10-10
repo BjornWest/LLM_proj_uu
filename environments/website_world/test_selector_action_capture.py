@@ -243,3 +243,175 @@ class SelectorLifecycleTests(unittest.TestCase):
 
 
 if __name__ == '__main__': unittest.main()
+
+class ScopedTaskActionTests(unittest.TestCase):
+    """Real copied helper exercised in Node; synthetic state, no browser evidence."""
+    def test_composed_order_and_basket_renderer_has_exact_action_inverse(self):
+        from .basket import basket_shop_source
+        from .simulated_order_presentation import project_assets as orders
+        source = (ROOT/'environments/website_drafts/shop.js').read_bytes()
+        basket = basket_shop_source(source.decode(), canonical_domain=True).encode()
+        quote = b'export const worldBinding={...itemBinding,basket:true,inquiryKey,\nconst key=inquiryKey(draft);\nrequests.set(key,{value});\nreturn key===inquiryKey(draft);'
+        assets, _ = orders({'shop.js':basket,'quote.js':quote}, expected_source_sha256=sha256(basket).hexdigest())
+        before = deepcopy(assets)
+        changed, evidence = capture.project_assets(assets,expected_source_sha256=sha256(assets['shop.js']).hexdigest(),
+            settings={'shop':{**SETTINGS['shop'],'task_actions':True}})
+        self.assertEqual(len(evidence['action_hooks']),3)
+        self.assertEqual(capture.restore_source(changed['shop.js'],evidence),before['shop.js'])
+        for name in before:
+            if name!='shop.js':self.assertEqual(changed[name],before[name])
+        for hook in evidence['action_hooks']:
+            self.assertEqual(changed['shop.js'].decode().count(hook['replacement']),1)
+        # An unsupported/changed actual remove-handler seam must fail closed.
+        with self.assertRaisesRegex(ValueError,'seam absent'):
+            bad=before['shop.js'].replace(b'if(target.dataset.remove){',b'if(target.dataset.deleted){')
+            capture.project_assets({**before,'shop.js':bad},expected_source_sha256=sha256(bad).hexdigest(),
+                settings={'shop':{**SETTINGS['shop'],'task_actions':True}})
+
+    def test_add_remove_submit_and_setup_exclusion_retained_in_actual_helper(self):
+        helper=Path(capture.__file__).with_suffix('.js').read_bytes()
+        uri='data:text/javascript;base64,'+base64.b64encode(helper).decode()
+        code='''import assert from 'node:assert/strict';
+const {selectorJournal}=await import(URI);
+const selection={colour:'brown',size_eu:'40'}, j=selectorJournal('secret',256,true);
+j.taskAction({kind:'cart_add',offer_id:'setup/offer',quantity:1});
+j.begin('secret','page',selection);
+j.taskAction({kind:'cart_add',offer_id:'shop/black39',quantity:1});
+j.taskAction({kind:'cart_remove',offer_id:'shop/black39',quantity:1});
+j.taskAction({kind:'order_submit'});
+const raw=j.seal('secret',selection);
+assert.equal(raw.complete,true);assert.equal(raw.taskEvents.length,3);
+assert.deepEqual(raw.taskEvents.map(x=>x.kind),['cart_add','cart_remove','order_submit']);
+assert.ok(Object.isFrozen(raw.taskEvents[0]));
+const legacy=selectorJournal('secret');legacy.begin('secret','page',selection);
+legacy.taskAction({kind:'cart_add',offer_id:'shop/item',quantity:1});
+assert.equal('taskEvents' in legacy.seal('secret',selection),false);
+for(const invalid of [{kind:'cart_add',offer_id:'shop/item',quantity:0},{kind:'cart_add',quantity:1},{kind:'unknown'}]){
+ const bad=selectorJournal('secret',256,true);bad.begin('secret','page',selection);bad.taskAction(invalid);
+ assert.equal(bad.seal('secret',selection).complete,false);
+}
+const overflow=selectorJournal('secret',1,true);overflow.begin('secret','page',selection);
+overflow.taskAction({kind:'cart_add',offer_id:'shop/item',quantity:1});overflow.taskAction({kind:'order_submit'});
+assert.equal(overflow.seal('secret',selection).complete,false);
+'''.replace('URI',json.dumps(uri))
+        result=subprocess.run(['node','--input-type=module','-e',code],capture_output=True,text=True,timeout=5)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_same_document_cart_navigation_preserves_actual_selector_and_action_rows(self):
+        fixture=SelectorLifecycleTests()
+        with tempfile.TemporaryDirectory() as directory:
+            observer, env, trace, page, final, events, before, after=fixture.fixture(directory)
+            observer.target['task_actions']=True
+            page.raw['taskEvents']=[{'kind':'cart_add','offer_id':'shop/black39','quantity':1},
+                                    {'kind':'cart_remove','offer_id':'shop/black39','quantity':1}]
+            with patch.object(capture.AddressCapture,'before',side_effect=before), patch.object(capture.AddressCapture,'after',side_effect=after):
+                observer.before(env,trace);page.selection=final
+                page.url='https://shop.test/#/cart';page.main_frame.url=page.url
+                page.handlers['framenavigated'](page.main_frame)
+                observer.after(env,trace,{})
+            record=fixture.finish(observer,trace)
+            self.assertEqual(len(record['interaction']['events']),2)
+            self.assertTrue(record['task_actions']['complete'])
+            self.assertEqual(len(record['task_actions']['events']),2)
+            self.assertEqual(record['task_actions']['main_trace_sha256'],'a'*64)
+            self.assertEqual(record['task_actions']['retailer_id'],'shop')
+
+    def test_lost_document_does_not_invent_empty_task_events(self):
+        fixture=SelectorLifecycleTests()
+        with tempfile.TemporaryDirectory() as directory:
+            observer, env, trace, page, final, events, before, after=fixture.fixture(directory)
+            observer.target['task_actions']=True;page.raw['taskEvents']=[]
+            with patch.object(capture.AddressCapture,'before',side_effect=before), patch.object(capture.AddressCapture,'after',side_effect=after):
+                observer.before(env,trace);page.selection=final;page.raw['documentToken']='reloaded'
+                observer.after(env,trace,{})
+            record=fixture.finish(observer,trace)
+            self.assertIsNone(record['interaction']);self.assertIsNone(record['task_actions'])
+
+class ScopedCaptureCorrectionTests(unittest.TestCase):
+    """Failure paths exercise copied JS and synthetic callbacks, not browser acceptance."""
+    def test_pagehide_fault_survives_restoration_but_setup_is_excluded(self):
+        helper=Path(capture.__file__).with_suffix('.js').read_bytes()
+        uri='data:text/javascript;base64,'+base64.b64encode(helper).decode()
+        code='''import assert from 'node:assert/strict';
+const listeners=[];globalThis.addEventListener=(name,fn)=>{assert.equal(name,'pagehide');listeners.push(fn);};
+const {selectorJournal}=await import(URI);
+const selection={size_eu:'40'},j=selectorJournal('secret',256,true);
+listeners[0]();j.begin('secret','page',selection);
+j.taskAction({kind:'cart_add',offer_id:'shop/item',quantity:1});
+listeners[0](); // Full document departure, then original document restored.
+const raw=j.seal('secret',selection);
+assert.equal(raw.complete,false);assert.equal(raw.taskEvents.length,1);
+assert.ok(raw.faults.includes('Document departed during policy'));
+const setup=selectorJournal('secret',256,true);listeners[1]();setup.begin('secret','page',selection);
+assert.equal(setup.seal('secret',selection).complete,true);
+'''.replace('URI',json.dumps(uri))
+        result=subprocess.run(['node','--input-type=module','-e',code],capture_output=True,text=True,timeout=5)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_unresolved_remove_cannot_block_native_handler_or_observe_setup(self):
+        from .basket import basket_shop_source
+        from .simulated_order_presentation import project_assets as orders
+        source=(ROOT/'environments/website_drafts/shop.js').read_bytes()
+        basket=basket_shop_source(source.decode(),canonical_domain=True).encode()
+        quote=b'export const worldBinding={...itemBinding,basket:true,inquiryKey,\nconst key=inquiryKey(draft);\nrequests.set(key,{value});\nreturn key===inquiryKey(draft);'
+        assets,_=orders({'shop.js':basket,'quote.js':quote},expected_source_sha256=sha256(basket).hexdigest())
+        changed,evidence=capture.project_assets(assets,expected_source_sha256=sha256(assets['shop.js']).hexdigest(),
+            settings={'shop':{**SETTINGS['shop'],'task_actions':True}})
+        original=assets['shop.js'].decode().split("  if(target.dataset.remove){",1)[1].split('\n',1)[0]
+        hooked=next(x['replacement'] for x in evidence['action_hooks'] if 'target.dataset.remove' in x['original'])
+        uri='data:text/javascript;base64,'+base64.b64encode(changed['selector-action-capture.js']).decode()
+        code='''import assert from 'node:assert/strict';
+const {selectorJournal}=await import(URI);
+const selection={size_eu:'40'},__selectorJournal=selectorJournal('secret',256,true),__selectorSettings={task_actions:true};
+const state={cart:[],editing:null},target={dataset:{remove:'1'}};
+let lookups=0;const byVariant=()=>{lookups++;return null;};const revise=()=>{};
+function remove(){HOOK ORIGINAL}
+state.cart=[{id:'1',key:'stale-key',quantity:1}];remove();
+assert.equal(state.cart.length,0);assert.equal(lookups,0); // setup exclusion
+__selectorJournal.begin('secret','page',selection);
+__selectorJournal.taskAction({kind:'cart_add',offer_id:'shop/known',quantity:1});
+state.cart=[{id:'1',key:'stale-key',quantity:1}];remove();
+assert.equal(state.cart.length,0);assert.equal(lookups,1);
+const raw=__selectorJournal.seal('secret',selection);
+assert.equal(raw.complete,false);assert.equal(raw.taskEvents.length,1);
+assert.ok(raw.faults.includes('Unable to observe actual task action'));
+'''.replace('URI',json.dumps(uri)).replace('HOOK',hooked).replace('ORIGINAL',original)
+        result=subprocess.run(['node','--input-type=module','-e',code],capture_output=True,text=True,timeout=5)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_same_origin_document_departure_restoration_preserves_known_rows_incomplete(self):
+        fixture=SelectorLifecycleTests()
+        with tempfile.TemporaryDirectory() as directory:
+            observer,env,trace,page,final,_,before,after=fixture.fixture(directory)
+            observer.target['task_actions']=True
+            page.raw['taskEvents']=[{'kind':'cart_remove','offer_id':'shop/known','quantity':1}]
+            with patch.object(capture.AddressCapture,'before',side_effect=before),patch.object(capture.AddressCapture,'after',side_effect=after):
+                observer.before(env,trace)
+                for url in ('https://shop.test/other-document','https://shop.test/#/product/page'):
+                    page.main_frame.url=url;page.handlers['framenavigated'](page.main_frame)
+                page.selection=final;observer.after(env,trace,{})
+            record=fixture.finish(observer,trace)
+            self.assertIsNone(record['interaction'])
+            self.assertFalse(record['task_actions']['complete'])
+            self.assertEqual(record['task_actions']['events'],page.raw['taskEvents'])
+
+    def test_atomic_native_schema_is_explicit_and_bound(self):
+        fixture=SelectorLifecycleTests()
+        with tempfile.TemporaryDirectory() as directory:
+            observer,env,trace,page,final,_,before,after=fixture.fixture(directory)
+            runtime,task=observer.runtime,observer.task
+            runtime.selector_capture_evidence['settings']={'shop':{**SETTINGS['shop'],'task_actions':True}}
+            def init(obj,runtime,task,**kw):
+                obj.runtime,obj.task=runtime,deepcopy(task);obj.binding={'retailers':{'shop':{'storage_key':'state.shop'}}}
+            with patch.object(capture.AddressCapture,'__init__',init):
+                observer=capture.SelectorCapture(runtime,task,task_action_schema='website-atomic-task-action-journal-v1')
+                with self.assertRaisesRegex(ValueError,'schema'):
+                    capture.SelectorCapture(runtime,task,task_action_schema='unrecognized')
+            page.raw['taskEvents']=[{'kind':'cart_remove','offer_id':'shop/known','quantity':1}]
+            with patch.object(capture.AddressCapture,'before',side_effect=before),patch.object(capture.AddressCapture,'after',side_effect=after):
+                observer.before(env,trace);page.selection=final;observer.after(env,trace,{})
+            journal=fixture.finish(observer,trace)['task_actions']
+            self.assertEqual(journal['schema_version'],'website-atomic-task-action-journal-v1')
+            self.assertEqual(journal['task_sha256'],capture.digest(task))
+            self.assertEqual(journal['main_trace_sha256'],'a'*64)
+            self.assertTrue(journal['complete'])
