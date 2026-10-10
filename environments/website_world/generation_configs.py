@@ -177,7 +177,7 @@ class Library:
         return [r for r in records if (tag is None or tag in r['tags']) and
                 query.lower() in json.dumps(r, ensure_ascii=False).lower()]
 
-    def import_generation(self, directory, name, *, run_directories=(), tags=(), notes=''):
+    def import_generation(self, directory, name, *, run_directories=(), tags=(), notes='', source_recipe=None):
         directory = Path(directory).resolve()
         request = json.loads((directory/'request.json').read_text())
         execution = {}
@@ -186,7 +186,24 @@ class Library:
             old = json.loads(policy.read_text())
             execution = {'validation': old.get('validation', 'off'),
                          **old.get('runtime_options', {}), 'answer_grading': old.get('answer_grading')}
-        record = self.put(name, request, execution, tags=tags, notes=notes)
+        record = None
+        if source_recipe is not None:
+            if type(source_recipe) is not dict or source_recipe.get('name') != name:
+                raise ValueError('Source recipe identity differs')
+            unpack(source_recipe)
+            # The selected revision must still be an actual immutable library
+            # member. A concurrently added revision must not change this use.
+            with self._lock():
+                selected = self.get(f"{name}@{source_recipe['version']}")
+            if selected != source_recipe:
+                raise ValueError('Source recipe changed after selection')
+            if (selected['config'] == config(request, execution) and
+                    selected['tags'] == sorted(set(tags)) and selected['notes'] == notes):
+                record = selected
+        if record is None:
+            # Explicit imports and effective CLI overrides retain the documented
+            # new-version behavior; replaying an old unchanged recipe does not.
+            record = self.put(name, request, execution, tags=tags, notes=notes)
         evidence = provenance(directory)
         evidence['config_sha256'] = record['config_sha256']
         evidence['name'] = name; evidence['version'] = record['version']

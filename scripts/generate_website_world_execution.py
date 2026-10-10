@@ -22,7 +22,8 @@ def main():
     parser.add_argument('--extractor-effort', choices=('low','medium','high','xhigh','max','ultra'))
     args = parser.parse_args()
     library = Library(args.library)
-    bundle = unpack(library.get(args.recipe) if args.recipe else json.loads(args.config.read_text()))
+    source_recipe = library.get(args.recipe) if args.recipe else None
+    bundle = unpack(source_recipe if source_recipe is not None else json.loads(args.config.read_text()))
     execution = bundle['execution']
     if args.validation is not None:execution['validation'] = args.validation
     if args.lazy_publication is not None:execution['lazy_publication'] = args.lazy_publication
@@ -38,8 +39,9 @@ def main():
                        answer_grading=grading, lazy_publication=execution['lazy_publication'])
     if args.recipe:
         # Overrides create a new named version, retaining the effective recipe.
-        library.import_generation(args.output,library.get(args.recipe)['name'],
-                                  tags=library.get(args.recipe)['tags'],notes=library.get(args.recipe)['notes'])
+        library.import_generation(args.output,source_recipe['name'],
+                                  tags=source_recipe['tags'],notes=source_recipe['notes'],
+                                  source_recipe=source_recipe)
     print(json.dumps({'output': str(args.output.resolve()), 'world_id': manifest['world_id'],
                       'summary': manifest['summary'], 'validation': execution['validation'], 'model_runs': 0}))
 

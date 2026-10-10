@@ -127,3 +127,44 @@ def test_human_report_uses_real_tables_escaped_content_and_downloadable_configs(
  assert parser.tables==1 and parser.rows==2 and parser.images==0
  assert '&lt;img' in text and result['configs']==1
  assert unpack(json.loads((tmp_path/'report/report--1.json').read_text()))['request']==request
+
+
+def test_unchanged_recipe_replay_preserves_selected_revision_and_latest(tmp_path):
+    library=Library(tmp_path/'library')
+    first=library.put('replay',REQUEST,tags=['first'],notes='Original')
+    latest=library.put('replay',{**REQUEST,'seed':63},tags=['latest'])
+    generated=tmp_path/'generated';generated.mkdir()
+    save(generated/'request.json',REQUEST)
+    save(generated/'execution.private.json',{
+        'validation':'off','runtime_options':{'lazy_publication':False},'answer_grading':None})
+    before={p.name:p.read_bytes() for p in (library.root/'recipes').iterdir()}
+    record,evidence=library.import_generation(
+        generated,'replay',tags=first['tags'],notes=first['notes'],source_recipe=first)
+    assert record==first and evidence['version']==1
+    assert evidence['config_sha256']==first['config_sha256']
+    assert library.get('replay')==latest
+    assert before=={p.name:p.read_bytes() for p in (library.root/'recipes').iterdir()}
+    altered=deepcopy(first);altered['notes']='Fabricated original'
+    with pytest.raises(ValueError,match='changed after selection'):
+        library.import_generation(generated,'replay',source_recipe=altered)
+
+
+def test_generation_cli_retains_initial_recipe_during_concurrent_new_revision(tmp_path,monkeypatch):
+    from scripts import generate_website_world_execution as cli
+    library=Library(tmp_path/'library');first=library.put('concurrent',REQUEST,tags=['initial'])
+    target=tmp_path/'generated';new=[]
+    def prepare(req,out,**kwargs):
+        new.append(library.put('concurrent',{**REQUEST,'seed':999},tags=['new']))
+        out.mkdir();save(out/'request.json',req)
+        save(out/'execution.private.json',{'validation':kwargs['validation'],
+            'runtime_options':{'lazy_publication':kwargs['lazy_publication']},
+            'answer_grading':kwargs['answer_grading']})
+        return {'world_id':'scripted-mock','summary':{}}
+    monkeypatch.setattr(cli,'prepare',prepare)
+    monkeypatch.setattr(sys,'argv',['generate','--recipe','concurrent','--library',str(library.root),
+        '--output',str(target)])
+    cli.main()
+    uses=[json.loads(p.read_text()) for p in (library.root/'uses').iterdir()]
+    assert len(uses)==1 and uses[0]['version']==first['version']
+    assert uses[0]['config_sha256']==first['config_sha256']
+    assert len(library.records())==2 and library.get('concurrent')==new[0]
