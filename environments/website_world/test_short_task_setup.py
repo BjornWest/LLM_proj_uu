@@ -154,3 +154,125 @@ def test_reacquire_controls_for_each_axis(kind):
     setup._select(page, plan(selected_offer_id='shop/sku')['selected_offer'])
     assert len(events) == 2
     if kind == 'select':assert events == [('select', 'black'), ('select', '42')]
+
+
+@pytest.mark.parametrize('opened', [True, False])
+def test_panel_choice_is_optional_bound_and_product_only(opened):
+    ordinary = plan()
+    assert 'product_details_open' not in ordinary
+    assert 'product_details_open' not in ordinary['request']
+    rt = runtime()
+    bound = plan(rt, product_details_open=opened)
+    setup.validate_plan(rt, bound)
+    bound['product_details_open'] = not opened
+    with pytest.raises(ValueError, match='differs'):
+        setup.validate_plan(rt, bound)
+    with pytest.raises(ValueError, match='product start'):
+        plan(start={'kind': 'cart'}, product_details_open=opened)
+
+
+@pytest.mark.parametrize('value', [0, 1, 'open', {}, []])
+def test_invalid_panel_choice_fails_before_browser(value):
+    with pytest.raises(ValueError, match='boolean'):
+        plan(product_details_open=value)
+
+
+class Panel:
+    def __init__(self, page, opened=False, count=1, label='Product details'):
+        self.page, self.opened, self.number, self.label = page, opened, count, label
+        self.clicks = 0
+    def count(self): return self.number
+    def get_attribute(self, name):
+        return ('' if self.opened else None) if name == 'open' else 'product:page:details'
+    def locator(self, selector):
+        assert selector == ':scope > summary'
+        return self
+    def inner_text(self): return self.label
+    def click(self):
+        self.clicks += 1
+        self.opened = not self.opened
+        self.page.state.setdefault('disclosures', {})['product:page:details'] = self.opened
+
+
+@pytest.mark.parametrize('before,after,clicks', [(False, True, 1), (True, False, 1),
+                                               (False, False, 0), (True, True, 0)])
+def test_ordinary_panel_setup_changes_only_disclosure(before, after, clicks):
+    page = Page()
+    panel = Panel(page, before)
+    page.state['disclosures'] = {'product:page:details': before}
+    original = deepcopy(page.state)
+    page.locator = lambda selector: panel if selector == setup.DETAILS_PANEL else None
+    result = setup.apply(page, plan(product_details_open=after), runtime=runtime())
+    assert panel.clicks == clicks and panel.opened is after
+    assert result['actions'][-1]['before_open'] is before
+    assert result['actions'][-1]['after_open'] is after
+    assert {k: v for k, v in page.state.items() if k != 'disclosures'} == {
+        k: v for k, v in original.items() if k != 'disclosures'}
+    assert page.context.pages == [page]
+
+
+@pytest.mark.parametrize('count', [0, 2])
+def test_missing_or_ambiguous_panel_is_not_rewritten(count):
+    page = Page(); panel = Panel(page, count=count)
+    page.locator = lambda selector: panel
+    with pytest.raises(ValueError, match='one existing'):
+        setup.apply(page, plan(product_details_open=True), runtime=runtime())
+    assert panel.clicks == 0
+
+
+class Panels:
+    def __init__(self, panels): self.panels = panels
+    def count(self): return len(self.panels)
+    def nth(self, i): return self.panels[i]
+
+
+def test_exact_native_heading_selects_only_one_existing_group():
+    rt = runtime()
+    variant = rt.public_catalogs['shop']['products'][0]['variants'][0]
+    variant['details'] = [{'heading': 'Specifications', 'facts': [{'label': 'Weight', 'value': 12}]},
+                          {'heading': 'Care instructions', 'facts': [{'label': 'Wash', 'value': 'Cold'}]}]
+    requested = plan(rt, product_details_open=True, product_details_heading='Specifications')
+    setup.validate_plan(rt, requested)
+    page = Page(); target = Panel(page, label='Specifications'); other = Panel(page, label='Care instructions')
+    page.locator = lambda selector: Panels([other, target])
+    result = setup.apply(page, requested, runtime=rt)
+    assert target.clicks == 1 and other.clicks == 0
+    assert result['actions'][-1]['summary'] == 'Specifications'
+    changed = deepcopy(requested); changed['request']['product_details_heading'] = 'Care instructions'
+    with pytest.raises(ValueError, match='differs'):
+        setup.validate_plan(rt, changed)
+    with pytest.raises(ValueError, match='absent'):
+        plan(rt, product_details_open=True, product_details_heading='Unknown group')
+
+
+@pytest.mark.parametrize('labels', [['Care instructions'], ['Specifications', 'Specifications']])
+def test_exact_heading_missing_or_ambiguous_never_clicks(labels):
+    page = Page(); panels = [Panel(page, label=label) for label in labels]
+    page.locator = lambda selector: Panels(panels)
+    with pytest.raises(ValueError, match='one existing matching'):
+        setup._details_panel(page, True, 'website-drafts.state.shop', 'Specifications')
+    assert all(panel.clicks == 0 for panel in panels)
+
+
+@pytest.mark.parametrize('heading,opened', [('', True), (False, True), ('Specifications', None)])
+def test_heading_needs_explicit_open_choice_and_nonempty_string(heading, opened):
+    with pytest.raises(ValueError, match='heading'):
+        plan(product_details_open=opened, product_details_heading=heading)
+
+
+@pytest.mark.parametrize('fact', [None, {'heading': 'Care instructions'}])
+def test_publication_refuses_non_native_heading_before_creating_output(tmp_path, monkeypatch, fact):
+    from hashlib import sha256
+    from environments.website_world import atomic_product_publication as publication
+    saved = tmp_path/'saved'; saved.mkdir()
+    payload = b'{"world_id":"synthetic-heading-control"}'
+    (saved/'world.private.json').write_bytes(payload)
+    (saved/'checkout-domain.private.json').write_text('{}')
+    monkeypatch.setattr(publication, 'compile_packet', lambda *args, **kwargs:
+                        {'task': {'public_fact': fact}})
+    output = tmp_path/'output'
+    with pytest.raises(ValueError, match='native requested fact'):
+        publication.prepare_saved(saved, output, spec={}, catalog={}, bindings={},
+            expected_world_sha256=sha256(payload).hexdigest(),
+            product_details_open=True, product_details_heading='Specifications')
+    assert not output.exists()

@@ -12,7 +12,8 @@ VERSION = 'website-short-task-setup-v1'
 PROTECTED = ('address', 'remembered', 'instructions', 'coupon', 'orders')
 
 
-def make_plan(runtime, *, retailer_id, start, prepared_cart=None, selected_offer_id=None):
+def make_plan(runtime, *, retailer_id, start, prepared_cart=None, selected_offer_id=None,
+              product_details_open=None, product_details_heading=None):
     """Resolve only explicit offer IDs; do not pick a task winner or mutate truth.
 
     Product starts identify the page containing an offer, not a preselected SKU.
@@ -34,6 +35,11 @@ def make_plan(runtime, *, retailer_id, start, prepared_cart=None, selected_offer
                 raise ValueError('Offer binding differs from public merchant tuple')
             offers[oid] = (product, variant)
     kind = start.get('kind')
+    if product_details_open is not None and (type(product_details_open) is not bool or kind != 'product'):
+        raise ValueError('Product details setup requires a boolean and a product start')
+    if product_details_heading is not None and (product_details_open is None or
+            type(product_details_heading) is not str or not product_details_heading.strip()):
+        raise ValueError('Product details heading requires a nonempty exact heading and open/closed choice')
     if kind == 'product' and set(start) == {'kind', 'offer_id'}:
         if start['offer_id'] not in offers:
             raise ValueError('Product start offer is not carried by this retailer')
@@ -91,12 +97,22 @@ def make_plan(runtime, *, retailer_id, start, prepared_cart=None, selected_offer
     selected = action(selected_offer_id) if selected_offer_id is not None else None
     if selected is not None and (kind != 'product' or selected['page_id'] != start_product):
         raise ValueError('Initial selection must belong to the declared product start')
-    return {'schema': VERSION, 'retailer_id': retailer_id,
+    plan = {'schema': VERSION, 'retailer_id': retailer_id,
             'request': {'retailer_id': retailer_id, 'start': deepcopy(start),
                         'prepared_cart': rows, 'selected_offer_id': selected_offer_id},
             'storage_key': 'website-drafts.state.' + retailer_id,
             'home_url': runtime.origins[retailer_id] + '/#/home',
             'start_url': start_url, 'prepared_cart': items, 'selected_offer': selected}
+    if product_details_heading is not None:
+        variant = offers[selected_offer_id or start['offer_id']][1]
+        if product_details_heading not in {g['heading'] for g in variant.get('details', [])}:
+            raise ValueError('Product details heading is absent from the bound selected SKU')
+        plan['request']['product_details_heading'] = product_details_heading
+        plan['product_details_heading'] = product_details_heading
+    if product_details_open is not None:
+        plan['request']['product_details_open'] = product_details_open
+        plan['product_details_open'] = product_details_open
+    return plan
 
 
 def validate_plan(runtime, plan):
@@ -156,6 +172,49 @@ def _select(page, item):
     return form
 
 
+
+# Choose only an existing outer facts disclosure, excluding nested group panels.
+# This supports base story and detailsPresentation=disclosure without assuming
+# facts are nonempty or rewriting layouts that expose them inline/in tabs.
+DETAILS_PANEL = ('main details[data-product-part="details"]:not(details details), '
+                 'main details:has([data-product-part="details"]):not(details details)')
+
+
+def _details_panel(page, opened, storage_key, heading=None):
+    if heading is None:
+        panel = page.locator(DETAILS_PANEL)
+    else:
+        candidates = page.locator('main details[data-product-part="details"], '
+                                  'main details:has([data-product-part="details"])')
+        matches = []
+        for i in range(candidates.count()):
+            candidate = candidates.nth(i)
+            summary = candidate.locator(':scope > summary')
+            if summary.count() == 1 and summary.inner_text().strip() == heading:
+                matches.append(candidate)
+        if len(matches) != 1:
+            raise ValueError('Product details heading requires one existing matching facts disclosure')
+        panel = matches[0]
+    if panel.count() != 1:
+        raise ValueError('Product details setup requires one existing outer facts disclosure')
+    summary = panel.locator(':scope > summary')
+    disclosure = panel.get_attribute('data-disclosure')
+    if summary.count() != 1 or not disclosure:
+        raise ValueError('Product details disclosure has no ordinary renderer binding')
+    before = panel.get_attribute('open') is not None
+    label = summary.inner_text()
+    if before != opened:
+        summary.click()
+    # Renderer toggle persists its own state so subsequent lazy delivery renders
+    # retain the requested panel. The helper never writes DOM/storage directly.
+    _wait(page, lambda: panel.count() == 1 and
+          (panel.get_attribute('open') is not None) == opened and
+          _state(page, storage_key).get('disclosures', {}).get(disclosure, False) == opened,
+          'Product details disclosure did not settle')
+    return {'operation': 'product_details_via_ui', 'summary': label,
+            'disclosure_id': disclosure, 'before_open': before, 'after_open': opened}
+
+
 def apply(page, plan, *, runtime):
     """Ordinary UI setup in the existing tab; never write browser storage.
 
@@ -187,6 +246,9 @@ def apply(page, plan, *, runtime):
     if plan['selected_offer'] is not None:
         _select(page, plan['selected_offer'])
         actions.append({'operation': 'select_via_ui', **deepcopy(plan['selected_offer'])})
+    if 'product_details_open' in plan:
+        actions.append(_details_panel(page, plan['product_details_open'], plan['storage_key'],
+                                      plan.get('product_details_heading')))
     after = _state(page, plan['storage_key'])
     actual = sorted((line['key'], line['quantity']) for line in after['cart'])
     expected = sorted((line['key'], line['quantity']) for line in plan['prepared_cart'])

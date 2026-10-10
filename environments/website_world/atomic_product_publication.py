@@ -85,7 +85,8 @@ def compile_packet(world, spec, *, catalog, bindings, checkout_domain,
 
 def prepare_saved(saved, output, *, spec, catalog, bindings,
                   expected_world_sha256, prepared_cart=None, answer_grading=None,
-                  scoring_scope="whole_run", runtime_options=None, asset_sha256=None, user_message=None):
+                  scoring_scope="whole_run", runtime_options=None, asset_sha256=None, user_message=None,
+                  product_details_open=None, product_details_heading=None):
     """Fresh isolated recipe, literal saved world, no sampling or live repair.
 
     catalog/bindings must come from the saved composition's actual runtime;
@@ -93,6 +94,11 @@ def prepare_saved(saved, output, *, spec, catalog, bindings,
     adoption follows until the exact Git consumer and capture are accepted.
     """
     from experiments.accepted_catalog_commerce.execution import Execution
+    if product_details_open is not None and type(product_details_open) is not bool:
+        raise ValueError('Product details setup requires a boolean')
+    if product_details_heading is not None and (product_details_open is None or
+            type(product_details_heading) is not str or not product_details_heading.strip()):
+        raise ValueError('Product details heading requires a nonempty exact heading and open/closed choice')
     saved, output = Path(saved).resolve(), Path(output).resolve()
     world_path = saved / 'world.private.json'
     world_bytes = world_path.read_bytes()
@@ -103,6 +109,8 @@ def prepare_saved(saved, output, *, spec, catalog, bindings,
     packet = compile_packet(world, spec, catalog=catalog, bindings=bindings, checkout_domain=domain,
         scoring_scope=scoring_scope, runtime_options=runtime_options, asset_sha256=asset_sha256)
     task = packet['task']
+    if product_details_heading is not None and (task.get('public_fact') or {}).get('heading') != product_details_heading:
+        raise ValueError('Product details heading differs from the native requested fact')
     message = task['user_message'] if user_message is None else user_message
     if type(message) is not str or not message.strip(): raise ValueError('Require nonempty public request')
     options = execution_options({'lazy_publication': True,
@@ -149,6 +157,10 @@ def prepare_saved(saved, output, *, spec, catalog, bindings,
     setup = {'start': {'kind': 'product', 'offer_id': task['offer_id']},
              'selected_offer_id': task['setup']['selected_offer_id'],
              'prepared_cart': deepcopy(prepared_cart or [])}
+    if product_details_open is not None:
+        setup['product_details_open'] = product_details_open
+    if product_details_heading is not None:
+        setup['product_details_heading'] = product_details_heading
     records.update({'atomic-product-task.private.json': task,
         'atomic-product-reference.private.json': packet['reference'],
         'atomic-product-catalog.private.json': packet['catalog'],

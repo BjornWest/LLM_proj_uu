@@ -307,7 +307,8 @@ def source_files():
     """Pin the bounded producer, public renderer and their local data recipes."""
     paths = set()
     pending = [Path(__file__).resolve(), ROOT/'environments/website_world/runtime.py',
-               ROOT/'intent_browser/runner.py']
+               ROOT/'intent_browser/runner.py',
+               ROOT/'experiments/world_sampling_defaults/execution.py']
     def enqueue(parts):
         if not parts or parts[0] not in ('environments', 'experiments', 'intent_browser'):
             return
@@ -344,6 +345,7 @@ def source_files():
         'environments/product_world/data/concept_registry') for p in (ROOT/folder).rglob('*.json'))
     paths.update(ROOT/name for name in ('environments/product_world/data/europe_locations.json',
         'experiments/footwear_world_pilot/config.json', 'environments/website_drafts/shop.html',
+        'intent_browser/model_tokenizers.json',
         'environments/website_drafts/component-priors-v1.json', 'docs/agents/world-sampling-defaults.json',
         'docs/agents/cross-family-store-theme-review.json',
         'environments/product_world/data/product_feature_policies/media_tablet_v1.json',
