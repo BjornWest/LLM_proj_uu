@@ -92,7 +92,16 @@ export const worldBinding={
     // Results are bound to their exact input, never to whichever draft is now open.
     return key===inquiryKey(draft);
   },
-  async refresh(address){const result=await fetch('/api/fulfilment?'+new URLSearchParams(address));const next=await result.json();if(!result.ok)throw Error(next.error||'Delivery is unavailable for this address');fulfilment=next;byAddress.set(addressKey(address),next);},
+  async refresh(address){
+    const result=await fetch('/api/fulfilment?'+new URLSearchParams(address)),next=await result.json();
+    if(!result.ok)throw Error(next.error||'Delivery is unavailable for this address');
+    const key=addressKey(address),previous=byAddress.get(key);
+    // A lazy address reply validates the destination without fetching every SKU.
+    // Preserve only this address's already loaded item routes, including requests
+    // that finished while the address save was in flight.
+    fulfilment=next.pending?{...next,optionsBySku:{...previous?.optionsBySku,...next.optionsBySku}}:next;
+    byAddress.set(key,fulfilment);
+  },
   stockText(v){return v.state==='unavailable'?'Unavailable':v.state==='backorder'?'Available to order from the supplier':v.stock?'Stock available for dispatch':'Available in shops; delivery availability depends on your address';},
   supplierNotice(v){if(v.state!=='backorder')return '';return v.supplierOrder.disclosure==='product_page'?`Supplier order; allow approximately ${v.supplierOrder.wait_days} additional days before dispatch.`:'This item can be ordered from the supplier. See the delivery policy for lead-time information.';},
   decorate(root){
