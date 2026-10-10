@@ -87,7 +87,7 @@ source. Preparation makes no world draws, browser runs or model calls.
 from environments.website_world import task_instances
 
 receipt = task_instances.prepare(instance, output)
-trace, summary = task_instances.run(
+result = task_instances.run(
     output, run_directory,
     policy_session=policy_session,
     metadata=metadata,
