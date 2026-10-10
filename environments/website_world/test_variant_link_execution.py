@@ -27,7 +27,7 @@ class LinkLifecycleControls(unittest.TestCase):
         (self.recipe/'pin').mkdir();(self.recipe/'pin/world.private.json').write_text('{}')
         for name in ('variant-link-task.private.json','variant-link-reference.private.json'):
             (self.recipe/name).write_text('{}')
-        self.events=[];self.cleanup_error=False;self.corrupt_public=False
+        self.events=[];self.cleanup_error=False;self.corrupt_public=False;self.corrupt_start=False
         self.projection=True;self.grade=True;self.summary_error=None
         self.missing=False;self.omit_returned_completeness=False
         self.run_options={'max_steps':1,'max_input_tokens':1000}
@@ -40,6 +40,7 @@ class LinkLifecycleControls(unittest.TestCase):
         class Episode:
             def __init__(self,output):
                 self.public=deepcopy(owner.public)
+                self.answer_grading=json.loads((Path(output)/'execution.private.json').read_bytes())['answer_grading']
                 path=Path(execution.__file__).resolve()
                 self.site_discovery=None
                 self.task=SimpleNamespace(files={str(path):sha256(path.read_bytes()).hexdigest(),
@@ -85,6 +86,8 @@ class LinkLifecycleControls(unittest.TestCase):
         gate.pending_external();(trace/'episode.json').write_text(json.dumps(summary))
         if self.corrupt_public:
             (trace/'policy-task.json').write_text(json.dumps({**self.public,'environment_context':{'currency':'USD'}}))
+        if self.corrupt_start:
+            (trace/'policy-task.json').write_text(json.dumps({**self.public,'start_url':'https://different.test/#/product/other'}))
         return trace,{k:v for k,v in summary.items() if not (self.omit_returned_completeness and k=='trace_complete')}
 
     def deferred(self,**kwargs):
@@ -108,7 +111,7 @@ class LinkLifecycleControls(unittest.TestCase):
         self.assertTrue(summary['infrastructure_completed'])
         return {'status':'verified' if self.projection else 'missing','qualification':'Authored offline projection, no HTTP'}
 
-    def execute(self):
+    def execute(self, *, extraction_backend_factory=lambda _:None):
         with patch.dict('sys.modules',{'agent_trace.adapters.browsergym':self.viewer_module}), \
              patch.object(execution.shared,'load',return_value={}), \
              patch.object(execution,'VariantLinkEpisode',self.Episode), \
@@ -117,7 +120,7 @@ class LinkLifecycleControls(unittest.TestCase):
             return execution.run(self.recipe,self.folder/'run',policy_session=self.session,
                 metadata={'tags':['scripted']},runner_options=self.run_options,
                 viewer_projection=self.viewer,quota_guard=lambda:self.events.append('quota'),
-                extraction_backend_factory=lambda _:None,runner=self.runner)
+                extraction_backend_factory=extraction_backend_factory,runner=self.runner)
 
     def test_prospective_real_gate_finalizes_after_closes_before_first_publication(self):
         result=self.execute();self.assertEqual(result['status'],'graded_and_projected')
@@ -160,6 +163,63 @@ class LinkLifecycleControls(unittest.TestCase):
     def test_context_drift_skips_extraction(self):
         self.corrupt_public=True;result=self.execute()
         self.assertEqual(result['status'],'system_failure');self.assertNotIn('grade',self.events)
+
+    def test_start_only_drift_rejects_before_answer_or_missing_output_grading(self):
+        self.corrupt_start=True
+        for missing in (False, True):
+            with self.subTest(missing=missing):
+                self.missing=missing
+                result=self.execute()
+                self.assertEqual(result['status'],'system_failure')
+                self.assertNotIn('grade',self.events);self.assertNotIn('publish',self.events)
+                self.assertNotIn('viewer',self.events)
+                self.assertFalse((self.folder/'run/missing-answer-native-grade.json').exists())
+                # Each run has independent output and gate state.
+                if not missing:
+                    import shutil
+                    shutil.rmtree(self.folder/'run')
+
+    def test_default_extractor_retains_authenticated_recipe_settings_after_cleanup(self):
+        from experiments.answer_grading import task_answer
+        configured={'mode':'subscription-post-run','model':'gpt-6-sol','reasoning_effort':'high'}
+        (self.recipe/'execution.private.json').write_text(json.dumps({'answer_grading':configured}))
+        deferred=self.deferred
+        transport=object()
+        def extracting(**kwargs):
+            self.assertIn('runtime-close',self.events);self.assertIn('policy-close',self.events)
+            self.assertIs(kwargs['backend_factory'](self.folder/'transport'),transport)
+            return deferred(**kwargs)
+        self.deferred=extracting
+        with patch.object(task_answer,'SubscriptionTaskExtractor') as constructor:
+            constructor.return_value.backend.return_value=transport
+            result=self.execute(extraction_backend_factory=None)
+            self.assertEqual(result['status'],'graded_and_projected')
+            constructor.assert_called_once()
+            self.assertEqual(constructor.call_args.kwargs['model'],'gpt-6-sol')
+            self.assertEqual(constructor.call_args.kwargs['reasoning_effort'],'high')
+            self.assertTrue(callable(constructor.call_args.kwargs['quota_guard']))
+            constructor.return_value.backend.assert_called_once_with(self.folder/'transport')
+
+    def test_explicit_extractor_override_is_retained(self):
+        from experiments.answer_grading import task_answer
+        backend=lambda _:None
+        deferred=self.deferred
+        def extracting(**kwargs):
+            self.assertIs(kwargs['backend_factory'],backend)
+            return deferred(**kwargs)
+        self.deferred=extracting
+        with patch.object(task_answer,'SubscriptionTaskExtractor') as constructor:
+            result=self.execute(extraction_backend_factory=backend)
+            self.assertEqual(result['status'],'graded_and_projected')
+            constructor.assert_not_called()
+
+    def test_missing_output_does_not_construct_configured_extractor(self):
+        from experiments.answer_grading import task_answer
+        self.missing=True
+        with patch.object(task_answer,'SubscriptionTaskExtractor') as constructor:
+            result=self.execute(extraction_backend_factory=None)
+            self.assertEqual(result['extraction_requests'],0)
+            constructor.assert_not_called()
 
     def test_setup_failure_does_not_dispatch_extraction(self):
         self.summary_error='Authored setup failure';result=self.execute()

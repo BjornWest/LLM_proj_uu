@@ -27,7 +27,8 @@ class VariantLinkEpisode:
             if self.manifest['files'].get(name) != sha256(payload).hexdigest():
                 raise ValueError('Variant-link input differs from its frozen manifest: ' + name)
             return json.loads(payload)
-        if read('execution.private.json')['answer_grading']['mode'] != 'subscription-post-run':
+        self.answer_grading = read('execution.private.json')['answer_grading']
+        if self.answer_grading['mode'] != 'subscription-post-run':
             raise ValueError('Automatic variant-link grading must be attached before dispatch')
         task = read('variant-link-task.private.json')
         accepted = read('variant-link-acceptance.private.json')
@@ -126,9 +127,34 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
     if quota_guard is None:
         quota_guard = SubscriptionQuotaGuard(Path(run_directory).resolve() / 'subscription-quota',
                                              remaining_floor=1)
-    return lifecycle.run(output, run_directory, episode_factory=VariantLinkEpisode,
+    retained = {}
+
+    def episode_factory(path):
+        episode = VariantLinkEpisode(path)
+        retained['public'] = deepcopy(episode.public)
+        retained['grading'] = deepcopy(episode.answer_grading)
+        return episode
+
+    def configured_backend(path):
+        from experiments.answer_grading.task_answer import SubscriptionTaskExtractor
+        grading = retained['grading']
+        return SubscriptionTaskExtractor(quota_guard=quota_guard,
+            model=grading['model'], reasoning_effort=grading['reasoning_effort']).backend(path)
+
+    def evidence_sources(trace):
+        # The shared validator checks request/context; retain this adapter's
+        # additional exact start binding before either answer branch is graded.
+        path = Path(trace) / 'policy-task.json'
+        actual = json.loads(path.read_bytes())
+        if actual.get('start_url') != retained['public']['start_url']:
+            raise ValueError('Saved variant-link start URL differs from its bound public task')
+        return [path]
+
+    return lifecycle.run(output, run_directory, episode_factory=episode_factory,
         inputs_factory=inputs_factory, grader_factory=grader_factory,
         contract_id=VERSION, verifier='variant-link-native',
         policy_session=policy_session, metadata=metadata, runner_options=runner_options,
         viewer_projection=viewer_projection, quota_guard=quota_guard,
-        extraction_backend_factory=extraction_backend_factory, runner=runner)
+        extraction_backend_factory=(configured_backend if extraction_backend_factory is None
+                                    else extraction_backend_factory),
+        evidence_sources=evidence_sources, runner=runner)
