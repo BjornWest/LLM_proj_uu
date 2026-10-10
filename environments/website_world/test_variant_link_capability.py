@@ -9,6 +9,7 @@ import unittest
 from .test_variant_link_task import fixture
 from . import variant_link_task as native, variant_link_capability as cap
 from .variant_link_publication import compile_packet
+from . import variant_link_publication as publication
 
 
 def packet(root):
@@ -46,6 +47,23 @@ def packet(root):
 
 
 class CapabilityControls(unittest.TestCase):
+    def test_archive_keeps_prior_manifest_member_and_named_current_envelope(self):
+        with TemporaryDirectory() as folder:
+            root=Path(folder); source=root/'packet';source.mkdir()
+            _, _, _, _, approval, _ = packet(source)
+            accepted=json.loads(Path(approval['path']).read_bytes())
+            original=Path(accepted['evidence_manifest']['path'])
+            first=original.read_bytes();manifest=json.loads(first)
+            manifest['files']['manifest.json']=sha256(first).hexdigest()
+            current=source/'manifest-v2.json';current.write_text(json.dumps(manifest))
+            pin={'path':str(current),'sha256':sha256(current.read_bytes()).hexdigest()}
+            path, checked=cap.check_manifest(pin)
+            archive=root/'archive'
+            publication.archive_evidence(path,checked,archive)
+            self.assertEqual((archive/'manifest.json').read_bytes(),first)
+            self.assertEqual((archive/'manifest-v2.json').read_bytes(),current.read_bytes())
+            cap.check_manifest({'path':str(archive/'manifest-v2.json'),'sha256':pin['sha256']})
+
     def test_complete_synthetic_packet_can_compile_but_inputs_stay_unchanged(self):
         with TemporaryDirectory() as folder:
             w, spec, inputs, assets, approval, _ = packet(Path(folder))

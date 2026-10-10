@@ -24,6 +24,19 @@ def public_request(task, episode):
     return manual['user_message']
 
 
+def archive_evidence(evidence_path, evidence, archive):
+    """Retain packet-relative filenames, including older manifest members."""
+    archive.mkdir()
+    for name in evidence['files']:
+        target = archive / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(evidence_path.parent / name, target)
+    copied_manifest = archive / evidence_path.name
+    shutil.copyfile(evidence_path, copied_manifest)
+    capability.check_manifest({'path': str(copied_manifest),
+                               'sha256': sha256(copied_manifest.read_bytes()).hexdigest()})
+
+
 def compile_packet(*, world, spec, catalog, bindings, asset_sha256, acceptance):
     """Gate an actual privately accepted recipient packet before task authoring."""
     cap = capability.validate(acceptance, world=world, catalog=catalog,
@@ -120,13 +133,7 @@ def prepare_saved(saved, output, *, spec, expected_world_sha256, acceptance,
                         'source_directory': str(saved), 'world_draws': 0}})
     for name, value in records.items(): shared.save(output / name, value)
     # Copy the complete accepted witness packet into the new recipe too.
-    archive = output / 'accepted-evidence'
-    archive.mkdir()
-    for name in evidence['files']:
-        target = archive / name
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(evidence_path.parent / name, target)
-    shutil.copyfile(evidence_path, archive / 'manifest.json')
+    archive_evidence(evidence_path, evidence, output / 'accepted-evidence')
     artifacts = {str(path.relative_to(output)): sha256(path.read_bytes()).hexdigest()
                  for path in output.rglob('*') if path.is_file() and not path.is_relative_to(output / 'pin/source-snapshot')}
     manifest = {'schema': 'website-world-generation-v2', 'recipe': VERSION,
