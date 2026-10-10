@@ -12,7 +12,7 @@ from .grading import grade_claims, research_effects
 def blank(status='selection', evidence='I recommend this.'):
     return {'interpretation': 'extracted', 'issues': [], 'status': {'value': status, 'evidence': evidence},
             **{k: {'value': None, 'evidence': None} for k in FIELDS+INTEGERS},
-            'total': None, 'average': None, 'source_urls': []}
+            'offers': [], 'total': None, 'average': None, 'average_undefined': {'value':None,'evidence':None}, 'source_urls': []}
 
 
 @pytest.fixture(scope='module')
@@ -179,7 +179,7 @@ def test_average_schema_keeps_empty_population_distinct():
     from .extraction import schema_for
     ep=SimpleNamespace(_task={'query':{'operation':'aggregate'}})
     schema=schema_for(ep)
-    assert set(schema['properties'])=={'interpretation','issues','status','source_urls','average','retailer_count'}
+    assert set(schema['properties'])=={'interpretation','issues','status','source_urls','average','average_undefined','retailer_count'}
     assert 'selection' not in schema['properties']['status']['properties']['value']['enum']
 
 
@@ -191,3 +191,39 @@ def test_provider_schema_is_also_visible_in_model_prompt(episode):
     assert embedded==response_format(schema)['json_schema']['schema']
     assert 'average' not in embedded['properties']
     assert 'best_candidate_ids' not in prompt[0]['content']
+
+
+def test_exact_store_display_name_resolves_without_changing_claims(episode):
+    best=next(c for c in episode._candidates if c['candidate_id'] in episode.reference()['best_candidate_ids'])
+    store=next(r for r in episode._scenario['bundle']['public']['retailers'] if r['retailer_id']==best['lines'][0]['retailer_id'])
+    c,text=extracted(episode,best);text+=' At '+store['name']
+    c['retailer_id']={'value':store['name'],'evidence':store['name']};before=deepcopy(c)
+    g=grade_claims(episode,c,text,effects=[])
+    assert g['oracle_grade']['requirements']['public_selection_identity'] is True
+    assert g['oracle_grade']['requirements']['follow_up_sku_link'] is True
+    assert g['oracle_answer']['retailer_id']==store['retailer_id']
+    assert c==before and any(d.get('method')=='retailer-display-name-v1' for d in g['derivations'])
+
+
+@pytest.mark.parametrize('use_id',[False,True])
+def test_conflicting_retailer_identity_is_not_repaired_to_match_url(episode,use_id):
+    best=next(c for c in episode._candidates if c['candidate_id'] in episode.reference()['best_candidate_ids'])
+    store=next(r for r in episode._scenario['bundle']['public']['retailers'] if r['retailer_id']!=best['lines'][0]['retailer_id'])
+    token=store['retailer_id'] if use_id else store['name']
+    c,text=extracted(episode,best);text+=' Retailer: '+token
+    c['retailer_id']={'value':token,'evidence':token}
+    g=grade_claims(episode,c,text,effects=[])
+    assert g['oracle_answer']['retailer_id']==store['retailer_id']
+    assert g['oracle_grade']['requirements']['public_selection_identity'] is False
+
+
+def test_duplicate_store_name_needs_review_and_unknown_id_stays_wrong(episode):
+    ep=deepcopy(episode);stores=ep._scenario['bundle']['public']['retailers']
+    stores[0]['name']=stores[1]['name']='Ambiguous Store'
+    c=blank();c['retailer_id']={'value':'Ambiguous Store','evidence':'Ambiguous Store'}
+    with pytest.raises(ValueError,match='Ambiguous retailer'):
+        grade_claims(ep,c,'I recommend this. Ambiguous Store',effects=[])
+    c['retailer_id']={'value':'invented-retailer','evidence':'invented-retailer'}
+    g=grade_claims(ep,c,'I recommend this. invented-retailer',effects=[])
+    assert g['oracle_answer']['retailer_id']=='invented-retailer'
+    assert g['structured_claims_correct'] is False
