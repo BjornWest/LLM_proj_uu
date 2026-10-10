@@ -4,11 +4,8 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
-from experiments.answer_grading import task_answer
 from experiments.external_agent.subscription_quota import SubscriptionQuotaGuard
-from intent_browser.connected_world_task import checked_files, TERMINAL_INSTRUCTION
 from . import generation as shared, variant_link_publication as publication
-from . import variant_link_task as native
 from .variant_link_answer_grading import VariantLinkGrader
 
 VERSION = 'website-variant-link-execution-v1'
@@ -20,11 +17,18 @@ class VariantLinkEpisode:
         from .comparison_sku_task import episode_task
         from intent_browser.standard_profile import standard_profile
         from intent_browser.connected_world_task import public_projection
+        self.site_discovery = None
         self.output = Path(output).resolve()
         self.manifest = shared.load(self.output)
         if self.manifest.get('recipe') != publication.VERSION:
             raise ValueError('Not a frozen variant-link recipe')
-        read = lambda name: json.loads((self.output / name).read_bytes())
+        def read(name):
+            payload = (self.output / name).read_bytes()
+            if self.manifest['files'].get(name) != sha256(payload).hexdigest():
+                raise ValueError('Variant-link input differs from its frozen manifest: ' + name)
+            return json.loads(payload)
+        if read('execution.private.json')['answer_grading']['mode'] != 'subscription-post-run':
+            raise ValueError('Automatic variant-link grading must be attached before dispatch')
         task = read('variant-link-task.private.json')
         accepted = read('variant-link-acceptance.private.json')
         # Acceptance is checked before any host publication as well as against
@@ -89,143 +93,42 @@ class VariantLinkEpisode:
                             'catalog.private.json': self.catalog,
                             'navigation-capability.private.json': self.capability,
                             'task.public.json': self.public}.items(): shared.save(output / name, value)
-        return output
+        manifest = {"files": {str(path.relative_to(output)): sha256(path.read_bytes()).hexdigest()
+                               for path in output.rglob("*") if path.is_file()}}
+        shared.save(output / "manifest.json", manifest)
+        return manifest
 
     def __enter__(self): return self
     def __exit__(self, *args): self.runtime.close()
 
+def inputs_factory(output, runtime_directory):
+    """Read exact task inputs plus authenticated actual Runtime exports."""
+    return {'world': output / 'pin/world.private.json',
+            'task': output / 'variant-link-task.private.json',
+            'reference': output / 'variant-link-reference.private.json',
+            'catalog': runtime_directory / 'catalog.private.json',
+            'bindings': runtime_directory / 'bindings.private.json',
+            'navigation_capability': runtime_directory / 'navigation-capability.private.json'}
+
+
+def grader_factory(*, world, task, reference, catalog, bindings, navigation_capability):
+    return VariantLinkGrader(world, task, reference, catalog, bindings, navigation_capability)
+
 
 def run(output, run_directory, *, policy_session, metadata, runner_options,
         viewer_projection, quota_guard=None, extraction_backend_factory=None, runner=None):
-    """Bind grading prospectively, finalize after both cleanups, then publish once.
+    """Reuse the reviewed external lifecycle; actual recipient acceptance gates setup.
 
-    This is consumer source preparation. Actual recipient capability, native
-    public-instance acceptance and a reviewed frozen dependency union still gate
-    every episode; this function grants neither a model run nor effect authority.
+    Read correctness never implies browser visits or complete effect authority.
+    No source-only capability can release a task through VariantLinkEpisode.
     """
-    import importlib
-    from intent_browser.automatic_grading import AutomaticGrading, canonical_viewer_check, finalize_external
-    from intent_browser.connected_world_task import policy_goal
-    from intent_browser.evaluation import Evaluation
-    from . import catalog_compare_review_execution as finalization
-    if not callable(policy_session) or not callable(viewer_projection):
-        raise ValueError('Policy session and automatic viewer projection are required')
-    if type(runner_options) is not dict or any(type(runner_options.get(k)) is not int
-            or runner_options[k] <= 0 for k in ('max_steps', 'max_input_tokens')):
-        raise ValueError('Declare finite positive policy turn and input limits')
-    reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task',
-        'harness_profile', 'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
-        'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}
-    if set(runner_options) & reserved:
-        raise ValueError('Runner options cannot replace native task or prospective grading bindings')
-    if extraction_backend_factory is not None and not callable(extraction_backend_factory):
-        raise ValueError('Configured answer extractor must be callable')
-    output, destination = Path(output).resolve(), Path(run_directory).resolve()
-    shared.load(output)
-    record = json.loads((output/'execution.private.json').read_bytes())
-    grading = record['answer_grading']
-    if grading['mode'] != 'subscription-post-run':
-        raise ValueError('Automatic variant-link grading must be attached before dispatch')
-    destination.mkdir(parents=True, exist_ok=False)
+    from . import saved_answer_lifecycle as lifecycle
     if quota_guard is None:
-        quota_guard = SubscriptionQuotaGuard(destination/'subscription-quota', remaining_floor=1)
-    if not callable(quota_guard):raise ValueError('Quota guard must be callable')
-    if runner is None:
-        from intent_browser.runner import run_episode
-        runner = run_episode
-    runner_options = deepcopy(runner_options)
-    state = {'policy_closed':False,'runtime_closed':False,'grade':None,'deferred':None}
-    trace = None; summary = None
-    shared.save(destination/'execution-plan.private.json', {'schema':VERSION,
-        'grading':grading,'runner_options':runner_options,'automatic_retries':0,
-        'extractor_requests_max':1,'prospective_external_grading':True,'viewer_projection_required':True})
-    try:
-        with VariantLinkEpisode(output) as episode:
-            binding = episode.export_private_runtime(destination/'runtime-binding')
-            expected_public = deepcopy(episode.public)
-            inputs = {'world':output/'pin/world.private.json',
-                'task':output/'variant-link-task.private.json',
-                'reference':output/'variant-link-reference.private.json',
-                'catalog':binding/'catalog.private.json','bindings':binding/'bindings.private.json',
-                'navigation_capability':binding/'navigation-capability.private.json'}
-            reference_files = {str(path.resolve()):sha256(path.read_bytes()).hexdigest()
-                               for path in inputs.values()}
-            episode.task.files.update(reference_files)
-            for name in ('intent_browser.automatic_grading','intent_browser.evaluation',
-                         'agent_trace.adapters.browsergym','environments.website_world.catalog_compare_review_execution'):
-                path = Path(importlib.import_module(name).__file__).resolve()
-                expected = sha256(path.read_bytes()).hexdigest()
-                if str(path) in episode.task.files and episode.task.files[str(path)] != expected:
-                    raise ValueError('Grading implementation differs from frozen variant binding')
-                episode.task.files[str(path)] = expected
-            def bind(env, actual_trace, observation):
-                if observation['goal'] != policy_goal(expected_public):
-                    raise ValueError('Displayed variant-link task differs from the bound public task')
-                return {'task_id':expected_public['task_id'],
-                    'goal_sha256':sha256(observation['goal'].encode()).hexdigest(),
-                    'reference_files':deepcopy(reference_files),'source_files':deepcopy(episode.task.files)}
-            def native_grade(env, actual_trace, outcome):
-                if not state['policy_closed'] or not state['runtime_closed']:
-                    raise ValueError('Variant-link grading requires policy and Runtime cleanup first')
-                if outcome.get('error') or outcome.get('execution_error') or outcome.get('cleanup_errors'):
-                    raise ValueError('Policy/setup/cleanup failed; no complete variant answer')
-                checked_files(episode.task.files)
-                public = json.loads((actual_trace.directory/'policy-task.json').read_bytes())
-                if any(public.get(key) != expected_public[key] for key in
-                       ('task_id','user_message','memories','environment_context','start_url')):
-                    raise ValueError('Saved public variant task or context changed')
-                factory = extraction_backend_factory or task_answer.SubscriptionTaskExtractor(
-                    quota_guard=quota_guard,model=grading['model'],reasoning_effort=grading['reasoning_effort']).backend
-                deferred = finalization.extract_saved_deferred(trace=actual_trace.directory, inputs=inputs,
-                    output=destination/'answer-grading',grader_factory=VariantLinkGrader,
-                    backend_factory=factory,source_paths=list(episode.task.files),before_model_dispatch=quota_guard)
-                state['deferred'],state['grade'] = deferred,deferred['grade']
-                return {'task_id':expected_public['task_id'],'native_grade':state['grade']}
-            def project(raw, captured_binding):
-                if raw['task_id'] != captured_binding['task_id']:
-                    raise ValueError('Automatic variant grade belongs to another task')
-                grade = raw['native_grade']
-                return Evaluation('variant-link-native',VERSION,trust='native_reference',
-                    task_completed=grade['structured_claims_correct'],
-                    evidence=[str(destination/'answer-grading/completed.json')],
-                    limitations=[*grade.get('limitations',[]),
-                        'Answer grading does not establish visits, exposure or whole-run effect authorization'])
-            contract = AutomaticGrading(VERSION,bind,native_grade,project,phase='external',viewer_check=canonical_viewer_check)
-            contract.validate()
-            if not contract.callable_sources() <= episode.task.files.keys():
-                raise ValueError('Prospective variant callbacks are absent from the source union')
-            def before_policy():
-                checked_files(episode.task.files);quota_guard()
-            before_policy()
-            with policy_session(before_dispatch=before_policy) as backend:
-                trace,summary = runner(episode.task.make_env,backend,metadata,output=destination/'runs',
-                    episode_task=episode.task,harness_profile=episode.profile,observation_pipeline='native',
-                    terminal_response_instruction=TERMINAL_INSTRUCTION,automatic_grading=contract,**runner_options)
-            state['policy_closed'] = True
-            trace = Path(trace).resolve()
-            if trace == destination/'runs' or not trace.is_relative_to(destination/'runs'):
-                raise ValueError('Returned variant trace escaped its declared run directory')
-            shared.save(destination/'policy-result.json',{'trace':str(trace),'summary':summary})
-            checked_files(episode.task.files)  # No post-policy quota check suppresses native grading.
-        state['runtime_closed'] = True
-        saved_summary = json.loads((trace/'episode.json').read_bytes())
-        if any(saved_summary.get(key) != summary.get(key) for key in
-               ('stop_reason','error','execution_error','cleanup_errors','trace_complete')):
-            raise ValueError('Returned policy outcome differs from its saved variant trace')
-        summary = finalize_external(trace,contract)
-        if summary.get('grading_error') or not summary.get('infrastructure_completed'):
-            raise ValueError('External automatic variant grading failed: '+str(summary.get('grading_error')))
-        finalization.publish_finalized_answer(state['deferred'],contract_id=contract.contract_id)
-        projected = viewer_projection(trace=trace,grade=state['grade'])
-        if type(projected) is not dict or projected.get('status') != 'verified':
-            raise ValueError('Final automatic variant viewer projection is missing/unverified')
-        result = {'schema':VERSION,'status':'graded_and_projected','trace':str(trace),
-            'task_completed':state['grade']['structured_claims_correct'],'answer_grading':state['grade'],
-            'viewer_projection':projected,'policy_summary':summary,'automatic_retries':0}
-    except Exception as error:
-        result = {'schema':VERSION,'status':'system_failure','trace':str(trace) if trace else None,
-            'task_completed':None,'policy_summary':summary,'error_type':type(error).__name__,
-            'reason':str(error),'policy_closed':state['policy_closed'],
-            'runtime_closed':state['runtime_closed'],'automatic_retries':0}
-    shared.save(destination/'execution-result.json',result)
-    return result
+        quota_guard = SubscriptionQuotaGuard(Path(run_directory).resolve() / 'subscription-quota',
+                                             remaining_floor=1)
+    return lifecycle.run(output, run_directory, episode_factory=VariantLinkEpisode,
+        inputs_factory=inputs_factory, grader_factory=grader_factory,
+        contract_id=VERSION, verifier='variant-link-native',
+        policy_session=policy_session, metadata=metadata, runner_options=runner_options,
+        viewer_projection=viewer_projection, quota_guard=quota_guard,
+        extraction_backend_factory=extraction_backend_factory, runner=runner)
