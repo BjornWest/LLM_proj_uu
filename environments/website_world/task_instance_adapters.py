@@ -7,6 +7,9 @@ from . import catalog_statistics_task, catalog_review_task
 from . import feature_saved_answer, statistics_saved_answer, saved_answer_registry
 from . import review_saved_runner
 from .review_saved_inputs import target_setup
+from .task_instance_navigation import BasicOfferAdapter, VariantLinkAdapter
+from .task_instance_atomic import AtomicAdapter
+from .task_instance_cart import CartAdapter
 
 
 @dataclass(frozen=True)
@@ -27,7 +30,7 @@ class Adapter:
     def reference_file(self):
         return self.stem + '-reference.private.json'
 
-    def construct(self, world, surrounding, parameters):
+    def construct(self, world, surrounding, parameters, *, snapshot=None):
         concept = parameters.get('concept_id')
         if self.stem == 'catalog-review':
             inventory = catalog_review_task.ReviewInventory(concept)
@@ -48,7 +51,7 @@ class Adapter:
         return task, reference, record
 
     def records(self, world, surrounding, task, reference, inventory, episode,
-                start, user_message):
+                start, user_message, *, snapshot=None, instance=None):
         """Bind one native instance to the existing episode/setup schemas."""
         episode = deepcopy(episode)
         episode.update(task_id=task['task_id'], manual_task={
@@ -108,6 +111,11 @@ def inventory_record(inventory):
 
 
 ADAPTERS = {
+    'catalog_cart': CartAdapter(),
+    'checkout_details': CartAdapter(checkout=True),
+    'atomic_product': AtomicAdapter(),
+    'basic_offer': BasicOfferAdapter(),
+    'variant_link': VariantLinkAdapter(),
     'feature_offer': Adapter('feature-offer', feature_offer_task, 'feature-field-inventory.private.json'),
     'catalog_priority': Adapter('catalog-priority', catalog_priority_task, 'priority-field-inventory.private.json'),
     'catalog_shortlist': Adapter('catalog-shortlist', catalog_shortlist_task, 'shortlist-field-inventory.private.json'),

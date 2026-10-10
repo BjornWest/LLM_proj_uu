@@ -5,6 +5,7 @@ Consumers retain the entire website and use ordinary pre-policy UI actions.
 """
 from copy import deepcopy
 from decimal import Decimal
+import re
 from urllib.parse import parse_qsl, urlsplit
 
 from .adapter import digest
@@ -72,7 +73,7 @@ def _target(world, rid, oid, catalog, bindings):
     return retailer, offer, page, variant, page_url
 
 
-def _public_fact(variant, selector):
+def _public_fact(variant, selector, *, product_id=None):
     if (type(selector) is not dict or len(selector) != 1
             or not set(selector) <= {'field', 'slotId'}
             or any(type(v) is not str or not v for v in selector.values())):
@@ -88,6 +89,25 @@ def _public_fact(variant, selector):
                        and not (type(value) is list and not value))
             if present and all(row.get(k) == v for k, v in selector.items()):
                 matches.append({'heading': group['heading'], 'row': deepcopy(row)})
+            elif present and selector == {'field': 'product.facts.reference_mass_g'}:
+                # Reviewed public formulations can combine reference dimensions
+                # and mass in one row. Select its declared scalar assertion,
+                # retaining the visible reference configuration as qualification.
+                assertions = row.get('assertions', [])
+                masses = [a for a in assertions if a.get('field') == selector['field']
+                          and a.get('status') == 'known' and a.get('authority') == 'catalog_fact']
+                bases = [a for a in assertions if a.get('field') == 'product.facts.reference_configuration'
+                         and a.get('status') == 'known' and a.get('authority') == 'catalog_fact']
+                if len(masses) == len(bases) == 1:
+                    mass, basis = masses[0], bases[0]
+                    if (type(mass.get('value')) in (int, float) and mass['value'] > 0
+                            and mass.get('unit') == 'g' and type(basis.get('value')) is str
+                            and basis['value'] and basis['value'] in str(row['value'])
+                            and re.search(r'(?<![\d.])' + re.escape(str(mass['value'])) + r'\s*g\b', str(row['value']))
+                            and mass.get('subject') == basis.get('subject') == {'kind': 'product', 'id': product_id}):
+                        projected = {**deepcopy(row), 'field': selector['field'],
+                                     'value': mass['value'], 'unit': 'g', 'qualifier': basis['value']}
+                        matches.append({'heading': group['heading'], 'row': projected})
     if len(matches) != 1:
         raise ValueError('Fact must be one actually displayed known/applicable row')
     return matches[0]
@@ -122,7 +142,7 @@ def make(world, spec, *, catalog, bindings, checkout_domain):
             raise ValueError('Exact quantity must fit physical dispatch stock and shared limits')
         action = f'Add exactly {q} additional unit' + ('s' if q != 1 else '') + f' of {target_text} to the cart. Preserve anything already in the cart.'
     elif kind == 'read_public_fact':
-        fact = _public_fact(variant, spec['fact'])
+        fact = _public_fact(variant, spec['fact'], product_id=offer['product_id'])
         action = f'For {target_text}, tell me the information shown as "{fact["row"]["label"]}" in "{fact["heading"]}". Include its unit and any stated qualification.'
     else:
         action = f'Tell me the listed price and currency of {target_text} on this page. I only want the item price, without shipping or coupons.'

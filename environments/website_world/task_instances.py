@@ -69,7 +69,7 @@ def validate(instance):
     if type(requirements) is not dict or set(requirements) - {'status', 'minimum_population'}:
         raise ValueError('Use status and minimum_population feasibility requirements')
     if 'status' in requirements and (type(requirements['status']) is not str
-            or requirements['status'] not in {'match', 'no_match', 'summary', 'undefined'}):
+            or requirements['status'] not in {'match', 'no_match', 'summary', 'undefined', 'ready'}):
         raise ValueError('Unsupported required reference status')
     minimum = requirements.get('minimum_population', 0)
     if type(minimum) is not int or not 0 <= minimum <= 100000:
@@ -90,6 +90,23 @@ def _metrics(family, reference):
     return {'status': reference['status'], 'population': len(reference['candidates'])}
 
 
+def _recipe_matches(adapter, manifest):
+    hook = getattr(adapter, 'recipe_matches', None)
+    return hook(manifest) if hook is not None else manifest.get('recipe') == adapter.recipe
+
+
+def _manifest_updates(adapter, prepared):
+    hook = getattr(adapter, 'manifest_updates', None)
+    updates = {} if hook is None else hook(prepared)
+    if type(updates) is not dict or set(updates) & {
+            'recipe', 'files', 'source_sha256', 'task_instance', 'original_recipe',
+            'automatic_grading_attached', 'automatic_grader_supported',
+            'task_kind', 'native_match_status', 'world_draws', 'model_runs', 'effects'}:
+        raise ValueError('Adapter manifest flags cannot replace core bindings')
+    _bytes(updates)
+    return updates
+
+
 def inspect(instance):
     """Construct the native instance and check feasibility without writing files.
 
@@ -101,16 +118,18 @@ def inspect(instance):
         expected_manifest_sha256=instance['source']['manifest_sha256'])
     _, manifest, buffers = snapshot
     adapter = adapters.ADAPTERS[instance['family']]
-    if manifest.get('recipe') != adapter.recipe:
+    if not _recipe_matches(adapter, manifest):
         raise ValueError('Source recipe is not the requested native family')
     read = lambda name: json.loads(buffers[name])
     world, surrounding = read('pin/world.private.json'), read('surrounding.private.json')
-    task, reference, inventory = adapter.construct(world, surrounding, instance['parameters'])
+    task, reference, inventory = adapter.construct(world, surrounding, instance['parameters'], snapshot=snapshot)
     if instance.get('memories', task['memories']) != task['memories']:
         raise ValueError('This family cannot override native memory semantics')
     records, start = adapter.records(world, surrounding, task, reference, inventory,
-        read('episode.json'), instance['start'], instance['user_message'])
-    metrics = _metrics(instance['family'], reference)
+        read('episode.json'), instance['start'], instance['user_message'],
+        snapshot=snapshot, instance=instance)
+    metrics_hook = getattr(adapter, 'metrics', None)
+    metrics = metrics_hook(reference) if metrics_hook is not None else _metrics(instance['family'], reference)
     requirements = instance.get('requirements', {})
     if ('status' in requirements and metrics['status'] != requirements['status']
             or metrics['population'] < requirements.get('minimum_population', 0)):
@@ -162,13 +181,17 @@ def prepare(instance, output):
         # target_setup above independently establishes the direct review start.
         # Ordinary published review inputs need not already carry this extension.
         native_manifest['saved_review_recipe'] = 'website-saved-review-publication-v1'
+    native_manifest.update(_manifest_updates(adapter, prepared))
     _write(stage/'manifest.json', _bytes(native_manifest))
     stage_hash = publication.file_hash(stage/'manifest.json')
+    execution_hook = getattr(adapter, 'execution_overrides', None)
+    execution_overrides = None if execution_hook is None else execution_hook(prepared)
     manifest = publication.prepare_saved(
         publication.read_recipe(stage, expected_manifest_sha256=stage_hash), output/'recipe',
         expected_manifest_sha256=stage_hash, setup=prepared['setup'],
         task_filename=adapter.task_file, adapter_file=__file__,
-        dependency_records=(prepared['reference'], prepared['records'][adapter.inventory_file]))
+        dependency_records=(prepared['reference'], prepared['records'][adapter.inventory_file]),
+        execution_overrides=execution_overrides)
     # Detect concurrent mutation of the original recipe, not just the derivative.
     publication.read_recipe(saved, expected_manifest_sha256=instance['source']['manifest_sha256'])
     recipe = output/'recipe'
@@ -203,7 +226,7 @@ def run(output, run_directory, **options):
     instance = validate(json.loads(buffers['task-instance.private.json']))
     adapter = adapters.ADAPTERS[instance['family']]
     task = json.loads(buffers[adapter.task_file])
-    if (instance['family'] != receipt['family'] or manifest['recipe'] != adapter.recipe
+    if (instance['family'] != receipt['family'] or not _recipe_matches(adapter, manifest)
             or task['task_id'] != receipt['task_id']
             or _hash(buffers['pin/world.private.json']) != receipt['world_sha256']):
         raise ValueError('Prepared family/task/world binding changed')

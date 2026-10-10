@@ -7,9 +7,12 @@ length, statistics operation/grain or review topic does not require another
 runner, grader or setup script. Public wording is an ordinary editable string;
 it is not required to equal the native constructor's English.
 
-The initial adapter registry supports `feature_offer`, `catalog_priority`,
-`catalog_shortlist`, `catalog_statistics` and `catalog_review`. Other accepted
-task families keep their current interfaces. This is a saved-world preparation
+The adapter registry supports `feature_offer`, `catalog_priority`,
+`catalog_shortlist`, `catalog_statistics`, `catalog_review`, `basic_offer` and
+`variant_link`, `atomic_product`, `catalog_cart` and `checkout_details`.
+Other accepted task families keep their current interfaces. Every new instance
+retains an explicit pending runtime acceptance until its capture and grading
+have been exercised. This is a saved-world preparation
 API, not a SAT solver, world editor or new inference backend.
 
 ## Instance format
@@ -54,6 +57,10 @@ Starts:
 | Feature, priority, shortlist | `directory`, `tool_discovery`, or `comparison_home` for the task's named comparison site |
 | Statistics | `comparison_catalog` for the task's site; opens its `/search` page |
 | Review | `review_product` with a covering `site_id`, optional existing `query`; product identity comes from native parameters |
+| Basic offer | The task's `comparison_home`, or `directory` for an unrestricted task |
+| Variant link | The exact native product-page start from its accepted recipient capability |
+| Atomic product | `product` for the target offer; ordinary saved setup may select an initial tuple or open/close a facts disclosure |
+| Cart / checkout details | The bound retailer cart, restored from separately authenticated original storage |
 
 Feasibility requirements are optional; absent requirements retain natural
 no-match and undefined results. `status` must equal the native reference
@@ -124,3 +131,44 @@ Preparation reports `runtime_acceptance: pending`. Native/reference checks do
 not establish browser startup, automatic grading, HTTP projection or model
 success for the new instance. Evaluation performs those existing acceptance
 stages before promotion. No whole-run effect authority is inferred.
+
+## Family adapters for state and navigation
+
+The shared layer passes the authenticated saved snapshot and instance to family
+adapters. A family can consume additional bound native inputs such as a public
+catalog, checkout domain, or recipient-link capability without reopening an
+unverified path or rebuilding those records from public English. Its recipe
+matcher handles existing container extension markers; its metrics describe
+native feasibility rather than runtime acceptance. State/link references may
+use `requirements.status: "ready"`; this does not mean the episode was run.
+
+The common publisher can retain the native runner's existing
+`subscription-post-run` answer extractor configuration. Its default remains
+`external_required` for the saved-answer lifecycle. Atomic variant/quantity
+tasks may retain `answer_grading: {mode: off}` because their existing runner
+attaches automatic native state grading without answer extraction. Read tasks
+still require extraction. The hook cannot disable the automatic episode grader
+or replace source/runtime bindings. Source archives
+and untouched world/sidecar bytes are still frozen by the same publisher once.
+
+Adding a family means one native-constructor/capture-runner binding, not a new
+runner per scenario. Existing families still accept their same configuration
+format. Variant links require a separately accepted actual recipient capability;
+the instance cannot supply an invented capability or claim URL parameters that
+the merchant does not support.
+
+Atomic price/fact/selector/quantity parameters share one adapter and the existing
+scoped atomic runner. Recorder assets belong to one merchant page; a different
+page needs an ordinary native source recipe bound to its actual assets. This
+is data preparation through the existing publisher, not another case runner.
+The matched collapsed-fact setup changes only the existing panel's initial
+exposure, and uses the same product, declared public value and basis.
+
+Cart preparation uses a reusable actual-state adapter. Its optional minimum
+item-subtotal objective ranks only requested additions, subject to quantities,
+stock and admitted cart limits; it does not optimize shipping. Authored prose
+must say this explicitly. Checkout-details preparation concerns the saved
+existing cart, address and delivery note, with no additional-product obligation.
+The saved initial-state bytes travel with the native recipe; their original
+path is provenance rather than a runtime input. Both tasks retain unknown
+whole-run effects and cannot confer complete order/payment authority.

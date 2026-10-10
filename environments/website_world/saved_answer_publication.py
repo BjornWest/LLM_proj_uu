@@ -74,7 +74,7 @@ def declared_sources(*records):
 
 
 def prepare_saved(snapshot, output, *, expected_manifest_sha256, setup,
-                  task_filename, adapter_file, dependency_records=()):
+                  task_filename, adapter_file, dependency_records=(), execution_overrides=None):
     """Rebind current reviewed code while preserving native data and every site.
 
     The adapter validates the native task/reference first. Setup is a separate
@@ -90,8 +90,50 @@ def prepare_saved(snapshot, output, *, expected_manifest_sha256, setup,
             or type(setup.get('user_message')) is not str
             or not setup['user_message'].strip()):
         raise ValueError('Saved public setup identity/memories/request changed')
+    overrides = {} if execution_overrides is None else deepcopy(execution_overrides)
+    if type(overrides) is not dict or set(overrides) - {'answer_grading'}:
+        raise ValueError('Only a required answer-grading protocol may override saved execution')
+    if 'answer_grading' in overrides:
+        from .generation_configs import grading_options
+        # Read/link tasks need answer extraction. Atomic state tasks attach their
+        # automatic native state grader independently and need no extractor.
+        # Keeping that existing protocol does not permit an ungraded episode.
+        grading = overrides['answer_grading']
+        native_state = (task_filename == 'atomic-product-task.private.json'
+                        and task.get('kind') in {'select_exact_variant', 'add_exact_quantity'})
+        if (type(grading) is not dict or
+                (grading.get('mode') != 'subscription-post-run'
+                 and not (native_state and grading == {'mode': 'off'}))):
+            raise ValueError('Require answer extraction or the atomic native-state grading protocol')
+        overrides['answer_grading'] = grading_options(grading)
     sources = _bind(shared.source_files, __file__=str(adapter_file))()
     sources['scripts/trace_grades.py'] = file_hash(ROOT/'scripts/trace_grades.py')
+    # Tokenizer configuration is opened dynamically by runtime token counting.
+    # Python import traversal alone cannot retain this committed dependency.
+    sources['intent_browser/model_tokenizers.json'] = file_hash(ROOT/'intent_browser/model_tokenizers.json')
+    # BrowserGym setup reads this packaged HTML through importlib.resources.
+    # Retain its license alongside it; neither is discoverable by Python imports.
+    for name in ('intent_browser/assets/chat/chat.html',
+                 'intent_browser/assets/chat/LICENSE.browsergym.txt',
+                 'intent_browser/observation_revision.js'):
+        sources[name] = file_hash(ROOT/name)
+    # Disclosure policies are referenced by JSON manifests, not Python imports.
+    # Runtime loads their complete inventory, even for a one-concept task.
+    policy_root = ROOT/'environments/product_world/data/product_feature_policies'
+    for version in ('catalogue_v1', 'catalogue_v2'):
+        policy_manifest = policy_root/version/'manifest.json'
+        policies = json.loads(policy_manifest.read_bytes())
+        sources[str(policy_manifest.relative_to(ROOT))] = file_hash(policy_manifest)
+        for member in policies['concepts'].values():
+            name = member['file']
+            relative = PurePosixPath(name)
+            path = (policy_manifest.parent/name).resolve()
+            if (relative.is_absolute() or str(relative) != name or '..' in relative.parts
+                    or '\\' in name or not path.is_relative_to(policy_manifest.parent)):
+                raise ValueError('Disclosure policy member escaped its manifest: '+name)
+            if file_hash(path) != member['sha256']:
+                raise ValueError('Disclosure policy member differs from manifest: '+name)
+            sources[str(path.relative_to(ROOT))] = member['sha256']
     if (ROOT/'scripts/__init__.py').is_file():
         sources['scripts/__init__.py'] = file_hash(ROOT/'scripts/__init__.py')
     # Native semantics often embed feature declarations in task/reference rows.
@@ -134,7 +176,8 @@ def prepare_saved(snapshot, output, *, expected_manifest_sha256, setup,
     previous = json.loads(buffers['execution.private.json'])
     shared.save(output/'execution.private.json', {**previous, 'source_sha256': sources,
         'answer_grading': {'mode': 'external_required', 'native_kind': task['kind']},
-        'runtime_options': {**previous.get('runtime_options', {}), 'lazy_publication': True}})
+        'runtime_options': {**previous.get('runtime_options', {}), 'lazy_publication': True},
+        **overrides})
     read_recipe(saved, expected_manifest_sha256=expected_manifest_sha256)
     for name, expected in sources.items():
         if file_hash(ROOT/name) != expected or file_hash(output/'pin/source-snapshot'/name) != expected:

@@ -72,6 +72,20 @@ def test_prepare_keeps_world_sites_old_prose_and_one_freeze(saved, tmp_path):
     receipt = api.prepare(saved.instance, output)
     recipe = output/'recipe'
     assert receipt['runtime_acceptance'] == 'pending' and len(saved.calls) == 1
+    manifest = json.loads((recipe/'manifest.json').read_bytes())
+    tokenizer = 'intent_browser/model_tokenizers.json'
+    assert manifest['source_sha256'][tokenizer] == api.publication.file_hash(api.publication.ROOT/tokenizer)
+    assert (recipe/'pin/source-snapshot'/tokenizer).read_bytes() == (api.publication.ROOT/tokenizer).read_bytes()
+    for asset in ('intent_browser/assets/chat/chat.html',
+                  'intent_browser/assets/chat/LICENSE.browsergym.txt',
+                  'intent_browser/observation_revision.js'):
+        assert manifest['source_sha256'][asset] == api.publication.file_hash(api.publication.ROOT/asset)
+        assert (recipe/'pin/source-snapshot'/asset).read_bytes() == (api.publication.ROOT/asset).read_bytes()
+    policy_dir = 'environments/product_world/data/product_feature_policies/catalogue_v2/'
+    policies = json.loads((api.publication.ROOT/policy_dir/'manifest.json').read_bytes())
+    for member in policies['concepts'].values():
+        assert manifest['source_sha256'][policy_dir + member['file']] == member['sha256']
+        assert (recipe/'pin/source-snapshot'/policy_dir/member['file']).is_file()
     for name, payload in parent.items():
         assert (saved.directory/name).read_bytes() == payload
     for name in ('pin/world.private.json', 'surrounding.private.json', 'presentation.json'):
@@ -193,3 +207,104 @@ def test_ambiguous_or_nonfinite_json_rejected(tmp_path, value):
 def test_config_validation_keeps_errors_local(saved, change):
     with pytest.raises(ValueError):
         api.validate({**saved.instance, **change})
+
+
+def test_state_adapter_receives_authenticated_snapshot_and_native_config(saved, monkeypatch, tmp_path):
+    delegate = api.adapters.ADAPTERS['catalog_statistics']
+    seen = {}
+    class StateAdapter:
+        stem = delegate.stem
+        recipe = delegate.recipe
+        task_file = delegate.task_file
+        reference_file = delegate.reference_file
+        inventory_file = delegate.inventory_file
+        def recipe_matches(self, manifest):
+            return manifest['recipe'] == delegate.recipe
+        def construct(self, world, surrounding, parameters, *, snapshot):
+            seen['construct'] = snapshot
+            return delegate.construct(world, surrounding, parameters)
+        def records(self, *args, snapshot, instance):
+            seen['records'] = snapshot
+            seen['instance'] = deepcopy(instance)
+            return delegate.records(*args)
+        def metrics(self, reference):
+            return {'status': 'ready', 'population': reference['population_count']}
+        def manifest_updates(self, prepared):
+            return {'state_protocol': 'actual-capture-v1'}
+        def execution_overrides(self, prepared):
+            return {'answer_grading': {'mode': 'subscription-post-run', 'model': 'fixture-extractor', 'reasoning_effort': 'low'}}
+        def run(self, *args, **options):
+            return delegate.run(*args, **options)
+    monkeypatch.setitem(api.adapters.ADAPTERS, 'state_fixture', StateAdapter())
+    instance = {**saved.instance, 'family': 'state_fixture', 'requirements': {'status': 'ready', 'minimum_population': 1}}
+    output = tmp_path/'state-prepared'
+    api.prepare(instance, output)
+    assert seen['construct'] == seen['records']
+    assert seen['construct'][2]['pin/world.private.json'] == (saved.directory/'pin/world.private.json').read_bytes()
+    assert seen['instance'] == instance
+    execution = json.loads((output/'recipe/execution.private.json').read_bytes())
+    assert execution['answer_grading'] == {'mode': 'subscription-post-run', 'model': 'fixture-extractor', 'reasoning_effort': 'low'}
+    manifest = json.loads((output/'recipe/manifest.json').read_bytes())
+    assert manifest['state_protocol'] == 'actual-capture-v1'
+    assert manifest['automatic_grader_supported'] and not manifest['automatic_grading_attached']
+
+
+@pytest.mark.parametrize('overrides', [
+    {'answer_grading': {'mode': 'off'}},
+    {'answer_grading': {'mode': 'subscription-post-run', 'model': ''}},
+    {'answer_grading': {'mode': 'subscription-post-run', 'allow_ungraded': True}},
+    {'source_sha256': {}},
+    {'runtime_options': {}},
+])
+def test_execution_protocol_cannot_disable_grading_or_replace_bindings(saved, tmp_path, overrides):
+    snapshot = api.publication.read_recipe(saved.directory,
+        expected_manifest_sha256=saved.instance['source']['manifest_sha256'])
+    task = json.loads(snapshot[2]['catalog-statistics-task.private.json'])
+    setup = {'schema': api.publication.VERSION, 'task_id': task['task_id'],
+             'memories': task['memories'], 'user_message': 'Count these models.'}
+    with pytest.raises(ValueError):
+        api.publication.prepare_saved(snapshot, tmp_path/'rejected-protocol',
+            expected_manifest_sha256=saved.instance['source']['manifest_sha256'], setup=setup,
+            task_filename='catalog-statistics-task.private.json', adapter_file=api.__file__,
+            execution_overrides=overrides)
+    assert not (tmp_path/'rejected-protocol').exists() and not saved.calls
+
+
+def test_adapter_extension_cannot_overwrite_source_or_grader_binding():
+    adapter = SimpleNamespace(manifest_updates=lambda prepared: {'source_sha256': {}})
+    with pytest.raises(ValueError, match='core bindings'):
+        api._manifest_updates(adapter, {})
+
+
+@pytest.mark.parametrize('kind,accepted', [
+    ('select_exact_variant', True), ('add_exact_quantity', True),
+    ('read_listed_price', False), ('read_public_fact', False),
+])
+def test_native_atomic_state_protocol_needs_no_answer_extractor(saved, tmp_path, kind, accepted):
+    snapshot = api.publication.read_recipe(saved.directory,
+        expected_manifest_sha256=saved.instance['source']['manifest_sha256'])
+    root, manifest, buffers = snapshot
+    task = json.loads(buffers['catalog-statistics-task.private.json'])
+    task['kind'] = kind
+    buffers = {**buffers, 'atomic-product-task.private.json': api._bytes(task)}
+    # The shared preparation stage archives the previous public setup instead
+    # of presenting it as an unchanged file to the source freezer.
+    manifest = {**manifest, 'files': {name: value for name, value in manifest['files'].items()
+                                     if name != 'saved-answer-setup.private.json'}}
+    setup = {'schema': api.publication.VERSION, 'task_id': task['task_id'],
+             'memories': task['memories'], 'user_message': 'Use the selected option.'}
+    args = dict(expected_manifest_sha256=saved.instance['source']['manifest_sha256'],
+                setup=setup, task_filename='atomic-product-task.private.json',
+                adapter_file=api.__file__, execution_overrides={'answer_grading': {'mode': 'off'}})
+    output = tmp_path/'native-state'
+    if not accepted:
+        with pytest.raises(ValueError):
+            api.publication.prepare_saved((root,manifest,buffers), output, **args)
+        assert not output.exists() and not saved.calls
+        return
+    api.publication.prepare_saved((root,manifest,buffers), output, **args)
+    execution = json.loads((output/'execution.private.json').read_bytes())
+    published = json.loads((output/'manifest.json').read_bytes())
+    assert execution['answer_grading'] == {'mode': 'off'}
+    assert published['automatic_grader_supported']
+    assert not published['automatic_grading_attached']
