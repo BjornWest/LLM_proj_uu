@@ -30,8 +30,24 @@ def scoped_seed(world_seed, site_id, scope):
     return int.from_bytes(sha256(material).digest()[:6], 'big')
 
 
-def load_priors():
-    return json.loads(PRIORS.read_text())
+def load_priors(*, version=1):
+    """Load unchanged historical priors, or explicitly choose canonical v2."""
+    if type(version) is not int or version not in (1, 2):
+        raise ValueError('Unsupported component priors version')
+    priors = json.loads(PRIORS.read_text())
+    if version == 2:
+        priors['schema'] = 'website-component-priors-v2'
+        _normalize_unit_order(priors)
+    return priors
+
+
+def _normalize_unit_order(priors):
+    # Unit arrays are unordered domains in v2. Normalize only an owned copy so
+    # the hash, JSON replay and CDF agree; v1 array order remains significant.
+    if priors.get('schema') == 'website-component-priors-v2':
+        for families in priors['roles'].values():
+            for family, units in families.items():
+                families[family] = sorted(units)
 
 
 def probabilities(weights):
@@ -45,18 +61,23 @@ def probabilities(weights):
 
 
 def factors(profile, priors):
-    if priors.get('schema') != 'website-component-priors-v1':
+    if priors.get('schema') not in ('website-component-priors-v1', 'website-component-priors-v2'):
         raise ValueError('Unsupported component priors')
     if profile not in priors['profiles']:
         raise ValueError(f'Unknown retailer architecture profile: {profile}')
+    ordered = priors['schema'] == 'website-component-priors-v2'
+    def items(mapping):
+        return sorted(mapping.items()) if ordered else mapping.items()
+    def normalized(weights):
+        return probabilities(dict(items(weights)))
     spec = priors['profiles'][profile]
     family_weights = spec['family_weights']
     if set(family_weights) != {'boutique', 'typical', 'huge'}:
         raise ValueError('Declare all three architecture family weights')
-    probabilities(family_weights)
+    normalized(family_weights)
     result = {}
-    for name, weights in priors['site_choices'].items():
-        result['site.' + name] = probabilities(weights)
+    for name, weights in items(priors['site_choices']):
+        result['site.' + name] = normalized(weights)
     required = {'global', 'iconCart', 'url', 'reset', 'opaque'}
     if set(priors['site_choices']) != required:
         raise ValueError('Unexpected or missing shared site choice')
@@ -64,18 +85,18 @@ def factors(profile, priors):
     if type(p) not in (int, float) or not isfinite(p) or not 0 <= p <= 1:
         raise ValueError('Search probability must lie in [0, 1]')
     result['site.search'] = {'true': p, 'false': 1 - p}
-    for role, families in priors['roles'].items():
+    for role, families in items(priors['roles']):
         # Family mass is divided across its available units. A family with more
         # designs therefore doesn't automatically get more probability.
         weights = {}
-        for family, ids in families.items():
+        for family, ids in items(families):
             if not ids:
                 raise ValueError(f'Empty architecture family: {role}/{family}')
             for unit in ids:
                 if unit in weights:
                     raise ValueError(f'Ambiguous unit: {role}/{unit}')
                 weights[unit] = family_weights[family] / len(ids)
-        result['module.' + role] = probabilities(weights)
+        result['module.' + role] = normalized(weights)
     return result
 
 
@@ -137,6 +158,7 @@ def sample_components(world_seed, site_id, *, profile, policy, priors=None, cond
         if not any(type(policy[key]) is type(value) and policy[key] == value for value in values):
             raise ValueError(f'Invalid upstream policy binding: {key}')
     priors = load_priors() if priors is None else deepcopy(priors)
+    _normalize_unit_order(priors)
     tables=None
     if variation_priors is None:
         distributions, mass = conditioned_factors(profile, priors=priors, conditions=conditions)
@@ -176,6 +198,8 @@ def sample_components(world_seed, site_id, *, profile, policy, priors=None, cond
                             'Domain constraints only; no whole-world SAT/compiler adoption.',
                             'Whole-world producer/renderer adoption is separate.']}
 
+    if priors['schema'] == 'website-component-priors-v2':
+        result['component_priors_schema'] = priors['schema']
     if tables is not None:
         result['variation_sampling']={'schema':variation_priors['schema'],
             'priors_sha256':sha256(canonical(variation_priors).encode()).hexdigest(),

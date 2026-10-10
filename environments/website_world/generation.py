@@ -108,10 +108,13 @@ def compile_request(request):
         raise ValueError('Population concentrations must be positive')
     world['controls'] = controls
 
-    priors = load_priors()
     realism = request.get('realism', {})
-    if not isinstance(realism, dict) or set(realism) - {'family_weights', 'convention_weights', 'icon_cart_probability', 'page_variations', 'selected_content', 'delivery_options'}:
+    if not isinstance(realism, dict) or set(realism) - {'family_weights', 'convention_weights', 'icon_cart_probability', 'page_variations', 'selected_content', 'delivery_options', 'component_ordering'}:
         raise ValueError('Unknown website realism control')
+    ordering = realism.get('component_ordering', 'legacy-v1')
+    if ordering not in ('legacy-v1', 'canonical-v2'):
+        raise ValueError('Unknown component ordering mode')
+    priors = load_priors(version=2 if ordering == 'canonical-v2' else 1)
     families = realism.get('family_weights', {})
     if not isinstance(families, dict) or set(families) - set(priors['profiles']):
         raise ValueError('Unknown architecture profile')
