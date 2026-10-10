@@ -19,6 +19,11 @@ def saved_publication(tmp_path, monkeypatch):
                 'intent_browser/assets/chat/chat.html': b'<html></html>',
                 'intent_browser/assets/chat/LICENSE.browsergym.txt': b'fixture license',
                 'intent_browser/observation_revision.js': b'// fixture revision'}
+    for version in ('catalogue_v1', 'catalogue_v2'):
+        prefix = 'environments/product_world/data/product_feature_policies/'+version+'/'
+        payloads[prefix+'policy.json'] = b'{\"policy\": \"fixture\"}'
+        payloads[prefix+'manifest.json'] = json.dumps({'concepts': {'fixture': {
+            'file': 'policy.json', 'sha256': sha256(payloads[prefix+'policy.json']).hexdigest()}}}).encode()
     for name, payload in payloads.items():
         target = root/name; target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(payload)
     hashes = {name: sha256(payload).hexdigest() for name, payload in payloads.items()}
@@ -61,7 +66,7 @@ def test_native_pin_shapes_keep_complete_source_archive(saved_publication, shape
         pins['field_source_sha256'] = {'fields.json': f.hashes['fields.json']}
     manifest, records = f.prepare(pins)
     expected = {**f.collector, **f.producer, 'scripts/trace_grades.py': f.hashes['scripts/trace_grades.py'],
-                **{name: digest for name,digest in f.hashes.items() if name.startswith('intent_browser/')}}
+                **{name: digest for name,digest in f.hashes.items() if name.startswith(('intent_browser/', 'environments/product_world/data/product_feature_policies/'))}}
     for mapping in pins.values():
         expected.update(mapping)
     assert manifest['source_sha256'] == expected
