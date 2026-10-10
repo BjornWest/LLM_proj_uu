@@ -18,6 +18,7 @@ SAMPLED_STATUS = "opt_in_candidate_commerce"
 AUTHORED_STATUS = "authored_derivative_construction_only"
 DRAW_FIELDS = ("matched_reference_draw", "offset_draw")
 META_FIELDS = ("provenance", "status", "limitations", "world_id")
+SEARCH_LIMIT = 10000
 
 
 class CannotConstruct(ValueError):
@@ -65,13 +66,30 @@ def _draw(offer):
     return tuple(offer["price_trace"][field] for field in DRAW_FIELDS)
 
 
+def _producible(draw, config):
+    """Whether the producer's `_offer_price` can record this draw."""
+    match, offset = draw
+    if type(match) is not bool or type(offset) not in (int, float):
+        return False
+    probability = config["reference_match_probability"]
+    if match:
+        # The matched branch sets zero without applying the clamp.
+        return probability > 0 and offset == 0
+    if probability >= 1:
+        return False
+    lo, hi = config["offset_min"], config["offset_max"]
+    if config["offset_standard_deviation"] == 0:
+        return offset == max(lo, min(hi, 0.0))
+    return lo <= offset <= hi
+
+
 def price_rule_violations(world, native_round):
     """Every listed price must follow from one recorded draw per retailer/product.
 
-    Mirrors the producer's `_offer_price`: reference from the exact SKU basis
-    when one exists, else the product; a matched draw has zero offset; other
-    offsets lie inside the clamp; all SKUs of a product at a retailer share
-    the draw. The native commerce validator does not check any of this.
+    Mirrors the producer's `_offer_price`: a positive reference from the exact
+    SKU basis when one exists, else the product; a draw its matched or
+    unmatched branch can record; all SKUs of a product at a retailer share the
+    draw. The native commerce validator does not check any of this.
     """
     config = world["config"]["retailer_price"]
     products = {p["public"]["product_id"]: p["public"] for p in world["products"]}
@@ -85,12 +103,10 @@ def price_rule_violations(world, native_round):
             basis = sku["reference_price_sek"] if exact else products[offer["product_id"]]["reference_price_sek"]
             reference = int((Decimal(str(basis)) * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
             match, offset = _draw(offer)
-            if (trace["reference_minor"] != reference or
+            if (reference <= 0 or trace["reference_minor"] != reference or
                     trace["reference_basis"] != ("exact_sku" if exact else "product")):
-                problems.append(offer["offer_id"] + ": reference differs from its manufacturer basis")
-            elif (type(match) is not bool or type(offset) not in (int, float) or
-                  (match and offset != 0) or
-                  not config["offset_min"] <= offset <= config["offset_max"]):
+                problems.append(offer["offer_id"] + ": reference is not its positive manufacturer basis")
+            elif not _producible((match, offset), config):
                 problems.append(offer["offer_id"] + ": recorded draw is outside the producer's range")
             elif offer["price_minor"] != _price(reference, (match, offset), config, native_round):
                 problems.append(offer["offer_id"] + ": price does not follow from its recorded draw")
@@ -106,10 +122,13 @@ def check_price_rule(world, native_round):
 
 
 def candidate_draws(references, config):
-    """One representative draw for every price the producer can emit.
+    """One representative draw for every price combination the producer can emit.
 
-    Bin centres k*step/reference round to exactly k steps; the clamp endpoints
-    cover prices that only a clamped draw reaches.
+    A SKU's rounded price flips where reference*offset/step crosses a half
+    step. Between two neighbouring flips of any SKU, every SKU's price is
+    constant, so one offset per interval covers the joint outcomes; bin centres
+    of single references would miss combinations of differently rounded SKUs.
+    Clamped draws land exactly on the endpoints.
     """
     lo, hi = config["offset_min"], config["offset_max"]
     if not -1 < lo <= hi:
@@ -121,16 +140,19 @@ def candidate_draws(references, config):
     if config["offset_standard_deviation"] == 0:
         # An unmatched draw of a zero-width normal is always the clamped zero.
         return draws + [(False, max(lo, min(hi, 0.0)))]
-    draws += [(False, lo), (False, hi)]
-    for reference in sorted(set(references)):
+    flips = set()
+    for reference in set(references):
         step = _step(reference, config)
-        first, last = ceil(lo * reference / step), floor(hi * reference / step)
-        if last - first > 10000:
-            raise ValueError("Native price grid exceeds bounded operator support")
-        for k in range(first, last + 1):
-            offset = k * step / reference
-            if lo <= offset <= hi and (k or probability <= 0):
-                draws.append((False, offset))
+        first, last = ceil(lo * reference / step - .5), floor(hi * reference / step - .5)
+        if last - first > SEARCH_LIMIT:
+            raise CannotConstruct("operator_limit", "Native price grid exceeds this operator's bounded search")
+        flips.update((k + .5) * step / reference for k in range(first, last + 1))
+    edges = [lo] + sorted(flip for flip in flips if lo < flip < hi) + [hi]
+    draws += [(False, lo), (False, hi)]
+    for left, right in zip(edges, edges[1:]):
+        # The matched draw already gives the prices of the interval around zero.
+        if not (probability > 0 and left < 0 < right):
+            draws.append((False, (left + right) / 2))
     return draws
 
 
@@ -166,25 +188,24 @@ def check(world, requirement, api):
     return task, reference
 
 
+def _background(world, changed):
+    """Canonical JSON of everything but identity and the declared price/draw fields.
+
+    JSON text, unlike Python equality, keeps true, 1 and 1.0 apart.
+    """
+    def offer(value):
+        if value["offer_id"] not in changed:
+            return value
+        return {**{k: v for k, v in value.items() if k != "price_minor"},
+                "price_trace": {k: v for k, v in value["price_trace"].items() if k not in DRAW_FIELDS}}
+    view = {k: v for k, v in world.items() if k not in META_FIELDS}
+    view["retailers"] = [{**r, "offers": [offer(o) for o in r["offers"]]} for r in world["retailers"]]
+    return json.dumps(view, sort_keys=True, ensure_ascii=False, allow_nan=False)
+
+
 def _only_declared_changes(parent, world, changed):
     """No leaf outside the declared offers' price and draw fields may differ."""
-    def strip(value, keys):
-        return {k: v for k, v in value.items() if k not in keys}
-    if strip(parent, META_FIELDS + ("retailers",)) != strip(world, META_FIELDS + ("retailers",)):
-        return False
-    if len(parent["retailers"]) != len(world["retailers"]):
-        return False
-    for before, after in zip(parent["retailers"], world["retailers"]):
-        if strip(before, ("offers",)) != strip(after, ("offers",)) or len(before["offers"]) != len(after["offers"]):
-            return False
-        for old, new in zip(before["offers"], after["offers"]):
-            if old == new:
-                continue
-            if (old["offer_id"] not in changed or
-                    strip(old, ("price_minor", "price_trace")) != strip(new, ("price_minor", "price_trace")) or
-                    strip(old["price_trace"], DRAW_FIELDS) != strip(new["price_trace"], DRAW_FIELDS)):
-                return False
-    return True
+    return _background(parent, changed) == _background(world, changed)
 
 
 def construct(parent, requirement, api, *, parent_bytes_sha256):
@@ -213,34 +234,35 @@ def construct(parent, requirement, api, *, parent_bytes_sha256):
     groups = {(r["retailer_id"], product_id): [o for o in r["offers"] if o["product_id"] == product_id]
               for r in parent["retailers"] if (r["retailer_id"], product_id) in available}
     # For each designated retailer: every price its cheapest available SKU can
-    # take, with the draw that reaches it by the smallest change.
+    # take, with the draw that reaches it while moving its listed prices least.
     options = {}
     for pair in designated:
         group = groups[pair]
         current = _draw(group[0])
-        buyable = [o for o in group if o["offer_id"] in available[pair]]
         reach = {}
         for draw in [current] + candidate_draws([o["price_trace"]["reference_minor"] for o in group], config):
-            price = min(_price(o["price_trace"]["reference_minor"], draw, config, native_round) for o in buyable)
-            cost = (draw != current, abs(draw[1] - current[1]))
+            repriced = [_price(o["price_trace"]["reference_minor"], draw, config, native_round) for o in group]
+            price = min(new for o, new in zip(group, repriced) if o["offer_id"] in available[pair])
+            cost = (draw != current, sum(abs(new - o["price_minor"]) for o, new in zip(group, repriced)),
+                    abs(draw[1] - current[1]))
             if price not in reach or cost < reach[price][0]:
                 reach[price] = (cost, draw)
-        options[pair] = (min(o["price_minor"] for o in buyable), reach)
-    feasible = [price for price in set.intersection(*(set(reach) for _, reach in options.values()))
+        options[pair] = reach
+    feasible = [price for price in set.intersection(*map(set, options.values()))
                 if competitor_floor is None or price < competitor_floor]
     if not feasible:
         raise CannotConstruct("no_common_price", "No common producer price below the unchanged competitors")
-    # Fewest retailers repriced, then the smallest total price movement, then
-    # the lower price. Not a random feasible choice.
+    # Fewest retailers repriced, then the smallest total movement over every
+    # repriced SKU price, then the lower price. Not a random feasible choice.
     chosen = min(feasible, key=lambda price: (
-        sum(reach[price][0][0] for _, reach in options.values()),
-        sum(abs(price - before) for before, _ in options.values()), price))
+        sum(reach[price][0][0] for reach in options.values()),
+        sum(reach[price][0][1] for reach in options.values()), price))
     world = deepcopy(parent)
     edited = {(r["retailer_id"], product_id): [o for o in r["offers"] if o["product_id"] == product_id]
               for r in world["retailers"] if (r["retailer_id"], product_id) in available}
     changes, changed = [], set()
     for pair in designated:
-        (differs, _), draw = options[pair][1][chosen]
+        (differs, *_), draw = options[pair][chosen]
         if not differs:
             continue
         rows = apply_draw(edited[pair], draw, config, native_round)

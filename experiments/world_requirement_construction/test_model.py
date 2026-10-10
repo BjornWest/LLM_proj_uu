@@ -56,6 +56,12 @@ def make_world(assortment, *, products=None, empty=()):
              "config": {"concept_ids": [CONCEPT], "retailer_price": deepcopy(PRICE)},
              "products": [{"public": p} for p in public.values()], "retailers": retailers,
              "provenance": {}, "limitations": ["Sparse stock is retained; no winner or seed repair."]}
+    return seal(world)
+
+
+def seal(world):
+    """Recompute the identity after a test adjusts the synthetic world."""
+    world.pop("world_id", None)
     world["world_id"] = native.digest(world)
     return world
 
@@ -125,13 +131,41 @@ class ConstructTests(unittest.TestCase):
         self.assertEqual(self.reason(lambda: model.check(world, requirement("north", "south"), API)), "price_rule")
 
     def test_sku_with_its_own_reference_shares_the_retailer_draw(self):
-        parent = make_world({"north": {"shoe": (False, -0.0535)}, "south": {"shoe": (False, -0.024)}},
+        # West also sells at 500 SEK, so the tie has to form below it.
+        parent = make_world({"north": {"shoe": (False, -0.0535)}, "south": {"shoe": (False, -0.024)},
+                             "west": {"shoe": (False, -0.024)}},
                             products={"shoe": (510, {41: 560})})
         world, _, reference, _ = build(parent, requirement("north", "south"))
         self.assertEqual(prices(world, "south")[:2], [48000] * 2)
         self.assertGreater(prices(world, "south")[2], 48000)
         self.assertEqual(model.price_rule_violations(world, native.rounded_price), [])
         self.assertEqual(len(reference["winners"]), 4)
+
+    def test_mixed_references_reach_a_joint_minimum_with_one_reprice(self):
+        # 499 SEK rounds in 5 SEK steps and 500 SEK in 10 SEK steps: 504/500/500
+        # needs an offset between the two SKUs' own bin centres.
+        for offset_min in (-0.3, 0):
+            parent = make_world({"north": {"shoe": MATCH}, "south": {"shoe": MATCH}},
+                                products={"shoe": (499, {40: 500, 41: 500})})
+            parent["retailers"][1]["offers"][0]["stock_by_source"]["south-warehouse"] = 0
+            parent["config"]["retailer_price"]["offset_min"] = offset_min
+            with self.subTest(offset_min=offset_min):
+                world, _, reference, provenance = build(seal(parent), requirement("north", "south"))
+                self.assertEqual([c["retailer_id"] for c in provenance["changes"]], ["north"])
+                self.assertEqual(prices(world, "north"), [50400, 50000, 50000])
+                self.assertEqual(reference["minimum_price_minor"], 50000)
+
+    def test_movement_counts_every_repriced_sku(self):
+        # 400/500/600 SEK; only north lists three sizes. Meeting at 500 moves
+        # four prices by 100 SEK, meeting at 400 moves two by 300 SEK in total.
+        parent = make_world({"north": {"shoe": (False, -110 / 510)}, "south": {"shoe": (False, -10 / 510)},
+                             "west": {"shoe": (False, 90 / 510)}})
+        for retailer in parent["retailers"][1:]:
+            retailer["offers"] = retailer["offers"][:1]
+            retailer["catalog"][0]["pages"][0]["listings"] = retailer["catalog"][0]["pages"][0]["listings"][:1]
+        world, _, reference, provenance = build(seal(parent), requirement("north", "south", "west"))
+        self.assertEqual(reference["minimum_price_minor"], 40000)
+        self.assertEqual([c["retailer_id"] for c in provenance["changes"]], ["south", "west"])
 
     def test_declines_when_a_competitor_is_below_every_producer_price(self):
         parent = make_world({"north": {"shoe": (False, -0.0535)}, "south": {"shoe": MATCH},
@@ -163,6 +197,33 @@ class ConstructTests(unittest.TestCase):
         self.assertFalse(model._only_declared_changes(self.parent, world, changed))
         world, *_ = build(self.parent, requirement("north", "south"))
         self.assertFalse(model._only_declared_changes(self.parent, world, set()))
+        retyped = deepcopy(self.parent)
+        retyped["retailers"][0]["source_locations"][0]["shipping_enabled"] = 1
+        self.assertFalse(model._only_declared_changes(self.parent, retyped, set()))
+
+
+class PriceRuleTests(unittest.TestCase):
+    def violations(self, draw, *, reference=510, **config):
+        world = make_world({"north": {"shoe": draw}}, products={"shoe": (reference, {})})
+        world["config"]["retailer_price"].update(config)
+        return model.price_rule_violations(world, native.rounded_price)
+
+    def test_draws_the_producer_cannot_record_are_violations(self):
+        self.assertEqual(self.violations(MATCH), [])
+        self.assertEqual(self.violations((False, -0.1)), [])
+        self.assertEqual(len(self.violations(MATCH, reference_match_probability=0)), 3)
+        self.assertEqual(len(self.violations((False, -0.1), reference_match_probability=1)), 3)
+        self.assertEqual(len(self.violations((False, -0.1), offset_standard_deviation=0)), 3)
+        self.assertEqual(self.violations((False, 0.0), offset_standard_deviation=0), [])
+        self.assertEqual(len(self.violations((False, 0.31))), 3)
+        self.assertEqual(len(self.violations((True, 0.05))), 3)
+
+    def test_matched_draw_is_valid_outside_the_unmatched_clamp(self):
+        self.assertEqual(self.violations(MATCH, offset_min=0.1), [])
+        self.assertEqual(len(self.violations((False, 0.0), offset_min=0.1)), 3)
+
+    def test_nonpositive_manufacturer_reference_is_a_violation(self):
+        self.assertEqual(len(self.violations(MATCH, reference=0)), 3)
 
 
 class DrawTests(unittest.TestCase):
@@ -180,10 +241,27 @@ class DrawTests(unittest.TestCase):
                 offset = 0 if match else max(PRICE["offset_min"], min(PRICE["offset_max"], rng.gauss(0, PRICE["offset_standard_deviation"])))
                 self.assertIn(native.rounded_price(reference * (1 + offset), reference, PRICE), reachable)
 
+    def test_candidates_reach_every_joint_price_of_differently_rounded_skus(self):
+        rng = Random(11)
+        for references in ((49900, 50000), (9900, 19000, 51000), (129900, 199000, 201000)):
+            joint = {tuple(native.rounded_price(r * (1 + draw[1]), r, PRICE) for r in references)
+                     for draw in model.candidate_draws(references, PRICE)}
+            if references == (49900, 50000):
+                self.assertIn((50400, 50000), joint)
+            for _ in range(3000):
+                match = rng.random() < PRICE["reference_match_probability"]
+                offset = 0 if match else max(PRICE["offset_min"], min(PRICE["offset_max"], rng.gauss(0, PRICE["offset_standard_deviation"])))
+                self.assertIn(tuple(native.rounded_price(r * (1 + offset), r, PRICE) for r in references), joint)
+
+    def test_search_limit_is_a_coded_decline(self):
+        with self.assertRaises(model.CannotConstruct) as caught:
+            model.candidate_draws([200000000], PRICE)
+        self.assertEqual(caught.exception.reason, "operator_limit")
+
     def test_candidates_stay_inside_the_producer_range(self):
-        for draw in model.candidate_draws([19000, 51000], PRICE):
-            self.assertTrue(PRICE["offset_min"] <= draw[1] <= PRICE["offset_max"])
-            self.assertTrue(draw[1] == 0 if draw[0] else True)
+        for config in (PRICE, {**PRICE, "offset_min": 0.1}, {**PRICE, "reference_match_probability": 0}):
+            for draw in model.candidate_draws([19000, 51000], config):
+                self.assertTrue(model._producible(draw, config))
         self.assertEqual(model.candidate_draws([51000], PRICE).count((True, 0)), 1)
         self.assertNotIn((False, 0.0), model.candidate_draws([51000], PRICE))
 

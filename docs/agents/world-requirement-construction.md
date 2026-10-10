@@ -26,20 +26,25 @@ The producer prices a product **once per retailer**: one recorded draw
 `rounded_price`. The operator therefore edits that draw, never a single SKU's
 price. It replaces the draw for a designated retailer/product pair and
 recomputes every SKU of the pair with the producer's own rounding. It only uses
-draws the producer can emit: the matched reference draw, offsets inside the
-clamp, and the clamp endpoints.
+draws the producer can emit: the matched reference draw, the clamp endpoints,
+and one offset from each interval between neighbouring rounding flips of any
+SKU in the pair. The intervals matter when SKUs have their own reference
+prices and round in different steps; per-SKU bin centres would miss some of
+their joint prices.
 
 Among the prices all designated retailers can reach below the unchanged
-competitors, it picks the one that reprices the fewest retailers, then moves
-prices least, then is lowest. This is a deterministic choice, not a random
+competitors, it picks the one that reprices the fewest retailers, then has the
+smallest total movement over every repriced SKU price (unavailable siblings
+included), then is lowest. This is a deterministic choice, not a random
 feasible one. Declining means this operator cannot construct the request; it
 does not prove that no world satisfies it. Each decline carries a reason code
 (`price_rule`, `unavailable`, `already_holds`, `no_common_price`,
-`not_sampled`, `winners`).
+`not_sampled`, `winners`, `operator_limit`).
 
 `price_rule_violations` checks the pricing rule over the whole world: every
-price follows from its recorded draw and manufacturer reference, the draw lies
-in the producer's range, and all SKUs of a product at a retailer share it. The
+price follows from its recorded draw and a positive manufacturer reference, the
+draw is one the producer's matched or unmatched branch can record under the
+world's own price config, and all SKUs of a product at a retailer share it. The
 operator requires this of the parent and of the result. The native commerce
 validator does not check it.
 
@@ -68,9 +73,9 @@ The derivative gets explicit authoring provenance (the parent's draw and every
 repriced offer), a new world identity, a new native task/reference, and rebuilt
 basket-plan and checkout-domain bindings with the parent's policies and
 quantity limits. The changed `price_trace` records hold the authored draw, so
-the seed no longer reproduces those prices; provenance says so. A structural
+the seed no longer reproduces those prices; provenance says so. A canonical-JSON
 comparison confirms that nothing outside the declared offers' price and draw
-fields differs from the parent.
+fields differs from the parent, including value types.
 
 Surrounding comparisons/reviews, public presentation, URL bindings and
 execution recipes are **not rebuilt and are unusable for the derivative**. The
@@ -84,8 +89,10 @@ a separate declared requirement if a scenario needs it.
 ## Evidence and cost
 
 Evidence is under `.local/coordination/world-requirement-construction-20261010/`:
-`native-v6/receipt.json` (with negative controls) and
-`native-v6-construct-only/receipt.json`. The requirement is `requirement-v2.json`.
+`native-v7/receipt.json` (with negative controls) and
+`native-v7-construct-only/receipt.json`. The requirement is `requirement-v2.json`.
+`native-v6*` are the same case on the first draw-level commit, before the Codex
+review fixes; the emitted world is the same.
 
 The edit itself is cheap: about 0.2 s for `construct` on this world, most of it
 the native oracle hashing the 6.4 MB world. A whole runner invocation is
