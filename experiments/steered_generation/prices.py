@@ -8,8 +8,10 @@ be sampled from their distribution given that outcome without any rejection
 loop. The planned draws are then fed to the real producer; this module never
 writes a price itself.
 """
+from collections import Counter
 from math import ceil, floor, fsum, prod
 from statistics import NormalDist
+from types import SimpleNamespace
 
 from experiments.world_requirement_construction import model as edits
 
@@ -140,18 +142,14 @@ def mass(by_price, accept):
     return fsum(atom[0] for price, found in by_price.items() if accept(price) for atom in found)
 
 
-def plan(world, requirement, api, rng):
-    """Sample the concept's price draws given that the designated retailers are cheapest.
+def model(world, requirement, api):
+    """The price block of a world and the probability of the requirement in it.
 
-    Returns the draws that must change, the probability of the requirement
-    given this world's upstream draws, and the sampled winning price.
-
-    A pair whose natural draw already satisfies its part (equal to the winning
-    price if designated, above it otherwise) keeps that draw; only the others
-    are redrawn from their conditional distribution. Keeping a prior draw when
-    it lies in the accepted set, and redrawing from the conditional otherwise,
-    is itself an exact draw from the conditional, so the result is an exact
-    conditional sample that stays as close to the seed's own world as it can.
+    `terms[w]` is the probability that the designated pairs' cheapest available
+    price is exactly w while every other pair's is above w. Pairs draw
+    independently, so each term is a product, and the terms for different w
+    are disjoint events whose sum is the probability of the requirement given
+    everything upstream of prices.
     """
     requirement = edits.resolve(requirement)
     config, native_round = world["config"]["retailer_price"], api.native.rounded_price
@@ -162,23 +160,36 @@ def plan(world, requirement, api, rng):
     spread = {pair: distribution(entry, config, native_round) for pair, entry in pairs.items()}
     terms = {}
     for price in set.intersection(*(set(spread[pair]) for pair in designated)):
-        terms[price] = prod(mass(by_price, (lambda p: p == price) if pair in designated else (lambda p: p > price))
-                            for pair, by_price in spread.items())
-    probability = fsum(terms.values())
-    if probability <= 0:
+        term = prod(mass(by_price, (lambda p: p == price) if pair in designated else (lambda p: p > price))
+                    for pair, by_price in spread.items())
+        if term > 0:
+            terms[price] = term
+    if not terms:
         raise ZeroMass("no_common_price", "The designated retailers cannot be exactly the cheapest in this world")
-    prices = sorted(terms)
-    winning = rng.choices(prices, weights=[terms[p] for p in prices])[0]
+    return SimpleNamespace(pairs=pairs, designated=designated, spread=spread, terms=terms,
+                           probability=fsum(terms.values()), config=config, native_round=native_round)
+
+
+def plan(world, requirement, api, rng):
+    """Sample every price draw of the concept given that the designated retailers are cheapest.
+
+    Returns a draw for each pair in the block, the probability of the
+    requirement given this world's upstream draws, and the sampled winning
+    price. The world's own price draws are not consulted: every pair is drawn
+    afresh from its conditional distribution, so repeated plans for one world
+    are independent samples of the same conditional distribution.
+    """
+    block_model = model(world, requirement, api)
+    prices = sorted(block_model.terms)
+    winning = rng.choices(prices, weights=[block_model.terms[p] for p in prices])[0]
     draws = {}
-    for pair in sorted(pairs):
-        entry = pairs[pair]
-        accept = (lambda p: p == winning) if pair in designated else (lambda p: p > winning)
-        if accept(min(o["price_minor"] for o in entry["buyable"])):
-            continue
-        options = [atom for price, found in sorted(spread[pair].items()) if accept(price) for atom in found]
+    for pair in sorted(block_model.pairs):
+        accept = (lambda p: p == winning) if pair in block_model.designated else (lambda p: p > winning)
+        options = [atom for price, found in sorted(block_model.spread[pair].items()) if accept(price) for atom in found]
         atom = rng.choices(options, weights=[a[0] for a in options])[0]
-        draws[pair] = draw_within(atom, entry["group"], config, native_round, rng)
-    return draws, probability, winning
+        draws[pair] = draw_within(atom, block_model.pairs[pair]["group"], block_model.config,
+                                  block_model.native_round, rng)
+    return draws, block_model.probability, winning
 
 
 def steer(session, natural, requirement, api, rng):
@@ -196,7 +207,7 @@ def steer(session, natural, requirement, api, rng):
                     raise PlanMismatch(f"{offer['offer_id']}: producer recorded {edits._draw(offer)}, plan was {draws[pair]}")
                 changed.add(offer["offer_id"])
     if not edits._only_declared_changes(natural, world, changed):
-        raise AssertionError("Steering the price draws changed something other than those prices")
+        raise AssertionError("Steering the price draws changed something other than the block's prices")
     by_id = {o["offer_id"]: o for r in natural["retailers"] for o in r["offers"]}
     for pair in sorted(draws):
         group = [o for r in world["retailers"] if r["retailer_id"] == pair[0]
@@ -210,12 +221,15 @@ def steer(session, natural, requirement, api, rng):
               "natural_world_id": natural["world_id"],
               "probability_given_upstream": probability, "winning_price_minor": winning,
               "streams_opened": len(opened), "streams_steered": len(draws), "repriced": repriced,
-              "distribution_claim": "Sample of this seed's price draws from their distribution given the "
-                                    "requirement and all upstream draws. Upstream draws are not reweighted; "
-                                    "use probability_given_upstream as the importance weight across seeds."}
+              "distribution_claim": "Every price draw of the concept is sampled from its distribution given the "
+                                    "requirement and all upstream draws, under the price model in prices.atoms. "
+                                    "Upstream draws are not reweighted; use probability_given_upstream as the "
+                                    "importance weight across seeds."}
     world["provenance"]["steered_generation"] = record
     world["status"] = STATUS
-    world["limitations"] = list(world["limitations"]) + [
+    # The producer's own statements (such as "no winner or seed repair")
+    # describe the natural draw, not this world.
+    world["limitations"] = ["Natural-draw declaration: " + note for note in world["limitations"]] + [
         "Steered conditional sample: the seed alone does not reproduce this world; see provenance.steered_generation."]
     world.pop("world_id")
     world["world_id"] = api.native.digest(world)
@@ -223,11 +237,12 @@ def steer(session, natural, requirement, api, rng):
     return world, task, reference, record
 
 
-def empirical_probability(natural, requirement, api, trials, first_seed):
-    """Frequency of the requirement when the real `_offer_price` redraws the block.
+def empirical(natural, requirement, api, trials, first_seed):
+    """Redraw the price block with the real `_offer_price` under other seeds.
 
-    Independent of `atoms`: it calls the producer's own pricing function under
-    other seeds, on this world's products, assortment and stock.
+    Returns how often the requirement held and the winning prices when it did.
+    Independent of `atoms`: the producer's own pricing function, on this
+    world's products, assortment and stock.
     """
     requirement = edits.resolve(requirement)
     config = natural["config"]["retailer_price"]
@@ -235,10 +250,11 @@ def empirical_probability(natural, requirement, api, trials, first_seed):
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
     products = {p["public"]["product_id"]: p["public"] for p in natural["products"]}
     skus = {s["sku_id"]: s for p in products.values() for s in p["skus"]}
-    hits = 0
+    winning = Counter()
     for seed in range(first_seed, first_seed + trials):
         low = {pair: min(api.commerce._offer_price(seed, pair[0], products[pair[1]], skus[o["sku_id"]], config)[0]
                          for o in entry["buyable"]) for pair, entry in pairs.items()}
         floor_price = min(low.values())
-        hits += {pair for pair, price in low.items() if price == floor_price} == designated
-    return hits / trials
+        if {pair for pair, price in low.items() if price == floor_price} == designated:
+            winning[floor_price] += 1
+    return winning

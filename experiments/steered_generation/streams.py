@@ -9,6 +9,7 @@ call. That is an experiment seam, not thread-safe and not a released API.
 """
 from contextlib import contextmanager
 from hashlib import sha256
+from math import isfinite
 import pickle
 
 
@@ -45,7 +46,7 @@ class Scripted:
 
     def gauss(self, mu, sigma):
         value = self._next("gauss")
-        return self._require(type(value) is float and (sigma > 0 or value == mu), value)
+        return self._require(type(value) is float and isfinite(value) and (sigma > 0 or value == mu), value)
 
     def randint(self, low, high):
         value = self._next("randint")

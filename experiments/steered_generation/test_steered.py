@@ -69,7 +69,8 @@ def toy_api(config=PRICE, empty=()):
                                   for pid in carried]})
         world = {"schema_version": commerce.VERSION, "seed": seed, "status": edits.SAMPLED_STATUS,
                  "config": {"concept_ids": [CONCEPT], "retailer_price": deepcopy(config)},
-                 "products": made, "retailers": retailers, "provenance": {}, "limitations": []}
+                 "products": made, "retailers": retailers, "provenance": {},
+                 "limitations": ["Sparse stock is retained; no winner or seed repair."]}
         world["world_id"] = native.digest(world)
         return world
 
@@ -128,6 +129,9 @@ class StreamTests(unittest.TestCase):
             scripted.randint(1, 5)
         with self.assertRaises(streams.OutOfSupport):
             streams.Scripted("k", [("choices", "empty")]).choices(["empty", "full"], weights=[0, 1])
+        for value in (float("nan"), float("inf"), -float("inf")):
+            with self.subTest(value=value), self.assertRaises(streams.OutOfSupport):
+                streams.Scripted("k", [("gauss", value)]).gauss(0, 0.1)
 
 
 class AtomTests(unittest.TestCase):
@@ -208,51 +212,49 @@ class PlanTests(unittest.TestCase):
             self.assertEqual(world["status"], prices.STATUS)
             self.assertEqual(record["winning_price_minor"], reference["minimum_price_minor"])
             self.assertNotEqual(world["world_id"], self.natural["world_id"])
+            self.assertEqual(record["streams_steered"], 5)
+            self.assertTrue(world["limitations"][0].startswith("Natural-draw declaration: "))
         self.assertEqual(self.api.manufactured, list(REFERENCES))
 
-    def test_samples_follow_the_exact_conditional_distribution(self):
-        # Fresh natural worlds each time, so this also checks that keeping a
-        # natural draw which already fits does not bias the result.
-        need, trials = requirement("north", "south"), 2000
+    def test_repeated_samples_of_one_world_follow_the_conditional_distribution(self):
+        # One frozen natural world, many plans: every pair, competitors
+        # included, must follow its conditional price distribution. Reusing the
+        # world's own draws where they happen to fit would freeze them instead.
+        need, trials = requirement("north", "south"), 4000
         names, outcomes = self.brute_force(need)
         total = sum(outcomes.values())
-        seen = Counter()
+        pairs = prices.block(self.natural, need, self.api)
+        seen, offsets = Counter(), {name: set() for name in names}
         for index in range(trials):
-            session = streams.Session(self.api, {**INPUTS, "seed": 1000 + index})
-            natural, _ = session.generate()
-            draws, _, _ = prices.plan(natural, need, self.api, Random(index))
-            pairs = prices.block(natural, need, self.api)
-            seen[tuple(prices.cheapest(pairs[name], draws.get(name, edits._draw(pairs[name]["group"][0])),
-                                       NARROW, native.rounded_price) for name in names)] += 1
+            draws, _, _ = prices.plan(self.natural, need, self.api, Random(index))
+            self.assertEqual(sorted(draws), names)
+            seen[tuple(prices.cheapest(pairs[name], draws[name], NARROW, native.rounded_price) for name in names)] += 1
+            for name in names:
+                offsets[name].add(draws[name])
         self.assertLessEqual(set(seen), set(outcomes))
-        # Compare each pair's price distribution; the joint table is too sparse
-        # for this many trials.
         for position, name in enumerate(names):
             expected, found = Counter(), Counter()
             for combo, weight in outcomes.items():
                 expected[combo[position]] += weight / total
             for combo, count in seen.items():
                 found[combo[position]] += count / trials
-            distance = sum(abs(expected[k] - found[k]) for k in expected) / 2
-            self.assertLess(distance, 0.05, name)
+            self.assertLess(sum(abs(expected[k] - found[k]) for k in expected) / 2, 0.04, name)
+            self.assertGreater(len(offsets[name]), 50, name)
+        # The competitor whose natural price always fits is not frozen at it.
+        position = names.index(("west", "boot"))
+        natural_price = min(o["price_minor"] for o in pairs[("west", "boot")]["buyable"])
+        share = sum(count for combo, count in seen.items() if combo[position] == natural_price) / trials
+        self.assertLess(share, 0.2)
 
-    def test_natural_draws_that_already_fit_are_kept(self):
-        need = requirement("north", "south")
-        kept = 0
-        for index in range(40):
-            draws, _, winning = prices.plan(self.natural, need, self.api, Random(index))
-            for pair, entry in prices.block(self.natural, need, self.api).items():
-                low = min(o["price_minor"] for o in entry["buyable"])
-                fits = low == winning if pair in {("north", "shoe"), ("south", "shoe")} else low > winning
-                self.assertEqual(pair not in draws, fits)
-                kept += fits
-        self.assertGreater(kept, 0)
-
-    def test_computed_probability_matches_real_redraws(self):
-        need, trials = requirement("north", "south"), 20000
-        _, probability, _ = prices.plan(self.natural, need, self.api, Random(0))
-        frequency = prices.empirical_probability(self.natural, need, self.api, trials, 10 ** 6)
-        self.assertLess(abs(frequency - probability), 4 * (probability * (1 - probability) / trials) ** .5)
+    def test_computed_probability_and_winning_prices_match_real_redraws(self):
+        need, trials = requirement("west"), 20000
+        block_model = prices.model(self.natural, need, self.api)
+        winning = prices.empirical(self.natural, need, self.api, trials, 10 ** 6)
+        hits, probability = sum(winning.values()), block_model.probability
+        self.assertLess(abs(hits / trials - probability), 4 * (probability * (1 - probability) / trials) ** .5)
+        distance = sum(abs(block_model.terms.get(p, 0) / probability - winning.get(p, 0) / hits)
+                       for p in set(block_model.terms) | set(winning)) / 2
+        self.assertLess(distance, 0.06)
 
     def test_zero_probability_is_a_coded_refusal(self):
         api = toy_api(empty={("south", "shoe-39"), ("south", "shoe-40"), ("south", "shoe-41")})

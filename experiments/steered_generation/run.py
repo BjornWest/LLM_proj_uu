@@ -114,13 +114,22 @@ def main():
                 "files": {name: edits.byte_digest((folder / name).read_bytes()) for name in files}})
         if args.validate_trials and case.get("status") == "sampled":
             probability = case["probability_given_upstream"]
-            frequency = prices.empirical_probability(natural, requirement, api, args.validate_trials, 10 ** 6)
+            winning = prices.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+            hits = sum(winning.values())
             error = sqrt(probability * (1 - probability) / args.validate_trials)
-            case["validation"] = {"trials": args.validate_trials, "frequency": frequency,
+            terms = prices.model(natural, requirement, api).terms
+            # Winning-price distribution given the requirement: model against real redraws.
+            distance = sum(abs(terms.get(p, 0) / probability - winning.get(p, 0) / hits)
+                           for p in set(terms) | set(winning)) / 2 if hits else None
+            case["validation"] = {"trials": args.validate_trials, "hits": hits, "frequency": hits / args.validate_trials,
                                   "computed": probability, "standard_error": error,
-                                  "within_four_standard_errors": abs(frequency - probability) <= 4 * error}
+                                  "within_four_standard_errors": abs(hits / args.validate_trials - probability) <= 4 * error,
+                                  "winning_price_total_variation": distance,
+                                  "winning_prices_modelled": len(terms)}
             pinned.ensure(case["validation"]["within_four_standard_errors"],
                           "Computed probability disagrees with the real pricing function")
+            pinned.ensure(hits < 1000 or distance < 0.1,
+                          "Conditional winning-price distribution disagrees with the real pricing function")
     final_pins = pinned.verify_sources(root, own_paths)
     pinned.ensure(native_pins.items() <= final_pins.items(), "Consumed native sources changed")
     pinned.ensure(args.generation_input.read_bytes() == inputs_raw, "Generation input changed")
