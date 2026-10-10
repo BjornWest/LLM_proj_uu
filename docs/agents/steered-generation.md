@@ -40,8 +40,11 @@ producer. And the result carries a probability.
 4. **Solve on a model, materialize with the producer, check with the oracle.**
    A block sampler decides the planned draws from a model of the affected
    draws. The real producer then generates the world with that plan, and the
-   native oracle and the pricing-rule check judge the result. If the model
-   were wrong, the world would fail those checks; it cannot be silently wrong.
+   native oracle and the pricing-rule check judge the result. Those checks
+   establish that the world satisfies the requirement and obeys the producer's
+   rules. They do not establish the sampling distribution or the probability;
+   those rest on the block model and on its comparison with the producer's own
+   pricing function (see the evidence below).
 
 Two module attributes are swapped while the producer runs
 (`population.stream`, `package_export.sample`). That is acceptable for an
@@ -62,11 +65,13 @@ exactly the designated retailers are cheapest is then a finite sum over the
 winning price, and `prices.plan` samples the price draws from their
 distribution given that outcome. There is no rejection loop.
 
-A pair whose natural draw already fits (at the winning price if designated,
-above it otherwise) keeps that draw; only the others are redrawn. Keeping a
-prior draw when it fits and redrawing from the conditional when it does not is
-itself a draw from the conditional, so the steered world stays as close to the
-seed's own world as the requirement allows without biasing the sample.
+Every pair of the concept is drawn afresh from its conditional distribution;
+the seed's own price draws for the concept are not consulted. Repeated samples
+of one world are therefore independent samples of the same distribution. An
+earlier version kept a natural draw whenever it already fit. That is a
+conditional draw only if the natural draw is itself fresh each time; with one
+frozen natural world reused for several samples it froze those pairs, and it
+was removed after the first Codex review.
 
 ### What the probability means
 
@@ -96,7 +101,9 @@ Saved seed 73 at accepted source `e3fbfadd84d3b16a26895d62abb66f61df433697`:
 25 products, 320 SKUs, 12 retailers, 411 offers; 48 retailer/product pairs sell
 walking shoes, and seven retailers sell the one walking shoe cheap enough to
 ever be cheapest. Receipt and worlds:
-`.local/coordination/world-requirement-construction-20261010/steering/run-v2/`.
+`.local/coordination/world-requirement-construction-20261010/steering/run-v3/`
+(`run-v1` and `run-v2` used the removed keep-if-it-fits rule; their worlds
+satisfy their requirements but are not a distributional sample).
 
 | Requirement on that shoe | Probability given upstream | Natural worlds per hit |
 | --- | --- | --- |
@@ -109,20 +116,35 @@ ever be cheapest. Receipt and worlds:
 than the three-way one because retailers that all draw the matched reference
 price tie automatically.
 
-Cost: the natural pass took 28 s and an unsteered replay 2.0 s. Each steered
-world took 2.3 to 2.7 s including planning, the pass through the producer and
+Cost: the natural pass took 27 s and an unsteered replay 2.0 s. Each steered
+world took 2.3 to 2.5 s including planning, the pass through the producer and
 all checks, whatever the probability. Three worlds were sampled per
 requirement, twelve in all.
 
-The computed probabilities were compared with the frequency obtained by
-redrawing the price block 30,000 times with the producer's own `_offer_price`
-under other seeds: 0.098, 0.0030, 0.00023 and 0.00090 in table order, each
-within two standard errors of the computed value. For the two rarest that is
-7 and 27 hits, so the comparison is coarse there.
+The model was compared with 30,000 redraws of the price block through the
+producer's own `_offer_price` under other seeds:
+
+| Requirement | Computed probability | Hits in 30,000 | Winning-price distance |
+| --- | --- | --- | --- |
+| Sole `footwear-03` | 0.101 | 2,939 | 0.025 |
+| Two-way tie | 0.0028 | 89 | 0.15 |
+| Three-way tie | 0.00036 | 7 | 0.24 |
+| Five-way tie | 0.00069 | 27 | 0.00 |
+
+Each hit count is within two standard errors of the computed probability.
+"Winning-price distance" is the total-variation distance between the model's
+distribution of the winning price given the requirement and the one observed
+among the hits. It is informative only for the first row; with 89 or 7 hits
+spread over up to 30 possible prices, distances of that size are sampling
+noise. The five-way tie is almost always at the reference price, in the model
+and in all 27 hits. Rare requirements are exactly where a direct empirical
+check is weakest; there the evidence is the per-pair price model, which the
+unit tests check against the producer's draw expression, together with the
+independence of separately named streams.
 
 The natural pass reproduces the saved world's identity, and an unsteered pass
 with cached manufacture reproduces it again. Each steered world differs from
-the natural one only in the price and price-draw fields of the repriced
+the natural one only in the price and price-draw fields of the concept's 48
 retailer/product pairs, satisfies the pricing rule, and has the designated
 retailers as its only cheapest sellers under both the native oracle and a
 separate full scan.
