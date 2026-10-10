@@ -14,7 +14,11 @@ def saved_publication(tmp_path, monkeypatch):
     root.mkdir(); saved.mkdir()
     payloads = {'collector.py': b'# collector source', 'producer.py': b'# producer source',
                 'fields.json': b'{"fields": []}', 'ordinary.py': b'# ordinary task source',
-                'scripts/trace_grades.py': b'# reader'}
+                'scripts/trace_grades.py': b'# reader',
+                'intent_browser/model_tokenizers.json': b'{}',
+                'intent_browser/assets/chat/chat.html': b'<html></html>',
+                'intent_browser/assets/chat/LICENSE.browsergym.txt': b'fixture license',
+                'intent_browser/observation_revision.js': b'// fixture revision'}
     for name, payload in payloads.items():
         target = root/name; target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(payload)
     hashes = {name: sha256(payload).hexdigest() for name, payload in payloads.items()}
@@ -56,7 +60,8 @@ def test_native_pin_shapes_keep_complete_source_archive(saved_publication, shape
     if shape in ('features', 'both'):
         pins['field_source_sha256'] = {'fields.json': f.hashes['fields.json']}
     manifest, records = f.prepare(pins)
-    expected = {**f.collector, **f.producer, 'scripts/trace_grades.py': f.hashes['scripts/trace_grades.py']}
+    expected = {**f.collector, **f.producer, 'scripts/trace_grades.py': f.hashes['scripts/trace_grades.py'],
+                **{name: digest for name,digest in f.hashes.items() if name.startswith('intent_browser/')}}
     for mapping in pins.values():
         expected.update(mapping)
     assert manifest['source_sha256'] == expected
