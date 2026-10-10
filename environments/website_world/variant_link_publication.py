@@ -12,6 +12,18 @@ from .generation_configs import execution_options
 VERSION = 'website-variant-link-publication-v1'
 
 
+def public_request(task, episode):
+    """Authenticate ordinary public prose while retaining native identity/start."""
+    manual = episode.get('manual_task')
+    if (type(manual) is not dict or set(manual) != {'user_message', 'memories'}
+            or manual['memories'] != task['memories']
+            or type(manual['user_message']) is not str or not manual['user_message'].strip()
+            or episode != {'task_id': task['task_id'], 'readable_origins': True,
+                           'start': task['start'], 'manual_task': manual}):
+        raise ValueError('Frozen public request/memories/product start changed')
+    return manual['user_message']
+
+
 def compile_packet(*, world, spec, catalog, bindings, asset_sha256, acceptance):
     """Gate an actual privately accepted recipient packet before task authoring."""
     cap = capability.validate(acceptance, world=world, catalog=catalog,
@@ -24,7 +36,7 @@ def compile_packet(*, world, spec, catalog, bindings, asset_sha256, acceptance):
 
 
 def prepare_saved(saved, output, *, spec, expected_world_sha256, acceptance,
-                  answer_grading, runtime_options=None):
+                  answer_grading, runtime_options=None, user_message=None):
     """Freeze a new container from accepted saved semantics, drawing no worlds.
 
     Preparation requires actual browser capability acceptance. Merely passing
@@ -41,6 +53,11 @@ def prepare_saved(saved, output, *, spec, expected_world_sha256, acceptance,
     world = json.loads(world_path.read_bytes())
     packet = compile_packet(world=world, spec=spec, catalog=read('catalog.private.json'),
         bindings=read('bindings.private.json'), asset_sha256=read('served-assets.private.json'), acceptance=acceptance)
+    public_message = packet['task']['user_message'] if user_message is None else user_message
+    episode = {'task_id': packet['task']['task_id'], 'readable_origins': True,
+        'start': deepcopy(packet['task']['start']),
+        'manual_task': {'user_message': public_message, 'memories': deepcopy(packet['task']['memories'])}}
+    public_request(packet['task'], episode)
     options = execution_options({'lazy_publication': True, 'answer_grading': answer_grading})
     if options['answer_grading']['mode'] == 'off':
         raise ValueError('Link episode publication requires an automatic answer grader')
@@ -97,9 +114,7 @@ def prepare_saved(saved, output, *, spec, expected_world_sha256, acceptance,
                     'variant-link-acceptance.private.json': packet['acceptance'],
                     'variant-link-runtime-options.private.json': runtime_options,
                     'execution.private.json': options,
-                    'episode.json': {'task_id': packet['task']['task_id'], 'readable_origins': True,
-                        'start': deepcopy(packet['task']['start']),
-                        'manual_task': {k: deepcopy(packet['task'][k]) for k in ('user_message', 'memories')}},
+                    'episode.json': episode,
                     'request.json': {'schema': VERSION, 'operation': 'saved_fixture_publication',
                         'world_sha256': expected_world_sha256, 'spec': deepcopy(spec), 'acceptance': deepcopy(acceptance),
                         'source_directory': str(saved), 'world_draws': 0}})

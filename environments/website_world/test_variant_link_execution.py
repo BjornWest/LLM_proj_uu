@@ -243,6 +243,32 @@ class LinkLifecycleControls(unittest.TestCase):
 
 
 class LinkConstructorControls(unittest.TestCase):
+    def test_natural_request_keeps_private_native_identity_memories_and_start(self):
+        task={'task_id':'authored-link', 'user_message':'Private generated coaching prose',
+              'memories':[], 'start':{'kind':'product', 'url':'https://authored.test/#/product/shoe'}}
+        for wording in (task['user_message'], 'Send me a link to these sandals in brown, EU size 38.'):
+            with self.subTest(wording=wording):
+                episode={'task_id':task['task_id'], 'readable_origins':True,
+                         'start':deepcopy(task['start']),
+                         'manual_task':{'user_message':wording, 'memories':[]}}
+                before=deepcopy((task,episode))
+                self.assertEqual(execution.publication.public_request(task,episode),wording)
+                self.assertEqual((task,episode),before)
+
+    def test_natural_request_does_not_relax_identity_memory_start_or_shape(self):
+        task={'task_id':'authored-link','memories':[], 'start':{'url':'https://authored.test'}}
+        baseline={'task_id':task['task_id'],'readable_origins':True, 'start':deepcopy(task['start']),
+                  'manual_task':{'user_message':'Send me a link.','memories':[]}}
+        changes=[{'task_id':'other'}, {'start':{'url':'https://different.test'}},
+                 {'readable_origins':False}, {'extra':True},
+                 {'manual_task':{'user_message':'  ','memories':[]}},
+                 {'manual_task':{'user_message':None,'memories':[]}},
+                 {'manual_task':{'user_message':'Send me a link.','memories':['invented']}},
+                 {'manual_task':{'user_message':'Send me a link.','memories':[],'extra':True}}]
+        for change in changes:
+            with self.subTest(change=change),self.assertRaises(ValueError):
+                execution.publication.public_request(task,{**baseline,**change})
+
     def test_unlisted_or_changed_grading_input_rejects_before_Runtime(self):
         from . import runtime
         for declared in (False, True):

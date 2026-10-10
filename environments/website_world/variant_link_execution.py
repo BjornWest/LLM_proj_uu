@@ -43,10 +43,7 @@ class VariantLinkEpisode:
         options = read('variant-link-runtime-options.private.json')
         if set(options) - {'review_presentation', 'page_option_order'}:
             raise ValueError('Unsupported variant-link Runtime override')
-        if episode != {'task_id': task['task_id'], 'readable_origins': True,
-                       'start': task['start'],
-                       'manual_task': {k: task[k] for k in ('user_message', 'memories')}}:
-            raise ValueError('Frozen public request/memories/product start changed')
+        public_message = publication.public_request(task, episode)
         self.runtime = Runtime(self.output / 'pin', presentation=read('presentation.json'),
             surrounding=read('surrounding.private.json'), basket_plan=read('basket-plan.private.json'),
             checkout_domain=read('checkout-domain.private.json'),
@@ -69,7 +66,7 @@ class VariantLinkEpisode:
                 catalog, self.runtime.bindings, self.capability)
             retailer = next(r for r in self.runtime.world['retailers'] if r['retailer_id'] == task['retailer_id'])
             self.public = public_projection({'schema_version': 'connected-world-manual-v1',
-                'task_id': task['task_id'], 'user_message': task['user_message'],
+                'task_id': task['task_id'], 'user_message': public_message,
                 'memories': deepcopy(task['memories']), 'start_url': task['start']['url'],
                 'environment_context': {'currency': 'SEK', 'scenario_date': self.runtime.world['quote_as_of'],
                                         'shopping_scope': retailer['name']}})
