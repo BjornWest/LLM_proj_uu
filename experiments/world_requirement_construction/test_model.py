@@ -1,65 +1,214 @@
+"""Operator tests on a tiny synthetic world, judged by the real native oracle."""
+from copy import deepcopy
+from pathlib import Path
+from random import Random
+import sys
+from types import SimpleNamespace
 import unittest
 
 if __package__:
-    from .model import VERSION, price_domain, resolve
+    from . import model
 else:
-    from model import VERSION, price_domain, resolve
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    import model
+
+from environments.website_world import basic_offer_task
+from experiments.accepted_catalog_commerce import model as commerce
+from experiments.footwear_world_pilot import model as native
+
+API = SimpleNamespace(basic=basic_offer_task, commerce=commerce, native=native)
+CONCEPT = "footwear.walking_shoes"
+PRICE = {"reference_match_probability": 0.4, "offset_standard_deviation": 0.1,
+         "offset_min": -0.3, "offset_max": 0.3,
+         "rounding_bands_sek": [[100, 1], [500, 5], [2000, 10], [10000, 50], [None, 100]]}
+MATCH = (True, 0)
+
+
+def make_world(assortment, *, products=None, empty=()):
+    """assortment: {retailer_id: {product_id: (matched, offset)}}; prices follow the rule."""
+    products = products or {"shoe": (510, {})}
+    public = {pid: {"product_id": pid, "concept_id": CONCEPT, "name": pid, "reference_price_sek": reference,
+                    "skus": [{"sku_id": f"{pid}-{size}", "product_id": pid,
+                              **({"reference_price_sek": exact[size]} if size in exact else {})}
+                             for size in (39, 40, 41)]}
+              for pid, (reference, exact) in products.items()}
+    retailers = []
+    for rid, carried in assortment.items():
+        offers = []
+        for pid, draw in carried.items():
+            for sku in public[pid]["skus"]:
+                reference = int(sku.get("reference_price_sek", public[pid]["reference_price_sek"]) * 100)
+                offers.append({
+                    "offer_id": rid + "/" + sku["sku_id"], "product_id": pid, "sku_id": sku["sku_id"],
+                    "price_minor": native.rounded_price(reference * (1 + draw[1]), reference, PRICE),
+                    "currency": "SEK", "stock_by_source": {rid + "-warehouse": 0 if (rid, pid) in empty else 3},
+                    "supplier_order": {"enabled": False, "wait_days": None, "disclosure": None},
+                    "price_trace": {"reference_minor": reference,
+                                    "reference_basis": "exact_sku" if "reference_price_sek" in sku else "product",
+                                    "matched_reference_draw": draw[0], "offset_draw": draw[1]}})
+        retailers.append({"retailer_id": rid, "name": rid.title(), "product_ids": list(carried),
+                          "source_locations": [{"source_id": rid + "-warehouse", "shipping_enabled": True}],
+                          "offers": offers,
+                          "catalog": [{"product_id": pid, "pages": [{"listings": [
+                              {"sku_id": o["sku_id"]} for o in offers if o["product_id"] == pid]}]}
+                              for pid in carried]})
+    world = {"schema_version": commerce.VERSION, "seed": 1, "status": model.SAMPLED_STATUS,
+             "config": {"concept_ids": [CONCEPT], "retailer_price": deepcopy(PRICE)},
+             "products": [{"public": p} for p in public.values()], "retailers": retailers,
+             "provenance": {}, "limitations": ["Sparse stock is retained; no winner or seed repair."]}
+    world["world_id"] = native.digest(world)
+    return world
+
+
+def requirement(*retailer_ids, product_id="shoe"):
+    return {"schema": model.VERSION, "kind": model.KIND, "concept_id": CONCEPT,
+            "product_id": product_id, "retailer_ids": list(retailer_ids)}
+
+
+def prices(world, rid, pid="shoe"):
+    return [o["price_minor"] for r in world["retailers"] if r["retailer_id"] == rid
+            for o in r["offers"] if o["product_id"] == pid]
+
+
+def build(world, need):
+    return model.construct(world, need, API, parent_bytes_sha256="test")
+
+
+class ConstructTests(unittest.TestCase):
+    def setUp(self):
+        # 480, 500 and 510 SEK for the same shoe at three retailers.
+        self.parent = make_world({"north": {"shoe": (False, -0.0535)},
+                                  "south": {"shoe": (False, -0.024)},
+                                  "west": {"shoe": MATCH}})
+
+    def reason(self, call):
+        with self.assertRaises(model.CannotConstruct) as caught:
+            call()
+        return caught.exception.reason
+
+    def test_tie_reprices_one_retailer_and_every_sku_of_the_product(self):
+        before = deepcopy(self.parent)
+        world, task, reference, provenance = build(self.parent, requirement("north", "south"))
+        self.assertEqual(self.parent, before)
+        self.assertEqual(prices(world, "north"), [48000] * 3)
+        self.assertEqual(prices(world, "south"), [48000] * 3)
+        self.assertEqual(prices(world, "west"), [51000] * 3)
+        self.assertEqual([c["retailer_id"] for c in provenance["changes"]], ["south"])
+        self.assertEqual(provenance["changes"][0]["before"],
+                         {"matched_reference_draw": False, "offset_draw": -0.024})
+        self.assertEqual(len(reference["winners"]), 6)
+        self.assertEqual(model.price_rule_violations(world, native.rounded_price), [])
+        self.assertEqual(world["status"], model.AUTHORED_STATUS)
+        self.assertNotEqual(world["world_id"], self.parent["world_id"])
+        self.assertEqual(task["world_id"], world["world_id"])
+
+    def test_one_designated_retailer_becomes_sole_cheapest(self):
+        world, _, reference, provenance = build(self.parent, requirement("west"))
+        self.assertEqual(prices(world, "west"), [47000] * 3)
+        self.assertEqual({row["retailer_id"] for row in reference["winners"]}, {"west"})
+        self.assertEqual(provenance["changes"][0]["after"]["matched_reference_draw"], False)
+
+    def test_matched_reference_draw_is_used_for_the_reference_price(self):
+        parent = make_world({"north": {"shoe": (False, 0.05)}, "south": {"shoe": MATCH},
+                             "west": {"shoe": (False, 0.1)}})
+        world, _, _, provenance = build(parent, requirement("north", "south"))
+        self.assertEqual(prices(world, "north"), [51000] * 3)
+        self.assertEqual(provenance["changes"][0]["after"],
+                         {"matched_reference_draw": True, "offset_draw": 0})
+
+    def test_single_variant_price_edit_breaks_the_price_rule(self):
+        self.parent["retailers"][1]["offers"][0]["price_minor"] = 47000
+        self.assertEqual(self.reason(lambda: build(self.parent, requirement("north", "south"))), "price_rule")
+        world, *_ = build(make_world({"north": {"shoe": (False, -0.0535)}, "south": {"shoe": MATCH}}),
+                          requirement("north", "south"))
+        world["retailers"][0]["offers"][0]["price_minor"] -= 1000
+        self.assertEqual(self.reason(lambda: model.check(world, requirement("north", "south"), API)), "price_rule")
+
+    def test_sku_with_its_own_reference_shares_the_retailer_draw(self):
+        parent = make_world({"north": {"shoe": (False, -0.0535)}, "south": {"shoe": (False, -0.024)}},
+                            products={"shoe": (510, {41: 560})})
+        world, _, reference, _ = build(parent, requirement("north", "south"))
+        self.assertEqual(prices(world, "south")[:2], [48000] * 2)
+        self.assertGreater(prices(world, "south")[2], 48000)
+        self.assertEqual(model.price_rule_violations(world, native.rounded_price), [])
+        self.assertEqual(len(reference["winners"]), 4)
+
+    def test_declines_when_a_competitor_is_below_every_producer_price(self):
+        parent = make_world({"north": {"shoe": (False, -0.0535)}, "south": {"shoe": MATCH},
+                             "west": {"budget": MATCH}},
+                            products={"shoe": (510, {}), "budget": (200, {})})
+        self.assertEqual(self.reason(lambda: build(parent, requirement("north", "south"))), "no_common_price")
+
+    def test_declines_without_stock_or_retailer(self):
+        parent = make_world({"north": {"shoe": (False, -0.0535)}, "south": {"shoe": MATCH}},
+                            empty={("south", "shoe")})
+        self.assertEqual(self.reason(lambda: build(parent, requirement("north", "south"))), "unavailable")
+        self.assertEqual(self.reason(lambda: build(self.parent, requirement("north", "absent"))), "unavailable")
+
+    def test_declines_satisfied_and_authored_parents(self):
+        self.assertEqual(self.reason(lambda: build(self.parent, requirement("north"))), "already_holds")
+        world, *_ = build(self.parent, requirement("north", "south"))
+        self.assertEqual(self.reason(lambda: build(world, requirement("north", "south"))), "not_sampled")
+
+    def test_check_requires_exactly_the_designated_retailers(self):
+        world, *_ = build(self.parent, requirement("north", "south"))
+        for ids in (("north",), ("north", "south", "west")):
+            self.assertEqual(self.reason(lambda: model.check(world, requirement(*ids), API)), "winners")
+
+    def test_background_change_is_detected(self):
+        world, *_ = build(self.parent, requirement("north", "south"))
+        changed = {o["offer_id"] for o in world["retailers"][1]["offers"]}
+        self.assertTrue(model._only_declared_changes(self.parent, world, changed))
+        world["retailers"][2]["offers"][0]["stock_by_source"]["west-warehouse"] = 0
+        self.assertFalse(model._only_declared_changes(self.parent, world, changed))
+        world, *_ = build(self.parent, requirement("north", "south"))
+        self.assertFalse(model._only_declared_changes(self.parent, world, set()))
+
+
+class DrawTests(unittest.TestCase):
+    def reachable(self, reference, config):
+        return {native.rounded_price(reference * (1 + draw[1]), reference, config)
+                for draw in model.candidate_draws([reference], config)}
+
+    def test_candidates_reach_every_price_the_producer_draws(self):
+        rng = Random(7)
+        for reference in (9900, 19000, 51000, 129900, 550000, 1250000):
+            reachable = self.reachable(reference, PRICE)
+            for _ in range(3000):
+                # The producer's own expression in `_offer_price`.
+                match = rng.random() < PRICE["reference_match_probability"]
+                offset = 0 if match else max(PRICE["offset_min"], min(PRICE["offset_max"], rng.gauss(0, PRICE["offset_standard_deviation"])))
+                self.assertIn(native.rounded_price(reference * (1 + offset), reference, PRICE), reachable)
+
+    def test_candidates_stay_inside_the_producer_range(self):
+        for draw in model.candidate_draws([19000, 51000], PRICE):
+            self.assertTrue(PRICE["offset_min"] <= draw[1] <= PRICE["offset_max"])
+            self.assertTrue(draw[1] == 0 if draw[0] else True)
+        self.assertEqual(model.candidate_draws([51000], PRICE).count((True, 0)), 1)
+        self.assertNotIn((False, 0.0), model.candidate_draws([51000], PRICE))
+
+    def test_degenerate_configs_do_not_invent_prices(self):
+        self.assertEqual(self.reachable(99000, {**PRICE, "reference_match_probability": 1}), {99000})
+        self.assertEqual(self.reachable(99000, {**PRICE, "offset_standard_deviation": 0}), {99000})
+        shifted = {**PRICE, "offset_standard_deviation": 0, "offset_min": 0.1,
+                   "reference_match_probability": 0}
+        self.assertEqual(self.reachable(100000, shifted), {110000})
+        never_matched = model.candidate_draws([51000], {**PRICE, "reference_match_probability": 0})
+        self.assertIn((False, 0.0), never_matched)
+        self.assertNotIn((True, 0), never_matched)
 
 
 class RequirementTests(unittest.TestCase):
-    def setUp(self):
-        self.requirement = {"schema": VERSION, "kind": "two_designated_available_cheapest_ties",
-                            "concept_id": "footwear.walking_shoes", "offer_ids": ["a", "b"]}
-
-    def test_declared_distinct_target_ids(self):
-        resolved = resolve(self.requirement)
-        resolved["offer_ids"].append("c")
-        self.assertEqual(self.requirement["offer_ids"], ["a", "b"])
-
-    def test_malformed_requirements(self):
-        for ids in (["a", "a"], ["a"], ["a", 2], [True, "b"], "ab"):
+    def test_resolve_copies_and_rejects_malformed_requirements(self):
+        need = requirement("north", "south")
+        model.resolve(need)["retailer_ids"].append("west")
+        self.assertEqual(need["retailer_ids"], ["north", "south"])
+        for ids in (["a", "a"], [], ["a", 2], [True, "b"], "ab"):
             with self.subTest(ids=ids), self.assertRaises(ValueError):
-                resolve({**self.requirement, "offer_ids": ids})
-        with self.assertRaises(ValueError):
-            resolve({**self.requirement, "allow_price_overflow": True})
-
-    def test_bounds_match_clamped_native_rounding(self):
-        def rounding(raw, reference, config):
-            return max(1000, reference + round((raw - reference) / 1000) * 1000)
-        cfg = {"offset_min": -.3, "offset_max": .3, "rounding_bands_sek": [[None, 10]]}
-        support = price_domain({"price_trace": {"reference_minor": 51000}}, cfg, rounding)
-        self.assertEqual(support, set(range(36000, 66001, 1000)))
-        self.assertNotIn(35999, support)
-        self.assertNotIn(47001, support)
-        # Every hundredth raw offset maps inside the finite output support.
-        for hundredth in range(-30, 31):
-            self.assertIn(rounding(51000 * (1 + hundredth / 100), 51000, cfg), support)
-
-    def test_clamped_endpoint_is_not_a_new_rounding_grid(self):
-        def rounding(raw, reference, config):
-            return max(100, reference + round((raw - reference) / 100) * 100)
-        cfg = {"offset_min": -.9, "offset_max": 2, "rounding_bands_sek": [[None, 1]]}
-        support = price_domain({"price_trace": {"reference_minor": 190}}, cfg, rounding)
-        self.assertEqual(support, {100, 190, 290, 390, 490, 590})
-        self.assertNotIn(200, support)
-
-    def test_existing_float_endpoint_keeps_its_half_step(self):
-        def rounding(raw, reference, config):
-            return max(100, reference + round((raw - reference) / 100) * 100)
-        cfg = {"offset_min": -.3, "offset_max": .3, "rounding_bands_sek": [[None, 1]]}
-        # float(5500*(1-.3)) falls just below3850; native round gives3800.
-        support = price_domain({"price_trace": {"reference_minor": 5500}}, cfg, rounding)
-        self.assertEqual(min(support), rounding(5500 * (1 + cfg["offset_min"]), 5500, cfg))
-        self.assertEqual(min(support), 3800)
-
-    def test_reference_match_draw_exists_outside_offset_interval(self):
-        def rounding(raw, reference, config):
-            return max(1000, reference + round((raw - reference) / 1000) * 1000)
-        cfg = {"offset_min": .05, "offset_max": .3,
-               "reference_match_probability": .4, "rounding_bands_sek": [[None, 10]]}
-        offer = {"price_trace": {"reference_minor": 51000}}
-        self.assertIn(51000, price_domain(offer, cfg, rounding))
-        self.assertNotIn(51000, price_domain(offer, {**cfg, "reference_match_probability": 0}, rounding))
+                model.resolve({**need, "retailer_ids": ids})
+        for extra in ({"allow_price_overflow": True}, {"kind": "other"}, {"product_id": ""}):
+            with self.subTest(extra=extra), self.assertRaises(ValueError):
+                model.resolve({**need, **extra})
 
 
 if __name__ == "__main__":

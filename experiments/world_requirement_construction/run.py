@@ -1,7 +1,6 @@
 """Saved-only construction/native acceptance from an exact Git dependency root."""
 import argparse
 from copy import deepcopy
-from hashlib import sha256
 import importlib
 import json
 from pathlib import Path
@@ -11,9 +10,14 @@ import time
 from types import SimpleNamespace
 
 if __package__:
-    from .model import CannotConstruct, VERSION, byte_digest, check, construct, price_domain
+    from .model import (CannotConstruct, META_FIELDS, VERSION, apply_draw, byte_digest,
+                        check, construct, price_rule_violations)
 else:
-    from model import CannotConstruct, VERSION, byte_digest, check, construct, price_domain
+    from model import (CannotConstruct, META_FIELDS, VERSION, apply_draw, byte_digest,
+                       check, construct, price_rule_violations)
+
+HERE = Path(__file__).resolve().parent
+RELATIVE = "experiments/world_requirement_construction/"
 
 
 def ensure(condition, message):
@@ -45,6 +49,23 @@ def load_native(root, commit):
     return SimpleNamespace(**modules)
 
 
+def pin_constructor(declared):
+    """Resolve the declared commit in the constructor's own repository."""
+    try:
+        commit = subprocess.check_output(
+            ["git", "-C", str(HERE), "rev-parse", "--verify", "--quiet", declared + "^{commit}"],
+            text=True, stderr=subprocess.DEVNULL).strip()
+    except subprocess.CalledProcessError:
+        raise ValueError("Constructor commit cannot be resolved: " + declared) from None
+    pins, paths = {}, {}
+    for name in ("__init__.py", "model.py", "run.py"):
+        expected = subprocess.check_output(["git", "-C", str(HERE), "show", commit + ":" + RELATIVE + name])
+        if (HERE / name).read_bytes() != expected:
+            raise ValueError("Constructor source differs from its declared commit: " + name)
+        pins[name] = paths[str(HERE / name)] = byte_digest(expected)
+    return commit, pins, paths
+
+
 def verify_sources(root, constructor_paths):
     pins = {}
     for module in tuple(sys.modules.values()):
@@ -66,12 +87,78 @@ def verify_sources(root, constructor_paths):
     return pins
 
 
-def reject(call, expected=(ValueError,)):
+def declines(call, reason):
+    """A control passes only when the operator declines for the named reason."""
     try:
         call()
-    except expected:
+    except CannotConstruct as error:
+        return error.reason == reason
+    return False
+
+
+def rejects(call):
+    try:
+        call()
+    except ValueError:
         return True
-    raise AssertionError("Negative control was accepted")
+    return False
+
+
+def direct_scan(world, requirement):
+    """Full-population winner scan, independent of the native oracle."""
+    products = {p["public"]["product_id"]: p["public"] for p in world["products"]}
+    eligible = [(r["retailer_id"], o) for r in world["retailers"] for o in r["offers"]
+                if products[o["product_id"]]["concept_id"] == requirement["concept_id"]
+                and (any(o["stock_by_source"].values()) or o["supplier_order"]["enabled"])]
+    minimum = min(o["price_minor"] for _, o in eligible)
+    return minimum, {(rid, o["product_id"]) for rid, o in eligible if o["price_minor"] == minimum}
+
+
+def negative_controls(parent, world, requirement, api, plan, domain):
+    """Deliberately broken inputs; none of this is needed to construct."""
+    selection = {"kind": "cheapest_available", "concept_id": requirement["concept_id"]}
+    controls = {
+        "old_basket_binding_rejects": rejects(lambda: api.basket.validate_plan(world, plan)),
+        "old_checkout_binding_rejects": rejects(lambda: api.checkout.validate(world, domain)),
+        "old_task_binding_rejects": rejects(
+            lambda: api.basic.reference(world, api.basic.make(parent, selection)))}
+    config = world["config"]["retailer_price"]
+    first, product_id = requirement["retailer_ids"][0], requirement["product_id"]
+    scratch = deepcopy(world)
+    group = [o for r in scratch["retailers"] if r["retailer_id"] == first
+             for o in r["offers"] if o["product_id"] == product_id]
+    saved = deepcopy(group)
+    # The retired variant-level edit: one SKU cheaper than its siblings.
+    group[0]["price_minor"] -= 100
+    controls["single_variant_price_edit_breaks_price_rule"] = declines(
+        lambda: check(scratch, requirement, api), "price_rule")
+    for offer, original in zip(group, saved):
+        offer.update(deepcopy(original))
+    if len(requirement["retailer_ids"]) > 1:
+        # A consistent draw that moves one designated retailer off the shared price.
+        current = group[0]["price_minor"]
+        for offset in (config["offset_max"], config["offset_min"]):
+            apply_draw(group, (False, offset), config, api.native.rounded_price)
+            if group[0]["price_minor"] != current:
+                break
+        controls["repriced_designated_retailer_loses_tie"] = declines(
+            lambda: check(scratch, requirement, api), "winners")
+    others = [r["retailer_id"] for r in world["retailers"]
+              if r["retailer_id"] not in requirement["retailer_ids"]]
+    if others:
+        wider = {**requirement, "retailer_ids": requirement["retailer_ids"] + others[:1]}
+        controls["extra_designated_retailer_rejects"] = declines(
+            lambda: check(world, wider, api), "winners")
+    absent = {**requirement, "retailer_ids": requirement["retailer_ids"] + ["absent-retailer"]}
+    controls["unknown_retailer_declines"] = declines(
+        lambda: construct(parent, absent, api, parent_bytes_sha256="control"), "unavailable")
+    controls["authored_chain_declines"] = declines(
+        lambda: construct(world, requirement, api, parent_bytes_sha256="control"), "not_sampled")
+    # The same prices presented as an untouched sampled world.
+    satisfied = {**world, **{field: parent[field] for field in META_FIELDS}}
+    controls["already_satisfied_parent_declines"] = declines(
+        lambda: construct(satisfied, requirement, api, parent_bytes_sha256="control"), "already_holds")
+    return controls
 
 
 def main():
@@ -83,20 +170,13 @@ def main():
     parser.add_argument("--expected-parent-manifest-sha256", required=True)
     parser.add_argument("--requirement", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--controls", action="store_true",
+                        help="also run the negative controls; not needed to construct")
     args = parser.parse_args()
     started = time.monotonic()
     root = args.native_root.resolve()
     api = load_native(root, args.native_commit)
-    constructor_commit = subprocess.check_output(["git", "-C", str(root), "rev-parse", "--verify", args.constructor_commit + "^{commit}"], text=True).strip()
-    constructor_pins = {}
-    constructor_paths = {}
-    for name in ("__init__.py", "model.py", "run.py"):
-        relative = "experiments/world_requirement_construction/" + name
-        expected = subprocess.check_output(["git", "-C", str(root), "show", constructor_commit + ":" + relative])
-        if Path(__file__).with_name(name).read_bytes() != expected:
-            raise ValueError("Constructor source differs from its declared commit: " + name)
-        constructor_pins[name] = byte_digest(expected)
-        constructor_paths[str(Path(__file__).with_name(name).resolve())] = byte_digest(expected)
+    constructor_commit, constructor_pins, constructor_paths = pin_constructor(args.constructor_commit)
     source_pins = verify_sources(root, constructor_paths)
     manifest_raw = (args.recipe / "manifest.json").read_bytes()
     if byte_digest(manifest_raw) != args.expected_parent_manifest_sha256:
@@ -108,7 +188,6 @@ def main():
         if byte_digest(raw) != manifest["files"][name]:
             raise ValueError("Accepted input differs from its recipe manifest: " + name)
     parent, plan, domain = (json.loads(originals[name]) for name in names)
-    api.commerce.validate(parent)
     api.basket.validate_plan(parent, plan)
     api.checkout.validate(parent, domain)
     requirement_raw = args.requirement.read_bytes()
@@ -124,66 +203,24 @@ def main():
     api.checkout.validate(world, new_domain)
     ensure(new_plan["retailer_policies"] == plan["retailer_policies"], "Basket policies changed")
     ensure(new_domain["quantity_limits"] == domain["quantity_limits"], "Checkout quantity limits changed")
-    controls = {"old_basket_binding_rejects": reject(lambda: api.basket.validate_plan(world, plan)),
-                "old_checkout_binding_rejects": reject(lambda: api.checkout.validate(world, domain)),
-                "old_task_binding_rejects": reject(lambda: api.basic.reference(world, api.basic.make(parent, {"kind": "cheapest_available", "concept_id": requirement["concept_id"]})))}
-    by_id = {o["offer_id"]: o for r in world["retailers"] for o in r["offers"]}
-    first = requirement["offer_ids"][0]
-    bad = deepcopy(world)
-    next(o for r in bad["retailers"] for o in r["offers"] if o["offer_id"] == first)["price_minor"] += 1
-    controls["unequal_target_prices_reject"] = reject(lambda: check(bad, requirement, api), (CannotConstruct,))
-    bad_stock = deepcopy(world)
-    offer = next(o for r in bad_stock["retailers"] for o in r["offers"] if o["offer_id"] == first)
-    offer["stock_by_source"] = {s: 0 for s in offer["stock_by_source"]}
-    offer["supplier_order"] = {"enabled": True, "wait_days": 1, "disclosure": "product_page"}
-    controls["supplier_only_target_rejects"] = reject(lambda: check(bad_stock, requirement, api), (CannotConstruct,))
-    impossible = deepcopy(parent)
-    targets = set(requirement["offer_ids"])
-    competitor = next(o for r in impossible["retailers"] for o in r["offers"]
-                      if o["offer_id"] in {c["offer_id"] for c in api.basic.reference(parent, api.basic.make(parent, {"kind": "cheapest_available", "concept_id": requirement["concept_id"]}))["candidates"]} and o["offer_id"] not in targets)
-    competitor["price_minor"] = 1
-    controls["no_price_support_declines_without_edit"] = reject(
-        lambda: construct(impossible, requirement, api, parent_bytes_sha256="control"), (CannotConstruct,))
-    bad_target = {**requirement, "offer_ids": [first, "absent-offer"]}
-    controls["unknown_target_rejects"] = reject(lambda: construct(parent, bad_target, api, parent_bytes_sha256="control"), (CannotConstruct,))
-    controls["authored_chains_reject"] = reject(lambda: construct(world, requirement, api, parent_bytes_sha256="control"), (CannotConstruct,))
-    already = deepcopy(parent)
-    for r in already["retailers"]:
-        for o in r["offers"]:
-            if o["offer_id"] in targets:
-                o["price_minor"] = reference["minimum_price_minor"]
-    before_already = deepcopy(already)
-    controls["already_satisfied_parent_declines_unchanged"] = reject(lambda: construct(already, requirement, api, parent_bytes_sha256="control"), (CannotConstruct,))
-    ensure(already == before_already, "Already-satisfied control was mutated")
-    backorder = deepcopy(world)
-    r = next(r for r in backorder["retailers"] if any(o["offer_id"] == first for o in r["offers"]))
-    branches = [s["source_id"] for s in r["source_locations"] if not s["shipping_enabled"]]
-    if not branches:
-        raise ValueError("Saved acceptance requires a non-shipping source for the backorder control")
-    o = next(o for o in r["offers"] if o["offer_id"] == first)
-    o["stock_by_source"] = {s: int(s == branches[0]) for s in o["stock_by_source"]}
-    o["supplier_order"] = {"enabled": True, "wait_days": 1, "disclosure": "product_page"}
-    controls["nonshipping_branch_plus_backorder_rejects"] = reject(lambda: check(backorder, requirement, api), (CannotConstruct,))
-    # A separate direct full-population scan, independent of the existing oracle.
-    products = {p["public"]["product_id"]: p["public"] for p in world["products"]}
-    eligible = [o for r in world["retailers"] for o in r["offers"]
-                if products[o["product_id"]]["concept_id"] == requirement["concept_id"]
-                and (any(o["stock_by_source"].values()) or o["supplier_order"]["enabled"])]
-    minimum = min(o["price_minor"] for o in eligible)
-    ensure({o["offer_id"] for o in eligible if o["price_minor"] == minimum} == targets,
-           "Direct full-population scan disagrees with designated targets")
-    controls["direct_scan_matches_native_reference"] = True
-    controls["target_prices_in_per_offer_native_support"] = all(
-        by_id[oid]["price_minor"] in price_domain(by_id[oid], world["config"]["retailer_price"], api.native.rounded_price) for oid in targets)
-    ensure(all(controls.values()), "An acceptance control failed")
+    designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
+    minimum, scanned = direct_scan(world, requirement)
+    checks = {"direct_scan_matches_native_reference":
+                  scanned == designated and minimum == reference["minimum_price_minor"],
+              "price_rule_holds": not price_rule_violations(world, api.native.rounded_price),
+              "parent_unchanged_in_memory": parent == json.loads(originals[names[0]])}
+    controls = negative_controls(parent, world, requirement, api, plan, domain) if args.controls else {}
+    ensure(all(checks.values()) and all(controls.values()),
+           "Failed: " + ", ".join(k for k, v in {**checks, **controls}.items() if not v))
     # No source or original artifact drift is accepted during construction.
-    ensure(source_pins.items() <= verify_sources(root, constructor_paths).items(), "Consumed native sources changed")
+    final_pins = verify_sources(root, constructor_paths)
+    ensure(source_pins.items() <= final_pins.items(), "Consumed native sources changed")
     ensure(all((args.recipe / n).read_bytes() == raw for n, raw in originals.items()), "Original input artifact changed")
     ensure((args.recipe / "manifest.json").read_bytes() == manifest_raw, "Parent manifest changed")
     ensure(args.requirement.read_bytes() == requirement_raw, "Requirement changed")
     ensure(subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip() == args.native_commit, "Native HEAD changed")
     ensure(not subprocess.check_output(["git", "-C", str(root), "status", "--porcelain", "--untracked-files=no"]), "Native tracked tree changed")
-    ensure(all(byte_digest(Path(__file__).with_name(n).read_bytes()) == pin for n, pin in constructor_pins.items()), "Constructor source changed")
+    ensure(all(byte_digest((HERE / n).read_bytes()) == pin for n, pin in constructor_pins.items()), "Constructor source changed")
     api.basket.validate_plan(parent, plan)
     api.checkout.validate(parent, domain)
     output = args.output.resolve()
@@ -196,21 +233,22 @@ def main():
     receipt = {"schema": VERSION, "status": "passed_construction_native_only",
                "native_commit": args.native_commit, "native_root": str(root),
                "constructor_commit": constructor_commit, "constructor_source_sha256": constructor_pins,
-               "native_source_sha256": verify_sources(root, constructor_paths),
+               "native_source_sha256": final_pins,
                "parent_recipe": str(args.recipe.resolve()), "parent_manifest_sha256": byte_digest(manifest_raw),
                "original_artifacts": {n: byte_digest(raw) for n, raw in originals.items()},
                "requirement_sha256": byte_digest(requirement_raw),
-               "controls": controls, "summary": parent["summary"],
+               "checks": checks, "negative_controls": controls, "summary": parent["summary"],
                "winner_count": len(reference["winners"]), "minimum_price_minor": minimum,
-               "changed_price_leaves": len(provenance["changes"]),
-               "joint_producer_prior_support_guaranteed": False,
-               "background_exact_inverse": True, "parent_bindings_remain_valid": True,
+               "repriced_retailer_products": len(provenance["changes"]),
+               "changed_price_leaves": sum(row["before"] != row["after"]
+                                           for change in provenance["changes"] for row in change["offers"]),
+               "probability_claim": None,
                "files": {n: byte_digest((output / n).read_bytes()) for n in artifacts},
                "invalidated_not_rebuilt": ["surrounding", "presentation", "URL bindings", "execution recipes", "old tasks and references"],
                "browser_runtime_ready": False, "world_draws": 0, "provider_calls": 0,
                "elapsed_seconds": time.monotonic() - started}
     (output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
-    print(json.dumps({k: receipt[k] for k in ("status", "minimum_price_minor", "winner_count", "changed_price_leaves", "elapsed_seconds")}))
+    print(json.dumps({k: receipt[k] for k in ("status", "minimum_price_minor", "winner_count", "repriced_retailer_products", "changed_price_leaves", "elapsed_seconds")}))
 
 
 if __name__ == "__main__":
