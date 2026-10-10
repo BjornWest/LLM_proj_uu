@@ -12,7 +12,8 @@ experiment, not a replacement generator or an episode release.
   like a world the producer could have made.
 - **Solver-backed sampling** (`experiments/constrained_world_pilot/`, not
   connected to this operator). Here probabilities matter: a constrained sample
-  needs the prior weight of what it conditions on.
+  needs the prior weight of what it conditions on. The first real step is
+  [steered generation](steered-generation.md).
 
 ## What the operator does
 
@@ -159,9 +160,11 @@ menu absence.
   Probabilities belong to the solver-backed sampling track.
 - A requirement describes a verifiable outcome; the construction method and its
   search budget are separate. A bounded decline is not global impossibility.
-- "Two offers tie" at SKU level is not a price requirement in this producer: a
-  retailer's SKUs of one product share a price. It arises naturally only when
-  stock leaves one SKU available at each retailer, which is a stock requirement.
+- A retailer's SKUs of one product share a price **draw**. When they also share
+  a reference price, which is the usual case, they share the price, so "exactly
+  two offers tie" is then not a price requirement: it arises only when stock
+  leaves one SKU available at each retailer. A SKU with its own, uniquely
+  lowest reference price can tie alone.
 - The sampled-parent marker check is a scope guard, not proof against stripped
   provenance. The runner binds the parent recipe to an externally declared
   manifest digest. Authored chains are outside this operator's scope.

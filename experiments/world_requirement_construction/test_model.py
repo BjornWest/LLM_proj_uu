@@ -240,6 +240,14 @@ class PriceRuleTests(unittest.TestCase):
         self.assertEqual(self.violations((False, 0.3)), [])
         self.assertEqual(self.violations((False, -0.3)), [])
 
+    def test_recorded_zero_keeps_the_sign_the_producer_writes(self):
+        self.assertEqual(len(self.violations((False, -0.0), offset_min=0.0)), 3)
+        self.assertEqual(self.violations((False, 0.0), offset_min=0.0), [])
+        self.assertEqual(len(self.violations((False, -0.0), offset_standard_deviation=0)), 3)
+        self.assertEqual(len(self.violations((False, 0.0), offset_min=-0.0, offset_max=0.0)), 3)
+        self.assertEqual(self.violations((False, -0.0), offset_min=-0.0, offset_max=0.0), [])
+        self.assertEqual(len(self.violations((False, -0.0))), 3)
+
     def test_matched_draw_is_valid_outside_the_unmatched_clamp(self):
         self.assertEqual(self.violations(MATCH, offset_min=0.1), [])
         self.assertEqual(len(self.violations((False, 0.0), offset_min=0.1)), 3)

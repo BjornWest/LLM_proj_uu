@@ -96,19 +96,29 @@ Saved seed 73 at accepted source `e3fbfadd84d3b16a26895d62abb66f61df433697`:
 25 products, 320 SKUs, 12 retailers, 411 offers; 48 retailer/product pairs sell
 walking shoes, and seven retailers sell the one walking shoe cheap enough to
 ever be cheapest. Receipt and worlds:
-`.local/coordination/world-requirement-construction-20261010/steering/run-v1/`.
+`.local/coordination/world-requirement-construction-20261010/steering/run-v2/`.
 
 | Requirement on that shoe | Probability given upstream | Natural worlds per hit |
 | --- | --- | --- |
-| `footwear-03` is the sole cheapest seller | 1.0e-1 | about 10 |
-| `footwear-02` and `apparel-06` tie as cheapest | 2.8e-3 | about 350 |
-| Those two and `department_store-02` tie | 3.6e-4 | about 2,700 |
-| Five named retailers tie, the other two do not | see receipt | see receipt |
+| `footwear-03` is the sole cheapest seller | 0.101 | about 10 |
+| `footwear-02` and `apparel-06` tie as cheapest | 0.0028 | about 350 |
+| Those two and `department_store-02` tie | 0.00036 | about 2,700 |
+| Five named retailers tie, the other two do not | 0.00069 | about 1,450 |
 
-The receipt records, for each requirement, three steered worlds with their
-timings, and a comparison of the computed probability with the frequency
-obtained by redrawing the price block with the producer's own `_offer_price`
-under other seeds. "Natural worlds per hit" is for this upstream.
+"Natural worlds per hit" is for this upstream. The five-way tie is likelier
+than the three-way one because retailers that all draw the matched reference
+price tie automatically.
+
+Cost: the natural pass took 28 s and an unsteered replay 2.0 s. Each steered
+world took 2.3 to 2.7 s including planning, the pass through the producer and
+all checks, whatever the probability. Three worlds were sampled per
+requirement, twelve in all.
+
+The computed probabilities were compared with the frequency obtained by
+redrawing the price block 30,000 times with the producer's own `_offer_price`
+under other seeds: 0.098, 0.0030, 0.00023 and 0.00090 in table order, each
+within two standard errors of the computed value. For the two rarest that is
+7 and 27 hits, so the comparison is coarse there.
 
 The natural pass reproduces the saved world's identity, and an unsteered pass
 with cached manufacture reproduces it again. Each steered world differs from

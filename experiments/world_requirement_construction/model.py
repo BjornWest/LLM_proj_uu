@@ -10,7 +10,7 @@ from copy import deepcopy
 from decimal import Decimal, ROUND_HALF_UP
 from hashlib import sha256
 import json
-from math import ceil, floor
+from math import ceil, copysign, floor
 
 VERSION = "authored-retailer-product-price-v2"
 KIND = "designated_retailers_cheapest_on_product"
@@ -74,7 +74,8 @@ def _producible(draw, config):
     JSON keeps 0 and 0.0 apart, and so does the producer: a matched draw is the
     integer 0; an unmatched one is `max(lo, min(hi, gauss))`, which returns the
     lower bound itself whenever the value equals it, else the upper bound
-    itself when the value equals that, else the drawn float.
+    itself when the value equals that, else the drawn float. The sign of a
+    zero is part of the record: -0.0 and 0.0 serialize differently.
     """
     match, offset = draw
     if type(match) is not bool or type(offset) not in (int, float):
@@ -86,11 +87,15 @@ def _producible(draw, config):
     if probability >= 1:
         return False
     lo, hi = config["offset_min"], config["offset_max"]
+    def same(recorded):
+        return (type(offset) is type(recorded) and offset == recorded and
+                copysign(1, offset) == copysign(1, recorded))
     if config["offset_standard_deviation"] == 0:
-        clamped = max(lo, min(hi, 0.0))
-        return type(offset) is type(clamped) and offset == clamped
-    expected = type(lo) if offset == lo else type(hi) if offset == hi else float
-    return lo <= offset <= hi and type(offset) is expected
+        return same(max(lo, min(hi, 0.0)))
+    if offset == lo or offset == hi:
+        return same(lo if offset == lo else hi)
+    # 0 + z*sigma is never the negative zero.
+    return type(offset) is float and lo < offset < hi and copysign(1, offset) == copysign(1, offset or 1)
 
 
 def price_rule_violations(world, native_round):
