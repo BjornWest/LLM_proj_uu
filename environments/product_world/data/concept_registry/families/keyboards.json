@@ -1,0 +1,206 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "keyboards",
+  "review_id": "F09",
+  "label": "Keyboards",
+  "section": "Electronics and computing",
+  "store_type_ids": [
+    "electronics",
+    "office"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Battery only for powered wireless configurations; hot-swap and mechanical switches are optional. Split geometry is distinct from compact size; comfort is subjective.",
+  "shared_dimension_ids": [
+    "colour",
+    "language_layout",
+    "key_format",
+    "key_mechanism",
+    "connection",
+    "backlighting",
+    "battery_capacity",
+    "remapping_support"
+  ],
+  "dimensions": [
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "language_layout",
+      "label": "Language layout",
+      "module_id": "digital",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "key_format",
+      "label": "Key format",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "key_mechanism",
+      "label": "Key mechanism",
+      "module_id": "digital",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "connection",
+      "label": "Connection",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "backlighting",
+      "label": "Backlighting",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "battery_capacity",
+      "label": "Battery capacity",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "Wh",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "remapping_support",
+      "label": "Remapping support",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "split_adjustment",
+      "label": "Split adjustment",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "keyboards.desktop_keyboards",
+      "label": "Desktop keyboards",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "battery_capacity": "Battery-powered connection version is present."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "keyboards.slim_portable_keyboards",
+      "label": "Slim/portable keyboards",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "battery_capacity": "Battery-powered connection version is present."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "keyboards.split_ergonomic_keyboards",
+      "label": "Split/ergonomic keyboards",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "split_adjustment"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "battery_capacity": "Battery-powered connection version is present."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "cookware",
+  "review_id": "F35",
+  "label": "Pans and shallow cookware",
+  "section": "Home, kitchen and appliances",
+  "store_type_ids": [
+    "home_kitchen"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Induction compatibility is an explicit construction/compatibility fact, not inferred from the main material. Oven limits may differ for handles/lids; non-stick coating, lid and grill ridges are optional.",
+  "shared_dimension_ids": [
+    "diameter",
+    "body_material",
+    "base_construction",
+    "coating",
+    "handle_construction",
+    "lid_included",
+    "oven_limit",
+    "care_method"
+  ],
+  "dimensions": [
+    {
+      "id": "diameter",
+      "label": "Diameter",
+      "module_id": "geometry",
+      "identity_level": "sku",
+      "value_kind": "number",
+      "unit": "cm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "body_material",
+      "label": "Body material",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "base_construction",
+      "label": "Base construction",
+      "module_id": "heat",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "coating",
+      "label": "Coating",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "handle_construction",
+      "label": "Handle construction",
+      "module_id": "heat",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "lid_included",
+      "label": "Lid included",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "boolean",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "oven_limit",
+      "label": "Oven limit",
+      "module_id": "heat",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "C",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "care_method",
+      "label": "Care method",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "cookware.frying_pans",
+      "label": "Frying pans",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "cookware.saut_pans",
+      "label": "Sauté pans",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "cookware.grill_pans",
+      "label": "Grill pans",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "cookware.woks",
+      "label": "Woks",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

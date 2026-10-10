@@ -1,0 +1,226 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "drills",
+  "review_id": "F30",
+  "label": "Drills and drivers",
+  "section": "Tools and garden",
+  "store_type_ids": [
+    "tools"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Impact driving, hammer drilling and ordinary drilling are distinct capabilities. Battery only for cordless tools; nominal motor figures are not task-specific performance.",
+  "shared_dimension_ids": [
+    "power_source",
+    "compatible_platform",
+    "motor_design",
+    "speed_range",
+    "weight",
+    "included_bundle",
+    "chuck_interface",
+    "torque_rating"
+  ],
+  "dimensions": [
+    {
+      "id": "power_source",
+      "label": "Power source",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "compatible_platform",
+      "label": "Compatible platform",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "motor_design",
+      "label": "Motor design",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "speed_range",
+      "label": "Speed range",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": "rpm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "weight",
+      "label": "Weight",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "g",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "included_bundle",
+      "label": "Included bundle",
+      "module_id": "compatibility",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "chuck_interface",
+      "label": "Chuck interface",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "torque_rating",
+      "label": "Torque rating",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "Nm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "battery_capacity",
+      "label": "Battery capacity",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "Wh",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "impact_rate",
+      "label": "Impact rate",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "integer",
+      "unit": "per_minute",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "drills.drill_drivers",
+      "label": "Drill-drivers",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "compatible_platform": "Tool uses a removable battery platform.",
+        "battery_capacity": "A battery is included in the chosen kit."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "drills.hammer_drills",
+      "label": "Hammer drills",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity",
+        "impact_rate"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "compatible_platform": "Tool uses a removable battery platform.",
+        "battery_capacity": "A battery is included in the chosen kit."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "drills.impact_drivers",
+      "label": "Impact drivers",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "compatible_platform": "Tool uses a removable battery platform.",
+        "battery_capacity": "A battery is included in the chosen kit."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

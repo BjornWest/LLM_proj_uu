@@ -1,0 +1,68 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.tablets_base",
+  "random_namespace": "product-width-tablets-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "product.name": {
+      "type": "string",
+      "optional": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights",
+      "stream": "product/tablets/positioning"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95,
+      "stream": "product/tablets/execution"
+    }
+  ],
+  "rules": [],
+  "language": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Neutral tablet identity and independent profile only; no hardware, quantities, OS, price, optional accessory or retail-axis assumptions",
+    "adoption": "New owned isolated authoring foundation; publication/production adoption pending"
+  }
+}

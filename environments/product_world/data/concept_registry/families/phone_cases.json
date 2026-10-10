@@ -1,0 +1,167 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "phone_cases",
+  "review_id": "F12",
+  "label": "Phone cases",
+  "section": "Electronics and computing",
+  "store_type_ids": [
+    "electronics"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Folio capacity/closure applies only to folios; protection claims need a stated basis. Similar screen size does not imply camera/button alignment or compatibility.",
+  "shared_dimension_ids": [
+    "compatible_platform",
+    "colour",
+    "component_materials",
+    "exposure_protection",
+    "magnetic_charging_support",
+    "stand_configuration"
+  ],
+  "dimensions": [
+    {
+      "id": "compatible_platform",
+      "label": "Compatible platform",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "exposure_protection",
+      "label": "Exposure protection",
+      "module_id": "exposure",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "magnetic_charging_support",
+      "label": "Magnetic charging support",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "stand_configuration",
+      "label": "Stand configuration",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "card_capacity",
+      "label": "Card capacity",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "folio_closure",
+      "label": "Folio closure",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "phone_cases.shell_cases",
+      "label": "Shell cases",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "phone_cases.folio_wallet_cases",
+      "label": "Folio/wallet cases",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "card_capacity",
+        "folio_closure"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

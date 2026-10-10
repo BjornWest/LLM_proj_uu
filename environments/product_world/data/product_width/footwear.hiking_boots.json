@@ -1,0 +1,1050 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.hiking_boots",
+  "random_namespace": "product-width-footwear.hiking_boots-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "brand.emphasis_weights": {
+      "type": "object",
+      "input": true
+    },
+    "profile.emphasis": {
+      "type": "enum",
+      "values": [
+        "cushioning",
+        "lightness",
+        "support"
+      ]
+    },
+    "internal.construction": {
+      "type": "object",
+      "properties": {
+        "upper": {
+          "type": "string"
+        },
+        "midsole": {
+          "type": "string"
+        },
+        "sole_structure": {
+          "type": "string"
+        },
+        "cushioning": {
+          "type": "string"
+        },
+        "base_mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "enclosed hiking boot",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.collar_height": {
+      "type": "enum",
+      "values": [
+        "mid",
+        "high"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "hiking",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one boot, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.midsole": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "string",
+      "constant": "rubber",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "string",
+      "constant": "regular adjustable laces",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cushioning": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_tread": {
+      "type": "string",
+      "constant": "hiking lugs",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lug_depth_mm": {
+      "type": "integer",
+      "unit": "mm",
+      "min": 4,
+      "max": 5,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.arch_shank": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.reinforced_toe": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tongue_gusseted": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_membrane": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 450,
+      "max": 800,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.collar_height": {
+      "type": "string",
+      "optional": true
+    },
+    "request.membrane_required": {
+      "type": "boolean",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "emphasis",
+      "target": "profile.emphasis",
+      "sample": "weighted_choice",
+      "weights_from": "brand.emphasis_weights"
+    },
+    {
+      "id": "boot_construction",
+      "target": "internal.construction",
+      "sample": "weighted_choice",
+      "weights": {
+        "light": 2,
+        "cushioned": 4,
+        "substantial": 3
+      },
+      "adjustments": [
+        {
+          "when": "profile.emphasis == 'lightness'",
+          "multiply": {
+            "light": 2
+          }
+        },
+        {
+          "when": "profile.emphasis == 'cushioning'",
+          "multiply": {
+            "cushioned": 2
+          }
+        },
+        {
+          "when": "profile.emphasis == 'support'",
+          "multiply": {
+            "substantial": 2
+          }
+        }
+      ],
+      "values": {
+        "light": {
+          "upper": "suede leather and textile",
+          "midsole": "EVA foam",
+          "sole_structure": "EVA midsole with rubber hiking outsole",
+          "cushioning": "moderate",
+          "base_mass_g": 500
+        },
+        "cushioned": {
+          "upper": "leather and textile",
+          "midsole": "EVA foam",
+          "sole_structure": "deep EVA midsole with rubber hiking outsole",
+          "cushioning": "substantial",
+          "base_mass_g": 620
+        },
+        "substantial": {
+          "upper": "nubuck leather",
+          "midsole": "PU foam",
+          "sole_structure": "PU midsole with rubber hiking outsole",
+          "cushioning": "moderate",
+          "base_mass_g": 690
+        }
+      }
+    },
+    {
+      "id": "upper",
+      "target": "product.facts.component_materials.upper",
+      "derive": "internal.construction.upper"
+    },
+    {
+      "id": "midsole",
+      "target": "product.facts.component_materials.midsole",
+      "derive": "internal.construction.midsole"
+    },
+    {
+      "id": "sole_structure",
+      "target": "product.facts.sole_structure",
+      "derive": "internal.construction.sole_structure"
+    },
+    {
+      "id": "cushioning",
+      "target": "product.facts.cushioning",
+      "derive": "internal.construction.cushioning"
+    },
+    {
+      "id": "collar",
+      "target": "product.facts.collar_height",
+      "sample": "weighted_choice",
+      "weights": {
+        "mid": 4,
+        "high": 1
+      }
+    },
+    {
+      "id": "lug",
+      "target": "product.facts.lug_depth_mm",
+      "sample": "weighted_choice",
+      "weights": {
+        "4": 2,
+        "5": 3
+      },
+      "values": {
+        "4": 4,
+        "5": 5
+      }
+    },
+    {
+      "id": "arch_shank",
+      "target": "product.facts.arch_shank",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 4,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "toe_protection",
+      "target": "product.facts.reinforced_toe",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 4,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "tongue",
+      "target": "product.facts.tongue_gusseted",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 4,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "membrane",
+      "target": "product.facts.waterproof_membrane",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 3,
+        "no": 2
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -25,
+      "max": 25
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.construction.base_mass_g + internal.mass_noise_g + (20 if product.facts.waterproof_membrane else 0) + (50 if product.facts.collar_height == 'high' else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.boot",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.intended_use",
+          "product.facts.collar_height",
+          "product.facts.component_materials.upper",
+          "product.facts.component_materials.midsole",
+          "product.facts.sole_structure",
+          "product.facts.cushioning"
+        ]
+      },
+      "slots": {
+        "height": "product.facts.collar_height",
+        "upper": "product.facts.component_materials.upper",
+        "sole": "product.facts.sole_structure",
+        "midsole": "product.facts.component_materials.midsole",
+        "cushion": "product.facts.cushioning"
+      },
+      "formulations": [
+        "Hiking boot: {height} collar, {upper}, {sole} with {midsole} and {cushion} cushioning.",
+        "For hiking: a {height} collar and {upper}; {sole}, {midsole}, {cushion} cushioning."
+      ]
+    },
+    {
+      "id": "description.closure_lug",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.fastening",
+          "product.facts.lug_depth_mm"
+        ]
+      },
+      "slots": {
+        "closure": "product.facts.fastening",
+        "lug": "product.facts.lug_depth_mm"
+      },
+      "formulations": [
+        "Fastening: {closure}; nominal hiking-lug depth: {lug} mm.",
+        "Uses {closure} with nominal {lug} mm hiking lugs."
+      ]
+    },
+    {
+      "id": "description.protection",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.arch_shank",
+          "product.facts.reinforced_toe",
+          "product.facts.tongue_gusseted",
+          "product.facts.waterproof_membrane"
+        ]
+      },
+      "slots": {
+        "shank": "'present' if product.facts.arch_shank else 'absent'",
+        "toe": "'present' if product.facts.reinforced_toe else 'absent'",
+        "gusset": "'present' if product.facts.tongue_gusseted else 'absent'",
+        "membrane": "'present' if product.facts.waterproof_membrane else 'absent'"
+      },
+      "formulations": [
+        "Arch shank: {shank}; reinforced toe: {toe}; gusseted tongue: {gusset}; waterproof membrane: {membrane}.",
+        "Declared components: shank {shank}, toe reinforcement {toe}, gusseted tongue {gusset}, waterproof membrane {membrane}."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One EU 40 reference boot weighs {mass} g.",
+        "Reference mass for a single boot in EU 40 is {mass} g."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.hiking_boots' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "collar",
+      "role": "filter",
+      "predicate": "product.facts.collar_height == request.collar_height",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "membrane",
+      "role": "task_requirement",
+      "predicate": "product.facts.waterproof_membrane == request.membrane_required",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "day_hike_comfort",
+            "forefoot_fit",
+            "collar_rubbing",
+            "lace_pressure"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "day_hike_comfort",
+              "forefoot_fit",
+              "collar_rubbing",
+              "lace_pressure"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 700,
+          "max": 4000
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 700
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 4000
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_day_hike_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_forefoot_fit": {
+          "type": "boolean"
+        },
+        "review.positive_collar_rubbing": {
+          "type": "boolean"
+        },
+        "review.positive_lace_pressure": {
+          "type": "boolean"
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_day_hike_comfort",
+          "target": "review.positive_day_hike_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_forefoot_fit",
+          "target": "review.positive_forefoot_fit",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_collar_rubbing",
+          "target": "review.positive_collar_rubbing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_lace_pressure",
+          "target": "review.positive_lace_pressure",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "day_hike_comfort.positive",
+          "when": "'day_hike_comfort' in review.topics and review.positive_day_hike_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "day_hike_comfort",
+            "polarity": "positive",
+            "context": "day hiking",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt comfortable during my day hikes.",
+            "Comfort was good during my day hikes."
+          ]
+        },
+        {
+          "id": "day_hike_comfort.negative",
+          "when": "'day_hike_comfort' in review.topics and not review.positive_day_hike_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "day_hike_comfort",
+            "polarity": "negative",
+            "context": "day hiking",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt uncomfortable during my day hikes.",
+            "Comfort was poor during my day hikes."
+          ]
+        },
+        {
+          "id": "forefoot_fit.positive",
+          "when": "'forefoot_fit' in review.topics and review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "positive",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot had enough room in the size I tried.",
+            "The tested size did not squeeze my forefoot."
+          ]
+        },
+        {
+          "id": "forefoot_fit.negative",
+          "when": "'forefoot_fit' in review.topics and not review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "negative",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot was squeezed in the size I tried.",
+            "The tested size squeezed my forefoot."
+          ]
+        },
+        {
+          "id": "collar_rubbing.positive",
+          "when": "'collar_rubbing' in review.topics and review.positive_collar_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "collar_rubbing",
+            "polarity": "positive",
+            "context": {
+              "use": "day hiking",
+              "aspect": "uncomfortable collar rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The collar did not rub uncomfortably during my day hikes.",
+            "I had no uncomfortable collar rubbing on my day hikes."
+          ]
+        },
+        {
+          "id": "collar_rubbing.negative",
+          "when": "'collar_rubbing' in review.topics and not review.positive_collar_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "collar_rubbing",
+            "polarity": "negative",
+            "context": {
+              "use": "day hiking",
+              "aspect": "uncomfortable collar rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The collar rubbed uncomfortably during my day hikes.",
+            "I had uncomfortable collar rubbing on my day hikes."
+          ]
+        },
+        {
+          "id": "lace_pressure.positive",
+          "when": "'lace_pressure' in review.topics and review.positive_lace_pressure",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lace_pressure",
+            "polarity": "positive",
+            "context": {
+              "use": "walking uphill and downhill on hikes",
+              "aspect": "uncomfortable lace pressure"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I had no uncomfortable lace pressure walking uphill and downhill on hikes.",
+            "Lace pressure was not uncomfortable while I hiked uphill and downhill."
+          ]
+        },
+        {
+          "id": "lace_pressure.negative",
+          "when": "'lace_pressure' in review.topics and not review.positive_lace_pressure",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lace_pressure",
+            "polarity": "negative",
+            "context": {
+              "use": "walking uphill and downhill on hikes",
+              "aspect": "uncomfortable lace pressure"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I had uncomfortable lace pressure walking uphill and downhill on hikes.",
+            "Lace pressure was uncomfortable while I hiked uphill and downhill."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 700,
+          "max_sek": 4000
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.hiking_boots.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "footwear",
+      "outdoors"
+    ],
+    "scope_exceptions": [
+      "No pack-load capability, certified waterproof/terrain safety, crampon rating or numerical stiffness",
+      "Regular-lace bounded recipe; other closures deferred, not physically excluded"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 700,
+      "max": 1500,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 1400,
+          "max": 2500
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 2200,
+          "max": 4000
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,4129 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "furniture.fixed_height_desks",
+  "family_id": "furniture",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/furniture.fixed_height_desks.json": "3f4555efcd2c96354463ecaa431e108feb66d9bd07eedbaa98321177b8198817",
+    "environments/product_world/data/product_width/_furniture_base.json": "bd77290414d2f4083d0ee35de38474fda1193e4bf08df7af00bcf661213a99de",
+    "environments/product_world/data/product_public_content/furniture.fixed_height_desks.json": "4e0e7a466f9b923223c836173122338ad7812bfd9c1a950eb7763fdf80313427"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep assembled-use geometry, folded geometry, clear knee space, wall-mount/assembly and load bases separate. Bulky shipping is operational.",
+  "concept_note": "Fixed-height desks have no height-adjustment/folding menu; exclude those fixed absences and NA adjustment ranges. Preserve actual desktop geometry and load.",
+  "fields": {
+    "product.name": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.product_name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "input": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.product_kind": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_product_kind",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "complete fixed-height rectangular desk"
+        ],
+        "constant": "complete fixed-height rectangular desk",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.intended_use": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ordinary indoor writing and laptop work"
+        ],
+        "constant": "ordinary indoor writing and laptop work",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.desk_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_desk_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.desktop_shape": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_desktop_shape",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "rectangular"
+        ],
+        "constant": "rectangular",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.nominal_depth_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_nominal_depth_mm",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "constant": 600,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_overall_dimensions"
+    },
+    "sku.nominal_height_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_nominal_height_mm",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "constant": 750,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_overall_dimensions"
+    },
+    "sku.desktop_thickness_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_desktop_thickness_mm",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "constant": 18,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_desktop_thickness_mm"
+    },
+    "sku.main_desktop_substrate": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_main_desktop_substrate",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "particleboard"
+        ],
+        "constant": "particleboard",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_main_desktop_substrate"
+    },
+    "sku.main_desktop_facing": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_main_desktop_facing",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "melamine"
+        ],
+        "constant": "melamine",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_main_desktop_facing"
+    },
+    "sku.foot_pad_material": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_foot_pad_material",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene"
+        ],
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.foot_pad_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_foot_pad_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 4,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.assembly_instructions_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_assembly_instructions_supplied",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_assembly_instructions_supplied"
+    },
+    "sku.geometry_basis": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_geometry_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Declared complete assembled outside dimensions; height is floor to desktop upper surface, excluding packaging."
+        ],
+        "constant": "Declared complete assembled outside dimensions; height is floor to desktop upper surface, excluding packaging.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.mass_basis": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_mass_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Declared complete assembled desk including fitted hardware and pads, excluding instructions, loose tools and packaging."
+        ],
+        "constant": "Declared complete assembled desk including fitted hardware and pads, excluding instructions, loose tools and packaging.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.desktop_load_basis": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_desktop_load_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Declared maximum static added load evenly distributed over the desktop after correct assembly; not a concentrated load or independent test."
+        ],
+        "constant": "Declared maximum static added load evenly distributed over the desktop after correct assembly; not a concentrated load or independent test.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.drawer_load_basis": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_drawer_load_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "Declared maximum static added load evenly distributed inside the one assembled drawer; separate from the desktop load."
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.shelf_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_shelf_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "sku.cable_tray_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_cable_tray_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "sku.height_adjustable": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_height_adjustable",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed-height desks have no height-adjustment/folding menu; exclude those fixed absences and NA adjustment ranges. Preserve actual desktop geometry and load."
+    },
+    "sku.foldable": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_foldable",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed-height desks have no height-adjustment/folding menu; exclude those fixed absences and NA adjustment ranges. Preserve actual desktop geometry and load."
+    },
+    "sku.power_required": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_power_required",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "sku.height_adjustment_mechanism": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_height_adjustment_mechanism",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "not applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.height_range_min_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_height_range_min_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.height_range_max_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_height_range_max_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.motor_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_motor_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "sku.motor_power_w": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_motor_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.fold_mechanism": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_fold_mechanism",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "not applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.desk_wall_mount": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_desk_wall_mount",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "sku.chair_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_chair_supplied",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.computer_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_computer_supplied",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.notebook_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_notebook_supplied",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.power_strip_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_power_strip_supplied",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.cable_ties_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_cable_ties_supplied",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.shipping_class": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_shipping_class",
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "bulky"
+        ],
+        "constant": "bulky",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "sku.board_care": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_board_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Wipe melamine-faced board surfaces with a soft damp cloth, then wipe dry; do not soak or use abrasive cleaner."
+        ],
+        "constant": "Wipe melamine-faced board surfaces with a soft damp cloth, then wipe dry; do not soak or use abrasive cleaner.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_board_care"
+    },
+    "sku.steel_care": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_steel_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Wipe powder-coated steel parts with a soft damp cloth, then wipe dry.",
+          "Wipe the black steel drawer handle with a soft damp cloth, then wipe dry."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_product_steel_care"
+    },
+    "sku.actual_width_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_actual_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_depth_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_actual_depth_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_height_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_actual_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_desk_mass_kg": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_actual_desk_mass_kg",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.clear_knee_space_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_clear_knee_space_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.independent_stability_test": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_independent_stability_test",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.independent_load_test": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_independent_load_test",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.ergonomic_fit_claim": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_ergonomic_fit_claim",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.package_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_package_count",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.package_dimensions": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_package_dimensions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.package_mass_kg": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_package_mass_kg",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.spare_fixings_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_spare_fixings_supplied",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.fixing_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_fixing_count",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.dowel_wood_species": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_dowel_wood_species",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.recipe_id": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_recipe_id",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "open_steel_legs",
+          "panel_drawer"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.construction": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_construction",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "one desktop on four steel legs",
+          "one desktop on two side panels with rear modesty panel and one drawer"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_construction"
+    },
+    "sku.steel_leg_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_steel_leg_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.supporting_panel_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_supporting_panel_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.modesty_panel_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_modesty_panel_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_modesty_panel_count"
+    },
+    "sku.leg_support_material": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_leg_support_material",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "powder-coated steel",
+          "melamine-faced particleboard"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_leg_support_material"
+    },
+    "sku.leg_finish": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_leg_finish",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "matches the declared board finish"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_leg_finish"
+    },
+    "sku.drawer_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_drawer_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_drawer_count"
+    },
+    "sku.drawer_material": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_drawer_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "particleboard front, sides and back; fibreboard bottom"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_drawer_material"
+    },
+    "sku.drawer_runner_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_drawer_runner_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.drawer_handle_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_drawer_handle_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.drawer_handle_material": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_drawer_handle_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "black steel"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_drawer_handle_material"
+    },
+    "sku.drawer_max_load_kg": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_drawer_max_load_kg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_drawer_max_load_kg"
+    },
+    "sku.desktop_max_load_kg": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_desktop_max_load_kg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "kg"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_desktop_max_load_kg"
+    },
+    "sku.cable_outlet_count": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_cable_outlet_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_cable_outlet_count"
+    },
+    "sku.cable_outlet_diameter_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_cable_outlet_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_cable_outlet_diameter_mm"
+    },
+    "sku.hex_key_count_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_hex_key_count_supplied",
+      "role": "descriptive",
+      "display_group": "assembly",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_hex_key_count_supplied"
+    },
+    "sku.hex_key_needed": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_hex_key_needed",
+      "role": "descriptive",
+      "display_group": "assembly",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_hex_key_needed"
+    },
+    "sku.screwdriver_needed": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_screwdriver_needed",
+      "role": "descriptive",
+      "display_group": "assembly",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_screwdriver_needed"
+    },
+    "sku.screwdriver_supplied": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_screwdriver_supplied",
+      "role": "literal",
+      "display_group": "assembly",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_screwdriver_supplied"
+    },
+    "sku.fixing_materials": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_fixing_materials",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "steel bolts",
+          "steel screws and wood dowels; dowel species unspecified"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.assembly_route": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_assembly_route",
+      "role": "descriptive",
+      "display_group": "assembly",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Attach all four legs to the pre-drilled desktop with the supplied bolts and hex key, following the supplied printed instructions.",
+          "Assemble the desktop, both supporting side panels, rear modesty panel and drawer using the supplied screws and wood dowels and your own cross-head screwdriver, following the supplied printed instructions."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_assembly_route"
+    },
+    "sku.contents": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_contents",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "One complete desk: one desktop, four steel legs with four foot pads, its required steel fixing bolts, one hex key and printed assembly instructions.",
+          "One complete desk: one desktop, two supporting side panels, one rear modesty panel, one drawer with two steel runners and one black steel handle, four foot pads, its required screws and wood dowels and printed assembly instructions. No screwdriver or hex key is included."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_contents"
+    },
+    "sku.size_key": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_size_key",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "small",
+          "large"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.size_label": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_size_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "100 × 60 cm",
+          "120 × 60 cm"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.nominal_width_mm": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_nominal_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_overall_dimensions"
+    },
+    "sku.colour": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "white",
+          "black"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.declared_desk_mass_kg": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_declared_desk_mass_kg",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_declared_desk_mass_kg"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "SEK",
+        "min": 400,
+        "max": 6300
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "review.purchase_price_sek": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.review_purchase_price_sek",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "sku.modesty_panel_material": {
+      "semantic_id": "furniture.fixed_height_desks.semantic.sku_modesty_panel_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "melamine-faced particleboard"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_modesty_panel_material"
+    },
+    "product.facts.family_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "furniture"
+        ],
+        "constant": "furniture",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.concept_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "furniture.fixed_height_desks"
+        ],
+        "constant": "furniture.fixed_height_desks",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.product_kind": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "complete fixed-height rectangular desk"
+        ],
+        "constant": "complete fixed-height rectangular desk",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ordinary indoor writing and laptop work"
+        ],
+        "constant": "ordinary indoor writing and laptop work",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.desk_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.desktop_shape": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "rectangular"
+        ],
+        "constant": "rectangular",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.nominal_depth_mm": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "constant": 600,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.nominal_height_mm": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "constant": 750,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.desktop_thickness_mm": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "constant": 18,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.main_desktop_substrate": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "particleboard"
+        ],
+        "constant": "particleboard",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.main_desktop_facing": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "melamine"
+        ],
+        "constant": "melamine",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.foot_pad_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene"
+        ],
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.foot_pad_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 4,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.assembly_instructions_supplied": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.assembly_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "customer assembly required"
+        ],
+        "constant": "customer assembly required",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.geometry_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Declared complete assembled outside dimensions; height is floor to desktop upper surface, excluding packaging."
+        ],
+        "constant": "Declared complete assembled outside dimensions; height is floor to desktop upper surface, excluding packaging.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Declared complete assembled desk including fitted hardware and pads, excluding instructions, loose tools and packaging."
+        ],
+        "constant": "Declared complete assembled desk including fitted hardware and pads, excluding instructions, loose tools and packaging.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.desktop_load_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Declared maximum static added load evenly distributed over the desktop after correct assembly; not a concentrated load or independent test."
+        ],
+        "constant": "Declared maximum static added load evenly distributed over the desktop after correct assembly; not a concentrated load or independent test.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.drawer_load_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "Declared maximum static added load evenly distributed inside the one assembled drawer; separate from the desktop load."
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.drawer_load_basis_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.shelf_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cable_tray_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.height_adjustable": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.foldable": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.power_required": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.height_adjustment_mechanism": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "not applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.height_adjustment_mechanism_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.height_range_min_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.height_range_min_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.height_range_max_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.height_range_max_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.motor_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.motor_power_w": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.motor_power_w_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.fold_mechanism": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "not applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.fold_mechanism_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.desk_wall_mount": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.chair_supplied": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.computer_supplied": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.notebook_supplied": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.power_strip_supplied": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cable_ties_supplied": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "bulky"
+        ],
+        "constant": "bulky",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.board_care": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Wipe melamine-faced board surfaces with a soft damp cloth, then wipe dry; do not soak or use abrasive cleaner."
+        ],
+        "constant": "Wipe melamine-faced board surfaces with a soft damp cloth, then wipe dry; do not soak or use abrasive cleaner.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.steel_care": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Wipe powder-coated steel parts with a soft damp cloth, then wipe dry.",
+          "Wipe the black steel drawer handle with a soft damp cloth, then wipe dry."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.actual_width_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_width_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_depth_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_depth_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_height_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_height_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_desk_mass_kg": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_desk_mass_kg_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.clear_knee_space_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.clear_knee_space_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.independent_stability_test": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.independent_stability_test_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.independent_load_test": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.independent_load_test_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.ergonomic_fit_claim": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.ergonomic_fit_claim_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.package_count": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.package_count_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.package_dimensions": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.package_dimensions_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.package_mass_kg": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.package_mass_kg_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.spare_fixings_supplied": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.spare_fixings_supplied_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.fixing_count": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.fixing_count_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.dowel_wood_species": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.dowel_wood_species_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "unknown"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "open_steel_legs",
+          "panel_drawer"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "one desktop on four steel legs",
+          "one desktop on two side panels with rear modesty panel and one drawer"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.steel_leg_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.supporting_panel_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.modesty_panel_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.leg_support_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "powder-coated steel",
+          "melamine-faced particleboard"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.leg_finish": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "matches the declared board finish"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.drawer_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.drawer_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "particleboard front, sides and back; fibreboard bottom"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.drawer_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.drawer_runner_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.drawer_handle_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.drawer_handle_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "black steel"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.drawer_handle_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.drawer_max_load_kg": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.drawer_max_load_kg_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.desktop_max_load_kg": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "kg"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cable_outlet_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cable_outlet_diameter_mm": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cable_outlet_diameter_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.hex_key_count_supplied": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.hex_key_needed": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.screwdriver_needed": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.screwdriver_supplied": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.fixing_materials": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "steel bolts",
+          "steel screws and wood dowels; dowel species unspecified"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.assembly_route": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Attach all four legs to the pre-drilled desktop with the supplied bolts and hex key, following the supplied printed instructions.",
+          "Assemble the desktop, both supporting side panels, rear modesty panel and drawer using the supplied screws and wood dowels and your own cross-head screwdriver, following the supplied printed instructions."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.contents": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "One complete desk: one desktop, four steel legs with four foot pads, its required steel fixing bolts, one hex key and printed assembly instructions.",
+          "One complete desk: one desktop, two supporting side panels, one rear modesty panel, one drawer with two steel runners and one black steel handle, four foot pads, its required screws and wood dowels and printed assembly instructions. No screwdriver or hex key is included."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_price_numerator": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.modesty_panel_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "melamine-faced particleboard"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.modesty_panel_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "sku_overall_dimensions": {
+      "id": "furniture.fixed_height_desks.content.sku_overall_dimensions",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_depth_mm",
+        "sku.nominal_height_mm",
+        "sku.nominal_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_desktop_thickness_mm": {
+      "id": "furniture.fixed_height_desks.content.sku_desktop_thickness_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.desktop_thickness_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_main_desktop_substrate": {
+      "id": "furniture.fixed_height_desks.content.sku_main_desktop_substrate",
+      "display_group": "features",
+      "fields": [
+        "sku.main_desktop_substrate"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_main_desktop_facing": {
+      "id": "furniture.fixed_height_desks.content.sku_main_desktop_facing",
+      "display_group": "features",
+      "fields": [
+        "sku.main_desktop_facing"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_assembly_instructions_supplied": {
+      "id": "furniture.fixed_height_desks.content.sku_assembly_instructions_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.assembly_instructions_supplied"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_board_care": {
+      "id": "furniture.fixed_height_desks.content.sku_product_board_care",
+      "display_group": "care",
+      "fields": [
+        "sku.board_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_steel_care": {
+      "id": "furniture.fixed_height_desks.content.sku_product_steel_care",
+      "display_group": "care",
+      "fields": [
+        "sku.steel_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_construction": {
+      "id": "furniture.fixed_height_desks.content.sku_construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.construction"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_modesty_panel_count": {
+      "id": "furniture.fixed_height_desks.content.sku_modesty_panel_count",
+      "display_group": "features",
+      "fields": [
+        "sku.modesty_panel_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_leg_support_material": {
+      "id": "furniture.fixed_height_desks.content.sku_leg_support_material",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.leg_support_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_leg_finish": {
+      "id": "furniture.fixed_height_desks.content.sku_leg_finish",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.leg_finish"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_drawer_count": {
+      "id": "furniture.fixed_height_desks.content.sku_drawer_count",
+      "display_group": "features",
+      "fields": [
+        "sku.drawer_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_drawer_material": {
+      "id": "furniture.fixed_height_desks.content.sku_drawer_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.drawer_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_drawer_handle_material": {
+      "id": "furniture.fixed_height_desks.content.sku_drawer_handle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.drawer_handle_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_drawer_max_load_kg": {
+      "id": "furniture.fixed_height_desks.content.sku_drawer_max_load_kg",
+      "display_group": "features",
+      "fields": [
+        "sku.drawer_max_load_kg"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_desktop_max_load_kg": {
+      "id": "furniture.fixed_height_desks.content.sku_desktop_max_load_kg",
+      "display_group": "features",
+      "fields": [
+        "sku.desktop_max_load_kg"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_cable_outlet_count": {
+      "id": "furniture.fixed_height_desks.content.sku_cable_outlet_count",
+      "display_group": "features",
+      "fields": [
+        "sku.cable_outlet_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_cable_outlet_diameter_mm": {
+      "id": "furniture.fixed_height_desks.content.sku_cable_outlet_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.cable_outlet_diameter_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_hex_key_count_supplied": {
+      "id": "furniture.fixed_height_desks.content.sku_hex_key_count_supplied",
+      "display_group": "assembly",
+      "fields": [
+        "sku.hex_key_count_supplied"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_hex_key_needed": {
+      "id": "furniture.fixed_height_desks.content.sku_hex_key_needed",
+      "display_group": "assembly",
+      "fields": [
+        "sku.hex_key_needed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_screwdriver_needed": {
+      "id": "furniture.fixed_height_desks.content.sku_screwdriver_needed",
+      "display_group": "assembly",
+      "fields": [
+        "sku.screwdriver_needed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_screwdriver_supplied": {
+      "id": "furniture.fixed_height_desks.content.sku_screwdriver_supplied",
+      "display_group": "assembly",
+      "fields": [
+        "sku.screwdriver_supplied"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_assembly_route": {
+      "id": "furniture.fixed_height_desks.content.sku_assembly_route",
+      "display_group": "assembly",
+      "fields": [
+        "sku.assembly_route"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_contents": {
+      "id": "furniture.fixed_height_desks.content.sku_contents",
+      "display_group": "contents",
+      "fields": [
+        "sku.contents"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_declared_desk_mass_kg": {
+      "id": "furniture.fixed_height_desks.content.sku_declared_desk_mass_kg",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.declared_desk_mass_kg"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_modesty_panel_material": {
+      "id": "furniture.fixed_height_desks.content.sku_modesty_panel_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.modesty_panel_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "assembly": {
+      "label": "Assembly",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 185,
+    "roles": {
+      "identity": 5,
+      "omit_fixed_detail": 19,
+      "literal": 8,
+      "qualifier": 8,
+      "omit_placeholder": 38,
+      "operational": 2,
+      "descriptive": 20,
+      "internal": 30,
+      "omit_low_value_detail": 5,
+      "buying_choice": 3,
+      "commerce": 1,
+      "review_only": 1,
+      "private_support": 45
+    },
+    "display_groups": 7,
+    "highlight_candidates": 5,
+    "unmapped_descriptive_fields": 0
+  },
+  "semantic_review_note": "Keep usable dimensions/load, adjustment/folding mechanism, storage and assembly/install requirements. Drawer runners/hinge/support unit inventories are not shopping detail. Folded versus working dimensions and electrical care remain separate; no absent computer/chair list."
+}

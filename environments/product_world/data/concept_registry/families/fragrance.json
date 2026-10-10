@@ -1,0 +1,160 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "fragrance",
+  "review_id": "F26",
+  "label": "Fragrance",
+  "section": "Beauty and personal care",
+  "store_type_ids": [
+    "beauty"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Concentration labels are not measured longevity or quality. A concentration change may also change the formula; bottle size alone should not silently change scent notes.",
+  "shared_dimension_ids": [
+    "scent_notes",
+    "concentration_class",
+    "delivery_format",
+    "net_volume",
+    "bottle_design"
+  ],
+  "dimensions": [
+    {
+      "id": "scent_notes",
+      "label": "Scent notes",
+      "module_id": "sensory",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "concentration_class",
+      "label": "Concentration class",
+      "module_id": "formula",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "delivery_format",
+      "label": "Delivery format",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "net_volume",
+      "label": "Net volume",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "number",
+      "unit": "ml",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "bottle_design",
+      "label": "Bottle design",
+      "module_id": "appearance",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "fragrance.fresh_citrus_led_fragrance",
+      "label": "Fresh/citrus-led fragrance",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "fragrance.floral_fragrance",
+      "label": "Floral fragrance",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "fragrance.wood_spice_led_fragrance",
+      "label": "Wood/spice-led fragrance",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "fragrance.sweet_amber_led_fragrance",
+      "label": "Sweet/amber-led fragrance",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

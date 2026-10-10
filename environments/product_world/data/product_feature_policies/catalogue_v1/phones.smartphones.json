@@ -1,0 +1,1602 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "phones.smartphones",
+  "family_id": "phones",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/phones.smartphones.json": "db81ac2e12a976ea0f6bde02358a1a51937d2f1535c28e8e655626946c295941",
+    "environments/product_world/data/product_width/_phones_base.json": "7beda2612783513f18815858dd06949173de0001ff54b94e7bede16157e991a4"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Use OS, display/camera and battery/support. Storage and colour remain buying choices; cable capabilities are not device charging guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.assembly": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembly"
+    },
+    "product.facts.os": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Android",
+          "iOS"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "os"
+    },
+    "product.facts.height_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "height_mm"
+    },
+    "product.facts.width_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "width_mm"
+    },
+    "product.facts.depth_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "depth_mm"
+    },
+    "product.facts.mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mass_g"
+    },
+    "product.facts.diagonal_unit": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "inch",
+          "mm"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "diagonal_unit"
+    },
+    "product.facts.diagonal_inch": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "inch",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.diagonal_unit == 'inch'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "diagonal_inch"
+    },
+    "product.facts.diagonal_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.diagonal_unit == 'mm'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "diagonal_mm"
+    },
+    "product.facts.diagonal_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "diagonal_label"
+    },
+    "product.facts.screen_technology": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_technology"
+    },
+    "product.facts.refresh_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "refresh_label"
+    },
+    "product.facts.processor": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "processor"
+    },
+    "product.facts.ram_gb": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ram_gb"
+    },
+    "product.facts.capacity_typical_mah": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mAh",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "capacity_typical_mah"
+    },
+    "product.facts.capacity_lower_mah": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mAh",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "capacity_lower_mah"
+    },
+    "product.facts.capacity_lower_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.adapter_basis_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "qualifiers",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_basis_w"
+    },
+    "product.facts.adapter_basis_label": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Formulation support/label, not an additional sampled feature."
+    },
+    "product.facts.wireless_support": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "supported",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wireless_support"
+    },
+    "product.facts.wireless_route": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wireless_route"
+    },
+    "product.facts.wireless_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wireless_max_w"
+    },
+    "product.facts.port_data": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "port_data"
+    },
+    "product.facts.cable_data": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cable_data"
+    },
+    "product.facts.sim": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sim"
+    },
+    "product.facts.wifi": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wifi"
+    },
+    "product.facts.bluetooth": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "bluetooth"
+    },
+    "product.facts.camera_description": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "camera_description"
+    },
+    "product.facts.rear_lens_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "rear_lens_count"
+    },
+    "product.facts.main_ois": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_ois"
+    },
+    "product.facts.os_generations": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "os_generations"
+    },
+    "product.facts.os_years": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "years",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "os_years"
+    },
+    "product.facts.security_years": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "years",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "security_years"
+    },
+    "product.facts.support_origin": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.support_qualifier": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.region": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "UK fixture",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.charge_connector": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "USB-C",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charge_connector"
+    },
+    "product.facts.network_5g": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "network_5g"
+    },
+    "product.facts.advertised_storage_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "nominal decimal GB; 1 TB = 1000 GB, not usable storage",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.usable_storage_gb": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_energy_wh": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cell_voltage": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_runtime": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.device_input_ceiling_w": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.charge_cable_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charge_cable_included"
+    },
+    "product.facts.power_adapter_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_adapter_included"
+    },
+    "product.facts.wireless_pad_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wireless_pad_included"
+    },
+    "product.facts.unlocked": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "unlocked"
+    },
+    "product.facts.support_launch_date": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.remaining_support_years": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "years",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.installed_os_version": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ip_disclosed": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.ip_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ip_label"
+    },
+    "product.facts.ip_protocol": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ip_protocol"
+    }
+  },
+  "disclosure_groups": {
+    "assembly": {
+      "id": "phones.smartphones.content.assembly",
+      "display_group": "features",
+      "fields": [
+        "product.facts.assembly"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "os": {
+      "id": "phones.smartphones.content.os",
+      "display_group": "features",
+      "fields": [
+        "product.facts.os"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "height_mm": {
+      "id": "phones.smartphones.content.height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "width_mm": {
+      "id": "phones.smartphones.content.width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "depth_mm": {
+      "id": "phones.smartphones.content.depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.depth_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mass_g": {
+      "id": "phones.smartphones.content.mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "diagonal_unit": {
+      "id": "phones.smartphones.content.diagonal_unit",
+      "display_group": "features",
+      "fields": [
+        "product.facts.diagonal_unit"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "diagonal_inch": {
+      "id": "phones.smartphones.content.diagonal_inch",
+      "display_group": "features",
+      "fields": [
+        "product.facts.diagonal_inch"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "diagonal_mm": {
+      "id": "phones.smartphones.content.diagonal_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.diagonal_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "diagonal_label": {
+      "id": "phones.smartphones.content.diagonal_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.diagonal_label"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "screen_technology": {
+      "id": "phones.smartphones.content.screen_technology",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_technology"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "refresh_label": {
+      "id": "phones.smartphones.content.refresh_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.refresh_label"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "processor": {
+      "id": "phones.smartphones.content.processor",
+      "display_group": "features",
+      "fields": [
+        "product.facts.processor"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "ram_gb": {
+      "id": "phones.smartphones.content.ram_gb",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ram_gb"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "capacity_typical_mah": {
+      "id": "phones.smartphones.content.capacity_typical_mah",
+      "display_group": "features",
+      "fields": [
+        "product.facts.capacity_typical_mah"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "capacity_lower_mah": {
+      "id": "phones.smartphones.content.capacity_lower_mah",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.capacity_lower_mah"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_basis_w": {
+      "id": "phones.smartphones.content.adapter_basis_w",
+      "display_group": "qualifiers",
+      "fields": [
+        "product.facts.adapter_basis_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wireless_support": {
+      "id": "phones.smartphones.content.wireless_support",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wireless_support"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "wireless_route": {
+      "id": "phones.smartphones.content.wireless_route",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wireless_route"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wireless_max_w": {
+      "id": "phones.smartphones.content.wireless_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wireless_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "port_data": {
+      "id": "phones.smartphones.content.port_data",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.port_data"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cable_data": {
+      "id": "phones.smartphones.content.cable_data",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cable_data"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sim": {
+      "id": "phones.smartphones.content.sim",
+      "display_group": "features",
+      "fields": [
+        "product.facts.sim"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wifi": {
+      "id": "phones.smartphones.content.wifi",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wifi"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth": {
+      "id": "phones.smartphones.content.bluetooth",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bluetooth"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "camera_description": {
+      "id": "phones.smartphones.content.camera_description",
+      "display_group": "features",
+      "fields": [
+        "product.facts.camera_description"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "rear_lens_count": {
+      "id": "phones.smartphones.content.rear_lens_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rear_lens_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "main_ois": {
+      "id": "phones.smartphones.content.main_ois",
+      "display_group": "features",
+      "fields": [
+        "product.facts.main_ois"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "os_generations": {
+      "id": "phones.smartphones.content.os_generations",
+      "display_group": "features",
+      "fields": [
+        "product.facts.os_generations"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "os_years": {
+      "id": "phones.smartphones.content.os_years",
+      "display_group": "features",
+      "fields": [
+        "product.facts.os_years"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "security_years": {
+      "id": "phones.smartphones.content.security_years",
+      "display_group": "features",
+      "fields": [
+        "product.facts.security_years"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "charge_connector": {
+      "id": "phones.smartphones.content.charge_connector",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.charge_connector"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "network_5g": {
+      "id": "phones.smartphones.content.network_5g",
+      "display_group": "features",
+      "fields": [
+        "product.facts.network_5g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charge_cable_included": {
+      "id": "phones.smartphones.content.charge_cable_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.charge_cable_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_adapter_included": {
+      "id": "phones.smartphones.content.power_adapter_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.power_adapter_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wireless_pad_included": {
+      "id": "phones.smartphones.content.wireless_pad_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.wireless_pad_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "unlocked": {
+      "id": "phones.smartphones.content.unlocked",
+      "display_group": "features",
+      "fields": [
+        "product.facts.unlocked"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ip_label": {
+      "id": "phones.smartphones.content.ip_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ip_label"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "ip_protocol": {
+      "id": "phones.smartphones.content.ip_protocol",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.ip_protocol"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "qualifiers": {
+      "label": "Qualifiers",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 54,
+    "roles": {
+      "descriptive": 33,
+      "qualifier": 4,
+      "internal": 2,
+      "operational": 1,
+      "literal": 6,
+      "omit_placeholder": 8
+    },
+    "display_groups": 5,
+    "highlight_candidates": 12,
+    "unmapped_descriptive_fields": 39
+  }
+}

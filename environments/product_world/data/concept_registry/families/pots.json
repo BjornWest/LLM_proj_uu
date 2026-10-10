@@ -1,0 +1,184 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "pots",
+  "review_id": "F46",
+  "label": "Pots",
+  "section": "Home, kitchen and appliances",
+  "store_type_ids": [
+    "home_kitchen"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Reuse cookware construction rules; a casserole, saucepan and stockpot differ in geometry. Nominal and working capacity are distinct; lid oven limits may differ from the vessel.",
+  "shared_dimension_ids": [
+    "vessel_capacity",
+    "body_material",
+    "base_construction",
+    "coating",
+    "handle_construction",
+    "lid_configuration",
+    "oven_limit",
+    "care_method"
+  ],
+  "dimensions": [
+    {
+      "id": "vessel_capacity",
+      "label": "Vessel capacity",
+      "module_id": "geometry",
+      "identity_level": "sku",
+      "value_kind": "number",
+      "unit": "litre",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "body_material",
+      "label": "Body material",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "base_construction",
+      "label": "Base construction",
+      "module_id": "heat",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "coating",
+      "label": "Coating",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "handle_construction",
+      "label": "Handle construction",
+      "module_id": "heat",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "lid_configuration",
+      "label": "Lid configuration",
+      "module_id": "heat",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "oven_limit",
+      "label": "Oven limit",
+      "module_id": "heat",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "C",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "care_method",
+      "label": "Care method",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "pots.saucepans",
+      "label": "Saucepans",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "pots.stockpots",
+      "label": "Stockpots",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "pots.casserole_dutch_oven_pots",
+      "label": "Casserole/Dutch-oven pots",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

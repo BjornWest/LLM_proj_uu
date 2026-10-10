@@ -1,0 +1,184 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "foundation",
+  "review_id": "F23",
+  "label": "Foundation and complexion bases",
+  "section": "Beauty and personal care",
+  "store_type_ids": [
+    "beauty"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Skin shade match is contextual, not a universal quality score. Powder and liquid need different quantity units/tools; advertised lasting time and observed wear remain separate.",
+  "shared_dimension_ids": [
+    "ingredient_formula",
+    "shade",
+    "undertone",
+    "coverage",
+    "finish",
+    "target_skin_type",
+    "net_amount",
+    "packaging"
+  ],
+  "dimensions": [
+    {
+      "id": "ingredient_formula",
+      "label": "Ingredient formula",
+      "module_id": "formula",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "shade",
+      "label": "Shade",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "undertone",
+      "label": "Undertone",
+      "module_id": "appearance",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "coverage",
+      "label": "Coverage",
+      "module_id": "appearance",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "finish",
+      "label": "Finish",
+      "module_id": "appearance",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "target_skin_type",
+      "label": "Target skin type",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "net_amount",
+      "label": "Net amount",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "packaging",
+      "label": "Packaging",
+      "module_id": "quantity",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "foundation.tinted_light_coverage_bases",
+      "label": "Tinted/light-coverage bases",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "foundation.liquid_cream_foundation",
+      "label": "Liquid/cream foundation",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "foundation.powder_foundation",
+      "label": "Powder foundation",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

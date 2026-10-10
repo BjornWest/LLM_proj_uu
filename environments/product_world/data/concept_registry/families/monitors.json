@@ -1,0 +1,245 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "monitors",
+  "review_id": "F07",
+  "label": "Monitors",
+  "section": "Electronics and computing",
+  "store_type_ids": [
+    "electronics",
+    "office"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Screen sizes may be separate models. Touch, speakers, USB hub and USB-C charging are optional. Distinguish advertised refresh from modes available at a chosen resolution/input.",
+  "shared_dimension_ids": [
+    "screen_size",
+    "screen_resolution",
+    "screen_technology",
+    "refresh_rate",
+    "aspect_ratio",
+    "ports",
+    "stand_adjustments",
+    "mount_pattern",
+    "colour_performance_spec",
+    "hub_configuration",
+    "speakers"
+  ],
+  "dimensions": [
+    {
+      "id": "screen_size",
+      "label": "Screen size",
+      "module_id": "digital",
+      "identity_level": "model_or_sku",
+      "value_kind": "number",
+      "unit": "inch",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "screen_resolution",
+      "label": "Screen resolution",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": "px",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "screen_technology",
+      "label": "Screen technology",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "refresh_rate",
+      "label": "Refresh rate",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "integer",
+      "unit": "Hz",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "aspect_ratio",
+      "label": "Aspect ratio",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "ports",
+      "label": "Ports",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "stand_adjustments",
+      "label": "Stand adjustments",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "mount_pattern",
+      "label": "Mount pattern",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "colour_performance_spec",
+      "label": "Colour performance spec",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "hub_configuration",
+      "label": "Hub configuration",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "speakers",
+      "label": "Speakers",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "boolean",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "monitors.office_productivity_monitors",
+      "label": "Office/productivity monitors",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "monitors.high_refresh_gaming_monitors",
+      "label": "High-refresh gaming monitors",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "monitors.creative_image_work_monitors",
+      "label": "Creative/image-work monitors",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "monitors.ultrawide_workspace_monitors",
+      "label": "Ultrawide workspace monitors",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

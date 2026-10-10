@@ -1,0 +1,2474 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "trousers.lounge_trousers",
+  "family_id": "trousers",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/trousers.lounge_trousers.json": "7454fcd007f32b37237536944dd671e1595a4aaadd2b63dc5036c3cf317ac55a",
+    "environments/product_world/data/product_width/_trousers_base.json": "e570bed914434be23619e2f3ad189274e25939df49d74b7943c6e13091401a5e",
+    "environments/product_world/data/product_public_content/trousers.lounge_trousers.json": "36eb789fe629c3a0338d33ffd58641fc378da16cf2ce0a3a859b252055973083"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Material, cut and useful pockets/conversion matter. Hardware inventories and ordinary belt-loop anatomy do not warrant independent highlights.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "trousers.lounge_trousers.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.market_range": {
+      "semantic_id": "catalog.market_range",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "women",
+          "men",
+          "unisex"
+        ],
+        "basis": "Commercial model range, not anatomy or fit.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.colour": {
+      "semantic_id": "trousers.lounge_trousers.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "grey"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "colour"
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.size_label": {
+      "semantic_id": "trousers.lounge_trousers.sku.size_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Fictional commercial label, not a body or garment measurement.",
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "size_label"
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.nominal_inseam_cm": {
+      "semantic_id": "trousers.lounge_trousers.sku.nominal_inseam_cm",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "basis": "Declared finished long-garment inside-leg reference before washing, not a bought-pair or wearer measurement or fit guarantee.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_nominal_inseam_cm"
+    },
+    "sku.pack_count": {
+      "semantic_id": "trousers.lounge_trousers.sku.pack_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "basis": "One assembled wearable garment, called one pair; attached components are not separate garments.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.garment_count"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "trousers.lounge_trousers.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "Whole-pair catalogue reference price with attached components; not a live offer.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.actual_waist_circumference_cm": {
+      "semantic_id": "trousers.lounge_trousers.sku.actual_waist_circumference_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual bought-pair garment waist circumference, unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_inseam_cm": {
+      "semantic_id": "trousers.lounge_trousers.sku.actual_inseam_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual bought-pair full inside leg, unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_garment_mass_g": {
+      "semantic_id": "trousers.lounge_trousers.sku.actual_garment_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual complete garment mass including all attached parts, excluding packaging, unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.main_fabric_areal_mass_g_m2": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.main_fabric_areal_mass_g_m2",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g/m²",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Main-cloth mass per area, unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_stretch_extension_percent": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.measured_stretch_extension_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Measured main-cloth extension and protocol unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_wash_shrinkage_percent": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.measured_wash_shrinkage_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Measured first-wash shrinkage of main cloth, unspecified; a care opinion is not a measurement.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.form": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.form",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "lounge trousers"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "ordinary lounging at home"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.full_length": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.full_length",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_full_length"
+    },
+    "product.facts.waist_elastic_present": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.waist_elastic_present",
+      "role": "literal",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_waist_elastic_present"
+    },
+    "product.facts.waist_elastic_band_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.waist_elastic_band_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.waist_elastic_composition": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.waist_elastic_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.waist_drawstring_present": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.waist_drawstring_present",
+      "role": "literal",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_waist_drawstring_present"
+    },
+    "product.facts.waist_drawstring_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.waist_drawstring_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.drawstring_location": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.drawstring_location",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "internal waist"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_drawstring_location"
+    },
+    "product.facts.drawstring_composition": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.drawstring_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.drawstring_adjustment": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.drawstring_adjustment",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "hand adjusted and tied"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_drawstring_adjustment"
+    },
+    "product.facts.sewing_thread_composition": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.sewing_thread_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fly_opening_present": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.fly_opening_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_fly_opening_present"
+    },
+    "product.facts.fly_zip_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.fly_zip_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_fly_zip_count"
+    },
+    "product.facts.button_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.button_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.hook_bar_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.hook_bar_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.belt_loop_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.belt_loop_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.lining_present": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.lining_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.lining_material": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.lining_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.lining_present",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "component": "garment lining",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not applicable"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pocket_bags_fitted": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.pocket_bags_fitted",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.pocket_bag_cotton_percent": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.pocket_bag_cotton_percent",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "component": "pocket bags",
+        "basis": "Separate pocket-bag fibre content, not main cloth or garment lining.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_pocket_bag_composition"
+    },
+    "product.facts.front_hand_pocket_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.front_hand_pocket_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_front_pockets"
+    },
+    "product.facts.front_pocket_closure": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.front_pocket_closure",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "open"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_front_pockets"
+    },
+    "product.facts.thigh_pocket_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.thigh_pocket_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_thigh_pockets"
+    },
+    "product.facts.coin_pocket_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.coin_pocket_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.garment_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.garment_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_garment_count"
+    },
+    "product.facts.top_supplied_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.top_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "product.facts.belt_supplied_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.belt_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "product.facts.spare_cord_supplied_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.spare_cord_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.care_product_supplied_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.care_product_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.body_fit_chart_supplied": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.body_fit_chart_supplied",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.removable_garment_piece_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.removable_garment_piece_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_removable_garment_piece_count"
+    },
+    "product.facts.stretch_declaration": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.stretch_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cooling_result": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.cooling_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.breathability_result": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.breathability_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.elastic_lifetime_result": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.elastic_lifetime_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.sleep_quality_result": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.sleep_quality_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wash_machine_allowed": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.wash_machine_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.wash_gentle_cycle": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.wash_gentle_cycle",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.wash_inside_out": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.wash_inside_out",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.wash_with_similar_colours": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.wash_with_similar_colours",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.untie_drawstring_before_wash": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.untie_drawstring_before_wash",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.bleach_allowed": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.bleach_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_bleaching"
+    },
+    "product.facts.tumble_dry_allowed": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.tumble_dry_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_drying"
+    },
+    "product.facts.dry_clean_allowed": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.dry_clean_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_professional_cleaning"
+    },
+    "product.facts.drying_method": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.drying_method",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "hang to dry"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_drying"
+    },
+    "product.facts.ironing_scope": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.ironing_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "main cloth only; avoid pocket bags, drawstring and all elastic"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.fabric_structure": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.fabric_structure",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_fabric_structure"
+    },
+    "product.facts.main_fabric_cotton_percent": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.main_fabric_cotton_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "component": "main cloth",
+        "basis": "Main-cloth fibre content only; pocket bags, thread, cord and waist/leg elastics excluded.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_main_fabric_composition"
+    },
+    "product.facts.main_fabric_polyester_percent": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.main_fabric_polyester_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "component": "main cloth",
+        "basis": "Main-cloth fibre content only; pocket bags, thread, cord and waist/leg elastics excluded.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_main_fabric_composition"
+    },
+    "product.facts.cut": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.cut",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_cut"
+    },
+    "product.facts.thigh_fit": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.thigh_fit",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_thigh_fit"
+    },
+    "product.facts.rise": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.rise",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_rise"
+    },
+    "product.facts.leg_hem_type": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.leg_hem_type",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_leg_hem_type"
+    },
+    "product.facts.leg_hem_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.leg_hem_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.leg_elastic_present": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.leg_elastic_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_leg_elastic_present"
+    },
+    "product.facts.leg_elastic_band_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.leg_elastic_band_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.leg_elastic_composition": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.leg_elastic_composition",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.leg_elastic_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "component": "attached leg elastic",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_leg_elastic_composition"
+    },
+    "product.facts.rear_pocket_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.rear_pocket_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_rear_pockets"
+    },
+    "product.facts.rear_pocket_type": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.rear_pocket_type",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_rear_pockets"
+    },
+    "product.facts.rear_pocket_closure": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.rear_pocket_closure",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_rear_pockets"
+    },
+    "product.facts.total_pocket_count": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.total_pocket_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "Count of the named attached or supplied component; known zero is absence.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_all_pockets"
+    },
+    "product.facts.wash_temperature_max_c": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.wash_temperature_max_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C",
+        "basis": "Declared maximum wash programme setting, not measured water temperature.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.iron_main_cloth_temperature_max_c": {
+      "semantic_id": "trousers.lounge_trousers.product.facts.iron_main_cloth_temperature_max_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C",
+        "component": "main cloth",
+        "basis": "Declared main-cloth ironing maximum, not measured iron temperature or permission for elastic, cord or pocket bags.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_product_ironing"
+    },
+    "review.subject.colour": {
+      "semantic_id": "trousers.lounge_trousers.review.subject.colour",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "grey"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.size_label": {
+      "semantic_id": "trousers.lounge_trousers.review.subject.size_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Fictional commercial label, not a body or garment measurement."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "product.facts.pocket_bag_polyester_percent": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "component": "pocket bags",
+        "basis": "Separate pocket-bag fibre content, not main cloth or garment lining.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.size_system": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "fictional commercial labels"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "regular"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.home_washing_allowed": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.main_fabric_elastane_percent": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "component": "main cloth",
+        "basis": "Main-cloth fibre content only; pocket bags, thread, cord and waist/leg elastics excluded.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "cotton_loopback_jogger",
+          "woven_blend_lounge"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "sku_nominal_inseam_cm": {
+      "id": "trousers.lounge_trousers.content.sku_nominal_inseam_cm",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "sku.nominal_inseam_cm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_full_length": {
+      "id": "trousers.lounge_trousers.content.product_full_length",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.full_length"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_waist_elastic_present": {
+      "id": "trousers.lounge_trousers.content.product_waist_elastic_present",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.waist_elastic_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_waist_drawstring_present": {
+      "id": "trousers.lounge_trousers.content.product_waist_drawstring_present",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.waist_drawstring_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_drawstring_location": {
+      "id": "trousers.lounge_trousers.content.product_drawstring_location",
+      "display_group": "features",
+      "fields": [
+        "product.facts.drawstring_location"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_drawstring_adjustment": {
+      "id": "trousers.lounge_trousers.content.product_drawstring_adjustment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.drawstring_adjustment"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_fly_opening_present": {
+      "id": "trousers.lounge_trousers.content.product_fly_opening_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fly_opening_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_fly_zip_count": {
+      "id": "trousers.lounge_trousers.content.product_fly_zip_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fly_zip_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_pocket_bag_composition": {
+      "id": "trousers.lounge_trousers.content.product_pocket_bag_composition",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.pocket_bag_cotton_percent"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_front_pockets": {
+      "id": "trousers.lounge_trousers.content.product_front_pockets",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_hand_pocket_count",
+        "product.facts.front_pocket_closure"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_thigh_pockets": {
+      "id": "trousers.lounge_trousers.content.product_thigh_pockets",
+      "display_group": "features",
+      "fields": [
+        "product.facts.thigh_pocket_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_garment_count": {
+      "id": "trousers.lounge_trousers.content.product_garment_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.garment_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_removable_garment_piece_count": {
+      "id": "trousers.lounge_trousers.content.product_removable_garment_piece_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.removable_garment_piece_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_washing": {
+      "id": "trousers.lounge_trousers.content.product_product_washing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_machine_allowed",
+        "product.facts.wash_gentle_cycle",
+        "product.facts.wash_inside_out",
+        "product.facts.wash_with_similar_colours",
+        "product.facts.untie_drawstring_before_wash",
+        "product.facts.wash_temperature_max_c"
+      ],
+      "atomic": true,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_bleaching": {
+      "id": "trousers.lounge_trousers.content.product_product_bleaching",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_allowed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_drying": {
+      "id": "trousers.lounge_trousers.content.product_product_drying",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tumble_dry_allowed",
+        "product.facts.drying_method"
+      ],
+      "atomic": true,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_professional_cleaning": {
+      "id": "trousers.lounge_trousers.content.product_product_professional_cleaning",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dry_clean_allowed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_fabric_structure": {
+      "id": "trousers.lounge_trousers.content.product_fabric_structure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fabric_structure"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_main_fabric_composition": {
+      "id": "trousers.lounge_trousers.content.product_main_fabric_composition",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.main_fabric_cotton_percent",
+        "product.facts.main_fabric_polyester_percent"
+      ],
+      "atomic": true,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_cut": {
+      "id": "trousers.lounge_trousers.content.product_cut",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.cut"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_thigh_fit": {
+      "id": "trousers.lounge_trousers.content.product_thigh_fit",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.thigh_fit"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_rise": {
+      "id": "trousers.lounge_trousers.content.product_rise",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.rise"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_leg_hem_type": {
+      "id": "trousers.lounge_trousers.content.product_leg_hem_type",
+      "display_group": "features",
+      "fields": [
+        "product.facts.leg_hem_type"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_leg_elastic_present": {
+      "id": "trousers.lounge_trousers.content.product_leg_elastic_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.leg_elastic_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_leg_elastic_composition": {
+      "id": "trousers.lounge_trousers.content.product_leg_elastic_composition",
+      "display_group": "features",
+      "fields": [
+        "product.facts.leg_elastic_composition"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_rear_pockets": {
+      "id": "trousers.lounge_trousers.content.product_rear_pockets",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rear_pocket_count",
+        "product.facts.rear_pocket_type",
+        "product.facts.rear_pocket_closure"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_all_pockets": {
+      "id": "trousers.lounge_trousers.content.product_all_pockets",
+      "display_group": "features",
+      "fields": [
+        "product.facts.total_pocket_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_ironing": {
+      "id": "trousers.lounge_trousers.content.product_product_ironing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.iron_main_cloth_temperature_max_c"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 85,
+    "roles": {
+      "identity": 3,
+      "buying_choice": 3,
+      "descriptive": 16,
+      "alias": 1,
+      "commerce": 1,
+      "omit_placeholder": 15,
+      "literal": 22,
+      "omit_fixed_detail": 14,
+      "qualifier": 1,
+      "omit_low_value_detail": 1,
+      "review_only": 2,
+      "private_support": 3,
+      "operational": 2,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 4,
+    "unmapped_descriptive_fields": 0
+  },
+  "semantic_review_note": "Fit, fabric and stretch dominate. Retain pocket layout, removable-leg conversion and knee overlays; suppress fastener arithmetic and belt-loop counts. Home versus professional cleaning is a real choice; no assumption that lining care equals outer fabric care."
+}

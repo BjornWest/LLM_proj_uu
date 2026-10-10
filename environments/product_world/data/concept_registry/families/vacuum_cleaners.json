@@ -1,0 +1,299 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "vacuum_cleaners",
+  "review_id": "F53",
+  "label": "Vacuum cleaners",
+  "section": "Home, kitchen and appliances",
+  "store_type_ids": [
+    "appliances"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Battery/runtime only cordless; mapping/dock/app only supported robots; liquid collection only suitable wet/dry models. Motor watts alone do not establish cleaning performance.",
+  "shared_dimension_ids": [
+    "collection_method",
+    "collection_capacity",
+    "filtration_system",
+    "included_heads",
+    "weight",
+    "noise_rating"
+  ],
+  "dimensions": [
+    {
+      "id": "collection_method",
+      "label": "Collection method",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "collection_capacity",
+      "label": "Collection capacity",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "litre",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "filtration_system",
+      "label": "Filtration system",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "included_heads",
+      "label": "Included heads",
+      "module_id": "compatibility",
+      "identity_level": "sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "weight",
+      "label": "Weight",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "g",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "noise_rating",
+      "label": "Noise rating",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "dB",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "cable_length",
+      "label": "Cable length",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "m",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "battery_capacity",
+      "label": "Battery capacity",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "Wh",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "charging_capability",
+      "label": "Charging capability",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "navigation_system",
+      "label": "Navigation system",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "dock_capabilities",
+      "label": "Dock capabilities",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "app_support",
+      "label": "App support",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "liquid_capacity",
+      "label": "Liquid capacity",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "litre",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "vacuum_cleaners.canister_cylinder_vacuums",
+      "label": "Canister/cylinder vacuums",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "cable_length"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "vacuum_cleaners.cordless_stick_vacuums",
+      "label": "Cordless stick vacuums",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity",
+        "charging_capability"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "vacuum_cleaners.upright_vacuums",
+      "label": "Upright vacuums",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "cable_length"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "vacuum_cleaners.robot_vacuums",
+      "label": "Robot vacuums",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity",
+        "charging_capability",
+        "navigation_system",
+        "dock_capabilities",
+        "app_support"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "vacuum_cleaners.wet_dry_utility_vacuums",
+      "label": "Wet/dry utility vacuums",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "cable_length",
+        "liquid_capacity"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

@@ -1,0 +1,620 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "footwear.rubber_boots",
+  "family_id": "footwear",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/footwear.rubber_boots.json": "ea978d0dd7ce970178f1eb23f63bbd1ae90a67f8570effa8dc252d60bc4112db",
+    "environments/product_world/data/product_width/_footwear_base.json": "9cc64c801b6420d286547eebee18d78bc9d8fe454fdcde32fb7aebfcad7deac8"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Emphasize the actual use: cushioning for running, terrain/protection for hiking, shape/heel for dress shoes, insulation for winter. Fixed closed-heel anatomy is not a selling point.",
+  "concept_note": "Pull-on rubber boots need shaft/lining/waterproof declarations, not fastening absence as a headline.",
+  "fields": {
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": true,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "rubber-upper wet-weather boot",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "wet-weather wear",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.closed_heel": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "closed_heel"
+    },
+    "product.facts.closed_toe": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "closed_toe"
+    },
+    "product.facts.component_materials.upper": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "rubber",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "component_materials.upper"
+    },
+    "product.facts.component_materials.outsole": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "rubber",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "component_materials.outsole"
+    },
+    "product.facts.rubber_formulation": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.component_materials.lining": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "component_materials.lining"
+    },
+    "product.facts.insulation_kind": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "insulation_kind"
+    },
+    "product.facts.removable_inner_boot": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "removable_inner_boot"
+    },
+    "product.facts.footbed_material": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.removable_footbed": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.shaft_height": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "mid",
+          "tall"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shaft_height"
+    },
+    "product.facts.fastening": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "pull-on",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fastening"
+    },
+    "product.facts.calf_adjuster": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "shaft buckle strap",
+          "gusset adjuster (hardware unspecified)"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "calf_adjuster"
+    },
+    "product.facts.waterproof_declared": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "waterproof_declared"
+    },
+    "product.facts.waterproof_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.temperature_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one boot, EU 40 reference configuration",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.reference_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "min": 670,
+        "max": 1040,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_mass_g"
+    }
+  },
+  "disclosure_groups": {
+    "construction": {
+      "id": "footwear.rubber_boots.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closed_heel": {
+      "id": "footwear.rubber_boots.content.closed_heel",
+      "display_group": "features",
+      "fields": [
+        "product.facts.closed_heel"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closed_toe": {
+      "id": "footwear.rubber_boots.content.closed_toe",
+      "display_group": "features",
+      "fields": [
+        "product.facts.closed_toe"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "component_materials.upper": {
+      "id": "footwear.rubber_boots.content.component_materials.upper",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials.upper"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_materials.outsole": {
+      "id": "footwear.rubber_boots.content.component_materials.outsole",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials.outsole"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_materials.lining": {
+      "id": "footwear.rubber_boots.content.component_materials.lining",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials.lining"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "insulation_kind": {
+      "id": "footwear.rubber_boots.content.insulation_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.insulation_kind"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "removable_inner_boot": {
+      "id": "footwear.rubber_boots.content.removable_inner_boot",
+      "display_group": "features",
+      "fields": [
+        "product.facts.removable_inner_boot"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "shaft_height": {
+      "id": "footwear.rubber_boots.content.shaft_height",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.shaft_height"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "fastening": {
+      "id": "footwear.rubber_boots.content.fastening",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fastening"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "calf_adjuster": {
+      "id": "footwear.rubber_boots.content.calf_adjuster",
+      "display_group": "features",
+      "fields": [
+        "product.facts.calf_adjuster"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "waterproof_declared": {
+      "id": "footwear.rubber_boots.content.waterproof_declared",
+      "display_group": "features",
+      "fields": [
+        "product.facts.waterproof_declared"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "reference_mass_g": {
+      "id": "footwear.rubber_boots.content.reference_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    }
+  },
+  "display_groups": {
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 21,
+    "roles": {
+      "operational": 1,
+      "literal": 7,
+      "identity": 1,
+      "omit_placeholder": 5,
+      "descriptive": 6,
+      "qualifier": 1
+    },
+    "display_groups": 3,
+    "highlight_candidates": 7,
+    "unmapped_descriptive_fields": 13
+  }
+}

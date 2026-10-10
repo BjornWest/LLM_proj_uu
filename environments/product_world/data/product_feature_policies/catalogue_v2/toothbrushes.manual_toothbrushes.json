@@ -1,0 +1,2236 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "toothbrushes.manual_toothbrushes",
+  "family_id": "toothbrushes",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/toothbrushes.manual_toothbrushes.json": "0fa978a8e8eb72e1d3a640e9f52273d081f0258d89272230618b87b82a0e46ce",
+    "environments/product_world/data/product_width/_toothbrushes_base.json": "b4814d3d5690b61db02d49e97c107f7c8f12b338c8cb3c52ca56b8cc4f247682",
+    "environments/product_world/data/product_public_content/toothbrushes.manual_toothbrushes.json": "f9667e4c7cd48642bc966162b21f054d2e878a8fa394e431369ac31cab555e73"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Manual and electric brushes differ. Brush/bundle controls and head-platform compatibility remain explicit; no cleaning or dental outcome inference.",
+  "concept_note": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features.",
+  "fields": {
+    "product.name": {
+      "semantic_id": "manual_toothbrushes.public.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.intended_user": {
+      "semantic_id": "manual_toothbrushes.public.sku.intended_user",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "adults",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.intended_use": {
+      "semantic_id": "manual_toothbrushes.public.sku.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "ordinary manual toothbrushing",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.head_attached_integrally": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_attached_integrally",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.neck_adjustable": {
+      "semantic_id": "manual_toothbrushes.public.sku.neck_adjustable",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.head_replaceable": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_replaceable",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.head_geometry": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_geometry",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_geometry"
+    },
+    "sku.handle_geometry": {
+      "semantic_id": "manual_toothbrushes.public.sku.handle_geometry",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_handle_geometry"
+    },
+    "sku.head_body_material": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_body_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_head_body_material"
+    },
+    "sku.handle_material": {
+      "semantic_id": "manual_toothbrushes.public.sku.handle_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_handle_material"
+    },
+    "sku.bristle_material": {
+      "semantic_id": "manual_toothbrushes.public.sku.bristle_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_bristle_material"
+    },
+    "sku.bristle_firmness_label": {
+      "semantic_id": "manual_toothbrushes.public.sku.bristle_firmness_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_bristle_firmness_label"
+    },
+    "sku.grip_material": {
+      "semantic_id": "manual_toothbrushes.public.sku.grip_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "polypropylene, no rubber insert",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_grip_material"
+    },
+    "sku.rubber_grip_insert_present": {
+      "semantic_id": "manual_toothbrushes.public.sku.rubber_grip_insert_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.bristle_tip_declaration": {
+      "semantic_id": "manual_toothbrushes.public.sku.bristle_tip_declaration",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "end-rounded",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_bristle_tip_declaration"
+    },
+    "sku.bristle_trim": {
+      "semantic_id": "manual_toothbrushes.public.sku.bristle_trim",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "flat single-height trim",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_bristle_trim"
+    },
+    "sku.polymer_grades_declaration": {
+      "semantic_id": "manual_toothbrushes.public.sku.polymer_grades_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.mechanical_stiffness_declaration": {
+      "semantic_id": "manual_toothbrushes.public.sku.mechanical_stiffness_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified; no mechanical test basis declared",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.colour": {
+      "semantic_id": "manual_toothbrushes.public.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.colour_policy": {
+      "semantic_id": "manual_toothbrushes.public.sku.colour_policy",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "all brushes in the selected pack have the stated handle and head-body colour",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_colour_policy"
+    },
+    "sku.bristle_colour": {
+      "semantic_id": "manual_toothbrushes.public.sku.bristle_colour",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "uncoloured",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_bristle_colour"
+    },
+    "sku.reference_overall_brush_length_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_overall_brush_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_overall_brush_length_mm_status",
+        "applicable_when": "sku.reference_overall_brush_length_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "one complete bare brush"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference from head tip to handle tip, excluding head cover"
+        },
+        "declared_status": {
+          "expr": "sku.reference_overall_brush_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_overall_brush_length_mm"
+    },
+    "sku.reference_head_body_length_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_head_body_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_head_body_length_mm_status",
+        "applicable_when": "sku.reference_head_body_length_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fixed head body"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference head-body length excluding bristles"
+        },
+        "declared_status": {
+          "expr": "sku.reference_head_body_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_head_body_length_mm"
+    },
+    "sku.reference_head_body_width_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_head_body_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_head_body_width_mm_status",
+        "applicable_when": "sku.reference_head_body_width_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fixed head body"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference head-body width excluding bristles"
+        },
+        "declared_status": {
+          "expr": "sku.reference_head_body_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_head_body_width_mm"
+    },
+    "sku.reference_bristle_projection_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_bristle_projection_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_bristle_projection_mm_status",
+        "applicable_when": "sku.reference_bristle_projection_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "bristles"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference bristle projection above head body"
+        },
+        "declared_status": {
+          "expr": "sku.reference_bristle_projection_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_bristle_projection_mm"
+    },
+    "sku.reference_handle_max_width_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_handle_max_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_handle_max_width_mm_status",
+        "applicable_when": "sku.reference_handle_max_width_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "handle"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference maximum handle width"
+        },
+        "declared_status": {
+          "expr": "sku.reference_handle_max_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_handle_max_width_mm"
+    },
+    "sku.actual_overall_brush_length_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_overall_brush_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_overall_brush_length_mm_status",
+        "applicable_when": "sku.actual_overall_brush_length_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "one complete bare brush"
+        },
+        "measurement_basis": {
+          "literal": "actual head-tip to handle-tip length excluding head cover"
+        },
+        "declared_status": {
+          "expr": "sku.actual_overall_brush_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_head_body_length_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_head_body_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_head_body_length_mm_status",
+        "applicable_when": "sku.actual_head_body_length_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fixed head body"
+        },
+        "measurement_basis": {
+          "literal": "actual head-body length excluding bristles"
+        },
+        "declared_status": {
+          "expr": "sku.actual_head_body_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_head_body_width_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_head_body_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_head_body_width_mm_status",
+        "applicable_when": "sku.actual_head_body_width_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fixed head body"
+        },
+        "measurement_basis": {
+          "literal": "actual head-body width excluding bristles"
+        },
+        "declared_status": {
+          "expr": "sku.actual_head_body_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_bristle_projection_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_bristle_projection_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_bristle_projection_mm_status",
+        "applicable_when": "sku.actual_bristle_projection_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "bristles"
+        },
+        "measurement_basis": {
+          "literal": "actual bristle projection above head body"
+        },
+        "declared_status": {
+          "expr": "sku.actual_bristle_projection_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_handle_max_width_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_handle_max_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_handle_max_width_mm_status",
+        "applicable_when": "sku.actual_handle_max_width_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "handle"
+        },
+        "measurement_basis": {
+          "literal": "actual maximum handle width"
+        },
+        "declared_status": {
+          "expr": "sku.actual_handle_max_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_filament_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_filament_count",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_filament_count_status",
+        "applicable_when": "sku.actual_filament_count_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "one brush head"
+        },
+        "measurement_basis": {
+          "literal": "actual number of individual bristle filaments on one head"
+        },
+        "declared_status": {
+          "expr": "sku.actual_filament_count_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_filament_diameter_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_filament_diameter_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_filament_diameter_mm_status",
+        "applicable_when": "sku.actual_filament_diameter_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "individual bristle filament"
+        },
+        "measurement_basis": {
+          "literal": "actual individual bristle filament diameter"
+        },
+        "declared_status": {
+          "expr": "sku.actual_filament_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_filament_tip_radius_mm": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_filament_tip_radius_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_filament_tip_radius_mm_status",
+        "applicable_when": "sku.actual_filament_tip_radius_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "individual bristle filament tip"
+        },
+        "measurement_basis": {
+          "literal": "actual end-tip radius of individual bristle filament"
+        },
+        "declared_status": {
+          "expr": "sku.actual_filament_tip_radius_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.reference_bare_brush_mass_g": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_bare_brush_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_bare_brush_mass_g_status",
+        "applicable_when": "sku.reference_bare_brush_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "one complete bare brush"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference per complete bare brush excluding head cover and retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.reference_bare_brush_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_bare_brush_mass_g"
+    },
+    "sku.reference_supplied_set_mass_g": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_supplied_set_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_supplied_set_mass_g_status",
+        "applicable_when": "sku.reference_supplied_set_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete usable purchased pack"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference sum of supplied brushes and any head covers, excluding retail packing, not actual weighing"
+        },
+        "declared_status": {
+          "expr": "sku.reference_supplied_set_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_supplied_set_mass_g"
+    },
+    "sku.actual_bare_brush_mass_g": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_bare_brush_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_bare_brush_mass_g_status",
+        "applicable_when": "sku.actual_bare_brush_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "one complete bare brush"
+        },
+        "measurement_basis": {
+          "literal": "actual per complete bare brush excluding head cover and retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.actual_bare_brush_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_supplied_set_mass_g": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_supplied_set_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_supplied_set_mass_g_status",
+        "applicable_when": "sku.actual_supplied_set_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete usable purchased pack"
+        },
+        "measurement_basis": {
+          "literal": "actual brushes and supplied head covers together excluding retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.actual_supplied_set_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.head_cover_present": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_cover_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_cover_present"
+    },
+    "sku.head_cover_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_cover_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_cover_count"
+    },
+    "sku.head_cover_material": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_cover_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_cover_material"
+    },
+    "sku.head_cover_colour": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_cover_colour",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_cover_colour"
+    },
+    "sku.head_cover_care": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_cover_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_head_cover_care"
+    },
+    "sku.reference_head_cover_mass_g": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_head_cover_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_head_cover_mass_g_status",
+        "applicable_when": "sku.reference_head_cover_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "one supplied head cover"
+        },
+        "measurement_basis": {
+          "literal": "catalogue reference per separate head cover excluding brush and retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.reference_head_cover_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_head_cover_mass_g"
+    },
+    "sku.actual_head_cover_mass_g": {
+      "semantic_id": "manual_toothbrushes.public.sku.actual_head_cover_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_head_cover_mass_g_status",
+        "applicable_when": "sku.actual_head_cover_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "one supplied head cover"
+        },
+        "measurement_basis": {
+          "literal": "actual per separate head cover excluding brush and retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.actual_head_cover_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.head_cover_removable": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_cover_removable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_cover_removable"
+    },
+    "sku.head_cover_vented": {
+      "semantic_id": "manual_toothbrushes.public.sku.head_cover_vented",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_cover_vented"
+    },
+    "sku.brush_first_use_care": {
+      "semantic_id": "manual_toothbrushes.public.sku.brush_first_use_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Remove retail packing and rinse the complete brush under running water before first use.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_brush_first_use_care"
+    },
+    "sku.brush_after_use_care": {
+      "semantic_id": "manual_toothbrushes.public.sku.brush_after_use_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "After brushing, rinse head, bristles and handle under running water; air-dry upright with the head uncovered.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_brush_after_use_care"
+    },
+    "sku.brush_care_limits": {
+      "semantic_id": "manual_toothbrushes.public.sku.brush_care_limits",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Do not heat, bend, dishwasher or share the brush; replace it if visibly damaged or the bristles splay.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_brush_care_limits"
+    },
+    "sku.brush_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.brush_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_brush_count"
+    },
+    "sku.usable_supplied_item_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.usable_supplied_item_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_usable_supplied_item_count"
+    },
+    "sku.fitted_head_neck_handle_bristles_excluded_from_extra_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.fitted_head_neck_handle_bristles_excluded_from_extra_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.retail_packing_excluded_from_usable_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.retail_packing_excluded_from_usable_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.spare_head_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.spare_head_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.toothpaste_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.toothpaste_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.floss_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.floss_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.holder_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.holder_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.travel_case_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.travel_case_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.battery_count_per_brush": {
+      "semantic_id": "manual_toothbrushes.public.sku.battery_count_per_brush",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.charger_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.charger_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.charging_cable_count": {
+      "semantic_id": "manual_toothbrushes.public.sku.charging_cable_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.powered": {
+      "semantic_id": "manual_toothbrushes.public.sku.powered",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.motor_count_per_brush": {
+      "semantic_id": "manual_toothbrushes.public.sku.motor_count_per_brush",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.timer_present": {
+      "semantic_id": "manual_toothbrushes.public.sku.timer_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.pressure_feedback_present": {
+      "semantic_id": "manual_toothbrushes.public.sku.pressure_feedback_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "sku.app_compatibility": {
+      "semantic_id": "manual_toothbrushes.public.sku.app_compatibility",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not applicable: no electronic mechanism",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.replacement_platform": {
+      "semantic_id": "manual_toothbrushes.public.sku.replacement_platform",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not applicable: permanently attached manual head",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.battery_energy_wh": {
+      "semantic_id": "manual_toothbrushes.public.sku.battery_energy_wh",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "Wh",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.battery_energy_wh_status",
+        "applicable_when": "sku.battery_energy_wh_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "battery"
+        },
+        "measurement_basis": {
+          "literal": "energy capacity of battery; no battery present"
+        },
+        "declared_status": {
+          "expr": "sku.battery_energy_wh_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.charging_power_w": {
+      "semantic_id": "manual_toothbrushes.public.sku.charging_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "W",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.charging_power_w_status",
+        "applicable_when": "sku.charging_power_w_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "charging mechanism"
+        },
+        "measurement_basis": {
+          "literal": "charging input power; no charging mechanism present"
+        },
+        "declared_status": {
+          "expr": "sku.charging_power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.powered_strokes_per_min": {
+      "semantic_id": "manual_toothbrushes.public.sku.powered_strokes_per_min",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "per_minute",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.powered_strokes_per_min_status",
+        "applicable_when": "sku.powered_strokes_per_min_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "powered head mechanism"
+        },
+        "measurement_basis": {
+          "literal": "powered head stroke rate; no powered head mechanism present"
+        },
+        "declared_status": {
+          "expr": "sku.powered_strokes_per_min_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "manual_toothbrushes.public.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "price_basis": {
+          "literal": "authored whole selected pack reference, including supplied covers, not per brush or retailer quote"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.recipe": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "tapered_soft",
+          "octagonal_ultra_soft"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "sku_head_geometry": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_geometry",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_geometry"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_handle_geometry": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_handle_geometry",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_geometry"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_head_body_material": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_body_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_handle_material": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_handle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_bristle_material": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_bristle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.bristle_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_bristle_firmness_label": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_bristle_firmness_label",
+      "display_group": "features",
+      "fields": [
+        "sku.bristle_firmness_label"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_grip_material": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_grip_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.grip_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_bristle_tip_declaration": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_bristle_tip_declaration",
+      "display_group": "features",
+      "fields": [
+        "sku.bristle_tip_declaration"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_bristle_trim": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_bristle_trim",
+      "display_group": "features",
+      "fields": [
+        "sku.bristle_trim"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_colour_policy": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_colour_policy",
+      "display_group": "features",
+      "fields": [
+        "sku.colour_policy"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_bristle_colour": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_bristle_colour",
+      "display_group": "features",
+      "fields": [
+        "sku.bristle_colour"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_overall_brush_length_mm": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_overall_brush_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_overall_brush_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_head_body_length_mm": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_head_body_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_body_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_head_body_width_mm": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_head_body_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_body_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_bristle_projection_mm": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_bristle_projection_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.reference_bristle_projection_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_handle_max_width_mm": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_handle_max_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_handle_max_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_bare_brush_mass_g": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_bare_brush_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_bare_brush_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_supplied_set_mass_g": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_supplied_set_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_supplied_set_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_cover_present": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_cover_present",
+      "display_group": "features",
+      "fields": [
+        "sku.head_cover_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_cover_count": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_cover_count",
+      "display_group": "features",
+      "fields": [
+        "sku.head_cover_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_cover_material": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_cover_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_cover_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_cover_colour": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_cover_colour",
+      "display_group": "features",
+      "fields": [
+        "sku.head_cover_colour"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_head_cover_care": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_head_cover_care",
+      "display_group": "care",
+      "fields": [
+        "sku.head_cover_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_head_cover_mass_g": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_reference_head_cover_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_cover_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_cover_removable": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_cover_removable",
+      "display_group": "features",
+      "fields": [
+        "sku.head_cover_removable"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_cover_vented": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_head_cover_vented",
+      "display_group": "features",
+      "fields": [
+        "sku.head_cover_vented"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_brush_first_use_care": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_product_brush_first_use_care",
+      "display_group": "care",
+      "fields": [
+        "sku.brush_first_use_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_brush_after_use_care": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_product_brush_after_use_care",
+      "display_group": "care",
+      "fields": [
+        "sku.brush_after_use_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_brush_care_limits": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_product_brush_care_limits",
+      "display_group": "care",
+      "fields": [
+        "sku.brush_care_limits"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_brush_count": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_brush_count",
+      "display_group": "features",
+      "fields": [
+        "sku.brush_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_usable_supplied_item_count": {
+      "id": "toothbrushes.manual_toothbrushes.content.sku_usable_supplied_item_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.usable_supplied_item_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 73,
+    "roles": {
+      "identity": 3,
+      "omit_fixed_detail": 18,
+      "descriptive": 21,
+      "literal": 10,
+      "omit_placeholder": 18,
+      "buying_choice": 1,
+      "commerce": 1,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 3,
+    "unmapped_descriptive_fields": 0
+  },
+  "semantic_review_note": "Keep head/bristle geometry/firmness; electric motion, timer/pressure response and replacement platform matter. Charging requirements and supplied spare heads/case remain useful. Remove toothpaste/floss and ordinary installed-part inventories."
+}

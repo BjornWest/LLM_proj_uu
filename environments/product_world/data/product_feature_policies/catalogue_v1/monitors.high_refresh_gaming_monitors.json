@@ -1,0 +1,5087 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "monitors.high_refresh_gaming_monitors",
+  "family_id": "monitors",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/monitors.high_refresh_gaming_monitors.json": "d0c0203eba7196825141cc9b391af5a46f0716039f4e8b975f2f1c540798c9f4",
+    "environments/product_world/data/product_width/_monitors_base.json": "b5bc8de51f89b1843f31b0c2e1911a3f277a3f4f4a4cfe9399671577a9419c40",
+    "environments/product_world/data/product_public_content/monitors.high_refresh_gaming_monitors.json": "2d3486a46a13f7b43f1fa2fbff9daef8e22f14938c0941ccf818acbdf1c7ea43"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Resolution, refresh, colour and connections have declared bases; no untested colour accuracy or cable bandwidth claims.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.monitor_units": {
+      "semantic_id": "monitors.gaming.product.facts.monitor_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "monitor_units"
+    },
+    "product.facts.construction": {
+      "semantic_id": "monitors.gaming.product.facts.construction",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "external monitor",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "monitors.gaming.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "prepared gaming on own computer",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.touchscreen": {
+      "semantic_id": "monitors.gaming.product.facts.touchscreen",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "touchscreen"
+    },
+    "product.facts.advertised_diagonal_in": {
+      "semantic_id": "monitors.gaming.product.facts.advertised_diagonal_in",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "inch",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "advertised_diagonal_in"
+    },
+    "product.facts.panel_type": {
+      "semantic_id": "monitors.gaming.product.facts.panel_type",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "panel_type"
+    },
+    "product.facts.screen_backlight": {
+      "semantic_id": "monitors.gaming.product.facts.screen_backlight",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_backlight"
+    },
+    "product.facts.screen_surface": {
+      "semantic_id": "monitors.gaming.product.facts.screen_surface",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "anti-glare",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "screen_surface"
+    },
+    "product.facts.screen_width_px": {
+      "semantic_id": "monitors.gaming.product.facts.screen_width_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_width_px"
+    },
+    "product.facts.screen_height_px": {
+      "semantic_id": "monitors.gaming.product.facts.screen_height_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_height_px"
+    },
+    "product.facts.aspect_ratio": {
+      "semantic_id": "monitors.gaming.product.facts.aspect_ratio",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "16:9",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "aspect_ratio"
+    },
+    "product.facts.touch_capabilities": {
+      "semantic_id": "monitors.gaming.product.facts.touch_capabilities",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.touchscreen",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.refresh_rate_hz": {
+      "semantic_id": "monitors.gaming.product.facts.refresh_rate_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "refresh_rate_hz"
+    },
+    "product.facts.refresh_declaration_basis": {
+      "semantic_id": "monitors.gaming.product.facts.refresh_declaration_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.overclock_required": {
+      "semantic_id": "monitors.gaming.product.facts.overclock_required",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "overclock_required"
+    },
+    "product.facts.hdmi_vertical_min_hz": {
+      "semantic_id": "monitors.gaming.product.facts.hdmi_vertical_min_hz",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hdmi_vertical_min_hz"
+    },
+    "product.facts.hdmi_vertical_max_hz": {
+      "semantic_id": "monitors.gaming.product.facts.hdmi_vertical_max_hz",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hdmi_vertical_max_hz"
+    },
+    "product.facts.dp_vertical_min_hz": {
+      "semantic_id": "monitors.gaming.product.facts.dp_vertical_min_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dp_vertical_min_hz"
+    },
+    "product.facts.dp_vertical_max_hz": {
+      "semantic_id": "monitors.gaming.product.facts.dp_vertical_max_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dp_vertical_max_hz"
+    },
+    "product.facts.mode_table_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.mode_table_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.declared_gtg_ms": {
+      "semantic_id": "monitors.gaming.product.facts.declared_gtg_ms",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "ms",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_gtg_ms"
+    },
+    "product.facts.response_conditions_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.response_conditions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.sync_label": {
+      "semantic_id": "monitors.gaming.product.facts.sync_label",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "Adaptive-Sync support declared",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sync_label"
+    },
+    "product.facts.sync_conditions_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.sync_conditions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hdr_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.hdr_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hdr_declaration"
+    },
+    "product.facts.active_area_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.active_area_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.brightness_nit": {
+      "semantic_id": "monitors.gaming.product.facts.brightness_nit",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "nit",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.gamut_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.gamut_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.calibration_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.calibration_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.contrast_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.contrast_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.input_lag_ms": {
+      "semantic_id": "monitors.gaming.product.facts.input_lag_ms",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "ms",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.achieved_game_frames_hz": {
+      "semantic_id": "monitors.gaming.product.facts.achieved_game_frames_hz",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.retention_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.retention_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hdmi_input_units": {
+      "semantic_id": "monitors.gaming.product.facts.hdmi_input_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_input_units"
+    },
+    "product.facts.hdmi_interface_label": {
+      "semantic_id": "monitors.gaming.product.facts.hdmi_interface_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "HDMI2.0",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_interface_label"
+    },
+    "product.facts.dp_input_units": {
+      "semantic_id": "monitors.gaming.product.facts.dp_input_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_input_units"
+    },
+    "product.facts.dp_input_interface_label": {
+      "semantic_id": "monitors.gaming.product.facts.dp_input_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dp_input_interface_label"
+    },
+    "product.facts.dp_output_units": {
+      "semantic_id": "monitors.gaming.product.facts.dp_output_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_output_units"
+    },
+    "product.facts.usb_c_units": {
+      "semantic_id": "monitors.gaming.product.facts.usb_c_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_c_units"
+    },
+    "product.facts.usb_hub_present": {
+      "semantic_id": "monitors.gaming.product.facts.usb_hub_present",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_hub_present"
+    },
+    "product.facts.usb_b_upstream_units": {
+      "semantic_id": "monitors.gaming.product.facts.usb_b_upstream_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_upstream_units"
+    },
+    "product.facts.usb_b_interface_label": {
+      "semantic_id": "monitors.gaming.product.facts.usb_b_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_interface_label"
+    },
+    "product.facts.usb_b_data_upstream": {
+      "semantic_id": "monitors.gaming.product.facts.usb_b_data_upstream",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_data_upstream"
+    },
+    "product.facts.usb_video_input": {
+      "semantic_id": "monitors.gaming.product.facts.usb_video_input",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_hub_present",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_video_input"
+    },
+    "product.facts.usb_source_charging": {
+      "semantic_id": "monitors.gaming.product.facts.usb_source_charging",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_hub_present",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_source_charging"
+    },
+    "product.facts.usb_a_downstream_units": {
+      "semantic_id": "monitors.gaming.product.facts.usb_a_downstream_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_a_downstream_units"
+    },
+    "product.facts.hub_nominal_rate_gbps": {
+      "semantic_id": "monitors.gaming.product.facts.hub_nominal_rate_gbps",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Gb/s",
+        "applicable_when": "product.facts.usb_hub_present",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hub_nominal_rate_gbps"
+    },
+    "product.facts.hub_per_port_power_w": {
+      "semantic_id": "monitors.gaming.product.facts.hub_per_port_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_shared_power_w": {
+      "semantic_id": "monitors.gaming.product.facts.hub_shared_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_achieved_rate_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.hub_achieved_rate_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_compatibility_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.hub_compatibility_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.signal_compatibility_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.signal_compatibility_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.speaker_units": {
+      "semantic_id": "monitors.gaming.product.facts.speaker_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "speaker_units"
+    },
+    "product.facts.speaker_channel_power_w": {
+      "semantic_id": "monitors.gaming.product.facts.speaker_channel_power_w",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "product.facts.speaker_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "speaker_channel_power_w"
+    },
+    "product.facts.headphone_output_units": {
+      "semantic_id": "monitors.gaming.product.facts.headphone_output_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "headphone_output_units"
+    },
+    "product.facts.microphone_units": {
+      "semantic_id": "monitors.gaming.product.facts.microphone_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "microphone_units"
+    },
+    "product.facts.camera_units": {
+      "semantic_id": "monitors.gaming.product.facts.camera_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "camera_units"
+    },
+    "product.facts.microphone_properties": {
+      "semantic_id": "monitors.gaming.product.facts.microphone_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.microphone_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.stand_set_units": {
+      "semantic_id": "monitors.gaming.sku.stand_set_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_set_units"
+    },
+    "product.facts.stand_tilt": {
+      "semantic_id": "monitors.gaming.product.facts.stand_tilt",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_tilt"
+    },
+    "product.facts.tilt_down_deg": {
+      "semantic_id": "monitors.gaming.product.facts.tilt_down_deg",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tilt_down_deg"
+    },
+    "product.facts.tilt_up_deg": {
+      "semantic_id": "monitors.gaming.product.facts.tilt_up_deg",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 20,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tilt_up_deg"
+    },
+    "product.facts.stand_height_adjustable": {
+      "semantic_id": "monitors.gaming.product.facts.stand_height_adjustable",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "stand_height_adjustable"
+    },
+    "product.facts.height_travel_mm": {
+      "semantic_id": "monitors.gaming.product.facts.height_travel_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "applicable_when": "product.facts.stand_height_adjustable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "height_travel_mm"
+    },
+    "product.facts.stand_swivel": {
+      "semantic_id": "monitors.gaming.product.facts.stand_swivel",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "stand_swivel"
+    },
+    "product.facts.swivel_left_deg": {
+      "semantic_id": "monitors.gaming.product.facts.swivel_left_deg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "applicable_when": "product.facts.stand_swivel",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "swivel_left_deg"
+    },
+    "product.facts.swivel_right_deg": {
+      "semantic_id": "monitors.gaming.product.facts.swivel_right_deg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "applicable_when": "product.facts.stand_swivel",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "swivel_right_deg"
+    },
+    "product.facts.stand_pivot": {
+      "semantic_id": "monitors.gaming.product.facts.stand_pivot",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "stand_pivot"
+    },
+    "product.facts.pivot_left_deg": {
+      "semantic_id": "monitors.gaming.product.facts.pivot_left_deg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "applicable_when": "product.facts.stand_pivot",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pivot_left_deg"
+    },
+    "product.facts.pivot_right_deg": {
+      "semantic_id": "monitors.gaming.product.facts.pivot_right_deg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "applicable_when": "product.facts.stand_pivot",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pivot_right_deg"
+    },
+    "product.facts.mount_x_mm": {
+      "semantic_id": "monitors.gaming.product.facts.mount_x_mm",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mount_x_mm"
+    },
+    "product.facts.mount_y_mm": {
+      "semantic_id": "monitors.gaming.product.facts.mount_y_mm",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mount_y_mm"
+    },
+    "product.facts.mount_hardware_requirements": {
+      "semantic_id": "monitors.gaming.product.facts.mount_hardware_requirements",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.control_kind": {
+      "semantic_id": "monitors.gaming.product.facts.control_kind",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "control_kind"
+    },
+    "product.facts.control_location": {
+      "semantic_id": "monitors.gaming.product.facts.control_location",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.control_permissions": {
+      "semantic_id": "monitors.gaming.product.facts.control_permissions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reference_configuration": {
+      "semantic_id": "monitors.gaming.product.facts.reference_configuration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_configuration"
+    },
+    "product.facts.reference_head_basis_label": {
+      "semantic_id": "monitors.gaming.product.facts.reference_head_basis_label",
+      "role": "descriptive",
+      "display_group": "qualifiers",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_basis_label"
+    },
+    "product.facts.reference_head_width_mm": {
+      "semantic_id": "monitors.gaming.product.facts.reference_head_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_width_mm"
+    },
+    "product.facts.reference_head_height_mm": {
+      "semantic_id": "monitors.gaming.product.facts.reference_head_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_height_mm"
+    },
+    "product.facts.reference_head_depth_mm": {
+      "semantic_id": "monitors.gaming.product.facts.reference_head_depth_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_depth_mm"
+    },
+    "product.facts.reference_head_mass_g": {
+      "semantic_id": "monitors.gaming.product.facts.reference_head_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_mass_g"
+    },
+    "product.facts.reference_assembly_basis_label": {
+      "semantic_id": "monitors.gaming.product.facts.reference_assembly_basis_label",
+      "role": "descriptive",
+      "display_group": "qualifiers",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_basis_label"
+    },
+    "product.facts.reference_assembly_width_mm": {
+      "semantic_id": "monitors.gaming.product.facts.reference_assembly_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_width_mm"
+    },
+    "product.facts.reference_assembly_height_mm": {
+      "semantic_id": "monitors.gaming.product.facts.reference_assembly_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_height_mm"
+    },
+    "product.facts.reference_assembly_depth_mm": {
+      "semantic_id": "monitors.gaming.product.facts.reference_assembly_depth_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_depth_mm"
+    },
+    "product.facts.reference_assembly_mass_g": {
+      "semantic_id": "monitors.gaming.product.facts.reference_assembly_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_mass_g"
+    },
+    "sku.actual_head_mass_g": {
+      "semantic_id": "monitors.gaming.sku.actual_head_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_assembly_mass_g": {
+      "semantic_id": "monitors.gaming.sku.actual_assembly_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_stand_mass_g": {
+      "semantic_id": "monitors.gaming.sku.actual_stand_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_kit_mass_g": {
+      "semantic_id": "monitors.gaming.sku.actual_kit_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_dimensions_declaration": {
+      "semantic_id": "monitors.gaming.sku.actual_dimensions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.power_input_scope": {
+      "semantic_id": "monitors.gaming.product.facts.power_input_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.ac_min_v": {
+      "semantic_id": "monitors.gaming.product.facts.ac_min_v",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_min_v"
+    },
+    "product.facts.ac_max_v": {
+      "semantic_id": "monitors.gaming.product.facts.ac_max_v",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 240,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_max_v"
+    },
+    "product.facts.ac_min_hz": {
+      "semantic_id": "monitors.gaming.product.facts.ac_min_hz",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 50,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_min_hz"
+    },
+    "product.facts.ac_max_hz": {
+      "semantic_id": "monitors.gaming.product.facts.ac_max_hz",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 60,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_max_hz"
+    },
+    "sku.external_adapter_units": {
+      "semantic_id": "monitors.gaming.sku.external_adapter_units",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "external_adapter_units"
+    },
+    "product.facts.monitor_dc_input_units": {
+      "semantic_id": "monitors.gaming.product.facts.monitor_dc_input_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "monitor_dc_input_units"
+    },
+    "product.facts.monitor_dc_input_connector_label": {
+      "semantic_id": "monitors.gaming.product.facts.monitor_dc_input_connector_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "monitor_dc_input_connector_label"
+    },
+    "product.facts.monitor_dc_input_v": {
+      "semantic_id": "monitors.gaming.product.facts.monitor_dc_input_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.monitor_dc_input_a": {
+      "semantic_id": "monitors.gaming.product.facts.monitor_dc_input_a",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.monitor_dc_input_w": {
+      "semantic_id": "monitors.gaming.product.facts.monitor_dc_input_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dc_connector_dimensions_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.dc_connector_dimensions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_output_v": {
+      "semantic_id": "monitors.gaming.product.facts.adapter_output_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_output_a": {
+      "semantic_id": "monitors.gaming.product.facts.adapter_output_a",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.operating_consumption_w": {
+      "semantic_id": "monitors.gaming.product.facts.operating_consumption_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.consumption_conditions": {
+      "semantic_id": "monitors.gaming.product.facts.consumption_conditions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.power_cord_units": {
+      "semantic_id": "monitors.gaming.sku.power_cord_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_cord_units"
+    },
+    "sku.power_cord_length_m": {
+      "semantic_id": "monitors.gaming.sku.power_cord_length_m",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_cord_length_m"
+    },
+    "sku.power_cord_detachable": {
+      "semantic_id": "monitors.gaming.sku.power_cord_detachable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_cord_detachable"
+    },
+    "sku.mains_plug_label": {
+      "semantic_id": "monitors.gaming.sku.mains_plug_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "EU plug",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mains_plug_label"
+    },
+    "sku.hdmi_cable_units": {
+      "semantic_id": "monitors.gaming.sku.hdmi_cable_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_units"
+    },
+    "sku.hdmi_cable_length_m": {
+      "semantic_id": "monitors.gaming.sku.hdmi_cable_length_m",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_length_m"
+    },
+    "sku.hdmi_cable_connector_label": {
+      "semantic_id": "monitors.gaming.sku.hdmi_cable_connector_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "HDMI to HDMI",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_connector_label"
+    },
+    "sku.hdmi_cable_detachable": {
+      "semantic_id": "monitors.gaming.sku.hdmi_cable_detachable",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_detachable"
+    },
+    "sku.dp_cable_units": {
+      "semantic_id": "monitors.gaming.sku.dp_cable_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_units"
+    },
+    "sku.dp_cable_length_m": {
+      "semantic_id": "monitors.gaming.sku.dp_cable_length_m",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_length_m"
+    },
+    "sku.dp_cable_connector_label": {
+      "semantic_id": "monitors.gaming.sku.dp_cable_connector_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "DisplayPort to DisplayPort",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_connector_label"
+    },
+    "sku.dp_cable_detachable": {
+      "semantic_id": "monitors.gaming.sku.dp_cable_detachable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_detachable"
+    },
+    "sku.usb_upstream_cable_units": {
+      "semantic_id": "monitors.gaming.sku.usb_upstream_cable_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_upstream_cable_units"
+    },
+    "product.facts.upstream_cable_connector_label": {
+      "semantic_id": "monitors.gaming.product.facts.upstream_cable_connector_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "upstream_cable_connector_label"
+    },
+    "product.facts.upstream_cable_detachable": {
+      "semantic_id": "monitors.gaming.product.facts.upstream_cable_detachable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "upstream_cable_detachable"
+    },
+    "product.facts.supplied_dc_lead_units": {
+      "semantic_id": "monitors.gaming.product.facts.supplied_dc_lead_units",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_dc_lead_units"
+    },
+    "product.facts.supplied_dc_lead_length_m": {
+      "semantic_id": "monitors.gaming.product.facts.supplied_dc_lead_length_m",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_dc_lead_length_m"
+    },
+    "product.facts.supplied_dc_lead_connector_label": {
+      "semantic_id": "monitors.gaming.product.facts.supplied_dc_lead_connector_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_dc_lead_connector_label"
+    },
+    "product.facts.supplied_dc_lead_detachable_from_adapter": {
+      "semantic_id": "monitors.gaming.product.facts.supplied_dc_lead_detachable_from_adapter",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_dc_lead_detachable_from_adapter"
+    },
+    "product.facts.power_cord_ratings_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.power_cord_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hdmi_cable_ratings_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.hdmi_cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dp_cable_ratings_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.dp_cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.upstream_cable_ratings_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.upstream_cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dc_lead_ratings_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.dc_lead_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.region_label": {
+      "semantic_id": "monitors.gaming.sku.region_label",
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "EEA",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "sku.computer_units": {
+      "semantic_id": "monitors.gaming.sku.computer_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "computer_units"
+    },
+    "sku.console_units": {
+      "semantic_id": "monitors.gaming.sku.console_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "console_units"
+    },
+    "sku.extra_display_units": {
+      "semantic_id": "monitors.gaming.sku.extra_display_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "extra_display_units"
+    },
+    "sku.keyboard_units": {
+      "semantic_id": "monitors.gaming.sku.keyboard_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keyboard_units"
+    },
+    "sku.mouse_units": {
+      "semantic_id": "monitors.gaming.sku.mouse_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mouse_units"
+    },
+    "sku.controller_units": {
+      "semantic_id": "monitors.gaming.sku.controller_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "controller_units"
+    },
+    "sku.mount_arm_units": {
+      "semantic_id": "monitors.gaming.sku.mount_arm_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mount_arm_units"
+    },
+    "sku.wall_screw_units": {
+      "semantic_id": "monitors.gaming.sku.wall_screw_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wall_screw_units"
+    },
+    "sku.game_software_entitlement_included": {
+      "semantic_id": "monitors.gaming.sku.game_software_entitlement_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "game_software_entitlement_included"
+    },
+    "product.facts.care_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.care_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ip_rating": {
+      "semantic_id": "monitors.gaming.product.facts.ip_rating",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.panel_care_declaration": {
+      "semantic_id": "monitors.gaming.product.facts.panel_care_declaration",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "panel_care_declaration"
+    },
+    "product.facts.panel_care_procedure": {
+      "semantic_id": "monitors.gaming.product.facts.panel_care_procedure",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_units": {
+      "semantic_id": "monitors.gaming.product.facts.battery_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_units"
+    },
+    "product.facts.battery_chemistry": {
+      "semantic_id": "monitors.gaming.product.facts.battery_chemistry",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.battery_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_energy_wh": {
+      "semantic_id": "monitors.gaming.product.facts.battery_energy_wh",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "applicable_when": "product.facts.battery_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_runtime_h": {
+      "semantic_id": "monitors.gaming.product.facts.battery_runtime_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "hour",
+        "applicable_when": "product.facts.battery_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.colour": {
+      "semantic_id": "monitors.gaming.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "gray",
+          "white"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "colour"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.logical_adapter_output_w": {
+      "semantic_id": "monitors.gaming.sku.adapter_output_w",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "sku.adapter_output_w_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_adapter_output_w"
+    },
+    "sku.logical_actual_adapter_mass_g": {
+      "semantic_id": "monitors.gaming.sku.actual_adapter_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "applicable_when": "sku.actual_adapter_mass_g_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_actual_adapter_mass_g"
+    },
+    "sku.logical_usb_upstream_cable_length_m": {
+      "semantic_id": "monitors.gaming.sku.usb_upstream_cable_length_m",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "applicable_when": "sku.usb_upstream_cable_length_m_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_usb_upstream_cable_length_m"
+    },
+    "product.facts.backlight_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.refresh_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.hdr_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.port_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.audio_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.adjustment_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.adapter_mass_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.power_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.mains_connection_target_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.extra_box_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.panel_care_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.model": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fast_ips_fhd_24",
+          "oled_qhd_26_5"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.model_price_factor": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 1,
+        "max": 2.4
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    }
+  },
+  "disclosure_groups": {
+    "monitor_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.monitor_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.monitor_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "construction": {
+      "id": "monitors.high_refresh_gaming_monitors.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "touchscreen": {
+      "id": "monitors.high_refresh_gaming_monitors.content.touchscreen",
+      "display_group": "features",
+      "fields": [
+        "product.facts.touchscreen"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "advertised_diagonal_in": {
+      "id": "monitors.high_refresh_gaming_monitors.content.advertised_diagonal_in",
+      "display_group": "features",
+      "fields": [
+        "product.facts.advertised_diagonal_in"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "panel_type": {
+      "id": "monitors.high_refresh_gaming_monitors.content.panel_type",
+      "display_group": "features",
+      "fields": [
+        "product.facts.panel_type"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_backlight": {
+      "id": "monitors.high_refresh_gaming_monitors.content.screen_backlight",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_backlight"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_surface": {
+      "id": "monitors.high_refresh_gaming_monitors.content.screen_surface",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_surface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_width_px": {
+      "id": "monitors.high_refresh_gaming_monitors.content.screen_width_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_width_px"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "screen_height_px": {
+      "id": "monitors.high_refresh_gaming_monitors.content.screen_height_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_height_px"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "aspect_ratio": {
+      "id": "monitors.high_refresh_gaming_monitors.content.aspect_ratio",
+      "display_group": "features",
+      "fields": [
+        "product.facts.aspect_ratio"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "refresh_rate_hz": {
+      "id": "monitors.high_refresh_gaming_monitors.content.refresh_rate_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.refresh_rate_hz"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "overclock_required": {
+      "id": "monitors.high_refresh_gaming_monitors.content.overclock_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.overclock_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_vertical_min_hz": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_vertical_min_hz",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hdmi_vertical_min_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_vertical_max_hz": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_vertical_max_hz",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hdmi_vertical_max_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_vertical_min_hz": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_vertical_min_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dp_vertical_min_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_vertical_max_hz": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_vertical_max_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dp_vertical_max_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_gtg_ms": {
+      "id": "monitors.high_refresh_gaming_monitors.content.declared_gtg_ms",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_gtg_ms"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sync_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.sync_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.sync_label"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "hdr_declaration": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdr_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hdr_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_input_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_input_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hdmi_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_interface_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hdmi_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_input_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_input_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dp_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_input_interface_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_input_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.dp_input_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_output_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_output_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dp_output_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_c_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_c_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_c_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_hub_present": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_hub_present",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_hub_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_upstream_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_b_upstream_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_b_upstream_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_interface_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_b_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_b_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_data_upstream": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_b_data_upstream",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_b_data_upstream"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_video_input": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_video_input",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_video_input"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_source_charging": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_source_charging",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_source_charging"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_a_downstream_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_a_downstream_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_a_downstream_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hub_nominal_rate_gbps": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hub_nominal_rate_gbps",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hub_nominal_rate_gbps"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "speaker_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.speaker_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.speaker_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "speaker_channel_power_w": {
+      "id": "monitors.high_refresh_gaming_monitors.content.speaker_channel_power_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.speaker_channel_power_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "headphone_output_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.headphone_output_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.headphone_output_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "microphone_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.microphone_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.microphone_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "camera_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.camera_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.camera_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_set_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.stand_set_units",
+      "display_group": "features",
+      "fields": [
+        "sku.stand_set_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_tilt": {
+      "id": "monitors.high_refresh_gaming_monitors.content.stand_tilt",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stand_tilt"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tilt_down_deg": {
+      "id": "monitors.high_refresh_gaming_monitors.content.tilt_down_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tilt_down_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tilt_up_deg": {
+      "id": "monitors.high_refresh_gaming_monitors.content.tilt_up_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tilt_up_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_height_adjustable": {
+      "id": "monitors.high_refresh_gaming_monitors.content.stand_height_adjustable",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.stand_height_adjustable"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "height_travel_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.height_travel_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.height_travel_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_swivel": {
+      "id": "monitors.high_refresh_gaming_monitors.content.stand_swivel",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stand_swivel"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "swivel_left_deg": {
+      "id": "monitors.high_refresh_gaming_monitors.content.swivel_left_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.swivel_left_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "swivel_right_deg": {
+      "id": "monitors.high_refresh_gaming_monitors.content.swivel_right_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.swivel_right_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_pivot": {
+      "id": "monitors.high_refresh_gaming_monitors.content.stand_pivot",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stand_pivot"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "pivot_left_deg": {
+      "id": "monitors.high_refresh_gaming_monitors.content.pivot_left_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pivot_left_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pivot_right_deg": {
+      "id": "monitors.high_refresh_gaming_monitors.content.pivot_right_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pivot_right_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mount_x_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.mount_x_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.mount_x_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mount_y_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.mount_y_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.mount_y_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "control_kind": {
+      "id": "monitors.high_refresh_gaming_monitors.content.control_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.control_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_configuration": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_configuration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.reference_configuration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_basis_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_head_basis_label",
+      "display_group": "qualifiers",
+      "fields": [
+        "product.facts.reference_head_basis_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_width_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_head_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_height_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_head_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_depth_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_head_depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_depth_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_mass_g": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_head_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_basis_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_assembly_basis_label",
+      "display_group": "qualifiers",
+      "fields": [
+        "product.facts.reference_assembly_basis_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_width_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_assembly_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_height_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_assembly_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_depth_mm": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_assembly_depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_depth_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_mass_g": {
+      "id": "monitors.high_refresh_gaming_monitors.content.reference_assembly_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_min_v": {
+      "id": "monitors.high_refresh_gaming_monitors.content.ac_min_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_max_v": {
+      "id": "monitors.high_refresh_gaming_monitors.content.ac_max_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_min_hz": {
+      "id": "monitors.high_refresh_gaming_monitors.content.ac_min_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_min_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_max_hz": {
+      "id": "monitors.high_refresh_gaming_monitors.content.ac_max_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_max_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "external_adapter_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.external_adapter_units",
+      "display_group": "contents",
+      "fields": [
+        "sku.external_adapter_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "monitor_dc_input_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.monitor_dc_input_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.monitor_dc_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "monitor_dc_input_connector_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.monitor_dc_input_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.monitor_dc_input_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_cord_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.power_cord_units",
+      "display_group": "features",
+      "fields": [
+        "sku.power_cord_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_cord_length_m": {
+      "id": "monitors.high_refresh_gaming_monitors.content.power_cord_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.power_cord_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_cord_detachable": {
+      "id": "monitors.high_refresh_gaming_monitors.content.power_cord_detachable",
+      "display_group": "features",
+      "fields": [
+        "sku.power_cord_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_plug_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.mains_plug_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.mains_plug_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_cable_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_length_m": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_cable_length_m",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_connector_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_detachable": {
+      "id": "monitors.high_refresh_gaming_monitors.content.hdmi_cable_detachable",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_cable_units",
+      "display_group": "features",
+      "fields": [
+        "sku.dp_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_length_m": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_cable_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.dp_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_connector_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.dp_cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_detachable": {
+      "id": "monitors.high_refresh_gaming_monitors.content.dp_cable_detachable",
+      "display_group": "features",
+      "fields": [
+        "sku.dp_cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_upstream_cable_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.usb_upstream_cable_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.usb_upstream_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "upstream_cable_connector_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.upstream_cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.upstream_cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "upstream_cable_detachable": {
+      "id": "monitors.high_refresh_gaming_monitors.content.upstream_cable_detachable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.upstream_cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_dc_lead_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.supplied_dc_lead_units",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_dc_lead_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_dc_lead_length_m": {
+      "id": "monitors.high_refresh_gaming_monitors.content.supplied_dc_lead_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.supplied_dc_lead_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_dc_lead_connector_label": {
+      "id": "monitors.high_refresh_gaming_monitors.content.supplied_dc_lead_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.supplied_dc_lead_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_dc_lead_detachable_from_adapter": {
+      "id": "monitors.high_refresh_gaming_monitors.content.supplied_dc_lead_detachable_from_adapter",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_dc_lead_detachable_from_adapter"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "computer_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.computer_units",
+      "display_group": "features",
+      "fields": [
+        "sku.computer_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "console_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.console_units",
+      "display_group": "features",
+      "fields": [
+        "sku.console_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "extra_display_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.extra_display_units",
+      "display_group": "features",
+      "fields": [
+        "sku.extra_display_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.keyboard_units",
+      "display_group": "features",
+      "fields": [
+        "sku.keyboard_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mouse_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.mouse_units",
+      "display_group": "features",
+      "fields": [
+        "sku.mouse_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "controller_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.controller_units",
+      "display_group": "features",
+      "fields": [
+        "sku.controller_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mount_arm_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.mount_arm_units",
+      "display_group": "features",
+      "fields": [
+        "sku.mount_arm_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wall_screw_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.wall_screw_units",
+      "display_group": "features",
+      "fields": [
+        "sku.wall_screw_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "game_software_entitlement_included": {
+      "id": "monitors.high_refresh_gaming_monitors.content.game_software_entitlement_included",
+      "display_group": "contents",
+      "fields": [
+        "sku.game_software_entitlement_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "panel_care_declaration": {
+      "id": "monitors.high_refresh_gaming_monitors.content.panel_care_declaration",
+      "display_group": "care",
+      "fields": [
+        "product.facts.panel_care_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_units": {
+      "id": "monitors.high_refresh_gaming_monitors.content.battery_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_adapter_output_w": {
+      "id": "monitors.high_refresh_gaming_monitors.content.logical_adapter_output_w",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_adapter_output_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_actual_adapter_mass_g": {
+      "id": "monitors.high_refresh_gaming_monitors.content.logical_actual_adapter_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.logical_actual_adapter_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_usb_upstream_cable_length_m": {
+      "id": "monitors.high_refresh_gaming_monitors.content.logical_usb_upstream_cable_length_m",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.logical_usb_upstream_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "qualifiers": {
+      "label": "Qualifiers",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 167,
+    "roles": {
+      "literal": 49,
+      "identity": 1,
+      "descriptive": 55,
+      "omit_placeholder": 45,
+      "qualifier": 2,
+      "operational": 1,
+      "buying_choice": 1,
+      "private_support": 13
+    },
+    "display_groups": 7,
+    "highlight_candidates": 8,
+    "unmapped_descriptive_fields": 0
+  }
+}

@@ -1,0 +1,1596 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "jackets.everyday_casual_jackets",
+  "random_namespace": "product-width-jackets.everyday_casual_jackets-v1",
+  "extends": "_apparel_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.body": {
+      "type": "object",
+      "properties": {
+        "construction": {
+          "type": "string"
+        },
+        "fabric": {
+          "type": "string"
+        },
+        "cotton": {
+          "type": "integer"
+        },
+        "polyester": {
+          "type": "integer"
+        },
+        "lining": {
+          "type": "string"
+        },
+        "collar": {
+          "type": "string"
+        },
+        "entry": {
+          "type": "string"
+        },
+        "pocket_closure": {
+          "type": "string"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "uninsulated casual outerwear",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.construction": {
+      "type": "enum",
+      "values": [
+        "denim trucker",
+        "woven-blend Harrington",
+        "canvas chore"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shell_fabric": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shell_cotton_percent": {
+      "type": "integer",
+      "min": 0,
+      "max": 100,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shell_polyester_percent": {
+      "type": "integer",
+      "min": 0,
+      "max": 100,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_lining": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lined": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.collar_style": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.collar_material": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.corduroy_collar_fibre": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.entry_kind": {
+      "type": "enum",
+      "values": [
+        "buttons",
+        "zip"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.front_closure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.two_way_zip": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hand_pocket_count": {
+      "type": "integer",
+      "constant": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hand_pocket_closure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cuff_adjustable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.collar_button_fastening": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.collar_button_count": {
+      "type": "integer",
+      "optional": true,
+      "min": 2,
+      "max": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.dedicated_fill": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.membrane_present": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_present": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cut": {
+      "type": "enum",
+      "values": [
+        "slim",
+        "regular",
+        "relaxed"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.surface_finish": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fabric_areal_mass": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.stretch_percentage": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.thermal_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.abrasion_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one garment, nominal size M reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 450,
+      "max": 900,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.construction": {
+      "type": "string",
+      "optional": true
+    },
+    "request.lined": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.max_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "body_bundle",
+      "target": "internal.body",
+      "sample": "weighted_choice",
+      "weights": {
+        "denim": 3,
+        "harrington": 2,
+        "chore": 3
+      },
+      "values": {
+        "denim": {
+          "construction": "denim trucker",
+          "fabric": "denim",
+          "cotton": 100,
+          "polyester": 0,
+          "lining": "none",
+          "collar": "point collar",
+          "entry": "buttons",
+          "pocket_closure": "open",
+          "mass_g": 750
+        },
+        "harrington": {
+          "construction": "woven-blend Harrington",
+          "fabric": "woven blend",
+          "cotton": 42,
+          "polyester": 58,
+          "lining": "polyester",
+          "collar": "dog-ear collar",
+          "entry": "zip",
+          "pocket_closure": "buttons",
+          "mass_g": 500
+        },
+        "chore": {
+          "construction": "canvas chore",
+          "fabric": "canvas",
+          "cotton": 100,
+          "polyester": 0,
+          "lining": "none",
+          "collar": "corduroy point collar",
+          "entry": "buttons",
+          "pocket_closure": "open",
+          "mass_g": 850
+        }
+      }
+    },
+    {
+      "id": "construction",
+      "target": "product.facts.construction",
+      "derive": "internal.body.construction"
+    },
+    {
+      "id": "fabric",
+      "target": "product.facts.shell_fabric",
+      "derive": "internal.body.fabric"
+    },
+    {
+      "id": "cotton",
+      "target": "product.facts.shell_cotton_percent",
+      "derive": "internal.body.cotton"
+    },
+    {
+      "id": "polyester",
+      "target": "product.facts.shell_polyester_percent",
+      "derive": "internal.body.polyester"
+    },
+    {
+      "id": "lining",
+      "target": "product.facts.body_lining",
+      "derive": "internal.body.lining"
+    },
+    {
+      "id": "collar",
+      "target": "product.facts.collar_style",
+      "derive": "internal.body.collar"
+    },
+    {
+      "id": "entry",
+      "target": "product.facts.entry_kind",
+      "derive": "internal.body.entry"
+    },
+    {
+      "id": "pocket_closure",
+      "target": "product.facts.hand_pocket_closure",
+      "derive": "internal.body.pocket_closure"
+    },
+    {
+      "id": "lined",
+      "target": "product.facts.lined",
+      "derive": "product.facts.body_lining != 'none'"
+    },
+    {
+      "id": "collar_material",
+      "target": "product.facts.collar_material",
+      "derive": "'corduroy' if product.facts.collar_style == 'corduroy point collar' else product.facts.shell_fabric"
+    },
+    {
+      "id": "corduroy_fibre",
+      "target": "product.facts.corduroy_collar_fibre",
+      "derive": "'not specified'",
+      "when": "product.facts.collar_style == 'corduroy point collar'"
+    },
+    {
+      "id": "zip_function",
+      "target": "product.facts.two_way_zip",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 0,
+        "no": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.entry_kind == 'zip'",
+          "weights": {
+            "yes": 3,
+            "no": 1
+          }
+        }
+      ],
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "front_closure",
+      "target": "product.facts.front_closure",
+      "derive": "'front buttons' if product.facts.entry_kind == 'buttons' else ('two-way full front zip' if product.facts.two_way_zip else 'one-way full front zip')"
+    },
+    {
+      "id": "cuff",
+      "target": "product.facts.cuff_adjustable",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 1,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "collar_fastening",
+      "target": "product.facts.collar_button_fastening",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 0,
+        "no": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.collar_style == 'dog-ear collar'",
+          "weights": {
+            "yes": 3,
+            "no": 1
+          }
+        }
+      ],
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "collar_button_count",
+      "target": "product.facts.collar_button_count",
+      "derive": "2",
+      "when": "product.facts.collar_button_fastening"
+    },
+    {
+      "id": "cut",
+      "target": "product.facts.cut",
+      "sample": "weighted_choice",
+      "weights": {
+        "slim": 2,
+        "regular": 4,
+        "relaxed": 3
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -50,
+      "max": 50
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.body.mass_g + internal.mass_noise_g"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.construction",
+          "product.facts.shell_fabric",
+          "product.facts.shell_cotton_percent",
+          "product.facts.shell_polyester_percent",
+          "product.facts.body_lining",
+          "product.facts.lined",
+          "product.facts.collar_style",
+          "product.facts.collar_material"
+        ]
+      },
+      "slots": {
+        "style": "product.facts.construction",
+        "fabric": "product.facts.shell_fabric",
+        "cotton": "product.facts.shell_cotton_percent",
+        "polyester": "product.facts.shell_polyester_percent",
+        "lining": "product.facts.body_lining",
+        "collar": "product.facts.collar_style"
+      },
+      "formulations": [
+        "{style}: {fabric} shell, {cotton}% cotton/{polyester}% polyester; body lining {lining}; {collar}.",
+        "A {style} with {cotton}% cotton and {polyester}% polyester {fabric} shell; lining: {lining}; collar: {collar}."
+      ]
+    },
+    {
+      "id": "description.controls",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.front_closure",
+          "product.facts.cut",
+          "product.facts.hand_pocket_count",
+          "product.facts.hand_pocket_closure",
+          "product.facts.cuff_adjustable",
+          "product.facts.collar_button_fastening"
+        ]
+      },
+      "slots": {
+        "front": "product.facts.front_closure",
+        "cut": "product.facts.cut",
+        "pocket": "product.facts.hand_pocket_closure",
+        "cuff": "'present' if product.facts.cuff_adjustable else 'absent'",
+        "collar": "'present' if product.facts.collar_button_fastening else 'absent'"
+      },
+      "formulations": [
+        "{front}, {cut} cut; two hand pockets with {pocket} closure; cuff adjustment {cuff}; collar-button fastening {collar}.",
+        "A {cut}-cut jacket with {front}; hand pockets: two, closure {pocket}; cuff adjustment {cuff}; collar-button fastening {collar}."
+      ]
+    },
+    {
+      "id": "description.collar_buttons",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.collar_button_count",
+          "product.facts.collar_button_fastening"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Two buttons fasten the collar, separate from front entry.",
+        "Collar fastening uses two buttons; this is not the front-entry fastening."
+      ],
+      "when": "product.facts.collar_button_fastening"
+    },
+    {
+      "id": "description.corduroy",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.collar_material",
+          "product.facts.corduroy_collar_fibre"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "The local corduroy collar fibre composition is unspecified.",
+        "No specified fibre composition for the corduroy collar component."
+      ],
+      "when": "product.facts.collar_style == 'corduroy point collar'"
+    },
+    {
+      "id": "description.absence",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.dedicated_fill",
+          "product.facts.membrane_present",
+          "product.facts.hood_present"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "No dedicated fill, membrane or hood in this assembly.",
+        "Dedicated insulating fill, membrane and hood are absent."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.surface_finish",
+          "product.facts.fabric_areal_mass",
+          "product.facts.stretch_percentage",
+          "product.facts.waterproof_rating",
+          "product.facts.thermal_rating",
+          "product.facts.abrasion_rating"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Surface finish, fabric areal mass, stretch percentage and numeric waterproof/thermal/abrasion ratings unspecified.",
+        "No specified surface finish, fabric g/m², stretch percentage or quantitative waterproof/thermal/abrasion result."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One nominal sizeM reference garment weighs {mass} g.",
+        "Reference mass: {mass} g for one garment in nominal sizeM."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'jackets.everyday_casual_jackets' in brand.eligible_concepts"
+    },
+    {
+      "id": "shell_total",
+      "require": "product.facts.shell_cotton_percent + product.facts.shell_polyester_percent == 100"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "construction",
+      "role": "filter",
+      "predicate": "product.facts.construction == request.construction",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "lining",
+      "role": "filter",
+      "predicate": "product.facts.lined == request.lined",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "mass",
+      "role": "filter",
+      "predicate": "product.facts.reference_mass_g <= request.max_mass_g",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "size_label": {
+                "type": "string"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "size_label": {
+              "type": "string"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "cuff_adjustment",
+              "collar_button_operation",
+              "lower_zip_operation"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 600,
+          "max": 4800
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 600
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 4800
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_mild_walk_warmth": {
+          "type": "boolean"
+        },
+        "review.positive_arm_shoulder_movement": {
+          "type": "boolean"
+        },
+        "review.positive_front_fastening": {
+          "type": "boolean"
+        },
+        "review.positive_cuff_adjustment": {
+          "type": "boolean"
+        },
+        "review.positive_collar_button_operation": {
+          "type": "boolean"
+        },
+        "review.positive_lower_zip_operation": {
+          "type": "boolean"
+        },
+        "product.facts.cuff_adjustable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.collar_button_fastening": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.two_way_zip": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.front_closure": {
+          "type": "string",
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "000": 1,
+            "001": 0,
+            "010": 0,
+            "011": 0,
+            "100": 0,
+            "101": 0,
+            "110": 0,
+            "111": 0
+          },
+          "cases": [
+            {
+              "when": "not product.facts.cuff_adjustable and not product.facts.collar_button_fastening and not product.facts.two_way_zip",
+              "weights": {
+                "000": 1,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "not product.facts.cuff_adjustable and not product.facts.collar_button_fastening and product.facts.two_way_zip",
+              "weights": {
+                "000": 0,
+                "001": 1,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "not product.facts.cuff_adjustable and product.facts.collar_button_fastening and not product.facts.two_way_zip",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 1,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "not product.facts.cuff_adjustable and product.facts.collar_button_fastening and product.facts.two_way_zip",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 1,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.cuff_adjustable and not product.facts.collar_button_fastening and not product.facts.two_way_zip",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 1,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.cuff_adjustable and not product.facts.collar_button_fastening and product.facts.two_way_zip",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 1,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.cuff_adjustable and product.facts.collar_button_fastening and not product.facts.two_way_zip",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 1,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.cuff_adjustable and product.facts.collar_button_fastening and product.facts.two_way_zip",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 1
+              }
+            }
+          ],
+          "values": {
+            "000": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening"
+            ],
+            "001": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "lower_zip_operation"
+            ],
+            "010": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "collar_button_operation"
+            ],
+            "011": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "collar_button_operation",
+              "lower_zip_operation"
+            ],
+            "100": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "cuff_adjustment"
+            ],
+            "101": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "cuff_adjustment",
+              "lower_zip_operation"
+            ],
+            "110": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "cuff_adjustment",
+              "collar_button_operation"
+            ],
+            "111": [
+              "value",
+              "mild_walk_warmth",
+              "arm_shoulder_movement",
+              "front_fastening",
+              "cuff_adjustment",
+              "collar_button_operation",
+              "lower_zip_operation"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_mild_walk_warmth",
+          "target": "review.positive_mild_walk_warmth",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_arm_shoulder_movement",
+          "target": "review.positive_arm_shoulder_movement",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_front_fastening",
+          "target": "review.positive_front_fastening",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_cuff_adjustment",
+          "target": "review.positive_cuff_adjustment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_collar_button_operation",
+          "target": "review.positive_collar_button_operation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_lower_zip_operation",
+          "target": "review.positive_lower_zip_operation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "mild_walk_warmth.positive",
+          "when": "'mild_walk_warmth' in review.topics and review.positive_mild_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "mild_walk_warmth",
+            "polarity": "positive",
+            "context": {
+              "use": "short mild dry walk",
+              "layer": "light shirt",
+              "front": "closed",
+              "aspect": "perceived sufficient warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I felt warm enough on a short mild dry walk over a light shirt with the front closed.",
+            "Warmth was sufficient for me on a short mild dry walk over a light shirt with the front closed."
+          ]
+        },
+        {
+          "id": "mild_walk_warmth.negative",
+          "when": "'mild_walk_warmth' in review.topics and not review.positive_mild_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "mild_walk_warmth",
+            "polarity": "negative",
+            "context": {
+              "use": "short mild dry walk",
+              "layer": "light shirt",
+              "front": "closed",
+              "aspect": "perceived sufficient warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I did not feel warm enough on a short mild dry walk over a light shirt with the front closed.",
+            "Warmth was insufficient for me on a short mild dry walk over a light shirt with the front closed."
+          ]
+        },
+        {
+          "id": "arm_shoulder_movement.positive",
+          "when": "'arm_shoulder_movement' in review.topics and review.positive_arm_shoulder_movement",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "arm_shoulder_movement",
+            "polarity": "positive",
+            "context": {
+              "layer": "light shirt",
+              "size": "tested size",
+              "aspect": "arm and shoulder movement comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving my arms and shoulders was comfortable in the tested size over a light shirt.",
+            "Arm and shoulder movement felt comfortable in the size I tried over a light shirt."
+          ]
+        },
+        {
+          "id": "arm_shoulder_movement.negative",
+          "when": "'arm_shoulder_movement' in review.topics and not review.positive_arm_shoulder_movement",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "arm_shoulder_movement",
+            "polarity": "negative",
+            "context": {
+              "layer": "light shirt",
+              "size": "tested size",
+              "aspect": "arm and shoulder movement comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving my arms and shoulders was uncomfortable in the tested size over a light shirt.",
+            "Arm and shoulder movement felt uncomfortable in the size I tried over a light shirt."
+          ]
+        },
+        {
+          "id": "front_fastening.positive",
+          "when": "'front_fastening' in review.topics and review.positive_front_fastening",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_fastening",
+            "polarity": "positive",
+            "context": "operating the actual front-entry fastening",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the {front} easy to operate.",
+            "Operating the {front} was easy for me."
+          ],
+          "slots": {
+            "front": "product.facts.front_closure"
+          }
+        },
+        {
+          "id": "front_fastening.negative",
+          "when": "'front_fastening' in review.topics and not review.positive_front_fastening",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_fastening",
+            "polarity": "negative",
+            "context": "operating the actual front-entry fastening",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the {front} difficult to operate.",
+            "Operating the {front} was difficult for me."
+          ],
+          "slots": {
+            "front": "product.facts.front_closure"
+          }
+        },
+        {
+          "id": "cuff_adjustment.positive",
+          "when": "'cuff_adjustment' in review.topics and review.positive_cuff_adjustment and product.facts.cuff_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cuff_adjustment",
+            "polarity": "positive",
+            "context": "adjusting the cuffs",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the cuffs easy to adjust.",
+            "Adjusting the cuffs was easy for me."
+          ]
+        },
+        {
+          "id": "cuff_adjustment.negative",
+          "when": "'cuff_adjustment' in review.topics and not review.positive_cuff_adjustment and product.facts.cuff_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cuff_adjustment",
+            "polarity": "negative",
+            "context": "adjusting the cuffs",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the cuffs difficult to adjust.",
+            "Adjusting the cuffs was difficult for me."
+          ]
+        },
+        {
+          "id": "collar_button_operation.positive",
+          "when": "'collar_button_operation' in review.topics and review.positive_collar_button_operation and product.facts.collar_button_fastening",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "collar_button_operation",
+            "polarity": "positive",
+            "context": "fastening and unfastening the two collar buttons",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Fastening and unfastening the two collar buttons was easy for me.",
+            "I found the two collar buttons easy to fasten and unfasten."
+          ]
+        },
+        {
+          "id": "collar_button_operation.negative",
+          "when": "'collar_button_operation' in review.topics and not review.positive_collar_button_operation and product.facts.collar_button_fastening",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "collar_button_operation",
+            "polarity": "negative",
+            "context": "fastening and unfastening the two collar buttons",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Fastening and unfastening the two collar buttons was difficult for me.",
+            "I found the two collar buttons difficult to fasten and unfasten."
+          ]
+        },
+        {
+          "id": "lower_zip_operation.positive",
+          "when": "'lower_zip_operation' in review.topics and review.positive_lower_zip_operation and product.facts.two_way_zip",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lower_zip_operation",
+            "polarity": "positive",
+            "context": "using the lower zip slider to open the front from below",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Using the lower zip slider to open the front from below was easy for me.",
+            "I found it easy to open the front from below with the lower zip slider."
+          ]
+        },
+        {
+          "id": "lower_zip_operation.negative",
+          "when": "'lower_zip_operation' in review.topics and not review.positive_lower_zip_operation and product.facts.two_way_zip",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lower_zip_operation",
+            "polarity": "negative",
+            "context": "using the lower zip slider to open the front from below",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Using the lower zip slider to open the front from below was difficult for me.",
+            "I found it difficult to open the front from below with the lower zip slider."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 600,
+          "max_sek": 4800
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "jackets",
+    "spec_path": "docs/agents/product-width-specs/jackets.everyday_casual_jackets.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "apparel"
+    ],
+    "scope_exceptions": [
+      "Unlined denim is authored, not omitted-source inference",
+      "Local corduroy collar not universal cotton composition",
+      "No padding/membrane/hood or source-normalized garment mass",
+      "Front fastening and collar buttons remain separate"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 600,
+      "max": 1500,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 1300,
+          "max": 2600
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 2400,
+          "max": 4800
+        }
+      ]
+    }
+  }
+}

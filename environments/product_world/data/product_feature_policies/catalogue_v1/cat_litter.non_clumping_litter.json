@@ -1,0 +1,853 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "cat_litter.non_clumping_litter",
+  "family_id": "cat_litter",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/cat_litter.non_clumping_litter.json": "08d7d5a4766a68a8df151b3067cc145a939f0fe353ffaf230f0caf20c1fadae4",
+    "environments/product_world/data/product_width/_cat_litter_base.json": "bde23a856d328089325fdf6d7374be4d79a6fea0083f9b29606353937911a0ae"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep clumping and fragrance-free declarations; no invented dust/odour performance. Disposal rules stay scoped to declared advice.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.clumping": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "clumping"
+    },
+    "product.facts.material": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "mineral",
+          "wood_fibre",
+          "silica"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "material"
+    },
+    "product.facts.material_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "material_label"
+    },
+    "product.facts.reference_amount_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "one liter",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.fill_depth_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fill_depth_label"
+    },
+    "product.facts.disposal_instruction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "unknown_values": [
+          "not specified"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "disposal_instruction"
+    },
+    "product.facts.quantity_disclosure": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "quantity_disclosure"
+    },
+    "product.facts.granule_descriptor": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "granule_descriptor"
+    },
+    "product.facts.fragrance_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fragrance_label"
+    },
+    "product.facts.added_fragrance": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "added_fragrance"
+    },
+    "product.facts.mass_declaration_kind": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unqualified_nominal",
+          "approximate_nominal",
+          "unknown"
+        ],
+        "unknown_values": [
+          "unknown"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mass_declaration_kind"
+    },
+    "product.facts.volume_declaration_kind": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unqualified_nominal",
+          "approximate_nominal",
+          "unknown"
+        ],
+        "unknown_values": [
+          "unknown"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "volume_declaration_kind"
+    },
+    "product.facts.reference_basis_price_factor": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 1,
+        "max": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.granule_size_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.bulk_density": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dust_measurement": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dust_protocol": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.absorption_measurement": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.odor_control_test": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.automatic_machine_compatibility": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.local_disposal_permission": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.package_opening_mechanism": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reference_price_basis": {
+      "semantic_id": null,
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "synthetic per-declared-unit anchor; exact pack price is a separate canonical fact, not a kg/L conversion",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.solid_removal_frequency": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "solid_removal_frequency"
+    },
+    "product.facts.replacement_condition": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "replacement_condition"
+    },
+    "product.facts.usage_conditions": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usage_conditions"
+    },
+    "product.facts.owner_tray_context": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "owner_tray_context"
+    },
+    "product.facts.replacement_use_context": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "replacement_use_context"
+    },
+    "product.facts.included_equipment": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "clumping": {
+      "id": "cat_litter.non_clumping_litter.content.clumping",
+      "display_group": "features",
+      "fields": [
+        "product.facts.clumping"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "material": {
+      "id": "cat_litter.non_clumping_litter.content.material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "material_label": {
+      "id": "cat_litter.non_clumping_litter.content.material_label",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.material_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "fill_depth_label": {
+      "id": "cat_litter.non_clumping_litter.content.fill_depth_label",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.fill_depth_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "disposal_instruction": {
+      "id": "cat_litter.non_clumping_litter.content.disposal_instruction",
+      "display_group": "features",
+      "fields": [
+        "product.facts.disposal_instruction"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "quantity_disclosure": {
+      "id": "cat_litter.non_clumping_litter.content.quantity_disclosure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.quantity_disclosure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "granule_descriptor": {
+      "id": "cat_litter.non_clumping_litter.content.granule_descriptor",
+      "display_group": "features",
+      "fields": [
+        "product.facts.granule_descriptor"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "fragrance_label": {
+      "id": "cat_litter.non_clumping_litter.content.fragrance_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fragrance_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "added_fragrance": {
+      "id": "cat_litter.non_clumping_litter.content.added_fragrance",
+      "display_group": "features",
+      "fields": [
+        "product.facts.added_fragrance"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "mass_declaration_kind": {
+      "id": "cat_litter.non_clumping_litter.content.mass_declaration_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.mass_declaration_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "volume_declaration_kind": {
+      "id": "cat_litter.non_clumping_litter.content.volume_declaration_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.volume_declaration_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "solid_removal_frequency": {
+      "id": "cat_litter.non_clumping_litter.content.solid_removal_frequency",
+      "display_group": "features",
+      "fields": [
+        "product.facts.solid_removal_frequency"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "replacement_condition": {
+      "id": "cat_litter.non_clumping_litter.content.replacement_condition",
+      "display_group": "features",
+      "fields": [
+        "product.facts.replacement_condition"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usage_conditions": {
+      "id": "cat_litter.non_clumping_litter.content.usage_conditions",
+      "display_group": "features",
+      "fields": [
+        "product.facts.usage_conditions"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "owner_tray_context": {
+      "id": "cat_litter.non_clumping_litter.content.owner_tray_context",
+      "display_group": "features",
+      "fields": [
+        "product.facts.owner_tray_context"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "replacement_use_context": {
+      "id": "cat_litter.non_clumping_litter.content.replacement_use_context",
+      "display_group": "features",
+      "fields": [
+        "product.facts.replacement_use_context"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 29,
+    "roles": {
+      "literal": 1,
+      "descriptive": 15,
+      "qualifier": 1,
+      "internal": 1,
+      "omit_placeholder": 10,
+      "commerce": 1
+    },
+    "display_groups": 3,
+    "highlight_candidates": 6,
+    "unmapped_descriptive_fields": 16
+  }
+}

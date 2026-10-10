@@ -1,0 +1,2173 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "headphones.over_ear_on_ear_headphones",
+  "random_namespace": "product-width-headphones.over_ear_on_ear_headphones-v1",
+  "extends": "_electronics_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.connection": {
+      "type": "object",
+      "properties": {
+        "bluetooth": {
+          "type": "boolean"
+        },
+        "analogue": {
+          "type": "boolean"
+        },
+        "powered": {
+          "type": "boolean"
+        }
+      }
+    },
+    "product.facts.wearing_geometry": {
+      "type": "enum",
+      "values": [
+        "over-ear",
+        "on-ear"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.acoustic_back": {
+      "type": "string",
+      "constant": "closed",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.driver_design": {
+      "type": "string",
+      "constant": "dynamic",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.driver_diameter_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 30,
+      "max": 45,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_audio": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analogue_audio": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.passive_analogue_listening": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.detachable_analogue_cable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.powered": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rechargeable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_audio": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analogue_plug_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 3.5,
+      "max": 3.5,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_version": {
+      "type": "enum",
+      "values": [
+        "5.2",
+        "5.3"
+      ],
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charging_connector": {
+      "type": "string",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_cell_voltage_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 3.7,
+      "max": 3.7,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_cell_capacity_mah": {
+      "type": "number",
+      "unit": "mAh",
+      "min": 300,
+      "max": 600,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.nominal_battery_energy_wh": {
+      "type": "number",
+      "unit": "Wh",
+      "min": 1.11,
+      "max": 2.22,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_music_max_anc_off_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 30,
+      "max": 60,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_music_max_anc_on_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 20,
+      "max": 50,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_empty_charge_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 2,
+      "max": 3.5,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.anc": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.volume_controls": {
+      "type": "enum",
+      "values": [
+        "none",
+        "buttons",
+        "touch"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_call_microphone": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ambient_passthrough": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ip_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.passive_isolation_measurement": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.anc_attenuation": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usable_battery_energy": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_test_method": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.impedance_sensitivity_latency": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one headphone excluding detachable cable, charger and case",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 135,
+      "max": 285,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.wearing_geometry": {
+      "type": "string",
+      "optional": true
+    },
+    "request.anc": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.max_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "optional": true
+    },
+    "internal.cell": {
+      "type": "object",
+      "optional": true,
+      "properties": {
+        "voltage_v": {
+          "type": "number",
+          "unit": "V"
+        },
+        "capacity_mah": {
+          "type": "number",
+          "unit": "mAh"
+        },
+        "energy_wh": {
+          "type": "number",
+          "unit": "Wh"
+        }
+      }
+    },
+    "internal.geometry_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    }
+  },
+  "steps": [
+    {
+      "id": "geometry",
+      "target": "product.facts.wearing_geometry",
+      "sample": "weighted_choice",
+      "weights": {
+        "over-ear": 3,
+        "on-ear": 2
+      }
+    },
+    {
+      "id": "driver_diameter",
+      "target": "product.facts.driver_diameter_mm",
+      "sample": "weighted_choice",
+      "weights": {
+        "30": 0,
+        "35": 0,
+        "40": 1,
+        "45": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.wearing_geometry == 'on-ear'",
+          "weights": {
+            "30": 1,
+            "35": 1,
+            "40": 0,
+            "45": 0
+          }
+        }
+      ],
+      "values": {
+        "30": 30,
+        "35": 35,
+        "40": 40,
+        "45": 45
+      }
+    },
+    {
+      "id": "connection_bundle",
+      "target": "internal.connection",
+      "sample": "weighted_choice",
+      "weights": {
+        "passive": 2,
+        "bluetooth": 3,
+        "hybrid": 3
+      },
+      "values": {
+        "passive": {
+          "bluetooth": false,
+          "analogue": true,
+          "powered": false
+        },
+        "bluetooth": {
+          "bluetooth": true,
+          "analogue": false,
+          "powered": true
+        },
+        "hybrid": {
+          "bluetooth": true,
+          "analogue": true,
+          "powered": true
+        }
+      }
+    },
+    {
+      "id": "bluetooth_audio",
+      "target": "product.facts.bluetooth_audio",
+      "derive": "internal.connection.bluetooth"
+    },
+    {
+      "id": "analogue_audio",
+      "target": "product.facts.analogue_audio",
+      "derive": "internal.connection.analogue"
+    },
+    {
+      "id": "powered",
+      "target": "product.facts.powered",
+      "derive": "internal.connection.powered"
+    },
+    {
+      "id": "rechargeable",
+      "target": "product.facts.rechargeable",
+      "derive": "internal.connection.powered"
+    },
+    {
+      "id": "passive_analogue_listening",
+      "target": "product.facts.passive_analogue_listening",
+      "derive": "internal.connection.analogue"
+    },
+    {
+      "id": "detachable_analogue_cable",
+      "target": "product.facts.detachable_analogue_cable",
+      "derive": "internal.connection.analogue"
+    },
+    {
+      "id": "analogue_plug",
+      "target": "product.facts.analogue_plug_mm",
+      "derive": "3.5",
+      "when": "product.facts.analogue_audio"
+    },
+    {
+      "id": "bt_version",
+      "target": "product.facts.bluetooth_version",
+      "sample": "weighted_choice",
+      "weights": {
+        "5.2": 1,
+        "5.3": 1
+      },
+      "when": "product.facts.bluetooth_audio"
+    },
+    {
+      "id": "charging",
+      "target": "product.facts.charging_connector",
+      "derive": "'USB-C'",
+      "when": "product.facts.rechargeable"
+    },
+    {
+      "id": "cell_bundle",
+      "target": "internal.cell",
+      "sample": "weighted_choice",
+      "weights": {
+        "300": 1,
+        "450": 1,
+        "600": 1
+      },
+      "values": {
+        "300": {
+          "voltage_v": 3.7,
+          "capacity_mah": 300,
+          "energy_wh": 1.11
+        },
+        "450": {
+          "voltage_v": 3.7,
+          "capacity_mah": 450,
+          "energy_wh": 1.665
+        },
+        "600": {
+          "voltage_v": 3.7,
+          "capacity_mah": 600,
+          "energy_wh": 2.22
+        }
+      },
+      "when": "product.facts.powered"
+    },
+    {
+      "id": "voltage",
+      "target": "product.facts.declared_cell_voltage_v",
+      "derive": "internal.cell.voltage_v",
+      "when": "product.facts.powered"
+    },
+    {
+      "id": "cell_capacity",
+      "target": "product.facts.declared_cell_capacity_mah",
+      "derive": "internal.cell.capacity_mah",
+      "when": "product.facts.powered"
+    },
+    {
+      "id": "cell_energy",
+      "target": "product.facts.nominal_battery_energy_wh",
+      "derive": "internal.cell.energy_wh",
+      "when": "product.facts.powered"
+    },
+    {
+      "id": "anc",
+      "target": "product.facts.anc",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 0,
+        "no": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.powered and product.facts.wearing_geometry == 'over-ear'",
+          "weights": {
+            "yes": 4,
+            "no": 1
+          }
+        },
+        {
+          "when": "product.facts.powered and product.facts.wearing_geometry == 'on-ear'",
+          "weights": {
+            "yes": 1,
+            "no": 4
+          }
+        }
+      ],
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "controls",
+      "target": "product.facts.volume_controls",
+      "sample": "weighted_choice",
+      "weights": {
+        "none": 1,
+        "buttons": 0,
+        "touch": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.powered",
+          "weights": {
+            "none": 0,
+            "buttons": 1,
+            "touch": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "call_mic",
+      "target": "product.facts.bluetooth_call_microphone",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 0,
+        "no": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.bluetooth_audio",
+          "weights": {
+            "yes": 4,
+            "no": 1
+          }
+        }
+      ],
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "music_off",
+      "target": "product.facts.declared_music_max_anc_off_h",
+      "sample": "weighted_choice",
+      "weights": {
+        "30": 1,
+        "45": 1,
+        "60": 1
+      },
+      "when": "product.facts.powered",
+      "values": {
+        "30": 30,
+        "45": 45,
+        "60": 60
+      }
+    },
+    {
+      "id": "music_on",
+      "target": "product.facts.declared_music_max_anc_on_h",
+      "derive": "product.facts.declared_music_max_anc_off_h - 10",
+      "when": "product.facts.anc"
+    },
+    {
+      "id": "charge_hours",
+      "target": "product.facts.declared_empty_charge_h",
+      "sample": "weighted_choice",
+      "weights": {
+        "2": 1,
+        "3.5": 1
+      },
+      "when": "product.facts.rechargeable",
+      "values": {
+        "2": 2,
+        "3.5": 3.5
+      }
+    },
+    {
+      "id": "usable_energy_status",
+      "target": "product.facts.usable_battery_energy",
+      "derive": "'not specified'",
+      "when": "product.facts.powered"
+    },
+    {
+      "id": "battery_method_status",
+      "target": "product.facts.battery_test_method",
+      "derive": "'not specified'",
+      "when": "product.facts.powered"
+    },
+    {
+      "id": "geometry_mass",
+      "target": "internal.geometry_mass_g",
+      "sample": "weighted_choice",
+      "weights": {
+        "150": 0,
+        "250": 1
+      },
+      "values": {
+        "150": 150,
+        "250": 250
+      },
+      "cases": [
+        {
+          "when": "product.facts.wearing_geometry == 'on-ear'",
+          "weights": {
+            "150": 1,
+            "250": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -15,
+      "max": 15
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.geometry_mass_g + internal.mass_noise_g + (20 if product.facts.powered else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wearing_geometry",
+          "product.facts.acoustic_back",
+          "product.facts.driver_design",
+          "product.facts.driver_diameter_mm"
+        ]
+      },
+      "slots": {
+        "geometry": "product.facts.wearing_geometry",
+        "diameter": "product.facts.driver_diameter_mm"
+      },
+      "formulations": [
+        "{geometry}, closed-back dynamic headphones with {diameter} mm drivers.",
+        "Closed-back {geometry} headphones; dynamic driver diameter {diameter} mm."
+      ]
+    },
+    {
+      "id": "description.capabilities",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bluetooth_audio",
+          "product.facts.analogue_audio",
+          "product.facts.passive_analogue_listening",
+          "product.facts.usb_audio",
+          "product.facts.anc",
+          "product.facts.volume_controls",
+          "product.facts.bluetooth_call_microphone"
+        ]
+      },
+      "slots": {
+        "bt": "'yes' if product.facts.bluetooth_audio else 'no'",
+        "analogue": "'yes' if product.facts.analogue_audio else 'no'",
+        "anc": "'present' if product.facts.anc else 'absent'",
+        "controls": "product.facts.volume_controls",
+        "mic": "'present' if product.facts.bluetooth_call_microphone else 'absent'"
+      },
+      "formulations": [
+        "Bluetooth audio {bt}; passive analogue audio {analogue}; USB audio not supported. ANC {anc}, volume controls {controls}, Bluetooth call microphone {mic}.",
+        "Capabilities: Bluetooth audio {bt}, passive analogue {analogue}, no USB audio; ANC {anc}; volume controls {controls}; Bluetooth call mic {mic}."
+      ]
+    },
+    {
+      "id": "description.analogue",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.analogue_plug_mm",
+          "product.facts.detachable_analogue_cable"
+        ]
+      },
+      "slots": {
+        "plug": "product.facts.analogue_plug_mm"
+      },
+      "formulations": [
+        "Detachable analogue cable with {plug} mm stereo source plug.",
+        "Stereo {plug} mm source plug on detachable analogue cable."
+      ],
+      "when": "product.facts.analogue_audio"
+    },
+    {
+      "id": "description.power",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bluetooth_version",
+          "product.facts.rechargeable",
+          "product.facts.charging_connector",
+          "product.facts.declared_cell_voltage_v",
+          "product.facts.declared_cell_capacity_mah",
+          "product.facts.nominal_battery_energy_wh",
+          "product.facts.declared_music_max_anc_off_h",
+          "product.facts.declared_empty_charge_h",
+          "product.facts.usable_battery_energy",
+          "product.facts.battery_test_method"
+        ]
+      },
+      "slots": {
+        "version": "product.facts.bluetooth_version",
+        "v": "product.facts.declared_cell_voltage_v",
+        "mah": "product.facts.declared_cell_capacity_mah",
+        "wh": "product.facts.nominal_battery_energy_wh",
+        "music": "product.facts.declared_music_max_anc_off_h",
+        "charge": "product.facts.declared_empty_charge_h"
+      },
+      "formulations": [
+        "Bluetooth {version}; USB-C charging, not USB audio. Declared nominal cell {v} V/{mah} mAh; calculated nominal {wh} Wh, usable energy unspecified. Music up to {music} h with ANC off; empty charging {charge} h; test method unspecified.",
+        "Rechargeable via USB-C with Bluetooth {version}. Nominal cell {v} V and {mah} mAh imply {wh} Wh, not measured usable energy. Declared ANC-off music maximum {music} h; empty-charge time {charge} h; protocol unspecified."
+      ],
+      "when": "product.facts.powered"
+    },
+    {
+      "id": "description.runtime_on",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.anc",
+          "product.facts.declared_music_max_anc_on_h"
+        ]
+      },
+      "slots": {
+        "music": "product.facts.declared_music_max_anc_on_h"
+      },
+      "formulations": [
+        "Declared music maximum with ANC on: {music} h.",
+        "With ANC enabled, declared maximum music time {music} h."
+      ],
+      "when": "product.facts.anc"
+    },
+    {
+      "id": "description.passive",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.powered",
+          "product.facts.rechargeable"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Passive analogue assembly: battery, charging and battery-runtime declarations do not apply.",
+        "No battery or charging in this passive analogue recipe; battery runtime is inapplicable."
+      ],
+      "when": "not product.facts.powered"
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.ambient_passthrough",
+          "product.facts.ip_rating",
+          "product.facts.passive_isolation_measurement",
+          "product.facts.anc_attenuation",
+          "product.facts.impedance_sensitivity_latency"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Ambient passthrough, IP protection, measured passive isolation/ANC attenuation, impedance/sensitivity and latency unspecified.",
+        "No specified ambient mode or IP rating; quantified passive isolation, ANC attenuation, impedance/sensitivity/latency results unspecified."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "Reference mass {mass} g, one headphone excluding detachable cable, charger and case.",
+        "One headphone weighs {mass} g excluding detachable cable/charger/case."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'headphones.over_ear_on_ear_headphones' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "geometry",
+      "role": "filter",
+      "predicate": "product.facts.wearing_geometry == request.wearing_geometry",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "anc",
+      "role": "filter",
+      "predicate": "product.facts.anc == request.anc",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "mass",
+      "role": "filter",
+      "predicate": "product.facts.reference_mass_g <= request.max_mass_g",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "volume_controls",
+              "cable_handling",
+              "train_anc"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 200,
+          "max": 4500
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 200
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 4500
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_wearing_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_vocal_clarity": {
+          "type": "boolean"
+        },
+        "review.positive_bass_preference": {
+          "type": "boolean"
+        },
+        "review.positive_bt_pairing": {
+          "type": "boolean"
+        },
+        "review.positive_volume_controls": {
+          "type": "boolean"
+        },
+        "review.positive_cable_handling": {
+          "type": "boolean"
+        },
+        "review.positive_train_anc": {
+          "type": "boolean"
+        },
+        "product.facts.bluetooth_audio": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.powered": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.detachable_analogue_cable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.anc": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.volume_controls": {
+          "type": "enum",
+          "values": [
+            "none",
+            "buttons",
+            "touch"
+          ],
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "0000": 1,
+            "0001": 0,
+            "0010": 0,
+            "0011": 0,
+            "0100": 0,
+            "0101": 0,
+            "0110": 0,
+            "0111": 0,
+            "1000": 0,
+            "1001": 0,
+            "1010": 0,
+            "1011": 0,
+            "1100": 0,
+            "1101": 0,
+            "1110": 0,
+            "1111": 0
+          },
+          "cases": [
+            {
+              "when": "not product.facts.bluetooth_audio and not product.facts.powered and not product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 1,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "not product.facts.bluetooth_audio and not product.facts.powered and not product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 1,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "not product.facts.bluetooth_audio and not product.facts.powered and product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 1,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "not product.facts.bluetooth_audio and not product.facts.powered and product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 1,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "not product.facts.bluetooth_audio and product.facts.powered and not product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 1,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "not product.facts.bluetooth_audio and product.facts.powered and not product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 1,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "not product.facts.bluetooth_audio and product.facts.powered and product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 1,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "not product.facts.bluetooth_audio and product.facts.powered and product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 1,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and not product.facts.powered and not product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 1,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and not product.facts.powered and not product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 1,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and not product.facts.powered and product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 1,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and not product.facts.powered and product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 1,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and product.facts.powered and not product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 1,
+                "1101": 0,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and product.facts.powered and not product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 1,
+                "1110": 0,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and product.facts.powered and product.facts.detachable_analogue_cable and not product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 1,
+                "1111": 0
+              }
+            },
+            {
+              "when": "product.facts.bluetooth_audio and product.facts.powered and product.facts.detachable_analogue_cable and product.facts.anc",
+              "weights": {
+                "0000": 0,
+                "0001": 0,
+                "0010": 0,
+                "0011": 0,
+                "0100": 0,
+                "0101": 0,
+                "0110": 0,
+                "0111": 0,
+                "1000": 0,
+                "1001": 0,
+                "1010": 0,
+                "1011": 0,
+                "1100": 0,
+                "1101": 0,
+                "1110": 0,
+                "1111": 1
+              }
+            }
+          ],
+          "values": {
+            "0000": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference"
+            ],
+            "0001": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "train_anc"
+            ],
+            "0010": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "cable_handling"
+            ],
+            "0011": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "cable_handling",
+              "train_anc"
+            ],
+            "0100": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "volume_controls"
+            ],
+            "0101": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "volume_controls",
+              "train_anc"
+            ],
+            "0110": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "volume_controls",
+              "cable_handling"
+            ],
+            "0111": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "volume_controls",
+              "cable_handling",
+              "train_anc"
+            ],
+            "1000": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing"
+            ],
+            "1001": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "train_anc"
+            ],
+            "1010": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "cable_handling"
+            ],
+            "1011": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "cable_handling",
+              "train_anc"
+            ],
+            "1100": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "volume_controls"
+            ],
+            "1101": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "volume_controls",
+              "train_anc"
+            ],
+            "1110": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "volume_controls",
+              "cable_handling"
+            ],
+            "1111": [
+              "value",
+              "wearing_comfort",
+              "vocal_clarity",
+              "bass_preference",
+              "bt_pairing",
+              "volume_controls",
+              "cable_handling",
+              "train_anc"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_wearing_comfort",
+          "target": "review.positive_wearing_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_vocal_clarity",
+          "target": "review.positive_vocal_clarity",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bass_preference",
+          "target": "review.positive_bass_preference",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bt_pairing",
+          "target": "review.positive_bt_pairing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_volume_controls",
+          "target": "review.positive_volume_controls",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_cable_handling",
+          "target": "review.positive_cable_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_train_anc",
+          "target": "review.positive_train_anc",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "wearing_comfort.positive",
+          "when": "'wearing_comfort' in review.topics and review.positive_wearing_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "wearing_comfort",
+            "polarity": "positive",
+            "context": {
+              "duration": "60 minutes",
+              "use": "seated indoors",
+              "aspect": "wearing comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Wearing them was comfortable during sixty minutes seated indoors.",
+            "They felt comfortable to wear for sixty minutes while seated indoors."
+          ]
+        },
+        {
+          "id": "wearing_comfort.negative",
+          "when": "'wearing_comfort' in review.topics and not review.positive_wearing_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "wearing_comfort",
+            "polarity": "negative",
+            "context": {
+              "duration": "60 minutes",
+              "use": "seated indoors",
+              "aspect": "wearing comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Wearing them was uncomfortable during sixty minutes seated indoors.",
+            "They felt uncomfortable to wear for sixty minutes while seated indoors."
+          ]
+        },
+        {
+          "id": "vocal_clarity.positive",
+          "when": "'vocal_clarity' in review.topics and review.positive_vocal_clarity",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "vocal_clarity",
+            "polarity": "positive",
+            "context": {
+              "audio": "familiar playlist",
+              "level": "usual comfortable listening level",
+              "aspect": "perceived vocal clarity"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Vocals sounded clear to me on my familiar playlist at my usual comfortable listening level.",
+            "I perceived clear vocals on my familiar playlist at my usual comfortable listening level."
+          ]
+        },
+        {
+          "id": "vocal_clarity.negative",
+          "when": "'vocal_clarity' in review.topics and not review.positive_vocal_clarity",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "vocal_clarity",
+            "polarity": "negative",
+            "context": {
+              "audio": "familiar playlist",
+              "level": "usual comfortable listening level",
+              "aspect": "perceived vocal clarity"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Vocals sounded unclear to me on my familiar playlist at my usual comfortable listening level.",
+            "I perceived unclear vocals on my familiar playlist at my usual comfortable listening level."
+          ]
+        },
+        {
+          "id": "bass_preference.positive",
+          "when": "'bass_preference' in review.topics and review.positive_bass_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bass_preference",
+            "polarity": "positive",
+            "context": {
+              "audio": "familiar playlist",
+              "level": "usual comfortable listening level",
+              "aspect": "preference for perceived bass balance"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked the bass balance on my familiar playlist at my usual comfortable listening level.",
+            "The bass balance suited my preference on my familiar playlist at my usual comfortable listening level."
+          ]
+        },
+        {
+          "id": "bass_preference.negative",
+          "when": "'bass_preference' in review.topics and not review.positive_bass_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bass_preference",
+            "polarity": "negative",
+            "context": {
+              "audio": "familiar playlist",
+              "level": "usual comfortable listening level",
+              "aspect": "preference for perceived bass balance"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked the bass balance on my familiar playlist at my usual comfortable listening level.",
+            "The bass balance did not suit my preference on my familiar playlist at my usual comfortable listening level."
+          ]
+        },
+        {
+          "id": "bt_pairing.positive",
+          "when": "'bt_pairing' in review.topics and review.positive_bt_pairing and product.facts.bluetooth_audio",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bt_pairing",
+            "polarity": "positive",
+            "context": "pairing by Bluetooth to a compatible phone",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pairing by Bluetooth to my compatible phone was easy.",
+            "I found Bluetooth pairing to my compatible phone easy."
+          ]
+        },
+        {
+          "id": "bt_pairing.negative",
+          "when": "'bt_pairing' in review.topics and not review.positive_bt_pairing and product.facts.bluetooth_audio",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bt_pairing",
+            "polarity": "negative",
+            "context": "pairing by Bluetooth to a compatible phone",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pairing by Bluetooth to my compatible phone was difficult.",
+            "I found Bluetooth pairing to my compatible phone difficult."
+          ]
+        },
+        {
+          "id": "volume_controls.positive",
+          "when": "'volume_controls' in review.topics and review.positive_volume_controls and product.facts.powered",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "volume_controls",
+            "polarity": "positive",
+            "context": "operating the actual ear-cup volume controls",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the ear-cup volume {controls} easy to operate.",
+            "Operating the ear-cup volume {controls} was easy for me."
+          ],
+          "slots": {
+            "controls": "'touch controls' if product.facts.volume_controls == 'touch' else 'buttons'"
+          }
+        },
+        {
+          "id": "volume_controls.negative",
+          "when": "'volume_controls' in review.topics and not review.positive_volume_controls and product.facts.powered",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "volume_controls",
+            "polarity": "negative",
+            "context": "operating the actual ear-cup volume controls",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the ear-cup volume {controls} difficult to operate.",
+            "Operating the ear-cup volume {controls} was difficult for me."
+          ],
+          "slots": {
+            "controls": "'touch controls' if product.facts.volume_controls == 'touch' else 'buttons'"
+          }
+        },
+        {
+          "id": "cable_handling.positive",
+          "when": "'cable_handling' in review.topics and review.positive_cable_handling and product.facts.detachable_analogue_cable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cable_handling",
+            "polarity": "positive",
+            "context": "connecting and disconnecting the detachable analogue cable",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the detachable analogue cable was easy for me.",
+            "I found the detachable analogue cable easy to connect and disconnect."
+          ]
+        },
+        {
+          "id": "cable_handling.negative",
+          "when": "'cable_handling' in review.topics and not review.positive_cable_handling and product.facts.detachable_analogue_cable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cable_handling",
+            "polarity": "negative",
+            "context": "connecting and disconnecting the detachable analogue cable",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the detachable analogue cable was difficult for me.",
+            "I found the detachable analogue cable difficult to connect and disconnect."
+          ]
+        },
+        {
+          "id": "train_anc.positive",
+          "when": "'train_anc' in review.topics and review.positive_train_anc and product.facts.anc",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "train_anc",
+            "polarity": "positive",
+            "context": {
+              "use": "seated on a train",
+              "mode": "ANC enabled",
+              "aspect": "perceived background-noise reduction"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Background-noise reduction felt sufficient to me while seated on a train with ANC enabled.",
+            "With ANC enabled while seated on a train, I felt background-noise reduction was sufficient."
+          ]
+        },
+        {
+          "id": "train_anc.negative",
+          "when": "'train_anc' in review.topics and not review.positive_train_anc and product.facts.anc",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "train_anc",
+            "polarity": "negative",
+            "context": {
+              "use": "seated on a train",
+              "mode": "ANC enabled",
+              "aspect": "perceived background-noise reduction"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Background-noise reduction felt insufficient to me while seated on a train with ANC enabled.",
+            "With ANC enabled while seated on a train, I felt background-noise reduction was insufficient."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 200,
+          "max_sek": 4500
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "headphones",
+    "spec_path": "docs/agents/product-width-specs/headphones.over_ear_on_ear_headphones.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "electronics"
+    ],
+    "scope_exceptions": [
+      "Closed/dynamic/noUSB-audio are bounded recipes, not omitted-source conclusions",
+      "Declared Wh is calculated nominal cell energy, not hours/usable energy",
+      "Charging USB-C does not imply audio; Bluetooth mic says nothing about wired route",
+      "No clothes/shoe geometry or source-normalized mass"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 200,
+      "max": 800,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 700,
+          "max": 1900
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1600,
+          "max": 4500
+        }
+      ]
+    }
+  }
+}

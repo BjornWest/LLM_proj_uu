@@ -1,0 +1,181 @@
+{
+  "schema_version": "product-concept-registry-v1",
+  "status": "proposed_not_runtime",
+  "counting_policy": "One explicitly registered candidate field is one dimension, including a structured tuple as one field. Fixed traits, derived outputs, names, prices and latent review quality are excluded. Conditional dimensions are counted separately and included in the potential total. Fields are not independent or equal-cardinality.",
+  "modules": [
+    {
+      "id": "fit",
+      "catalog_features": "Body/user/animal/item size systems, measurements, target user, adjustment range; fit chart with units.",
+      "reach": "Footwear, apparel, pets, oral care, seating, bedding, outdoor gear, strollers.",
+      "review_contexts": "Comfort, rubbing, pressure, ease of fitting.",
+      "boundary": "A foot, dog chest and mattress share a measurement pattern, not a common size vocabulary. Cosmetic shade match uses Appearance.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "materials",
+      "catalog_features": "Components, fibre/material composition, construction, finish and care/cleaning.",
+      "reach": "Clothing/outdoors, home/kitchen, pets, office furniture and accessories.",
+      "review_contexts": "Skin feel, grip, wear, pilling, maintenance.",
+      "boundary": "Name the component: leather straps do not make the entire sandal leather. Composition percentages need a component-specific total; packaging is separate.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "geometry",
+      "catalog_features": "Dimensions and axis meaning, weight, working/folded/packed state and physical capacity.",
+      "reach": "Electronics, home, tools, outdoor gear, pets and strollers.",
+      "review_contexts": "Handling, portability, space and stability.",
+      "boundary": "Litres of bag capacity and kilograms of safe load are different fields. Keep usable vs external dimensions distinct.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "quantity",
+      "catalog_features": "Net amount, units per pack, per-unit amount, contents and comparison basis.",
+      "reach": "Food/drink, beauty, consumables, sets and storage capacity.",
+      "review_contexts": "Portioning and pack handling; value relative to the stated quantity.",
+      "boundary": "Digital GB is not consumable volume; share typed quantity machinery only. Multipacks are selectable variants by project choice even where real shops use separate pages.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "compatibility",
+      "catalog_features": "Explicit supported model/platform/version, interfaces, dependent accessories and included vs required items.",
+      "reach": "Electronics, tools, appliance consumables, oral care, strollers and game expansions.",
+      "review_contexts": "Successful pairing/use or a specific observed mismatch.",
+      "boundary": "Same brand, connector shape or nominal size is insufficient. Known incompatibility, unverified and not applicable are separate states.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "power",
+      "catalog_features": "Power source, electrical input/output, battery capacity, charging method and rated/observed runtime with conditions.",
+      "reach": "Electronics, tools, appliances and powered concepts in pets/beauty/furniture.",
+      "review_contexts": "Runtime, charging, heat and noise where physically meaningful.",
+      "boundary": "Manual products inherit none of this. Motor noise, electrical buzzing and fan noise have different causes and eligible products.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "digital",
+      "catalog_features": "OS/software support, compute/storage, screen, input, connectivity, app features and accessibility.",
+      "reach": "Electronics; limited opt-in for connected appliances and powered products.",
+      "review_contexts": "Workload performance, UI, display and software reliability.",
+      "boundary": "Do not attach a screen, app or subscription to everything powered. RAM, storage and display quality are separate traits.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "exposure",
+      "catalog_features": "Intended environment, weather/water/dust exposure, thermal conditions and documented resistance/test claims.",
+      "reach": "Clothing/outdoors, electronics, pets, tools and travel.",
+      "review_contexts": "Use in rain/sun/water, drying and wear under specified exposure.",
+      "boundary": "Resistant is not proof against every exposure. A subjective report of surviving water does not establish a protection rating.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "formula",
+      "catalog_features": "Ingredient lists, composition/recipe, declared nutrition or concentration where relevant, target and instructions.",
+      "reach": "Beauty/personal care, pet foods, drinks; optional scented litter.",
+      "review_contexts": "Scent, texture, acceptance/tolerance and reported experience.",
+      "boundary": "Food nutrition, alcohol and cosmetic ingredient percentages retain distinct meanings. Missing ingredients are not evidence of absence; claim and medical efficacy are distinct.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "sensory",
+      "catalog_features": "Stated aroma/texture/flavour descriptors, serving/application context; distinguish product description from perceived sensations.",
+      "reach": "Drinks, beauty and fragrance.",
+      "review_contexts": "Bitterness, finish, scent, mouthfeel or skin feel, with subject and time course.",
+      "boundary": "Do not give shampoos taste reviews or treat a pet owner as tasting pet food. Measured sugar, marketed sweetness and perceived sweetness are separate.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "appearance",
+      "catalog_features": "Shade/undertone, opacity, sheen/finish and pattern description.",
+      "reach": "Makeup; conditional finishes/textiles across clothing/home.",
+      "review_contexts": "Shade match, colour accuracy, transfer and appearance after use.",
+      "boundary": "Foundation coverage, paint-like opacity and fabric transparency need typed meanings. Colour alone is not a new concept or proof of material/price difference.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "heat",
+      "catalog_features": "Heat-source compatibility, operating/oven limits and temperature-sensitive parts.",
+      "reach": "Kitchen cookware/pots/utensils; selected tools or devices have separate thermal limits.",
+      "review_contexts": "Heating, cooling, hot handles and cooking results.",
+      "boundary": "Hob suitability is not an oven limit. Whole-item limits must respect lids/handles/coatings, not just the body material.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "assembly",
+      "catalog_features": "Required setup, parts, tools, instructions, clearance/installation and supplied vs separately sold components.",
+      "reach": "Home/office, appliances, tents and strollers.",
+      "review_contexts": "Setup difficulty, instructions and adjustment.",
+      "boundary": "Retail installation service is an offer. Product setup requirements stay the same when the service is unavailable.",
+      "status": "semantic_placeholder"
+    },
+    {
+      "id": "content",
+      "catalog_features": "Work identity, creator, topic/theme, language, edition/version, audience and contents.",
+      "reach": "Books and board games; software/media can reuse version/language patterns later.",
+      "review_contexts": "Clarity, engagement, learning and replay/reading experience.",
+      "boundary": "Book plot/topic and game mechanics need their own semantics. Edition may change text/rules; cosmetic packaging does not necessarily change the work.",
+      "status": "semantic_placeholder"
+    }
+  ],
+  "family_files": [
+    "families/footwear.json",
+    "families/trousers.json",
+    "families/jackets.json",
+    "families/tops.json",
+    "families/knitwear.json",
+    "families/laptops.json",
+    "families/phones.json",
+    "families/tablets.json",
+    "families/monitors.json",
+    "families/headphones.json",
+    "families/keyboards.json",
+    "families/memory_cards.json",
+    "families/ssd.json",
+    "families/phone_cases.json",
+    "families/chargers.json",
+    "families/camera_lenses.json",
+    "families/printer_ink.json",
+    "families/dog_food.json",
+    "families/cat_food.json",
+    "families/pet_harnesses.json",
+    "families/pet_bowls.json",
+    "families/pet_toys.json",
+    "families/cat_litter.json",
+    "families/beer.json",
+    "families/wine.json",
+    "families/moisturizers.json",
+    "families/cleansers.json",
+    "families/serums.json",
+    "families/foundation.json",
+    "families/lip_colour.json",
+    "families/shampoo.json",
+    "families/fragrance.json",
+    "families/toothbrushes.json",
+    "families/brush_heads.json",
+    "families/bedding.json",
+    "families/cookware.json",
+    "families/pots.json",
+    "families/kitchen_utensils.json",
+    "families/towels.json",
+    "families/furniture.json",
+    "families/office_chairs.json",
+    "families/washing_machines.json",
+    "families/vacuum_cleaners.json",
+    "families/vacuum_bags.json",
+    "families/drills.json",
+    "families/garden_trimmers.json",
+    "families/saws.json",
+    "families/sanders.json",
+    "families/tool_power.json",
+    "families/tents.json",
+    "families/backpacks.json",
+    "families/sleeping_bags.json",
+    "families/sleeping_mats.json",
+    "families/strollers.json",
+    "families/board_games.json",
+    "families/books.json"
+  ],
+  "source_snapshots": {
+    "docs/agents/product-family-concept-review.json": "3671948a05679fe38c3b22c4e01065535fe4a0a73bd966ff052e6fc1cdd06b53",
+    "docs/agents/product-shared-features.json": "b9d91b829e961b584c5a5b67ebc08228497a7a475fcc20666b0690e9f802f799"
+  }
+}

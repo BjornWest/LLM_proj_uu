@@ -1,0 +1,288 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "bedding",
+  "review_id": "F34",
+  "label": "Bedding",
+  "section": "Home, kitchen and appliances",
+  "store_type_ids": [
+    "home_kitchen"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Fill and warmth ratings belong to duvets/pillows; fitted-sheet depth belongs to fitted sheets. Pillow support and duvet warmth are separate traits. Set contents must identify included pieces.",
+  "shared_dimension_ids": [
+    "size",
+    "component_materials",
+    "colour",
+    "care_method",
+    "closure"
+  ],
+  "dimensions": [
+    {
+      "id": "size",
+      "label": "Size",
+      "module_id": "fit",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "care_method",
+      "label": "Care method",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "closure",
+      "label": "Closure",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "set_contents",
+      "label": "Set contents",
+      "module_id": "quantity",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "sheet_construction",
+      "label": "Sheet construction",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fitted_depth",
+      "label": "Fitted depth",
+      "module_id": "fit",
+      "identity_level": "model_or_sku",
+      "value_kind": "number",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fill_material",
+      "label": "Fill material",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fill_amount",
+      "label": "Fill amount",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "g",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "warmth_class",
+      "label": "Warmth class",
+      "module_id": "exposure",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "support_profile",
+      "label": "Support profile",
+      "module_id": "fit",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "bedding.duvet_cover_sets",
+      "label": "Duvet-cover sets",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "set_contents"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "bedding.sheets",
+      "label": "Sheets",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "sheet_construction",
+        "fitted_depth"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "fitted_depth": "Sheet construction is fitted."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "bedding.pillowcases",
+      "label": "Pillowcases",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "bedding.duvets",
+      "label": "Duvets",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "fill_material",
+        "fill_amount",
+        "warmth_class"
+      ],
+      "excluded_dimension_ids": [
+        "closure"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "bedding.pillows",
+      "label": "Pillows",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "fill_material",
+        "fill_amount",
+        "support_profile"
+      ],
+      "excluded_dimension_ids": [
+        "closure"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

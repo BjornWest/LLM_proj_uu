@@ -1,0 +1,157 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.keyboards_base",
+  "random_namespace": "product-width-keyboards-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "product.name": {
+      "type": "string",
+      "optional": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "product.colours": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "product.language_layouts": {
+      "type": "set",
+      "items": {
+        "type": "enum",
+        "values": [
+          "US English ANSI",
+          "UK English ISO"
+        ]
+      },
+      "min_items": 1
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "language_layout": {
+            "type": "enum",
+            "values": [
+              "US English ANSI",
+              "UK English ISO"
+            ]
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 120,
+            "max": 1950
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "group.colour": {
+      "type": "string"
+    },
+    "group.language_layout": {
+      "type": "enum",
+      "values": [
+        "US English ANSI",
+        "UK English ISO"
+      ]
+    },
+    "sku.colour": {
+      "type": "string",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "colour"
+      }
+    },
+    "sku.language_layout": {
+      "type": "enum",
+      "values": [
+        "US English ANSI",
+        "UK English ISO"
+      ],
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "language_layout"
+      }
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights",
+      "stream": "product/keyboards/positioning"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95,
+      "stream": "product/keyboards/execution"
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Neutral identity/profile and child-defined canonical language/colour contract",
+    "support": "Authoring foundation only; no default keyboard hardware, palette, counts or price producer"
+  }
+}

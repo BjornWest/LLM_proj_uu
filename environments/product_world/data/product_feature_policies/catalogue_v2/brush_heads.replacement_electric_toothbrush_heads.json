@@ -1,0 +1,1474 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "brush_heads.replacement_electric_toothbrush_heads",
+  "family_id": "brush_heads",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/brush_heads.replacement_electric_toothbrush_heads.json": "4f481a4bc9ed8a6a9ada4beb4ae751aa742f1a03a9438afc5ceb25ffc905ede7",
+    "environments/product_world/data/product_width/_brush_heads_base.json": "2987d5a63fd3309fcfd63f8d11f81ed3734098570d6cb87271df1a12e297d1e9",
+    "environments/product_world/data/product_public_content/brush_heads.replacement_electric_toothbrush_heads.json": "c93274afed8e67725b6fae2d5fea271bb81acce15698ad6f0e71b4a1710dcd78"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Compatibility, head geometry and bristle declaration matter; pack count is a buying choice, measured stiffness is not inferred.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.product_name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.compatible_platform": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_compatible_platform",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Round-R",
+          "Sonic-S"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_compatible_platform"
+    },
+    "sku.excluded_platform": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_excluded_platform",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Sonic-S",
+          "Round-R"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_excluded_platform"
+    },
+    "sku.head_interface": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_head_interface",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "removable push-on"
+        ],
+        "optional": true,
+        "constant": "removable push-on",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_connector"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_head_interface"
+    },
+    "sku.head_body_material": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_head_body_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene"
+        ],
+        "optional": true,
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_body"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_head_body_material"
+    },
+    "sku.bristle_material": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_bristle_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polyamide"
+        ],
+        "optional": true,
+        "constant": "polyamide",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "bristles"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_bristle_material"
+    },
+    "sku.internal_coupling_material": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_internal_coupling_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_connector"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.bristle_firmness_label": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_bristle_firmness_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "soft",
+          "medium"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_bristle_firmness_label"
+    },
+    "sku.reference_round_body_diameter_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_round_body_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_body"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_round_body_diameter_mm"
+    },
+    "sku.reference_head_body_length_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_head_body_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "mm",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_body"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_head_body_length_mm"
+    },
+    "sku.reference_head_body_width_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_head_body_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "mm",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_body"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_head_body_width_mm"
+    },
+    "sku.reference_head_assembly_length_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_head_assembly_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "mm",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "complete_head"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_head_assembly_length_mm"
+    },
+    "sku.reference_free_bristle_projection_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_free_bristle_projection_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "mm",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "bristles"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_free_bristle_projection_mm"
+    },
+    "sku.actual_head_mass_g": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_actual_head_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "complete_head"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_actual_head_mass_g"
+    },
+    "sku.actual_head_assembly_length_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_actual_head_assembly_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "complete_head"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_actual_head_assembly_length_mm"
+    },
+    "sku.actual_bristle_diameter_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_actual_bristle_diameter_mm",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "bristles"
+      },
+      "source_inherited": false,
+      "reason": "Laboratory/sample measurement outside the useful retail head/firmness description."
+    },
+    "sku.measured_bristle_stiffness_n_per_mm": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_measured_bristle_stiffness_n_per_mm",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "N/mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "bristles"
+      },
+      "source_inherited": false,
+      "reason": "Laboratory/sample measurement outside the useful retail head/firmness description."
+    },
+    "sku.head_count": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_head_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "count",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.all_detached",
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.count_basis",
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.one_cover_per_head"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.colour": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "white",
+          "black"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.cover_count": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_cover_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.no_covers",
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.one_cover_per_head"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_covers"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_cover_count"
+    },
+    "sku.head_cover_material": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_head_cover_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "polypropylene"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_covers"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_cover_material"
+    },
+    "sku.reference_head_mass_g": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_head_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "g",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "complete_head"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_head_mass_g"
+    },
+    "sku.reference_whole_pack_mass_g": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_whole_pack_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "g",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "whole_purchase"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_whole_pack_mass_g"
+    },
+    "sku.actual_whole_pack_mass_g": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_actual_whole_pack_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "whole_purchase"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_actual_whole_pack_mass_g"
+    },
+    "sku.reference_cover_mass_g": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_cover_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_covers"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_cover_mass_g"
+    },
+    "sku.actual_cover_mass_g": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_actual_cover_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_covers"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_actual_cover_mass_g"
+    },
+    "sku.head_care": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_head_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Remove from a switched-off handle; rinse the head, bristles and connector with warm running water; air-dry uncovered."
+        ],
+        "optional": true,
+        "constant": "Remove from a switched-off handle; rinse the head, bristles and connector with warm running water; air-dry uncovered.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "complete_head"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_head_head_care"
+    },
+    "sku.head_cover_care": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_head_cover_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "Rinse covers with running water and air-dry separately; put them on only dry heads; no dishwasher or boiling water."
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "head_covers"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_head_cover_care"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.sku_reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 80,
+        "max": 800,
+        "unit": "SEK",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "review.subject.head_count": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.review_subject_head_count",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.colour": {
+      "semantic_id": "brush_heads.replacement_electric_toothbrush_heads.semantic.review_subject_colour",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "sku.intended_user": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "adults"
+        ],
+        "optional": true,
+        "constant": "adults",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.adult_ordinary_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ordinary powered toothbrushing"
+        ],
+        "optional": true,
+        "constant": "ordinary powered toothbrushing",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.adult_ordinary_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.product_kind": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "replacement powered-toothbrush heads"
+        ],
+        "optional": true,
+        "constant": "replacement powered-toothbrush heads",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.adult_ordinary_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.requires_compatible_handle": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.needs_compatible_handle"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.head_geometry": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "round",
+          "oval"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.oval_body",
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.round_body"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_head_geometry"
+    },
+    "sku.all_heads_detached": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.all_detached"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.detached_head_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "optional": true,
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.all_detached"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_detached_head_count"
+    },
+    "sku.handle_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.no_handle_battery_charger_toothpaste"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.battery_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.no_handle_battery_charger_toothpaste"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.charger_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.no_handle_battery_charger_toothpaste"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.toothpaste_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.no_handle_battery_charger_toothpaste"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.pack_count": {
+      "semantic_id": null,
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "optional": true,
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.count_basis"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.bristles_counted_as_heads": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.count_basis"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.retail_packing_counted_as_heads": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.count_basis"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.covers_per_head": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 4000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.no_covers",
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.one_cover_per_head"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_covers_per_head"
+    },
+    "sku.head_dishwasher_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.head_care_limits"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_head_washing"
+    },
+    "sku.head_boiling_water_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "brush_heads.replacement_electric_toothbrush_heads.predicate.head_care_limits"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_head_boiling_water_allowed"
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "round_soft",
+          "oval_medium"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "sku_compatible_platform": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_compatible_platform",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.compatible_platform"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_excluded_platform": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_excluded_platform",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.excluded_platform"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_interface": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.head_interface"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_head_body_material": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_body_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_bristle_material": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_bristle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.bristle_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_bristle_firmness_label": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_bristle_firmness_label",
+      "display_group": "features",
+      "fields": [
+        "sku.bristle_firmness_label"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_reference_round_body_diameter_mm": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_round_body_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_round_body_diameter_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_reference_head_body_length_mm": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_head_body_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_body_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_reference_head_body_width_mm": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_head_body_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_body_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_reference_head_assembly_length_mm": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_head_assembly_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_assembly_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_free_bristle_projection_mm": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_free_bristle_projection_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.reference_free_bristle_projection_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_actual_head_mass_g": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_actual_head_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.actual_head_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_actual_head_assembly_length_mm": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_actual_head_assembly_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.actual_head_assembly_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_cover_count": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_cover_count",
+      "display_group": "features",
+      "fields": [
+        "sku.cover_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_cover_material": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_cover_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_cover_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_head_mass_g": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_head_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_whole_pack_mass_g": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_whole_pack_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_whole_pack_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_actual_whole_pack_mass_g": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_actual_whole_pack_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.actual_whole_pack_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_cover_mass_g": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_reference_cover_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_cover_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_actual_cover_mass_g": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_actual_cover_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.actual_cover_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_head_care": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_head_care",
+      "display_group": "care",
+      "fields": [
+        "sku.head_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_head_cover_care": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_head_cover_care",
+      "display_group": "care",
+      "fields": [
+        "sku.head_cover_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_geometry": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_geometry",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_geometry"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_detached_head_count": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_detached_head_count",
+      "display_group": "features",
+      "fields": [
+        "sku.detached_head_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_covers_per_head": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_covers_per_head",
+      "display_group": "features",
+      "fields": [
+        "sku.covers_per_head"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_washing": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_washing",
+      "display_group": "care",
+      "fields": [
+        "sku.head_dishwasher_allowed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_head_boiling_water_allowed": {
+      "id": "brush_heads.replacement_electric_toothbrush_heads.content.sku_head_boiling_water_allowed",
+      "display_group": "features",
+      "fields": [
+        "sku.head_boiling_water_allowed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 49,
+    "roles": {
+      "identity": 4,
+      "descriptive": 21,
+      "literal": 6,
+      "omit_placeholder": 1,
+      "omit_low_value_detail": 2,
+      "buying_choice": 3,
+      "commerce": 1,
+      "review_only": 2,
+      "omit_fixed_detail": 8,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 8,
+    "unmapped_descriptive_fields": 5
+  },
+  "semantic_review_note": "Platform compatibility, bristle firmness and head geometry matter. Do not promote laboratory stiffness or microscopic bristle diameter as retail highlights. Pack count/cover care remain scoped; no motor/battery/toothpaste inventory."
+}

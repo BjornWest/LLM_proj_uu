@@ -1,0 +1,1938 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "tops.polo_shirts",
+  "family_id": "tops",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/tops.polo_shirts.json": "f82ebefab79656325ed3f378427a2ff3d79de698d8f727ec6180a3a519bd27db",
+    "environments/product_world/data/product_width/_tops_base.json": "51e32a831e1723b60c6e5d7ed71820eee5e785d67cdbeec4a5a765b368a91a8c",
+    "environments/product_world/data/product_public_content/tops.polo_shirts.json": "ceeea41885ffaaa07719851b032e4d45d8ed09ff11c4aa98c93e93edcdc74840"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Main fabric, fit and neckline dominate; whole-garment versus trim composition must stay distinct. All care statements share one display area.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "tops.polo_shirts.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.colour": {
+      "semantic_id": "tops.polo_shirts.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "white"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "colour"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.size_label": {
+      "semantic_id": "tops.polo_shirts.sku.size_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Synthetic commercial label, not anatomy, body fit or a bought garment measurement.",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "size_label"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "tops.polo_shirts.sku.pack_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": 1,
+        "max": 2,
+        "basis": "Whole purchase of complete same-recipe, same-colour, same-label garments; wrapping and attached parts add no garments.",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "pack_count"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.nominal_chart_back_length_cm": {
+      "semantic_id": "tops.polo_shirts.sku.nominal_chart_back_length_cm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "basis": "Nominal finished-garment chart back length before washing, not an actual purchased or wearer measurement.",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_chart_back_length_cm"
+    },
+    "sku.nominal_chart_sleeve_length_cm": {
+      "semantic_id": "tops.polo_shirts.sku.nominal_chart_sleeve_length_cm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "basis": "Nominal finished-garment short-sleeve length shoulder seam to cuff outer edge laid flat before washing; not an actual purchased measurement.",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_chart_sleeve_length_cm"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "tops.polo_shirts.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "Authored current reference price of whole exact selected purchase, not live seller quote or delivery fee.",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "review.purchase_price_sek": {
+      "semantic_id": "tops.polo_shirts.review.purchase_price_sek",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "Paid amount for whole exact selected purchase in the authored owner history."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "sku.actual_back_length_cm": {
+      "semantic_id": "tops.polo_shirts.sku.actual_back_length_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased garment back length, independently unspecified.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_sleeve_length_cm": {
+      "semantic_id": "tops.polo_shirts.sku.actual_sleeve_length_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased shoulder-seam-to-cuff outer-edge sleeve length, independently unspecified.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_half_chest_width_cm": {
+      "semantic_id": "tops.polo_shirts.sku.actual_half_chest_width_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased laid-flat half-chest width, independently unspecified; not body circumference.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_single_garment_mass_g": {
+      "semantic_id": "tops.polo_shirts.sku.actual_single_garment_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "One complete purchased garment with attached parts, excluding wrapping, independently unspecified.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_whole_purchase_textile_mass_g": {
+      "semantic_id": "tops.polo_shirts.sku.actual_whole_purchase_textile_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "All supplied complete purchased garments with attached parts, excluding wrapping, independently unspecified; not count times unknown single mass.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.form": {
+      "semantic_id": "tops.polo_shirts.product.facts.form",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ordinary adult short-sleeve polo"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_user": {
+      "semantic_id": "tops.polo_shirts.product.facts.intended_user",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "adults"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "tops.polo_shirts.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ordinary everyday wear"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.collar_style": {
+      "semantic_id": "tops.polo_shirts.product.facts.collar_style",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "ribbed turn-down collar"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "collar_style"
+    },
+    "product.facts.collar_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.collar_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Complete attached collars per assembled garment.",
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.cuff_style": {
+      "semantic_id": "tops.polo_shirts.product.facts.cuff_style",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ribbed short-sleeve cuff"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cuff_style"
+    },
+    "product.facts.cuff_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.cuff_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Attached short-sleeve cuffs across both sleeves per assembled garment.",
+        "constant": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.collar_cuff_structure": {
+      "semantic_id": "tops.polo_shirts.product.facts.collar_cuff_structure",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "component": "collar_and_two_cuff_ribs",
+        "constant": "rib knit"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "collar_cuff_structure"
+    },
+    "product.facts.placket_outer_composition_same_as_main": {
+      "semantic_id": "tops.polo_shirts.product.facts.placket_outer_composition_same_as_main",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "component": "neck_placket_outer_cloth",
+        "basis": "Declared equality of fibre composition only to main body/sleeve cloth; not knit structure or inner reinforcement.",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "placket_outer_composition_same_as_main"
+    },
+    "product.facts.neck_placket_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.neck_placket_count_per_garment",
+      "role": "literal",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Short neck plackets per garment, not full-front openings.",
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "neck_placket_count_per_garment"
+    },
+    "product.facts.neck_placket_style": {
+      "semantic_id": "tops.polo_shirts.product.facts.neck_placket_style",
+      "role": "literal",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "short buttoned neck placket"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "neck_placket_style"
+    },
+    "product.facts.full_front_opening_present": {
+      "semantic_id": "tops.polo_shirts.product.facts.full_front_opening_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.neck_buttons_exposed": {
+      "semantic_id": "tops.polo_shirts.product.facts.neck_buttons_exposed",
+      "role": "literal",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "neck_buttons_exposed"
+    },
+    "product.facts.button_material": {
+      "semantic_id": "tops.polo_shirts.product.facts.button_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "component": "all_attached_neck_buttons",
+        "constant": "polyester resin"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "button_material"
+    },
+    "product.facts.other_button_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.other_button_count_per_garment",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Other attached buttons, including sleeve-placket/cuff buttons, per garment; zero explicitly means absent.",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "other_button_count_per_garment"
+    },
+    "product.facts.sleeve_length": {
+      "semantic_id": "tops.polo_shirts.product.facts.sleeve_length",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "short"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sleeve_length"
+    },
+    "product.facts.sleeve_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.sleeve_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Short sleeves per complete assembled garment.",
+        "constant": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.pocket_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.pocket_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.lining_present": {
+      "semantic_id": "tops.polo_shirts.product.facts.lining_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.lining_material": {
+      "semantic_id": "tops.polo_shirts.product.facts.lining_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "not applicable"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.print_present": {
+      "semantic_id": "tops.polo_shirts.product.facts.print_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "print_present"
+    },
+    "product.facts.zip_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.zip_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.collar_stay_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.collar_stay_count_per_garment",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "collar_stay_count_per_garment"
+    },
+    "product.facts.removable_garment_part_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.removable_garment_part_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.reinforcement_presence": {
+      "semantic_id": "tops.polo_shirts.product.facts.reinforcement_presence",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reinforcement_material": {
+      "semantic_id": "tops.polo_shirts.product.facts.reinforcement_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.sewing_thread_composition": {
+      "semantic_id": "tops.polo_shirts.product.facts.sewing_thread_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.whole_garment_fibre_composition": {
+      "semantic_id": "tops.polo_shirts.product.facts.whole_garment_fibre_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.nominal_main_fabric_areal_mass_g_m2": {
+      "semantic_id": "tops.polo_shirts.product.facts.nominal_main_fabric_areal_mass_g_m2",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "g/m²",
+        "component": "main_body_and_sleeve_cloth",
+        "basis": "Nominal declaration for body/sleeve cloth alone; independent unknown, not garment mass.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_main_fabric_areal_mass_g_m2": {
+      "semantic_id": "tops.polo_shirts.product.facts.actual_main_fabric_areal_mass_g_m2",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "g/m²",
+        "component": "main_body_and_sleeve_cloth",
+        "basis": "Actual bought value for body/sleeve cloth alone; independent unknown, not garment mass.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hanger_supplied_count": {
+      "semantic_id": "tops.polo_shirts.product.facts.hanger_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.care_product_supplied_count": {
+      "semantic_id": "tops.polo_shirts.product.facts.care_product_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.spare_button_supplied_count": {
+      "semantic_id": "tops.polo_shirts.product.facts.spare_button_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.other_garment_type_supplied_count": {
+      "semantic_id": "tops.polo_shirts.product.facts.other_garment_type_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.wash_machine_allowed": {
+      "semantic_id": "tops.polo_shirts.product.facts.wash_machine_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wash_machine_allowed"
+    },
+    "product.facts.wash_cycle": {
+      "semantic_id": "tops.polo_shirts.product.facts.wash_cycle",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "gentle"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wash_cycle"
+    },
+    "product.facts.line_drying_allowed": {
+      "semantic_id": "tops.polo_shirts.product.facts.line_drying_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "line_drying_allowed"
+    },
+    "product.facts.bleach_allowed": {
+      "semantic_id": "tops.polo_shirts.product.facts.bleach_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bleach_allowed"
+    },
+    "product.facts.tumble_drying_allowed": {
+      "semantic_id": "tops.polo_shirts.product.facts.tumble_drying_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tumble_drying_allowed"
+    },
+    "product.facts.dry_cleaning_allowed": {
+      "semantic_id": "tops.polo_shirts.product.facts.dry_cleaning_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dry_cleaning_allowed"
+    },
+    "product.facts.ironing_instruction": {
+      "semantic_id": "tops.polo_shirts.product.facts.ironing_instruction",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_stretch_extension_percent": {
+      "semantic_id": "tops.polo_shirts.product.facts.measured_stretch_extension_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Actual garment measurement unspecified; no physical or care outcome inferred.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_wash_shrinkage_percent": {
+      "semantic_id": "tops.polo_shirts.product.facts.measured_wash_shrinkage_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Actual garment measurement unspecified; no physical or care outcome inferred.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.colourfastness_test_result": {
+      "semantic_id": "tops.polo_shirts.product.facts.colourfastness_test_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fabric_structure": {
+      "semantic_id": "tops.polo_shirts.product.facts.fabric_structure",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "component": "main_body_and_sleeve_cloth"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fabric_structure"
+    },
+    "product.facts.main_fabric_cotton_percent": {
+      "semantic_id": "tops.polo_shirts.product.facts.main_fabric_cotton_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "component": "main_body_and_sleeve_cloth",
+        "basis": "Body and short-sleeve cloth only, excluding collar/cuff rib, placket outer cloth, reinforcement, hardware, sewing thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_silk_percent": {
+      "semantic_id": "tops.polo_shirts.product.facts.main_fabric_silk_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "component": "main_body_and_sleeve_cloth",
+        "basis": "Body and short-sleeve cloth only, excluding collar/cuff rib, placket outer cloth, reinforcement, hardware, sewing thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.collar_cuff_cotton_percent": {
+      "semantic_id": "tops.polo_shirts.product.facts.collar_cuff_cotton_percent",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "component": "collar_and_two_cuff_ribs",
+        "basis": "Local declared fibre composition of each collar/cuff rib only, excluding reinforcement, placket cloth, hardware, thread and labels; not whole-garment composition."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_cuff_cotton_percent"
+    },
+    "product.facts.collar_cuff_silk_percent": {
+      "semantic_id": "tops.polo_shirts.product.facts.collar_cuff_silk_percent",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "component": "collar_and_two_cuff_ribs",
+        "basis": "Local declared fibre composition of each collar/cuff rib only, excluding reinforcement, placket cloth, hardware, thread and labels; not whole-garment composition."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_cuff_silk_percent"
+    },
+    "product.facts.cut": {
+      "semantic_id": "tops.polo_shirts.product.facts.cut",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cut"
+    },
+    "product.facts.neck_button_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.neck_button_count_per_garment",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Attached exposed short-neck-placket buttons per garment, excluding any other hardware."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "neck_button_count_per_garment"
+    },
+    "product.facts.total_button_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.total_button_count_per_garment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "All attached buttons per complete garment; wrapping/spares/stays excluded."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "total_button_count_per_garment"
+    },
+    "product.facts.lower_hem": {
+      "semantic_id": "tops.polo_shirts.product.facts.lower_hem",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lower_hem"
+    },
+    "product.facts.side_vent_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.product.facts.side_vent_count_per_garment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Open lower-hem side vents per garment, not buttonholes."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "side_vent_count_per_garment"
+    },
+    "product.facts.wash_temperature_max_c": {
+      "semantic_id": "tops.polo_shirts.product.facts.wash_temperature_max_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C",
+        "basis": "Authored maximum gentle machine-wash setting for complete garment including attached parts, not a measured outcome."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wash_temperature_max_c"
+    },
+    "product.facts.market_range": {
+      "semantic_id": "tops.polo_shirts.product.facts.market_range",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "women",
+          "men",
+          "unisex"
+        ],
+        "basis": "Commercial product range, not anatomy, personal fit or size conversion.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "review.subject.colour": {
+      "semantic_id": "tops.polo_shirts.review.subject.colour",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "white"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.size_label": {
+      "semantic_id": "tops.polo_shirts.review.subject.size_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Synthetic commercial label, not anatomy, body fit or a bought garment measurement."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.pack_count": {
+      "semantic_id": "tops.polo_shirts.review.subject.pack_count",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": 1,
+        "max": 2,
+        "basis": "Whole purchase of complete same-recipe, same-colour, same-label garments; wrapping and attached parts add no garments."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.facts.garment_label": {
+      "semantic_id": "tops.polo_shirts.review.subject.facts.garment_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.facts.neck_button_count_per_garment": {
+      "semantic_id": "tops.polo_shirts.review.subject.facts.neck_button_count_per_garment",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Attached exposed short-neck-placket buttons per garment, excluding any other hardware."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "product.facts.garment_label": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "polo"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.main_fabric_composition_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Body and short-sleeve cloth only, excluding collar/cuff rib, placket outer cloth, reinforcement, hardware, sewing thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.size_system": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "fictional commercial labels"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "cotton_pique",
+          "fine_silk_cotton"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "nominal_chart_back_length_cm": {
+      "id": "tops.polo_shirts.content.nominal_chart_back_length_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_chart_back_length_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_chart_sleeve_length_cm": {
+      "id": "tops.polo_shirts.content.nominal_chart_sleeve_length_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_chart_sleeve_length_cm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "collar_style": {
+      "id": "tops.polo_shirts.content.collar_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_style"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "cuff_style": {
+      "id": "tops.polo_shirts.content.cuff_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cuff_style"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_cuff_structure": {
+      "id": "tops.polo_shirts.content.collar_cuff_structure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.collar_cuff_structure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "placket_outer_composition_same_as_main": {
+      "id": "tops.polo_shirts.content.placket_outer_composition_same_as_main",
+      "display_group": "features",
+      "fields": [
+        "product.facts.placket_outer_composition_same_as_main"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "neck_placket_count_per_garment": {
+      "id": "tops.polo_shirts.content.neck_placket_count_per_garment",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.neck_placket_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "neck_placket_style": {
+      "id": "tops.polo_shirts.content.neck_placket_style",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.neck_placket_style"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "neck_buttons_exposed": {
+      "id": "tops.polo_shirts.content.neck_buttons_exposed",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.neck_buttons_exposed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "button_material": {
+      "id": "tops.polo_shirts.content.button_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.button_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "other_button_count_per_garment": {
+      "id": "tops.polo_shirts.content.other_button_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.other_button_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sleeve_length": {
+      "id": "tops.polo_shirts.content.sleeve_length",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.sleeve_length"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "print_present": {
+      "id": "tops.polo_shirts.content.print_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.print_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_stay_count_per_garment": {
+      "id": "tops.polo_shirts.content.collar_stay_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_stay_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_machine_allowed": {
+      "id": "tops.polo_shirts.content.wash_machine_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_machine_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_cycle": {
+      "id": "tops.polo_shirts.content.wash_cycle",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_cycle"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "line_drying_allowed": {
+      "id": "tops.polo_shirts.content.line_drying_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.line_drying_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bleach_allowed": {
+      "id": "tops.polo_shirts.content.bleach_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tumble_drying_allowed": {
+      "id": "tops.polo_shirts.content.tumble_drying_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tumble_drying_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dry_cleaning_allowed": {
+      "id": "tops.polo_shirts.content.dry_cleaning_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dry_cleaning_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fabric_structure": {
+      "id": "tops.polo_shirts.content.fabric_structure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fabric_structure"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "main_fabric_composition": {
+      "id": "tops.polo_shirts.content.main_fabric_composition",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.main_fabric_cotton_percent",
+        "product.facts.main_fabric_silk_percent"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "collar_cuff_cotton_percent": {
+      "id": "tops.polo_shirts.content.collar_cuff_cotton_percent",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_cuff_cotton_percent"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_cuff_silk_percent": {
+      "id": "tops.polo_shirts.content.collar_cuff_silk_percent",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_cuff_silk_percent"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cut": {
+      "id": "tops.polo_shirts.content.cut",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.cut"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "neck_button_count_per_garment": {
+      "id": "tops.polo_shirts.content.neck_button_count_per_garment",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.neck_button_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "total_button_count_per_garment": {
+      "id": "tops.polo_shirts.content.total_button_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.total_button_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lower_hem": {
+      "id": "tops.polo_shirts.content.lower_hem",
+      "display_group": "features",
+      "fields": [
+        "product.facts.lower_hem"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_vent_count_per_garment": {
+      "id": "tops.polo_shirts.content.side_vent_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.side_vent_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_temperature_max_c": {
+      "id": "tops.polo_shirts.content.wash_temperature_max_c",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_temperature_max_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 79,
+    "roles": {
+      "identity": 5,
+      "buying_choice": 4,
+      "descriptive": 13,
+      "commerce": 1,
+      "review_only": 6,
+      "omit_placeholder": 16,
+      "literal": 18,
+      "omit_fixed_detail": 12,
+      "qualifier": 1,
+      "operational": 2,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 6,
+    "unmapped_descriptive_fields": 0
+  }
+}

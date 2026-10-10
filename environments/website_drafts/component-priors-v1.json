@@ -1,0 +1,167 @@
+{
+  "schema": "website-component-priors-v1",
+  "calibration": "Initial tunable heuristics; not empirical estimates.",
+  "roles": {
+    "home": {
+      "typical": [
+        "departments",
+        "editorial",
+        "noticeboard"
+      ],
+      "huge": [
+        "marketplace",
+        "superstore"
+      ],
+      "boutique": [
+        "atelier",
+        "counter"
+      ]
+    },
+    "results": {
+      "typical": [
+        "faceted",
+        "ledger",
+        "grouped"
+      ],
+      "huge": [
+        "marketplace",
+        "superstore"
+      ],
+      "boutique": [
+        "atelier",
+        "counter"
+      ]
+    },
+    "product": {
+      "typical": [
+        "story",
+        "tabs",
+        "technical"
+      ],
+      "huge": [
+        "marketplace",
+        "superstore"
+      ],
+      "boutique": [
+        "atelier",
+        "counter"
+      ]
+    },
+    "cart": {
+      "typical": [
+        "table",
+        "cards",
+        "groups"
+      ]
+    },
+    "checkout": {
+      "typical": [
+        "steps",
+        "single",
+        "sections"
+      ]
+    },
+    "info": {
+      "typical": [
+        "directory",
+        "questions",
+        "handbook"
+      ]
+    },
+    "navbar": {
+      "typical": [
+        "departments",
+        "menu",
+        "compact"
+      ],
+      "huge": [
+        "marketplace",
+        "superstore"
+      ],
+      "boutique": [
+        "atelier",
+        "counter"
+      ]
+    },
+    "sidebar": {
+      "typical": [
+        "directory",
+        "drawer",
+        "services"
+      ],
+      "huge": [
+        "marketplace",
+        "superstore"
+      ],
+      "boutique": [
+        "atelier",
+        "counter"
+      ]
+    },
+    "footer": {
+      "typical": [
+        "columns",
+        "disclosures",
+        "directory"
+      ],
+      "huge": [
+        "marketplace",
+        "superstore"
+      ],
+      "boutique": [
+        "atelier",
+        "counter"
+      ]
+    }
+  },
+  "profiles": {
+    "boutique": {
+      "family_weights": {
+        "boutique": 0.75,
+        "typical": 0.2,
+        "huge": 0.05
+      },
+      "search_probability": 0.85
+    },
+    "typical": {
+      "family_weights": {
+        "boutique": 0.2,
+        "typical": 0.65,
+        "huge": 0.15
+      },
+      "search_probability": 0.98
+    },
+    "huge": {
+      "family_weights": {
+        "boutique": 0.05,
+        "typical": 0.2,
+        "huge": 0.75
+      },
+      "search_probability": 1
+    }
+  },
+  "site_choices": {
+    "global": {
+      "standard": 1,
+      "guided": 1,
+      "concise": 1
+    },
+    "iconCart": {
+      "true": 1,
+      "false": 1
+    },
+    "url": {
+      "all": 1,
+      "colour": 1,
+      "none": 1
+    },
+    "reset": {
+      "true": 0.1,
+      "false": 0.9
+    },
+    "opaque": {
+      "true": 0.2,
+      "false": 0.8
+    }
+  }
+}

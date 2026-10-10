@@ -1,0 +1,231 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "garden_trimmers",
+  "review_id": "F31",
+  "label": "Grass trimmers and brushcutters",
+  "section": "Tools and garden",
+  "store_type_ids": [
+    "tools"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Line spool and blade details depend on the tool. Blades require explicitly supported attachments; weather exposure does not imply unrestricted wet-weather operation.",
+  "shared_dimension_ids": [
+    "power_source",
+    "compatible_platform",
+    "motor_design",
+    "speed_range",
+    "weight",
+    "included_bundle",
+    "cutting_width",
+    "shaft_configuration",
+    "handle_configuration"
+  ],
+  "dimensions": [
+    {
+      "id": "power_source",
+      "label": "Power source",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "compatible_platform",
+      "label": "Compatible platform",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "motor_design",
+      "label": "Motor design",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "speed_range",
+      "label": "Speed range",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": "rpm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "weight",
+      "label": "Weight",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "g",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "included_bundle",
+      "label": "Included bundle",
+      "module_id": "compatibility",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "cutting_width",
+      "label": "Cutting width",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "shaft_configuration",
+      "label": "Shaft configuration",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "handle_configuration",
+      "label": "Handle configuration",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "battery_capacity",
+      "label": "Battery capacity",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "Wh",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "line_diameter",
+      "label": "Line diameter",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "blade_type",
+      "label": "Blade type",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "garden_trimmers.grass_line_trimmers",
+      "label": "Grass/line trimmers",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity",
+        "line_diameter"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "compatible_platform": "Tool uses a removable battery platform.",
+        "battery_capacity": "A battery is included in the chosen kit."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "garden_trimmers.brushcutters",
+      "label": "Brushcutters",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity",
+        "blade_type"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "compatible_platform": "Tool uses a removable battery platform.",
+        "battery_capacity": "A battery is included in the chosen kit."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

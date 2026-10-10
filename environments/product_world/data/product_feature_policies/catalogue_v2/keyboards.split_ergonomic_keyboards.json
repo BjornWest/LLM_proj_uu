@@ -1,0 +1,3518 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "keyboards.split_ergonomic_keyboards",
+  "family_id": "keyboards",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/keyboards.split_ergonomic_keyboards.json": "d2f1e789db4432fc3d97f52d1eb0383e2f6da4929b208497e2c7ddb0dd5751b0",
+    "environments/product_world/data/product_width/_keyboards_base.json": "8d58ae22d7a69014800243cef8cfad45d0489a9a670905623087a676719fb1fc",
+    "environments/product_world/data/product_public_content/keyboards.split_ergonomic_keyboards.json": "1a86f60596ccbba5bfe248a1aac34610f409e31bf21b94d5d0928d07f42ff883"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Layout is a buying choice. Adjustment, connection and switch types matter; artificial controls and excluded mouse inventories do not.",
+  "concept_note": null,
+  "fields": {
+    "sku.language_layout": {
+      "semantic_id": "keyboards.split.sku.language_layout",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "US English ANSI",
+          "UK English ISO",
+          "US English columnar",
+          "UK English columnar"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "language_layout"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.physical_layout": {
+      "semantic_id": "keyboards.split.sku.physical_layout",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ANSI",
+          "ISO",
+          "columnar"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.key_count": {
+      "semantic_id": "keyboards.split.sku.key_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 52,
+        "max": 105,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_key_count"
+    },
+    "sku.enter_geometry": {
+      "semantic_id": "keyboards.split.sku.enter_geometry",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "horizontal single-row Enter",
+          "tall two-row Enter",
+          "one-unit rectangular Enter"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_enter_geometry"
+    },
+    "sku.number_pad": {
+      "semantic_id": "keyboards.split.sku.number_pad",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_number_pad"
+    },
+    "product.facts.body_units": {
+      "semantic_id": "keyboards.split.body_units",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.split_key_groups": {
+      "semantic_id": "keyboards.split.split_key_groups",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.separation_adjustable": {
+      "semantic_id": "keyboards.split.separation_adjustable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "keyboards.split.separation.fixed"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_split_adjustment"
+    },
+    "product.facts.splay_adjustable": {
+      "semantic_id": "keyboards.split.splay_adjustable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_split_adjustment"
+    },
+    "product.facts.max_clear_gap_mm": {
+      "semantic_id": "keyboards.split.max_clear_gap_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.separation_adjustable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_split_adjustment"
+    },
+    "product.facts.front_pitch_positions_deg": {
+      "semantic_id": "keyboards.split.front_pitch_positions_deg",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "deg"
+        },
+        "applicable_when": "product.facts.front_pitch_adjustable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": [
+          0,
+          -4,
+          -7
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_front_pitch_adjustment"
+    },
+    "product.facts.front_pitch_adjustable": {
+      "semantic_id": "keyboards.split.front_pitch_adjustable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_front_pitch_adjustment"
+    },
+    "product.facts.tent_support_units": {
+      "semantic_id": "keyboards.split.tent_support_units",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "applicable_when": "product.facts.tent_supports_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "tent_supports"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.tent_supports_included": {
+      "semantic_id": "keyboards.split.tent_supports_included",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "tent_supports"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_tenting_adjustment"
+    },
+    "product.facts.tent_positions_deg": {
+      "semantic_id": "keyboards.split.tent_positions_deg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "deg"
+        },
+        "applicable_when": "product.facts.tenting_adjustable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_tenting_adjustment"
+    },
+    "product.facts.tenting_adjustable": {
+      "semantic_id": "keyboards.split.tenting_adjustable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_tenting_adjustment"
+    },
+    "product.facts.body_material": {
+      "semantic_id": "keyboards.split.body_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ABS",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "keyboard_bodies"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_body_material"
+    },
+    "product.facts.keycap_material": {
+      "semantic_id": "keyboards.split.keycap_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ABS",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "installed_keycaps"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_keycap_material"
+    },
+    "product.facts.key_mechanism": {
+      "semantic_id": "keyboards.split.key_mechanism",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "low-profile scissor",
+          "rubber-dome membrane",
+          "low-profile linear mechanical"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_key_mechanism"
+    },
+    "product.facts.lower_baseplate_material": {
+      "semantic_id": "keyboards.split.lower_baseplate_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "steel"
+        ],
+        "applicable_when": "product.facts.mechanical",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "steel",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "lower_baseplates"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_lower_baseplate_material"
+    },
+    "product.facts.hot_swap": {
+      "semantic_id": "keyboards.split.hot_swap",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_hot_swap"
+    },
+    "product.facts.replacement_compatibility": {
+      "semantic_id": "keyboards.split.replacement_compatibility",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.mechanical",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.palm_support_units": {
+      "semantic_id": "keyboards.split.palm_support_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "applicable_when": "product.facts.palm_supports_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "palm_supports"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_palm_support_units"
+    },
+    "product.facts.palm_supports_included": {
+      "semantic_id": "keyboards.split.palm_supports_included",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "palm_supports"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_palm_supports_included"
+    },
+    "product.facts.palm_support_removable": {
+      "semantic_id": "keyboards.split.palm_support_removable",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.palm_supports_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "palm_supports"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_palm_support_removable"
+    },
+    "product.facts.palm_support_construction": {
+      "semantic_id": "keyboards.split.palm_support_construction",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fabric/foam",
+          "foam/ABS"
+        ],
+        "applicable_when": "product.facts.palm_supports_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "palm_supports"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_palm_support_construction"
+    },
+    "product.facts.palm_support_care": {
+      "semantic_id": "keyboards.split.palm_support_care",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.palm_supports_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "palm_supports"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_included": {
+      "semantic_id": "keyboards.split.battery_included",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_battery_included"
+    },
+    "product.facts.aaa_cell_units": {
+      "semantic_id": "keyboards.split.aaa_cell_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "installed_cells"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_aaa_cell_units"
+    },
+    "product.facts.battery_type": {
+      "semantic_id": "keyboards.split.battery_type",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "AAA alkaline"
+        ],
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "AAA alkaline",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "installed_cells"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_battery_type"
+    },
+    "product.facts.user_replaceable_battery": {
+      "semantic_id": "keyboards.split.user_replaceable_battery",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_user_replaceable_battery"
+    },
+    "product.facts.battery_capacity_wh": {
+      "semantic_id": "keyboards.split.battery_capacity_wh",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.charge_time_h": {
+      "semantic_id": "keyboards.split.charge_time_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.rechargeable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usb_keyboard_data": {
+      "semantic_id": "keyboards.split.usb_keyboard_data",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_usb_keyboard_data"
+    },
+    "product.facts.host_powered": {
+      "semantic_id": "keyboards.split.host_powered",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_host_powered"
+    },
+    "product.facts.battery_runtime_h": {
+      "semantic_id": "keyboards.split.battery_runtime_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.bluetooth": {
+      "semantic_id": "keyboards.split.bluetooth",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_bluetooth"
+    },
+    "product.facts.remembered_bluetooth_hosts": {
+      "semantic_id": "keyboards.split.remembered_bluetooth_hosts",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "applicable_when": "product.facts.bluetooth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 3,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_remembered_bluetooth_hosts"
+    },
+    "product.facts.receiver_included": {
+      "semantic_id": "keyboards.split.receiver_included",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "matched_receiver"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_receiver_included"
+    },
+    "product.facts.receiver_units": {
+      "semantic_id": "keyboards.split.receiver_units",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "applicable_when": "product.facts.receiver_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "matched_receiver"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.receiver_host_plug": {
+      "semantic_id": "keyboards.split.receiver_host_plug",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "USB-A"
+        ],
+        "applicable_when": "product.facts.receiver_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "USB-A",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "matched_receiver"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_receiver_host_plug"
+    },
+    "product.facts.receiver_interchangeability": {
+      "semantic_id": "keyboards.split.receiver_interchangeability",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.receiver_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "matched_receiver"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.bluetooth_version": {
+      "semantic_id": "keyboards.split.bluetooth_version",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.bluetooth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.radio_range": {
+      "semantic_id": "keyboards.split.radio_range",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.bluetooth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.host_lead_included": {
+      "semantic_id": "keyboards.split.host_lead_included",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "host_lead"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_host_lead"
+    },
+    "product.facts.host_lead_length_m": {
+      "semantic_id": "keyboards.split.host_lead_length_m",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "applicable_when": "product.facts.host_lead_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "host_lead"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_host_lead"
+    },
+    "product.facts.host_plug": {
+      "semantic_id": "keyboards.split.host_plug",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "USB-A"
+        ],
+        "applicable_when": "product.facts.host_lead_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "USB-A",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "host_lead"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_host_plug"
+    },
+    "product.facts.host_lead_detachable": {
+      "semantic_id": "keyboards.split.host_lead_detachable",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "host_lead"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_host_lead"
+    },
+    "product.facts.bridge_included": {
+      "semantic_id": "keyboards.split.bridge_included",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "intermodule_bridge"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_intermodule_bridge"
+    },
+    "product.facts.bridge_length_m": {
+      "semantic_id": "keyboards.split.bridge_length_m",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "applicable_when": "product.facts.bridge_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "intermodule_bridge"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_intermodule_bridge"
+    },
+    "product.facts.bridge_detachable": {
+      "semantic_id": "keyboards.split.bridge_detachable",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "intermodule_bridge"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_intermodule_bridge"
+    },
+    "product.facts.bridge_connector": {
+      "semantic_id": "keyboards.split.bridge_connector",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.bridge_detachable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "matched3.5mm four-contact keyboard intermodule",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "intermodule_bridge"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_intermodule_bridge"
+    },
+    "product.facts.backlight": {
+      "semantic_id": "keyboards.split.backlight",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_backlight"
+    },
+    "product.facts.backlight_family": {
+      "semantic_id": "keyboards.split.backlight_family",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "RGB"
+        ],
+        "applicable_when": "product.facts.backlight",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "RGB",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_backlight_family"
+    },
+    "product.facts.backlight_brightness": {
+      "semantic_id": "keyboards.split.backlight_brightness",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.backlight",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.backlight_modes": {
+      "semantic_id": "keyboards.split.backlight_modes",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.backlight",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.backlight_controls": {
+      "semantic_id": "keyboards.split.backlight_controls",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.backlight",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.backlight_spectrum": {
+      "semantic_id": "keyboards.split.backlight_spectrum",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.backlight",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.remapping_support": {
+      "semantic_id": "keyboards.split.remapping_support",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "set",
+        "items": {
+          "type": "string"
+        },
+        "unknown_values": [
+          [
+            "not specified"
+          ]
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_remapping_support"
+    },
+    "product.facts.remapping_scope": {
+      "semantic_id": "keyboards.split.remapping_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.logical_layers": {
+      "semantic_id": "keyboards.split.logical_layers",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_logical_layers"
+    },
+    "product.facts.max_layers": {
+      "semantic_id": "keyboards.split.max_layers",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.logical_layers",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.default_keymap": {
+      "semantic_id": "keyboards.split.default_keymap",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.utility_setup_result": {
+      "semantic_id": "keyboards.split.utility_setup_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.configured_dimensions_declaration": {
+      "semantic_id": "keyboards.split.configured_dimensions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.mass_declaration": {
+      "semantic_id": "keyboards.split.mass_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.switch_performance_tests": {
+      "semantic_id": "keyboards.split.switch_performance_tests",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.keyboard_care": {
+      "semantic_id": "keyboards.split.keyboard_care",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.box_hardware": {
+      "semantic_id": "keyboards.split.box_hardware",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_box_hardware"
+    },
+    "product.facts.box_exclusions": {
+      "semantic_id": "keyboards.split.box_exclusions",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "constant": [
+          "mouse",
+          "wall charger",
+          "host adapter",
+          "extension",
+          "separate number pad",
+          "extra battery",
+          "carrying case",
+          "spare keycaps/switches",
+          "puller",
+          "tripod/mount",
+          "trackpad/display",
+          "knob",
+          "powered hub"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Legacy negative-inventory prose cannot bypass feature pruning."
+    },
+    "product.facts.host_lead_units": {
+      "semantic_id": "keyboards.split.host_lead_units",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "applicable_when": "product.facts.host_lead_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "host_lead"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.bridge_units": {
+      "semantic_id": "keyboards.split.bridge_units",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "applicable_when": "product.facts.bridge_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "intermodule_bridge"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.lead_keyboard_plug": {
+      "semantic_id": "keyboards.split.lead_keyboard_plug",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "USB-C"
+        ],
+        "applicable_when": "product.facts.host_lead_detachable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "USB-C",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "host_lead"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_host_lead"
+    },
+    "product.facts.receiver_model_match": {
+      "semantic_id": "keyboards.split.receiver_model_match",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.receiver_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component_key": "matched_receiver"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_receiver_model_match"
+    },
+    "review.purchase_price_sek": {
+      "semantic_id": "keyboards.split.review.purchase_price_sek",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.setup_label": {
+      "semantic_id": "keyboards.split.review.setup_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.connection_label": {
+      "semantic_id": "keyboards.split.review.connection_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.input_map_label": {
+      "semantic_id": "keyboards.split.review.input_map_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.raised_tent_deg": {
+      "semantic_id": "keyboards.split.review.raised_tent_deg",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "product.facts.assembly": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fixed_curve",
+          "separated_membrane",
+          "separated_columnar"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.mechanical": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.number_pad": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.box_hardware_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.assembly_price_factor": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 1,
+        "max": 1.7,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.gap_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "declared maximum clear gap between inner module edges; flat parallel modules and supplied bridge without tension; not cable length or configured footprint",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.basic_host_support": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "constant": [
+          "Windows",
+          "macOS",
+          "Linux"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.keyboard_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.rechargeable": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.folding": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.trackpad": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.display": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.knob": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.powered_usb_hub": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.mouse_included": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.wall_charger_included": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.host_adapter_included": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.extension_included": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.separate_number_pad_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.extra_battery_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.carrying_case_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.spare_keycaps_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.spare_switches_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.puller_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.tripod_mount_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.keyboard_units": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.full_key_matrix": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.exact_legend_inventory": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.host_os_firmware_versions": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.platform_hotkeys": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.clinical_effects": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.splay_limit_deg": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "deg",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.separation_adjustable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fixed_transverse_curve_deg": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "deg",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.assembly == 'fixed_curve'",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.tent_support_care": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.tent_supports_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.keycap_removal": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "True",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.battery_nominal_voltage_v": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_charge_capacity_mah": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_arrangement": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_compartment": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "authored rear compartment",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.charging_socket": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.rechargeable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.on_off_control": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.battery_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.host_selection_controls": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.bluetooth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.keyboard_socket": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "USB-C"
+        ],
+        "applicable_when": "product.facts.host_lead_detachable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "USB-C",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.device_input_voltage_v": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.host_powered",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.device_input_current_a": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.host_powered",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.device_input_power_w": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.host_powered",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cable_electrical_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.host_lead_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cable_data_speed": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "applicable_when": "product.facts.host_lead_included",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "sku_key_count": {
+      "id": "keyboards.split_ergonomic_keyboards.content.sku_key_count",
+      "display_group": "features",
+      "fields": [
+        "sku.key_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_enter_geometry": {
+      "id": "keyboards.split_ergonomic_keyboards.content.sku_enter_geometry",
+      "display_group": "features",
+      "fields": [
+        "sku.enter_geometry"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_number_pad": {
+      "id": "keyboards.split_ergonomic_keyboards.content.sku_number_pad",
+      "display_group": "features",
+      "fields": [
+        "sku.number_pad"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_split_adjustment": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_split_adjustment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.separation_adjustable",
+        "product.facts.splay_adjustable",
+        "product.facts.max_clear_gap_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_front_pitch_adjustment": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_front_pitch_adjustment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_pitch_positions_deg",
+        "product.facts.front_pitch_adjustable"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_tenting_adjustment": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_tenting_adjustment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tent_supports_included",
+        "product.facts.tent_positions_deg",
+        "product.facts.tenting_adjustable"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_body_material": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_keycap_material": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_keycap_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.keycap_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_key_mechanism": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_key_mechanism",
+      "display_group": "features",
+      "fields": [
+        "product.facts.key_mechanism"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_lower_baseplate_material": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_lower_baseplate_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.lower_baseplate_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_hot_swap": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_hot_swap",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hot_swap"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_palm_support_units": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_palm_support_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.palm_support_units"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_palm_supports_included": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_palm_supports_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.palm_supports_included"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_palm_support_removable": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_palm_support_removable",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.palm_support_removable"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_palm_support_construction": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_palm_support_construction",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.palm_support_construction"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_battery_included": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_battery_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.battery_included"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_aaa_cell_units": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_aaa_cell_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.aaa_cell_units"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_battery_type": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_battery_type",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_type"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_user_replaceable_battery": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_user_replaceable_battery",
+      "display_group": "features",
+      "fields": [
+        "product.facts.user_replaceable_battery"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_usb_keyboard_data": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_usb_keyboard_data",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_keyboard_data"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_host_powered": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_host_powered",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.host_powered"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_bluetooth": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_bluetooth",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bluetooth"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_remembered_bluetooth_hosts": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_remembered_bluetooth_hosts",
+      "display_group": "features",
+      "fields": [
+        "product.facts.remembered_bluetooth_hosts"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_receiver_included": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_receiver_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.receiver_included"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_receiver_host_plug": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_receiver_host_plug",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.receiver_host_plug"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_host_lead": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_host_lead",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.host_lead_included",
+        "product.facts.host_lead_length_m",
+        "product.facts.host_lead_detachable",
+        "product.facts.lead_keyboard_plug"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_host_plug": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_host_plug",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.host_plug"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_intermodule_bridge": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_intermodule_bridge",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.bridge_included",
+        "product.facts.bridge_length_m",
+        "product.facts.bridge_detachable",
+        "product.facts.bridge_connector"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_backlight": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_backlight",
+      "display_group": "features",
+      "fields": [
+        "product.facts.backlight"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_backlight_family": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_backlight_family",
+      "display_group": "features",
+      "fields": [
+        "product.facts.backlight_family"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_remapping_support": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_remapping_support",
+      "display_group": "features",
+      "fields": [
+        "product.facts.remapping_support"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_logical_layers": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_logical_layers",
+      "display_group": "features",
+      "fields": [
+        "product.facts.logical_layers"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_box_hardware": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_box_hardware",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.box_hardware"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_receiver_model_match": {
+      "id": "keyboards.split_ergonomic_keyboards.content.product_receiver_model_match",
+      "display_group": "features",
+      "fields": [
+        "product.facts.receiver_model_match"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 127,
+    "roles": {
+      "buying_choice": 2,
+      "descriptive": 33,
+      "omit_low_value_detail": 1,
+      "omit_fixed_detail": 10,
+      "literal": 12,
+      "omit_placeholder": 36,
+      "qualifier": 2,
+      "review_only": 5,
+      "private_support": 25,
+      "internal": 1
+    },
+    "display_groups": 4,
+    "highlight_candidates": 10,
+    "unmapped_descriptive_fields": 0
+  },
+  "semantic_review_note": "Format, switch/connection, host support and real remapping conditions matter. Ergonomic split/tent/gap settings are meaningful. Suppress ordinary unit counts and inventories of missing knobs/trackpads/extra keycaps; retain battery and USB-data distinctions."
+}

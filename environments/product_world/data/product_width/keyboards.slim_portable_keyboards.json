@@ -1,0 +1,4544 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "keyboards.slim_portable_keyboards",
+  "random_namespace": "product-width-keyboards.slim_portable_keyboards-v1",
+  "extends": "_keyboards_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "language_layout": {
+            "type": "enum",
+            "values": [
+              "US English ANSI",
+              "UK English ISO"
+            ]
+          },
+          "physical_layout": {
+            "type": "enum",
+            "values": [
+              "ANSI",
+              "ISO"
+            ]
+          },
+          "enter_geometry": {
+            "type": "enum",
+            "values": [
+              "horizontal single-row Enter",
+              "tall two-row Enter"
+            ]
+          },
+          "key_count": {
+            "type": "integer",
+            "unit": "count",
+            "min": 77,
+            "max": 80
+          },
+          "assembly": {
+            "type": "enum",
+            "values": [
+              "cell_compact",
+              "rechargeable_lit",
+              "rechargeable_trimode"
+            ]
+          },
+          "number_pad": {
+            "type": "boolean"
+          },
+          "outer_width_mm": {
+            "type": "number",
+            "unit": "mm",
+            "min": 1
+          },
+          "outer_depth_mm": {
+            "type": "number",
+            "unit": "mm",
+            "min": 1
+          },
+          "outer_max_height_mm": {
+            "type": "number",
+            "unit": "mm",
+            "min": 1
+          },
+          "body_mass_g": {
+            "type": "number",
+            "unit": "g",
+            "min": 1
+          },
+          "dimension_basis": {
+            "type": "string"
+          },
+          "mass_basis": {
+            "type": "string"
+          },
+          "battery_type": {
+            "type": "enum",
+            "values": [
+              "AAA alkaline",
+              "integrated Li-polymer"
+            ]
+          },
+          "installed_battery_units": {
+            "type": "integer",
+            "unit": "count",
+            "min": 1,
+            "max": 2
+          },
+          "rechargeable": {
+            "type": "boolean"
+          },
+          "user_replaceable_battery": {
+            "type": "boolean"
+          },
+          "battery_energy_status": {
+            "type": "enum",
+            "values": [
+              "unknown",
+              "authored nominal"
+            ]
+          },
+          "bluetooth": {
+            "type": "boolean"
+          },
+          "remembered_bluetooth_hosts": {
+            "type": "integer",
+            "unit": "count",
+            "min": 3,
+            "max": 3
+          },
+          "usb_keyboard_data": {
+            "type": "boolean"
+          },
+          "receiver_mode": {
+            "type": "boolean"
+          },
+          "receiver_included": {
+            "type": "boolean"
+          },
+          "usb_lead_included": {
+            "type": "boolean"
+          },
+          "usb_lead_length_m": {
+            "type": "number",
+            "unit": "m",
+            "min": -1,
+            "unknown_values": [
+              -1
+            ]
+          },
+          "usb_lead_length_status": {
+            "type": "enum",
+            "values": [
+              "nominal",
+              "not applicable"
+            ]
+          },
+          "host_plug_label": {
+            "type": "enum",
+            "values": [
+              "USB-A",
+              "not applicable"
+            ]
+          },
+          "keyboard_socket_label": {
+            "type": "enum",
+            "values": [
+              "USB-C",
+              "not applicable"
+            ]
+          },
+          "keyboard_socket_status": {
+            "type": "enum",
+            "values": [
+              "declared",
+              "not applicable"
+            ]
+          },
+          "lead_role_label": {
+            "type": "enum",
+            "values": [
+              "charge only at keyboard",
+              "keyboard data and charge",
+              "not applicable"
+            ]
+          },
+          "assembly_price_factor": {
+            "type": "number",
+            "min": 1,
+            "max": 1.35
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 180,
+            "max": 2700
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK",
+      "min": 180,
+      "max": 2000
+    },
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "assembly": {
+          "type": "enum",
+          "values": [
+            "cell_compact",
+            "rechargeable_lit",
+            "rechargeable_trimode"
+          ]
+        },
+        "key_format": {
+          "type": "enum",
+          "values": [
+            "compact function-row",
+            "compact75%"
+          ]
+        },
+        "rechargeable": {
+          "type": "boolean"
+        },
+        "user_replaceable_battery": {
+          "type": "boolean"
+        },
+        "battery_type": {
+          "type": "enum",
+          "values": [
+            "AAA alkaline",
+            "integrated Li-polymer"
+          ]
+        },
+        "installed_battery_units": {
+          "type": "integer",
+          "unit": "count",
+          "min": 1,
+          "max": 2
+        },
+        "battery_charge_capacity_mah": {
+          "type": "number",
+          "unit": "mAh",
+          "min": -1
+        },
+        "battery_nominal_voltage_v": {
+          "type": "number",
+          "unit": "V",
+          "min": -1
+        },
+        "battery_capacity_wh": {
+          "type": "number",
+          "unit": "Wh",
+          "min": -1
+        },
+        "usb_keyboard_data": {
+          "type": "boolean"
+        },
+        "receiver_mode": {
+          "type": "boolean"
+        },
+        "receiver_included": {
+          "type": "boolean"
+        },
+        "usb_lead_included": {
+          "type": "boolean"
+        },
+        "usb_lead_length_m": {
+          "type": "number",
+          "unit": "m",
+          "min": -1
+        },
+        "lead_data_support": {
+          "type": "enum",
+          "values": [
+            "declared keyboard data",
+            "not specified"
+          ]
+        },
+        "backlight": {
+          "type": "boolean"
+        },
+        "remapping_support": {
+          "type": "set",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remapping_scope": {
+          "type": "enum",
+          "values": [
+            "function-row shortcuts",
+            "physical-key assignments",
+            "not specified"
+          ]
+        },
+        "outer_width_mm": {
+          "type": "number",
+          "unit": "mm",
+          "min": 1
+        },
+        "outer_depth_mm": {
+          "type": "number",
+          "unit": "mm",
+          "min": 1
+        },
+        "outer_max_height_mm": {
+          "type": "number",
+          "unit": "mm",
+          "min": 1
+        },
+        "body_mass_g": {
+          "type": "number",
+          "unit": "g",
+          "min": 1
+        },
+        "assembly_price_factor": {
+          "type": "number",
+          "min": 1,
+          "max": 1.35
+        }
+      }
+    },
+    "product.facts.assembly": {
+      "type": "enum",
+      "values": [
+        "cell_compact",
+        "rechargeable_lit",
+        "rechargeable_trimode"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.key_format": {
+      "type": "enum",
+      "values": [
+        "compact function-row",
+        "compact75%"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rechargeable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.user_replaceable_battery": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_type": {
+      "type": "enum",
+      "values": [
+        "AAA alkaline",
+        "integrated Li-polymer"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.installed_battery_units": {
+      "type": "integer",
+      "unit": "count",
+      "min": 1,
+      "max": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_charge_capacity_mah": {
+      "type": "number",
+      "unit": "mAh",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_nominal_voltage_v": {
+      "type": "number",
+      "unit": "V",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_capacity_wh": {
+      "type": "number",
+      "unit": "Wh",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_keyboard_data": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_mode": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_lead_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_lead_length_m": {
+      "type": "number",
+      "unit": "m",
+      "min": -1,
+      "applicable_when": "product.facts.usb_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lead_data_support": {
+      "type": "enum",
+      "values": [
+        "declared keyboard data",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.usb_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.remapping_support": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "unknown_values": [
+        [
+          "not specified"
+        ]
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.remapping_scope": {
+      "type": "enum",
+      "values": [
+        "function-row shortcuts",
+        "physical-key assignments",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.outer_width_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.outer_depth_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.outer_max_height_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "min": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.assembly_price_factor": {
+      "type": "number",
+      "min": 1,
+      "max": 1.35,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.key_mechanism": {
+      "type": "string",
+      "constant": "low-profile scissor",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_allocation": {
+      "type": "string",
+      "constant": "ABS body and keycaps with authored scissor mechanism",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.dimension_basis": {
+      "type": "string",
+      "constant": "nominal assembled body with installed keycaps and operating batteries; external lead/receiver/packaging excluded",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "nominal assembled keyboard with installed operating batteries; external lead/receiver/packaging excluded",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.capacity_basis": {
+      "type": "string",
+      "constant": "authored nominal installed cell/pack charge capacity; not runtime",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.energy_basis": {
+      "type": "string",
+      "constant": "authored nominal cell/pack energy; not USB input or runtime",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lead_length_basis": {
+      "type": "string",
+      "constant": "nominal included detachable USB lead length",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.basic_host_support": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "constant": [
+        "Windows",
+        "macOS",
+        "iPadOS",
+        "Android",
+        "Linux"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.connection_support": {
+      "type": "array",
+      "items": {
+        "type": "enum",
+        "values": [
+          "Bluetooth",
+          "receiver",
+          "USB keyboard data"
+        ]
+      },
+      "min_items": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.box_exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "constant": [
+        "mouse",
+        "wall charger",
+        "host adapter",
+        "extension",
+        "separate number pad",
+        "wrist rest",
+        "extra batteries",
+        "cover/pouch",
+        "silicone skin",
+        "puller",
+        "spare keycaps/switches",
+        "stand"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keyboard_included": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_included": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.on_off_slider": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_selection_controls": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.number_pad": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.separate_navigation_cluster": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.folding": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.split_halves": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tilt_feet": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hot_swap": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.trackpad": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.display": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.knob": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.powered_usb_hub": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mouse_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wall_charger_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_adapter_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.extension_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.detachable_number_pad_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wrist_rest_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.extra_batteries_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cover_pouch_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.silicone_skin_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.puller_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.spare_keycaps_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.spare_switches_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.stand_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keyboard_units": {
+      "type": "integer",
+      "unit": "count",
+      "constant": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.remembered_bluetooth_hosts": {
+      "type": "integer",
+      "unit": "count",
+      "constant": 3,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_runtime_h": {
+      "type": "number",
+      "unit": "h",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.polling_hz": {
+      "type": "number",
+      "unit": "Hz",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.input_latency_ms": {
+      "type": "number",
+      "unit": "ms",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cell_only_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.packaging_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.complete_box_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_electrical_arrangement": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.switch_supplier_model": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.switch_force_travel": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.key_rollover": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.acoustic_measurement": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wear_cycles": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.spill_impact_certification": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keycap_removal": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.full_key_matrix": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.exact_legend_inventory": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_version": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.radio_range_rssi": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.radio_security": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.reconnect_latency": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_version_compatibility": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_keycap_care": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.permissible_cleaner": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.water_exposure": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.utility_os_firmware_interoperability": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.installed_keymap": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.utility_setup_result": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.clinical_effects": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keyboard_socket": {
+      "type": "enum",
+      "values": [
+        "USB-C"
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lead_host_plug": {
+      "type": "enum",
+      "values": [
+        "USB-A"
+      ],
+      "applicable_when": "product.facts.usb_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lead_keyboard_plug": {
+      "type": "enum",
+      "values": [
+        "USB-C"
+      ],
+      "applicable_when": "product.facts.usb_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lead_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.usb_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_lead_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.usb_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cable_electrical_data_rating": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.usb_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_input_voltage_v": {
+      "type": "number",
+      "unit": "V",
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_input_current_a": {
+      "type": "number",
+      "unit": "A",
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_input_power_w": {
+      "type": "number",
+      "unit": "W",
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charge_time_h": {
+      "type": "number",
+      "unit": "h",
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charging_protocol": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cell_compartment": {
+      "type": "enum",
+      "values": [
+        "tool-free rear compartment"
+      ],
+      "applicable_when": "product.facts.user_replaceable_battery",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.integrated_pack_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.aaa_cell_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.user_replaceable_battery",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_host_plug": {
+      "type": "enum",
+      "values": [
+        "USB-A"
+      ],
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_radio_ghz": {
+      "type": "number",
+      "unit": "GHz",
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_protocol": {
+      "type": "string",
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_interchangeability": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_colour": {
+      "type": "enum",
+      "values": [
+        "white"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_brightness": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_modes": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_spectrum": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_controls_sensors": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mechanical_plate": {
+      "type": "string",
+      "applicable_when": "False",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tilt_adjustment_dimensions": {
+      "type": "string",
+      "applicable_when": "product.facts.tilt_feet",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.folded_dimensions": {
+      "type": "string",
+      "applicable_when": "product.facts.folding",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.split_adjustment": {
+      "type": "string",
+      "applicable_when": "product.facts.split_halves",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "sku.sku_id": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.product_id": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.physical_layout": {
+      "type": "enum",
+      "values": [
+        "ANSI",
+        "ISO"
+      ],
+      "optional": true
+    },
+    "sku.enter_geometry": {
+      "type": "enum",
+      "values": [
+        "horizontal single-row Enter",
+        "tall two-row Enter"
+      ],
+      "optional": true
+    },
+    "sku.key_count": {
+      "type": "integer",
+      "unit": "count",
+      "min": 77,
+      "max": 80,
+      "optional": true
+    },
+    "sku.assembly": {
+      "type": "enum",
+      "values": [
+        "cell_compact",
+        "rechargeable_lit",
+        "rechargeable_trimode"
+      ],
+      "optional": true
+    },
+    "sku.number_pad": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.outer_width_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 1,
+      "optional": true
+    },
+    "sku.outer_depth_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 1,
+      "optional": true
+    },
+    "sku.outer_max_height_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 1,
+      "optional": true
+    },
+    "sku.body_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "min": 1,
+      "optional": true
+    },
+    "sku.dimension_basis": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.mass_basis": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.battery_type": {
+      "type": "enum",
+      "values": [
+        "AAA alkaline",
+        "integrated Li-polymer"
+      ],
+      "optional": true
+    },
+    "sku.installed_battery_units": {
+      "type": "integer",
+      "unit": "count",
+      "min": 1,
+      "max": 2,
+      "optional": true
+    },
+    "sku.rechargeable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.user_replaceable_battery": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.battery_energy_status": {
+      "type": "enum",
+      "values": [
+        "unknown",
+        "authored nominal"
+      ],
+      "optional": true
+    },
+    "sku.bluetooth": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.remembered_bluetooth_hosts": {
+      "type": "integer",
+      "unit": "count",
+      "min": 3,
+      "max": 3,
+      "optional": true
+    },
+    "sku.usb_keyboard_data": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.receiver_mode": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.receiver_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.usb_lead_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.usb_lead_length_m": {
+      "type": "number",
+      "unit": "m",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "optional": true
+    },
+    "sku.usb_lead_length_status": {
+      "type": "enum",
+      "values": [
+        "nominal",
+        "not applicable"
+      ],
+      "optional": true
+    },
+    "sku.host_plug_label": {
+      "type": "enum",
+      "values": [
+        "USB-A",
+        "not applicable"
+      ],
+      "optional": true
+    },
+    "sku.keyboard_socket_label": {
+      "type": "enum",
+      "values": [
+        "USB-C",
+        "not applicable"
+      ],
+      "optional": true
+    },
+    "sku.keyboard_socket_status": {
+      "type": "enum",
+      "values": [
+        "declared",
+        "not applicable"
+      ],
+      "optional": true
+    },
+    "sku.lead_role_label": {
+      "type": "enum",
+      "values": [
+        "charge only at keyboard",
+        "keyboard data and charge",
+        "not applicable"
+      ],
+      "optional": true
+    },
+    "sku.assembly_price_factor": {
+      "type": "number",
+      "min": 1,
+      "max": 1.35,
+      "optional": true
+    },
+    "sku.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK",
+      "min": 180,
+      "max": 2700,
+      "optional": true
+    },
+    "request.language_layout": {
+      "type": "enum",
+      "values": [
+        "US English ANSI",
+        "UK English ISO"
+      ],
+      "optional": true
+    },
+    "request.colour": {
+      "type": "string",
+      "optional": true
+    },
+    "request.min_key_count": {
+      "type": "integer",
+      "unit": "count",
+      "min": 0,
+      "optional": true
+    },
+    "request.number_pad": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.key_mechanism": {
+      "type": "string",
+      "optional": true
+    },
+    "request.dimension_basis": {
+      "type": "string",
+      "optional": true
+    },
+    "request.mass_basis": {
+      "type": "string",
+      "optional": true
+    },
+    "request.max_width_mm": {
+      "type": "number",
+      "unit": "mm",
+      "optional": true
+    },
+    "request.max_depth_mm": {
+      "type": "number",
+      "unit": "mm",
+      "optional": true
+    },
+    "request.max_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "optional": true
+    },
+    "request.input_route": {
+      "type": "enum",
+      "values": [
+        "Bluetooth",
+        "receiver",
+        "USB keyboard data"
+      ],
+      "optional": true
+    },
+    "request.supplied_receiver": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.rechargeable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.user_replaceable_battery": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.min_battery_wh": {
+      "type": "number",
+      "unit": "Wh",
+      "optional": true
+    },
+    "request.backlight": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.remapping_system": {
+      "type": "string",
+      "optional": true
+    },
+    "request.assignment_scope": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 180,
+      "max": 450,
+      "round_to": 5,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 400,
+          "max": 1100
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 900,
+          "max": 2000
+        }
+      ]
+    },
+    {
+      "id": "assembly_joint",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "cell_compact": 4,
+        "rechargeable_lit": 3,
+        "rechargeable_trimode": 3
+      },
+      "cases": [
+        {
+          "when": "profile.positioning == 'budget'",
+          "weights": {
+            "cell_compact": 8,
+            "rechargeable_lit": 2,
+            "rechargeable_trimode": 2
+          }
+        },
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "weights": {
+            "cell_compact": 4,
+            "rechargeable_lit": 4,
+            "rechargeable_trimode": 4
+          }
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "weights": {
+            "cell_compact": 2,
+            "rechargeable_lit": 6,
+            "rechargeable_trimode": 6
+          }
+        }
+      ],
+      "values": {
+        "cell_compact": {
+          "assembly": "cell_compact",
+          "key_format": "compact function-row",
+          "rechargeable": false,
+          "user_replaceable_battery": true,
+          "battery_type": "AAA alkaline",
+          "installed_battery_units": 2,
+          "battery_charge_capacity_mah": -1,
+          "battery_nominal_voltage_v": -1,
+          "battery_capacity_wh": -1,
+          "usb_keyboard_data": false,
+          "receiver_mode": false,
+          "receiver_included": false,
+          "usb_lead_included": false,
+          "usb_lead_length_m": -1,
+          "lead_data_support": "not specified",
+          "backlight": false,
+          "remapping_support": [
+            "not specified"
+          ],
+          "remapping_scope": "not specified",
+          "outer_width_mm": 280,
+          "outer_depth_mm": 125,
+          "outer_max_height_mm": 17,
+          "body_mass_g": 420,
+          "assembly_price_factor": 1
+        },
+        "rechargeable_lit": {
+          "assembly": "rechargeable_lit",
+          "key_format": "compact function-row",
+          "rechargeable": true,
+          "user_replaceable_battery": false,
+          "battery_type": "integrated Li-polymer",
+          "installed_battery_units": 1,
+          "battery_charge_capacity_mah": 1500,
+          "battery_nominal_voltage_v": -1,
+          "battery_capacity_wh": -1,
+          "usb_keyboard_data": false,
+          "receiver_mode": false,
+          "receiver_included": false,
+          "usb_lead_included": true,
+          "usb_lead_length_m": 1,
+          "lead_data_support": "not specified",
+          "backlight": true,
+          "remapping_support": [
+            "shortcut_utility"
+          ],
+          "remapping_scope": "function-row shortcuts",
+          "outer_width_mm": 300,
+          "outer_depth_mm": 132,
+          "outer_max_height_mm": 21,
+          "body_mass_g": 510,
+          "assembly_price_factor": 1.2
+        },
+        "rechargeable_trimode": {
+          "assembly": "rechargeable_trimode",
+          "key_format": "compact75%",
+          "rechargeable": true,
+          "user_replaceable_battery": false,
+          "battery_type": "integrated Li-polymer",
+          "installed_battery_units": 1,
+          "battery_charge_capacity_mah": 800,
+          "battery_nominal_voltage_v": 3.7,
+          "battery_capacity_wh": 2.96,
+          "usb_keyboard_data": true,
+          "receiver_mode": true,
+          "receiver_included": true,
+          "usb_lead_included": true,
+          "usb_lead_length_m": 1.2,
+          "lead_data_support": "declared keyboard data",
+          "backlight": false,
+          "remapping_support": [
+            "keymap_utility"
+          ],
+          "remapping_scope": "physical-key assignments",
+          "outer_width_mm": 296,
+          "outer_depth_mm": 130,
+          "outer_max_height_mm": 15,
+          "body_mass_g": 430,
+          "assembly_price_factor": 1.35
+        }
+      }
+    },
+    {
+      "id": "assembly_assembly",
+      "target": "product.facts.assembly",
+      "derive": "internal.assembly.assembly"
+    },
+    {
+      "id": "assembly_key_format",
+      "target": "product.facts.key_format",
+      "derive": "internal.assembly.key_format"
+    },
+    {
+      "id": "assembly_rechargeable",
+      "target": "product.facts.rechargeable",
+      "derive": "internal.assembly.rechargeable"
+    },
+    {
+      "id": "assembly_user_replaceable_battery",
+      "target": "product.facts.user_replaceable_battery",
+      "derive": "internal.assembly.user_replaceable_battery"
+    },
+    {
+      "id": "assembly_battery_type",
+      "target": "product.facts.battery_type",
+      "derive": "internal.assembly.battery_type"
+    },
+    {
+      "id": "assembly_installed_battery_units",
+      "target": "product.facts.installed_battery_units",
+      "derive": "internal.assembly.installed_battery_units"
+    },
+    {
+      "id": "assembly_battery_charge_capacity_mah",
+      "target": "product.facts.battery_charge_capacity_mah",
+      "derive": "internal.assembly.battery_charge_capacity_mah"
+    },
+    {
+      "id": "assembly_battery_nominal_voltage_v",
+      "target": "product.facts.battery_nominal_voltage_v",
+      "derive": "internal.assembly.battery_nominal_voltage_v"
+    },
+    {
+      "id": "assembly_battery_capacity_wh",
+      "target": "product.facts.battery_capacity_wh",
+      "derive": "internal.assembly.battery_capacity_wh"
+    },
+    {
+      "id": "assembly_usb_keyboard_data",
+      "target": "product.facts.usb_keyboard_data",
+      "derive": "internal.assembly.usb_keyboard_data"
+    },
+    {
+      "id": "assembly_receiver_mode",
+      "target": "product.facts.receiver_mode",
+      "derive": "internal.assembly.receiver_mode"
+    },
+    {
+      "id": "assembly_receiver_included",
+      "target": "product.facts.receiver_included",
+      "derive": "internal.assembly.receiver_included"
+    },
+    {
+      "id": "assembly_usb_lead_included",
+      "target": "product.facts.usb_lead_included",
+      "derive": "internal.assembly.usb_lead_included"
+    },
+    {
+      "id": "assembly_usb_lead_length_m",
+      "target": "product.facts.usb_lead_length_m",
+      "derive": "internal.assembly.usb_lead_length_m"
+    },
+    {
+      "id": "assembly_lead_data_support",
+      "target": "product.facts.lead_data_support",
+      "derive": "internal.assembly.lead_data_support"
+    },
+    {
+      "id": "assembly_backlight",
+      "target": "product.facts.backlight",
+      "derive": "internal.assembly.backlight"
+    },
+    {
+      "id": "assembly_remapping_support",
+      "target": "product.facts.remapping_support",
+      "derive": "internal.assembly.remapping_support"
+    },
+    {
+      "id": "assembly_remapping_scope",
+      "target": "product.facts.remapping_scope",
+      "derive": "internal.assembly.remapping_scope"
+    },
+    {
+      "id": "assembly_outer_width_mm",
+      "target": "product.facts.outer_width_mm",
+      "derive": "internal.assembly.outer_width_mm"
+    },
+    {
+      "id": "assembly_outer_depth_mm",
+      "target": "product.facts.outer_depth_mm",
+      "derive": "internal.assembly.outer_depth_mm"
+    },
+    {
+      "id": "assembly_outer_max_height_mm",
+      "target": "product.facts.outer_max_height_mm",
+      "derive": "internal.assembly.outer_max_height_mm"
+    },
+    {
+      "id": "assembly_body_mass_g",
+      "target": "product.facts.body_mass_g",
+      "derive": "internal.assembly.body_mass_g"
+    },
+    {
+      "id": "assembly_assembly_price_factor",
+      "target": "product.facts.assembly_price_factor",
+      "derive": "internal.assembly.assembly_price_factor"
+    },
+    {
+      "id": "input_routes",
+      "target": "product.facts.connection_support",
+      "derive": "['Bluetooth','receiver','USB keyboard data'] if product.facts.receiver_mode else ['Bluetooth']"
+    },
+    {
+      "id": "status_keyboard_socket",
+      "target": "product.facts.keyboard_socket",
+      "derive": "'USB-C'"
+    },
+    {
+      "id": "status_lead_host_plug",
+      "target": "product.facts.lead_host_plug",
+      "derive": "'USB-A'"
+    },
+    {
+      "id": "status_lead_keyboard_plug",
+      "target": "product.facts.lead_keyboard_plug",
+      "derive": "'USB-C'"
+    },
+    {
+      "id": "status_lead_units",
+      "target": "product.facts.lead_units",
+      "derive": "1"
+    },
+    {
+      "id": "status_usb_lead_mass_g",
+      "target": "product.facts.usb_lead_mass_g",
+      "derive": "-1"
+    },
+    {
+      "id": "status_cable_electrical_data_rating",
+      "target": "product.facts.cable_electrical_data_rating",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_device_input_voltage_v",
+      "target": "product.facts.device_input_voltage_v",
+      "derive": "-1"
+    },
+    {
+      "id": "status_device_input_current_a",
+      "target": "product.facts.device_input_current_a",
+      "derive": "-1"
+    },
+    {
+      "id": "status_device_input_power_w",
+      "target": "product.facts.device_input_power_w",
+      "derive": "-1"
+    },
+    {
+      "id": "status_charge_time_h",
+      "target": "product.facts.charge_time_h",
+      "derive": "-1"
+    },
+    {
+      "id": "status_charging_protocol",
+      "target": "product.facts.charging_protocol",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_cell_compartment",
+      "target": "product.facts.cell_compartment",
+      "derive": "'tool-free rear compartment'"
+    },
+    {
+      "id": "status_integrated_pack_units",
+      "target": "product.facts.integrated_pack_units",
+      "derive": "1"
+    },
+    {
+      "id": "status_aaa_cell_units",
+      "target": "product.facts.aaa_cell_units",
+      "derive": "2"
+    },
+    {
+      "id": "status_receiver_host_plug",
+      "target": "product.facts.receiver_host_plug",
+      "derive": "'USB-A'"
+    },
+    {
+      "id": "status_receiver_radio_ghz",
+      "target": "product.facts.receiver_radio_ghz",
+      "derive": "2.4"
+    },
+    {
+      "id": "status_receiver_protocol",
+      "target": "product.facts.receiver_protocol",
+      "derive": "'matched authored receiver for this exact keyboard model'"
+    },
+    {
+      "id": "status_receiver_units",
+      "target": "product.facts.receiver_units",
+      "derive": "1"
+    },
+    {
+      "id": "status_receiver_mass_g",
+      "target": "product.facts.receiver_mass_g",
+      "derive": "-1"
+    },
+    {
+      "id": "status_receiver_interchangeability",
+      "target": "product.facts.receiver_interchangeability",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_colour",
+      "target": "product.facts.backlight_colour",
+      "derive": "'white'"
+    },
+    {
+      "id": "status_backlight_brightness",
+      "target": "product.facts.backlight_brightness",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_modes",
+      "target": "product.facts.backlight_modes",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_spectrum",
+      "target": "product.facts.backlight_spectrum",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_controls_sensors",
+      "target": "product.facts.backlight_controls_sensors",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_mechanical_plate",
+      "target": "product.facts.mechanical_plate",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_tilt_adjustment_dimensions",
+      "target": "product.facts.tilt_adjustment_dimensions",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_folded_dimensions",
+      "target": "product.facts.folded_dimensions",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_split_adjustment",
+      "target": "product.facts.split_adjustment",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 1,
+        "white": 1
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      }
+    },
+    {
+      "id": "layouts",
+      "target": "product.language_layouts",
+      "sample": "weighted_subset",
+      "weights": {
+        "US English ANSI": 1,
+        "UK English ISO": 1
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      }
+    },
+    {
+      "id": "layout_groups",
+      "for_each": {
+        "binding": "group.language_layout",
+        "from": "product.language_layouts"
+      },
+      "steps": [
+        {
+          "id": "colour_groups",
+          "for_each": {
+            "binding": "group.colour",
+            "from": "product.colours"
+          },
+          "steps": [
+            {
+              "id": "skus",
+              "target": "product.skus",
+              "emit": {
+                "assembly": "product.facts.assembly",
+                "number_pad": "product.facts.number_pad",
+                "outer_width_mm": "product.facts.outer_width_mm",
+                "outer_depth_mm": "product.facts.outer_depth_mm",
+                "outer_max_height_mm": "product.facts.outer_max_height_mm",
+                "body_mass_g": "product.facts.body_mass_g",
+                "dimension_basis": "product.facts.dimension_basis",
+                "mass_basis": "product.facts.mass_basis",
+                "battery_type": "product.facts.battery_type",
+                "installed_battery_units": "product.facts.installed_battery_units",
+                "rechargeable": "product.facts.rechargeable",
+                "user_replaceable_battery": "product.facts.user_replaceable_battery",
+                "bluetooth": "product.facts.bluetooth",
+                "remembered_bluetooth_hosts": "product.facts.remembered_bluetooth_hosts",
+                "usb_keyboard_data": "product.facts.usb_keyboard_data",
+                "receiver_mode": "product.facts.receiver_mode",
+                "receiver_included": "product.facts.receiver_included",
+                "usb_lead_included": "product.facts.usb_lead_included",
+                "assembly_price_factor": "product.facts.assembly_price_factor",
+                "sku_id": "product.product_id + '-' + product.facts.assembly + '-' + group.language_layout + '-' + group.colour",
+                "product_id": "product.product_id",
+                "colour": "group.colour",
+                "language_layout": "group.language_layout",
+                "physical_layout": "'ANSI' if group.language_layout == 'US English ANSI' else 'ISO'",
+                "enter_geometry": "'horizontal single-row Enter' if group.language_layout == 'US English ANSI' else 'tall two-row Enter'",
+                "key_count": "(77 if group.language_layout == 'US English ANSI' else 78) if product.facts.assembly == 'rechargeable_trimode' else (79 if group.language_layout == 'US English ANSI' else 80)",
+                "battery_energy_status": "'authored nominal' if known(product.facts.battery_capacity_wh) else 'unknown'",
+                "usb_lead_length_m": "product.facts.usb_lead_length_m if applicable(product.facts.usb_lead_length_m) else -1",
+                "usb_lead_length_status": "'nominal' if product.facts.usb_lead_included else 'not applicable'",
+                "host_plug_label": "'USB-A' if product.facts.usb_lead_included else 'not applicable'",
+                "keyboard_socket_label": "'USB-C' if product.facts.rechargeable else 'not applicable'",
+                "keyboard_socket_status": "'declared' if product.facts.rechargeable else 'not applicable'",
+                "lead_role_label": "('keyboard data and charge' if product.facts.usb_keyboard_data else 'charge only at keyboard') if product.facts.usb_lead_included else 'not applicable'",
+                "reference_price_sek": "product.reference_price_sek * product.facts.assembly_price_factor"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "description.layout",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "sku.language_layout",
+          "sku.physical_layout",
+          "sku.enter_geometry",
+          "sku.key_count"
+        ]
+      },
+      "slots": {
+        "layout": "sku.language_layout",
+        "count": "sku.key_count",
+        "enter": "sku.enter_geometry",
+        "geometry": "sku.physical_layout"
+      },
+      "formulations": [
+        "Selected {layout}, {geometry}: {count} installed keys and {enter}. Computer input map and firmware functions are separate.",
+        "{count} physical keys for this {layout} configuration, with {enter}; changing software does not change its {geometry} body or legends."
+      ]
+    },
+    {
+      "id": "description.construction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.key_format",
+          "product.facts.key_mechanism",
+          "product.facts.component_allocation",
+          "product.facts.number_pad",
+          "product.facts.separate_navigation_cluster"
+        ]
+      },
+      "slots": {
+        "format": "product.facts.key_format",
+        "mechanism": "product.facts.key_mechanism",
+        "parts": "product.facts.component_allocation"
+      },
+      "formulations": [
+        "{format}, {mechanism}; {parts}. No number pad or separate full navigation cluster; counted layouts are authored tuples.",
+        "Declared {parts} and {mechanism} in {format}; integrated number pad/full navigation cluster absent. Percentage labels do not determine key count."
+      ]
+    },
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.outer_width_mm",
+          "product.facts.outer_depth_mm",
+          "product.facts.outer_max_height_mm",
+          "product.facts.body_mass_g",
+          "product.facts.dimension_basis",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "w": "product.facts.outer_width_mm",
+        "d": "product.facts.outer_depth_mm",
+        "h": "product.facts.outer_max_height_mm",
+        "mass": "product.facts.body_mass_g"
+      },
+      "formulations": [
+        "Authored nominal W/D/maximum-height {w}/{d}/{h} mm and body mass {mass} g, with installed keycaps/operating batteries; external lead, receiver and packaging excluded.",
+        "Nominal assembled keyboard, including keycaps and operating batteries: {w}×{d}×{h} mm outer maximum and {mass} g. Neither supplied lead/receiver nor packaging is included in that basis."
+      ]
+    },
+    {
+      "id": "description.cell",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.installed_battery_units",
+          "product.facts.battery_type",
+          "product.facts.cell_compartment",
+          "product.facts.battery_capacity_wh",
+          "product.facts.battery_nominal_voltage_v",
+          "product.facts.battery_charge_capacity_mah",
+          "product.facts.battery_electrical_arrangement",
+          "product.facts.rechargeable"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Two preinstalled replaceable AAA alkaline cells in an authored tool-free rear compartment. Cell voltage, charge capacity, arrangement and aggregate Wh unknown; on-device recharging not applicable.",
+        "Authored two-cell AAA alkaline supply with user-accessible tool-free rear compartment, not an integrated rechargeable pack. Electrical arrangement/capacity/voltage/Wh unspecified."
+      ],
+      "when": "product.facts.user_replaceable_battery"
+    },
+    {
+      "id": "description.lit_battery",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.installed_battery_units",
+          "product.facts.battery_charge_capacity_mah",
+          "product.facts.battery_nominal_voltage_v",
+          "product.facts.battery_capacity_wh",
+          "product.facts.user_replaceable_battery",
+          "product.facts.capacity_basis"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "One authored integrated1500mAh Li-polymer pack, not user-replaceable in this recipe. Nominal voltage and Wh unknown; mAh is not energy or runtime.",
+        "Declared1500mAh for one integrated Li-polymer pack; no user replacement. Without a declared nominal voltage, Wh remains unknown."
+      ],
+      "when": "product.facts.assembly == 'rechargeable_lit'"
+    },
+    {
+      "id": "description.trimode_battery",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.battery_charge_capacity_mah",
+          "product.facts.battery_nominal_voltage_v",
+          "product.facts.battery_capacity_wh",
+          "product.facts.installed_battery_units",
+          "product.facts.user_replaceable_battery",
+          "product.facts.energy_basis"
+        ]
+      },
+      "slots": {
+        "mah": "product.facts.battery_charge_capacity_mah",
+        "v": "product.facts.battery_nominal_voltage_v",
+        "wh": "product.facts.battery_capacity_wh"
+      },
+      "formulations": [
+        "One authored nominal integrated Li-polymer tuple: {mah:g} mAh, {v:g} V cell basis, {wh:g} Wh; not user-replaceable, not a USB input rating or runtime measurement.",
+        "Authored cell/pack energy {wh:g} Wh from the joint nominal {mah:g} mAh/{v:g} V fixture. One integrated Li-polymer pack; user replacement absent, USB input/runtime unknown."
+      ],
+      "when": "product.facts.assembly == 'rechargeable_trimode'"
+    },
+    {
+      "id": "description.bluetooth",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bluetooth",
+          "product.facts.remembered_bluetooth_hosts",
+          "product.facts.host_selection_controls",
+          "product.facts.basic_host_support",
+          "product.facts.bluetooth_version",
+          "product.facts.radio_range_rssi",
+          "product.facts.host_version_compatibility"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Bluetooth input with three remembered host slots and selection controls. Compatible Windows/macOS/iPadOS/Android/Linux basic input declared; no simultaneous-input, range, version or production interoperability guarantee.",
+        "Select between up to three already paired Bluetooth hosts; this does not mean concurrent keyboard input. Basic compatible-host support declared, exact OS/version/radio behavior unknown."
+      ]
+    },
+    {
+      "id": "description.charge_lead",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.usb_lead_length_m",
+          "product.facts.lead_host_plug",
+          "product.facts.lead_keyboard_plug",
+          "product.facts.keyboard_socket",
+          "product.facts.device_input_voltage_v",
+          "product.facts.device_input_current_a",
+          "product.facts.device_input_power_w",
+          "product.facts.charge_time_h",
+          "product.facts.lead_data_support"
+        ]
+      },
+      "slots": {
+        "length": "product.facts.usb_lead_length_m",
+        "role": "'keyboard data and charging' if product.facts.usb_keyboard_data else 'charging only at this keyboard; typing remains Bluetooth'"
+      },
+      "formulations": [
+        "One supplied nominal {length:g} m USB-A-to-USB-C lead and keyboard USB-C socket for {role}. Input/cable ratings, charging time and achieved charging results unspecified.",
+        "Included detachable USB-A host/source to USB-C keyboard lead, nominal {length:g} m: {role}. Socket identity does not establish an input wattage or USB-C host adapter."
+      ],
+      "when": "product.facts.usb_lead_included"
+    },
+    {
+      "id": "description.lead_na",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.usb_lead_included",
+          "product.facts.keyboard_socket",
+          "product.facts.device_input_voltage_v",
+          "product.facts.charge_time_h",
+          "product.facts.usb_keyboard_data"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "No USB lead or charging socket. USB keyboard-data mode absent; charge/input quantities not applicable to this nonrechargeable fixture.",
+        "Cell-powered Bluetooth-only recipe, with no lead/socket or USB keyboard data. On-device charge time/input ratings inapplicable, not0W."
+      ],
+      "when": "not product.facts.usb_lead_included"
+    },
+    {
+      "id": "description.receiver",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.receiver_included",
+          "product.facts.receiver_mode",
+          "product.facts.receiver_host_plug",
+          "product.facts.receiver_radio_ghz",
+          "product.facts.receiver_protocol",
+          "product.facts.receiver_mass_g",
+          "product.facts.receiver_interchangeability",
+          "product.facts.usb_keyboard_data"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "One matched supplied USB-A2.4GHz receiver for this exact keyboard model; not a universal receiver or Bluetooth adapter. USB keyboard data also declared; receiver mass/interchangeability unknown.",
+        "Declared receiver input uses the included model-matched2.4GHz USB-A dongle, separate from Bluetooth and USB data modes. Radio results and interchangeable hardware compatibility unspecified."
+      ],
+      "when": "product.facts.receiver_included"
+    },
+    {
+      "id": "description.receiver_na",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.receiver_included",
+          "product.facts.receiver_mode",
+          "product.facts.receiver_host_plug",
+          "product.facts.receiver_protocol",
+          "product.facts.receiver_mass_g"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "No receiver input mode or included receiver in this authored fixture; receiver connector/protocol/mass not applicable.",
+        "Receiver hardware and input route explicitly absent here, rather than an optional included Bluetooth dongle. Related receiver properties inapplicable."
+      ],
+      "when": "not product.facts.receiver_included"
+    },
+    {
+      "id": "description.light",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.backlight",
+          "product.facts.backlight_colour",
+          "product.facts.backlight_brightness",
+          "product.facts.backlight_modes",
+          "product.facts.backlight_controls_sensors",
+          "product.facts.backlight_spectrum"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "White key backlight declared; brightness, modes, controls/sensors and spectrum unknown.",
+        "Authored white-lit keys, without a brightness/mode/sensor/control/spectrum measurement."
+      ],
+      "when": "product.facts.backlight"
+    },
+    {
+      "id": "description.light_na",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.backlight",
+          "product.facts.backlight_colour",
+          "product.facts.backlight_brightness",
+          "product.facts.backlight_modes",
+          "product.facts.backlight_controls_sensors",
+          "product.facts.backlight_spectrum"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "No key backlight; light colour, brightness, modes, controls/sensors and spectrum not applicable.",
+        "Lighting explicitly absent, with related quantities inapplicable rather than known black LEDs."
+      ],
+      "when": "not product.facts.backlight"
+    },
+    {
+      "id": "description.remap",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.remapping_support",
+          "product.facts.remapping_scope",
+          "product.facts.utility_os_firmware_interoperability",
+          "product.facts.installed_keymap",
+          "product.facts.utility_setup_result"
+        ]
+      },
+      "slots": {
+        "scope": "product.facts.remapping_scope",
+        "setup": "'configured compatible shortcut_utility on Windows/macOS; Bluetooth input' if product.facts.assembly == 'rechargeable_lit' else 'configured compatible keymap_utility on a host connected by the supplied USB data lead'"
+      },
+      "formulations": [
+        "Authored support for {scope} using {setup}. Utility IDs are synthetic fixtures, not real-vendor interoperability; installed setup, exact OS/app/firmware versions and setup result unspecified.",
+        "Declared assignment scope {scope}, requiring {setup}. No supplied utility/keymap or automatic discovery/production application compatibility promise."
+      ],
+      "when": "known(product.facts.remapping_support)"
+    },
+    {
+      "id": "description.remap_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.remapping_support",
+          "product.facts.remapping_scope"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Remapping-system support and assignment scope unspecified, not an empty known support set.",
+        "No remapping declaration here; unknown capability is not evidence that remapping is impossible."
+      ],
+      "when": "not known(product.facts.remapping_support)"
+    },
+    {
+      "id": "description.box",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.keyboard_units",
+          "product.facts.installed_battery_units",
+          "product.facts.usb_lead_included",
+          "product.facts.receiver_included",
+          "product.facts.box_exclusions",
+          "product.facts.wall_charger_included",
+          "product.facts.cover_pouch_included",
+          "product.facts.silicone_skin_included"
+        ]
+      },
+      "slots": {
+        "extras": "'two preinstalled AAA cells; no lead or receiver' if product.facts.user_replaceable_battery else ('integrated pack and supplied detachable USB lead plus matched receiver' if product.facts.receiver_included else 'integrated pack and supplied detachable USB charge lead; no receiver')"
+      },
+      "formulations": [
+        "One assembled keyboard with {extras}. No mouse, wall charger, host adapter, extension, separate number pad, wrist rest, extra battery, cover/pouch, silicone skin, puller, spares or stand included.",
+        "Box hardware: one keyboard, {extras}; mouse/charger/adapter/extension, number pad/wrist rest, extra batteries, cover/pouch/skin, puller/spare keys or switches/stand explicitly excluded."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.battery_runtime_h",
+          "product.facts.body_keycap_care",
+          "product.facts.permissible_cleaner",
+          "product.facts.water_exposure",
+          "product.facts.cell_only_mass_g",
+          "product.facts.packaging_mass_g",
+          "product.facts.complete_box_mass_g",
+          "product.facts.polling_hz",
+          "product.facts.input_latency_ms",
+          "product.facts.switch_force_travel",
+          "product.facts.acoustic_measurement",
+          "product.facts.wear_cycles",
+          "product.facts.spill_impact_certification",
+          "product.facts.full_key_matrix",
+          "product.facts.clinical_effects"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Runtime/endurance, body-care/cleaner/water instructions, component/box masses, force/travel/rollover/polling/latency/noise/wear/spill tests, complete legends/matrix and clinical effects unspecified. No washable-keyboard or health assurance.",
+        "No measured runtime/radio/typing performance, chemical care permission, component/complete-box weights, complete key matrix or clinical result. A separate washable accessory would not make the keyboard washable."
+      ]
+    },
+    {
+      "id": "description.scope",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.folding",
+          "product.facts.split_halves",
+          "product.facts.tilt_feet",
+          "product.facts.mechanical_plate",
+          "product.facts.hot_swap",
+          "product.facts.trackpad",
+          "product.facts.display",
+          "product.facts.knob",
+          "product.facts.powered_usb_hub",
+          "product.facts.on_off_slider"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Rigid unsplit keyboard with on/off slider; no folding, adjustable tilt feet, mechanical-switch plate, hot-swap sockets, trackpad, display, knob or powered hub. Folded/split/adjustable-foot quantities not applicable.",
+        "No folding/split/tilt adjustment or mechanical plate/hot-swap mechanism in this scissor fixture. Trackpad/screen/knob/hub absent; on/off slider declared."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'keyboards.slim_portable_keyboards' in brand.eligible_concepts"
+    },
+    {
+      "id": "power_bundle",
+      "require": "product.facts.usb_lead_included == product.facts.rechargeable and product.facts.user_replaceable_battery == (not product.facts.rechargeable)"
+    },
+    {
+      "id": "receiver_bundle",
+      "require": "product.facts.receiver_mode == product.facts.receiver_included and product.facts.usb_keyboard_data == product.facts.receiver_mode"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "language",
+      "role": "filter",
+      "predicate": "sku.language_layout == request.language_layout",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "colour",
+      "role": "filter",
+      "predicate": "sku.colour == request.colour",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "key_count",
+      "role": "filter",
+      "predicate": "sku.key_count >= request.min_key_count",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "number_pad",
+      "role": "filter",
+      "predicate": "sku.number_pad == request.number_pad",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "mechanism",
+      "role": "filter",
+      "predicate": "product.facts.key_mechanism == request.key_mechanism",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "footprint",
+      "role": "filter",
+      "predicate": "sku.dimension_basis == request.dimension_basis and sku.outer_width_mm <= request.max_width_mm and sku.outer_depth_mm <= request.max_depth_mm",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "mass",
+      "role": "filter",
+      "predicate": "sku.mass_basis == request.mass_basis and sku.body_mass_g <= request.max_mass_g",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "input_route",
+      "role": "filter",
+      "predicate": "(request.input_route == 'Bluetooth' and sku.bluetooth) or (request.input_route == 'receiver' and sku.receiver_mode) or (request.input_route == 'USB keyboard data' and sku.usb_keyboard_data)",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "receiver",
+      "role": "filter",
+      "predicate": "sku.receiver_included == request.supplied_receiver",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "rechargeable",
+      "role": "filter",
+      "predicate": "sku.rechargeable == request.rechargeable",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "replaceable",
+      "role": "filter",
+      "predicate": "sku.user_replaceable_battery == request.user_replaceable_battery",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "battery_energy",
+      "role": "filter",
+      "predicate": "known(product.facts.battery_capacity_wh) and product.facts.battery_capacity_wh >= request.min_battery_wh",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "backlight",
+      "role": "filter",
+      "predicate": "product.facts.backlight == request.backlight",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "remap",
+      "role": "filter",
+      "predicate": "known(product.facts.remapping_support) and request.remapping_system in product.facts.remapping_support and known(product.facts.remapping_scope) and product.facts.remapping_scope == request.assignment_scope",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "language_layout": {
+                "type": "enum",
+                "values": [
+                  "US English ANSI",
+                  "UK English ISO"
+                ]
+              },
+              "physical_layout": {
+                "type": "enum",
+                "values": [
+                  "ANSI",
+                  "ISO"
+                ]
+              },
+              "enter_geometry": {
+                "type": "enum",
+                "values": [
+                  "horizontal single-row Enter",
+                  "tall two-row Enter"
+                ]
+              },
+              "key_count": {
+                "type": "integer",
+                "unit": "count",
+                "min": 77,
+                "max": 80
+              },
+              "assembly": {
+                "type": "enum",
+                "values": [
+                  "cell_compact",
+                  "rechargeable_lit",
+                  "rechargeable_trimode"
+                ]
+              },
+              "number_pad": {
+                "type": "boolean"
+              },
+              "outer_width_mm": {
+                "type": "number",
+                "unit": "mm",
+                "min": 1
+              },
+              "outer_depth_mm": {
+                "type": "number",
+                "unit": "mm",
+                "min": 1
+              },
+              "outer_max_height_mm": {
+                "type": "number",
+                "unit": "mm",
+                "min": 1
+              },
+              "body_mass_g": {
+                "type": "number",
+                "unit": "g",
+                "min": 1
+              },
+              "dimension_basis": {
+                "type": "string"
+              },
+              "mass_basis": {
+                "type": "string"
+              },
+              "battery_type": {
+                "type": "enum",
+                "values": [
+                  "AAA alkaline",
+                  "integrated Li-polymer"
+                ]
+              },
+              "installed_battery_units": {
+                "type": "integer",
+                "unit": "count",
+                "min": 1,
+                "max": 2
+              },
+              "rechargeable": {
+                "type": "boolean"
+              },
+              "user_replaceable_battery": {
+                "type": "boolean"
+              },
+              "battery_energy_status": {
+                "type": "enum",
+                "values": [
+                  "unknown",
+                  "authored nominal"
+                ]
+              },
+              "bluetooth": {
+                "type": "boolean"
+              },
+              "remembered_bluetooth_hosts": {
+                "type": "integer",
+                "unit": "count",
+                "min": 3,
+                "max": 3
+              },
+              "usb_keyboard_data": {
+                "type": "boolean"
+              },
+              "receiver_mode": {
+                "type": "boolean"
+              },
+              "receiver_included": {
+                "type": "boolean"
+              },
+              "usb_lead_included": {
+                "type": "boolean"
+              },
+              "usb_lead_length_m": {
+                "type": "number",
+                "unit": "m",
+                "min": -1,
+                "unknown_values": [
+                  -1
+                ]
+              },
+              "usb_lead_length_status": {
+                "type": "enum",
+                "values": [
+                  "nominal",
+                  "not applicable"
+                ]
+              },
+              "host_plug_label": {
+                "type": "enum",
+                "values": [
+                  "USB-A",
+                  "not applicable"
+                ]
+              },
+              "keyboard_socket_label": {
+                "type": "enum",
+                "values": [
+                  "USB-C",
+                  "not applicable"
+                ]
+              },
+              "keyboard_socket_status": {
+                "type": "enum",
+                "values": [
+                  "declared",
+                  "not applicable"
+                ]
+              },
+              "lead_role_label": {
+                "type": "enum",
+                "values": [
+                  "charge only at keyboard",
+                  "keyboard data and charge",
+                  "not applicable"
+                ]
+              },
+              "assembly_price_factor": {
+                "type": "number",
+                "min": 1,
+                "max": 1.35
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 180,
+                "max": 2700
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "language_layout": {
+              "type": "enum",
+              "values": [
+                "US English ANSI",
+                "UK English ISO"
+              ]
+            },
+            "physical_layout": {
+              "type": "enum",
+              "values": [
+                "ANSI",
+                "ISO"
+              ]
+            },
+            "enter_geometry": {
+              "type": "enum",
+              "values": [
+                "horizontal single-row Enter",
+                "tall two-row Enter"
+              ]
+            },
+            "key_count": {
+              "type": "integer",
+              "unit": "count",
+              "min": 77,
+              "max": 80
+            },
+            "assembly": {
+              "type": "enum",
+              "values": [
+                "cell_compact",
+                "rechargeable_lit",
+                "rechargeable_trimode"
+              ]
+            },
+            "number_pad": {
+              "type": "boolean"
+            },
+            "outer_width_mm": {
+              "type": "number",
+              "unit": "mm",
+              "min": 1
+            },
+            "outer_depth_mm": {
+              "type": "number",
+              "unit": "mm",
+              "min": 1
+            },
+            "outer_max_height_mm": {
+              "type": "number",
+              "unit": "mm",
+              "min": 1
+            },
+            "body_mass_g": {
+              "type": "number",
+              "unit": "g",
+              "min": 1
+            },
+            "dimension_basis": {
+              "type": "string"
+            },
+            "mass_basis": {
+              "type": "string"
+            },
+            "battery_type": {
+              "type": "enum",
+              "values": [
+                "AAA alkaline",
+                "integrated Li-polymer"
+              ]
+            },
+            "installed_battery_units": {
+              "type": "integer",
+              "unit": "count",
+              "min": 1,
+              "max": 2
+            },
+            "rechargeable": {
+              "type": "boolean"
+            },
+            "user_replaceable_battery": {
+              "type": "boolean"
+            },
+            "battery_energy_status": {
+              "type": "enum",
+              "values": [
+                "unknown",
+                "authored nominal"
+              ]
+            },
+            "bluetooth": {
+              "type": "boolean"
+            },
+            "remembered_bluetooth_hosts": {
+              "type": "integer",
+              "unit": "count",
+              "min": 3,
+              "max": 3
+            },
+            "usb_keyboard_data": {
+              "type": "boolean"
+            },
+            "receiver_mode": {
+              "type": "boolean"
+            },
+            "receiver_included": {
+              "type": "boolean"
+            },
+            "usb_lead_included": {
+              "type": "boolean"
+            },
+            "usb_lead_length_m": {
+              "type": "number",
+              "unit": "m",
+              "min": -1,
+              "unknown_values": [
+                -1
+              ]
+            },
+            "usb_lead_length_status": {
+              "type": "enum",
+              "values": [
+                "nominal",
+                "not applicable"
+              ]
+            },
+            "host_plug_label": {
+              "type": "enum",
+              "values": [
+                "USB-A",
+                "not applicable"
+              ]
+            },
+            "keyboard_socket_label": {
+              "type": "enum",
+              "values": [
+                "USB-C",
+                "not applicable"
+              ]
+            },
+            "keyboard_socket_status": {
+              "type": "enum",
+              "values": [
+                "declared",
+                "not applicable"
+              ]
+            },
+            "lead_role_label": {
+              "type": "enum",
+              "values": [
+                "charge only at keyboard",
+                "keyboard data and charge",
+                "not applicable"
+              ]
+            },
+            "assembly_price_factor": {
+              "type": "number",
+              "min": 1,
+              "max": 1.35
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 180,
+              "max": 2700
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "bag_packing",
+              "host_selection",
+              "power_slider",
+              "cell_compartment",
+              "charge_lead",
+              "lit_legends",
+              "receiver_handling",
+              "usb_input",
+              "shortcut_assignment",
+              "key_assignment"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 180,
+          "max": 2700
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 180
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 2700
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_typing_feel": {
+          "type": "boolean"
+        },
+        "review.positive_key_sound": {
+          "type": "boolean"
+        },
+        "review.positive_printed_punctuation": {
+          "type": "boolean"
+        },
+        "review.positive_bag_packing": {
+          "type": "boolean"
+        },
+        "review.positive_host_selection": {
+          "type": "boolean"
+        },
+        "review.positive_power_slider": {
+          "type": "boolean"
+        },
+        "review.positive_cell_compartment": {
+          "type": "boolean"
+        },
+        "review.positive_charge_lead": {
+          "type": "boolean"
+        },
+        "review.positive_lit_legends": {
+          "type": "boolean"
+        },
+        "review.positive_receiver_handling": {
+          "type": "boolean"
+        },
+        "review.positive_usb_input": {
+          "type": "boolean"
+        },
+        "review.positive_shortcut_assignment": {
+          "type": "boolean"
+        },
+        "review.positive_key_assignment": {
+          "type": "boolean"
+        },
+        "product.facts.assembly": {
+          "type": "enum",
+          "values": [
+            "cell_compact",
+            "rechargeable_lit",
+            "rechargeable_trimode"
+          ],
+          "input": true
+        },
+        "product.facts.user_replaceable_battery": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.rechargeable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.backlight": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.receiver_mode": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.receiver_included": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.usb_keyboard_data": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.remapping_support": {
+          "type": "set",
+          "items": {
+            "type": "string"
+          },
+          "unknown_values": [
+            [
+              "not specified"
+            ]
+          ],
+          "input": true
+        },
+        "product.facts.remapping_scope": {
+          "type": "enum",
+          "values": [
+            "function-row shortcuts",
+            "physical-key assignments",
+            "not specified"
+          ],
+          "unknown_values": [
+            "not specified"
+          ],
+          "input": true
+        },
+        "product.facts.on_off_slider": {
+          "type": "boolean",
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "cell_compact": 1,
+            "rechargeable_lit": 0,
+            "rechargeable_trimode": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.assembly == 'rechargeable_lit'",
+              "weights": {
+                "cell_compact": 0,
+                "rechargeable_lit": 1,
+                "rechargeable_trimode": 0
+              }
+            },
+            {
+              "when": "product.facts.assembly == 'rechargeable_trimode'",
+              "weights": {
+                "cell_compact": 0,
+                "rechargeable_lit": 0,
+                "rechargeable_trimode": 1
+              }
+            }
+          ],
+          "values": {
+            "cell_compact": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "bag_packing",
+              "host_selection",
+              "power_slider",
+              "cell_compartment"
+            ],
+            "rechargeable_lit": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "bag_packing",
+              "host_selection",
+              "power_slider",
+              "charge_lead",
+              "lit_legends",
+              "shortcut_assignment"
+            ],
+            "rechargeable_trimode": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "bag_packing",
+              "host_selection",
+              "power_slider",
+              "charge_lead",
+              "receiver_handling",
+              "usb_input",
+              "key_assignment"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_typing_feel",
+          "target": "review.positive_typing_feel",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_key_sound",
+          "target": "review.positive_key_sound",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_printed_punctuation",
+          "target": "review.positive_printed_punctuation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bag_packing",
+          "target": "review.positive_bag_packing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_host_selection",
+          "target": "review.positive_host_selection",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_power_slider",
+          "target": "review.positive_power_slider",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_cell_compartment",
+          "target": "review.positive_cell_compartment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_charge_lead",
+          "target": "review.positive_charge_lead",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_lit_legends",
+          "target": "review.positive_lit_legends",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_receiver_handling",
+          "target": "review.positive_receiver_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_usb_input",
+          "target": "review.positive_usb_input",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_shortcut_assignment",
+          "target": "review.positive_shortcut_assignment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_key_assignment",
+          "target": "review.positive_key_assignment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "typing_feel.positive",
+          "when": "'typing_feel' in review.topics and review.positive_typing_feel",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "typing_feel",
+            "polarity": "positive",
+            "context": {
+              "operation": "type short passage at small shared table on already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With my laptop already paired over Bluetooth, the keys felt comfortable as I typed a short passage at a small shared table.",
+            "Typing a short passage at a small shared table felt comfortable with this keyboard and my already paired Bluetooth laptop."
+          ]
+        },
+        {
+          "id": "typing_feel.negative",
+          "when": "'typing_feel' in review.topics and not review.positive_typing_feel",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "typing_feel",
+            "polarity": "negative",
+            "context": {
+              "operation": "type short passage at small shared table on already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With my laptop already paired over Bluetooth, the keys felt uncomfortable as I typed a short passage at a small shared table.",
+            "Typing a short passage at a small shared table felt uncomfortable with this keyboard and my already paired Bluetooth laptop."
+          ]
+        },
+        {
+          "id": "key_sound.positive",
+          "when": "'key_sound' in review.topics and review.positive_key_sound",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_sound",
+            "polarity": "positive",
+            "context": {
+              "operation": "hear keys typing short passage in quiet room on already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The key sound was pleasant while I typed a short passage in my quiet room on my already paired Bluetooth laptop.",
+            "Using my already paired Bluetooth laptop to type a short passage in my quiet room, I liked the sound of the keys."
+          ]
+        },
+        {
+          "id": "key_sound.negative",
+          "when": "'key_sound' in review.topics and not review.positive_key_sound",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_sound",
+            "polarity": "negative",
+            "context": {
+              "operation": "hear keys typing short passage in quiet room on already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The key sound was distracting while I typed a short passage in my quiet room on my already paired Bluetooth laptop.",
+            "Using my already paired Bluetooth laptop to type a short passage in my quiet room, I disliked the sound of the keys."
+          ]
+        },
+        {
+          "id": "printed_punctuation.positive",
+          "when": "'printed_punctuation' in review.topics and review.positive_printed_punctuation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "printed_punctuation",
+            "polarity": "positive",
+            "context": {
+              "operation": "find printed punctuation with selected matching laptop input map and already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With my already paired Bluetooth laptop set to {input_map} input, the printed punctuation keys were easy to find.",
+            "Finding the printed punctuation keys felt straightforward with {input_map} input active on my already paired Bluetooth laptop."
+          ],
+          "slots": {
+            "input_map": "'US English' if review.subject.physical_layout == 'ANSI' else 'UK English'"
+          }
+        },
+        {
+          "id": "printed_punctuation.negative",
+          "when": "'printed_punctuation' in review.topics and not review.positive_printed_punctuation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "printed_punctuation",
+            "polarity": "negative",
+            "context": {
+              "operation": "find printed punctuation with selected matching laptop input map and already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With my already paired Bluetooth laptop set to {input_map} input, the printed punctuation keys were hard to find.",
+            "Finding the printed punctuation keys felt difficult with {input_map} input active on my already paired Bluetooth laptop."
+          ],
+          "slots": {
+            "input_map": "'US English' if review.subject.physical_layout == 'ANSI' else 'UK English'"
+          }
+        },
+        {
+          "id": "bag_packing.positive",
+          "when": "'bag_packing' in review.topics and review.positive_bag_packing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bag_packing",
+            "polarity": "positive",
+            "context": {
+              "operation": "pack individual keyboard in owner usual work bag; no universal fit or complete box mass claim",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Packing this keyboard in my usual work bag was easy.",
+            "I found this keyboard easy to pack in my usual work bag."
+          ]
+        },
+        {
+          "id": "bag_packing.negative",
+          "when": "'bag_packing' in review.topics and not review.positive_bag_packing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bag_packing",
+            "polarity": "negative",
+            "context": {
+              "operation": "pack individual keyboard in owner usual work bag; no universal fit or complete box mass claim",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Packing this keyboard in my usual work bag was awkward.",
+            "I found this keyboard awkward to pack in my usual work bag."
+          ]
+        },
+        {
+          "id": "host_selection.positive",
+          "when": "'host_selection' in review.topics and review.positive_host_selection",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "host_selection",
+            "polarity": "positive",
+            "context": {
+              "operation": "select between already paired Bluetooth laptop/tablet then type message on selected device",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Switching between my already paired Bluetooth laptop and tablet, then typing a message on the selected device, worked reliably for me.",
+            "I could reliably select my already paired Bluetooth laptop or tablet and type a message on that device."
+          ]
+        },
+        {
+          "id": "host_selection.negative",
+          "when": "'host_selection' in review.topics and not review.positive_host_selection",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "host_selection",
+            "polarity": "negative",
+            "context": {
+              "operation": "select between already paired Bluetooth laptop/tablet then type message on selected device",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Switching between my already paired Bluetooth laptop and tablet, then typing a message on the selected device, worked unreliably for me.",
+            "Selecting my already paired Bluetooth laptop or tablet and typing a message on that device was unreliable for me."
+          ]
+        },
+        {
+          "id": "power_slider.positive",
+          "when": "'power_slider' in review.topics and review.positive_power_slider and product.facts.on_off_slider",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "power_slider",
+            "polarity": "positive",
+            "context": {
+              "operation": "move actual on/off slider before packing keyboard",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The on/off slider was easy to use before I packed the keyboard.",
+            "Before packing the keyboard, I found the on/off slider easy to move."
+          ]
+        },
+        {
+          "id": "power_slider.negative",
+          "when": "'power_slider' in review.topics and not review.positive_power_slider and product.facts.on_off_slider",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "power_slider",
+            "polarity": "negative",
+            "context": {
+              "operation": "move actual on/off slider before packing keyboard",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The on/off slider was awkward to use before I packed the keyboard.",
+            "Before packing the keyboard, I found the on/off slider awkward to move."
+          ]
+        },
+        {
+          "id": "cell_compartment.positive",
+          "when": "'cell_compartment' in review.topics and review.positive_cell_compartment and product.facts.user_replaceable_battery",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cell_compartment",
+            "polarity": "positive",
+            "context": {
+              "operation": "open/close tool-free rear compartment replacing both AAA cells with matching replacements",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and closing the rear compartment to replace both AAA cells with matching replacements was easy.",
+            "I found the rear compartment easy to open and close when replacing both AAA cells with matching replacements."
+          ]
+        },
+        {
+          "id": "cell_compartment.negative",
+          "when": "'cell_compartment' in review.topics and not review.positive_cell_compartment and product.facts.user_replaceable_battery",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cell_compartment",
+            "polarity": "negative",
+            "context": {
+              "operation": "open/close tool-free rear compartment replacing both AAA cells with matching replacements",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and closing the rear compartment to replace both AAA cells with matching replacements was awkward.",
+            "I found the rear compartment awkward to open and close when replacing both AAA cells with matching replacements."
+          ]
+        },
+        {
+          "id": "charge_lead.positive",
+          "when": "'charge_lead' in review.topics and review.positive_charge_lead and product.facts.rechargeable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "charge_lead",
+            "polarity": "positive",
+            "context": {
+              "operation": "connect/remove actual supplied USB-A-to-USB-C lead between keyboard socket and compatible USB-A power source for charging",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found it easy to connect and remove the supplied USB-A-to-USB-C lead between the keyboard and my compatible USB-A power source for charging.",
+            "Connecting and removing the supplied USB-A-to-USB-C lead for charging at the keyboard socket and my compatible USB-A power source felt easy."
+          ]
+        },
+        {
+          "id": "charge_lead.negative",
+          "when": "'charge_lead' in review.topics and not review.positive_charge_lead and product.facts.rechargeable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "charge_lead",
+            "polarity": "negative",
+            "context": {
+              "operation": "connect/remove actual supplied USB-A-to-USB-C lead between keyboard socket and compatible USB-A power source for charging",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found it awkward to connect and remove the supplied USB-A-to-USB-C lead between the keyboard and my compatible USB-A power source for charging.",
+            "Connecting and removing the supplied USB-A-to-USB-C lead for charging at the keyboard socket and my compatible USB-A power source felt awkward."
+          ]
+        },
+        {
+          "id": "lit_legends.positive",
+          "when": "'lit_legends' in review.topics and review.positive_lit_legends and product.facts.backlight",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lit_legends",
+            "polarity": "positive",
+            "context": {
+              "operation": "read actual white-lit legends typing passage in dim room using already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The white-lit legends were easy to read as I typed a passage in my dim room on my already paired Bluetooth laptop.",
+            "Typing a passage on my already paired Bluetooth laptop in my dim room, I could easily read the white-lit key labels."
+          ]
+        },
+        {
+          "id": "lit_legends.negative",
+          "when": "'lit_legends' in review.topics and not review.positive_lit_legends and product.facts.backlight",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lit_legends",
+            "polarity": "negative",
+            "context": {
+              "operation": "read actual white-lit legends typing passage in dim room using already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The white-lit legends were hard to read as I typed a passage in my dim room on my already paired Bluetooth laptop.",
+            "Typing a passage on my already paired Bluetooth laptop in my dim room, I found the white-lit key labels hard to read."
+          ]
+        },
+        {
+          "id": "receiver_handling.positive",
+          "when": "'receiver_handling' in review.topics and review.positive_receiver_handling and product.facts.receiver_included and product.facts.receiver_mode",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "receiver_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "insert/remove exact matched supplied receiver at compatible laptop USB-A port using receiver input mode",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Using receiver input mode, I found the supplied matched receiver easy to insert and remove at my compatible laptop USB-A port.",
+            "Inserting and removing the supplied matched receiver at my compatible laptop USB-A port felt easy while using receiver input mode."
+          ]
+        },
+        {
+          "id": "receiver_handling.negative",
+          "when": "'receiver_handling' in review.topics and not review.positive_receiver_handling and product.facts.receiver_included and product.facts.receiver_mode",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "receiver_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "insert/remove exact matched supplied receiver at compatible laptop USB-A port using receiver input mode",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Using receiver input mode, I found the supplied matched receiver awkward to insert and remove at my compatible laptop USB-A port.",
+            "Inserting and removing the supplied matched receiver at my compatible laptop USB-A port felt awkward while using receiver input mode."
+          ]
+        },
+        {
+          "id": "usb_input.positive",
+          "when": "'usb_input' in review.topics and review.positive_usb_input and product.facts.usb_keyboard_data",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usb_input",
+            "polarity": "positive",
+            "context": {
+              "operation": "connect supplied USB data lead to matching computer USB-A port and keyboard USB-C socket then type in USB keyboard mode",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting the supplied USB data lead between my matching computer USB-A port and the keyboard USB-C socket, then typing in USB keyboard mode, felt straightforward.",
+            "I found it easy to connect the supplied USB data lead to my matching computer USB-A port and the keyboard USB-C socket and type in USB keyboard mode."
+          ]
+        },
+        {
+          "id": "usb_input.negative",
+          "when": "'usb_input' in review.topics and not review.positive_usb_input and product.facts.usb_keyboard_data",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usb_input",
+            "polarity": "negative",
+            "context": {
+              "operation": "connect supplied USB data lead to matching computer USB-A port and keyboard USB-C socket then type in USB keyboard mode",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting the supplied USB data lead between my matching computer USB-A port and the keyboard USB-C socket, then typing in USB keyboard mode, felt awkward.",
+            "I found it difficult to connect the supplied USB data lead to my matching computer USB-A port and the keyboard USB-C socket and type in USB keyboard mode."
+          ]
+        },
+        {
+          "id": "shortcut_assignment.positive",
+          "when": "'shortcut_assignment' in review.topics and review.positive_shortcut_assignment and known(product.facts.remapping_support) and 'shortcut_utility' in product.facts.remapping_support and known(product.facts.remapping_scope) and product.facts.remapping_scope == 'function-row shortcuts'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "shortcut_assignment",
+            "polarity": "positive",
+            "context": {
+              "operation": "assign one function-row shortcut using configured compatible shortcut_utility on Windows/macOS host; Bluetooth connection",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the compatible shortcut utility configured on my computer and Bluetooth input active, assigning one function-row shortcut felt easy.",
+            "I found it straightforward to assign one function-row shortcut with the compatible shortcut utility configured on my computer over Bluetooth."
+          ]
+        },
+        {
+          "id": "shortcut_assignment.negative",
+          "when": "'shortcut_assignment' in review.topics and not review.positive_shortcut_assignment and known(product.facts.remapping_support) and 'shortcut_utility' in product.facts.remapping_support and known(product.facts.remapping_scope) and product.facts.remapping_scope == 'function-row shortcuts'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "shortcut_assignment",
+            "polarity": "negative",
+            "context": {
+              "operation": "assign one function-row shortcut using configured compatible shortcut_utility on Windows/macOS host; Bluetooth connection",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the compatible shortcut utility configured on my computer and Bluetooth input active, assigning one function-row shortcut felt difficult.",
+            "I found it hard to assign one function-row shortcut with the compatible shortcut utility configured on my computer over Bluetooth."
+          ]
+        },
+        {
+          "id": "key_assignment.positive",
+          "when": "'key_assignment' in review.topics and review.positive_key_assignment and known(product.facts.remapping_support) and 'keymap_utility' in product.facts.remapping_support and known(product.facts.remapping_scope) and product.facts.remapping_scope == 'physical-key assignments' and product.facts.usb_keyboard_data",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_assignment",
+            "polarity": "positive",
+            "context": {
+              "operation": "assign one physical key using configured compatible keymap_utility on host connected by supplied USB data lead",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the compatible keymap utility configured on my computer connected by the supplied USB data lead, assigning one physical key felt easy.",
+            "I found it straightforward to assign one physical key with the compatible keymap utility configured on my computer using the supplied USB data lead."
+          ]
+        },
+        {
+          "id": "key_assignment.negative",
+          "when": "'key_assignment' in review.topics and not review.positive_key_assignment and known(product.facts.remapping_support) and 'keymap_utility' in product.facts.remapping_support and known(product.facts.remapping_scope) and product.facts.remapping_scope == 'physical-key assignments' and product.facts.usb_keyboard_data",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_assignment",
+            "polarity": "negative",
+            "context": {
+              "operation": "assign one physical key using configured compatible keymap_utility on host connected by supplied USB data lead",
+              "subject": "exact selected language/colour SKU; first_hand owner experience",
+              "limit": "No health/speed/range/endurance/electrical/chemical-care/production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the compatible keymap utility configured on my computer connected by the supplied USB data lead, assigning one physical key felt difficult.",
+            "I found it hard to assign one physical key with the compatible keymap utility configured on my computer using the supplied USB data lead."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Exact selected canonical assembly/layout/colour price, global180–2700SEK bounds",
+        "relative_price_basis": {
+          "min_sek": 180,
+          "max_sek": 2700
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "keyboards",
+    "store_type_ids": [
+      "electronics",
+      "office"
+    ],
+    "spec_path": "docs/agents/product-width-specs/keyboards.slim_portable_keyboards.md",
+    "source_notes": ".local/product-width/research/slim_portable_keyboards.md",
+    "heuristic_status": "Tunable authored assemblies/associations, not observed frequencies",
+    "sku_formulation_contract": "Bind exact existing canonical row under sku; no default physical layout",
+    "review_policy_revision": "width-review-policy-v2",
+    "price_effects": "Complete-menu assembly factor before subsets; global180–2700SEK selected-SKU value bounds",
+    "authored_exceptions": [
+      "All complete hardware/counted regional/box/quantity fixtures authored; synthetic utilities not vendor software integration",
+      "Trimode800mAh/3.7V/2.96Wh is an authored nominal pack tuple, not a corrected source input rating",
+      "Cell/lit energy unknown; charging USB is not necessarily USB keyboard data; matched receiver separate",
+      "Body quantities include installed batteries, external lead/receiver/packaging excluded"
+    ],
+    "limits": "Care/runtime/range/latency/health unknown; USB/radio/OS/utility interoperability and production consumers deferred",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only"
+  }
+}

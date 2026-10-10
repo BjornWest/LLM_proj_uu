@@ -1,0 +1,2141 @@
+{
+  "schema_version": "world-sampling-defaults-v1",
+  "status": "authored_initial_defaults_reference_sampler_not_production",
+  "source_registry": "environments/product_world/data/concept_registry/registry.json",
+  "source_plan": "docs/agents/cross-family-store-theme-review.json",
+  "scope": "Items 1–5: population, retailer templates, product allocation, SKU listing, carrier/service assignment. Product facts/content/pricing and task constraints are separate work.",
+  "controls": {
+    "world_size": 0.75,
+    "product_concentration": 1.8,
+    "retailer_concentration": 1,
+    "within_store_task_concentration": 2,
+    "unrelated_store_assortment_weight": 0.35,
+    "brand_diversity": 1
+  },
+  "population": {
+    "base_expected_products_per_concept": {
+      "footwear": 5,
+      "trousers": 4,
+      "jackets": 4,
+      "tops": 4,
+      "knitwear": 4,
+      "laptops": 4,
+      "phones": 6,
+      "tablets": 3,
+      "monitors": 4,
+      "headphones": 4,
+      "keyboards": 4,
+      "memory_cards": 3,
+      "ssd": 3,
+      "phone_cases": 3,
+      "chargers": 3,
+      "camera_lenses": 3,
+      "printer_ink": 2,
+      "dog_food": 4,
+      "cat_food": 4,
+      "pet_harnesses": 4,
+      "pet_bowls": 3,
+      "pet_toys": 4,
+      "cat_litter": 3,
+      "beer": 6,
+      "wine": 6,
+      "moisturizers": 4,
+      "cleansers": 4,
+      "serums": 4,
+      "foundation": 4,
+      "lip_colour": 4,
+      "shampoo": 4,
+      "fragrance": 4,
+      "toothbrushes": 4,
+      "brush_heads": 2,
+      "bedding": 4,
+      "cookware": 4,
+      "pots": 4,
+      "kitchen_utensils": 3,
+      "towels": 4,
+      "furniture": 4,
+      "office_chairs": 4,
+      "washing_machines": 4,
+      "vacuum_cleaners": 4,
+      "vacuum_bags": 2,
+      "drills": 4,
+      "garden_trimmers": 4,
+      "saws": 4,
+      "sanders": 4,
+      "tool_power": 3,
+      "tents": 4,
+      "backpacks": 4,
+      "sleeping_bags": 4,
+      "sleeping_mats": 4,
+      "strollers": 4,
+      "board_games": 6,
+      "books": 8
+    },
+    "task_affinity": {
+      "exact_concept": 1,
+      "shared_theme": 0.5,
+      "same_family": 0.25,
+      "unrelated": 0
+    },
+    "concept_expectation_formula": "world_size * family_base * (1 + (product_concentration - 1) * affinity); affinity is max across task references, not a multiplier per reference.",
+    "brand_scopes": {
+      "footwear": {
+        "family_ids": [
+          "footwear"
+        ],
+        "diversity_multiplier": 1.2,
+        "candidate_brand_capacity": 24
+      },
+      "clothing": {
+        "family_ids": [
+          "trousers",
+          "jackets",
+          "tops",
+          "knitwear"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "computing": {
+        "family_ids": [
+          "laptops",
+          "tablets",
+          "monitors",
+          "keyboards"
+        ],
+        "diversity_multiplier": 0.9,
+        "candidate_brand_capacity": 24
+      },
+      "phones": {
+        "family_ids": [
+          "phones",
+          "phone_cases"
+        ],
+        "diversity_multiplier": 1.1,
+        "candidate_brand_capacity": 24
+      },
+      "audio": {
+        "family_ids": [
+          "headphones"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "storage": {
+        "family_ids": [
+          "ssd",
+          "memory_cards"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "charging": {
+        "family_ids": [
+          "chargers"
+        ],
+        "diversity_multiplier": 0.8,
+        "candidate_brand_capacity": 24
+      },
+      "printer_supplies": {
+        "family_ids": [
+          "printer_ink"
+        ],
+        "diversity_multiplier": 0.8,
+        "candidate_brand_capacity": 24
+      },
+      "lenses": {
+        "family_ids": [
+          "camera_lenses"
+        ],
+        "diversity_multiplier": 0.7,
+        "candidate_brand_capacity": 24
+      },
+      "pet_food": {
+        "family_ids": [
+          "dog_food",
+          "cat_food"
+        ],
+        "diversity_multiplier": 1.2,
+        "candidate_brand_capacity": 24
+      },
+      "pet_accessories": {
+        "family_ids": [
+          "pet_harnesses",
+          "pet_bowls",
+          "pet_toys"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "litter": {
+        "family_ids": [
+          "cat_litter"
+        ],
+        "diversity_multiplier": 0.8,
+        "candidate_brand_capacity": 24
+      },
+      "beer": {
+        "family_ids": [
+          "beer"
+        ],
+        "diversity_multiplier": 1.3,
+        "candidate_brand_capacity": 24
+      },
+      "wine": {
+        "family_ids": [
+          "wine"
+        ],
+        "diversity_multiplier": 1.3,
+        "candidate_brand_capacity": 24
+      },
+      "skincare": {
+        "family_ids": [
+          "moisturizers",
+          "cleansers",
+          "serums"
+        ],
+        "diversity_multiplier": 1.2,
+        "candidate_brand_capacity": 24
+      },
+      "makeup": {
+        "family_ids": [
+          "foundation",
+          "lip_colour"
+        ],
+        "diversity_multiplier": 1.1,
+        "candidate_brand_capacity": 24
+      },
+      "haircare": {
+        "family_ids": [
+          "shampoo"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "fragrance": {
+        "family_ids": [
+          "fragrance"
+        ],
+        "diversity_multiplier": 1.1,
+        "candidate_brand_capacity": 24
+      },
+      "oral_care": {
+        "family_ids": [
+          "toothbrushes",
+          "brush_heads"
+        ],
+        "diversity_multiplier": 0.8,
+        "candidate_brand_capacity": 24
+      },
+      "textiles": {
+        "family_ids": [
+          "bedding",
+          "towels"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "kitchen": {
+        "family_ids": [
+          "cookware",
+          "pots",
+          "kitchen_utensils"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "furniture": {
+        "family_ids": [
+          "furniture",
+          "office_chairs"
+        ],
+        "diversity_multiplier": 0.9,
+        "candidate_brand_capacity": 24
+      },
+      "appliances": {
+        "family_ids": [
+          "washing_machines",
+          "vacuum_cleaners",
+          "vacuum_bags"
+        ],
+        "diversity_multiplier": 0.8,
+        "candidate_brand_capacity": 24
+      },
+      "tools": {
+        "family_ids": [
+          "drills",
+          "saws",
+          "sanders",
+          "garden_trimmers",
+          "tool_power"
+        ],
+        "diversity_multiplier": 0.8,
+        "candidate_brand_capacity": 24
+      },
+      "outdoor_equipment": {
+        "family_ids": [
+          "tents",
+          "backpacks",
+          "sleeping_bags",
+          "sleeping_mats"
+        ],
+        "diversity_multiplier": 1,
+        "candidate_brand_capacity": 24
+      },
+      "strollers": {
+        "family_ids": [
+          "strollers"
+        ],
+        "diversity_multiplier": 0.9,
+        "candidate_brand_capacity": 24
+      },
+      "publishing": {
+        "family_ids": [
+          "books"
+        ],
+        "diversity_multiplier": 1.3,
+        "candidate_brand_capacity": 24
+      },
+      "tabletop": {
+        "family_ids": [
+          "board_games"
+        ],
+        "diversity_multiplier": 1.1,
+        "candidate_brand_capacity": 24
+      }
+    },
+    "brand_mean_formula": "diversity_multiplier * brand_diversity * sqrt(sum of concept expectations in this scope)), bounded by candidate_brand_capacity",
+    "brand_sampling": "Each candidate brand independently exists with probability desired_mean / candidate_brand_capacity. No global total draw; zero brands in a scope is valid.",
+    "brand_product_slots_per_concept": 12,
+    "product_sampling": "For each concept, give compatible sampled brands weight 1.5 if their neutral reference theme focus matches the concept theme, otherwise 1; normalize across these brands. Independently include each brand/concept slot with probability concept_expectation * brand_weight / (sum_brand_weights * slots_per_brand_concept), capped at .95. A scope with no sampled brands contributes no products; never invent a compensating brand.",
+    "bounds": "Candidate slots are finite resource support, not quotas. Report capped expectations; do not silently clip a desired mean without diagnostics.",
+    "brand_priors": "Reuse scope-local positioning/emphasis priors and diversity penalty from brand sampling; author name pools and emphasis domains per scope during product-width work. Brand execution remains independent. Reference sampler uses neutral metadata IDs, not production names.",
+    "reference_profiles": "The metadata reference uses scope-local three-positioning priors, a diversity penalty of .5 and simple broad/theme-focused brand metadata. It does not implement the reviewed family-specific profile axes, feature distributions, execution, names, descriptions or reviews. Production brand eligibility and emphasis use the authored concept/scoped domains during product-width work.",
+    "control_domains": "All controls finite and nonnegative; product_concentration and within_store_task_concentration must be positive to preserve eligible product support. Large intensity settings may reach finite support; report capacity diagnostics."
+  },
+  "themes": {
+    "running": [
+      "footwear.road_running_shoes",
+      "footwear.trail_running_shoes",
+      "backpacks.running_hydration_packs",
+      "headphones.open_ear_sport_headphones",
+      "tops.technical_base_layer_tops"
+    ],
+    "walking": [
+      "footwear.walking_shoes",
+      "footwear.walking_sandals"
+    ],
+    "hiking": [
+      "footwear.low_hiking_shoes",
+      "footwear.hiking_boots",
+      "trousers.walking_travel_trousers"
+    ],
+    "travel": [
+      "backpacks.travel_packs",
+      "backpacks.everyday_daypacks",
+      "footwear.walking_shoes",
+      "footwear.walking_sandals",
+      "trousers.walking_travel_trousers",
+      "towels.travel_quick_drying_towels"
+    ],
+    "gaming": [
+      "laptops.gaming_laptops",
+      "monitors.high_refresh_gaming_monitors",
+      "headphones.call_gaming_headsets"
+    ],
+    "photography": [
+      "laptops.creator_workstation_laptops",
+      "monitors.creative_image_work_monitors",
+      "tablets.pen_work_focused_tablets",
+      "camera_lenses.wide_angle_primes",
+      "camera_lenses.standard_primes",
+      "camera_lenses.portrait_telephoto_primes",
+      "camera_lenses.zoom_lenses",
+      "camera_lenses.macro_lenses"
+    ],
+    "camping": [
+      "tents.light_trekking_tents",
+      "tents.freestanding_dome_tents",
+      "tents.larger_campsite_tunnel_tents",
+      "tents.quick_pitch_pop_up_tents",
+      "sleeping_bags.mummy_bags",
+      "sleeping_bags.rectangular_bags",
+      "sleeping_bags.sleeping_quilts",
+      "sleeping_mats.closed_cell_foam_mats",
+      "sleeping_mats.self_inflating_mats",
+      "sleeping_mats.inflatable_air_mats"
+    ]
+  },
+  "retailer_templates": [
+    {
+      "id": "footwear",
+      "label": "Adult footwear shop",
+      "departments": [
+        {
+          "id": "footwear",
+          "weight": 1,
+          "concept_ids": [
+            "footwear.casual_trainers",
+            "footwear.walking_shoes",
+            "footwear.road_running_shoes",
+            "footwear.trail_running_shoes",
+            "footwear.low_hiking_shoes",
+            "footwear.hiking_boots",
+            "footwear.flat_low_heeled_dress_shoes",
+            "footwear.heeled_dress_shoes",
+            "footwear.walking_sandals",
+            "footwear.flip_flops",
+            "footwear.winter_boots",
+            "footwear.rubber_boots"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "footwear.casual_trainers",
+        "footwear.walking_shoes",
+        "footwear.road_running_shoes",
+        "footwear.trail_running_shoes",
+        "footwear.low_hiking_shoes",
+        "footwear.hiking_boots",
+        "footwear.flat_low_heeled_dress_shoes",
+        "footwear.heeled_dress_shoes",
+        "footwear.walking_sandals",
+        "footwear.flip_flops",
+        "footwear.winter_boots",
+        "footwear.rubber_boots"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "apparel",
+      "label": "Clothing and footwear shop",
+      "departments": [
+        {
+          "id": "tops_knitwear",
+          "weight": 0.35,
+          "concept_ids": [
+            "tops.t_shirts",
+            "tops.button_up_shirts_blouses",
+            "tops.polo_shirts",
+            "tops.sleeveless_tops",
+            "tops.technical_base_layer_tops",
+            "knitwear.pullovers",
+            "knitwear.cardigans",
+            "knitwear.zip_neck_sweaters"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "trousers",
+          "weight": 0.25,
+          "concept_ids": [
+            "trousers.jeans",
+            "trousers.chinos",
+            "trousers.tailored_trousers",
+            "trousers.walking_travel_trousers",
+            "trousers.work_utility_trousers",
+            "trousers.lounge_trousers"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "jackets",
+          "weight": 0.25,
+          "concept_ids": [
+            "jackets.rain_shells",
+            "jackets.softshell_jackets",
+            "jackets.fleece_jackets",
+            "jackets.insulated_puffer_jackets",
+            "jackets.parkas_long_winter_coats",
+            "jackets.everyday_casual_jackets"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "footwear",
+          "weight": 0.15,
+          "concept_ids": [
+            "footwear.casual_trainers",
+            "footwear.walking_shoes",
+            "footwear.road_running_shoes",
+            "footwear.trail_running_shoes",
+            "footwear.low_hiking_shoes",
+            "footwear.hiking_boots",
+            "footwear.flat_low_heeled_dress_shoes",
+            "footwear.heeled_dress_shoes",
+            "footwear.walking_sandals",
+            "footwear.flip_flops",
+            "footwear.winter_boots",
+            "footwear.rubber_boots"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "tops.t_shirts",
+        "tops.button_up_shirts_blouses",
+        "tops.polo_shirts",
+        "tops.sleeveless_tops",
+        "tops.technical_base_layer_tops",
+        "knitwear.pullovers",
+        "knitwear.cardigans",
+        "knitwear.zip_neck_sweaters",
+        "trousers.jeans",
+        "trousers.chinos",
+        "trousers.tailored_trousers",
+        "trousers.walking_travel_trousers",
+        "trousers.work_utility_trousers",
+        "trousers.lounge_trousers",
+        "jackets.rain_shells",
+        "jackets.softshell_jackets",
+        "jackets.fleece_jackets",
+        "jackets.insulated_puffer_jackets",
+        "jackets.parkas_long_winter_coats",
+        "jackets.everyday_casual_jackets"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "outdoors",
+      "label": "Walking and camping shop",
+      "departments": [
+        {
+          "id": "footwear",
+          "weight": 0.3,
+          "concept_ids": [
+            "footwear.walking_shoes",
+            "footwear.walking_sandals",
+            "footwear.low_hiking_shoes",
+            "footwear.hiking_boots",
+            "footwear.winter_boots",
+            "footwear.rubber_boots"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "clothing",
+          "weight": 0.2,
+          "concept_ids": [
+            "jackets.rain_shells",
+            "jackets.softshell_jackets",
+            "jackets.fleece_jackets",
+            "jackets.insulated_puffer_jackets",
+            "trousers.walking_travel_trousers",
+            "tops.technical_base_layer_tops"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "camping",
+          "weight": 0.3,
+          "concept_ids": [
+            "tents.light_trekking_tents",
+            "tents.freestanding_dome_tents",
+            "tents.larger_campsite_tunnel_tents",
+            "tents.quick_pitch_pop_up_tents",
+            "sleeping_bags.mummy_bags",
+            "sleeping_bags.rectangular_bags",
+            "sleeping_bags.sleeping_quilts",
+            "sleeping_mats.closed_cell_foam_mats",
+            "sleeping_mats.self_inflating_mats",
+            "sleeping_mats.inflatable_air_mats"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "packs",
+          "weight": 0.2,
+          "concept_ids": [
+            "backpacks.everyday_daypacks",
+            "backpacks.hiking_trekking_packs",
+            "backpacks.commuter_laptop_packs",
+            "backpacks.travel_packs",
+            "backpacks.running_hydration_packs"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "tents.light_trekking_tents",
+        "tents.freestanding_dome_tents",
+        "tents.larger_campsite_tunnel_tents",
+        "tents.quick_pitch_pop_up_tents",
+        "sleeping_bags.mummy_bags",
+        "sleeping_bags.rectangular_bags",
+        "sleeping_bags.sleeping_quilts",
+        "sleeping_mats.closed_cell_foam_mats",
+        "sleeping_mats.self_inflating_mats",
+        "sleeping_mats.inflatable_air_mats",
+        "backpacks.everyday_daypacks",
+        "backpacks.hiking_trekking_packs",
+        "backpacks.commuter_laptop_packs",
+        "backpacks.travel_packs",
+        "backpacks.running_hydration_packs",
+        "footwear.low_hiking_shoes",
+        "footwear.hiking_boots"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "electronics",
+      "label": "Electronics and computing shop",
+      "departments": [
+        {
+          "id": "computing",
+          "weight": 0.4,
+          "concept_ids": [
+            "laptops.everyday_office_laptops",
+            "laptops.ultraportables",
+            "laptops.creator_workstation_laptops",
+            "laptops.gaming_laptops",
+            "phones.smartphones",
+            "tablets.everyday_media_tablets",
+            "tablets.pen_work_focused_tablets"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "screens",
+          "weight": 0.15,
+          "concept_ids": [
+            "monitors.office_productivity_monitors",
+            "monitors.high_refresh_gaming_monitors",
+            "monitors.creative_image_work_monitors",
+            "monitors.ultrawide_workspace_monitors"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "audio_input",
+          "weight": 0.15,
+          "concept_ids": [
+            "headphones.over_ear_on_ear_headphones",
+            "headphones.in_ear_earbuds",
+            "headphones.open_ear_sport_headphones",
+            "headphones.call_gaming_headsets",
+            "keyboards.desktop_keyboards",
+            "keyboards.slim_portable_keyboards",
+            "keyboards.split_ergonomic_keyboards"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "storage",
+          "weight": 0.15,
+          "concept_ids": [
+            "ssd.nvme_ssds",
+            "ssd.sata_ssds",
+            "ssd.hard_disk_drives_hdds",
+            "memory_cards.memory_cards"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "accessories",
+          "weight": 0.1,
+          "concept_ids": [
+            "chargers.plug_in_wall_chargers",
+            "chargers.desktop_charging_hubs",
+            "phone_cases.shell_cases",
+            "phone_cases.folio_wallet_cases",
+            "printer_ink.ink_cartridges_and_cartridge_sets"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "photo",
+          "weight": 0.05,
+          "concept_ids": [
+            "camera_lenses.wide_angle_primes",
+            "camera_lenses.standard_primes",
+            "camera_lenses.portrait_telephoto_primes",
+            "camera_lenses.zoom_lenses",
+            "camera_lenses.macro_lenses"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "laptops.everyday_office_laptops",
+        "laptops.ultraportables",
+        "laptops.creator_workstation_laptops",
+        "laptops.gaming_laptops",
+        "phones.smartphones",
+        "tablets.everyday_media_tablets",
+        "tablets.pen_work_focused_tablets",
+        "monitors.office_productivity_monitors",
+        "monitors.high_refresh_gaming_monitors",
+        "monitors.creative_image_work_monitors",
+        "monitors.ultrawide_workspace_monitors",
+        "headphones.over_ear_on_ear_headphones",
+        "headphones.in_ear_earbuds",
+        "headphones.open_ear_sport_headphones",
+        "headphones.call_gaming_headsets",
+        "keyboards.desktop_keyboards",
+        "keyboards.slim_portable_keyboards",
+        "keyboards.split_ergonomic_keyboards",
+        "ssd.nvme_ssds",
+        "ssd.sata_ssds",
+        "ssd.hard_disk_drives_hdds",
+        "memory_cards.memory_cards",
+        "chargers.plug_in_wall_chargers",
+        "chargers.desktop_charging_hubs",
+        "phone_cases.shell_cases",
+        "phone_cases.folio_wallet_cases",
+        "printer_ink.ink_cartridges_and_cartridge_sets",
+        "camera_lenses.wide_angle_primes",
+        "camera_lenses.standard_primes",
+        "camera_lenses.portrait_telephoto_primes",
+        "camera_lenses.zoom_lenses",
+        "camera_lenses.macro_lenses"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "pets",
+      "label": "Pet supplies shop",
+      "departments": [
+        {
+          "id": "food",
+          "weight": 0.5,
+          "concept_ids": [
+            "dog_food.dry_food",
+            "dog_food.wet_food",
+            "dog_food.treats_snacks",
+            "cat_food.dry_food",
+            "cat_food.wet_food",
+            "cat_food.treats_snacks"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "accessories",
+          "weight": 0.3,
+          "concept_ids": [
+            "pet_harnesses.strap_harnesses",
+            "pet_harnesses.vest_padded_harnesses",
+            "pet_bowls.standard_bowls",
+            "pet_bowls.slow_feed_bowls",
+            "pet_bowls.raised_feeding_stations",
+            "pet_bowls.drinking_fountains",
+            "pet_toys.chew_toys",
+            "pet_toys.fetch_tug_toys",
+            "pet_toys.soft_toys",
+            "pet_toys.puzzle_treat_toys",
+            "pet_toys.teaser_chase_toys"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "litter",
+          "weight": 0.2,
+          "concept_ids": [
+            "cat_litter.clumping_litter",
+            "cat_litter.non_clumping_litter"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "dog_food.dry_food",
+        "dog_food.wet_food",
+        "dog_food.treats_snacks",
+        "cat_food.dry_food",
+        "cat_food.wet_food",
+        "cat_food.treats_snacks",
+        "pet_harnesses.strap_harnesses",
+        "pet_harnesses.vest_padded_harnesses",
+        "pet_bowls.standard_bowls",
+        "pet_bowls.slow_feed_bowls",
+        "pet_bowls.raised_feeding_stations",
+        "pet_bowls.drinking_fountains",
+        "pet_toys.chew_toys",
+        "pet_toys.fetch_tug_toys",
+        "pet_toys.soft_toys",
+        "pet_toys.puzzle_treat_toys",
+        "pet_toys.teaser_chase_toys",
+        "cat_litter.clumping_litter",
+        "cat_litter.non_clumping_litter"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "beauty",
+      "label": "Beauty and personal care shop",
+      "departments": [
+        {
+          "id": "skin",
+          "weight": 0.3,
+          "concept_ids": [
+            "moisturizers.light_facial_moisturizers",
+            "moisturizers.rich_facial_creams",
+            "moisturizers.body_moisturizers",
+            "cleansers.water_based_rinse_off_cleansers",
+            "cleansers.oil_balm_cleansers",
+            "serums.hydration_focused_serums",
+            "serums.ingredient_focused_cosmetic_treatment_serums"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "makeup",
+          "weight": 0.25,
+          "concept_ids": [
+            "foundation.tinted_light_coverage_bases",
+            "foundation.liquid_cream_foundation",
+            "foundation.powder_foundation",
+            "lip_colour.lipsticks",
+            "lip_colour.liquid_lip_colour",
+            "lip_colour.lip_gloss"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "hair",
+          "weight": 0.2,
+          "concept_ids": [
+            "shampoo.everyday_shampoo",
+            "shampoo.clarifying_deep_cleansing_shampoo"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "fragrance",
+          "weight": 0.15,
+          "concept_ids": [
+            "fragrance.fresh_citrus_led_fragrance",
+            "fragrance.floral_fragrance",
+            "fragrance.wood_spice_led_fragrance",
+            "fragrance.sweet_amber_led_fragrance"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "oral_care",
+          "weight": 0.1,
+          "concept_ids": [
+            "toothbrushes.manual_toothbrushes",
+            "toothbrushes.electric_toothbrushes",
+            "brush_heads.replacement_electric_toothbrush_heads"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "moisturizers.light_facial_moisturizers",
+        "moisturizers.rich_facial_creams",
+        "moisturizers.body_moisturizers",
+        "cleansers.water_based_rinse_off_cleansers",
+        "cleansers.oil_balm_cleansers",
+        "serums.hydration_focused_serums",
+        "serums.ingredient_focused_cosmetic_treatment_serums",
+        "foundation.tinted_light_coverage_bases",
+        "foundation.liquid_cream_foundation",
+        "foundation.powder_foundation",
+        "lip_colour.lipsticks",
+        "lip_colour.liquid_lip_colour",
+        "lip_colour.lip_gloss",
+        "shampoo.everyday_shampoo",
+        "shampoo.clarifying_deep_cleansing_shampoo",
+        "fragrance.fresh_citrus_led_fragrance",
+        "fragrance.floral_fragrance",
+        "fragrance.wood_spice_led_fragrance",
+        "fragrance.sweet_amber_led_fragrance",
+        "toothbrushes.manual_toothbrushes",
+        "toothbrushes.electric_toothbrushes",
+        "brush_heads.replacement_electric_toothbrush_heads"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "drinks",
+      "label": "Beer and wine merchant",
+      "departments": [
+        {
+          "id": "beer",
+          "weight": 0.5,
+          "concept_ids": [
+            "beer.lager_pilsner",
+            "beer.pale_ale_ipa",
+            "beer.wheat_beer",
+            "beer.stout_porter",
+            "beer.sour_beer",
+            "beer.strong_dark_ale"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "wine",
+          "weight": 0.5,
+          "concept_ids": [
+            "wine.crisp_light_white_wine",
+            "wine.aromatic_white_wine",
+            "wine.fuller_bodied_white_wine",
+            "wine.light_red_wine",
+            "wine.structured_full_bodied_red_wine",
+            "wine.ros_wine",
+            "wine.sparkling_wine",
+            "wine.sweet_dessert_wine"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "beer.lager_pilsner",
+        "beer.pale_ale_ipa",
+        "beer.wheat_beer",
+        "beer.stout_porter",
+        "beer.sour_beer",
+        "beer.strong_dark_ale",
+        "wine.crisp_light_white_wine",
+        "wine.aromatic_white_wine",
+        "wine.fuller_bodied_white_wine",
+        "wine.light_red_wine",
+        "wine.structured_full_bodied_red_wine",
+        "wine.ros_wine",
+        "wine.sparkling_wine",
+        "wine.sweet_dessert_wine"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "books",
+      "label": "Bookshop",
+      "departments": [
+        {
+          "id": "books",
+          "weight": 1,
+          "concept_ids": [
+            "books.crime_thriller",
+            "books.fantasy",
+            "books.science_fiction",
+            "books.romance",
+            "books.general_literary_fiction",
+            "books.picture_books",
+            "books.children_s_chapter_books",
+            "books.history",
+            "books.biography_memoir",
+            "books.popular_science",
+            "books.practical_how_to_guides",
+            "books.cookbooks"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "books.crime_thriller",
+        "books.fantasy",
+        "books.science_fiction",
+        "books.romance",
+        "books.general_literary_fiction",
+        "books.picture_books",
+        "books.children_s_chapter_books",
+        "books.history",
+        "books.biography_memoir",
+        "books.popular_science",
+        "books.practical_how_to_guides",
+        "books.cookbooks"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "games",
+      "label": "Tabletop game shop",
+      "departments": [
+        {
+          "id": "games",
+          "weight": 1,
+          "concept_ids": [
+            "board_games.light_family_strategy_games",
+            "board_games.heavier_strategy_economic_games",
+            "board_games.cooperative_adventure_games",
+            "board_games.party_games",
+            "board_games.deduction_social_deduction_games",
+            "board_games.two_player_duelling_games",
+            "board_games.solo_puzzle_games",
+            "board_games.expansion_packs"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "board_games.light_family_strategy_games",
+        "board_games.heavier_strategy_economic_games",
+        "board_games.cooperative_adventure_games",
+        "board_games.party_games",
+        "board_games.deduction_social_deduction_games",
+        "board_games.two_player_duelling_games",
+        "board_games.solo_puzzle_games",
+        "board_games.expansion_packs"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "home_kitchen",
+      "label": "Kitchen and home textiles shop",
+      "departments": [
+        {
+          "id": "cookware",
+          "weight": 0.35,
+          "concept_ids": [
+            "cookware.frying_pans",
+            "cookware.saut_pans",
+            "cookware.grill_pans",
+            "cookware.woks",
+            "pots.saucepans",
+            "pots.stockpots",
+            "pots.casserole_dutch_oven_pots"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "utensils",
+          "weight": 0.3,
+          "concept_ids": [
+            "kitchen_utensils.turners_spatulas",
+            "kitchen_utensils.serving_spoons_ladles",
+            "kitchen_utensils.whisks",
+            "kitchen_utensils.tongs",
+            "kitchen_utensils.strainers_colanders",
+            "kitchen_utensils.graters_peelers",
+            "kitchen_utensils.kitchen_knives",
+            "kitchen_utensils.chopping_boards"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "textiles",
+          "weight": 0.35,
+          "concept_ids": [
+            "bedding.duvet_cover_sets",
+            "bedding.sheets",
+            "bedding.pillowcases",
+            "bedding.duvets",
+            "bedding.pillows",
+            "towels.bath_hand_towels",
+            "towels.kitchen_towels",
+            "towels.travel_quick_drying_towels"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "cookware.frying_pans",
+        "cookware.saut_pans",
+        "cookware.grill_pans",
+        "cookware.woks",
+        "pots.saucepans",
+        "pots.stockpots",
+        "pots.casserole_dutch_oven_pots",
+        "kitchen_utensils.turners_spatulas",
+        "kitchen_utensils.serving_spoons_ladles",
+        "kitchen_utensils.whisks",
+        "kitchen_utensils.tongs",
+        "kitchen_utensils.strainers_colanders",
+        "kitchen_utensils.graters_peelers",
+        "kitchen_utensils.kitchen_knives",
+        "kitchen_utensils.chopping_boards",
+        "bedding.duvet_cover_sets",
+        "bedding.sheets",
+        "bedding.pillowcases",
+        "bedding.duvets",
+        "bedding.pillows",
+        "towels.bath_hand_towels",
+        "towels.kitchen_towels",
+        "towels.travel_quick_drying_towels"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "office",
+      "label": "Office and workspace shop",
+      "departments": [
+        {
+          "id": "furniture",
+          "weight": 0.55,
+          "concept_ids": [
+            "furniture.fixed_height_desks",
+            "furniture.sit_stand_desks",
+            "furniture.folding_space_saving_desks",
+            "office_chairs.office_task_chairs",
+            "office_chairs.high_drafting_chairs",
+            "office_chairs.active_saddle_seating"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "equipment",
+          "weight": 0.3,
+          "concept_ids": [
+            "monitors.office_productivity_monitors",
+            "monitors.high_refresh_gaming_monitors",
+            "monitors.creative_image_work_monitors",
+            "monitors.ultrawide_workspace_monitors",
+            "keyboards.desktop_keyboards",
+            "keyboards.slim_portable_keyboards",
+            "keyboards.split_ergonomic_keyboards"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "accessories",
+          "weight": 0.15,
+          "concept_ids": [
+            "chargers.plug_in_wall_chargers",
+            "chargers.desktop_charging_hubs",
+            "printer_ink.ink_cartridges_and_cartridge_sets"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "furniture.fixed_height_desks",
+        "furniture.sit_stand_desks",
+        "furniture.folding_space_saving_desks",
+        "office_chairs.office_task_chairs",
+        "office_chairs.high_drafting_chairs",
+        "office_chairs.active_saddle_seating",
+        "monitors.office_productivity_monitors",
+        "monitors.high_refresh_gaming_monitors",
+        "monitors.creative_image_work_monitors",
+        "monitors.ultrawide_workspace_monitors",
+        "keyboards.desktop_keyboards",
+        "keyboards.slim_portable_keyboards",
+        "keyboards.split_ergonomic_keyboards"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "tools",
+      "label": "Power tools and garden equipment shop",
+      "departments": [
+        {
+          "id": "workshop",
+          "weight": 0.6,
+          "concept_ids": [
+            "drills.drill_drivers",
+            "drills.hammer_drills",
+            "drills.impact_drivers",
+            "saws.jigsaws",
+            "saws.circular_saws",
+            "saws.reciprocating_saws",
+            "saws.mitre_saws",
+            "sanders.orbital_sanders",
+            "sanders.belt_sanders",
+            "sanders.detail_sanders"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "garden",
+          "weight": 0.2,
+          "concept_ids": [
+            "garden_trimmers.grass_line_trimmers",
+            "garden_trimmers.brushcutters"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "power",
+          "weight": 0.2,
+          "concept_ids": [
+            "tool_power.replacement_tool_batteries",
+            "tool_power.compatible_tool_chargers"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "drills.drill_drivers",
+        "drills.hammer_drills",
+        "drills.impact_drivers",
+        "saws.jigsaws",
+        "saws.circular_saws",
+        "saws.reciprocating_saws",
+        "saws.mitre_saws",
+        "sanders.orbital_sanders",
+        "sanders.belt_sanders",
+        "sanders.detail_sanders",
+        "garden_trimmers.grass_line_trimmers",
+        "garden_trimmers.brushcutters",
+        "tool_power.replacement_tool_batteries",
+        "tool_power.compatible_tool_chargers"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "appliances",
+      "label": "Household appliance shop",
+      "departments": [
+        {
+          "id": "laundry",
+          "weight": 0.35,
+          "concept_ids": [
+            "washing_machines.freestanding_front_load_washers",
+            "washing_machines.integrated_washers",
+            "washing_machines.top_load_washers"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "cleaning",
+          "weight": 0.5,
+          "concept_ids": [
+            "vacuum_cleaners.canister_cylinder_vacuums",
+            "vacuum_cleaners.cordless_stick_vacuums",
+            "vacuum_cleaners.upright_vacuums",
+            "vacuum_cleaners.robot_vacuums",
+            "vacuum_cleaners.wet_dry_utility_vacuums"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "consumables",
+          "weight": 0.15,
+          "concept_ids": [
+            "vacuum_bags.replacement_vacuum_bags"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "washing_machines.freestanding_front_load_washers",
+        "washing_machines.integrated_washers",
+        "washing_machines.top_load_washers",
+        "vacuum_cleaners.canister_cylinder_vacuums",
+        "vacuum_cleaners.cordless_stick_vacuums",
+        "vacuum_cleaners.upright_vacuums",
+        "vacuum_cleaners.robot_vacuums",
+        "vacuum_cleaners.wet_dry_utility_vacuums",
+        "vacuum_bags.replacement_vacuum_bags"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "strollers",
+      "label": "Baby transport shop",
+      "departments": [
+        {
+          "id": "strollers",
+          "weight": 0.85,
+          "concept_ids": [
+            "strollers.everyday_full_size_strollers",
+            "strollers.compact_travel_strollers",
+            "strollers.all_terrain_strollers",
+            "strollers.double_strollers"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "carriers",
+          "weight": 0.15,
+          "concept_ids": [],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "strollers.everyday_full_size_strollers",
+        "strollers.compact_travel_strollers",
+        "strollers.all_terrain_strollers",
+        "strollers.double_strollers"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "marketplace",
+      "label": "General marketplace",
+      "departments": [
+        {
+          "id": "fashion",
+          "weight": 0.15,
+          "concept_ids": [
+            "footwear.casual_trainers",
+            "footwear.walking_shoes",
+            "footwear.road_running_shoes",
+            "footwear.trail_running_shoes",
+            "footwear.low_hiking_shoes",
+            "footwear.hiking_boots",
+            "footwear.flat_low_heeled_dress_shoes",
+            "footwear.heeled_dress_shoes",
+            "footwear.walking_sandals",
+            "footwear.flip_flops",
+            "footwear.winter_boots",
+            "footwear.rubber_boots",
+            "trousers.jeans",
+            "trousers.chinos",
+            "trousers.tailored_trousers",
+            "trousers.walking_travel_trousers",
+            "trousers.work_utility_trousers",
+            "trousers.lounge_trousers",
+            "jackets.rain_shells",
+            "jackets.softshell_jackets",
+            "jackets.fleece_jackets",
+            "jackets.insulated_puffer_jackets",
+            "jackets.parkas_long_winter_coats",
+            "jackets.everyday_casual_jackets",
+            "tops.t_shirts",
+            "tops.button_up_shirts_blouses",
+            "tops.polo_shirts",
+            "tops.sleeveless_tops",
+            "tops.technical_base_layer_tops",
+            "knitwear.pullovers",
+            "knitwear.cardigans",
+            "knitwear.zip_neck_sweaters"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "electronics",
+          "weight": 0.2,
+          "concept_ids": [
+            "laptops.everyday_office_laptops",
+            "laptops.ultraportables",
+            "laptops.creator_workstation_laptops",
+            "laptops.gaming_laptops",
+            "phones.smartphones",
+            "tablets.everyday_media_tablets",
+            "tablets.pen_work_focused_tablets",
+            "monitors.office_productivity_monitors",
+            "monitors.high_refresh_gaming_monitors",
+            "monitors.creative_image_work_monitors",
+            "monitors.ultrawide_workspace_monitors",
+            "headphones.over_ear_on_ear_headphones",
+            "headphones.in_ear_earbuds",
+            "headphones.open_ear_sport_headphones",
+            "headphones.call_gaming_headsets",
+            "keyboards.desktop_keyboards",
+            "keyboards.slim_portable_keyboards",
+            "keyboards.split_ergonomic_keyboards",
+            "ssd.nvme_ssds",
+            "ssd.sata_ssds",
+            "ssd.hard_disk_drives_hdds",
+            "memory_cards.memory_cards",
+            "chargers.plug_in_wall_chargers",
+            "chargers.desktop_charging_hubs",
+            "phone_cases.shell_cases",
+            "phone_cases.folio_wallet_cases",
+            "camera_lenses.wide_angle_primes",
+            "camera_lenses.standard_primes",
+            "camera_lenses.portrait_telephoto_primes",
+            "camera_lenses.zoom_lenses",
+            "camera_lenses.macro_lenses",
+            "printer_ink.ink_cartridges_and_cartridge_sets"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "home",
+          "weight": 0.2,
+          "concept_ids": [
+            "bedding.duvet_cover_sets",
+            "bedding.sheets",
+            "bedding.pillowcases",
+            "bedding.duvets",
+            "bedding.pillows",
+            "towels.bath_hand_towels",
+            "towels.kitchen_towels",
+            "towels.travel_quick_drying_towels",
+            "cookware.frying_pans",
+            "cookware.saut_pans",
+            "cookware.grill_pans",
+            "cookware.woks",
+            "pots.saucepans",
+            "pots.stockpots",
+            "pots.casserole_dutch_oven_pots",
+            "kitchen_utensils.turners_spatulas",
+            "kitchen_utensils.serving_spoons_ladles",
+            "kitchen_utensils.whisks",
+            "kitchen_utensils.tongs",
+            "kitchen_utensils.strainers_colanders",
+            "kitchen_utensils.graters_peelers",
+            "kitchen_utensils.kitchen_knives",
+            "kitchen_utensils.chopping_boards",
+            "furniture.fixed_height_desks",
+            "furniture.sit_stand_desks",
+            "furniture.folding_space_saving_desks",
+            "office_chairs.office_task_chairs",
+            "office_chairs.high_drafting_chairs",
+            "office_chairs.active_saddle_seating",
+            "washing_machines.freestanding_front_load_washers",
+            "washing_machines.integrated_washers",
+            "washing_machines.top_load_washers",
+            "vacuum_cleaners.canister_cylinder_vacuums",
+            "vacuum_cleaners.cordless_stick_vacuums",
+            "vacuum_cleaners.upright_vacuums",
+            "vacuum_cleaners.robot_vacuums",
+            "vacuum_cleaners.wet_dry_utility_vacuums",
+            "vacuum_bags.replacement_vacuum_bags"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "leisure",
+          "weight": 0.2,
+          "concept_ids": [
+            "books.crime_thriller",
+            "books.fantasy",
+            "books.science_fiction",
+            "books.romance",
+            "books.general_literary_fiction",
+            "books.picture_books",
+            "books.children_s_chapter_books",
+            "books.history",
+            "books.biography_memoir",
+            "books.popular_science",
+            "books.practical_how_to_guides",
+            "books.cookbooks",
+            "board_games.light_family_strategy_games",
+            "board_games.heavier_strategy_economic_games",
+            "board_games.cooperative_adventure_games",
+            "board_games.party_games",
+            "board_games.deduction_social_deduction_games",
+            "board_games.two_player_duelling_games",
+            "board_games.solo_puzzle_games",
+            "board_games.expansion_packs",
+            "tents.light_trekking_tents",
+            "tents.freestanding_dome_tents",
+            "tents.larger_campsite_tunnel_tents",
+            "tents.quick_pitch_pop_up_tents",
+            "backpacks.everyday_daypacks",
+            "backpacks.hiking_trekking_packs",
+            "backpacks.commuter_laptop_packs",
+            "backpacks.travel_packs",
+            "backpacks.running_hydration_packs",
+            "sleeping_bags.mummy_bags",
+            "sleeping_bags.rectangular_bags",
+            "sleeping_bags.sleeping_quilts",
+            "sleeping_mats.closed_cell_foam_mats",
+            "sleeping_mats.self_inflating_mats",
+            "sleeping_mats.inflatable_air_mats",
+            "strollers.everyday_full_size_strollers",
+            "strollers.compact_travel_strollers",
+            "strollers.all_terrain_strollers",
+            "strollers.double_strollers"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "care",
+          "weight": 0.15,
+          "concept_ids": [
+            "dog_food.dry_food",
+            "dog_food.wet_food",
+            "dog_food.treats_snacks",
+            "cat_food.dry_food",
+            "cat_food.wet_food",
+            "cat_food.treats_snacks",
+            "pet_harnesses.strap_harnesses",
+            "pet_harnesses.vest_padded_harnesses",
+            "pet_bowls.standard_bowls",
+            "pet_bowls.slow_feed_bowls",
+            "pet_bowls.raised_feeding_stations",
+            "pet_bowls.drinking_fountains",
+            "pet_toys.chew_toys",
+            "pet_toys.fetch_tug_toys",
+            "pet_toys.soft_toys",
+            "pet_toys.puzzle_treat_toys",
+            "pet_toys.teaser_chase_toys",
+            "cat_litter.clumping_litter",
+            "cat_litter.non_clumping_litter",
+            "moisturizers.light_facial_moisturizers",
+            "moisturizers.rich_facial_creams",
+            "moisturizers.body_moisturizers",
+            "cleansers.water_based_rinse_off_cleansers",
+            "cleansers.oil_balm_cleansers",
+            "serums.hydration_focused_serums",
+            "serums.ingredient_focused_cosmetic_treatment_serums",
+            "foundation.tinted_light_coverage_bases",
+            "foundation.liquid_cream_foundation",
+            "foundation.powder_foundation",
+            "lip_colour.lipsticks",
+            "lip_colour.liquid_lip_colour",
+            "lip_colour.lip_gloss",
+            "shampoo.everyday_shampoo",
+            "shampoo.clarifying_deep_cleansing_shampoo",
+            "fragrance.fresh_citrus_led_fragrance",
+            "fragrance.floral_fragrance",
+            "fragrance.wood_spice_led_fragrance",
+            "fragrance.sweet_amber_led_fragrance",
+            "toothbrushes.manual_toothbrushes",
+            "toothbrushes.electric_toothbrushes",
+            "brush_heads.replacement_electric_toothbrush_heads"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "tools_drinks",
+          "weight": 0.1,
+          "concept_ids": [
+            "drills.drill_drivers",
+            "drills.hammer_drills",
+            "drills.impact_drivers",
+            "saws.jigsaws",
+            "saws.circular_saws",
+            "saws.reciprocating_saws",
+            "saws.mitre_saws",
+            "sanders.orbital_sanders",
+            "sanders.belt_sanders",
+            "sanders.detail_sanders",
+            "garden_trimmers.grass_line_trimmers",
+            "garden_trimmers.brushcutters",
+            "tool_power.replacement_tool_batteries",
+            "tool_power.compatible_tool_chargers",
+            "beer.lager_pilsner",
+            "beer.pale_ale_ipa",
+            "beer.wheat_beer",
+            "beer.stout_porter",
+            "beer.sour_beer",
+            "beer.strong_dark_ale",
+            "wine.crisp_light_white_wine",
+            "wine.aromatic_white_wine",
+            "wine.fuller_bodied_white_wine",
+            "wine.light_red_wine",
+            "wine.structured_full_bodied_red_wine",
+            "wine.ros_wine",
+            "wine.sparkling_wine",
+            "wine.sweet_dessert_wine"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "beer",
+      "label": "Beer specialist",
+      "departments": [
+        {
+          "id": "beer",
+          "weight": 1,
+          "concept_ids": [
+            "beer.lager_pilsner",
+            "beer.pale_ale_ipa",
+            "beer.wheat_beer",
+            "beer.stout_porter",
+            "beer.sour_beer",
+            "beer.strong_dark_ale"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "beer.lager_pilsner",
+        "beer.pale_ale_ipa",
+        "beer.wheat_beer",
+        "beer.stout_porter",
+        "beer.sour_beer",
+        "beer.strong_dark_ale"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "wine",
+      "label": "Wine specialist",
+      "departments": [
+        {
+          "id": "wine",
+          "weight": 1,
+          "concept_ids": [
+            "wine.crisp_light_white_wine",
+            "wine.aromatic_white_wine",
+            "wine.fuller_bodied_white_wine",
+            "wine.light_red_wine",
+            "wine.structured_full_bodied_red_wine",
+            "wine.ros_wine",
+            "wine.sparkling_wine",
+            "wine.sweet_dessert_wine"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "wine.crisp_light_white_wine",
+        "wine.aromatic_white_wine",
+        "wine.fuller_bodied_white_wine",
+        "wine.light_red_wine",
+        "wine.structured_full_bodied_red_wine",
+        "wine.ros_wine",
+        "wine.sparkling_wine",
+        "wine.sweet_dessert_wine"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "running",
+      "label": "Running specialist",
+      "departments": [
+        {
+          "id": "shoes",
+          "weight": 0.5,
+          "concept_ids": [
+            "footwear.road_running_shoes",
+            "footwear.trail_running_shoes"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "packs",
+          "weight": 0.15,
+          "concept_ids": [
+            "backpacks.running_hydration_packs"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "clothing",
+          "weight": 0.3,
+          "concept_ids": [
+            "tops.technical_base_layer_tops",
+            "tops.t_shirts",
+            "tops.sleeveless_tops",
+            "jackets.rain_shells"
+          ],
+          "requires_declared_theme": {
+            "tops.t_shirts": "running",
+            "tops.sleeveless_tops": "running",
+            "jackets.rain_shells": "running"
+          }
+        },
+        {
+          "id": "optional_accessories",
+          "weight": 0.05,
+          "concept_ids": [
+            "headphones.open_ear_sport_headphones",
+            "towels.travel_quick_drying_towels"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "footwear.road_running_shoes",
+        "footwear.trail_running_shoes",
+        "backpacks.running_hydration_packs"
+      ],
+      "focus_theme": "running",
+      "base_generation_weight": 1
+    },
+    {
+      "id": "travel",
+      "label": "Travel and packing shop",
+      "departments": [
+        {
+          "id": "bags",
+          "weight": 0.4,
+          "concept_ids": [
+            "backpacks.travel_packs",
+            "backpacks.everyday_daypacks"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "clothing",
+          "weight": 0.2,
+          "concept_ids": [
+            "trousers.walking_travel_trousers",
+            "jackets.rain_shells"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "footwear",
+          "weight": 0.25,
+          "concept_ids": [
+            "footwear.walking_shoes",
+            "footwear.walking_sandals"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "accessories",
+          "weight": 0.15,
+          "concept_ids": [
+            "towels.travel_quick_drying_towels",
+            "chargers.plug_in_wall_chargers"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "backpacks.travel_packs",
+        "backpacks.everyday_daypacks",
+        "trousers.walking_travel_trousers",
+        "jackets.rain_shells"
+      ],
+      "focus_theme": "travel",
+      "base_generation_weight": 1
+    },
+    {
+      "id": "gaming_setup",
+      "label": "PC gaming setup retailer",
+      "departments": [
+        {
+          "id": "computing",
+          "weight": 0.5,
+          "concept_ids": [
+            "laptops.gaming_laptops",
+            "monitors.high_refresh_gaming_monitors"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "peripherals",
+          "weight": 0.3,
+          "concept_ids": [
+            "headphones.call_gaming_headsets",
+            "keyboards.desktop_keyboards"
+          ],
+          "requires_declared_theme": {
+            "keyboards.desktop_keyboards": "gaming"
+          }
+        },
+        {
+          "id": "storage",
+          "weight": 0.15,
+          "concept_ids": [
+            "ssd.nvme_ssds",
+            "ssd.sata_ssds",
+            "ssd.hard_disk_drives_hdds"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "optional_workspace",
+          "weight": 0.05,
+          "concept_ids": [
+            "furniture.fixed_height_desks",
+            "furniture.sit_stand_desks",
+            "office_chairs.office_task_chairs"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "laptops.gaming_laptops",
+        "monitors.high_refresh_gaming_monitors",
+        "headphones.call_gaming_headsets",
+        "keyboards.desktop_keyboards"
+      ],
+      "focus_theme": "gaming",
+      "base_generation_weight": 1
+    },
+    {
+      "id": "books_games",
+      "label": "Books and tabletop games shop",
+      "departments": [
+        {
+          "id": "books",
+          "weight": 0.6,
+          "concept_ids": [
+            "books.crime_thriller",
+            "books.fantasy",
+            "books.science_fiction",
+            "books.romance",
+            "books.general_literary_fiction",
+            "books.picture_books",
+            "books.children_s_chapter_books",
+            "books.history",
+            "books.biography_memoir",
+            "books.popular_science",
+            "books.practical_how_to_guides",
+            "books.cookbooks"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "games",
+          "weight": 0.4,
+          "concept_ids": [
+            "board_games.light_family_strategy_games",
+            "board_games.heavier_strategy_economic_games",
+            "board_games.cooperative_adventure_games",
+            "board_games.party_games",
+            "board_games.deduction_social_deduction_games",
+            "board_games.two_player_duelling_games",
+            "board_games.solo_puzzle_games",
+            "board_games.expansion_packs"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "books.crime_thriller",
+        "books.fantasy",
+        "books.science_fiction",
+        "books.romance",
+        "books.general_literary_fiction",
+        "books.picture_books",
+        "books.children_s_chapter_books",
+        "books.history",
+        "books.biography_memoir",
+        "books.popular_science",
+        "books.practical_how_to_guides",
+        "books.cookbooks",
+        "board_games.light_family_strategy_games",
+        "board_games.heavier_strategy_economic_games",
+        "board_games.cooperative_adventure_games",
+        "board_games.party_games",
+        "board_games.deduction_social_deduction_games",
+        "board_games.two_player_duelling_games",
+        "board_games.solo_puzzle_games",
+        "board_games.expansion_packs"
+      ],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "department_store",
+      "label": "Curated department store",
+      "departments": [
+        {
+          "id": "fashion",
+          "weight": 0.45,
+          "concept_ids": [
+            "footwear.casual_trainers",
+            "footwear.walking_shoes",
+            "footwear.road_running_shoes",
+            "footwear.trail_running_shoes",
+            "footwear.low_hiking_shoes",
+            "footwear.hiking_boots",
+            "footwear.flat_low_heeled_dress_shoes",
+            "footwear.heeled_dress_shoes",
+            "footwear.walking_sandals",
+            "footwear.flip_flops",
+            "footwear.winter_boots",
+            "footwear.rubber_boots",
+            "trousers.jeans",
+            "trousers.chinos",
+            "trousers.tailored_trousers",
+            "trousers.walking_travel_trousers",
+            "trousers.work_utility_trousers",
+            "trousers.lounge_trousers",
+            "jackets.rain_shells",
+            "jackets.softshell_jackets",
+            "jackets.fleece_jackets",
+            "jackets.insulated_puffer_jackets",
+            "jackets.parkas_long_winter_coats",
+            "jackets.everyday_casual_jackets",
+            "tops.t_shirts",
+            "tops.button_up_shirts_blouses",
+            "tops.polo_shirts",
+            "tops.sleeveless_tops",
+            "tops.technical_base_layer_tops",
+            "knitwear.pullovers",
+            "knitwear.cardigans",
+            "knitwear.zip_neck_sweaters"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "beauty",
+          "weight": 0.25,
+          "concept_ids": [
+            "fragrance.fresh_citrus_led_fragrance",
+            "fragrance.floral_fragrance",
+            "fragrance.wood_spice_led_fragrance",
+            "fragrance.sweet_amber_led_fragrance",
+            "foundation.tinted_light_coverage_bases",
+            "foundation.liquid_cream_foundation",
+            "foundation.powder_foundation",
+            "lip_colour.lipsticks",
+            "lip_colour.liquid_lip_colour",
+            "lip_colour.lip_gloss",
+            "moisturizers.light_facial_moisturizers",
+            "moisturizers.rich_facial_creams",
+            "moisturizers.body_moisturizers",
+            "cleansers.water_based_rinse_off_cleansers",
+            "cleansers.oil_balm_cleansers",
+            "serums.hydration_focused_serums",
+            "serums.ingredient_focused_cosmetic_treatment_serums",
+            "shampoo.everyday_shampoo",
+            "shampoo.clarifying_deep_cleansing_shampoo"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "home",
+          "weight": 0.25,
+          "concept_ids": [
+            "bedding.duvet_cover_sets",
+            "bedding.sheets",
+            "bedding.pillowcases",
+            "bedding.duvets",
+            "bedding.pillows",
+            "towels.bath_hand_towels",
+            "towels.kitchen_towels",
+            "towels.travel_quick_drying_towels",
+            "cookware.frying_pans",
+            "cookware.saut_pans",
+            "cookware.grill_pans",
+            "cookware.woks",
+            "pots.saucepans",
+            "pots.stockpots",
+            "pots.casserole_dutch_oven_pots",
+            "kitchen_utensils.turners_spatulas",
+            "kitchen_utensils.serving_spoons_ladles",
+            "kitchen_utensils.whisks",
+            "kitchen_utensils.tongs",
+            "kitchen_utensils.strainers_colanders",
+            "kitchen_utensils.graters_peelers",
+            "kitchen_utensils.kitchen_knives",
+            "kitchen_utensils.chopping_boards"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "optional_gifts",
+          "weight": 0.05,
+          "concept_ids": [
+            "books.crime_thriller",
+            "books.fantasy",
+            "books.science_fiction",
+            "books.romance",
+            "books.general_literary_fiction",
+            "books.picture_books",
+            "books.children_s_chapter_books",
+            "books.history",
+            "books.biography_memoir",
+            "books.popular_science",
+            "books.practical_how_to_guides",
+            "books.cookbooks",
+            "board_games.light_family_strategy_games",
+            "board_games.heavier_strategy_economic_games",
+            "board_games.cooperative_adventure_games",
+            "board_games.party_games",
+            "board_games.deduction_social_deduction_games",
+            "board_games.two_player_duelling_games",
+            "board_games.solo_puzzle_games",
+            "board_games.expansion_packs"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [],
+      "focus_theme": null,
+      "base_generation_weight": 1
+    },
+    {
+      "id": "creator_equipment",
+      "label": "Image-work equipment and accessories",
+      "departments": [
+        {
+          "id": "image_computing",
+          "weight": 0.45,
+          "concept_ids": [
+            "laptops.creator_workstation_laptops",
+            "monitors.creative_image_work_monitors",
+            "tablets.pen_work_focused_tablets"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "photo_accessories",
+          "weight": 0.35,
+          "concept_ids": [
+            "camera_lenses.wide_angle_primes",
+            "camera_lenses.standard_primes",
+            "camera_lenses.portrait_telephoto_primes",
+            "camera_lenses.zoom_lenses",
+            "camera_lenses.macro_lenses",
+            "memory_cards.memory_cards"
+          ],
+          "requires_declared_theme": {}
+        },
+        {
+          "id": "storage",
+          "weight": 0.2,
+          "concept_ids": [
+            "ssd.nvme_ssds",
+            "ssd.sata_ssds",
+            "ssd.hard_disk_drives_hdds"
+          ],
+          "requires_declared_theme": {}
+        }
+      ],
+      "direct_task_concept_ids": [
+        "laptops.creator_workstation_laptops",
+        "monitors.creative_image_work_monitors",
+        "tablets.pen_work_focused_tablets",
+        "camera_lenses.wide_angle_primes",
+        "camera_lenses.standard_primes",
+        "camera_lenses.portrait_telephoto_primes",
+        "camera_lenses.zoom_lenses",
+        "camera_lenses.macro_lenses",
+        "memory_cards.memory_cards"
+      ],
+      "focus_theme": "photography",
+      "base_generation_weight": 1
+    }
+  ],
+  "retailer_population": {
+    "candidate_slots_per_template": 8,
+    "base_mean_per_template": 0.65,
+    "world_size_exponent": 0.5,
+    "scope_population_reference": 30,
+    "scope_population_exponent": 0.35,
+    "generation_weights": {
+      "direct": 4,
+      "partial": 2,
+      "unrelated": 1
+    },
+    "formula": "mean = base_mean * world_size ** .5 * (scope_product_count / 30) ** .35 * generation_weight ** retailer_concentration; each of eight template slots independently exists with probability min(.95, mean/8). No products in scope means no retailer of that template.",
+    "relevance": "Normalize distinct requested concepts to equal weights. Direct if at least 75% are in direct_task_concept_ids; partial if any requested concept is in the hard scope; unrelated otherwise. With no task, all are unrelated for generation weighting but background depth is not reduced. Unknown task concepts fail.",
+    "scope_count": "Count eligible distinct products, excluding unconfirmed conditional theme membership. Never count SKUs, available stock, price winners or review qualification.",
+    "scale_probabilities": {
+      "small": 0.45,
+      "medium": 0.35,
+      "large": 0.2
+    },
+    "emphasis_specificity_probabilities": {
+      "balanced": 0.6,
+      "focused": 0.4
+    },
+    "price_preference_probabilities_balanced": {
+      "budget": 0.25,
+      "mainstream": 0.5,
+      "premium": 0.25
+    },
+    "price_preference_probabilities_focused": {
+      "budget": 0.2,
+      "mainstream": 0.4,
+      "premium": 0.4
+    },
+    "notes": "Price preference remains soft. Template scope is hard; focus acts within it. High-scale focused stores can exist. Departments cover the chosen scope, never form a second narrowing draw.",
+    "conditional_scope": "Conditional theme membership must be authored product metadata, supported by the concept recipe. Missing membership is ineligible. The reference knows only unambiguous concept-derived themes and reports conditional products excluded; it never fabricates activities for broad concepts."
+  },
+  "allocation": {
+    "coverage_fraction_by_scale": {
+      "small": 0.15,
+      "medium": 0.35,
+      "large": 0.65
+    },
+    "focused_depth_formula": "Multiply the expected distinct-product budget by .35 + .65 * focus_fraction_of_eligible_products. Balanced depth multiplier is 1.",
+    "inside_focus_product_weight": 3,
+    "price_match_weight": 1.35,
+    "brand_alignment_match_weight": 1.2,
+    "preferred_brand_probabilities": {
+      "small": 0.65,
+      "medium": 0.45,
+      "large": 0.25
+    },
+    "preferred_brand_count_probabilities": {
+      "1": 0.8,
+      "2": 0.2
+    },
+    "brand_preference_selection": "Weighted without replacement from brands with eligible products; weight 1 + .5 * fraction of their eligible products aligned with focus, and multiply by 1.2 when brand positioning tendency matches retailer price preference. No hard brand gate.",
+    "preferred_brand_product_weight": 2,
+    "within_store_brand_reinforcement": 0,
+    "within_store_task_weight": "1 + (within_store_task_concentration - 1) * task affinity; affects product selection weights, not the assortment budget.",
+    "product_budget": "Eligible distinct products * scale coverage fraction * focused depth factor; multiply by unrelated_store_assortment_weight only for task-unrelated stores when a task exists.",
+    "department_budget": "Use authored department weights with bounded capacity allocation: solve a shared scale c so sum(min(.95 * department_eligible_count, c * department_weight)) equals the store expected product budget, up to total eligible capacity. Empty or saturated departments redistribute expected budget to other departments inside the same hard scope, never inventing products or demanding exact counts. Unknown conditional theme membership is ineligible.",
+    "product_selection": "Within each department, combine emphasis, price, weak brand alignment, preferred-brand and task weights. Solve a common scale c such that sum(min(.95, c * product_weight)) equals department expected budget, bounded by .95 times eligible count; independently select products with those probabilities. Report unattainable budgets. No forced nonempty inventory, answerability or overlap resampling.",
+    "empty_result": "Retain an empty sampled retailer with a diagnostic rather than quietly retrying; optional complete-world quality rejection must be explicit.",
+    "overlap": "Emergent independent allocations over shared world products; no cross-retailer adjustment or overlap target.",
+    "preferred_brand_warning": "Brand preference is a retailer-local relationship, not a world-level per-product distribution tendency. All eligible products keep positive weights.",
+    "weight_formula": "product_weight = (3 if product matches focus else 1) * (1.35 if product positioning matches price preference else 1) * (1.2 if brand emphasis matches focus else 1) * (2 if preferred brand else 1) * (1 + (within_store_task_concentration - 1) * task_affinity)."
+  },
+  "sku_listing": {
+    "role_default_probabilities": {
+      "base": 0.95,
+      "alternative": 0.7,
+      "extension": 0.45
+    },
+    "standard_colour_probability": 0.9,
+    "alternative_colour_probability_formula": ".75 / sqrt(max(1, number_of_alternative_colours)); when no standard colour exists all colours are alternatives. A sole manufactured value is retained.",
+    "size_coverage_mode_probabilities": {
+      "all_manufactured_sizes": 0.9,
+      "every_other_size": 0.1
+    },
+    "size_scope": "Once per product/selected non-size configuration at the retailer; choose parity uniformly for every-other coverage. Keep a sole size. Never expand the manufactured size range.",
+    "other_axis_selection": "Draw inclusion independently across manufactured values using declared base/alternative/extension roles. Retain a sole manufactured value. Undefined roles fail validation. Colour supports base/alternative roles only, with at most one base colour; no standard colour is required.",
+    "combination_filter": "Retain only manufactured SKUs whose axis values were selected. This does not manufacture a Cartesian grid.",
+    "empty_subset": "If all valid SKUs were excluded for an allocated product, retain one existing SKU sampled with commonness weights (base/alternative/extension .95/.7/.45 and colour weights). This enforces a nonempty listed product, not in-stock availability; standard values are not mandatory.",
+    "stock_boundary": "Listing commonness never modifies subsequent stockout or positive quantity draws. Sold-out listings remain part of retailer page grouping.",
+    "presentation": "For each retailer and eligible grouping-policy key, draw uniformly from concept-declared allowed selector/page-partition roles, then reuse that decision across products. Size remains selector; sandal width remains page partition under the agreed example. Description-only features do not enter SKU listing."
+  },
+  "shipping_selection": {
+    "world_carrier_count": 8,
+    "carrier_count_ranges_by_scale": {
+      "small": [
+        1,
+        3
+      ],
+      "medium": [
+        2,
+        4
+      ],
+      "large": [
+        3,
+        5
+      ]
+    },
+    "carrier_selection": "Uniform integer count within range; sample without replacement from the world pool. No adjustment for stock, price winners or task success.",
+    "standard_service_probability": 1,
+    "economy_service_probability": 0.4,
+    "express_service_probability": 0.3,
+    "tier_sampling_unit": "Once per retailer-carrier contract, shared across products; shipping-class compatibility and point access filter available quotes.",
+    "world_carrier_regular_home_probability": 1,
+    "world_carrier_bulky_home_probability": 0.6,
+    "bulky_sampling_unit": "Once per world carrier, reused by all retailers. The .6 value is the base prior; conditioning on bulky-selling retailer support can change its marginals.",
+    "bulky_retailer_support": {
+      "status": "agreed_2026_10_01_not_adopted_by_isolated_sampler_or_frozen_audit",
+      "requirement": "Every retailer offering bulky products must have a contracted service supporting bulky home delivery within its declared delivery area. Regular-only home service does not satisfy this. Retailers without bulky listings have no such requirement; stock and delivery to the current user are not guaranteed.",
+      "sampling": "Condition the original assortment/carrier/capability distribution using weighted completion masses. Do not force a supporting carrier after sampling. Shared carrier capabilities couple constraints across retailers.",
+      "supersedes": "Earlier permission for bulky-selling retailers to have no bulky-capable carrier.",
+      "reference": "docs/agents/website-generation-contract.md"
+    },
+    "collection_access_defaults": {
+      "radius_km": 3,
+      "point_count": 10,
+      "locker_probability": 0.4,
+      "home_only_probability": 0.2,
+      "non_home_only_mode_probabilities": {
+        "staffed": 0.5,
+        "locker": 0.1875,
+        "both": 0.3125
+      },
+      "accessed_point_count_range": [
+        1,
+        3
+      ]
+    },
+    "collection_access": "Reuse the carrier-location pilot: shared physical points and opening hours, access sets reused across retailers, no fabricated point when an eligible type is absent. Regular collection only.",
+    "nearby_foreign_pickup": {
+      "maximum_driving_minutes": 90,
+      "relaxed_domestic_only_foreign_multiplier": 1,
+      "ordinary_multiplier": 0.2,
+      "scope": "Pickup/inspection tasks only; test a proposed foreign home-city route before inventory, using modeled driving time including crossings. Unmodeled or farther cities keep .2. Do not relax shipping destination coverage.",
+      "reference": "Use zero-offset city anchors at candidate placement to avoid a circular dependency on later branch generation. Final task distances still use actual branch positions."
+    },
+    "collection_opening_hours": "Reuse pilot defaults: fuel-station counters 06:00–23:00 daily; other staffed points equally choose the three authored weekly schedules in the carrier-location pilot, including Sunday-closed schedules. Lockers 24/7. Sample once per physical point, never separately per retailer or carrier."
+  },
+  "implementation_boundary": "Isolated reference sampling and validation only. Do not alter existing generator, renderer, checkout, hosts or frozen pins. Later integration consumes a versioned contract.",
+  "diagnostics": [
+    "expected/realized products per concept and scope",
+    "brand count and capped slot expectations",
+    "retailer relevance/scale and eligible-product populations",
+    "listed distinct-product coverage per department",
+    "empty scopes/stores and missing conditional facts",
+    "shared-product overlap as measurement only",
+    "SKU listing fallback and retained zero-stock listings",
+    "carrier counts, unsupported bulky and missing local collection modes"
+  ]
+}

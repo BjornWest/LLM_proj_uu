@@ -1,0 +1,995 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "jackets.insulated_puffer_jackets",
+  "family_id": "jackets",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/jackets.insulated_puffer_jackets.json": "20ed09303ca3a8b0dc3c4beba62d40a10416b7f8355c706c7c452062ea99d679",
+    "environments/product_world/data/product_width/_apparel_base.json": "706ca4bbc3f0702c10ab54968d391cabde18bb8359daba199fb611ab94fc9f23"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep waterproof declarations distinct from measured ratings; insulation and weather protection do not become guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.size_system": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "nominal adult alpha labels",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": true,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": true,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "hip-length insulated outerwear",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.insulation_kind": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "down",
+          "synthetic"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "insulation_kind"
+    },
+    "product.facts.insulation_material": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "insulation_material"
+    },
+    "product.facts.insulation_distribution": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "insulation_distribution"
+    },
+    "product.facts.shell_fibre": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "nylon",
+          "polyester"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shell_fibre"
+    },
+    "product.facts.lining_fibre": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "polyester",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lining_fibre"
+    },
+    "product.facts.dedicated_fill": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dedicated_fill"
+    },
+    "product.facts.membrane_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "membrane_present"
+    },
+    "product.facts.declared_down_fill_power": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cu in/oz",
+        "min": 700,
+        "max": 800,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_down_fill_power"
+    },
+    "product.facts.declared_down_fill_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": 100,
+        "max": 200,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_down_fill_mass_g"
+    },
+    "product.facts.hydrophobic_down_treatment": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hydrophobic_down_treatment"
+    },
+    "product.facts.declared_synthetic_insulation_g_m2": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g/m2",
+        "min": 60,
+        "max": 100,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_synthetic_insulation_g_m2"
+    },
+    "product.facts.synthetic_total_fill_mass": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fill_reference_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one garment, nominal size M reference configuration",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.fill_power_test_method": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fill_power_conditioning": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.down_species_and_blend": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.seam_treatment": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.waterproof_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.thermal_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pack_volume": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.front_closure": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "full front zip",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_closure"
+    },
+    "product.facts.hand_pocket_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hand_pocket_count"
+    },
+    "product.facts.hand_pocket_closure": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "zip",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hand_pocket_closure"
+    },
+    "product.facts.hood_style": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "absent",
+          "fixed",
+          "adjustable"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hood_style"
+    },
+    "product.facts.hood_present": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hood_present"
+    },
+    "product.facts.hood_adjustable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hood_adjustable"
+    },
+    "product.facts.internal_pocket_storage": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "internal_pocket_storage"
+    },
+    "product.facts.shell_dwr": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shell_dwr"
+    },
+    "product.facts.cut": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "slim",
+          "regular",
+          "relaxed"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cut"
+    },
+    "product.facts.mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one garment, nominal size M reference configuration",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.reference_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "min": 295,
+        "max": 445,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_mass_g"
+    }
+  },
+  "disclosure_groups": {
+    "insulation_kind": {
+      "id": "jackets.insulated_puffer_jackets.content.insulation_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.insulation_kind"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "insulation_material": {
+      "id": "jackets.insulated_puffer_jackets.content.insulation_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.insulation_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "insulation_distribution": {
+      "id": "jackets.insulated_puffer_jackets.content.insulation_distribution",
+      "display_group": "features",
+      "fields": [
+        "product.facts.insulation_distribution"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "shell_fibre": {
+      "id": "jackets.insulated_puffer_jackets.content.shell_fibre",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.shell_fibre"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lining_fibre": {
+      "id": "jackets.insulated_puffer_jackets.content.lining_fibre",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.lining_fibre"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dedicated_fill": {
+      "id": "jackets.insulated_puffer_jackets.content.dedicated_fill",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dedicated_fill"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "membrane_present": {
+      "id": "jackets.insulated_puffer_jackets.content.membrane_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.membrane_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_down_fill_power": {
+      "id": "jackets.insulated_puffer_jackets.content.declared_down_fill_power",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_down_fill_power"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_down_fill_mass_g": {
+      "id": "jackets.insulated_puffer_jackets.content.declared_down_fill_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.declared_down_fill_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hydrophobic_down_treatment": {
+      "id": "jackets.insulated_puffer_jackets.content.hydrophobic_down_treatment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hydrophobic_down_treatment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_synthetic_insulation_g_m2": {
+      "id": "jackets.insulated_puffer_jackets.content.declared_synthetic_insulation_g_m2",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_synthetic_insulation_g_m2"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_closure": {
+      "id": "jackets.insulated_puffer_jackets.content.front_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.front_closure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hand_pocket_count": {
+      "id": "jackets.insulated_puffer_jackets.content.hand_pocket_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hand_pocket_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hand_pocket_closure": {
+      "id": "jackets.insulated_puffer_jackets.content.hand_pocket_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.hand_pocket_closure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hood_style": {
+      "id": "jackets.insulated_puffer_jackets.content.hood_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hood_style"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "hood_present": {
+      "id": "jackets.insulated_puffer_jackets.content.hood_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hood_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hood_adjustable": {
+      "id": "jackets.insulated_puffer_jackets.content.hood_adjustable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hood_adjustable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "internal_pocket_storage": {
+      "id": "jackets.insulated_puffer_jackets.content.internal_pocket_storage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.internal_pocket_storage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "shell_dwr": {
+      "id": "jackets.insulated_puffer_jackets.content.shell_dwr",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.shell_dwr"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cut": {
+      "id": "jackets.insulated_puffer_jackets.content.cut",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.cut"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "reference_mass_g": {
+      "id": "jackets.insulated_puffer_jackets.content.reference_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    }
+  },
+  "display_groups": {
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 34,
+    "roles": {
+      "operational": 2,
+      "identity": 1,
+      "descriptive": 15,
+      "literal": 6,
+      "omit_placeholder": 8,
+      "qualifier": 2
+    },
+    "display_groups": 4,
+    "highlight_candidates": 5,
+    "unmapped_descriptive_fields": 21
+  }
+}

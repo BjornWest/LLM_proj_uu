@@ -1,0 +1,1470 @@
+{
+  "schema_version": "cross-family-store-theme-review-v1",
+  "status": "planning_only_proposals_not_runtime",
+  "source_registry": {
+    "families": 56,
+    "concepts": 210
+  },
+  "original_store_type_count": 15,
+  "original_shortlist": "store-assortment-scope.json",
+  "candidate_count": 6,
+  "candidates": [
+    {
+      "id": "running",
+      "label": "Running specialist",
+      "status": "proposed_conditional",
+      "related_existing_store_types": [
+        "footwear",
+        "outdoors",
+        "apparel"
+      ],
+      "departments": [
+        {
+          "label": "Shoes",
+          "concept_ids": [
+            "footwear.road_running_shoes",
+            "footwear.trail_running_shoes"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Packs",
+          "concept_ids": [
+            "backpacks.running_hydration_packs"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Clothing",
+          "concept_ids": [
+            "tops.technical_base_layer_tops",
+            "tops.t_shirts",
+            "tops.sleeveless_tops",
+            "jackets.rain_shells"
+          ],
+          "selection_condition": "Only running-suitable products; canonical suitability predicate is not yet authored."
+        },
+        {
+          "label": "Optional accessories",
+          "concept_ids": [
+            "headphones.open_ear_sport_headphones",
+            "towels.travel_quick_drying_towels"
+          ],
+          "selection_condition": null
+        }
+      ],
+      "gaps": [
+        "Running shorts/tights and sports socks are not in the current concept inventory.",
+        "No authored running-suitability predicate for broad clothing concepts."
+      ],
+      "notes": "Allocate separate shoe, clothing and equipment shares; concept counts must not determine shelf shares. Do not claim a complete running shop yet."
+    },
+    {
+      "id": "travel",
+      "label": "Travel and packing shop",
+      "status": "proposed_bounded",
+      "related_existing_store_types": [
+        "outdoors",
+        "apparel",
+        "electronics"
+      ],
+      "departments": [
+        {
+          "label": "Bags",
+          "concept_ids": [
+            "backpacks.travel_packs",
+            "backpacks.everyday_daypacks"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Clothing",
+          "concept_ids": [
+            "trousers.walking_travel_trousers",
+            "jackets.rain_shells"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Footwear",
+          "concept_ids": [
+            "footwear.walking_shoes",
+            "footwear.walking_sandals"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Accessories",
+          "concept_ids": [
+            "towels.travel_quick_drying_towels",
+            "chargers.plug_in_wall_chargers"
+          ],
+          "selection_condition": "Charger department must say chargers, not travel plug adapters; adapters are not specified."
+        }
+      ],
+      "gaps": [
+        "Suitcases and packing organisers are absent if expanding to a full luggage shop."
+      ],
+      "notes": "A bounded backpack-led travel shop is supportable from existing concepts. Optional departments should vary between retailers."
+    },
+    {
+      "id": "gaming_setup",
+      "label": "PC gaming setup retailer",
+      "status": "proposed_conditional",
+      "related_existing_store_types": [
+        "electronics",
+        "office"
+      ],
+      "departments": [
+        {
+          "label": "Computing",
+          "concept_ids": [
+            "laptops.gaming_laptops",
+            "monitors.high_refresh_gaming_monitors"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Peripherals",
+          "concept_ids": [
+            "headphones.call_gaming_headsets",
+            "keyboards.desktop_keyboards"
+          ],
+          "selection_condition": "Gaming suitability must be explicitly authored for mixed-use headset/keyboard concepts; backlighting alone is not evidence."
+        },
+        {
+          "label": "Storage",
+          "concept_ids": [
+            "ssd.nvme_ssds",
+            "ssd.sata_ssds",
+            "ssd.hard_disk_drives_hdds"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Optional workspace",
+          "concept_ids": [
+            "furniture.fixed_height_desks",
+            "furniture.sit_stand_desks",
+            "office_chairs.office_task_chairs"
+          ],
+          "selection_condition": null
+        }
+      ],
+      "gaps": [
+        "Mice are a useful missing core peripheral. Desktop PCs, consoles and components are not currently supported."
+      ],
+      "notes": "Use a laptop-led gaming-equipment scope, not a complete gaming shop or PC-building supplier. No invented gaming performance claims for furniture."
+    },
+    {
+      "id": "books_games",
+      "label": "Books and tabletop games shop",
+      "status": "proposed_bounded",
+      "related_existing_store_types": [
+        "books",
+        "games"
+      ],
+      "departments": [
+        {
+          "label": "Books",
+          "concept_ids": [
+            "books.crime_thriller",
+            "books.fantasy",
+            "books.science_fiction",
+            "books.romance",
+            "books.general_literary_fiction",
+            "books.picture_books",
+            "books.children_s_chapter_books",
+            "books.history",
+            "books.biography_memoir",
+            "books.popular_science",
+            "books.practical_how_to_guides",
+            "books.cookbooks"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Games",
+          "concept_ids": [
+            "board_games.light_family_strategy_games",
+            "board_games.heavier_strategy_economic_games",
+            "board_games.cooperative_adventure_games",
+            "board_games.party_games",
+            "board_games.deduction_social_deduction_games",
+            "board_games.two_player_duelling_games",
+            "board_games.solo_puzzle_games",
+            "board_games.expansion_packs"
+          ],
+          "selection_condition": null
+        }
+      ],
+      "gaps": [],
+      "notes": "No new family needed. Apply shared audience/theme preferences to both departments where their authored domains support them; default can simply be a mixed book/game shop."
+    },
+    {
+      "id": "department_store",
+      "label": "Curated department store",
+      "status": "proposed_bounded",
+      "related_existing_store_types": [
+        "apparel",
+        "beauty",
+        "home_kitchen",
+        "marketplace"
+      ],
+      "departments": [
+        {
+          "label": "Fashion",
+          "concept_ids": [
+            "footwear.casual_trainers",
+            "footwear.walking_shoes",
+            "footwear.road_running_shoes",
+            "footwear.trail_running_shoes",
+            "footwear.low_hiking_shoes",
+            "footwear.hiking_boots",
+            "footwear.flat_low_heeled_dress_shoes",
+            "footwear.heeled_dress_shoes",
+            "footwear.walking_sandals",
+            "footwear.flip_flops",
+            "footwear.winter_boots",
+            "footwear.rubber_boots",
+            "trousers.jeans",
+            "trousers.chinos",
+            "trousers.tailored_trousers",
+            "trousers.walking_travel_trousers",
+            "trousers.work_utility_trousers",
+            "trousers.lounge_trousers",
+            "jackets.rain_shells",
+            "jackets.softshell_jackets",
+            "jackets.fleece_jackets",
+            "jackets.insulated_puffer_jackets",
+            "jackets.parkas_long_winter_coats",
+            "jackets.everyday_casual_jackets",
+            "tops.t_shirts",
+            "tops.button_up_shirts_blouses",
+            "tops.polo_shirts",
+            "tops.sleeveless_tops",
+            "tops.technical_base_layer_tops",
+            "knitwear.pullovers",
+            "knitwear.cardigans",
+            "knitwear.zip_neck_sweaters"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Beauty",
+          "concept_ids": [
+            "fragrance.fresh_citrus_led_fragrance",
+            "fragrance.floral_fragrance",
+            "fragrance.wood_spice_led_fragrance",
+            "fragrance.sweet_amber_led_fragrance",
+            "foundation.tinted_light_coverage_bases",
+            "foundation.liquid_cream_foundation",
+            "foundation.powder_foundation",
+            "lip_colour.lipsticks",
+            "lip_colour.liquid_lip_colour",
+            "lip_colour.lip_gloss",
+            "moisturizers.light_facial_moisturizers",
+            "moisturizers.rich_facial_creams",
+            "moisturizers.body_moisturizers",
+            "cleansers.water_based_rinse_off_cleansers",
+            "cleansers.oil_balm_cleansers",
+            "serums.hydration_focused_serums",
+            "serums.ingredient_focused_cosmetic_treatment_serums",
+            "shampoo.everyday_shampoo",
+            "shampoo.clarifying_deep_cleansing_shampoo"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Home",
+          "concept_ids": [
+            "bedding.duvet_cover_sets",
+            "bedding.sheets",
+            "bedding.pillowcases",
+            "bedding.duvets",
+            "bedding.pillows",
+            "towels.bath_hand_towels",
+            "towels.kitchen_towels",
+            "towels.travel_quick_drying_towels",
+            "cookware.frying_pans",
+            "cookware.saut_pans",
+            "cookware.grill_pans",
+            "cookware.woks",
+            "pots.saucepans",
+            "pots.stockpots",
+            "pots.casserole_dutch_oven_pots",
+            "kitchen_utensils.turners_spatulas",
+            "kitchen_utensils.serving_spoons_ladles",
+            "kitchen_utensils.whisks",
+            "kitchen_utensils.tongs",
+            "kitchen_utensils.strainers_colanders",
+            "kitchen_utensils.graters_peelers",
+            "kitchen_utensils.kitchen_knives",
+            "kitchen_utensils.chopping_boards"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Optional gifts",
+          "concept_ids": [
+            "books.crime_thriller",
+            "books.fantasy",
+            "books.science_fiction",
+            "books.romance",
+            "books.general_literary_fiction",
+            "books.picture_books",
+            "books.children_s_chapter_books",
+            "books.history",
+            "books.biography_memoir",
+            "books.popular_science",
+            "books.practical_how_to_guides",
+            "books.cookbooks",
+            "board_games.light_family_strategy_games",
+            "board_games.heavier_strategy_economic_games",
+            "board_games.cooperative_adventure_games",
+            "board_games.party_games",
+            "board_games.deduction_social_deduction_games",
+            "board_games.two_player_duelling_games",
+            "board_games.solo_puzzle_games",
+            "board_games.expansion_packs"
+          ],
+          "selection_condition": null
+        }
+      ],
+      "gaps": [],
+      "notes": "One retailer with curated departments, distinct from the catch-all marketplace. Scale affects enabled departments and their depth. No default tool, pet-food or alcohol department."
+    },
+    {
+      "id": "creator_equipment",
+      "label": "Image-work equipment and accessories",
+      "status": "lower_priority_conditional",
+      "related_existing_store_types": [
+        "electronics"
+      ],
+      "departments": [
+        {
+          "label": "Image computing",
+          "concept_ids": [
+            "laptops.creator_workstation_laptops",
+            "monitors.creative_image_work_monitors",
+            "tablets.pen_work_focused_tablets"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Photo accessories",
+          "concept_ids": [
+            "camera_lenses.wide_angle_primes",
+            "camera_lenses.standard_primes",
+            "camera_lenses.portrait_telephoto_primes",
+            "camera_lenses.zoom_lenses",
+            "camera_lenses.macro_lenses",
+            "memory_cards.memory_cards"
+          ],
+          "selection_condition": null
+        },
+        {
+          "label": "Storage",
+          "concept_ids": [
+            "ssd.nvme_ssds",
+            "ssd.sata_ssds",
+            "ssd.hard_disk_drives_hdds"
+          ],
+          "selection_condition": null
+        }
+      ],
+      "gaps": [
+        "Cameras including bodies are agreed as a bounded addition but not yet authored in the registry.",
+        "Tripods/stands and lighting remain deferred."
+      ],
+      "notes": "Camera addition can support a photography specialization. Existing mappings list only current concept IDs; add camera references after authoring. Do not require a professional studio equipment assortment."
+    }
+  ],
+  "retailer_price_preference": {
+    "decision": "accepted_soft_bias",
+    "price_basis": "product positioning before retailer offer prices",
+    "eligible_segments": [
+      "budget",
+      "mainstream",
+      "premium"
+    ],
+    "hard_exclusions": false,
+    "boutique_correlation": "Strong curation makes premium preference more likely, never mandatory; no universal premium bias for every specialist.",
+    "strength": "Weaker than thematic assortment emphasis; weights not yet calibrated.",
+    "scarcity_behavior": "Select only world products; relax soft preferences when filling assortment where feasible, never expand hard scope or invent products.",
+    "small_sample_note": "Positive weights do not guarantee every segment appears in each realized catalog."
+  },
+  "mapping_contract": {
+    "family_role": "Shared product features and browsing grouping; not a hard retailer boundary.",
+    "scope_role": "Explicit concept eligibility across families; conditional membership requires authored canonical predicates.",
+    "theme_role": "Shared cross-family relevance identity; distinct from product-profile emphasis.",
+    "allocation": "Explicit department shares before within-department products, not proportional to number of concepts by accident.",
+    "task_relevance": "Scope overlap informs retailer sampling; exact task qualification, stock and cheapest status do not define retailer relevance.",
+    "template_policy": "Human-authored coherent retailer templates reference reusable themes; no arbitrary theme composition.",
+    "department_policy": "Optional allocation groups partition chosen scope; no extra department-selection or boost draw narrowing that scope. Site collections may overlap, but unique-product budgets count each product once."
+  },
+  "retailer_population_contract": {
+    "status": "accepted_design_not_implemented",
+    "tuning_status": "Initial population, relevance, retailer allocation and SKU listing defaults authored in world-sampling-defaults.json; not calibrated or integrated into production.",
+    "relevance_classes": {
+      "direct": {
+        "meaning": "Scope and emphasis closely align with requested concepts.",
+        "generation_weight": 4,
+        "task_concept_allocation_weight": 2,
+        "assortment_size_weight": 1
+      },
+      "partial": {
+        "meaning": "Scope includes requested concepts within a broader or less aligned assortment.",
+        "generation_weight": 2,
+        "task_concept_allocation_weight": 2,
+        "assortment_size_weight": 1
+      },
+      "unrelated": {
+        "meaning": "Scope does not include requested concepts.",
+        "generation_weight": 1,
+        "task_concept_allocation_weight": 1,
+        "assortment_size_weight": 0.35
+      }
+    },
+    "relevance_basis": [
+      "authored retailer scope",
+      "thematic emphasis",
+      "task concept or theme references"
+    ],
+    "excluded_relevance_inputs": [
+      "actual qualifying stock",
+      "price winner",
+      "oracle outcome"
+    ],
+    "controls": {
+      "world_size": "Generation intensity steering emergent expected distinct-product population; no early global total draw or default population constraint; not a direct SKU multiplier.",
+      "product_concentration": "Adjusts relative task-concept generation weights separately from global intensity. Task conditioning may change realized expected population; calibrate rather than enforce a fixed total.",
+      "retailer_concentration": "Redistributes expected retailer population using relevance-class generation weights.",
+      "within_store_task_concentration": "Adjusts concept allocation inside eligible scopes without changing eligibility.",
+      "unrelated_store_assortment_weight": "Changes inventory depth only for unrelated stores; does not penalize unrelated products inside relevant stores."
+    },
+    "population_policy": {
+      "status": "accepted_design_not_implemented",
+      "decision": "emergent_population_tune_priors",
+      "early_global_total_draw": false,
+      "default_population_constraint": false,
+      "bounds": "Finite local capacity for resource and solver support; capacity is not a required population.",
+      "calibration": "Measure total and task-relevant products, brands and stores after conditioning; tune generation weights and track explicit complete-world quality rejection rates.",
+      "optional_constraints": "Task-specific minimum populations, such as three running-shoe stores, only when required; no universal population preservation.",
+      "weight_reuse": "Unchanged logical support permits reuse of feasibility results or complete compiled support, with weighted masses recalculated; changing bounds, domains or dependencies can require new solver work.",
+      "design_reference": "docs/agents/constrained-world-sampling-pilot.md"
+    },
+    "geography_and_delivery_policy": {
+      "status": "accepted_design_not_implemented",
+      "design_date": "2026-09-30",
+      "geographic_scope": "Existing offline Western Europe country/city fixture; synthetic local positions and named areas.",
+      "user_placement": "Uniform supported country, then uniform supported city, unless explicitly selected; tunable priors.",
+      "retailer_network": "One warehouse; branches in retailer home country, with count and spread determined by scale. International physical expansion deferred.",
+      "base_home_location_weights": {
+        "same_user_city": 0.4,
+        "other_city_in_user_country": 0.45,
+        "foreign_country": 0.15
+      },
+      "domestic_city_categories": "Mutually exclusive. If no other supported domestic city exists, move that weight to the user city.",
+      "foreign_connected_country_probability": 0.85,
+      "foreign_connection_meaning": "Existing bundled ground/sea corridor adjacency, including ferries; not strictly land borders.",
+      "international_shipping_probability_by_profile": {
+        "local_shop": 0.05,
+        "regional_chain": 0.25,
+        "major_retailer": 0.8,
+        "online_specialist": 0.6
+      },
+      "profile_mapping_note": "Current MVP profile IDs. Online-specialist probability is an operating-format override when format and scale are separated.",
+      "delivery_coverage": "Domestic-only retailers serve their home country; international retailers serve all supported countries. Capability does not guarantee stock or a modelled route.",
+      "branch_shipping": {
+        "status": "accepted_design_existing_mvp_capability",
+        "enabled_probability": 0.45,
+        "sampling_unit": "Physical branch; flat probability independent of scale, family and inventory.",
+        "stock_scope": "Every saleable SKU stocked at an enabled branch is eligible as a delivery source; no additional product-specific shipping capability draw.",
+        "eligibility": "Requested quantity must be present, retailer must serve destination, and freight route must be modelled. Display-only inspection units are not saleable stock.",
+        "disabled": "Branch stock can support pickup even when branch shipping is disabled."
+      },
+      "shared_shipping_carriers": {
+        "status": "accepted_design_not_implemented",
+        "sampling_stage": "Create a world-level carrier pool before retailer shipping options. Generate one shared collection-location pool near the user, then assign carrier access before retailer binding.",
+        "authoring_preview": {
+          "status": "implemented_isolated_draft_not_live_integration",
+          "url": "http://localhost:8879/",
+          "module": "experiments.carrier_location_pilot",
+          "documentation": "docs/agents/carrier-location-pilot.md",
+          "draft_defaults": {
+            "radius_km": 3,
+            "point_count": 10,
+            "locker_probability": 0.4,
+            "home_only_probability": 0.2
+          }
+        },
+        "carriers_per_world": 8,
+        "name_pool": [
+          "Parcelia",
+          "VeloPost",
+          "NordParcel",
+          "Sendora",
+          "RouteBox",
+          "Paketra",
+          "LumoParcel",
+          "AvenPost",
+          "RelayGo",
+          "ParcelNest",
+          "WayParcel",
+          "Dropora",
+          "BoxTrail",
+          "Shipora",
+          "ParcelLoop",
+          "Postella",
+          "RelayPoint",
+          "Sendivo",
+          "ParcelWave",
+          "RouteNest"
+        ],
+        "name_policy": "Intended fictional labels, sampled without replacement within the world. No persistent timing or service profile attached to a name across episodes.",
+        "identity": "Stable world-local carrier IDs shared by all retailers, shipping quotes and travel/location evidence.",
+        "transit": "Derive from common geographic routes and small carrier-wide timing parameters. Cache by carrier, service and endpoints; never sample fresh transit times per retailer. Timing parameters remain to be defined with service options.",
+        "pickup_points": "Shared physical collection locations have stable IDs and positions, distinct from retailer branches. Several carriers may use the exact same location. Retailers reference carrier access sets rather than inventing their own points.",
+        "pickup_scope": "Generate collection locations only near the current user; do not populate cities across the world. Nearby extent and point-count distributions remain to be assigned.",
+        "pickup_types": {
+          "staffed_counter": {
+            "host_types": [
+              "fuel_station",
+              "grocery_store",
+              "convenience_store",
+              "other_shop"
+            ],
+            "access": "Specific weekly opening intervals and location timezone, sampled once for the physical point and shared across carriers.",
+            "access_24_7": false
+          },
+          "parcel_locker": {
+            "host_type": "unmanned_pickup_boxes",
+            "access": "24/7, accessible independently of nearby shop opening hours.",
+            "access_24_7": true
+          }
+        },
+        "carrier_local_availability": "Sample carrier access to nearby staffed points and lockers. Zero collection points is valid: the carrier may offer only home delivery for the user's address. Carrier service availability is independent of a retailer's stock.",
+        "locker_access": "Not universal across carriers. Only carriers assigned access to a locker can offer that collection destination.",
+        "opening_hours_semantics": "Parcel-ready time and user collection access are distinct. A staffed counter's closing time does not change carrier travel time; any collection-time claims must also respect the point's access schedule.",
+        "task_memory_semantics": "Collection type, 24/7 access, hours and distance can be explicit requirements or preferences. Bind them to structured point facts; no claim of live task/grader support.",
+        "unassigned_sampling_parameters": [],
+        "coverage": "Initially use supported modelled routes without extra sampled carrier-country restrictions; retailer destination coverage still applies.",
+        "retailer_binding": "Retailers select carriers and services from the eight-carrier pool in a later step, allowing roughly five options without exhausting the pool. Counts and service composition remain to be defined. Dispatch delays remain separate, so equal carrier transit does not imply equal total arrival time.",
+        "deferred": [
+          "Production export and renderer/runtime binding",
+          "Carrier network expansion beyond the local shared point pool"
+        ],
+        "authoring_defaults_reference": "docs/agents/world-sampling-defaults.json: shipping_selection"
+      },
+      "delivery_options_proposal": {
+        "status": "proposed_not_implemented",
+        "carrier_standard_transit": {
+          "basis": "Existing offline freight distance/crossing transit rule, using one-day same-city transit for all origins; source dispatch remains separate.",
+          "carrier_offset_calendar_day_probabilities": {
+            "-1": 0.2,
+            "0": 0.6,
+            "1": 0.2
+          },
+          "sampling_unit": "Once per world carrier; shared across retailers. Clamp final standard transit to at least one day."
+        },
+        "service_relations": {
+          "economy": {
+            "transit_relative_to_standard_days": 1,
+            "base_fee_relative_to_standard_minor": -1000,
+            "minimum_base_fee_minor": 1900
+          },
+          "standard": {
+            "transit_relative_to_standard_days": 0,
+            "base_fee_relative_to_standard_minor": 0
+          },
+          "express": {
+            "transit_relative_to_standard_days": -1,
+            "minimum_transit_days": 1,
+            "base_fee_relative_to_standard_minor": 4000
+          }
+        },
+        "retailer_carrier_standard_collection_base_fee_minor_probabilities": {
+          "3900": 0.1,
+          "4900": 0.25,
+          "5900": 0.3,
+          "6900": 0.25,
+          "7900": 0.1
+        },
+        "fee_sampling_unit": "Once per retailer-carrier contract, not per SKU or quote. Transit is carrier-wide; retail customer charges may differ.",
+        "home_delivery_relative_to_collection_minor_probabilities": {
+          "-2000": 0.1,
+          "-1000": 0.1,
+          "0": 0.2,
+          "1000": 0.4,
+          "2000": 0.2
+        },
+        "home_delivery_offset_status": "Accepted weights. Sample once per retailer-carrier contract and retain across quotes; nonnegative final fees.",
+        "distance_surcharge": {
+          "first_km_included": 500,
+          "each_additional_commenced_500km_minor": 2500
+        },
+        "geographic_supplements": {
+          "cross_border_minor": 8000,
+          "non_air_crossing_minor": 7000,
+          "air_cargo_minor": 25000
+        },
+        "readiness": "Supplier lead time when applicable, then origin dispatch, then carrier/service transit. Collection access hours remain distinct from parcel readiness.",
+        "free_shipping_threshold": {
+          "probability_status": "accepted",
+          "enabled_probability_by_profile": {
+            "local_shop": 0.25,
+            "regional_chain": 0.5,
+            "major_retailer": 0.75,
+            "online_specialist": 0.6
+          },
+          "threshold_minor_values_equal_weight": [
+            20000,
+            50000,
+            70000,
+            75000,
+            100000,
+            150000,
+            200000
+          ],
+          "threshold_policy": "Accepted round-threshold policy and equal-weight pool. Eligibility is subtotal >= threshold, preserving possible one-SEK shortfalls such as 499 versus 500 without forcing them.",
+          "basis": "Eligible item subtotal after item coupons at this retailer; shipping and membership fees do not count.",
+          "scope": "Domestic standard home or collection delivery; waives standard shipping charge including domestic distance supplement. Express keeps its extra 40 SEK charge. No automatic cross-border or bulky-charge waiver; explicitly declare covered shipping classes."
+        },
+        "delivery_membership": {
+          "eligible_scale": "major_retailer only, including major online retailers when scale and format are separated",
+          "enabled_probability": 0.4,
+          "kind_probabilities": {
+            "free_signup": 0.6,
+            "annual_paid": 0.4
+          },
+          "annual_fee_minor_values_equal_weight": [
+            19900,
+            29900,
+            39900
+          ],
+          "existing_active_membership_probability_given_program": 0.3,
+          "benefit": "Same domestic standard shipping waiver, without a basket threshold; express surcharge remains. Explicit shipping-class coverage is required before waiving bulky charges. Membership does not modify dispatch or transit initially.",
+          "state": "Explicit membership state separate from ordinary account existence and signed-in state; no membership inference from login alone.",
+          "comparison": "Already-active benefits can apply. Newly joining is a separately labelled conditional scenario; include full signup fee for a new single-order comparison unless task defines another accounting scope. No implicit account creation, signup or paid activation.",
+          "outcomes": "Do not force membership to be cheapest: threshold promotions may already waive delivery, paid fees may outweigh savings, or another retailer may still win."
+        },
+        "product_shipping_class": {
+          "status": "accepted_regular_bulky_classification_not_implemented",
+          "feature_reference": "docs/agents/product-shared-features.json: common_product_envelope_features.shipping_class",
+          "eligibility": "Bulky carrier shipping is home-only; no carrier-counter or locker collection. Retailer branch collection is a separate fulfilment service. Match other carrier-service capabilities explicitly.",
+          "charges_and_time": "Bulky handling can have class-specific fees and transit rules, separate from ordinary parcel tariffs. Numeric rates and capability probabilities remain to be specified.",
+          "promotions": "Declare which classes and fee components a threshold or membership covers; generic free shipping must not silently erase bulky surcharges."
+        },
+        "bulky_delivery": {
+          "status": "accepted_home_only_cost_main_effect_small_delay_parameters_proposed_not_implemented",
+          "carrier_destination": "User home only; carrier counters and lockers unavailable. Retailer branch collection is separate.",
+          "surcharge_minor_probabilities": {
+            "14900": 0.25,
+            "24900": 0.35,
+            "34900": 0.25,
+            "49900": 0.15
+          },
+          "surcharge_sampling_unit": "Once per retailer-carrier contract, stable across quotes. Added to ordinary home-delivery charge; geographic/service supplements still apply.",
+          "transit_extra_calendar_day_probabilities": {
+            "0": 0.3,
+            "1": 0.7
+          },
+          "transit_sampling_unit": "Once per carrier, shared across retailers for bulky shipments; added to service transit, not source dispatch.",
+          "promotion_treatment_probabilities": {
+            "waive_all": 0.2,
+            "waive_base_only": 0.5,
+            "exclude_bulky": 0.3
+          },
+          "promotion_sampling_unit": "Once per retailer; applies to threshold and delivery-membership benefits initially, independent of basket qualification.",
+          "promotion_meanings": {
+            "waive_all": "A qualifying standard-shipping promotion waives ordinary home delivery and bulky surcharge; express surcharge remains if that service exists.",
+            "waive_base_only": "A qualifying promotion waives ordinary home delivery but retains bulky and express surcharges.",
+            "exclude_bulky": "Bulky product tariffs receive no shipping waiver despite subtotal or membership qualification. Regular product tariffs can still qualify. Bulky tariff retains ordinary shipping plus bulky and service supplements; aggregate complete product tariffs by maximum."
+          },
+          "cart_scope": "Accepted default: one consolidated shipment per retailer checkout. Cart shipping is max(complete applicable shipping tariff per product), not summed line fees or base plus an already complete maximum. Evaluate each common carrier/service/destination option separately for the whole cart; do not combine independently optimal line options. Any bulky item excludes carrier collection for the cart.",
+          "aggregation_order": "Compute checkout item subtotal after coupons, determine threshold/membership qualification, apply explicit class treatment to each complete product shipping tariff, then take maximum for the selected common option. Across separate retailer checkouts, add each checkout's shipping charge.",
+          "middle_policy": "waive_base_only discounts the ordinary component of a bulky tariff, retaining its surcharge; it does not split regular and bulky goods into separate shipments.",
+          "procurement_and_packages": "Supplier orders and stock transfers can delay item readiness without automatically creating multiple customer shipments or charges. Default shipment waits for all its items. Remote/split fulfilment is a possible explicit later exception, not the usual checkout model.",
+          "quantity_scope": "No general per-unit freight scaling in the initial model. Manufactured multipacks use their own SKU shipping class/tariff. Quantity-dependent packaging and multiple-origin fulfilment remain deferred.",
+          "threshold_basis": "All eligible item subtotal after coupons counts, including bulky items. Promotion treatment controls shipping waiver separately.",
+          "terms": "Public shipping conditions must state bulky charges and promotion exclusions. Quote components preserve ordinary shipping, bulky surcharge and applied waiver separately.",
+          "outcomes": "Do not force free delivery, cheapest offer or compatible stocked origin."
+        },
+        "home_delivery_terms_backlog": {
+          "status": "user_requested_next_spec_topic",
+          "scope": "Home-delivery arrangements, including whether appointments or delivery windows can be scheduled. Terms attach to retailer-carrier services and agree with selectable options.",
+          "scheduling_modes": [
+            "carrier_assigned",
+            "choose_day",
+            "choose_day_and_window"
+          ],
+          "scheduling_semantics": "Selectable dates/windows must be explicit. Scheduled delivery does not by itself promise evening availability. Probabilities and concrete slot generation remain to be authored.",
+          "sampling_proposal": {
+            "status": "accepted_design_not_implemented",
+            "scheduling_choice_rationale": "User-approved: bulky delivery should more often offer a choice. Day or day-and-window selection totals 90% for bulky versus 60% for regular; explicit window selection is 55% versus 25%.",
+            "scope": "Home-delivery terms only, conditional on the carrier offering the shipping class. Service availability, retailer option counts and review outcome rates are separate decisions.",
+            "sampling_order": [
+              "Carrier service terms by shipping class",
+              "Carrier access for the user's building",
+              "Retailer selection of existing services",
+              "Order-specific dates and recipient permissions",
+              "Historical shipment outcomes",
+              "Applicable review statements"
+            ],
+            "sampling_units": {
+              "service_terms": "Once per world-local carrier and shipping class, shared across retailer bindings and speed tiers initially. Retailers select existing terms rather than resampling them.",
+              "building_access": "Once per carrier and specific user building, shared across stores and regular/bulky services. A detached house delivers at its door without this apartment-entry draw.",
+              "order_context": "Dates, recipient presence and unattended-delivery permission belong to the particular order; permission is never inferred from service eligibility."
+            },
+            "scheduling_mode_probabilities_by_shipping_class": {
+              "regular": {
+                "carrier_assigned": 0.4,
+                "choose_day": 0.35,
+                "choose_day_and_window": 0.25
+              },
+              "bulky": {
+                "carrier_assigned": 0.1,
+                "choose_day": 0.35,
+                "choose_day_and_window": 0.55
+              }
+            },
+            "calendar_proposal": {
+              "first_eligible_day": "After all cart items are ready plus shared carrier/service transit; later slots never arrive earlier than physical readiness. Same canonical estimates feed public terms and task checks.",
+              "carrier_assigned": "Assign the first eligible date; no clock-time window is promised in this initial mode.",
+              "choose_day": "Offer the first eligible date and the next two calendar dates, without a promised clock-time window.",
+              "choose_day_and_window": "Offer the same three dates with explicit four-hour windows in the destination timezone.",
+              "window_set_probabilities_given_window_selection": {
+                "daytime_only": 0.5,
+                "daytime_and_evening": 0.5
+              },
+              "window_sets_local": {
+                "daytime_only": [
+                  "08:00-12:00",
+                  "12:00-16:00"
+                ],
+                "daytime_and_evening": [
+                  "08:00-12:00",
+                  "12:00-16:00",
+                  "16:00-20:00"
+                ]
+              },
+              "window_set_sampling_unit": "Once per carrier shipping-class service; actual dates instantiated per order. A 16:00-20:00 window is not wholly after 18:00.",
+              "simplifications": "Calendar days including weekends, no cutoffs or capacity depletion, and no extra scheduling fee or independent arrival-time redraw initially."
+            },
+            "apartment_entry_mode_probabilities": {
+              "recipient_opens": 0.4,
+              "provided_code_or_intercom": 0.35,
+              "authorised_access": 0.25
+            },
+            "entry_resolution": "recipient_opens requires someone present; provided_code_or_intercom requires a working supplied code or someone to answer. authorised_access means confirmed permission/access for this building. Resolved entry always means apartment-door delivery; failure to resolve entry invokes failed-delivery handling rather than a lobby-policy draw.",
+            "unattended_delivery_allowed_probability_by_shipping_class": {
+              "regular": 0.5,
+              "bulky": 0.0
+            },
+            "unattended_conditions": "Permission to leave the parcel is an explicit order fact. Unattended apartment-door delivery also needs entry without the absent recipient. Initial attended services require a recipient, without a separate signature-policy draw; ID-sensitive goods can override this in future concept rules.",
+            "failed_delivery": {
+              "status": "accepted_simple_policy_not_order_simulation",
+              "trigger": "A failed home-delivery attempt, such as absent required recipient or unavailable building access; do not manufacture a lobby handoff as the permitted fallback.",
+              "regular_policy_probabilities": {
+                "reattempt": 0.7,
+                "redirect_to_collection": 0.3
+              },
+              "collection_eligibility": "Carrier must have a nearby collection point eligible for the shipping class. Otherwise remove redirect_to_collection and renormalize to reattempt; bulky always uses reattempt.",
+              "sampling_unit": "Once per carrier shipping-class service, after carrier collection access is known; stable across retailers.",
+              "reattempt": "One additional attempt on the next calendar date. A selected delivery window does not automatically survive reattempt; publish the newly assigned date without a clock-time promise in the initial model.",
+              "redirect_to_collection": "Use an existing eligible carrier point, with parcel readiness one calendar day after the failed attempt; collection must respect the point's actual access hours. Public terms disclose this fallback and may conflict with a home-only requirement.",
+              "scope_limits": "No extra customer charge initially. Exhausted attempts, storage deadlines and return-to-sender timing are deferred, with no unsupported task claims."
+            },
+            "review_applicability": {
+              "punctuality": "Requires a dated promise and an observed arrival; distinguish retailer dispatch from the carrier transport leg.",
+              "delivery_window_adherence": "Requires an explicit promised window for the actual attempt; date-only delivery has no clock-time-window adherence claim.",
+              "apartment_door_handoff": "Requires an apartment, confirmed entry and door-delivery promise; lobby handoff can then be a complaint about service failure.",
+              "failed_delivery_handling": "Requires an actual failed attempt and the offered fallback; do not describe collection redirection for a service whose policy is reattempt.",
+              "package_handling": "Requires an observed parcel condition; attributing damage to the carrier also requires evidence in the underlying history.",
+              "communication": "Tracking/notification claims require a defined communication feature and history. Those capabilities and outcome rates remain to be authored.",
+              "selection": "Build the set of supported observations for each historical shipment before selecting statements. Inapplicable topics are excluded; applicable ones need not be mentioned, and several observations may share one comment. Policies constrain facts, while sampled performance can violate a promise."
+            },
+            "deferred": "Numeric historical reliability/failure rates, communication capabilities, review prose and renderer/task integration. Service sampling weights are accepted design settings, not implemented runtime defaults."
+          },
+          "building_access_proposal": {
+            "status": "accepted_simplified_design_not_implemented",
+            "scope": "Carrier-service capability plus actual access conditions at this user's building; no universal carrier key/access assertion.",
+            "entry_modes": [
+              "recipient_opens",
+              "provided_code_or_intercom",
+              "authorised_access"
+            ],
+            "authorised_access": "Abstract confirmed entry arrangement for the specific building; no simulated physical keys or credentials are required.",
+            "delivery_place": "Accepted simplification: confirmed building entry means apartment-door delivery. Without entry, handover is at the building entrance and requires the recipient to come downstairs. Do not independently sample a lobby-delivery policy when entry is supported. Room carrying is outside this apartment-access distinction.",
+            "recipient_presence": "Separate handover/presence condition; building access alone does not imply permission to leave goods unattended or skip a required signature.",
+            "coherence": "Bind to available home/building facts, published service terms and confirmed access. Unknown access remains unknown; neither a carrier name nor favourable reviews establishes compatibility.",
+            "task_memory_examples": [
+              "I cannot come downstairs to receive deliveries.",
+              "Leave it at my apartment door while I am out."
+            ],
+            "review_experiences": "Record promised apartment-door delivery separately from actual historical handoff. A reviewer may report that the driver left the parcel in the lobby despite confirmed entry and door delivery; this is a service failure, not a separately sampled shipping policy. Reports with unknown access or permission must not invent a breach.",
+            "evidence_basis": [
+              "https://www.postnord.se/privat/ta-emot/postutdelning/utdelning-i-flerbostadshus/",
+              "https://www.bring.se/privat/ta-emot/hemleverans"
+            ]
+          },
+          "deferred": "Implementation of home/building facts and dated slots, communication capabilities, historical outcome sampling and runtime binding."
+        },
+        "deferred": [
+          "Service availability probabilities and retailer option counts",
+          "Multiple-shipment baskets and bulky quantity scaling",
+          "Bulky carrier-service capabilities",
+          "Home delivery arrangements and scheduling",
+          "Promotion dates and renewal details",
+          "New signup/runtime flows",
+          "Shipping benefits in oracle/account quote wiring"
+        ],
+        "retailer_selection_defaults_reference": "docs/agents/world-sampling-defaults.json: shipping_selection"
+      },
+      "dispatch_timing": {
+        "status": "accepted_design_not_implemented",
+        "sampling_unit": "Once per fulfilment location, shared by stocked goods at that origin; independent of retailer scale initially.",
+        "warehouse_calendar_day_probabilities": {
+          "0": 0.2,
+          "1": 0.6,
+          "2": 0.2
+        },
+        "branch_calendar_day_probabilities": {
+          "0": 0.5,
+          "1": 0.5
+        },
+        "delivery_readiness": "Origin dispatch delay plus chosen delivery-service freight transit time.",
+        "transfer_readiness": "Warehouse dispatch delay plus warehouse-to-branch freight transit time; no transfer delay when enough saleable stock already exists at the collection branch.",
+        "supplier_orders": "Supplier lead time precedes ordinary dispatch and transit.",
+        "time_basis": "Whole calendar days; order cutoffs and weekend schedules deferred.",
+        "evidence": "Public shipping information and oracle estimates consume the same canonical timing rules."
+      },
+      "stock_transfers": {
+        "status": "accepted_design_not_implemented",
+        "enabled_probability": 0.6,
+        "sampling_unit": "Retailer-wide capability, sampled before inventory; no independent capability draw per branch pair.",
+        "network": "Transfers from the retailer's single located warehouse to its branches only. Branch-to-branch transfers are excluded.",
+        "eligibility": "Source must have the entire requested quantity in saleable stock and a modelled freight route to destination branch. Do not sum partial stock across sources or use inspection-only units.",
+        "timing": "Readiness includes source dispatch/handling and actual source-to-destination freight route time. Immediate local availability remains distinct from availability after transfer.",
+        "customer_shipping": "Delivery cost and transit depend on the actual fulfilment-origin-to-user route. A nearby destination branch does not erase upstream transfer time.",
+        "transfer_fee": "Retain retailer-absorbed internal transfer fee as the MVP default; distance still affects readiness even when the customer pays no transfer charge.",
+        "inspection": "Transfer capability does not imply a service for trying before buying.",
+        "branch_shipping_relation": "Warehouse transfers are separate from branch-to-customer shipping capability; shipping-disabled branches can receive warehouse transfers for collection.",
+        "warehouse_location": "Existing MVP warehouse has its own location ID, city and synthetic local position, distinct from headquarters and branch IDs. Source-to-user and source-to-branch routes use that position.",
+        "warehouse_count": 1,
+        "multiple_warehouses": "Deferred. The single warehouse is a representative fulfilment origin even for major retailers, not a claim to model their full real-world networks.",
+        "implementation_gap": "MVP already supports a located warehouse and warehouse-to-branch quotes. Adopt the accepted 60% capability prior in an additive implementation; preserve frozen worlds."
+      },
+      "sampling_order": "Retailer profile, then shipping capability, then home placement, before inventory and price outcomes.",
+      "domestic_only_foreign_weight_multiplier": 0.2,
+      "placement_normalization": "Multiply only the foreign weight for domestic-only retailers, then normalize all three weights. Foreign probability becomes 0.03/0.88, approximately 3.4%; overall foreign frequency is no longer fixed at 15%.",
+      "pickup_exception": {
+        "status": "authored_initial_rule_not_implemented",
+        "maximum_driving_minutes": 90,
+        "relaxed_multiplier": 1,
+        "ordinary_multiplier": 0.2,
+        "scope": "Pickup/inspection tasks only, based on modeled candidate city-to-user driving time including crossings before inventory; use zero-offset city anchors. Unmodeled or farther candidates retain the ordinary penalty. Actual task travel uses final branch locations. No shipping-coverage relaxation."
+      },
+      "index_policy": "All generated retailers remain discoverable, including those unable to serve the destination. No post-generation removal based on delivery, stock or oracle qualification."
+    },
+    "overlap_inspection_target": {
+      "metric": "shared distinct product IDs / smaller distinct-product assortment size",
+      "range": [
+        0.3333333333333333,
+        0.5
+      ],
+      "applies_to": "Pairs of medium-sized, similarly scoped retailers with nonempty assortments.",
+      "enforced": false,
+      "excluded_units": [
+        "SKUs",
+        "in-stock offers"
+      ],
+      "status": "historical_suggestion_not_active_target",
+      "notes": "Retained only as discussion history. Do not tune or reject worlds to fit this range."
+    },
+    "invariants": [
+      "Hard scope eligibility always wins over weights.",
+      "Sampling selects only world products.",
+      "Product overlap is separate from variant selection and stock.",
+      "Assortment selection has no universal answerability or multi-retailer guarantee.",
+      "Required shared offers for specific task types belong to explicit setup constraints."
+    ],
+    "deferred": [
+      "Production integration of authored defaults",
+      "Product-specific domains, canonical theme facts and per-scope naming/profile authoring",
+      "Calibration across complete generated worlds"
+    ],
+    "assortment_selection_controls": {
+      "preferred_brand_weight": 2,
+      "within_store_brand_reinforcement": 0,
+      "notes": "Use a weak brand alignment weight 1.2 and retailer-local preferred-brand weight 2, without a hard brand gate or cumulative reinforcement. Full formulas are in world-sampling-defaults.json."
+    },
+    "overlap_policy": {
+      "decision": "emergent_only",
+      "mechanism": "Each store selects brands and products from the common finite world population. Shared eligibility and preferences naturally produce overlap.",
+      "exclude": [
+        "shared per-product distribution tendency",
+        "cross-store correlation or anti-correlation adjustment",
+        "overlap-target fitting or resampling"
+      ],
+      "measure": "Shared distinct products divided by smaller assortment size, before SKU selection and stock; undefined for empty assortments."
+    }
+  },
+  "camera_scope_decision": {
+    "status": "accepted_addition_pending_registry_authoring",
+    "include": "Cameras, including interchangeable-lens camera bodies; not restricted to built-in-lens cameras.",
+    "defer": [
+      "tripods and stands",
+      "lighting equipment"
+    ],
+    "notes": "User correction: body was mistaken for stand. Camera concepts and mount compatibility still need authoring; existing concept counts remain unchanged."
+  },
+  "stock_and_supplier_order_contract": {
+    "status": "accepted_design_not_implemented",
+    "shared_stock_tendencies": {
+      "status": "accepted_initial_design_not_implemented",
+      "retailer": "Sample one world-local retailer stock tendency shared across its assortment; scale mainly influences positive stock quantities.",
+      "product": "Sample one world-local product stock tendency shared across its SKUs and retailers; do not infer scarcity from price or review execution.",
+      "location_draws": "Retailer and product tendencies determine the product inventory-condition distribution. Draw independently from that same distribution at each retailer location, then sample listed-SKU quantities conditional on the local condition.",
+      "initial_influence": "Use modest initial weight tilts so local variation remains substantial; all values remain tunable.",
+      "sampling": {
+        "unit": "Independently once per retailer and once per product, world-local.",
+        "direction_probabilities": {
+          "lower_availability": 0.2,
+          "typical": 0.6,
+          "higher_availability": 0.2
+        },
+        "direction_values": {
+          "lower_availability": -1,
+          "typical": 0,
+          "higher_availability": 1
+        },
+        "weight_factor": 1.5,
+        "condition_scores": {
+          "well_stocked": 1,
+          "patchy": 0,
+          "mostly_depleted": -1
+        },
+        "formula": "For each condition: adjusted_weight = base_probability * weight_factor ** ((retailer_direction + product_direction) * condition_score). Normalize across the three conditions, then independently draw each location.",
+        "scope": "Shared tendencies shift condition weights only, not listing commonness or conditional SKU stockout/quantity rules. Retailer scale controls positive quantity ranges separately.",
+        "reinforcement": "Matching directions reinforce; opposing directions cancel. No automatic scarcity relationship with price or review execution."
+      },
+      "online_availability": "Derived from actual eligible stock sources, not a separately sampled global availability flag."
+    },
+    "variant_stock_contract": {
+      "status": "accepted_design_not_implemented",
+      "listing": "Existing variant-commonness rules affect retailer SKU listing coverage.",
+      "stock": "All listed variants initially follow the same stock and quantity rules, conditional on their shared product inventory condition at that location.",
+      "shared_product_tendency": "Product stock tendency is shared across its variants; individual listed SKUs receive separate local stock draws.",
+      "no_double_penalty": "Do not automatically make less commonly listed variants more likely to sell out or have smaller positive quantities.",
+      "unlisted": "Stock sampling does not create unlisted or unmanufactured variants.",
+      "deferred": "Variant-specific stock-depth differences may be added later if useful."
+    },
+    "inventory_condition": {
+      "scope": "product at an inventory location",
+      "states": [
+        "well_stocked",
+        "patchy",
+        "mostly_depleted"
+      ],
+      "base_probabilities": {
+        "well_stocked": 0.5,
+        "patchy": 0.35,
+        "mostly_depleted": 0.15
+      },
+      "baseline_status": "Accepted starting probabilities before retailer/product tendency adjustments; independently draw each location from the resulting conditional distribution.",
+      "sku_stockout_probabilities": {
+        "well_stocked": 0.1,
+        "patchy": 0.45,
+        "mostly_depleted": 0.85
+      },
+      "sku_stockout_status": "Accepted base values. Draw separately for each listed SKU conditional on the shared local product condition; initially do not reapply retailer/product tendencies or variant rarity at this stage.",
+      "role": "Conditions per-SKU stockout probabilities and positive quantities; internal sampling state, not required UI text.",
+      "retailer_scale": "Influences stock depth without excluding stockouts.",
+      "parameters": "Initial condition, tendency, SKU stockout and positive quantity defaults are authored; runtime integration and tuning remain."
+    },
+    "positive_quantity": {
+      "status": "accepted_base_values_not_implemented",
+      "distribution": "Uniform integer, inclusive bounds, independently per listed SKU and location after a non-stockout draw.",
+      "ranges_by_retailer_scale": {
+        "small": {
+          "well_stocked": [
+            1,
+            8
+          ],
+          "patchy": [
+            1,
+            4
+          ],
+          "mostly_depleted": [
+            1,
+            2
+          ]
+        },
+        "medium": {
+          "well_stocked": [
+            1,
+            20
+          ],
+          "patchy": [
+            1,
+            10
+          ],
+          "mostly_depleted": [
+            1,
+            3
+          ]
+        },
+        "large": {
+          "well_stocked": [
+            1,
+            50
+          ],
+          "patchy": [
+            1,
+            25
+          ],
+          "mostly_depleted": [
+            1,
+            5
+          ]
+        }
+      },
+      "unit": "Saleable SKU units: one pair or one multipack counts as one unit, not its contents.",
+      "variant_commonness": "No extra quantity modifier for less commonly listed variants initially.",
+      "location_policy": "Use the same rule for all locations of the retailer, with independent draws; no warehouse quantity bonus initially.",
+      "tuning": "Base ranges remain tunable; concept-specific overrides are a possible later extension. Mapping existing runtime profile scales remains an implementation task."
+    },
+    "supplier_order": {
+      "customer_label": "Available to order",
+      "internal_id": "supplier_order",
+      "retailer_capability": {
+        "scope": "retailer",
+        "enabled_probability": 0.5,
+        "status": "Accepted initial retailer-wide probability, independent of SKU stock draws."
+      },
+      "sku_eligibility_probability": 0.2,
+      "eligibility_condition": "Retailer supports supplier orders, SKU is manufactured and listed, and no currently available stock route satisfies the requested fulfilment method.",
+      "lead_time": "Supplier lead time plus normal fulfilment time; materially longer than normal stocked delivery.",
+      "supplier_wait": {
+        "status": "Accepted initial sampling defaults; runtime integration pending.",
+        "regular_range_calendar_days": [
+          21,
+          28
+        ],
+        "outlier_range_calendar_days": [
+          35,
+          56
+        ],
+        "range_probabilities": {
+          "regular": 0.9,
+          "outlier": 0.1
+        },
+        "within_range_distribution": "Uniform integer over inclusive calendar-day bounds.",
+        "sampling_unit": "Once per world-local retailer-product pair, shared across its SKUs and locations; retain the draw for repeated quotes.",
+        "arrival_dates": "Add ordinary origin dispatch and chosen-service transit afterward; local sources may therefore yield different arrival dates despite shared supplier waiting.",
+        "timing_role": "Additional supplier waiting before ordinary dispatch and chosen-service transit, not total arrival time.",
+        "reference": "Ranges are authored against the roughly 21-day slow extreme of the current bundled geographic quote model; do not force or resample ordinary offers to establish this comparison."
+      },
+      "separate_from": "Stock transfers between the retailer own branches or warehouses."
+    },
+    "lead_time_disclosure": {
+      "policy_only_probability": 0.5,
+      "sampling_scope": "retailer presentation policy",
+      "policy_only": "Product page states Available to order without its approximate duration; applicable supplier-order guidance is discoverable in the retailer shipping information/policy.",
+      "otherwise": "Product page includes approximate supplier-order lead time; policy remains consistent.",
+      "facts": "One canonical lead-time rule drives both placements. If rules differ by product or family, policy must identify the applicable rule.",
+      "task_semantics": "An information-location hindrance, not truly missing public evidence. Normal stocked delivery timing must not be used for supplier orders. Estimates are not delivery guarantees."
+    },
+    "outcomes": [
+      "in_stock",
+      "available_to_order",
+      "out_of_stock"
+    ],
+    "deferred": [
+      "Runtime/page/quote/oracle integration"
+    ]
+  },
+  "merchant_review_backlog": [
+    {
+      "id": "delivery_punctuality",
+      "status": "deferred_by_user_delivery_service_only_simplification",
+      "current_decision": "Keep one delivery-service reliability/review layer for this sampling walkthrough. Do not add separate retailer dispatch/order-communication reliability profiles or a new merchant fulfilment-review corpus. Retain retailer dispatch timing in arrival arithmetic. Existing merchant-review implementations and frozen corpora remain outside this planning change.",
+      "question": "Do deliveries arrive within this retailer stated arrival estimate?",
+      "task_connection": "Retailer reliability requirements or preferences, including arrival-sensitive shopping tasks.",
+      "design_notes": [
+        "Distinguish delivery speed from punctuality: a slow supplier order can arrive on time.",
+        "Bind synthetic review claims to agreed retailer fulfilment/reliability evidence when designing the corpus.",
+        "Historical complaints or praise do not guarantee the outcome of a future order.",
+        "Consider distinguishing ordinary stocked orders from supplier orders; exact task and grading semantics remain undecided.",
+        "Retain retailer end-to-end delivery experiences, dispatch and order communication while adding separately scoped carrier transport/delivery reviews. Do not infer who caused a delay from overall late arrival alone."
+      ]
+    }
+  ],
+  "carrier_review_backlog": {
+    "status": "implemented_isolated_authoring_pilot_not_connected_world",
+    "authoring_prototype": {
+      "module": "experiments.carrier_service_pilot",
+      "url": "http://localhost:8881/",
+      "schema_version": "carrier-service-evidence-v1",
+      "documentation": "docs/agents/carrier-service-pilot.md",
+      "scope": "Carrier communication policy, historical shipment outcomes, private statement evidence and public review/rating exports. No existing renderer, frozen review corpus, checkout runtime or task/grader integration is changed."
+    },
+    "communication_policy_proposal": {
+      "status": "implemented_prototype_defaults_for_review",
+      "sampling_unit": "Once per carrier, shared across shipping-class services; context gates when each feature applies. Independent of sampled communication reliability.",
+      "tracking": {
+        "enabled": true,
+        "detailed_probability": 0.7,
+        "basic_probability": 0.3,
+        "maximum_promised_update_delay_minutes": 60,
+        "basic_scope": "Handover and delivery/collection completion",
+        "detailed_scope": "Basic plus transit, out-for-delivery and failed-attempt events"
+      },
+      "notification_enabled_probabilities": {
+        "dispatch": 0.7,
+        "delivery_day": 0.7,
+        "approaching": 0.4,
+        "failed_attempt": 0.8
+      },
+      "channel_probabilities": {
+        "email": 0.4,
+        "sms": 0.35,
+        "email_and_sms": 0.25
+      },
+      "notification_promises": {
+        "dispatch": "Within 60 minutes after carrier handover",
+        "delivery_day": "By 08:00 on the home-delivery day and before the attempt",
+        "approaching": "At least 30 minutes before a home-delivery attempt",
+        "failed_attempt": "Within 30 minutes after a failed home-delivery attempt"
+      },
+      "applicability": "All prototype historical customers supply valid contact details. Dispatch is offered for home/collection; other notices only apply to home delivery and actual triggering events. Communication failure draws happen only for applicable promised features.",
+      "failures": "Missing or late promised notifications; delayed/stale promised tracking, with false attempted-delivery scans as an additional detailed-tracking failure when a recipient was present and no actual attempt occurred at that time. Ground truth events and published scans remain separate.",
+      "review_defaults": {
+        "shipments_per_carrier": 64,
+        "text_probability": 0.25,
+        "statement_count_probabilities": {
+          "1": 0.4,
+          "2": 0.35,
+          "3": 0.2,
+          "4": 0.05
+        },
+        "rating_concentration": 1.5
+      },
+      "public_evidence": "All stars count toward the actual sampled average. Aspect summary counts use written review statements only, deduplicated by reviewer. Silent ratings do not acquire hidden aspect claims; full history outcomes and reliability parameters stay in the private export.",
+      "deferred": "User tuning of prototype notification/participation defaults, missing contact details, additional failure mechanisms, production exports/renderers and task/grader integration."
+    },
+    "identity": "Reviews bind to the world-local carrier IDs and eight-name draw, shared across stores; names have no persistent reliability profile across worlds.",
+    "review_surfaces": "Accepted separate carrier profile/review pages alongside retained retailer review pages, with carrier-wide and service-specific scope explicit where needed.",
+    "aspects": [
+      "delivery_punctuality",
+      "delivery_window_adherence",
+      "handoff_location",
+      "package_handling",
+      "delivery_communication"
+    ],
+    "retailer_scope": "User simplified the current plan to one delivery-service reliability/review layer: separate retailer dispatch/order-communication reliability and new merchant fulfilment-review generation are deferred. Dispatch remains part of quoted arrival arithmetic. Existing merchant-review corpora are untouched; retailer-operated delivery retains its actual operator.",
+    "carrier_scope": "After-handover transport, agreed delivery-window adherence, driver/drop-off experience, damage reports and carrier notifications.",
+    "handoff_experiences": "Apartment-door delivery is the promised destination when building entry is confirmed. Historical reviews may praise compliance or report a lobby drop-off instead; keep promised and actual handoff separate and preserve known access context. No extra lobby shipping policy is needed.",
+    "attribution": "Unknown cause remains unknown. A late end-to-end shipment is not automatically a late carrier leg. If reviews use the same synthetic shipment, dates, service and attributed observations must agree across sites; retain shipment/reviewer IDs for deduplication.",
+    "public_evidence": "Official shipping terms establish offered capabilities; review statements establish scoped historical reports and task-supported summaries, not guaranteed future delivery or building access.",
+    "generation": "Reuse shared statement/rating machinery; correlate historical experiences with independently sampled carrier reliability, without deriving reliability from nominal speed. Do not retroactively attach claims to frozen corpora.",
+    "experience_sampling_proposal": {
+      "status": "accepted_design_not_implemented",
+      "independence": "Independently sample carrier parameters for punctuality, parcel handling, promised handoff compliance and communication. No common good/bad carrier variable or general bad-shipment variable initially. Historical aspect draws are independent conditional on carrier parameters and applicable service/order context, except required timeline and policy dependencies.",
+      "parameter_sampling_unit": "Once per world-local carrier and aspect, shared across its eligible services and retailer bindings. A company can be punctual but poor at handling parcels. Names, nominal speed, retailer scale and prices do not determine these parameters.",
+      "aspect_level_probabilities": {
+        "strong": 0.5,
+        "mixed": 0.35,
+        "weak": 0.15
+      },
+      "success_probabilities_by_aspect_level": {
+        "arrival_on_promised_day": {
+          "strong": 0.95,
+          "mixed": 0.8,
+          "weak": 0.6
+        },
+        "within_promised_window_given_right_day": {
+          "strong": 0.95,
+          "mixed": 0.85,
+          "weak": 0.7
+        },
+        "parcel_intact": {
+          "strong": 0.98,
+          "mixed": 0.9,
+          "weak": 0.75
+        },
+        "promised_handoff_complied_with": {
+          "strong": 0.95,
+          "mixed": 0.8,
+          "weak": 0.6
+        },
+        "communication_promise_met": {
+          "strong": 0.95,
+          "mixed": 0.8,
+          "weak": 0.6
+        }
+      },
+      "punctuality_joint_draw": {
+        "shared_level": "One punctuality level supplies both day and conditional window probabilities; these are not independently assigned quality levels.",
+        "window_service_states": {
+          "right_day_inside_window": "p_day * p_window_given_right_day",
+          "right_day_outside_window": "p_day * (1 - p_window_given_right_day)",
+          "later_day": "1 - p_day"
+        },
+        "date_only_service_states": {
+          "right_day": "p_day",
+          "later_day": "1 - p_day"
+        },
+        "late_days_equal_weight": [
+          1,
+          2,
+          3
+        ],
+        "timeline": "Compare carrier performance to the service commitment anchored to actual retailer handover, keeping planned handover, actual handover, transport attempt and successful receipt separate. Retailer end-to-end lateness follows the same actual timeline against the original customer promise, not a second independent draw. When a chosen slot has become physically impossible because of late handover, record the missed original promise and an explicit revised feasible slot if supported; do not invent a new appointment or blame the carrier automatically.",
+        "time_resolution": "For window services, instantiate a local timestamp inside the interval or on the same day outside it, never earlier than physical readiness. Remove and renormalize physically impossible time regions. No early-day deliveries initially.",
+        "conditional_joint_probabilities": "For strong punctuality, the three states are 90.25% / 4.75% / 5%; mixed 68% / 12% / 20%; weak 42% / 18% / 40%. These apply only while the promised slot remains feasible."
+      },
+      "applicability_and_dependencies": [
+        "Unpromised or unobserved aspects are not_applicable/unknown, not automatically successful. Exclude them from relevant statement pools and rate denominators.",
+        "Only draw handoff compliance for an eligible promised handoff. A lobby-instead-of-door complaint needs confirmed building entry and apartment-door delivery; unavailable access triggers the service's failed-attempt policy rather than an arbitrary handoff failure label.",
+        "A failed attempt triggers the previously sampled reattempt/collection policy and adds its actual delay. Final receipt can therefore be later even when the first carrier attempt was punctual; do not equate punctual attempt with punctual successful receipt.",
+        "Collection-point opening hours constrain actual collection, not carrier lateness. User delay in collecting must not turn into a carrier late-delivery complaint.",
+        "Parcel damage and missed windows do not automatically worsen communication, and a damage event does not automatically add an unmodelled delay.",
+        "Communication experiences require concrete tracking/notification promises and truthful event histories. The isolated carrier-service pilot supplies these; production integration remains deferred. Misleading tracking must contradict an actual event, not merely receive a randomly sampled complaint label."
+      ],
+      "review_selection": "Generate service context and observed outcomes before choosing which applicable aspects a reviewer mentions. Complaint frequency in visible comments is not the underlying shipment failure rate; review participation and aspect-mention selection are separate later choices. Several statements may describe the same experience without counting as independent shipments.",
+      "ratings": "Later rating sampling should reflect observed praised/criticised aspects with variation; do not independently contradict the structured review meaning. Star distribution and participation weights are not specified here.",
+      "deferred": "Executable timeline/history sampler, communication capabilities, review participation/mention weights, rating linkage, concrete exports and renderer integration. Numeric aspect reliability defaults are accepted design settings, not live runtime parameters."
+    },
+    "ownership": "Product owns the isolated data/generation and authoring preview. Production carrier pages/runtime implementation needs coordination with Curation; no existing page or frozen corpus is edited.",
+    "deferred": "Production adoption of aspect reliability/history/communication exports, public review page composition and task bindings. The isolated prototype is implemented, not a connected-world publication."
+  },
+  "checkout_address_autofill_contract": {
+    "status": "accepted_hindrance_scope_probability_details_proposed_not_implemented",
+    "world_requirement_backlog": {
+      "status": "user_requested_deferred",
+      "scope": "Later task/world contracts should be able to require particular autofill states in specified retailer checkout contexts, instead of merely adjusting their sampling probabilities.",
+      "separate_facts": [
+        "autofill occurs",
+        "populated values are incorrect",
+        "fields are missing",
+        "previous-home versus minor mismatch",
+        "required delivery instructions are initially absent"
+      ],
+      "timing": "Return to this with world-constraint integration; no solver/compiler hook or forced task sampling is implemented now. Retain the ordinary random sampler and its tunable probabilities."
+    },
+    "authoring_prototype": {
+      "status": "implemented_isolated_fixture_not_live_checkout_or_task_integration",
+      "module": "experiments.address_checkout_pilot",
+      "url": "http://localhost:8880/",
+      "documentation": "docs/agents/address-checkout-pilot.md",
+      "implemented": [
+        "17-country simplified fictional address formatting",
+        "Four local postal areas and two saved alternative homes",
+        "Correct/wrong/incomplete autofill with tunable probabilities",
+        "Address-bound shipping quote and stale quote rejection",
+        "Dynamic or separate-step shipping disclosure",
+        "Browser-local address/instruction persistence and saved draft inspection"
+      ],
+      "limitations": "Two authored retailer fixtures, illustrative native-currency prices and limited standard services; no live orders, full world-allocation filtering, review-history generation, appointment reservations or semantic instruction grading."
+    },
+    "scope": "Checkout initial address values, separate from carrier reliability, actual user destination and delivery instructions. Preserve existing worlds; no checkout renderer/runtime edits in this plan.",
+    "autofill_probability": 0.3,
+    "autofill_probability_status": "user_selected_tunable_default",
+    "sampling_unit": "Once per retailer checkout context within the episode; retain initial state, user edits and provenance on navigation/revisit. Do not redraw on every page render or quote.",
+    "conditional_probabilities_proposal": {
+      "status": "draft_for_user_review",
+      "incorrect_values_given_autofill": 0.2,
+      "missing_fields_given_autofill": 0.25,
+      "independence": "Draw incorrect-values and missing-fields flags independently conditional on autofill; allow both. Their field assignments must preserve the intended distinctions. Without autofill these two autofill failure draws are inactive, rather than errors in the user's canonical address.",
+      "resulting_world_rates": {
+        "no_autofill": 0.7,
+        "correct_complete_autofill": 0.18,
+        "incorrect_only": 0.045,
+        "missing_only": 0.06,
+        "incorrect_and_missing": 0.015
+      }
+    },
+    "canonical_truth": "Keep the actual requested delivery address and delivery instructions separate from stale/incomplete form state. They must be available in the request, applicable structured memory or a supported clarification reply. No guessing an undisclosed address or apartment number is required.",
+    "incorrect_values_proposal": {
+      "status": "draft_for_user_review",
+      "mode_probabilities": {
+        "minor_field_mismatch": 0.5,
+        "previous_home": 0.5
+      },
+      "minor_field_mismatch": "Initial example: street/house/city are right but postal code is wrong. Use a different syntactically valid code in the synthetic address fixture; no real postal lookup dependency or secret formatting trap.",
+      "previous_home": "Accepted restriction: use a coherent alternative saved address within the explicitly modelled local checkout delivery region, with its own location, street/house, city and postal code. The address must resolve to a supported destination served by this retailer and at least one compatible carrier service; do not extend coverage merely to accommodate stale autofill. Availability of actual cart stock remains separate. A wrong old address can pass validation and receive an honest shipping quote while still failing the user's intended-destination requirement.",
+      "previous_home_candidate_filter": "Filter the address candidates against existing retailer destination coverage, modelled origin routes and carrier/service shipping-class capabilities. Sample only eligible different addresses; if none exist, remove previous_home and renormalize the incorrect-value mode draw, without backtracking to force retailer coverage. No unbounded geocoding or foreign-address population is introduced.",
+      "joint_with_missing": "Remove fields after constructing the correct or stale address, preserving at least one populated incorrect field when incorrect_values is true. This keeps wrong-and-missing distinct from missing-only; sample masks from eligible support rather than relabelling errors."
+    },
+    "missing_fields_proposal": {
+      "status": "draft_for_user_review",
+      "mask_templates": [
+        "one otherwise required address field",
+        "apartment/unit number for a home where it is task-relevant but the form does not require it",
+        "small authored subset of address fields"
+      ],
+      "mask_weights": null,
+      "semantics": "At least one missing address field. Apartment-number absence is distinct from an invalid value and can pass the retailer's basic form validation. Only require apartment/unit information where the intended destination or explicit user instruction actually needs it, and expose a field or supported delivery-instruction fallback.",
+      "optional_field_hindrance": "A task may require a known apartment/unit number even when the site allows submission without it. Successful basic validation is not evidence that the destination fulfills the user's requirement."
+    },
+    "delivery_instructions": {
+      "status": "accepted_task_scope_initial_state_proposed",
+      "requirements": "Represent task-relevant delivery instructions as structured predicates with human prose in request or applicable memory. The requirement is independent of whether autofill occurs or is correct.",
+      "initial_state_proposal": "Keep the instructions field empty initially for instruction-focused tasks, including correct-complete address autofill. Sampling correct, stale or partial prefilled instructions is a possible later extension, not another default failure draw now.",
+      "examples": [
+        "Ring apartment 24 rather than the street-door bell.",
+        "Leave the parcel outside my apartment door if I am out.",
+        "Please do not ring the bell; call me instead."
+      ],
+      "compatibility": "Instructions must be compatible with the selected carrier/service and actual building access. Instructions cannot create building-entry capability, waive required recipient presence or make an unsupported delivery place available. Task/world contracts may explicitly require a compatible option, but ordinary sampling does not guarantee one.",
+      "persistence": "Compare the final saved/submitted checkout instruction value, not merely whether the agent typed it at some point. Renderers must disclose if changing address/service clears notes; no silent invented persistence guarantee."
+    },
+    "task_and_outcome_semantics": {
+      "address": "For authorized order tasks, inspect the final committed order destination against the user's canonical structured destination, including task-relevant optional fields. Do not compare it to the initial autofill snapshot. Research-only tasks do not require editing checkout or placing orders.",
+      "instructions": "Check specified instruction predicates in the committed order or saved checkout state when that state is the requested outcome; allow equivalent wording rather than an exact prose string. Preserve unspecified fields without inventing new user preferences.",
+      "quote_refresh": "Correcting the destination must recompute address-sensitive coverage, collection points, fees and arrival estimates; invalidate incompatible previously selected options. The global task remains anchored to the intended address, not the stale form destination.",
+      "failures": "Keep wrong destination, missing necessary field and missing/incompatible instructions separately diagnosable; do not simulate an actual misdelivery simply because the initial form is wrong."
+    },
+    "destination_and_checkout_update_contract": {
+      "status": "accepted_design_not_implemented",
+      "supported_region": "Accepted default: finite modelled checkout delivery region with synthetic address/postcode rules, using supported synthetic postal areas in the user's city within 10 km straight-line distance of the canonical user home. This is destination-resolution scope, not a replacement for the existing international retailer/route policy.",
+      "region_sampling_proposal": {
+        "status": "accepted_design_not_implemented",
+        "centre": "Canonical user-home position, fixed for the episode; stale autofill or later typing does not move the region centre.",
+        "city_scope": "One generated user city initially, in whichever supported country the world selects. Other-city checkout destinations are outside this initial region even if the wider freight graph models those cities.",
+        "maximum_straight_line_radius_km": 10,
+        "synthetic_postal_area_count": 4,
+        "postal_areas": "Generate four stable synthetic postal areas and coarse representative positions inside the region, one covering the canonical home. Bind country/city/postcode aliases explicitly; these are fictional local codes with appropriate country formatting, not claims about actual postal boundaries.",
+        "saved_alternative_address_count": 2,
+        "alternative_home_distance_km": {
+          "minimum": 0.5,
+          "maximum": 5
+        },
+        "alternative_sampling": "Generate two different coherent saved-address candidates using uniform-area offsets in the 0.5-5 km annulus around the home; assign supported local postal areas. Retailers independently filter these shared candidates for actual shipping eligibility before using one as stale autofill. Do not condition the entire retailer/world population to make a stale address eligible.",
+        "tuning": "Radius, postal-area count and alternative-address count/distance are independent authoring parameters; changing them does not enlarge the whole world or regenerate carriers.",
+        "postcode_resolution": "Normalize supported country formatting and explicit city aliases, validate required fields, and resolve postcode/city/country against the finite postal-area map. For known complete home addresses use the saved exact synthetic position; other complete addresses in a supported postal area use its approximate representative position. Do not require an exact whitelist of full street addresses, and do not silently replace street/house/unit values with the user's true address.",
+        "unknown_or_conflicting_input": "Unknown/out-of-region postcodes or other cities/countries return shipping unavailable. Contradictory city/country/postcode combinations return a visible address-validation error without repairing values behind the agent's back. Preserve the typed address for correction; a postcode-shaped string alone is not proof of geographic support.",
+        "address_precision": "Canonical and saved addresses have explicit synthetic street/house and optional unit details. Postal-area fallback is explicitly approximate; it does not infer building access or perform real street geocoding. Country-format templates, code pools and localized street names remain to be authored.",
+        "collection_and_entry": "Reuse the already generated carrier collection points and their shared opening hours. Recompute their distance/eligibility from the resolved destination rather than retaining the true home's nearest point; no global collection-point generation. Confirmed building entry binds to the addressed building, never follows the shopper to another address. Unknown alternate-building entry remains unknown.",
+        "refresh_outcomes": "Recompute every destination-sensitive field even when nearby addresses yield identical rounded fees or arrival days. A quote refresh need not manufacture a price/timing difference. Destination summary, point distances and known building-entry facts still bind to the new address."
+      },
+      "unsupported_input": "Addresses beyond this modelled checkout region show Shipping not available for this address. Do not fall back to the user's true address, nearest supported point or stale quote. Syntactically invalid/incomplete address fields can instead show their ordinary validation errors.",
+      "coverage_checks": "Resolving within the modelled region is necessary, not sufficient: also check retailer/carrier destination coverage, route support, cart shipping class and fulfilment availability. Preserve honest unavailable outcomes.",
+      "required_flow_for_every_shipping_checkout": "Provide either a distinct shipping-information step after address entry or dynamic updates on the checkout page. This choice may vary by site, but neither design may hide the updated shipping information until after order placement.",
+      "step_page": "Continue from the address step performs validation and quote refresh; the next step shows the destination summary, available carrier/services, charges, timing and applicable delivery terms before confirmation. Revising the address requires a refreshed shipping step.",
+      "dynamic_updates": "Changing destination invalidates the old quote immediately. Show pending/needs-update state while recomputing, then show available services, charges, timing and terms for the current destination. Explicit Update shipping is also valid if the old quote remains visibly invalid until used.",
+      "quote_binding": "Bind each quote and selected option to the current normalized destination, cart, coupon/membership state and service. Ignore stale asynchronous responses. Do not leave old address-sensitive fees or dates labelled current.",
+      "selection_and_confirmation": "Invalidate previous selections and require reconfirmation whenever destination-sensitive options or prices change; never silently keep an incompatible service. Unsupported, invalid or pending destination quotes block shipping-order confirmation, while valid supported stale addresses remain orderable so the address-checking hindrance is meaningful.",
+      "form_persistence": "Address and instruction edits persist across steps/revisits unless an explicit visible flow explains a change. Validate task-relevant optional fields separately from basic form validity; rendering must not silently correct a deliberately stale address.",
+      "acceptance_journeys": [
+        "Correct complete autofill obtains a current quote",
+        "Supported previous-home autofill obtains its own quote without being silently corrected",
+        "Agent correction refreshes destination summary, services, fees and dates",
+        "Out-of-region input clears the old quote, reports unavailable and blocks shipping confirmation",
+        "Address edits during an in-flight refresh cannot restore an obsolete quote",
+        "Required delivery instructions survive address/shipping steps and appear in final order state"
+      ]
+    },
+    "ownership": "Product owns proposed world/task sampling and canonical truth contracts. Curation owns checkout/address/instruction UI and runtime adoption when a concrete integration handoff is coordinated.",
+    "deferred": "Acceptance of conditional error defaults/mode weights, country-specific synthetic address fields and postcode support, missing-mask weights, browser/account prefill provenance, executable sidecar/export, UI/runtime integration and outcome checks. Local region defaults are accepted design settings."
+  },
+  "retailer_offer_price_contract": {
+    "status": "accepted_design_not_implemented",
+    "anchor": "Reference/MSRP rounded once to an allowed currency-specific price point; shared between retailers for the same configuration.",
+    "sampling_unit": "retailer and product; maintain coherent SKU pricing rather than unrelated per-size/per-colour random draws",
+    "anchor_match_probability": 0.4,
+    "variation_probability": 0.6,
+    "variation": {
+      "zero_allowed": false,
+      "allowed_delta": "Nonzero integer multiples of the MSRP-scaled increment, drawn from valid positive-price support.",
+      "distribution": "normal_relative_offset",
+      "spread": {
+        "standard_deviation_fraction_of_msrp": 0.1
+      },
+      "direction_weights": {
+        "below": 1,
+        "above": 1
+      },
+      "constraint": "Resulting item price must be positive; sample from valid support rather than clamping to a price point or back to the anchor.",
+      "step_policy": {
+        "basis": "Unrounded SKU reference/MSRP in the offer currency; independent of the sampled offer deviation.",
+        "rule": "Use the first inclusive upper MSRP limit that contains the reference price. Above 14,999 SEK retain the 100 SEK step until a higher-price band is authored.",
+        "band_thresholds": {
+          "currency": "SEK",
+          "upper_inclusive_msrp_minor_and_step_minor": [
+            [
+              2900,
+              100
+            ],
+            [
+              7900,
+              500
+            ],
+            [
+              49900,
+              1000
+            ],
+            [
+              199900,
+              5000
+            ],
+            [
+              1499900,
+              10000
+            ]
+          ],
+          "above_last_limit_step_minor": 10000
+        },
+        "units": "Store monetary increments exactly in currency minor units."
+      },
+      "default_distribution": {
+        "status": "accepted_design_not_implemented",
+        "family": "normal_relative_offset",
+        "mean_fraction": 0,
+        "standard_deviation_fraction": 0.1,
+        "maximum_absolute_fraction": 0.3,
+        "quantization": "Nearest nonzero-support grid price around shared anchor; zero adjustments are excluded by conditioning, not mapped to either sign.",
+        "support": "Nonzero step multiples within max(one step, 30% of MSRP) and producing a positive offer.",
+        "notes": "Distribution of final offsets differs after truncation, rounding and exclusion of zero. 10% is the pre-quantization standard deviation, not the final observed spread. No systematic directional bias."
+      }
+    },
+    "example": {
+      "currency": "SEK",
+      "anchor_major": 499,
+      "possible_nonanchor_prices_major": [
+        479,
+        489,
+        509,
+        519
+      ],
+      "note": "Illustrates 10 SEK steps, not distribution probabilities or the complete support."
+    },
+    "invariants": [
+      "Round the shared anchor once; exact matches retain it.",
+      "The anchor and increment are jointly chosen to retain suitable price points; inexpensive items can use finer steps.",
+      "No independent below-reference market-anchor draw in this initial version.",
+      "No persistent cheap/expensive retailer tendency is required.",
+      "Reference-price differences between SKUs remain meaningful; equal-priced alternatives stay equal absent explicit variant surcharges.",
+      "Retailer assortment price preference is separate from offer pricing.",
+      "Do not sample conditional on being cheapest; ties are valid.",
+      "Below-reference pricing alone does not establish a sale or a previous price.",
+      "Shipping and account coupons apply later and may yield non-rounded totals."
+    ],
+    "deferred": [
+      "Base price-point styles and magnitude thresholds",
+      "Exact joint application to unequal-reference-price SKU configurations",
+      "Non-SEK step sizes",
+      "Runtime offer/quote integration"
+    ]
+  },
+  "sampling_defaults": {
+    "schema_version": "world-sampling-defaults-v1",
+    "path": "docs/agents/world-sampling-defaults.json",
+    "status": "authored_initial_defaults_reference_sampler_not_production",
+    "documentation": "docs/agents/world-sampling-defaults.md",
+    "scope": "Items 1–5 have concrete tunable defaults; production integration and concept-specific factual authoring remain separate work."
+  }
+}

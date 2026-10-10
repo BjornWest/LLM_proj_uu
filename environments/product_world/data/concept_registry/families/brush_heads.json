@@ -1,0 +1,92 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "brush_heads",
+  "review_id": "F27",
+  "label": "Toothbrush heads",
+  "section": "Beauty and personal care",
+  "store_type_ids": [
+    "beauty"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "No handle, charger or battery included unless the actual bundle says so. Similar-looking connectors do not establish compatibility; target claims are not clinical outcomes.",
+  "shared_dimension_ids": [
+    "compatible_platform",
+    "head_geometry",
+    "bristle_firmness",
+    "pack_count"
+  ],
+  "dimensions": [
+    {
+      "id": "compatible_platform",
+      "label": "Compatible platform",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "head_geometry",
+      "label": "Head geometry",
+      "module_id": "fit",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "bristle_firmness",
+      "label": "Bristle firmness",
+      "module_id": "fit",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "brush_heads.replacement_electric_toothbrush_heads",
+      "label": "Replacement electric-toothbrush heads",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.tops_base",
+  "random_namespace": "product-width-tops-neutral-v1",
+  "status": "independently_accepted_neutral_module_not_production_integrated",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.name": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "properties": {
+        "budget": {
+          "type": "number",
+          "min": 0
+        },
+        "mainstream": {
+          "type": "number",
+          "min": 0
+        },
+        "premium": {
+          "type": "number",
+          "min": 0
+        }
+      },
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1,
+      "input": true
+    },
+    "brand.market_range_weights": {
+      "type": "object",
+      "properties": {
+        "women": {
+          "type": "number",
+          "min": 0
+        },
+        "men": {
+          "type": "number",
+          "min": 0
+        },
+        "unisex": {
+          "type": "number",
+          "min": 0
+        }
+      },
+      "input": true,
+      "optional": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "product.concept_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0.05,
+      "max": 0.95
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95
+    }
+  ],
+  "rules": [],
+  "bindings": [],
+  "language": [],
+  "metadata": {
+    "purpose": "Nine approved neutral original identity/configuration and independent profile fields only; no garment/chart/care/anatomy defaults.",
+    "market_stage": "Child composes accepted opt-in stage exactly once after profile."
+  }
+}

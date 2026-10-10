@@ -1,0 +1,443 @@
+{
+  "schema_version": "footwear-retail-recipe-v1",
+  "status": "bounded_pilot_authoring_package",
+  "fields": [
+    {
+      "id": "size_eu",
+      "label": "Size (EU)",
+      "path": "size_eu",
+      "registry_dimension": "size",
+      "scope": "sku",
+      "eligible_roles": [
+        "selector"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "colour",
+      "label": "Colour",
+      "path": "colour",
+      "registry_dimension": "colour",
+      "scope": "sku",
+      "eligible_roles": [
+        "selector",
+        "page_partition"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "width",
+      "label": "Width",
+      "path": "width",
+      "registry_dimension": "width",
+      "scope": "sku",
+      "eligible_roles": [
+        "selector",
+        "page_partition"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "construction",
+      "label": "Construction",
+      "path": "facts.construction",
+      "registry_dimension": null,
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": false
+    },
+    {
+      "id": "intended_use",
+      "label": "Intended use",
+      "path": "facts.intended_use",
+      "registry_dimension": null,
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "cushioning",
+      "label": "Cushioning",
+      "path": "facts.cushioning",
+      "registry_dimension": "cushioning",
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "footbed",
+      "label": "Footbed",
+      "path": "facts.footbed",
+      "registry_dimension": null,
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": false
+    },
+    {
+      "id": "sole_structure",
+      "label": "Sole structure",
+      "path": "facts.sole_structure",
+      "registry_dimension": null,
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "path": "facts.component_materials",
+      "registry_dimension": "component_materials",
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "fastening",
+      "label": "Fastening",
+      "path": "facts.fastening",
+      "registry_dimension": "fastening",
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "sole_tread",
+      "label": "Tread",
+      "path": "facts.sole_tread",
+      "registry_dimension": "sole_tread",
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true
+    },
+    {
+      "id": "reference_mass_g",
+      "label": "Reference mass (g)",
+      "path": "facts.reference_mass_g",
+      "registry_dimension": null,
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": false,
+      "qualifier_paths": [
+        "facts.mass_basis"
+      ]
+    },
+    {
+      "id": "mass_basis",
+      "label": "Mass measurement basis",
+      "path": "facts.mass_basis",
+      "registry_dimension": null,
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": false
+    },
+    {
+      "id": "waterproof_rating",
+      "label": "Waterproof rating",
+      "path": "facts.waterproof_rating",
+      "registry_dimension": "exposure_protection",
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true,
+      "unknown_values": [
+        "not specified"
+      ]
+    },
+    {
+      "id": "closed_heel",
+      "label": "Closed heel",
+      "path": "facts.closed_heel",
+      "registry_dimension": "heel_geometry",
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": false,
+      "concepts": [
+        "walking_shoes"
+      ]
+    },
+    {
+      "id": "heel_retention",
+      "label": "Heel retention",
+      "path": "facts.heel_retention",
+      "registry_dimension": "heel_geometry",
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": false,
+      "concepts": [
+        "walking_sandals"
+      ]
+    },
+    {
+      "id": "toe_coverage",
+      "label": "Toe coverage",
+      "path": "facts.toe_coverage",
+      "registry_dimension": null,
+      "scope": "product",
+      "eligible_roles": [
+        "descriptive"
+      ],
+      "facet_candidate": true,
+      "concepts": [
+        "walking_sandals"
+      ]
+    }
+  ],
+  "concepts": {
+    "walking_shoes": {
+      "concept_id": "footwear.walking_shoes",
+      "role_overrides": {},
+      "description_blocks": [
+        {
+          "id": "introduction",
+          "slots": {
+            "name": "name"
+          },
+          "requires": {
+            "facts.construction": "enclosed shoe",
+            "facts.closed_heel": true,
+            "facts.intended_use": "everyday walking"
+          },
+          "variants": [
+            {
+              "id": "introduction.1",
+              "text": "{name} is an enclosed walking shoe for everyday walking."
+            },
+            {
+              "id": "introduction.2",
+              "text": "Designed for everyday walking, {name} has an enclosed construction and a closed heel."
+            }
+          ]
+        },
+        {
+          "id": "materials",
+          "slots": {
+            "material": "facts.component_materials.upper"
+          },
+          "requires": {},
+          "variants": [
+            {
+              "id": "materials.1",
+              "text": "The upper is made from {material}."
+            },
+            {
+              "id": "materials.2",
+              "text": "This model uses {material} for the upper."
+            }
+          ]
+        },
+        {
+          "id": "construction_details",
+          "slots": {
+            "fastening": "facts.fastening",
+            "footbed": "facts.footbed",
+            "cushioning": "facts.cushioning"
+          },
+          "requires": {},
+          "variants": [
+            {
+              "id": "construction_details.1",
+              "text": "The design combines {fastening}, a {footbed} and {cushioning} cushioning."
+            },
+            {
+              "id": "construction_details.2",
+              "text": "It has {fastening} and a {footbed}, with {cushioning} cushioning."
+            }
+          ]
+        },
+        {
+          "id": "outsole",
+          "slots": {
+            "material": "facts.component_materials.outsole",
+            "tread": "facts.sole_tread",
+            "structure": "facts.sole_structure"
+          },
+          "requires": {},
+          "variants": [
+            {
+              "id": "outsole.1",
+              "text": "The {material} outsole has a {tread} tread and a {structure} structure."
+            },
+            {
+              "id": "outsole.2",
+              "text": "Underfoot, the {material} outsole combines a {tread} tread with a {structure} construction."
+            }
+          ]
+        },
+        {
+          "id": "reference_mass",
+          "slots": {
+            "mass": "facts.reference_mass_g"
+          },
+          "requires": {
+            "facts.mass_basis": "one item, EU 40 reference configuration"
+          },
+          "variants": [
+            {
+              "id": "reference_mass.1",
+              "text": "The EU 40 reference configuration weighs {mass} g per shoe."
+            },
+            {
+              "id": "reference_mass.2",
+              "text": "Reference weight: {mass} g for one shoe in EU 40."
+            }
+          ]
+        }
+      ]
+    },
+    "walking_sandals": {
+      "concept_id": "footwear.walking_sandals",
+      "role_overrides": {
+        "width": [
+          "page_partition"
+        ]
+      },
+      "description_blocks": [
+        {
+          "id": "introduction",
+          "slots": {
+            "name": "name"
+          },
+          "requires": {
+            "facts.construction": "open strapped sandal",
+            "facts.heel_retention": true,
+            "facts.toe_coverage": "open",
+            "facts.intended_use": "everyday walking"
+          },
+          "variants": [
+            {
+              "id": "introduction.1",
+              "text": "{name} is an open-toe walking sandal with heel retention for everyday walking."
+            },
+            {
+              "id": "introduction.2",
+              "text": "Designed for everyday walking, {name} has an open toe and straps with heel retention."
+            }
+          ]
+        },
+        {
+          "id": "materials",
+          "slots": {
+            "material": "facts.component_materials.straps"
+          },
+          "requires": {},
+          "variants": [
+            {
+              "id": "materials.1",
+              "text": "The straps are made from {material}."
+            },
+            {
+              "id": "materials.2",
+              "text": "This model uses {material} straps."
+            }
+          ]
+        },
+        {
+          "id": "construction_details",
+          "slots": {
+            "fastening": "facts.fastening",
+            "footbed": "facts.footbed",
+            "cushioning": "facts.cushioning"
+          },
+          "requires": {},
+          "variants": [
+            {
+              "id": "construction_details.1",
+              "text": "The design combines {fastening}, a {footbed} and {cushioning} cushioning."
+            },
+            {
+              "id": "construction_details.2",
+              "text": "It has {fastening} and a {footbed}, with {cushioning} cushioning."
+            }
+          ]
+        },
+        {
+          "id": "outsole",
+          "slots": {
+            "material": "facts.component_materials.outsole",
+            "tread": "facts.sole_tread",
+            "structure": "facts.sole_structure"
+          },
+          "requires": {},
+          "variants": [
+            {
+              "id": "outsole.1",
+              "text": "The {material} outsole has a {tread} tread and a {structure} structure."
+            },
+            {
+              "id": "outsole.2",
+              "text": "Underfoot, the {material} outsole combines a {tread} tread with a {structure} construction."
+            }
+          ]
+        },
+        {
+          "id": "reference_mass",
+          "slots": {
+            "mass": "facts.reference_mass_g"
+          },
+          "requires": {
+            "facts.mass_basis": "one item, EU 40 reference configuration"
+          },
+          "variants": [
+            {
+              "id": "reference_mass.1",
+              "text": "The EU 40 reference configuration weighs {mass} g per sandal."
+            },
+            {
+              "id": "reference_mass.2",
+              "text": "Reference weight: {mass} g for one sandal in EU 40."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "unsupported_claims": [
+    "waterproof or water-resistant performance",
+    "care or cleaning instructions",
+    "durability guarantees",
+    "certified grip or safety",
+    "comfort or support guarantees",
+    "suitability for demanding trails"
+  ],
+  "open_design_items": [
+    "Rated exposure protection is unknown in every current sample; no waterproofing domain is authored.",
+    "Heel geometry records enclosure or retention only, without measured heel dimensions.",
+    "Reference mass is measured for EU 40 only; other size weights are unknown.",
+    "Material variation is product-level in this subset, not SKU-level.",
+    "Protected-toe walking sandals remain outside this pilot subset.",
+    "Care, in-box contents and manufacturer warranty facts have not been authored."
+  ],
+  "authoring_rules": [
+    "Use only bound catalog facts; private execution, profiles and review opinions are not retail facts.",
+    "Every description variant must preserve all slots and the same assertions, including scope qualifiers.",
+    "New assertions require a new meaning/block and its source facts, not a paraphrase of an existing block.",
+    "Facet candidates are suggestions, not a promise that a retailer provides the filter. Unknown values cannot satisfy a positive requirement.",
+    "Retailer price, stock, delivery, returns and coupons come from offer/store state, not product descriptions.",
+    "Preserve sparse and sold-out SKU membership when resolving retailer page controls."
+  ]
+}

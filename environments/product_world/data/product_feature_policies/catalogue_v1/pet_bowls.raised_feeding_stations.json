@@ -1,0 +1,1356 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "pet_bowls.raised_feeding_stations",
+  "family_id": "pet_bowls",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pet_bowls.raised_feeding_stations.json": "b2c848985eb5cca8bac94915b37ca60bf979846dc0160053bb8cb2f372961de7",
+    "environments/product_world/data/product_width/_pet_bowls_base.json": "746e065f271eccf416ff93902d1e4448ddfbb8221418a98fb2e2e4e33568dd51"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Fountains need power/cleaning information; slow-feed and raised designs need geometry. Do not present them as tested health benefits.",
+  "concept_note": "Focus on height, removable bowls and materials; no slow-feed obstacles is ordinary station anatomy.",
+  "fields": {
+    "product.facts.capacity_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "per-bowl nominal brim-full liquid volume",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.height_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "floor-to-platform top and floor-to-supplied-bowl rim; discrete mm settings",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.common_bowl_height": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "common_bowl_height"
+    },
+    "product.facts.removable_bowls": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "removable_bowls"
+    },
+    "product.facts.retaining_flange": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "retaining_flange"
+    },
+    "product.facts.rubber_feet": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rubber_feet"
+    },
+    "product.facts.separate_rattle_rings": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "separate_rattle_rings"
+    },
+    "product.facts.ordinary_food_water_use": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ordinary_food_water_use"
+    },
+    "product.facts.feeding_obstacles": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Focus on height, removable bowls and materials; no slow-feed obstacles is ordinary station anatomy."
+    },
+    "product.facts.motor": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "motor"
+    },
+    "product.facts.pump": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pump"
+    },
+    "product.facts.filter": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "filter"
+    },
+    "product.facts.food_storage_bin": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "food_storage_bin"
+    },
+    "product.facts.stand_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_units"
+    },
+    "product.facts.bowl_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bowl_units"
+    },
+    "product.facts.stand_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_included"
+    },
+    "product.facts.bowls_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bowls_included"
+    },
+    "product.facts.rubber_feet_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rubber_feet_included"
+    },
+    "product.facts.food_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "food_included"
+    },
+    "product.facts.mat_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mat_included"
+    },
+    "product.facts.lid_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_included"
+    },
+    "product.facts.spare_bowl_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spare_bowl_included"
+    },
+    "product.facts.separate_extension_kit_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "separate_extension_kit_included"
+    },
+    "product.facts.slow_feed_insert_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "slow_feed_insert_included"
+    },
+    "product.facts.bowls_top_rack_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bowls_top_rack_dishwasher"
+    },
+    "product.facts.stand_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_dishwasher"
+    },
+    "product.facts.adjustment_control": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.adjustable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "two pin-locked vertical telescopic-leg settings",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adjustment_control"
+    },
+    "product.facts.stand_mass_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.per_bowl_mass_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fixed_mdf",
+          "adjustable_steel"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.component_materials": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "painted MDF",
+            "powder-coated steel",
+            "stainless steel",
+            "rubber"
+          ]
+        },
+        "min_items": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "component_materials"
+    },
+    "product.facts.component_allocation": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "component_allocation"
+    },
+    "product.facts.adjustable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adjustable"
+    },
+    "product.facts.stand_care": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "wipe the stand with a damp cloth and dry it",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_care"
+    },
+    "product.facts.bowl_care": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "lift bowls out; hand wash or top-rack dishwasher",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bowl_care"
+    },
+    "product.facts.dimensional_tolerances": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.replacement_bowl_fit": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.clinical_outcomes": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.animal_fit_test": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.durability_test": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.stability_load_test": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.steel_grade": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.finish_chemistry": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.safety_certificate": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.working_fill": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.full_cad": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "common_bowl_height": {
+      "id": "pet_bowls.raised_feeding_stations.content.common_bowl_height",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.common_bowl_height"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "removable_bowls": {
+      "id": "pet_bowls.raised_feeding_stations.content.removable_bowls",
+      "display_group": "features",
+      "fields": [
+        "product.facts.removable_bowls"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "retaining_flange": {
+      "id": "pet_bowls.raised_feeding_stations.content.retaining_flange",
+      "display_group": "features",
+      "fields": [
+        "product.facts.retaining_flange"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rubber_feet": {
+      "id": "pet_bowls.raised_feeding_stations.content.rubber_feet",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rubber_feet"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "separate_rattle_rings": {
+      "id": "pet_bowls.raised_feeding_stations.content.separate_rattle_rings",
+      "display_group": "features",
+      "fields": [
+        "product.facts.separate_rattle_rings"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ordinary_food_water_use": {
+      "id": "pet_bowls.raised_feeding_stations.content.ordinary_food_water_use",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ordinary_food_water_use"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "motor": {
+      "id": "pet_bowls.raised_feeding_stations.content.motor",
+      "display_group": "features",
+      "fields": [
+        "product.facts.motor"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump": {
+      "id": "pet_bowls.raised_feeding_stations.content.pump",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pump"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filter": {
+      "id": "pet_bowls.raised_feeding_stations.content.filter",
+      "display_group": "features",
+      "fields": [
+        "product.facts.filter"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "food_storage_bin": {
+      "id": "pet_bowls.raised_feeding_stations.content.food_storage_bin",
+      "display_group": "features",
+      "fields": [
+        "product.facts.food_storage_bin"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_units": {
+      "id": "pet_bowls.raised_feeding_stations.content.stand_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stand_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bowl_units": {
+      "id": "pet_bowls.raised_feeding_stations.content.bowl_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bowl_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.stand_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.stand_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bowls_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.bowls_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.bowls_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rubber_feet_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.rubber_feet_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.rubber_feet_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "food_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.food_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.food_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mat_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.mat_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.mat_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.lid_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.lid_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_bowl_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.spare_bowl_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.spare_bowl_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "separate_extension_kit_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.separate_extension_kit_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.separate_extension_kit_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "slow_feed_insert_included": {
+      "id": "pet_bowls.raised_feeding_stations.content.slow_feed_insert_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.slow_feed_insert_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bowls_top_rack_dishwasher": {
+      "id": "pet_bowls.raised_feeding_stations.content.bowls_top_rack_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bowls_top_rack_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_dishwasher": {
+      "id": "pet_bowls.raised_feeding_stations.content.stand_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.stand_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adjustment_control": {
+      "id": "pet_bowls.raised_feeding_stations.content.adjustment_control",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adjustment_control"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "construction": {
+      "id": "pet_bowls.raised_feeding_stations.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_materials": {
+      "id": "pet_bowls.raised_feeding_stations.content.component_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_allocation": {
+      "id": "pet_bowls.raised_feeding_stations.content.component_allocation",
+      "display_group": "features",
+      "fields": [
+        "product.facts.component_allocation"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adjustable": {
+      "id": "pet_bowls.raised_feeding_stations.content.adjustable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adjustable"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "stand_care": {
+      "id": "pet_bowls.raised_feeding_stations.content.stand_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.stand_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bowl_care": {
+      "id": "pet_bowls.raised_feeding_stations.content.bowl_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bowl_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 47,
+    "roles": {
+      "qualifier": 2,
+      "literal": 26,
+      "omit_fixed_detail": 1,
+      "omit_placeholder": 13,
+      "operational": 1,
+      "descriptive": 4
+    },
+    "display_groups": 5,
+    "highlight_candidates": 4,
+    "unmapped_descriptive_fields": 30
+  }
+}

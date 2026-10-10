@@ -1,0 +1,174 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "sleeping_mats",
+  "review_id": "F55",
+  "label": "Sleeping mats",
+  "section": "Outdoor equipment and family travel",
+  "store_type_ids": [
+    "outdoors"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Foam has no inflation valve; self-inflating and inflatable mats differ in setup. Claimed thickness is not a comfort score; insulation values require a stated basis for comparison.",
+  "shared_dimension_ids": [
+    "size",
+    "thickness",
+    "component_materials",
+    "insulation_rating",
+    "packed_dimensions"
+  ],
+  "dimensions": [
+    {
+      "id": "size",
+      "label": "Size",
+      "module_id": "fit",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "thickness",
+      "label": "Thickness",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "number",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "insulation_rating",
+      "label": "Insulation rating",
+      "module_id": "exposure",
+      "identity_level": "model_or_sku",
+      "value_kind": "number",
+      "unit": "R-value",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "packed_dimensions",
+      "label": "Packed dimensions",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "valve_platform",
+      "label": "Valve platform",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "included_bundle",
+      "label": "Included bundle",
+      "module_id": "compatibility",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "sleeping_mats.closed_cell_foam_mats",
+      "label": "Closed-cell foam mats",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "sleeping_mats.self_inflating_mats",
+      "label": "Self-inflating mats",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "valve_platform",
+        "included_bundle"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "sleeping_mats.inflatable_air_mats",
+      "label": "Inflatable air mats",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "valve_platform",
+        "included_bundle"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

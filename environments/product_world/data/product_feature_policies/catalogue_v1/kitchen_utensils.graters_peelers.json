@@ -1,0 +1,1231 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "kitchen_utensils.graters_peelers",
+  "family_id": "kitchen_utensils",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/kitchen_utensils.graters_peelers.json": "c7fe4d4f415422760317828393a4a62b49e100a9c13382543dfafb89fc7aa568",
+    "environments/product_world/data/product_width/_kitchen_utensils_base.json": "0d3b6bb90cb1061d33594e34a163cd84614b28216c00ce13a6de6a7e39e2d43f",
+    "environments/product_world/data/product_public_content/kitchen_utensils.graters_peelers.json": "f6e3c1a1b34d2bf6970bd726e28e43288cf32e6189e87ae6e1e12f037d9639eb"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Function/material/contact surface first. Component-specific heat and cleaning are scoped groups, not whole-tool guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "utensils.graters_peelers.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.pack_count": {
+      "semantic_id": "utensils.graters_peelers.product.facts.pack_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "assembled functional tools; cover and fitted parts are not extra tools",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pack_count"
+    },
+    "product.facts.manual": {
+      "semantic_id": "utensils.graters_peelers.product.facts.manual",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "manual"
+    },
+    "product.facts.working_surface_material": {
+      "semantic_id": "utensils.graters_peelers.product.facts.working_surface_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "stainless steel",
+        "component": "food-contact grating surface or peeling blade",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "working_surface_material"
+    },
+    "product.facts.working_surface_user_removable": {
+      "semantic_id": "utensils.graters_peelers.product.facts.working_surface_user_removable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "basis": "declared user detachment of working surface; swivelling is a separate motion",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "working_surface_user_removable"
+    },
+    "product.facts.fastening_method": {
+      "semantic_id": "utensils.graters_peelers.product.facts.fastening_method",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_purchase_mass_g": {
+      "semantic_id": "utensils.graters_peelers.product.facts.actual_purchase_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "actual complete supplied purchase, tool plus any supplied cover, excluding packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.base_support": {
+      "semantic_id": "utensils.graters_peelers.product.facts.base_support",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "fixed continuous base rim"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "base_support"
+    },
+    "product.facts.base_material": {
+      "semantic_id": "utensils.graters_peelers.product.facts.base_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "stainless steel"
+        ],
+        "component": "standing base, none means absent",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "base_material"
+    },
+    "product.facts.stands_on_base": {
+      "semantic_id": "utensils.graters_peelers.product.facts.stands_on_base",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "declared standing base presence, not observed stability or universal worktop fit",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "stands_on_base"
+    },
+    "product.facts.tool_form": {
+      "semantic_id": "utensils.graters_peelers.product.facts.tool_form",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "handheld fine rasp/zester",
+          "four-face box grater",
+          "Y-shaped smooth swivel peeler",
+          "inline smooth swivel peeler",
+          "Y-shaped toothed julienne swivel peeler"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "tool_form"
+    },
+    "product.facts.function_group": {
+      "semantic_id": "utensils.graters_peelers.product.facts.function_group",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "grater",
+          "peeler"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "function_group"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "utensils.graters_peelers.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "zesting lemon",
+          "grating or slicing cheese and vegetables",
+          "removing potato skin",
+          "cutting carrot strips"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.cut_profile": {
+      "semantic_id": "utensils.graters_peelers.product.facts.cut_profile",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fine grating only",
+          "coarse grating, fine grating, slicing and rasping",
+          "smooth skin peeling only",
+          "julienne strip cutting only"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cut_profile"
+    },
+    "product.facts.working_surface_count": {
+      "semantic_id": "utensils.graters_peelers.product.facts.working_surface_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "fitted working faces or blade assembly; not number of loose items or cutting edges",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "working_surface_count"
+    },
+    "product.facts.blade_movement": {
+      "semantic_id": "utensils.graters_peelers.product.facts.blade_movement",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fixed",
+          "swivelling"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "blade_movement"
+    },
+    "product.facts.frame_material": {
+      "semantic_id": "utensils.graters_peelers.product.facts.frame_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene",
+          "stainless steel"
+        ],
+        "component": "tool frame",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "frame_material"
+    },
+    "product.facts.grip_surface_material": {
+      "semantic_id": "utensils.graters_peelers.product.facts.grip_surface_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "thermoplastic elastomer",
+          "stainless steel",
+          "polypropylene"
+        ],
+        "component": "hand-contact handle",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "grip_surface_material"
+    },
+    "product.facts.cover_count": {
+      "semantic_id": "utensils.graters_peelers.product.facts.cover_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "separate supplied removable storage covers",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cover_count"
+    },
+    "product.facts.cover_material": {
+      "semantic_id": "utensils.graters_peelers.product.facts.cover_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene",
+          "none"
+        ],
+        "component": "separate supplied storage cover, none means absent",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cover_material"
+    },
+    "product.facts.cover_care": {
+      "semantic_id": "utensils.graters_peelers.product.facts.cover_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "handwash only",
+          "no cover supplied"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cover_care"
+    },
+    "product.facts.supplied_item_count": {
+      "semantic_id": "utensils.graters_peelers.product.facts.supplied_item_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "one assembled tool plus any separate supplied storage cover; not number of blades or faces",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_item_count"
+    },
+    "product.facts.supplied_contents": {
+      "semantic_id": "utensils.graters_peelers.product.facts.supplied_contents",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "one assembled manual rasp and one removable storage cover; no bowl, food, brush, extra tool or replacement blade",
+          "one assembled manual tool; no cover, bowl, food, brush, extra tool or replacement blade"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_contents"
+    },
+    "product.facts.tool_care": {
+      "semantic_id": "utensils.graters_peelers.product.facts.tool_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Tool: top-rack dishwasher-safe; handwashing permitted. Cover: handwash only.",
+          "Tool: dishwasher-safe with no rack restriction; handwashing permitted. No cover supplied.",
+          "Tool: top-rack dishwasher-safe; handwashing permitted. No cover supplied.",
+          "Tool: handwash only; dishwasher use not permitted. No cover supplied."
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "tool_care"
+    },
+    "product.facts.tool_dishwasher_safe": {
+      "semantic_id": "utensils.graters_peelers.product.facts.tool_dishwasher_safe",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "explicit tool care only, excluding any removable cover; no reviewer dishwasher trial",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "tool_dishwasher_safe"
+    },
+    "product.facts.tool_top_rack_only": {
+      "semantic_id": "utensils.graters_peelers.product.facts.tool_top_rack_only",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "restriction on permitted tool dishwasher use; false is not a permission when tool_dishwasher_safe is false",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "tool_top_rack_only"
+    },
+    "product.facts.overall_measure_basis": {
+      "semantic_id": "utensils.graters_peelers.product.facts.overall_measure_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "nominal end-to-end tool length including grip, with any removable cover off",
+          "nominal base-to-top-of-handle height with the box grater upright"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.working_width_basis": {
+      "semantic_id": "utensils.graters_peelers.product.facts.working_width_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "nominal usable width across the fitted fine grating surface, not tool or frame width",
+          "nominal usable width across the coarse grating face, not box footprint or sliced-food width",
+          "nominal usable span along the installed peeling blade, not frame width or peel thickness"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.colour_scope": {
+      "semantic_id": "utensils.graters_peelers.product.facts.colour_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "hand-contact grip only",
+          "exposed steel finish",
+          "frame and hand-contact grip together"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.overall_length_mm": {
+      "semantic_id": "utensils.graters_peelers.product.facts.overall_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "basis": "declared nominal overall measurement; use recipe overall_measure_basis, not package dimensions",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "overall_length_mm"
+    },
+    "product.facts.working_width_mm": {
+      "semantic_id": "utensils.graters_peelers.product.facts.working_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "basis": "declared nominal working span; use recipe working_width_basis, not output-food dimensions",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "working_width_mm"
+    },
+    "sku.colour": {
+      "semantic_id": "utensils.graters_peelers.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "blue",
+          "green",
+          "red",
+          "silver"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "utensils.graters_peelers.sku.pack_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "assembled functional tools; cover and fitted parts are not extra tools"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.pack_count"
+    },
+    "sku.supplied_contents": {
+      "semantic_id": "utensils.graters_peelers.sku.supplied_contents",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "values": [
+          "one assembled manual rasp and one removable storage cover; no bowl, food, brush, extra tool or replacement blade",
+          "one assembled manual tool; no cover, bowl, food, brush, extra tool or replacement blade"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supplied_contents"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "utensils.graters_peelers.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "whole purchase including supplied cover, not offer, delivery total or payment",
+        "min": 25,
+        "max": 330
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fine_rasp",
+          "box_four_face",
+          "y_smooth",
+          "inline_smooth",
+          "y_julienne"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "pack_count": {
+      "id": "kitchen_utensils.graters_peelers.content.pack_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.pack_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "manual": {
+      "id": "kitchen_utensils.graters_peelers.content.manual",
+      "display_group": "features",
+      "fields": [
+        "product.facts.manual"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "working_surface_material": {
+      "id": "kitchen_utensils.graters_peelers.content.working_surface_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.working_surface_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "working_surface_user_removable": {
+      "id": "kitchen_utensils.graters_peelers.content.working_surface_user_removable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.working_surface_user_removable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "base_support": {
+      "id": "kitchen_utensils.graters_peelers.content.base_support",
+      "display_group": "features",
+      "fields": [
+        "product.facts.base_support"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "base_material": {
+      "id": "kitchen_utensils.graters_peelers.content.base_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.base_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stands_on_base": {
+      "id": "kitchen_utensils.graters_peelers.content.stands_on_base",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stands_on_base"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tool_form": {
+      "id": "kitchen_utensils.graters_peelers.content.tool_form",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tool_form"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "function_group": {
+      "id": "kitchen_utensils.graters_peelers.content.function_group",
+      "display_group": "features",
+      "fields": [
+        "product.facts.function_group"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cut_profile": {
+      "id": "kitchen_utensils.graters_peelers.content.cut_profile",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cut_profile"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "working_surface_count": {
+      "id": "kitchen_utensils.graters_peelers.content.working_surface_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.working_surface_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "blade_movement": {
+      "id": "kitchen_utensils.graters_peelers.content.blade_movement",
+      "display_group": "features",
+      "fields": [
+        "product.facts.blade_movement"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "frame_material": {
+      "id": "kitchen_utensils.graters_peelers.content.frame_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.frame_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "grip_surface_material": {
+      "id": "kitchen_utensils.graters_peelers.content.grip_surface_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.grip_surface_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cover_count": {
+      "id": "kitchen_utensils.graters_peelers.content.cover_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cover_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cover_material": {
+      "id": "kitchen_utensils.graters_peelers.content.cover_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.cover_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cover_care": {
+      "id": "kitchen_utensils.graters_peelers.content.cover_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.cover_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_item_count": {
+      "id": "kitchen_utensils.graters_peelers.content.supplied_item_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_item_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_contents": {
+      "id": "kitchen_utensils.graters_peelers.content.supplied_contents",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_contents"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tool_care": {
+      "id": "kitchen_utensils.graters_peelers.content.tool_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tool_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tool_dishwasher_safe": {
+      "id": "kitchen_utensils.graters_peelers.content.tool_dishwasher_safe",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tool_dishwasher_safe"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tool_top_rack_only": {
+      "id": "kitchen_utensils.graters_peelers.content.tool_top_rack_only",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tool_top_rack_only"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "overall_length_mm": {
+      "id": "kitchen_utensils.graters_peelers.content.overall_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.overall_length_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "working_width_mm": {
+      "id": "kitchen_utensils.graters_peelers.content.working_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.working_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 37,
+    "roles": {
+      "identity": 2,
+      "literal": 4,
+      "omit_placeholder": 2,
+      "descriptive": 20,
+      "qualifier": 3,
+      "buying_choice": 1,
+      "alias": 2,
+      "commerce": 1,
+      "operational": 1,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 4,
+    "unmapped_descriptive_fields": 0
+  }
+}

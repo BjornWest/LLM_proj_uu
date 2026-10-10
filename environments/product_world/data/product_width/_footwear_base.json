@@ -1,0 +1,458 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.footwear_base",
+  "random_namespace": "product-width-footwear-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.widths": {
+      "type": "array",
+      "items": {
+        "type": "enum",
+        "values": [
+          "standard",
+          "narrow",
+          "wide"
+        ]
+      },
+      "min_items": 1
+    },
+    "product.colours": {
+      "type": "set",
+      "items": {
+        "type": "enum",
+        "values": [
+          "black",
+          "navy",
+          "brown",
+          "olive",
+          "stone",
+          "white",
+          "grey",
+          "burgundy",
+          "blue",
+          "pink"
+        ]
+      },
+      "min_items": 1
+    },
+    "product.sizes_eu": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "min_items": 1
+    },
+    "group.width": {
+      "type": "enum",
+      "values": [
+        "standard",
+        "narrow",
+        "wide"
+      ]
+    },
+    "group.colour_mode": {
+      "type": "enum",
+      "values": [
+        "all",
+        "subset"
+      ]
+    },
+    "group.colour_count": {
+      "type": "integer"
+    },
+    "group.colours": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      }
+    },
+    "group.colour": {
+      "type": "string"
+    },
+    "group.size_mode": {
+      "type": "enum",
+      "values": [
+        "full",
+        "subrange",
+        "alternating"
+      ]
+    },
+    "group.sizes": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "min_items": 1
+    },
+    "group.size": {
+      "type": "integer"
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "width": {
+            "type": "string"
+          },
+          "size_eu": {
+            "type": "integer"
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "sku.size_eu": {
+      "type": "integer",
+      "retail_presentation": {
+        "allowed": [
+          "selector"
+        ],
+        "policy_key": "size_eu"
+      }
+    },
+    "sku.colour": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "colour"
+      }
+    },
+    "sku.width": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "width"
+      }
+    },
+    "product.facts.shipping_class": {
+      "type": "string",
+      "constant": "regular",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.name": {
+      "type": "string",
+      "optional": true
+    },
+    "request.size_eu": {
+      "type": "integer",
+      "optional": true
+    },
+    "request.colour": {
+      "type": "string",
+      "optional": true
+    },
+    "request.width": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights",
+      "stream": "product/walking_shoes/positioning"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95,
+      "stream": "product/walking_shoes/execution"
+    },
+    {
+      "id": "width_set",
+      "target": "product.widths",
+      "sample": "weighted_choice",
+      "weights": {
+        "standard_only": 7,
+        "standard_and_wide": 2,
+        "all_widths": 1
+      },
+      "values": {
+        "standard_only": [
+          "standard"
+        ],
+        "standard_and_wide": [
+          "standard",
+          "wide"
+        ],
+        "all_widths": [
+          "standard",
+          "narrow",
+          "wide"
+        ]
+      },
+      "stream": "product/walking_shoes/width_set"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 5,
+        "navy": 3,
+        "brown": 2,
+        "olive": 2,
+        "stone": 3,
+        "white": 3,
+        "grey": 3,
+        "burgundy": 1,
+        "blue": 2,
+        "pink": 1
+      },
+      "count_weights": {
+        "1": 25,
+        "2": 40,
+        "3": 25,
+        "4": 10
+      },
+      "streams": {
+        "count": "product/walking_shoes/colour_count",
+        "item": "product/walking_shoes/colour_{index}"
+      }
+    },
+    {
+      "id": "size_range",
+      "target": "product.sizes_eu",
+      "sample": "weighted_choice",
+      "weights": {
+        "compact": 2,
+        "broad": 3,
+        "larger": 1
+      },
+      "values": {
+        "compact": [
+          36,
+          37,
+          38,
+          39,
+          40,
+          41
+        ],
+        "broad": [
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "larger": [
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ]
+      },
+      "stream": "product/walking_shoes/size_range"
+    },
+    {
+      "id": "width_groups",
+      "for_each": {
+        "binding": "group.width",
+        "from": "product.widths"
+      },
+      "steps": [
+        {
+          "id": "width_colour_mode",
+          "target": "group.colour_mode",
+          "sample": "weighted_choice",
+          "weights": {
+            "all": 1,
+            "subset": 0
+          },
+          "cases": [
+            {
+              "when": "group.width != 'standard'",
+              "weights": {
+                "all": 60,
+                "subset": 40
+              }
+            }
+          ],
+          "stream": "product/walking_shoes/colour_coverage/{width}"
+        },
+        {
+          "id": "width_colour_count",
+          "target": "group.colour_count",
+          "sample": "uniform_int",
+          "min": "len(product.colours)",
+          "max": "len(product.colours)",
+          "cases": [
+            {
+              "when": "group.colour_mode == 'subset' and len(product.colours) > 1",
+              "min": 1,
+              "max": "len(product.colours) - 1"
+            }
+          ],
+          "stream": "product/walking_shoes/colour_subset_count/{width}"
+        },
+        {
+          "id": "width_colours",
+          "target": "group.colours",
+          "sample": "weighted_subset",
+          "weights": {
+            "black": 5,
+            "navy": 3,
+            "brown": 2,
+            "olive": 2,
+            "stone": 3,
+            "white": 3,
+            "grey": 3,
+            "burgundy": 1,
+            "blue": 2,
+            "pink": 1
+          },
+          "eligible_from": "product.colours",
+          "count_from": "group.colour_count",
+          "streams": {
+            "item": "product/walking_shoes/colour_subset/{width}/{index}"
+          }
+        },
+        {
+          "id": "colour_groups",
+          "for_each": {
+            "binding": "group.colour",
+            "from": "group.colours"
+          },
+          "steps": [
+            {
+              "id": "size_mode",
+              "target": "group.size_mode",
+              "sample": "weighted_choice",
+              "weights": {
+                "full": 75,
+                "subrange": 20,
+                "alternating": 5
+              },
+              "stream": "product/walking_shoes/sizes/{colour}/{width}/mode"
+            },
+            {
+              "id": "size_coverage",
+              "target": "group.sizes",
+              "sample": "uniform_choice",
+              "values_from": "coverage_groups(product.sizes_eu, group.size_mode)",
+              "stream": "product/walking_shoes/sizes/{colour}/{width}/coverage"
+            },
+            {
+              "id": "sku_sizes",
+              "for_each": {
+                "binding": "group.size",
+                "from": "group.sizes"
+              },
+              "steps": [
+                {
+                  "id": "skus",
+                  "target": "product.skus",
+                  "emit": {
+                    "sku_id": "product.product_id + '-' + group.colour + '-' + group.width + '-' + str(group.size)",
+                    "product_id": "product.product_id",
+                    "colour": "group.colour",
+                    "width": "group.width",
+                    "size_eu": "group.size"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 350,
+      "max": 800,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 650,
+          "max": 1300
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1100,
+          "max": 2400
+        }
+      ],
+      "stream": "product/walking_shoes/price"
+    }
+  ],
+  "language": [],
+  "bindings": [],
+  "rules": [],
+  "metadata": {
+    "purpose": "Shared nominal adult sizing and sparse colour/width manufacture. No use/comfort/construction assumptions.",
+    "heuristics": "Weights/grids are tunable authoring assumptions, not population estimates.",
+    "separation": "Manufacturer facts only; no retailer stock or offer service sampling."
+  }
+}

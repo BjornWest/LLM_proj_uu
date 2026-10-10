@@ -1,0 +1,3021 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "pet_bowls.drinking_fountains",
+  "family_id": "pet_bowls",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pet_bowls.drinking_fountains.json": "c481444ac085c189a1124e7338a87fe75019ec53370c28dcd4be38e24b9d82ba",
+    "environments/product_world/data/product_width/_pet_bowls_base.json": "746e065f271eccf416ff93902d1e4448ddfbb8221418a98fb2e2e4e33568dd51"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Fountains need power/cleaning information; slow-feed and raised designs need geometry. Do not present them as tested health benefits.",
+  "concept_note": "Publish the water/pump/filter power and care; ordinary absence of feeding obstacles is not a fountain feature.",
+  "fields": {
+    "product.facts.flow_control": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.flow_adjustable",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "manual cap controls single-outlet stream strength",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "flow_control"
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "usb_tray",
+          "steel_stream"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.component_materials": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "polypropylene",
+            "stainless steel",
+            "silicone"
+          ]
+        },
+        "min_items": 3,
+        "max_items": 3,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": [
+          "polypropylene",
+          "stainless steel",
+          "silicone"
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "component_materials"
+    },
+    "product.facts.component_allocation": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "component_allocation"
+    },
+    "product.facts.drinking_part": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "drinking_part"
+    },
+    "product.facts.colour_scope": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.low_voltage_interface": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "USB-A",
+          "matched dedicated connector"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "low_voltage_interface"
+    },
+    "product.facts.adapter_output_voltage_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "V",
+        "min": 1,
+        "max": 24,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_output_voltage_v"
+    },
+    "product.facts.adapter_max_output_current_a": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "min": 0.1,
+        "max": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_max_output_current_a"
+    },
+    "product.facts.pump_lead_length_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "min": 1,
+        "max": 3000,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pump_lead_length_mm"
+    },
+    "product.facts.filter_platform": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "F-PAD-A",
+          "F-CART-B"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "filter_platform"
+    },
+    "product.facts.filter_shape": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "carbon pad",
+          "carbon cartridge"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "filter_shape"
+    },
+    "product.facts.flow_adjustable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "flow_adjustable"
+    },
+    "product.facts.flow_cap_included": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "flow_cap_included"
+    },
+    "product.facts.reservoir_top_rack_dishwasher": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reservoir_top_rack_dishwasher"
+    },
+    "product.facts.drinking_part_top_rack_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "drinking_part_top_rack_dishwasher"
+    },
+    "product.facts.capacity_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "nominal reservoir water volume at marked MAX line",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.exterior_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "nominal assembled exterior bounding dimensions",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.power_source": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "corded external mains adapter",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_source"
+    },
+    "product.facts.pump_design": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "removable sealed low-voltage submersible impeller pump with removable cover and impeller",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pump_design"
+    },
+    "product.facts.filter_media": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "activated carbon",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "filter_media"
+    },
+    "product.facts.min_max_marks": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "min_max_marks"
+    },
+    "product.facts.indoor_only": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "indoor_only"
+    },
+    "product.facts.water_only": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "water_only"
+    },
+    "product.facts.motor": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "motor"
+    },
+    "product.facts.pump": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pump"
+    },
+    "product.facts.removable_pump": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "removable_pump"
+    },
+    "product.facts.filter": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "filter"
+    },
+    "product.facts.whole_fountain_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "whole_fountain_dishwasher"
+    },
+    "product.facts.pump_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pump_dishwasher"
+    },
+    "product.facts.filter_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "filter_dishwasher"
+    },
+    "product.facts.adapter_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_dishwasher"
+    },
+    "product.facts.holder_top_rack_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "holder_top_rack_dishwasher"
+    },
+    "product.facts.tube_top_rack_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tube_top_rack_dishwasher"
+    },
+    "product.facts.flow_cap_top_rack_dishwasher": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "flow_cap_top_rack_dishwasher"
+    },
+    "product.facts.filter_detergent_wash": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "filter_detergent_wash"
+    },
+    "product.facts.adapter_washable": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_washable"
+    },
+    "product.facts.plug_washable": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "plug_washable"
+    },
+    "product.facts.reservoir_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "reservoir_included"
+    },
+    "product.facts.drinking_part_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "drinking_part_included"
+    },
+    "product.facts.pump_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pump_included"
+    },
+    "product.facts.pump_lead_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pump_lead_included"
+    },
+    "product.facts.matched_adapter_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "matched_adapter_included"
+    },
+    "product.facts.tube_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tube_included"
+    },
+    "product.facts.holder_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "holder_included"
+    },
+    "product.facts.starter_filter_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "starter_filter_included"
+    },
+    "product.facts.battery": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery"
+    },
+    "product.facts.wireless_operation": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wireless_operation"
+    },
+    "product.facts.charging_function": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charging_function"
+    },
+    "product.facts.app": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "app"
+    },
+    "product.facts.radio": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "radio"
+    },
+    "product.facts.uv_source": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "uv_source"
+    },
+    "product.facts.heater": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "heater"
+    },
+    "product.facts.water_level_sensor": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "water_level_sensor"
+    },
+    "product.facts.automatic_dry_run_shutdown": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "automatic_dry_run_shutdown"
+    },
+    "product.facts.food_storage_bin": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "food_storage_bin"
+    },
+    "product.facts.separate_prefilter": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "separate_prefilter"
+    },
+    "product.facts.interchangeable_spout_kit": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "interchangeable_spout_kit"
+    },
+    "product.facts.spare_pump_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spare_pump_included"
+    },
+    "product.facts.spare_filters_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spare_filters_included"
+    },
+    "product.facts.cleaning_brush_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cleaning_brush_included"
+    },
+    "product.facts.protective_mat_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "protective_mat_included"
+    },
+    "product.facts.separate_prefilter_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "separate_prefilter_included"
+    },
+    "product.facts.battery_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_included"
+    },
+    "product.facts.usb_data_cable_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_data_cable_included"
+    },
+    "product.facts.spout_kit_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spout_kit_included"
+    },
+    "product.facts.reservoir_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 1,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "reservoir_units"
+    },
+    "product.facts.drinking_part_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 1,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "drinking_part_units"
+    },
+    "product.facts.pump_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 1,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pump_units"
+    },
+    "product.facts.adapter_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 1,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_units"
+    },
+    "product.facts.tube_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 1,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tube_units"
+    },
+    "product.facts.holder_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 1,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "holder_units"
+    },
+    "product.facts.starter_filter_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 1,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "starter_filter_units"
+    },
+    "product.facts.pump_consumption_w": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pump_flow_ml_per_s": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL/s",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pump_head_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.noise_db": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "dB",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.minimum_water_volume_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usable_before_MIN_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reservoir_mass_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.inner_opening_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.filter_efficiency_percent": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "percent",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.full_cad": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dimensional_tolerances": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pump_ip_grade": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.mains_input_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.mains_plug_geometry": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dedicated_connector_geometry_polarity": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.third_party_adapter_fit": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.third_party_pump_fit": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.third_party_filter_fit": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.filter_optional_operation": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.filter_life": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.filter_availability": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.water_disinfection": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.refill_interval": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.animal_fit": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.clinical_outcomes": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.steel_grade": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.finish_chemistry": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.safety_certificate": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.durability_test": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.anti_slip_base": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "False",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "anti_slip_base"
+    },
+    "product.facts.feeding_obstacles": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "False",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Publish the water/pump/filter power and care; ordinary absence of feeding obstacles is not a fountain feature."
+    },
+    "product.facts.raised_stand": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "False",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "raised_stand"
+    }
+  },
+  "disclosure_groups": {
+    "flow_control": {
+      "id": "pet_bowls.drinking_fountains.content.flow_control",
+      "display_group": "features",
+      "fields": [
+        "product.facts.flow_control"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "construction": {
+      "id": "pet_bowls.drinking_fountains.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_materials": {
+      "id": "pet_bowls.drinking_fountains.content.component_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_allocation": {
+      "id": "pet_bowls.drinking_fountains.content.component_allocation",
+      "display_group": "features",
+      "fields": [
+        "product.facts.component_allocation"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "drinking_part": {
+      "id": "pet_bowls.drinking_fountains.content.drinking_part",
+      "display_group": "features",
+      "fields": [
+        "product.facts.drinking_part"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "low_voltage_interface": {
+      "id": "pet_bowls.drinking_fountains.content.low_voltage_interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.low_voltage_interface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_output_voltage_v": {
+      "id": "pet_bowls.drinking_fountains.content.adapter_output_voltage_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adapter_output_voltage_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_max_output_current_a": {
+      "id": "pet_bowls.drinking_fountains.content.adapter_max_output_current_a",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adapter_max_output_current_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump_lead_length_mm": {
+      "id": "pet_bowls.drinking_fountains.content.pump_lead_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.pump_lead_length_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filter_platform": {
+      "id": "pet_bowls.drinking_fountains.content.filter_platform",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.filter_platform"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filter_shape": {
+      "id": "pet_bowls.drinking_fountains.content.filter_shape",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.filter_shape"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "flow_adjustable": {
+      "id": "pet_bowls.drinking_fountains.content.flow_adjustable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.flow_adjustable"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "flow_cap_included": {
+      "id": "pet_bowls.drinking_fountains.content.flow_cap_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.flow_cap_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reservoir_top_rack_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.reservoir_top_rack_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.reservoir_top_rack_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "drinking_part_top_rack_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.drinking_part_top_rack_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.drinking_part_top_rack_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_source": {
+      "id": "pet_bowls.drinking_fountains.content.power_source",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.power_source"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "pump_design": {
+      "id": "pet_bowls.drinking_fountains.content.pump_design",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pump_design"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filter_media": {
+      "id": "pet_bowls.drinking_fountains.content.filter_media",
+      "display_group": "features",
+      "fields": [
+        "product.facts.filter_media"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "min_max_marks": {
+      "id": "pet_bowls.drinking_fountains.content.min_max_marks",
+      "display_group": "features",
+      "fields": [
+        "product.facts.min_max_marks"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "indoor_only": {
+      "id": "pet_bowls.drinking_fountains.content.indoor_only",
+      "display_group": "features",
+      "fields": [
+        "product.facts.indoor_only"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "water_only": {
+      "id": "pet_bowls.drinking_fountains.content.water_only",
+      "display_group": "features",
+      "fields": [
+        "product.facts.water_only"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "motor": {
+      "id": "pet_bowls.drinking_fountains.content.motor",
+      "display_group": "features",
+      "fields": [
+        "product.facts.motor"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump": {
+      "id": "pet_bowls.drinking_fountains.content.pump",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pump"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "removable_pump": {
+      "id": "pet_bowls.drinking_fountains.content.removable_pump",
+      "display_group": "features",
+      "fields": [
+        "product.facts.removable_pump"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "filter": {
+      "id": "pet_bowls.drinking_fountains.content.filter",
+      "display_group": "features",
+      "fields": [
+        "product.facts.filter"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "whole_fountain_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.whole_fountain_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.whole_fountain_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.pump_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.pump_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filter_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.filter_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.filter_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.adapter_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.adapter_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "holder_top_rack_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.holder_top_rack_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.holder_top_rack_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tube_top_rack_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.tube_top_rack_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tube_top_rack_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "flow_cap_top_rack_dishwasher": {
+      "id": "pet_bowls.drinking_fountains.content.flow_cap_top_rack_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.flow_cap_top_rack_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filter_detergent_wash": {
+      "id": "pet_bowls.drinking_fountains.content.filter_detergent_wash",
+      "display_group": "care",
+      "fields": [
+        "product.facts.filter_detergent_wash"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_washable": {
+      "id": "pet_bowls.drinking_fountains.content.adapter_washable",
+      "display_group": "care",
+      "fields": [
+        "product.facts.adapter_washable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "plug_washable": {
+      "id": "pet_bowls.drinking_fountains.content.plug_washable",
+      "display_group": "care",
+      "fields": [
+        "product.facts.plug_washable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reservoir_included": {
+      "id": "pet_bowls.drinking_fountains.content.reservoir_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.reservoir_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "drinking_part_included": {
+      "id": "pet_bowls.drinking_fountains.content.drinking_part_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.drinking_part_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump_included": {
+      "id": "pet_bowls.drinking_fountains.content.pump_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.pump_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump_lead_included": {
+      "id": "pet_bowls.drinking_fountains.content.pump_lead_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.pump_lead_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "matched_adapter_included": {
+      "id": "pet_bowls.drinking_fountains.content.matched_adapter_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.matched_adapter_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tube_included": {
+      "id": "pet_bowls.drinking_fountains.content.tube_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.tube_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "holder_included": {
+      "id": "pet_bowls.drinking_fountains.content.holder_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.holder_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "starter_filter_included": {
+      "id": "pet_bowls.drinking_fountains.content.starter_filter_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.starter_filter_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery": {
+      "id": "pet_bowls.drinking_fountains.content.battery",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wireless_operation": {
+      "id": "pet_bowls.drinking_fountains.content.wireless_operation",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wireless_operation"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charging_function": {
+      "id": "pet_bowls.drinking_fountains.content.charging_function",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.charging_function"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "app": {
+      "id": "pet_bowls.drinking_fountains.content.app",
+      "display_group": "features",
+      "fields": [
+        "product.facts.app"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "radio": {
+      "id": "pet_bowls.drinking_fountains.content.radio",
+      "display_group": "features",
+      "fields": [
+        "product.facts.radio"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "uv_source": {
+      "id": "pet_bowls.drinking_fountains.content.uv_source",
+      "display_group": "features",
+      "fields": [
+        "product.facts.uv_source"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heater": {
+      "id": "pet_bowls.drinking_fountains.content.heater",
+      "display_group": "features",
+      "fields": [
+        "product.facts.heater"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "water_level_sensor": {
+      "id": "pet_bowls.drinking_fountains.content.water_level_sensor",
+      "display_group": "features",
+      "fields": [
+        "product.facts.water_level_sensor"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "automatic_dry_run_shutdown": {
+      "id": "pet_bowls.drinking_fountains.content.automatic_dry_run_shutdown",
+      "display_group": "features",
+      "fields": [
+        "product.facts.automatic_dry_run_shutdown"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "food_storage_bin": {
+      "id": "pet_bowls.drinking_fountains.content.food_storage_bin",
+      "display_group": "features",
+      "fields": [
+        "product.facts.food_storage_bin"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "separate_prefilter": {
+      "id": "pet_bowls.drinking_fountains.content.separate_prefilter",
+      "display_group": "features",
+      "fields": [
+        "product.facts.separate_prefilter"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "interchangeable_spout_kit": {
+      "id": "pet_bowls.drinking_fountains.content.interchangeable_spout_kit",
+      "display_group": "features",
+      "fields": [
+        "product.facts.interchangeable_spout_kit"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_pump_included": {
+      "id": "pet_bowls.drinking_fountains.content.spare_pump_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.spare_pump_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_filters_included": {
+      "id": "pet_bowls.drinking_fountains.content.spare_filters_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.spare_filters_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cleaning_brush_included": {
+      "id": "pet_bowls.drinking_fountains.content.cleaning_brush_included",
+      "display_group": "care",
+      "fields": [
+        "product.facts.cleaning_brush_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "protective_mat_included": {
+      "id": "pet_bowls.drinking_fountains.content.protective_mat_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.protective_mat_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "separate_prefilter_included": {
+      "id": "pet_bowls.drinking_fountains.content.separate_prefilter_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.separate_prefilter_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_included": {
+      "id": "pet_bowls.drinking_fountains.content.battery_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.battery_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_data_cable_included": {
+      "id": "pet_bowls.drinking_fountains.content.usb_data_cable_included",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_data_cable_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spout_kit_included": {
+      "id": "pet_bowls.drinking_fountains.content.spout_kit_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.spout_kit_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reservoir_units": {
+      "id": "pet_bowls.drinking_fountains.content.reservoir_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.reservoir_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "drinking_part_units": {
+      "id": "pet_bowls.drinking_fountains.content.drinking_part_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.drinking_part_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump_units": {
+      "id": "pet_bowls.drinking_fountains.content.pump_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pump_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_units": {
+      "id": "pet_bowls.drinking_fountains.content.adapter_units",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.adapter_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tube_units": {
+      "id": "pet_bowls.drinking_fountains.content.tube_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tube_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "holder_units": {
+      "id": "pet_bowls.drinking_fountains.content.holder_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.holder_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "starter_filter_units": {
+      "id": "pet_bowls.drinking_fountains.content.starter_filter_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.starter_filter_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "anti_slip_base": {
+      "id": "pet_bowls.drinking_fountains.content.anti_slip_base",
+      "display_group": "features",
+      "fields": [
+        "product.facts.anti_slip_base"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "raised_stand": {
+      "id": "pet_bowls.drinking_fountains.content.raised_stand",
+      "display_group": "features",
+      "fields": [
+        "product.facts.raised_stand"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 105,
+    "roles": {
+      "literal": 60,
+      "descriptive": 12,
+      "qualifier": 3,
+      "omit_placeholder": 29,
+      "omit_fixed_detail": 1
+    },
+    "display_groups": 6,
+    "highlight_candidates": 6,
+    "unmapped_descriptive_fields": 72
+  }
+}

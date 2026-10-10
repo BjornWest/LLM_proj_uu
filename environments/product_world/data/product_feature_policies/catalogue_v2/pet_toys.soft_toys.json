@@ -1,0 +1,2681 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "pet_toys.soft_toys",
+  "family_id": "pet_toys",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pet_toys.soft_toys.json": "7ae99dfd2a09245af6b78ed434e47a435e139ab21c707b635efc0f39aec265e4",
+    "environments/product_world/data/product_width/_pet_toys_base.json": "e29f03458136d223052afad9efd88874fd961e3c38401771248c3baa6253b73b",
+    "environments/product_world/data/product_public_content/pet_toys.soft_toys.json": "90766b8d9f1692ba77944279f755a9b18d07341722b7ead1a39c4999d7c3b45c"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Chew, tug, soft, puzzle and teaser functions differ. Keep supervision/inspection instructions as care/use details, without claiming durability or clinical effects.",
+  "concept_note": "Plush construction, stuffing, squeaker/catnip and care matter; no food compartment is not promotional.",
+  "fields": {
+    "product.name": {
+      "semantic_id": "pet_toys.soft.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Lundvik Mjuk"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.toy_length_mm": {
+      "semantic_id": "pet_toys.soft.geometry.length",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "min": 1,
+        "max": 1000,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one complete toy; nominal dry relaxed exterior resting flat without external compression; installed components and sewn ears/tail included; inherited mm units"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_overall_dimensions"
+    },
+    "sku.toy_width_mm": {
+      "semantic_id": "pet_toys.soft.geometry.width",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "min": 1,
+        "max": 1000,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one complete toy; nominal dry relaxed exterior resting flat without external compression; installed components and sewn ears/tail included; inherited mm units"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_overall_dimensions"
+    },
+    "sku.toy_height_mm": {
+      "semantic_id": "pet_toys.soft.geometry.height",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "min": 1,
+        "max": 1000,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one complete toy; nominal dry relaxed exterior resting flat without external compression; installed components and sewn ears/tail included; inherited mm units"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_overall_dimensions"
+    },
+    "sku.pack_count": {
+      "semantic_id": "pet_toys.soft.pack.toys",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full selected pack; identical complete same-size same-colour toys"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.removable_squeaker_count": {
+      "semantic_id": "pet_toys.soft.squeakers.removable_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 1,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "per complete toy; already installed"
+        }
+      },
+      "supporting_assertion_ids": [
+        "pet_toys.soft.squeaker.one_removable_plastic"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "removable_squeaker"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.fixed_squeaker_count": {
+      "semantic_id": "pet_toys.soft.squeakers.fixed_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 3,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "per complete toy; enclosed"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "fixed_squeakers"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.pack_squeaker_count": {
+      "semantic_id": "pet_toys.soft.squeakers.pack_total",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 6,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full selected pack; no loose extras"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.toy_mass_g": {
+      "semantic_id": "pet_toys.soft.mass.unspecified",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ]
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one complete toy; explicit unknown, not zero"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.filling_mass_g": {
+      "semantic_id": "pet_toys.soft.filling.mass_unspecified",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.filling_present",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "fibre filling in one toy; applicable but unknown"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "fiber_filling"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pocket_opening_mm": {
+      "semantic_id": "pet_toys.soft.pocket.opening_unspecified",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.access_pocket_present",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "owner-access pocket opening clearance; applicable but unknown, not exterior width"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "access_closure"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "pet_toys.soft.price.full_pack_reference",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 70,
+        "max": 1008,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full exact selected SKU pack; synthetic reference, not retail quote; inherited SEK units"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.intended_species": {
+      "semantic_id": "pet_toys.soft.field.intended_species",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "dog",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.adult_dog"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_life_stage": {
+      "semantic_id": "pet_toys.soft.field.intended_life_stage",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "adult",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.adult_dog"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_intended_life_stage"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "pet_toys.soft.field.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "supervised indoor carry and shake play",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.outer_material": {
+      "semantic_id": "pet_toys.soft.field.outer_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "polyester plush",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.body.polyester_plush"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "plush_body"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_outer_material"
+    },
+    "product.facts.body_construction": {
+      "semantic_id": "pet_toys.soft.field.body_construction",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.body.sewn_embroidered"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "plush_body"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_body_construction"
+    },
+    "product.facts.filling_present": {
+      "semantic_id": "pet_toys.soft.field.filling_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.filling.absent",
+        "pet_toys.soft.filling.polyester_fibre"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_filling_present"
+    },
+    "product.facts.filling_materials": {
+      "semantic_id": "pet_toys.soft.field.filling_materials",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 0,
+        "max_items": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.filling.absent",
+        "pet_toys.soft.filling.polyester_fibre"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "fiber_filling"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_filling_materials"
+    },
+    "product.facts.squeaker_material": {
+      "semantic_id": "pet_toys.soft.field.squeaker_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "plastic",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_squeaker_material"
+    },
+    "product.facts.squeaker_mechanism": {
+      "semantic_id": "pet_toys.soft.field.squeaker_mechanism",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "mechanical air squeaker",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_squeaker_mechanism"
+    },
+    "product.facts.access_pocket_present": {
+      "semantic_id": "pet_toys.soft.field.access_pocket_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.closure.polyamide_hook_loop"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_access_pocket_present"
+    },
+    "product.facts.closure_type": {
+      "semantic_id": "pet_toys.soft.field.closure_type",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.closure.polyamide_hook_loop"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "access_closure"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_closure_type"
+    },
+    "product.facts.closure_materials": {
+      "semantic_id": "pet_toys.soft.field.closure_materials",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 0,
+        "max_items": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.closure.polyamide_hook_loop"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "access_closure"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_closure_materials"
+    },
+    "product.facts.body_care": {
+      "semantic_id": "pet_toys.soft.field.body_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "plush_body"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_body_body_care"
+    },
+    "product.facts.module_care": {
+      "semantic_id": "pet_toys.soft.field.module_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_module_module_care"
+    },
+    "product.facts.owner_module_removal_permitted": {
+      "semantic_id": "pet_toys.soft.field.owner_module_removal_permitted",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.module.original_only",
+        "pet_toys.soft.squeakers.fixed_enclosed"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "removable_squeaker"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_owner_module_removal_permitted"
+    },
+    "product.facts.fixed_squeakers_enclosed": {
+      "semantic_id": "pet_toys.soft.field.fixed_squeakers_enclosed",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.squeakers.fixed_enclosed"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "fixed_squeakers"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_fixed_squeakers_enclosed"
+    },
+    "product.facts.remove_retail_tags_ties": {
+      "semantic_id": "pet_toys.soft.field.remove_retail_tags_ties",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.packaging.remove_retail_keep_parts"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_remove_retail_tags_ties"
+    },
+    "product.facts.retain_sewn_parts_and_closure": {
+      "semantic_id": "pet_toys.soft.field.retain_sewn_parts_and_closure",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.packaging.remove_retail_keep_parts"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.supervision_required": {
+      "semantic_id": "pet_toys.soft.field.supervision_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.inspect_stop_remove",
+        "pet_toys.soft.use.supervised_indoor_carry_shake"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_supervision_required"
+    },
+    "product.facts.inspection_required": {
+      "semantic_id": "pet_toys.soft.field.inspection_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.inspect_stop_remove"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_inspection_required"
+    },
+    "product.facts.stop_remove_discard_on_damage": {
+      "semantic_id": "pet_toys.soft.field.stop_remove_discard_on_damage",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.inspect_stop_remove"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_stop_remove_discard_on_damage"
+    },
+    "product.facts.tug_permitted": {
+      "semantic_id": "pet_toys.soft.field.tug_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.no_tug_sustained_chewing_unsupervised"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_tug_permitted"
+    },
+    "product.facts.sustained_chewing_permitted": {
+      "semantic_id": "pet_toys.soft.field.sustained_chewing_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.no_tug_sustained_chewing_unsupervised"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_sustained_chewing_permitted"
+    },
+    "product.facts.unsupervised_use_permitted": {
+      "semantic_id": "pet_toys.soft.field.unsupervised_use_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.no_tug_sustained_chewing_unsupervised"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_unsupervised_use_permitted"
+    },
+    "product.facts.food_present": {
+      "semantic_id": "pet_toys.soft.field.food_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.food_compartment_present": {
+      "semantic_id": "pet_toys.soft.field.food_compartment_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.catnip_present": {
+      "semantic_id": "pet_toys.soft.field.catnip_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.has_tug_handle": {
+      "semantic_id": "pet_toys.soft.field.has_tug_handle",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.rope_present": {
+      "semantic_id": "pet_toys.soft.field.rope_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.battery_present": {
+      "semantic_id": "pet_toys.soft.field.battery_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.electronics_present": {
+      "semantic_id": "pet_toys.soft.field.electronics_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "sku.squeaker_count": {
+      "semantic_id": "pet_toys.soft.field.squeaker_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 3,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "per complete toy"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_squeaker_count"
+    },
+    "sku.spare_module_count": {
+      "semantic_id": "pet_toys.soft.field.spare_module_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 0,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full selected complete pack"
+        }
+      },
+      "supporting_assertion_ids": [
+        "pet_toys.soft.box.no_extras"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.loose_squeaker_count": {
+      "semantic_id": "pet_toys.soft.field.loose_squeaker_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 0,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full selected complete pack"
+        }
+      },
+      "supporting_assertion_ids": [
+        "pet_toys.soft.box.no_extras"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.colour": {
+      "semantic_id": "pet_toys.soft.variant.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.size_key": {
+      "semantic_id": "pet_toys.soft.variant.size_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "authored nominal exterior size, not individual suitability guide"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "product.facts.carry_shake_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.supervised_indoor_carry_shake"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_carry_shake_permitted"
+    },
+    "product.facts.indoor_play_only": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.use.supervised_indoor_carry_shake"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_indoor_play_only"
+    },
+    "sku.owner_module_removal_permitted": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.squeaker.one_removable_plastic"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.owner_module_removal_permitted"
+    },
+    "sku.squeaker_material": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "plastic",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.squeaker.one_removable_plastic"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.squeaker_material"
+    },
+    "product.facts.fixed_squeaker_removal_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.fixed_assembled_surface_only",
+        "pet_toys.soft.squeakers.fixed_enclosed"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_fixed_squeaker_removal_permitted"
+    },
+    "sku.identical_toys_per_pack": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.pack.identical"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.identical_toys_per_pack"
+    },
+    "product.facts.module_reinstallation_required": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "assembly",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.filled_body_only",
+        "pet_toys.soft.module.original_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_module_reinstallation_required"
+    },
+    "product.facts.replacement_module_use_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.module.original_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_replacement_module_use_permitted"
+    },
+    "product.facts.body_machinewash_permitted": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.filled_body_only",
+        "pet_toys.soft.care.fixed_assembled_surface_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_body_washing"
+    },
+    "product.facts.pocket_closed_for_play_required": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.filled_body_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_pocket_closed_for_play_required"
+    },
+    "product.facts.complete_toy_machinewash_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.filled_body_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.module_dry_wipe_only": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.original_module_dry_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_module_dry_wipe_only"
+    },
+    "product.facts.module_immersion_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.original_module_dry_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_module_module_immersion_permitted"
+    },
+    "product.facts.module_machinewash_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.original_module_dry_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_module_washing"
+    },
+    "product.facts.body_surface_clean_only": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.fixed_assembled_surface_only"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_body_surface_clean_only"
+    },
+    "product.facts.dishwasher_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.prohibited_treatments"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.tumble_dryer_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.prohibited_treatments"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_drying"
+    },
+    "product.facts.heated_drying_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.prohibited_treatments"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_drying"
+    },
+    "product.facts.boiling_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.prohibited_treatments"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_boiling_permitted"
+    },
+    "product.facts.microwave_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.prohibited_treatments"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_microwave_permitted"
+    },
+    "product.facts.bleach_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.prohibited_treatments"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_bleaching"
+    },
+    "product.facts.solvent_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.care.prohibited_treatments"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_solvent_permitted"
+    },
+    "sku.removable_packaging_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.box.no_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.removable_packaging_included"
+    },
+    "sku.extra_filling_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.box.no_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.extra_filling_included"
+    },
+    "sku.cleaning_brush_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.box.no_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.cleaning_brush_included"
+    },
+    "sku.detergent_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.box.no_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.detergent_included"
+    },
+    "product.facts.non_edible": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_non_edible"
+    },
+    "product.facts.powered": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pet_toys.soft.components.no_food_rope_handle_power"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary absent electronics/extra lid inventory; removal and cleaning instructions remain."
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "filled_removable",
+          "unstuffed_fixed"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.component_materials": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 0,
+        "max_items": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.size_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "one dry relaxed toy with installed components and sewn ears/tail; nominal exterior resting flat without external compression",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.damage_targets": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.detached_module_is_pet_toy": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.identical_toys_per_pack": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.removable_packaging_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.extra_filling_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cleaning_brush_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.detergent_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.sound_level_db": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "dB",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actuation_force_n": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "N",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wear_life_days": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "day",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dimensional_tolerances": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.plastic_resin": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.replacement_module_compatibility": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "sku_overall_dimensions": {
+      "id": "pet_toys.soft_toys.content.sku_overall_dimensions",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.toy_length_mm",
+        "sku.toy_width_mm",
+        "sku.toy_height_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_intended_life_stage": {
+      "id": "pet_toys.soft_toys.content.product_intended_life_stage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.intended_life_stage"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_outer_material": {
+      "id": "pet_toys.soft_toys.content.product_outer_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.outer_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_body_construction": {
+      "id": "pet_toys.soft_toys.content.product_body_construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_construction"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_filling_present": {
+      "id": "pet_toys.soft_toys.content.product_filling_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.filling_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_filling_materials": {
+      "id": "pet_toys.soft_toys.content.product_filling_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.filling_materials"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_squeaker_material": {
+      "id": "pet_toys.soft_toys.content.product_squeaker_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.squeaker_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_squeaker_mechanism": {
+      "id": "pet_toys.soft_toys.content.product_squeaker_mechanism",
+      "display_group": "features",
+      "fields": [
+        "product.facts.squeaker_mechanism"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_access_pocket_present": {
+      "id": "pet_toys.soft_toys.content.product_access_pocket_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.access_pocket_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_closure_type": {
+      "id": "pet_toys.soft_toys.content.product_closure_type",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure_type"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_closure_materials": {
+      "id": "pet_toys.soft_toys.content.product_closure_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure_materials"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_body_body_care": {
+      "id": "pet_toys.soft_toys.content.product_body_body_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.body_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_module_module_care": {
+      "id": "pet_toys.soft_toys.content.product_module_module_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.module_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_owner_module_removal_permitted": {
+      "id": "pet_toys.soft_toys.content.product_owner_module_removal_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.owner_module_removal_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_fixed_squeakers_enclosed": {
+      "id": "pet_toys.soft_toys.content.product_fixed_squeakers_enclosed",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fixed_squeakers_enclosed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_remove_retail_tags_ties": {
+      "id": "pet_toys.soft_toys.content.product_remove_retail_tags_ties",
+      "display_group": "features",
+      "fields": [
+        "product.facts.remove_retail_tags_ties"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_supervision_required": {
+      "id": "pet_toys.soft_toys.content.product_supervision_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.supervision_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_inspection_required": {
+      "id": "pet_toys.soft_toys.content.product_inspection_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.inspection_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_stop_remove_discard_on_damage": {
+      "id": "pet_toys.soft_toys.content.product_stop_remove_discard_on_damage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stop_remove_discard_on_damage"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_tug_permitted": {
+      "id": "pet_toys.soft_toys.content.product_tug_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tug_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_sustained_chewing_permitted": {
+      "id": "pet_toys.soft_toys.content.product_sustained_chewing_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.sustained_chewing_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_unsupervised_use_permitted": {
+      "id": "pet_toys.soft_toys.content.product_unsupervised_use_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.unsupervised_use_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_squeaker_count": {
+      "id": "pet_toys.soft_toys.content.sku_squeaker_count",
+      "display_group": "features",
+      "fields": [
+        "sku.squeaker_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_carry_shake_permitted": {
+      "id": "pet_toys.soft_toys.content.product_carry_shake_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.carry_shake_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_indoor_play_only": {
+      "id": "pet_toys.soft_toys.content.product_indoor_play_only",
+      "display_group": "features",
+      "fields": [
+        "product.facts.indoor_play_only"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_fixed_squeaker_removal_permitted": {
+      "id": "pet_toys.soft_toys.content.product_fixed_squeaker_removal_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fixed_squeaker_removal_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_module_reinstallation_required": {
+      "id": "pet_toys.soft_toys.content.product_module_reinstallation_required",
+      "display_group": "assembly",
+      "fields": [
+        "product.facts.module_reinstallation_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_replacement_module_use_permitted": {
+      "id": "pet_toys.soft_toys.content.product_replacement_module_use_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.replacement_module_use_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_body_washing": {
+      "id": "pet_toys.soft_toys.content.product_body_washing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.body_machinewash_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_pocket_closed_for_play_required": {
+      "id": "pet_toys.soft_toys.content.product_pocket_closed_for_play_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pocket_closed_for_play_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_washing": {
+      "id": "pet_toys.soft_toys.content.product_product_washing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.complete_toy_machinewash_permitted",
+        "product.facts.dishwasher_permitted"
+      ],
+      "atomic": true,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_module_dry_wipe_only": {
+      "id": "pet_toys.soft_toys.content.product_module_dry_wipe_only",
+      "display_group": "features",
+      "fields": [
+        "product.facts.module_dry_wipe_only"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_module_module_immersion_permitted": {
+      "id": "pet_toys.soft_toys.content.product_module_module_immersion_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.module_immersion_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_module_washing": {
+      "id": "pet_toys.soft_toys.content.product_module_washing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.module_machinewash_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_body_surface_clean_only": {
+      "id": "pet_toys.soft_toys.content.product_body_surface_clean_only",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_surface_clean_only"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_drying": {
+      "id": "pet_toys.soft_toys.content.product_product_drying",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tumble_dryer_permitted",
+        "product.facts.heated_drying_permitted"
+      ],
+      "atomic": true,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_boiling_permitted": {
+      "id": "pet_toys.soft_toys.content.product_boiling_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.boiling_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_microwave_permitted": {
+      "id": "pet_toys.soft_toys.content.product_microwave_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.microwave_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_bleaching": {
+      "id": "pet_toys.soft_toys.content.product_product_bleaching",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_solvent_permitted": {
+      "id": "pet_toys.soft_toys.content.product_solvent_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.solvent_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_non_edible": {
+      "id": "pet_toys.soft_toys.content.product_non_edible",
+      "display_group": "features",
+      "fields": [
+        "product.facts.non_edible"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "assembly": {
+      "label": "Assembly",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 92,
+    "roles": {
+      "identity": 3,
+      "descriptive": 19,
+      "buying_choice": 3,
+      "omit_low_value_detail": 3,
+      "omit_placeholder": 9,
+      "commerce": 1,
+      "literal": 26,
+      "omit_fixed_detail": 11,
+      "alias": 7,
+      "private_support": 9,
+      "qualifier": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 3,
+    "unmapped_descriptive_fields": 20
+  },
+  "semantic_review_note": "Keep play mechanism/material, purpose, size and supervised use. Remove absent batteries/food/rope and minor shell/track hardware inventories. Removable squeaker versus fixed module and component-specific washing are meaningful; toys are not safe chew items by default."
+}

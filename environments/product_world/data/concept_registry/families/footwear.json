@@ -1,0 +1,418 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "footwear",
+  "review_id": "F01",
+  "label": "Footwear",
+  "section": "Clothing and footwear",
+  "store_type_ids": [
+    "footwear",
+    "apparel",
+    "outdoors"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Width/fit language can span the family. Heel rubbing requires heel contact; flip-flops have no enclosed heel. Long-walk comfort is especially relevant to walking/hiking shoes but can apply to tested sandals. Water exposure and sun-heated straps/footbeds are conditional experiences, not facts implied by leather or colour.",
+  "shared_dimension_ids": [
+    "size",
+    "colour",
+    "width",
+    "component_materials",
+    "cushioning",
+    "sole_tread",
+    "fastening",
+    "heel_geometry",
+    "exposure_protection"
+  ],
+  "dimensions": [
+    {
+      "id": "size",
+      "label": "Size",
+      "module_id": "fit",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "width",
+      "label": "Width",
+      "module_id": "fit",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "cushioning",
+      "label": "Cushioning",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "sole_tread",
+      "label": "Sole tread",
+      "module_id": "exposure",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fastening",
+      "label": "Fastening",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "heel_geometry",
+      "label": "Heel geometry",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "exposure_protection",
+      "label": "Exposure protection",
+      "module_id": "exposure",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "heel_to_toe_drop",
+      "label": "Heel to toe drop",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "shaft_height",
+      "label": "Shaft height",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "cm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "footwear.casual_trainers",
+      "label": "Casual trainers",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.walking_shoes",
+      "label": "Walking shoes",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "construction_class": "enclosed_footwear",
+        "heel_enclosure": "closed",
+        "primary_intended_use": "everyday_walking"
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": [
+        "Agreed concept boundary: enclosed footwear with a closed heel, intended for everyday walking, commuting and sightseeing.",
+        "Intended use does not guarantee long-distance comfort, waterproofing or suitability for demanding trails. Capabilities can overlap other concepts; easy-trail use is not excluded."
+      ]
+    },
+    {
+      "id": "footwear.road_running_shoes",
+      "label": "Road-running shoes",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "heel_to_toe_drop"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.trail_running_shoes",
+      "label": "Trail-running shoes",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "heel_to_toe_drop"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.low_hiking_shoes",
+      "label": "Low hiking shoes",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.hiking_boots",
+      "label": "Hiking boots",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.flat_low_heeled_dress_shoes",
+      "label": "Flat/low-heeled dress shoes",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [
+        "exposure_protection"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.heeled_dress_shoes",
+      "label": "Heeled dress shoes",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [
+        "exposure_protection"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.walking_sandals",
+      "label": "Walking sandals",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "construction_class": "substantially_open_strapped_footwear",
+        "heel_retention": true,
+        "primary_intended_use": "everyday_walking"
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": [
+        "Agreed concept boundary: substantially open construction with straps and heel retention, intended for everyday walking and sightseeing, particularly in warm conditions. Toes may be open or protected.",
+        "Backless slides and flip-flops belong to separate concepts. Intended use does not guarantee long-distance comfort, water resistance or quick drying. Capabilities can overlap hiking sandals."
+      ]
+    },
+    {
+      "id": "footwear.flip_flops",
+      "label": "Flip-flops",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [
+        "fastening",
+        "heel_geometry",
+        "exposure_protection"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.winter_boots",
+      "label": "Winter boots",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "footwear.rubber_boots",
+      "label": "Rubber boots",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "shaft_height"
+      ],
+      "excluded_dimension_ids": [
+        "fastening"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

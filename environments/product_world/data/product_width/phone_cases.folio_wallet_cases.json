@@ -1,0 +1,2060 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "phone_cases.folio_wallet_cases",
+  "random_namespace": "product-width-phone_cases.folio_wallet_cases-v1",
+  "extends": "_phone_cases_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "assembly": {
+          "type": "enum",
+          "values": [
+            "simple",
+            "natural",
+            "topgrain"
+          ]
+        },
+        "component_materials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "min_items": 1
+        },
+        "component_allocation": {
+          "type": "string"
+        },
+        "closure_type": {
+          "type": "enum",
+          "values": [
+            "press-stud side strap",
+            "magnetic side clasp"
+          ]
+        },
+        "clasp_magnets": {
+          "type": "boolean"
+        },
+        "card_slots": {
+          "type": "integer",
+          "unit": "count",
+          "min": 2,
+          "max": 3
+        },
+        "card_capacity": {
+          "type": "integer",
+          "unit": "count",
+          "min": -1,
+          "max": 3
+        },
+        "card_capacity_basis": {
+          "type": "enum",
+          "values": [
+            "declared up to",
+            "not specified"
+          ]
+        },
+        "note_pocket": {
+          "type": "boolean"
+        },
+        "stand_configuration": {
+          "type": "enum",
+          "values": [
+            "none",
+            "folding folio"
+          ]
+        },
+        "stand_use": {
+          "type": "string"
+        },
+        "charging_alignment_magnets": {
+          "type": "enum",
+          "values": [
+            "present",
+            "absent",
+            "not specified"
+          ]
+        },
+        "official_apple_magsafe_route": {
+          "type": "enum",
+          "values": [
+            "declared compatible",
+            "excluded",
+            "not specified"
+          ]
+        },
+        "other_wireless": {
+          "type": "enum",
+          "values": [
+            "conditional not guaranteed",
+            "not specified"
+          ]
+        }
+      }
+    },
+    "internal.device": {
+      "type": "object",
+      "properties": {
+        "supported_device_id": {
+          "type": "string"
+        },
+        "supported_device_label": {
+          "type": "string"
+        },
+        "device_controls": {
+          "type": "string"
+        }
+      }
+    },
+    "product.facts.assembly": {
+      "type": "enum",
+      "values": [
+        "simple",
+        "natural",
+        "topgrain"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_allocation": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closure_type": {
+      "type": "enum",
+      "values": [
+        "press-stud side strap",
+        "magnetic side clasp"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.clasp_magnets": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.card_slots": {
+      "type": "integer",
+      "unit": "count",
+      "min": 2,
+      "max": 3,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.card_capacity": {
+      "type": "integer",
+      "unit": "count",
+      "min": -1,
+      "max": 3,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.card_capacity_basis": {
+      "type": "enum",
+      "values": [
+        "declared up to",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.note_pocket": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.stand_configuration": {
+      "type": "enum",
+      "values": [
+        "none",
+        "folding folio"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.stand_use": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charging_alignment_magnets": {
+      "type": "enum",
+      "values": [
+        "present",
+        "absent",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.official_apple_magsafe_route": {
+      "type": "enum",
+      "values": [
+        "declared compatible",
+        "excluded",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.other_wireless": {
+      "type": "enum",
+      "values": [
+        "conditional not guaranteed",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.supported_device_id": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.supported_device_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_controls": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.front_cover": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.covered_side_buttons": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_included": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.phone_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charger_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.payment_cards_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cash_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.screen_protector_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_units": {
+      "type": "integer",
+      "unit": "count",
+      "constant": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charge_port": {
+      "type": "string",
+      "constant": "USB-C cutout",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.loaded_closure_clearance": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.card_dimensions_thickness": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cash_capacity": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.protection_protocol": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.drop_survival": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.clasp_retention_strength": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rfid_protection": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.third_party_clearance": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.loaded_folded_charging_condition": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.achieved_charging": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_fit_tolerances": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.stand_angles": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.packaging_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.supported_device_id": {
+      "type": "string",
+      "optional": true
+    },
+    "request.min_card_capacity": {
+      "type": "integer",
+      "unit": "count",
+      "optional": true
+    },
+    "request.closure_type": {
+      "type": "string",
+      "optional": true
+    },
+    "request.integrated_stand": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.official_magsafe_compatible": {
+      "type": "boolean",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "supported_device_joint",
+      "target": "internal.device",
+      "sample": "weighted_choice",
+      "weights": {
+        "compact": 3,
+        "mid": 2
+      },
+      "values": {
+        "compact": {
+          "supported_device_id": "case-fixture-compact-uk-v1",
+          "supported_device_label": "Compact UK fixture",
+          "device_controls": "right-side power and volume buttons; bottom USB-C port; upper-left rear-camera area"
+        },
+        "mid": {
+          "supported_device_id": "case-fixture-mid-uk-v1",
+          "supported_device_label": "Mid UK fixture",
+          "device_controls": "right-side power and left-side volume buttons; bottom USB-C port; upper-centre rear-camera area"
+        }
+      }
+    },
+    {
+      "id": "device_supported_device_id",
+      "target": "product.facts.supported_device_id",
+      "derive": "internal.device.supported_device_id"
+    },
+    {
+      "id": "device_supported_device_label",
+      "target": "product.facts.supported_device_label",
+      "derive": "internal.device.supported_device_label"
+    },
+    {
+      "id": "device_device_controls",
+      "target": "product.facts.device_controls",
+      "derive": "internal.device.device_controls"
+    },
+    {
+      "id": "assembly_joint",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "simple": 5,
+        "natural": 3,
+        "topgrain": 2
+      },
+      "cases": [
+        {
+          "when": "profile.positioning == 'budget'",
+          "weights": {
+            "simple": 7,
+            "natural": 2,
+            "topgrain": 1
+          }
+        },
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "weights": {
+            "simple": 3,
+            "natural": 4,
+            "topgrain": 3
+          }
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "weights": {
+            "simple": 1,
+            "natural": 3,
+            "topgrain": 6
+          }
+        }
+      ],
+      "values": {
+        "simple": {
+          "assembly": "simple",
+          "component_materials": [
+            "PU",
+            "TPU",
+            "textile"
+          ],
+          "component_allocation": "PU exterior, TPU device holder, textile lining",
+          "closure_type": "press-stud side strap",
+          "clasp_magnets": false,
+          "card_slots": 2,
+          "card_capacity": 2,
+          "card_capacity_basis": "declared up to",
+          "note_pocket": false,
+          "stand_configuration": "none",
+          "stand_use": "not specified",
+          "charging_alignment_magnets": "absent",
+          "official_apple_magsafe_route": "not specified",
+          "other_wireless": "not specified"
+        },
+        "natural": {
+          "assembly": "natural",
+          "component_materials": [
+            "natural leather",
+            "pigskin"
+          ],
+          "component_allocation": "natural-leather exterior (outer animal/grade unspecified), pigskin lining, flexible device holder (polymer unspecified)",
+          "closure_type": "magnetic side clasp",
+          "clasp_magnets": true,
+          "card_slots": 3,
+          "card_capacity": -1,
+          "card_capacity_basis": "not specified",
+          "note_pocket": true,
+          "stand_configuration": "folding folio",
+          "stand_use": "landscape on a flat desk",
+          "charging_alignment_magnets": "not specified",
+          "official_apple_magsafe_route": "excluded",
+          "other_wireless": "conditional not guaranteed"
+        },
+        "topgrain": {
+          "assembly": "topgrain",
+          "component_materials": [
+            "cowhide",
+            "TPE",
+            "microfibre"
+          ],
+          "component_allocation": "top-grain cowhide exterior, TPE holder/frame, microfibre lining",
+          "closure_type": "magnetic side clasp",
+          "clasp_magnets": true,
+          "card_slots": 3,
+          "card_capacity": 3,
+          "card_capacity_basis": "declared up to",
+          "note_pocket": true,
+          "stand_configuration": "folding folio",
+          "stand_use": "landscape on a flat desk",
+          "charging_alignment_magnets": "present",
+          "official_apple_magsafe_route": "declared compatible",
+          "other_wireless": "not specified"
+        }
+      }
+    },
+    {
+      "id": "assembly_assembly",
+      "target": "product.facts.assembly",
+      "derive": "internal.assembly.assembly"
+    },
+    {
+      "id": "assembly_component_materials",
+      "target": "product.facts.component_materials",
+      "derive": "internal.assembly.component_materials"
+    },
+    {
+      "id": "assembly_component_allocation",
+      "target": "product.facts.component_allocation",
+      "derive": "internal.assembly.component_allocation"
+    },
+    {
+      "id": "assembly_closure_type",
+      "target": "product.facts.closure_type",
+      "derive": "internal.assembly.closure_type"
+    },
+    {
+      "id": "assembly_clasp_magnets",
+      "target": "product.facts.clasp_magnets",
+      "derive": "internal.assembly.clasp_magnets"
+    },
+    {
+      "id": "assembly_card_slots",
+      "target": "product.facts.card_slots",
+      "derive": "internal.assembly.card_slots"
+    },
+    {
+      "id": "assembly_card_capacity",
+      "target": "product.facts.card_capacity",
+      "derive": "internal.assembly.card_capacity"
+    },
+    {
+      "id": "assembly_card_capacity_basis",
+      "target": "product.facts.card_capacity_basis",
+      "derive": "internal.assembly.card_capacity_basis"
+    },
+    {
+      "id": "assembly_note_pocket",
+      "target": "product.facts.note_pocket",
+      "derive": "internal.assembly.note_pocket"
+    },
+    {
+      "id": "assembly_stand_configuration",
+      "target": "product.facts.stand_configuration",
+      "derive": "internal.assembly.stand_configuration"
+    },
+    {
+      "id": "assembly_stand_use",
+      "target": "product.facts.stand_use",
+      "derive": "internal.assembly.stand_use"
+    },
+    {
+      "id": "assembly_charging_alignment_magnets",
+      "target": "product.facts.charging_alignment_magnets",
+      "derive": "internal.assembly.charging_alignment_magnets"
+    },
+    {
+      "id": "assembly_official_apple_magsafe_route",
+      "target": "product.facts.official_apple_magsafe_route",
+      "derive": "internal.assembly.official_apple_magsafe_route"
+    },
+    {
+      "id": "assembly_other_wireless",
+      "target": "product.facts.other_wireless",
+      "derive": "internal.assembly.other_wireless"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 5,
+        "brown": 3,
+        "blue": 2
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 4,
+        "3": 2
+      }
+    },
+    {
+      "id": "colour_groups",
+      "for_each": {
+        "binding": "group.colour",
+        "from": "product.colours"
+      },
+      "steps": [
+        {
+          "id": "skus",
+          "target": "product.skus",
+          "emit": {
+            "sku_id": "product.product_id + '-' + product.facts.supported_device_id + '-' + group.colour",
+            "product_id": "product.product_id",
+            "colour": "group.colour",
+            "supported_device_id": "product.facts.supported_device_id",
+            "reference_price_sek": "product.reference_price_sek"
+          }
+        }
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "description.fit",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.supported_device_id",
+          "product.facts.supported_device_label",
+          "product.facts.device_controls",
+          "product.facts.device_fit_tolerances"
+        ]
+      },
+      "slots": {
+        "id": "product.facts.supported_device_id",
+        "device": "product.facts.supported_device_label",
+        "controls": "product.facts.device_controls"
+      },
+      "formulations": [
+        "Exact declared fit: {device} ({id}); {controls}. Authoring fixture, not real vendor phone; fit tolerances unspecified.",
+        "For {device}, exact fixture ID {id}. Represented layout: {controls}; not similar-size compatibility, numerical fit tolerances unspecified."
+      ]
+    },
+    {
+      "id": "description.construction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.component_materials",
+          "product.facts.component_allocation",
+          "product.facts.front_cover",
+          "product.facts.covered_side_buttons",
+          "product.facts.charge_port"
+        ]
+      },
+      "slots": {
+        "material": "product.facts.component_allocation"
+      },
+      "formulations": [
+        "{material}. Front cover opens for screen access; covered side power/volume buttons and USB-C cutout.",
+        "Component construction: {material}; front screen cover, covered side buttons and USB-C access cutout."
+      ]
+    },
+    {
+      "id": "description.clasp_slots",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.closure_type",
+          "product.facts.clasp_magnets",
+          "product.facts.card_slots",
+          "product.facts.loaded_closure_clearance",
+          "product.facts.card_dimensions_thickness"
+        ]
+      },
+      "slots": {
+        "closure": "product.facts.closure_type",
+        "slots": "product.facts.card_slots"
+      },
+      "formulations": [
+        "{closure}; {slots} card slots. Card dimensions/thickness and loaded-closure clearance unspecified; slot count is not maximum card capacity.",
+        "Closure: {closure}. {slots} slots for cards, not a measured total-card limit. Card geometry and loaded-clasp clearance unspecified."
+      ]
+    },
+    {
+      "id": "description.capacity",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.card_capacity",
+          "product.facts.card_capacity_basis",
+          "product.facts.loaded_closure_clearance"
+        ]
+      },
+      "slots": {
+        "count": "product.facts.card_capacity"
+      },
+      "formulations": [
+        "Declared capacity up to {count} cards, not guaranteed for every card/cash load or measured loaded closure.",
+        "Up-to-{count}-card label; no universal card fit or fully loaded-clasp guarantee."
+      ],
+      "when": "known(product.facts.card_capacity)"
+    },
+    {
+      "id": "description.capacity_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.card_capacity",
+          "product.facts.card_capacity_basis",
+          "product.facts.card_slots"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Maximum card capacity unspecified despite three card slots; not zero or unlimited.",
+        "Three known slots do not establish total maximum card count, which remains unspecified."
+      ],
+      "when": "not known(product.facts.card_capacity)"
+    },
+    {
+      "id": "description.note_pocket",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.note_pocket",
+          "product.facts.cash_capacity"
+        ]
+      },
+      "slots": {
+        "state": "'present' if product.facts.note_pocket else 'absent'"
+      },
+      "formulations": [
+        "Separate notes pocket {state}; cash capacity unspecified.",
+        "Notes compartment: {state}. No supplied cash-capacity limit."
+      ]
+    },
+    {
+      "id": "description.stand_none",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.stand_configuration"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "No integrated stand, an explicit authored design.",
+        "This wallet fixture has no built-in stand."
+      ],
+      "when": "product.facts.stand_configuration == 'none'"
+    },
+    {
+      "id": "description.stand",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.stand_configuration",
+          "product.facts.stand_use",
+          "product.facts.stand_angles"
+        ]
+      },
+      "slots": {
+        "use": "product.facts.stand_use"
+      },
+      "formulations": [
+        "Integrated folding folio stand for {use}; stand angles unspecified.",
+        "Folio cover forms a folding stand for {use}; no numerical angle declaration."
+      ],
+      "when": "product.facts.stand_configuration != 'none'"
+    },
+    {
+      "id": "description.alignment",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.charging_alignment_magnets",
+          "product.facts.clasp_magnets"
+        ]
+      },
+      "slots": {
+        "state": "product.facts.charging_alignment_magnets"
+      },
+      "formulations": [
+        "Charging-attachment magnets {state}; clasp magnets do not establish this feature or active power delivery.",
+        "Charging-alignment hardware: {state}, separately declared from any magnetic clasp; not a powered charger."
+      ],
+      "when": "known(product.facts.charging_alignment_magnets)"
+    },
+    {
+      "id": "description.alignment_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.charging_alignment_magnets",
+          "product.facts.clasp_magnets"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Charging-alignment magnets unspecified; a magnetic clasp is not evidence of a charging ring.",
+        "No charging-magnet declaration; do not infer one from the clasp."
+      ],
+      "when": "not known(product.facts.charging_alignment_magnets)"
+    },
+    {
+      "id": "description.magsafe_declared",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.official_apple_magsafe_route",
+          "product.facts.third_party_clearance",
+          "product.facts.loaded_folded_charging_condition",
+          "product.facts.achieved_charging"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Official Apple MagSafe charger route declared compatible with matching phone/equipment; other accessories, loaded/folded-cover condition and achieved charging unspecified.",
+        "Declared route for official Apple MagSafe chargers requires matching phone and equipment. Third-party fit, loaded-wallet charging state and actual charging unknown."
+      ],
+      "when": "known(product.facts.official_apple_magsafe_route) and product.facts.official_apple_magsafe_route == 'declared compatible'"
+    },
+    {
+      "id": "description.magsafe_excluded",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.official_apple_magsafe_route"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Official Apple MagSafe chargers explicitly excluded; this is not an exclusion of every magnetic accessory.",
+        "Not compatible with the official Apple MagSafe charger route; other magnetic accessories are not thereby universally excluded."
+      ],
+      "when": "known(product.facts.official_apple_magsafe_route) and product.facts.official_apple_magsafe_route == 'excluded'"
+    },
+    {
+      "id": "description.magsafe_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.official_apple_magsafe_route"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Official Apple MagSafe route unspecified, not declared excluded or compatible.",
+        "No official Apple MagSafe compatibility declaration."
+      ],
+      "when": "not known(product.facts.official_apple_magsafe_route)"
+    },
+    {
+      "id": "description.wireless_conditional",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.other_wireless",
+          "product.facts.loaded_folded_charging_condition",
+          "product.facts.achieved_charging"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Other wireless compatibility is conditional and not guaranteed; loaded/folded-cover state and achieved charging unspecified.",
+        "Other wireless routes are not guaranteed. No loaded-wallet/cover-position condition or successful charging result supplied."
+      ],
+      "when": "known(product.facts.other_wireless)"
+    },
+    {
+      "id": "description.wireless_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.other_wireless",
+          "product.facts.achieved_charging"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Other wireless support unspecified; no actual charging result inferred.",
+        "No supplied other-wireless compatibility or achieved-charging declaration."
+      ],
+      "when": "not known(product.facts.other_wireless)"
+    },
+    {
+      "id": "description.box",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.case_units",
+          "product.facts.case_included",
+          "product.facts.phone_included",
+          "product.facts.charger_included",
+          "product.facts.payment_cards_included",
+          "product.facts.cash_included",
+          "product.facts.screen_protector_included"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Authored box: one wallet case; phone, charger, cards, cash and screen protector excluded.",
+        "One case unit included; this recipe does not include a phone, charger, payment cards, cash or screen protector."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.case_mass_g",
+          "product.facts.packaging_mass_g",
+          "product.facts.protection_protocol",
+          "product.facts.drop_survival",
+          "product.facts.clasp_retention_strength",
+          "product.facts.rfid_protection"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Case/package mass, quantified protection/drop result, clasp retention and RFID protection unspecified.",
+        "No supplied case or packaging mass, protection protocol/drop outcome, clasp-strength measurement or RFID security declaration."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'phone_cases.folio_wallet_cases' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "device",
+      "role": "filter",
+      "predicate": "product.facts.supported_device_id == request.supported_device_id",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "card_capacity",
+      "role": "filter",
+      "predicate": "known(product.facts.card_capacity) and product.facts.card_capacity >= request.min_card_capacity",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "closure",
+      "role": "filter",
+      "predicate": "product.facts.closure_type == request.closure_type",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "stand",
+      "role": "filter",
+      "predicate": "(product.facts.stand_configuration != 'none') == request.integrated_stand",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "magsafe",
+      "role": "filter",
+      "predicate": "known(product.facts.official_apple_magsafe_route) and (product.facts.official_apple_magsafe_route == 'declared compatible') == request.official_magsafe_compatible",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "supported_device_id": {
+                "type": "string"
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 70,
+                "max": 900
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "supported_device_id": {
+              "type": "string"
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 70,
+              "max": 900
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "case_attachment",
+              "screen_cover",
+              "clasp_handling",
+              "card_slot_handling",
+              "usual_pocket",
+              "usb_plug_attachment",
+              "folio_stand"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 150,
+          "max": 900
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 150
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 900
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_case_attachment": {
+          "type": "boolean"
+        },
+        "review.positive_screen_cover": {
+          "type": "boolean"
+        },
+        "review.positive_clasp_handling": {
+          "type": "boolean"
+        },
+        "review.positive_card_slot_handling": {
+          "type": "boolean"
+        },
+        "review.positive_usual_pocket": {
+          "type": "boolean"
+        },
+        "review.positive_usb_plug_attachment": {
+          "type": "boolean"
+        },
+        "review.positive_folio_stand": {
+          "type": "boolean"
+        },
+        "product.facts.supported_device_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.supported_device_label": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.closure_type": {
+          "type": "enum",
+          "values": [
+            "press-stud side strap",
+            "magnetic side clasp"
+          ],
+          "input": true
+        },
+        "product.facts.card_slots": {
+          "type": "integer",
+          "unit": "count",
+          "min": 2,
+          "max": 3,
+          "input": true
+        },
+        "product.facts.stand_configuration": {
+          "type": "enum",
+          "values": [
+            "none",
+            "folding folio"
+          ],
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "no_stand": 1,
+            "stand": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.stand_configuration != 'none'",
+              "weights": {
+                "no_stand": 0,
+                "stand": 1
+              }
+            }
+          ],
+          "values": {
+            "no_stand": [
+              "value",
+              "case_attachment",
+              "screen_cover",
+              "clasp_handling",
+              "card_slot_handling",
+              "usual_pocket",
+              "usb_plug_attachment"
+            ],
+            "stand": [
+              "value",
+              "case_attachment",
+              "screen_cover",
+              "clasp_handling",
+              "card_slot_handling",
+              "usual_pocket",
+              "usb_plug_attachment",
+              "folio_stand"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_case_attachment",
+          "target": "review.positive_case_attachment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_screen_cover",
+          "target": "review.positive_screen_cover",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_clasp_handling",
+          "target": "review.positive_clasp_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_card_slot_handling",
+          "target": "review.positive_card_slot_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_usual_pocket",
+          "target": "review.positive_usual_pocket",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_usb_plug_attachment",
+          "target": "review.positive_usb_plug_attachment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_folio_stand",
+          "target": "review.positive_folio_stand",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        },
+        {
+          "id": "tested_device",
+          "require": "review.subject.supported_device_id == product.facts.supported_device_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "case_attachment.positive",
+          "when": "'case_attachment' in review.topics and review.positive_case_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "case_attachment",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "seat/remove device holder on declared device"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Putting the holder on and taking it off my {device} felt easy.",
+            "I found seating and removing this case holder on my {device} straightforward."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "case_attachment.negative",
+          "when": "'case_attachment' in review.topics and not review.positive_case_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "case_attachment",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "seat/remove device holder on declared device"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Putting the holder on and taking it off my {device} felt awkward.",
+            "I found seating and removing this case holder on my {device} difficult."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "screen_cover.positive",
+          "when": "'screen_cover' in review.topics and review.positive_screen_cover",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "screen_cover",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "open front cover to access device screen"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening the front cover to reach my {device} screen felt easy.",
+            "I found the front cover easy to open for access to my {device} screen."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "screen_cover.negative",
+          "when": "'screen_cover' in review.topics and not review.positive_screen_cover",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "screen_cover",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "open front cover to access device screen"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening the front cover to reach my {device} screen felt awkward.",
+            "I found the front cover difficult to open for access to my {device} screen."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "clasp_handling.positive",
+          "when": "'clasp_handling' in review.topics and review.positive_clasp_handling and known(product.facts.closure_type) and product.facts.card_slots >= 1",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "clasp_handling",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "open/close actual clasp with one ordinary card in one slot and no cash"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and closing the {clasp} on my {device} felt easy with one ordinary card in one slot and no cash.",
+            "With one ordinary card in one slot and no cash, I found my {device} {clasp} easy to open and close."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label",
+            "clasp": "product.facts.closure_type"
+          }
+        },
+        {
+          "id": "clasp_handling.negative",
+          "when": "'clasp_handling' in review.topics and not review.positive_clasp_handling and known(product.facts.closure_type) and product.facts.card_slots >= 1",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "clasp_handling",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "open/close actual clasp with one ordinary card in one slot and no cash"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and closing the {clasp} on my {device} felt awkward with one ordinary card in one slot and no cash.",
+            "With one ordinary card in one slot and no cash, I found my {device} {clasp} difficult to open and close."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label",
+            "clasp": "product.facts.closure_type"
+          }
+        },
+        {
+          "id": "card_slot_handling.positive",
+          "when": "'card_slot_handling' in review.topics and review.positive_card_slot_handling and product.facts.card_slots >= 1",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "card_slot_handling",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "insert/remove one owner ordinary card in actual card slot"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Inserting and removing one of my ordinary cards from a slot in my {device} case felt easy.",
+            "On my {device}, I found one ordinary card easy to put into and take out of a case slot."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "card_slot_handling.negative",
+          "when": "'card_slot_handling' in review.topics and not review.positive_card_slot_handling and product.facts.card_slots >= 1",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "card_slot_handling",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "insert/remove one owner ordinary card in actual card slot"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Inserting and removing one of my ordinary cards from a slot in my {device} case felt awkward.",
+            "On my {device}, I found one ordinary card difficult to put into and take out of a case slot."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "usual_pocket.positive",
+          "when": "'usual_pocket' in review.topics and review.positive_usual_pocket",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usual_pocket",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "insert/remove cased device from owner usual pocket"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Putting my cased {device} into and taking it out of my usual pocket felt easy.",
+            "With this wallet case, I found moving my {device} into and out of my usual pocket straightforward."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "usual_pocket.negative",
+          "when": "'usual_pocket' in review.topics and not review.positive_usual_pocket",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usual_pocket",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "insert/remove cased device from owner usual pocket"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Putting my cased {device} into and taking it out of my usual pocket felt awkward.",
+            "With this wallet case, I found moving my {device} into and out of my usual pocket difficult."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "usb_plug_attachment.positive",
+          "when": "'usb_plug_attachment' in review.topics and review.positive_usb_plug_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usb_plug_attachment",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "attach owner usual USB-C plug through actual access cutout; not successful charging"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Attaching my usual USB-C plug through the cutout on my cased {device} felt easy.",
+            "I found my usual USB-C plug easy to attach through my {device} case cutout."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "usb_plug_attachment.negative",
+          "when": "'usb_plug_attachment' in review.topics and not review.positive_usb_plug_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usb_plug_attachment",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "attach owner usual USB-C plug through actual access cutout; not successful charging"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Attaching my usual USB-C plug through the cutout on my cased {device} felt awkward.",
+            "I found my usual USB-C plug difficult to attach through my {device} case cutout."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "folio_stand.positive",
+          "when": "'folio_stand' in review.topics and review.positive_folio_stand and product.facts.stand_configuration != 'none'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "folio_stand",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "set up/fold actual folio stand; device in landscape on flat desk"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Setting up and folding the folio stand with my {device} in landscape on a flat desk felt easy.",
+            "On a flat desk, I found the folio stand easy to set up and fold with my {device} in landscape."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "folio_stand.negative",
+          "when": "'folio_stand' in review.topics and not review.positive_folio_stand and product.facts.stand_configuration != 'none'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "folio_stand",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture bound to tested colour SKU",
+              "operation": "set up/fold actual folio stand; device in landscape on flat desk"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Setting up and folding the folio stand with my {device} in landscape on a flat desk felt awkward.",
+            "On a flat desk, I found the folio stand difficult to set up and fold with my {device} in landscape."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Exact selected device/colour SKU price; shared150–900folio bounds",
+        "relative_price_basis": {
+          "min_sek": 150,
+          "max_sek": 900
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "phone_cases",
+    "spec_path": "docs/agents/product-width-specs/phone_cases.folio_wallet_cases.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Exact selected canonical colour/device SKU price; no colour surcharge",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "electronics"
+    ],
+    "source_notes": ".local/product-width/research/folio_wallet_cases.md",
+    "authored_exceptions": [
+      "Named device fixtures, component allocations, simple press-stud design and box exclusions authored; not vendor manufacture matrix",
+      "Natural3slots has unknown maximum; simpleup-to2label authored, topgrainup-to3source-inspired; no universal loaded/card fit",
+      "Natural stand landscape/flat-desk use authored; no inherited folded-stand charging rule or charging outcome"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 150,
+      "max": 350,
+      "round_to": 5,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 300,
+          "max": 700
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 500,
+          "max": 900
+        }
+      ]
+    }
+  }
+}

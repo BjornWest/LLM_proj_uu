@@ -1,0 +1,936 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "jackets.everyday_casual_jackets",
+  "family_id": "jackets",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/jackets.everyday_casual_jackets.json": "48884ed3f2c0ae07ecda10f68e43105e36853882405af2f2ecc8071e952f9498",
+    "environments/product_world/data/product_width/_apparel_base.json": "706ca4bbc3f0702c10ab54968d391cabde18bb8359daba199fb611ab94fc9f23"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep waterproof declarations distinct from measured ratings; insulation and weather protection do not become guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.size_system": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "nominal adult alpha labels",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": true,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": true,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "uninsulated casual outerwear",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "denim trucker",
+          "woven-blend Harrington",
+          "canvas chore"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.shell_fabric": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shell_fabric"
+    },
+    "product.facts.shell_cotton_percent": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shell_cotton_percent"
+    },
+    "product.facts.shell_polyester_percent": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": 0,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shell_polyester_percent"
+    },
+    "product.facts.body_lining": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "body_lining"
+    },
+    "product.facts.lined": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lined"
+    },
+    "product.facts.collar_style": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_style"
+    },
+    "product.facts.collar_material": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_material"
+    },
+    "product.facts.corduroy_collar_fibre": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.entry_kind": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "buttons",
+          "zip"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "entry_kind"
+    },
+    "product.facts.front_closure": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "front_closure"
+    },
+    "product.facts.two_way_zip": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "two_way_zip"
+    },
+    "product.facts.hand_pocket_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hand_pocket_count"
+    },
+    "product.facts.hand_pocket_closure": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hand_pocket_closure"
+    },
+    "product.facts.cuff_adjustable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cuff_adjustable"
+    },
+    "product.facts.collar_button_fastening": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_button_fastening"
+    },
+    "product.facts.collar_button_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "min": 2,
+        "max": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "collar_button_count"
+    },
+    "product.facts.dedicated_fill": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dedicated_fill"
+    },
+    "product.facts.membrane_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "membrane_present"
+    },
+    "product.facts.hood_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hood_present"
+    },
+    "product.facts.cut": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "slim",
+          "regular",
+          "relaxed"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cut"
+    },
+    "product.facts.surface_finish": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fabric_areal_mass": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.stretch_percentage": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.waterproof_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.thermal_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.abrasion_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one garment, nominal size M reference configuration",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.reference_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "min": 450,
+        "max": 900,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_mass_g"
+    }
+  },
+  "disclosure_groups": {
+    "construction": {
+      "id": "jackets.everyday_casual_jackets.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "shell_fabric": {
+      "id": "jackets.everyday_casual_jackets.content.shell_fabric",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.shell_fabric"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "shell_cotton_percent": {
+      "id": "jackets.everyday_casual_jackets.content.shell_cotton_percent",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.shell_cotton_percent"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "shell_polyester_percent": {
+      "id": "jackets.everyday_casual_jackets.content.shell_polyester_percent",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.shell_polyester_percent"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_lining": {
+      "id": "jackets.everyday_casual_jackets.content.body_lining",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_lining"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lined": {
+      "id": "jackets.everyday_casual_jackets.content.lined",
+      "display_group": "features",
+      "fields": [
+        "product.facts.lined"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_style": {
+      "id": "jackets.everyday_casual_jackets.content.collar_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_style"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_material": {
+      "id": "jackets.everyday_casual_jackets.content.collar_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.collar_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "entry_kind": {
+      "id": "jackets.everyday_casual_jackets.content.entry_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.entry_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_closure": {
+      "id": "jackets.everyday_casual_jackets.content.front_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.front_closure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "two_way_zip": {
+      "id": "jackets.everyday_casual_jackets.content.two_way_zip",
+      "display_group": "features",
+      "fields": [
+        "product.facts.two_way_zip"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "hand_pocket_count": {
+      "id": "jackets.everyday_casual_jackets.content.hand_pocket_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hand_pocket_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hand_pocket_closure": {
+      "id": "jackets.everyday_casual_jackets.content.hand_pocket_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.hand_pocket_closure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cuff_adjustable": {
+      "id": "jackets.everyday_casual_jackets.content.cuff_adjustable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cuff_adjustable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_button_fastening": {
+      "id": "jackets.everyday_casual_jackets.content.collar_button_fastening",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.collar_button_fastening"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_button_count": {
+      "id": "jackets.everyday_casual_jackets.content.collar_button_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_button_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dedicated_fill": {
+      "id": "jackets.everyday_casual_jackets.content.dedicated_fill",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dedicated_fill"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "membrane_present": {
+      "id": "jackets.everyday_casual_jackets.content.membrane_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.membrane_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hood_present": {
+      "id": "jackets.everyday_casual_jackets.content.hood_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hood_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cut": {
+      "id": "jackets.everyday_casual_jackets.content.cut",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.cut"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "reference_mass_g": {
+      "id": "jackets.everyday_casual_jackets.content.reference_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    }
+  },
+  "display_groups": {
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 32,
+    "roles": {
+      "operational": 2,
+      "identity": 1,
+      "descriptive": 16,
+      "omit_placeholder": 7,
+      "literal": 5,
+      "qualifier": 1
+    },
+    "display_groups": 4,
+    "highlight_candidates": 4,
+    "unmapped_descriptive_fields": 21
+  }
+}

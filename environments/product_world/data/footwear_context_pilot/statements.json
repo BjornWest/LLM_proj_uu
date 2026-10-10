@@ -1,0 +1,161 @@
+{
+  "schema_version": "footwear-context-statements-v1",
+  "status": "hand_authored_pilot_realizations",
+  "aspects": {
+    "walking_comfort": {
+      "context": {
+        "activity": "walking around town",
+        "duration": "several hours",
+        "source": "first_hand"
+      },
+      "positive": [
+        "Walked around town all afternoon and my feet were still comfortable.",
+        "Several hours of sightseeing in these, with no aching feet afterwards.",
+        "Comfortable right through a long walk around town.",
+        "My feet felt fine after an afternoon spent walking from place to place."
+      ],
+      "negative": [
+        "My feet were aching by the end of an afternoon walking around town.",
+        "A few hours of sightseeing was enough to make me want to take these off.",
+        "Not comfortable for me on a long walk around town.",
+        "I regretted wearing these for a whole afternoon of walking."
+      ]
+    },
+    "heel_rubbing": {
+      "context": {
+        "activity": "walking",
+        "contact": "heel",
+        "source": "first_hand"
+      },
+      "positive": [
+        "The {heel_contact} didn't rub while I was walking.",
+        "No rubbing from the {heel_contact} on my walks.",
+        "I was pleased that the {heel_contact} left my heels alone when walking.",
+        "The {heel_contact} has been comfortable against my heels on walks."
+      ],
+      "negative": [
+        "The {heel_contact} rubbed my heels when I walked.",
+        "I kept noticing the {heel_contact} rubbing against my heels on walks.",
+        "The {heel_contact} left my heels sore after walking.",
+        "Rubbing from the {heel_contact} is my main complaint when walking in these."
+      ]
+    },
+    "forefoot_room": {
+      "context": {
+        "activity": "wearing",
+        "body_region": "forefoot",
+        "source": "first_hand"
+      },
+      "positive": [
+        "Plenty of room across the front of my feet.",
+        "My toes don't feel squeezed together in these.",
+        "The fit across my forefoot works well for me.",
+        "There is enough space for my toes to spread out."
+      ],
+      "negative": [
+        "Too tight across the front of my feet.",
+        "My toes feel squeezed together in these.",
+        "The fit is cramped across my forefoot.",
+        "I wish there were more room for my toes."
+      ]
+    },
+    "finish": {
+      "context": {
+        "activity": "examining purchased item",
+        "source": "first_hand"
+      },
+      "positive": [
+        "The finish looks neat up close.",
+        "Nicely finished, including the less obvious edges.",
+        "I couldn't spot any untidy finishing when I unpacked them.",
+        "The finish on my pair is tidy."
+      ],
+      "negative": [
+        "The finishing looks rough up close.",
+        "Some untidy edges spoil the finish.",
+        "I noticed sloppy finishing as soon as I unpacked them.",
+        "My pair looks carelessly finished."
+      ]
+    },
+    "wet_paving_grip": {
+      "context": {
+        "activity": "walking",
+        "surface": "wet paving",
+        "source": "first_hand"
+      },
+      "positive": [
+        "Felt secure underfoot on the wet paving outside my office.",
+        "I didn't slip while walking over wet paving.",
+        "The soles felt reassuring on wet pavement.",
+        "Walking across rain-soaked paving felt secure."
+      ],
+      "negative": [
+        "Slipped on the wet paving outside my office.",
+        "I had to tread carefully because they slid on wet paving.",
+        "The soles felt slippery on wet pavement.",
+        "Walking across rain-soaked paving felt unsteady because the soles slipped."
+      ]
+    },
+    "value": {
+      "context": {
+        "basis": "recorded purchase price",
+        "source": "first_hand"
+      },
+      "positive": [
+        "Good for the price.",
+        "Worth what I paid.",
+        "I feel I got my money's worth.",
+        "A good buy at the price I paid.",
+        "No regrets about what I spent on these."
+      ],
+      "negative": [
+        "Not worth what I paid.",
+        "Overpriced for what I got.",
+        "I expected more for my money.",
+        "The price is hard to justify.",
+        "I regret spending this much on them."
+      ]
+    },
+    "footbed_heat": {
+      "concepts": [
+        "walking_sandals"
+      ],
+      "context": {
+        "activity": "wearing outdoors in sunshine",
+        "body_contact": "footbed",
+        "source": "first_hand"
+      },
+      "positive": [
+        "The footbed stayed comfortable against my feet in the sunshine.",
+        "I wore these in the sun without the footbed feeling unpleasantly hot.",
+        "No uncomfortable heat from the footbed while wearing them in the sun.",
+        "The footbed didn't feel too hot against my feet in direct sunshine."
+      ],
+      "negative": [
+        "The footbed got uncomfortably hot against my feet in the sunshine.",
+        "Wearing these in the sun made the footbed feel unpleasantly hot.",
+        "I wanted some shade because the footbed was getting too hot against my feet.",
+        "The footbed felt uncomfortably hot when I wore them in direct sunshine."
+      ]
+    },
+    "size_fit": {
+      "context": {
+        "activity": "trying on purchased footwear",
+        "body_region": "foot length",
+        "source": "first_hand"
+      },
+      "fits": [
+        "I usually wear EU {usual_size:g}; the EU {purchased_size:g} pair fits me well in length.",
+        "EU {purchased_size:g} feels right lengthwise. My usual size is EU {usual_size:g}."
+      ],
+      "too_short": [
+        "I usually wear EU {usual_size:g}, but EU {purchased_size:g} felt too short for my feet.",
+        "Not enough length for me in EU {purchased_size:g}. I normally wear EU {usual_size:g}."
+      ],
+      "too_long": [
+        "I usually wear EU {usual_size:g}, but EU {purchased_size:g} left too much space in front of my toes.",
+        "EU {purchased_size:g} was too long for my feet; my usual size is EU {usual_size:g}."
+      ]
+    }
+  }
+}

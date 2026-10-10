@@ -1,0 +1,1850 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "kitchen_utensils.chopping_boards",
+  "family_id": "kitchen_utensils",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/kitchen_utensils.chopping_boards.json": "5163406da689e27e99600d1ab70e045c0438653bf496007bfc647233896aa35e",
+    "environments/product_world/data/product_width/_kitchen_utensils_base.json": "0d3b6bb90cb1061d33594e34a163cd84614b28216c00ce13a6de6a7e39e2d43f",
+    "environments/product_world/data/product_public_content/kitchen_utensils.chopping_boards.json": "a8427910415ab550475a69a34218f0e708825159969195b7ba5d809e5b0a5a58"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Function/material/contact surface first. Component-specific heat and cleaning are scoped groups, not whole-tool guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "chopping_boards.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.pack_count": {
+      "semantic_id": "chopping_boards.product.facts.pack_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "complete assembled boards, not fitted components",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pack_count"
+    },
+    "product.facts.supplied_item_count": {
+      "semantic_id": "chopping_boards.product.facts.supplied_item_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "usable assembled supplied items; fitted parts and packaging excluded",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_item_count"
+    },
+    "product.facts.manual": {
+      "semantic_id": "chopping_boards.product.facts.manual",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "manual"
+    },
+    "product.facts.board_form": {
+      "semantic_id": "chopping_boards.product.facts.board_form",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "rectangular chopping board",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "board_form"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "chopping_boards.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ordinary preparation of washed raw carrots with an appropriate manual plain-edge stainless-steel food-preparation knife",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.body_user_removable": {
+      "semantic_id": "chopping_boards.product.facts.body_user_removable",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_user_removable"
+    },
+    "product.facts.supplied_contents": {
+      "semantic_id": "chopping_boards.product.facts.supplied_contents",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one assembled chopping board with its fitted parts; no separate knife, food, cloth, cleaning brush, oil bottle, drying rack, stand, mat or spare feet",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_contents"
+    },
+    "product.facts.supplied_oil_bottle_count": {
+      "semantic_id": "chopping_boards.product.facts.supplied_oil_bottle_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0,
+        "unit": "count",
+        "basis": "separate supplied oil bottles",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_oil_bottle_count"
+    },
+    "product.facts.actual_overall_length_mm": {
+      "semantic_id": "chopping_boards.product.facts.actual_overall_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "mm",
+        "basis": "actual purchased-unit overall assembled footprint length including handling protrusions, excluding packaging",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_overall_width_mm": {
+      "semantic_id": "chopping_boards.product.facts.actual_overall_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "mm",
+        "basis": "actual purchased-unit overall assembled footprint width including handling protrusions, excluding packaging",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_body_thickness_mm": {
+      "semantic_id": "chopping_boards.product.facts.actual_body_thickness_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "mm",
+        "basis": "actual purchased-unit main cutting-body thickness excluding feet",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_assembled_height_mm": {
+      "semantic_id": "chopping_boards.product.facts.actual_assembled_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "mm",
+        "basis": "actual purchased-unit assembled height including any feet, excluding packaging",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_purchase_mass_g": {
+      "semantic_id": "chopping_boards.product.facts.actual_purchase_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "g",
+        "basis": "actual complete supplied assembled board mass including all fitted parts, excluding packaging",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usable_face_length_mm": {
+      "semantic_id": "chopping_boards.product.facts.usable_face_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "mm",
+        "basis": "usable cutting-face length; not overall footprint length or measured from nominal exterior dimensions",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usable_face_width_mm": {
+      "semantic_id": "chopping_boards.product.facts.usable_face_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unit": "mm",
+        "basis": "usable cutting-face width; not overall footprint width or measured from nominal exterior dimensions",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.board_material": {
+      "semantic_id": "chopping_boards.product.facts.board_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polyethylene",
+          "beech wood"
+        ],
+        "component": "main cutting body/surface",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "board_material"
+    },
+    "product.facts.body_construction": {
+      "semantic_id": "chopping_boards.product.facts.body_construction",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "solid polymer body",
+          "single-piece wood body",
+          "joined wood pieces"
+        ],
+        "component": "main cutting body",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "body_construction"
+    },
+    "product.facts.body_joining_method": {
+      "semantic_id": "chopping_boards.product.facts.body_joining_method",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.body_construction == 'joined wood pieces'",
+        "component": "main cutting body",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "body_joining_method"
+    },
+    "product.facts.finish_class": {
+      "semantic_id": "chopping_boards.product.facts.finish_class",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "oil"
+        ],
+        "component": "cutting body finish",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "finish_class"
+    },
+    "product.facts.oil_type": {
+      "semantic_id": "chopping_boards.product.facts.oil_type",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.finish_class == 'oil'",
+        "component": "cutting body oil finish",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "oil_type"
+    },
+    "product.facts.handle_form": {
+      "semantic_id": "chopping_boards.product.facts.handle_form",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "one integral hand opening",
+          "integral projecting handle with one hanging hole",
+          "no dedicated handle or hand opening",
+          "two fitted edge grips"
+        ],
+        "component": "dedicated handling construction",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "handle_form"
+    },
+    "product.facts.handle_material": {
+      "semantic_id": "chopping_boards.product.facts.handle_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polyethylene",
+          "beech wood",
+          "not applicable",
+          "thermoplastic elastomer"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.handle_form != 'no dedicated handle or hand opening'",
+        "component": "dedicated handling construction",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "handle_material"
+    },
+    "product.facts.hand_opening_count": {
+      "semantic_id": "chopping_boards.product.facts.hand_opening_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "component": "integral hand or hanging opening",
+        "unit": "count",
+        "basis": "integral hand opening or projecting-handle hanging hole",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hand_opening_count"
+    },
+    "product.facts.fitted_grip_count": {
+      "semantic_id": "chopping_boards.product.facts.fitted_grip_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "component": "fitted edge grips",
+        "unit": "count",
+        "basis": "fitted edge grips, not separate usable supplied items",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fitted_grip_count"
+    },
+    "product.facts.fitted_grip_material": {
+      "semantic_id": "chopping_boards.product.facts.fitted_grip_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "thermoplastic elastomer"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.fitted_grip_count > 0",
+        "component": "fitted edge grips",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fitted_grip_material"
+    },
+    "product.facts.fitted_grip_fastening": {
+      "semantic_id": "chopping_boards.product.facts.fitted_grip_fastening",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.fitted_grip_count > 0",
+        "component": "fitted edge grips",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fitted_grip_fastening"
+    },
+    "product.facts.fitted_grip_colour": {
+      "semantic_id": "chopping_boards.product.facts.fitted_grip_colour",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "black"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.fitted_grip_count > 0",
+        "component": "fitted edge grips",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fitted_grip_colour"
+    },
+    "product.facts.foot_count": {
+      "semantic_id": "chopping_boards.product.facts.foot_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "component": "fitted underside feet",
+        "unit": "count",
+        "basis": "fitted underside feet, not separate usable supplied items",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "foot_count"
+    },
+    "product.facts.foot_material": {
+      "semantic_id": "chopping_boards.product.facts.foot_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "thermoplastic elastomer"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.foot_count > 0",
+        "component": "fitted underside feet",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "foot_material"
+    },
+    "product.facts.foot_fastening": {
+      "semantic_id": "chopping_boards.product.facts.foot_fastening",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.foot_count > 0",
+        "component": "fitted underside feet",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "foot_fastening"
+    },
+    "product.facts.foot_colour": {
+      "semantic_id": "chopping_boards.product.facts.foot_colour",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "black"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.foot_count > 0",
+        "component": "fitted underside feet",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "foot_colour"
+    },
+    "product.facts.nominal_foot_projection_mm": {
+      "semantic_id": "chopping_boards.product.facts.nominal_foot_projection_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "component": "fitted underside feet",
+        "unit": "mm",
+        "basis": "catalogue nominal underside projection of fitted feet; zero is known absence when no feet exist",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_foot_projection_mm"
+    },
+    "product.facts.actual_foot_projection_mm": {
+      "semantic_id": "chopping_boards.product.facts.actual_foot_projection_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "applicable_when": "product.facts.foot_count > 0",
+        "component": "fitted underside feet",
+        "unit": "mm",
+        "basis": "actual purchased-unit underside foot projection; not applicable when no feet exist",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          0
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "actual_foot_projection_mm"
+    },
+    "product.facts.groove_count": {
+      "semantic_id": "chopping_boards.product.facts.groove_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "component": "cutting-face perimeter groove",
+        "unit": "count",
+        "basis": "perimeter groove on declared cutting face",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "groove_count"
+    },
+    "product.facts.groove_placement": {
+      "semantic_id": "chopping_boards.product.facts.groove_placement",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "perimeter of one cutting face",
+          "perimeter of upper cutting face"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.groove_count > 0",
+        "component": "cutting-face perimeter groove",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "groove_placement"
+    },
+    "product.facts.groove_detail": {
+      "semantic_id": "chopping_boards.product.facts.groove_detail",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.groove_count > 0",
+        "component": "cutting-face perimeter groove",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "groove_detail"
+    },
+    "product.facts.intended_cutting_face_count": {
+      "semantic_id": "chopping_boards.product.facts.intended_cutting_face_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "faces declared for cutting in their supported orientation",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "intended_cutting_face_count"
+    },
+    "product.facts.face_layout": {
+      "semantic_id": "chopping_boards.product.facts.face_layout",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "two flat cutting faces",
+          "one grooved and one flat cutting face",
+          "upper cutting face only; fitted feet on underside"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "face_layout"
+    },
+    "product.facts.parts_user_removable": {
+      "semantic_id": "chopping_boards.product.facts.parts_user_removable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "parts_user_removable"
+    },
+    "product.facts.dishwasher_allowed": {
+      "semantic_id": "chopping_boards.product.facts.dishwasher_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "component": "entire assembled board with integral handling parts and any fitted grips/feet",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dishwasher_allowed"
+    },
+    "product.facts.oil_treatment_required": {
+      "semantic_id": "chopping_boards.product.facts.oil_treatment_required",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "component": "wooden cutting body finish",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "oil_treatment_required"
+    },
+    "product.facts.care_declaration": {
+      "semantic_id": "chopping_boards.product.facts.care_declaration",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Wash the entire assembled board, including integral handling parts and any fitted grips and feet, before first use and after use with mild washing-up liquid and a soft sponge; rinse and dry upright. Do not soak. Dishwasher use is permitted for the whole assembled board without a rack restriction. No oil treatment is required.",
+          "Wash the entire assembled board, including integral handling parts and any fitted grips and feet, before first use and after use with mild washing-up liquid and a soft sponge; rinse and dry upright. Do not soak. Handwash only; dishwasher use is not permitted. Factory-oiled and ready for first washing and use without an initial oil application. Periodically treat with food-contact board oil when the surface looks dry; no oil formulation or certification is specified."
+        ],
+        "component": "entire assembled board with integral handling parts and any fitted grips/feet",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "care_declaration"
+    },
+    "product.facts.nominal_overall_length_mm": {
+      "semantic_id": "chopping_boards.product.facts.nominal_overall_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "catalogue nominal overall assembled footprint length including any handle or grip protrusion, excluding packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_overall_length_mm"
+    },
+    "product.facts.nominal_overall_width_mm": {
+      "semantic_id": "chopping_boards.product.facts.nominal_overall_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "catalogue nominal overall assembled footprint width including any handle or grip protrusion, excluding packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_overall_width_mm"
+    },
+    "product.facts.nominal_body_thickness_mm": {
+      "semantic_id": "chopping_boards.product.facts.nominal_body_thickness_mm",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "catalogue nominal main cutting-body thickness excluding feet",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_body_thickness_mm"
+    },
+    "product.facts.nominal_assembled_height_mm": {
+      "semantic_id": "chopping_boards.product.facts.nominal_assembled_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "catalogue nominal total assembled height including any underside feet, excluding packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_assembled_height_mm"
+    },
+    "sku.colour": {
+      "semantic_id": "chopping_boards.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "blue",
+          "grey",
+          "natural wood",
+          "white"
+        ],
+        "component": "main cutting body, fixed grip/foot colours separate",
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "chopping_boards.sku.pack_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "complete assembled boards, not fitted components"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.pack_count"
+    },
+    "sku.supplied_contents": {
+      "semantic_id": "chopping_boards.sku.supplied_contents",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one assembled chopping board with its fitted parts; no separate knife, food, cloth, cleaning brush, oil bottle, drying rack, stand, mat or spare feet"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supplied_contents"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "chopping_boards.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "reference for complete single assembled board including fitted parts, not retailer offer, shipping total or actual payment",
+        "min": 40,
+        "max": 750
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "plain_polyethylene",
+          "handled_beech",
+          "grooved_beech",
+          "footed_polyethylene"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "pack_count": {
+      "id": "kitchen_utensils.chopping_boards.content.pack_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.pack_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_item_count": {
+      "id": "kitchen_utensils.chopping_boards.content.supplied_item_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_item_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "manual": {
+      "id": "kitchen_utensils.chopping_boards.content.manual",
+      "display_group": "features",
+      "fields": [
+        "product.facts.manual"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "board_form": {
+      "id": "kitchen_utensils.chopping_boards.content.board_form",
+      "display_group": "features",
+      "fields": [
+        "product.facts.board_form"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_user_removable": {
+      "id": "kitchen_utensils.chopping_boards.content.body_user_removable",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_user_removable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_contents": {
+      "id": "kitchen_utensils.chopping_boards.content.supplied_contents",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_contents"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_oil_bottle_count": {
+      "id": "kitchen_utensils.chopping_boards.content.supplied_oil_bottle_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_oil_bottle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "board_material": {
+      "id": "kitchen_utensils.chopping_boards.content.board_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.board_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "body_construction": {
+      "id": "kitchen_utensils.chopping_boards.content.body_construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_joining_method": {
+      "id": "kitchen_utensils.chopping_boards.content.body_joining_method",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_joining_method"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "finish_class": {
+      "id": "kitchen_utensils.chopping_boards.content.finish_class",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.finish_class"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "oil_type": {
+      "id": "kitchen_utensils.chopping_boards.content.oil_type",
+      "display_group": "features",
+      "fields": [
+        "product.facts.oil_type"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_form": {
+      "id": "kitchen_utensils.chopping_boards.content.handle_form",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_form"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_material": {
+      "id": "kitchen_utensils.chopping_boards.content.handle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hand_opening_count": {
+      "id": "kitchen_utensils.chopping_boards.content.hand_opening_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hand_opening_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fitted_grip_count": {
+      "id": "kitchen_utensils.chopping_boards.content.fitted_grip_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fitted_grip_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fitted_grip_material": {
+      "id": "kitchen_utensils.chopping_boards.content.fitted_grip_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fitted_grip_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fitted_grip_fastening": {
+      "id": "kitchen_utensils.chopping_boards.content.fitted_grip_fastening",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fitted_grip_fastening"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fitted_grip_colour": {
+      "id": "kitchen_utensils.chopping_boards.content.fitted_grip_colour",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fitted_grip_colour"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "foot_count": {
+      "id": "kitchen_utensils.chopping_boards.content.foot_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.foot_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "foot_material": {
+      "id": "kitchen_utensils.chopping_boards.content.foot_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.foot_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "foot_fastening": {
+      "id": "kitchen_utensils.chopping_boards.content.foot_fastening",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.foot_fastening"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "foot_colour": {
+      "id": "kitchen_utensils.chopping_boards.content.foot_colour",
+      "display_group": "features",
+      "fields": [
+        "product.facts.foot_colour"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_foot_projection_mm": {
+      "id": "kitchen_utensils.chopping_boards.content.nominal_foot_projection_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.nominal_foot_projection_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "actual_foot_projection_mm": {
+      "id": "kitchen_utensils.chopping_boards.content.actual_foot_projection_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.actual_foot_projection_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "groove_count": {
+      "id": "kitchen_utensils.chopping_boards.content.groove_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.groove_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "groove_placement": {
+      "id": "kitchen_utensils.chopping_boards.content.groove_placement",
+      "display_group": "features",
+      "fields": [
+        "product.facts.groove_placement"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "groove_detail": {
+      "id": "kitchen_utensils.chopping_boards.content.groove_detail",
+      "display_group": "features",
+      "fields": [
+        "product.facts.groove_detail"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "intended_cutting_face_count": {
+      "id": "kitchen_utensils.chopping_boards.content.intended_cutting_face_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.intended_cutting_face_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "face_layout": {
+      "id": "kitchen_utensils.chopping_boards.content.face_layout",
+      "display_group": "features",
+      "fields": [
+        "product.facts.face_layout"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "parts_user_removable": {
+      "id": "kitchen_utensils.chopping_boards.content.parts_user_removable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.parts_user_removable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dishwasher_allowed": {
+      "id": "kitchen_utensils.chopping_boards.content.dishwasher_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dishwasher_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "oil_treatment_required": {
+      "id": "kitchen_utensils.chopping_boards.content.oil_treatment_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.oil_treatment_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_declaration": {
+      "id": "kitchen_utensils.chopping_boards.content.care_declaration",
+      "display_group": "care",
+      "fields": [
+        "product.facts.care_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_overall_length_mm": {
+      "id": "kitchen_utensils.chopping_boards.content.nominal_overall_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.nominal_overall_length_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "nominal_overall_width_mm": {
+      "id": "kitchen_utensils.chopping_boards.content.nominal_overall_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.nominal_overall_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_body_thickness_mm": {
+      "id": "kitchen_utensils.chopping_boards.content.nominal_body_thickness_mm",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.nominal_body_thickness_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_assembled_height_mm": {
+      "id": "kitchen_utensils.chopping_boards.content.nominal_assembled_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.nominal_assembled_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 53,
+    "roles": {
+      "identity": 2,
+      "literal": 7,
+      "omit_placeholder": 7,
+      "descriptive": 31,
+      "buying_choice": 1,
+      "alias": 2,
+      "commerce": 1,
+      "operational": 1,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 2,
+    "unmapped_descriptive_fields": 0
+  }
+}

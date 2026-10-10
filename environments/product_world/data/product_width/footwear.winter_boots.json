@@ -1,0 +1,1000 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.winter_boots",
+  "random_namespace": "product-width-footwear.winter_boots-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.winter_bundle": {
+      "type": "object",
+      "properties": {
+        "upper": {
+          "type": "string"
+        },
+        "shell": {
+          "type": "string"
+        },
+        "insulation": {
+          "type": "string"
+        },
+        "removable": {
+          "type": "boolean"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "insulated cold-weather boot",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "cold-weather wear",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_toe": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shaft_height": {
+      "type": "enum",
+      "values": [
+        "mid",
+        "high"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.lower_shell": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "string",
+      "constant": "rubber",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.insulation_kind": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.removable_inner_boot": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "enum",
+      "values": [
+        "regular laces",
+        "pull-on"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_construction": {
+      "type": "enum",
+      "values": [
+        "membrane lining",
+        "seam-sealed joins",
+        "molded shell with sealed joins",
+        "not declared"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.temperature_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one boot, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 550,
+      "max": 980,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.closure": {
+      "type": "string",
+      "optional": true
+    },
+    "request.removable_inner_boot": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.waterproof_construction": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "winter_bundle",
+      "target": "internal.winter_bundle",
+      "sample": "weighted_choice",
+      "weights": {
+        "textile": 3,
+        "felt": 3,
+        "neoprene": 2
+      },
+      "values": {
+        "textile": {
+          "upper": "textile and synthetic",
+          "shell": "synthetic shell",
+          "insulation": "integrated synthetic insulation",
+          "removable": false,
+          "mass_g": 580
+        },
+        "felt": {
+          "upper": "leather",
+          "shell": "rubber shell",
+          "insulation": "removable felt inner boot",
+          "removable": true,
+          "mass_g": 800
+        },
+        "neoprene": {
+          "upper": "neoprene and textile",
+          "shell": "rubber shell",
+          "insulation": "neoprene upper insulation",
+          "removable": false,
+          "mass_g": 900
+        }
+      }
+    },
+    {
+      "id": "upper",
+      "target": "product.facts.component_materials.upper",
+      "derive": "internal.winter_bundle.upper"
+    },
+    {
+      "id": "shell",
+      "target": "product.facts.component_materials.lower_shell",
+      "derive": "internal.winter_bundle.shell"
+    },
+    {
+      "id": "insulation",
+      "target": "product.facts.insulation_kind",
+      "derive": "internal.winter_bundle.insulation"
+    },
+    {
+      "id": "removable",
+      "target": "product.facts.removable_inner_boot",
+      "derive": "internal.winter_bundle.removable"
+    },
+    {
+      "id": "shaft",
+      "target": "product.facts.shaft_height",
+      "sample": "weighted_choice",
+      "weights": {
+        "mid": 3,
+        "high": 2
+      }
+    },
+    {
+      "id": "closure",
+      "target": "product.facts.fastening",
+      "sample": "weighted_choice",
+      "weights": {
+        "regular laces": 4,
+        "pull-on": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.insulation_kind == 'neoprene upper insulation'",
+          "weights": {
+            "regular laces": 1,
+            "pull-on": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "waterproof_declaration",
+      "target": "product.facts.waterproof_construction",
+      "sample": "weighted_choice",
+      "weights": {
+        "membrane lining": 5,
+        "seam-sealed joins": 0,
+        "molded shell with sealed joins": 0,
+        "not declared": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.insulation_kind == 'removable felt inner boot'",
+          "weights": {
+            "membrane lining": 0,
+            "seam-sealed joins": 5,
+            "molded shell with sealed joins": 0,
+            "not declared": 1
+          }
+        },
+        {
+          "when": "product.facts.insulation_kind == 'neoprene upper insulation'",
+          "weights": {
+            "membrane lining": 0,
+            "seam-sealed joins": 0,
+            "molded shell with sealed joins": 5,
+            "not declared": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -30,
+      "max": 30
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.winter_bundle.mass_g + internal.mass_noise_g + (50 if product.facts.shaft_height == 'high' else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.construction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.intended_use",
+          "product.facts.shaft_height",
+          "product.facts.closed_heel",
+          "product.facts.closed_toe",
+          "product.facts.component_materials.upper",
+          "product.facts.component_materials.lower_shell",
+          "product.facts.component_materials.outsole"
+        ]
+      },
+      "slots": {
+        "shaft": "product.facts.shaft_height",
+        "upper": "product.facts.component_materials.upper",
+        "shell": "product.facts.component_materials.lower_shell"
+      },
+      "formulations": [
+        "Closed-toe, closed-heel cold-weather boot: {shaft} shaft, {upper} upper, {shell} and rubber outsole.",
+        "For cold-weather wear: {upper} above a {shell}, a {shaft} shaft and rubber outsole; toe and upper heel enclosed."
+      ]
+    },
+    {
+      "id": "description.insulation",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.insulation_kind",
+          "product.facts.removable_inner_boot",
+          "product.facts.fastening"
+        ]
+      },
+      "slots": {
+        "insulation": "product.facts.insulation_kind",
+        "removable": "'yes' if product.facts.removable_inner_boot else 'no'",
+        "closure": "product.facts.fastening"
+      },
+      "formulations": [
+        "Insulation: {insulation}; removable inner boot: {removable}; entry/fastening: {closure}.",
+        "Uses {insulation} and {closure}. Removable inner boot: {removable}."
+      ]
+    },
+    {
+      "id": "description.weather",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.waterproof_construction",
+          "product.facts.waterproof_rating",
+          "product.facts.temperature_rating"
+        ]
+      },
+      "slots": {
+        "construction": "product.facts.waterproof_construction"
+      },
+      "formulations": [
+        "Waterproof-construction declaration: {construction}. Quantitative waterproof and temperature ratings are not specified.",
+        "Declared waterproof construction: {construction}; numeric waterproof-test rating and temperature rating unspecified."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One EU40 reference boot weighs {mass} g.",
+        "Reference mass: {mass} g for one boot in EU40."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.winter_boots' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "closure",
+      "role": "filter",
+      "predicate": "product.facts.fastening == request.closure",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "liner",
+      "role": "filter",
+      "predicate": "product.facts.removable_inner_boot == request.removable_inner_boot",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "waterproof_declaration",
+      "role": "filter",
+      "predicate": "product.facts.waterproof_construction == request.waterproof_construction",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "cold_walk_warmth",
+            "winter_sock_fit",
+            "boot_entry",
+            "shaft_rubbing"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "cold_walk_warmth",
+              "winter_sock_fit",
+              "boot_entry",
+              "shaft_rubbing"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 400,
+          "max": 3000
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 400
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 3000
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_cold_walk_warmth": {
+          "type": "boolean"
+        },
+        "review.positive_winter_sock_fit": {
+          "type": "boolean"
+        },
+        "review.positive_boot_entry": {
+          "type": "boolean"
+        },
+        "review.positive_shaft_rubbing": {
+          "type": "boolean"
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_cold_walk_warmth",
+          "target": "review.positive_cold_walk_warmth",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_winter_sock_fit",
+          "target": "review.positive_winter_sock_fit",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_boot_entry",
+          "target": "review.positive_boot_entry",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_shaft_rubbing",
+          "target": "review.positive_shaft_rubbing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "cold_walk_warmth.positive",
+          "when": "'cold_walk_warmth' in review.topics and review.positive_cold_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cold_walk_warmth",
+            "polarity": "positive",
+            "context": {
+              "use": "short cold-weather walk",
+              "aspect": "perceived foot warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My feet felt warm enough on a short cold-weather walk.",
+            "Foot warmth was sufficient for me on a short cold-weather walk."
+          ]
+        },
+        {
+          "id": "cold_walk_warmth.negative",
+          "when": "'cold_walk_warmth' in review.topics and not review.positive_cold_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cold_walk_warmth",
+            "polarity": "negative",
+            "context": {
+              "use": "short cold-weather walk",
+              "aspect": "perceived foot warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My feet did not feel warm enough on a short cold-weather walk.",
+            "Foot warmth was insufficient for me on a short cold-weather walk."
+          ]
+        },
+        {
+          "id": "winter_sock_fit.positive",
+          "when": "'winter_sock_fit' in review.topics and review.positive_winter_sock_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "winter_sock_fit",
+            "polarity": "positive",
+            "context": {
+              "aspect": "forefoot room",
+              "socks": "winter socks",
+              "size": "tested size"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot had enough room with winter socks in the size I tried.",
+            "The tested size left enough forefoot room for my winter socks."
+          ]
+        },
+        {
+          "id": "winter_sock_fit.negative",
+          "when": "'winter_sock_fit' in review.topics and not review.positive_winter_sock_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "winter_sock_fit",
+            "polarity": "negative",
+            "context": {
+              "aspect": "forefoot room",
+              "socks": "winter socks",
+              "size": "tested size"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot lacked room with winter socks in the size I tried.",
+            "The tested size left too little forefoot room for my winter socks."
+          ]
+        },
+        {
+          "id": "boot_entry.positive",
+          "when": "'boot_entry' in review.topics and review.positive_boot_entry",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "boot_entry",
+            "polarity": "positive",
+            "context": "putting on the boots",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the boots easy to put on.",
+            "Putting on the boots was easy for me."
+          ]
+        },
+        {
+          "id": "boot_entry.negative",
+          "when": "'boot_entry' in review.topics and not review.positive_boot_entry",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "boot_entry",
+            "polarity": "negative",
+            "context": "putting on the boots",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the boots difficult to put on.",
+            "Putting on the boots was difficult for me."
+          ]
+        },
+        {
+          "id": "shaft_rubbing.positive",
+          "when": "'shaft_rubbing' in review.topics and review.positive_shaft_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "shaft_rubbing",
+            "polarity": "positive",
+            "context": {
+              "use": "short cold-weather walk",
+              "aspect": "uncomfortable shaft rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The shaft did not rub uncomfortably during my short cold-weather walk.",
+            "I had no uncomfortable shaft rubbing on a short cold-weather walk."
+          ]
+        },
+        {
+          "id": "shaft_rubbing.negative",
+          "when": "'shaft_rubbing' in review.topics and not review.positive_shaft_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "shaft_rubbing",
+            "polarity": "negative",
+            "context": {
+              "use": "short cold-weather walk",
+              "aspect": "uncomfortable shaft rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The shaft rubbed uncomfortably during my short cold-weather walk.",
+            "I had uncomfortable shaft rubbing on a short cold-weather walk."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 400,
+          "max_sek": 3000
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.winter_boots.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "footwear",
+      "apparel",
+      "outdoors"
+    ],
+    "scope_exceptions": [
+      "No insulation quantities, thermal performance or ice-grip guarantee",
+      "One synthetic EU40 boot mass; source size/pair bases not converted",
+      "Waterproof declaration is not a customer dry-foot conclusion",
+      "Winter purpose and rubber construction overlap; closure correlations remain soft"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 400,
+      "max": 1000,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 900,
+          "max": 1800
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1600,
+          "max": 3000
+        }
+      ]
+    }
+  }
+}

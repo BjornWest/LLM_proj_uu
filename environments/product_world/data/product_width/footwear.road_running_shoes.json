@@ -1,0 +1,913 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.road_running_shoes",
+  "random_namespace": "product-width-footwear.road_running_shoes-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "brand.running_target_weights": {
+      "type": "object",
+      "input": true
+    },
+    "profile.session_target": {
+      "type": "enum",
+      "values": [
+        "short_fast",
+        "daily_training",
+        "long_distance"
+      ]
+    },
+    "internal.construction": {
+      "type": "object",
+      "properties": {
+        "sole_structure": {
+          "type": "string"
+        },
+        "cushioning": {
+          "type": "string"
+        },
+        "base_mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "enclosed road-running shoe",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "paved-road running",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one shoe, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "enum",
+      "values": [
+        "engineered mesh",
+        "knit with synthetic overlays"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "string",
+      "constant": "rubber",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "string",
+      "constant": "laces",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cushioning": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_tread": {
+      "type": "enum",
+      "values": [
+        "shallow",
+        "moderate"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.heel_to_toe_drop_mm": {
+      "type": "integer",
+      "unit": "mm",
+      "min": 0,
+      "max": 12,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 170,
+      "max": 380,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.cushioning": {
+      "type": "string",
+      "optional": true
+    },
+    "request.maximum_drop_mm": {
+      "type": "integer",
+      "unit": "mm",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "session_target",
+      "target": "profile.session_target",
+      "sample": "weighted_choice",
+      "weights_from": "brand.running_target_weights"
+    },
+    {
+      "id": "running_construction",
+      "target": "internal.construction",
+      "sample": "weighted_choice",
+      "weights": {
+        "light_foam": 2,
+        "daily_foam": 5,
+        "high_foam": 3
+      },
+      "adjustments": [
+        {
+          "when": "profile.session_target == 'short_fast'",
+          "multiply": {
+            "light_foam": 2
+          }
+        },
+        {
+          "when": "profile.session_target == 'daily_training'",
+          "multiply": {
+            "daily_foam": 1.5
+          }
+        },
+        {
+          "when": "profile.session_target == 'long_distance'",
+          "multiply": {
+            "high_foam": 2
+          }
+        }
+      ],
+      "values": {
+        "light_foam": {
+          "sole_structure": "light foam midsole with rubber outsole",
+          "cushioning": "moderate",
+          "base_mass_g": 215
+        },
+        "daily_foam": {
+          "sole_structure": "balanced foam midsole with rubber outsole",
+          "cushioning": "moderate",
+          "base_mass_g": 275
+        },
+        "high_foam": {
+          "sole_structure": "deep foam midsole with rubber outsole",
+          "cushioning": "substantial",
+          "base_mass_g": 310
+        }
+      }
+    },
+    {
+      "id": "sole",
+      "target": "product.facts.sole_structure",
+      "derive": "internal.construction.sole_structure"
+    },
+    {
+      "id": "cushion",
+      "target": "product.facts.cushioning",
+      "derive": "internal.construction.cushioning"
+    },
+    {
+      "id": "upper",
+      "target": "product.facts.component_materials.upper",
+      "sample": "weighted_choice",
+      "weights": {
+        "engineered mesh": 4,
+        "knit with synthetic overlays": 1
+      }
+    },
+    {
+      "id": "tread",
+      "target": "product.facts.sole_tread",
+      "sample": "weighted_choice",
+      "weights": {
+        "shallow": 4,
+        "moderate": 1
+      }
+    },
+    {
+      "id": "drop",
+      "target": "product.facts.heel_to_toe_drop_mm",
+      "sample": "weighted_choice",
+      "weights": {
+        "0": 1,
+        "4": 2,
+        "6": 2,
+        "8": 4,
+        "10": 3,
+        "12": 1
+      },
+      "values": {
+        "0": 0,
+        "4": 4,
+        "6": 6,
+        "8": 8,
+        "10": 10,
+        "12": 12
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -15,
+      "max": 15
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.construction.base_mass_g + internal.mass_noise_g"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.running",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.intended_use",
+          "product.facts.component_materials.upper",
+          "product.facts.sole_structure",
+          "product.facts.cushioning"
+        ]
+      },
+      "slots": {
+        "upper": "product.facts.component_materials.upper",
+        "sole": "product.facts.sole_structure",
+        "cushion": "product.facts.cushioning"
+      },
+      "formulations": [
+        "For paved-road running, with a {upper} upper and {sole}; declared cushioning is {cushion}.",
+        "A road-running model combining {upper} and {sole}, with {cushion} cushioning."
+      ]
+    },
+    {
+      "id": "description.drop_mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.heel_to_toe_drop_mm",
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "drop": "product.facts.heel_to_toe_drop_mm",
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "Nominal heel-to-toe drop: {drop} mm. Reference weight: {mass} g for one EU 40 shoe.",
+        "One EU 40 reference shoe weighs {mass} g; nominal heel-to-toe drop is {drop} mm."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.road_running_shoes' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "match_cushion",
+      "role": "task_requirement",
+      "predicate": "product.facts.cushioning == request.cushioning",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "maximum_drop",
+      "role": "filter",
+      "predicate": "product.facts.heel_to_toe_drop_mm <= request.maximum_drop_mm",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "road_comfort",
+            "forefoot_fit",
+            "outsole_wear",
+            "ventilation"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "road_comfort",
+              "forefoot_fit",
+              "outsole_wear",
+              "ventilation"
+            ]
+          }
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_road_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_forefoot_fit": {
+          "type": "boolean"
+        },
+        "review.positive_outsole_wear": {
+          "type": "boolean"
+        },
+        "review.positive_ventilation": {
+          "type": "boolean"
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 550,
+          "max": 2800
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 550
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 2800
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_road_comfort",
+          "target": "review.positive_road_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_forefoot_fit",
+          "target": "review.positive_forefoot_fit",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_outsole_wear",
+          "target": "review.positive_outsole_wear",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_ventilation",
+          "target": "review.positive_ventilation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "road_comfort.positive",
+          "when": "'road_comfort' in review.topics and review.positive_road_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "road_comfort",
+            "polarity": "positive",
+            "context": "ordinary paved-road running",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt comfortable during my ordinary road runs.",
+            "Comfort was good on the road runs I used them for."
+          ]
+        },
+        {
+          "id": "road_comfort.negative",
+          "when": "'road_comfort' in review.topics and not review.positive_road_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "road_comfort",
+            "polarity": "negative",
+            "context": "ordinary paved-road running",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt uncomfortable during my ordinary road runs.",
+            "My feet were uncomfortable on the road runs I used them for."
+          ]
+        },
+        {
+          "id": "forefoot_fit.positive",
+          "when": "'forefoot_fit' in review.topics and review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "positive",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The forefoot had enough space for my foot in the size I tried.",
+            "My forefoot did not feel squeezed in the size I tested."
+          ]
+        },
+        {
+          "id": "forefoot_fit.negative",
+          "when": "'forefoot_fit' in review.topics and not review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "negative",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They squeezed my forefoot in the size I tried.",
+            "The front was too narrow for my foot in the tested size."
+          ]
+        },
+        {
+          "id": "outsole_wear.positive",
+          "when": "'outsole_wear' in review.topics and review.positive_outsole_wear",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "outsole_wear",
+            "polarity": "positive",
+            "context": {
+              "use": "repeated paved-road running",
+              "duration": "several months",
+              "aspect": "abrasion"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The outsole showed little wear after several months of road running.",
+            "After several months of road runs, the outsole wear was modest."
+          ]
+        },
+        {
+          "id": "outsole_wear.negative",
+          "when": "'outsole_wear' in review.topics and not review.positive_outsole_wear",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "outsole_wear",
+            "polarity": "negative",
+            "context": {
+              "use": "repeated paved-road running",
+              "duration": "several months",
+              "aspect": "abrasion"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The outsole wore down quickly over several months of road running.",
+            "There was more outsole wear than I expected after several months of road runs."
+          ]
+        },
+        {
+          "id": "ventilation.positive",
+          "when": "'ventilation' in review.topics and review.positive_ventilation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "ventilation",
+            "polarity": "positive",
+            "context": "upper ventilation during road running",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My feet did not feel overheated during my road runs.",
+            "The upper felt adequately ventilated while I was running on roads."
+          ]
+        },
+        {
+          "id": "ventilation.negative",
+          "when": "'ventilation' in review.topics and not review.positive_ventilation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "ventilation",
+            "polarity": "negative",
+            "context": "upper ventilation during road running",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My feet felt overheated during my road runs.",
+            "The upper felt too warm while I was running on roads."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent, concentration1.5, protected mention frequency; value score reuses pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote or checkout record",
+        "relative_price_basis": {
+          "min_sek": 550,
+          "max_sek": 2800
+        },
+        "value_not_quality": "Price changes only value sentiment; not star draw, execution or every topic"
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.road_running_shoes.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "store_type_ids": [
+      "footwear",
+      "outdoors"
+    ],
+    "preview_input_defaults": {
+      "brand": {
+        "running_target_weights": {
+          "short_fast": 2,
+          "daily_training": 5,
+          "long_distance": 3
+        }
+      }
+    },
+    "scope_exceptions": [
+      "No plated racer, medical support guarantee or measured pace field",
+      "Extra-wide, half-size and conversion chart deferred"
+    ],
+    "review_policy_revision": "width-review-policy-v2"
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 550,
+      "max": 1100,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 1000,
+          "max": 1800
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1600,
+          "max": 2800
+        }
+      ]
+    }
+  }
+}

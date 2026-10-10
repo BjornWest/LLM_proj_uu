@@ -1,0 +1,2215 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "moisturizers.light_facial_moisturizers",
+  "family_id": "moisturizers",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/moisturizers.light_facial_moisturizers.json": "3705279a2830552d58fdae53738b0b0550473779bf2acdc99f193ba5d596e5ce",
+    "environments/product_world/data/product_width/_moisturizers_base.json": "693e2168aa11b28496ca0674c213ba8f651533210be33f69e8f4815192595b78",
+    "environments/product_world/data/product_public_content/moisturizers.light_facial_moisturizers.json": "5ca1402df105e9fcfed32dfadaa0dc0e7727a2eabeb3d15cc27cbf7471549413"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Declarations describe texture/target/ingredients; no inferred hydration duration or individual tolerance. Packaging internals are secondary.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.product_name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.ingredient_declaration": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_ingredient_declaration",
+      "role": "descriptive",
+      "display_group": "ingredients",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Aqua, Caprylic/Capric Triglyceride, Carbomer, Cetearyl Alcohol, Dimethicone, Ethylhexylglycerin, Glycerin, Glyceryl Stearate Citrate, Phenoxyethanol, Sodium Hyaluronate, Sodium Hydroxide",
+          "Aqua, Carbomer, Cetearyl Olivate, Dimethicone, Ethylhexylglycerin, Glycerin, Parfum, Phenoxyethanol, Sodium Hyaluronate, Sodium Hydroxide, Sorbitan Olivate"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ingredient_declaration"
+    },
+    "sku.ingredient_concentrations_declaration": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_ingredient_concentrations_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.texture_label": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_texture_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "light lotion",
+          "light water gel"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "texture_label"
+    },
+    "sku.target_skin_label": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_target_skin_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "normal to dry skin",
+          "normal to oily skin"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "target_skin_label"
+    },
+    "sku.fragrance_mixture_details": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_fragrance_mixture_details",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.container_body_material": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_container_body_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene"
+        ],
+        "optional": true,
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "container_body"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "container_body_material"
+    },
+    "sku.cap_material": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_cap_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene",
+          "not applicable"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "removable_cap"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cap_material"
+    },
+    "sku.lid_material": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_lid_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "polypropylene"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "screw_lid"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_material"
+    },
+    "sku.pump_materials": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_pump_materials",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified",
+          "not applicable"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "pump"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.pack_count": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_pack_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.identical_contents_no_extra_applicator"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.nominal_net_volume_per_container_ml": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_nominal_net_volume_per_container_ml",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "mL",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_net_volume_per_container_ml"
+    },
+    "sku.nominal_total_net_volume_ml": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_nominal_total_net_volume_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "mL",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "whole_purchase"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_total_net_volume_ml"
+    },
+    "sku.directions": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_directions",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "For external adult facial use. Apply a small amount to clean, dry skin, avoiding eyes and broken skin. Replace the cap or lid after use. Stop use if irritation occurs."
+        ],
+        "optional": true,
+        "constant": "For external adult facial use. Apply a small amount to clean, dry skin, avoiding eyes and broken skin. Replace the cap or lid after use. Stop use if irritation occurs.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "directions"
+    },
+    "sku.storage": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_storage",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Keep closed in a cool, dry place away from direct sunlight."
+        ],
+        "optional": true,
+        "constant": "Keep closed in a cool, dry place away from direct sunlight.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage"
+    },
+    "sku.actual_net_volume_per_container_ml": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_actual_net_volume_per_container_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_total_net_volume_ml": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_actual_total_net_volume_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "whole_purchase"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_content_mass_per_container_g": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_actual_content_mass_per_container_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_hydration_change_pct": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_measured_hydration_change_pct",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "%",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_hydration_duration_h": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_measured_hydration_duration_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "h",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.period_after_opening_months": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_period_after_opening_months",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "months",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "container"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.sensitive_skin_label": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_sensitive_skin_label",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.individual_tolerance_declaration": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_individual_tolerance_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "moisturizers.light_facial_moisturizers.semantic.sku_reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "unit": "SEK",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.intended_user": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "adults"
+        ],
+        "optional": true,
+        "constant": "adults",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.adult_leave_on_face"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.product_kind": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "light leave-on facial moisturizer"
+        ],
+        "optional": true,
+        "constant": "light leave-on facial moisturizer",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.adult_leave_on_face"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.fragrance_added": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "ingredients",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.added_fragrance_declaration",
+        "moisturizers.light_facial_moisturizers.predicate.no_added_fragrance_declaration"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fragrance_added"
+    },
+    "sku.ingredients": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "ingredients",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "Aqua",
+            "Caprylic/Capric Triglyceride",
+            "Carbomer",
+            "Cetearyl Alcohol",
+            "Dimethicone",
+            "Ethylhexylglycerin",
+            "Glycerin",
+            "Glyceryl Stearate Citrate",
+            "Phenoxyethanol",
+            "Sodium Hyaluronate",
+            "Sodium Hydroxide",
+            "Cetearyl Olivate",
+            "Parfum",
+            "Sorbitan Olivate"
+          ]
+        },
+        "min_items": 11,
+        "max_items": 11,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.added_fragrance_declaration"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ingredients"
+    },
+    "sku.pump_per_container": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.one_pump_and_cap_per_bottle",
+        "moisturizers.light_facial_moisturizers.predicate.one_screw_lid_per_jar_no_pump"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pump_per_container"
+    },
+    "sku.removable_cap_per_container": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.one_pump_and_cap_per_bottle"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "removable_cap_per_container"
+    },
+    "sku.screw_lid_per_container": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.one_screw_lid_per_jar_no_pump"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screw_lid_per_container"
+    },
+    "sku.filled_container_count": {
+      "semantic_id": null,
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.identical_contents_no_extra_applicator"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.separate_applicator_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.identical_contents_no_extra_applicator"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "separate_applicator_count"
+    },
+    "sku.extra_usable_items_supplied": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.identical_contents_no_extra_applicator"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "extra_usable_items_supplied"
+    },
+    "sku.retail_wrapping_counted_as_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.identical_contents_no_extra_applicator"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "retail_wrapping_counted_as_units"
+    },
+    "sku.spf_declared": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.no_declared_SPF_or_supplied_sunscreen"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spf_declared"
+    },
+    "sku.sunscreen_supplied": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "moisturizers.light_facial_moisturizers.predicate.no_declared_SPF_or_supplied_sunscreen"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sunscreen_supplied"
+    },
+    "product.facts.family_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "moisturizers"
+        ],
+        "constant": "moisturizers",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.concept_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "moisturizers.light_facial_moisturizers"
+        ],
+        "constant": "moisturizers.light_facial_moisturizers",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.product_kind": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "light leave-on facial moisturizer"
+        ],
+        "constant": "light leave-on facial moisturizer",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_user": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "adults"
+        ],
+        "constant": "adults",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ordinary external facial moisturizing"
+        ],
+        "constant": "ordinary external facial moisturizing",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.ingredient_declaration_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "complete authored ingredient presence, alphabetical; concentrations and manufacturing order unspecified"
+        ],
+        "constant": "complete authored ingredient presence, alphabetical; concentrations and manufacturing order unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.ingredient_concentrations_declaration": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ingredient_concentrations_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.sensitive_skin_label": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.sensitive_skin_label_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.individual_tolerance_declaration": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.individual_tolerance_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.spf_declared": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.spf_value": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.spf_value_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.sunscreen_supplied": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.fragrance_mixture_details": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "unspecified"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.fragrance_mixture_details_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "unknown"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.nominal_volume_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "declared net contents per unopened container; not a purchased fill measurement"
+        ],
+        "constant": "declared net contents per unopened container; not a purchased fill measurement",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.pack_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "identical filled containers of one formula and nominal size; primary closures included, retail wrapping excluded"
+        ],
+        "constant": "identical filled containers of one formula and nominal size; primary closures included, retail wrapping excluded",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.container_body_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene"
+        ],
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.separate_applicator_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.extra_usable_items_supplied": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.retail_wrapping_counted_as_units": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.actual_net_volume_per_container_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_net_volume_per_container_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_total_net_volume_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_total_net_volume_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_content_mass_per_container_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_content_mass_per_container_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.measured_hydration_change_pct": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.measured_hydration_change_pct_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.measured_hydration_duration_h": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.measured_hydration_duration_h_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.period_after_opening_months": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.period_after_opening_months_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.directions": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "For external adult facial use. Apply a small amount to clean, dry skin, avoiding eyes and broken skin. Replace the cap or lid after use. Stop use if irritation occurs."
+        ],
+        "constant": "For external adult facial use. Apply a small amount to clean, dry skin, avoiding eyes and broken skin. Replace the cap or lid after use. Stop use if irritation occurs.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.storage": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Keep closed in a cool, dry place away from direct sunlight."
+        ],
+        "constant": "Keep closed in a cool, dry place away from direct sunlight.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "lotion_no_added_fragrance",
+          "gel_added_fragrance"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.texture_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "light lotion",
+          "light water gel"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.target_skin_types": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "normal",
+            "dry",
+            "oily"
+          ]
+        },
+        "min_items": 2,
+        "max_items": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.target_skin_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "normal to dry skin",
+          "normal to oily skin"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.ingredients": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "Aqua",
+            "Caprylic/Capric Triglyceride",
+            "Carbomer",
+            "Cetearyl Alcohol",
+            "Dimethicone",
+            "Ethylhexylglycerin",
+            "Glycerin",
+            "Glyceryl Stearate Citrate",
+            "Phenoxyethanol",
+            "Sodium Hyaluronate",
+            "Sodium Hydroxide",
+            "Cetearyl Olivate",
+            "Parfum",
+            "Sorbitan Olivate"
+          ]
+        },
+        "min_items": 11,
+        "max_items": 11
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.fragrance_added": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.fragrance_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "no added fragrance",
+          "added fragrance"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.container_type": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "pump bottle",
+          "jar"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pump_per_container": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.removable_cap_per_container": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.screw_lid_per_container": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 2000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cap_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene",
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cap_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "not_applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.lid_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "polypropylene"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.lid_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.pump_materials": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified",
+          "not applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.pump_materials_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown",
+          "not_applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.price_multiplier": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 2000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.ingredient_declaration": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Aqua, Caprylic/Capric Triglyceride, Carbomer, Cetearyl Alcohol, Dimethicone, Ethylhexylglycerin, Glycerin, Glyceryl Stearate Citrate, Phenoxyethanol, Sodium Hyaluronate, Sodium Hydroxide",
+          "Aqua, Carbomer, Cetearyl Olivate, Dimethicone, Ethylhexylglycerin, Glycerin, Parfum, Phenoxyethanol, Sodium Hyaluronate, Sodium Hydroxide, Sorbitan Olivate"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    }
+  },
+  "disclosure_groups": {
+    "ingredient_declaration": {
+      "id": "moisturizers.light_facial_moisturizers.content.ingredient_declaration",
+      "display_group": "ingredients",
+      "fields": [
+        "sku.ingredient_declaration"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "texture_label": {
+      "id": "moisturizers.light_facial_moisturizers.content.texture_label",
+      "display_group": "features",
+      "fields": [
+        "sku.texture_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "target_skin_label": {
+      "id": "moisturizers.light_facial_moisturizers.content.target_skin_label",
+      "display_group": "features",
+      "fields": [
+        "sku.target_skin_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "container_body_material": {
+      "id": "moisturizers.light_facial_moisturizers.content.container_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.container_body_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cap_material": {
+      "id": "moisturizers.light_facial_moisturizers.content.cap_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.cap_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_material": {
+      "id": "moisturizers.light_facial_moisturizers.content.lid_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lid_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_net_volume_per_container_ml": {
+      "id": "moisturizers.light_facial_moisturizers.content.nominal_net_volume_per_container_ml",
+      "display_group": "features",
+      "fields": [
+        "sku.nominal_net_volume_per_container_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_total_net_volume_ml": {
+      "id": "moisturizers.light_facial_moisturizers.content.nominal_total_net_volume_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_total_net_volume_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "directions": {
+      "id": "moisturizers.light_facial_moisturizers.content.directions",
+      "display_group": "care",
+      "fields": [
+        "sku.directions"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage": {
+      "id": "moisturizers.light_facial_moisturizers.content.storage",
+      "display_group": "features",
+      "fields": [
+        "sku.storage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fragrance_added": {
+      "id": "moisturizers.light_facial_moisturizers.content.fragrance_added",
+      "display_group": "ingredients",
+      "fields": [
+        "sku.fragrance_added"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ingredients": {
+      "id": "moisturizers.light_facial_moisturizers.content.ingredients",
+      "display_group": "ingredients",
+      "fields": [
+        "sku.ingredients"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pump_per_container": {
+      "id": "moisturizers.light_facial_moisturizers.content.pump_per_container",
+      "display_group": "features",
+      "fields": [
+        "sku.pump_per_container"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "removable_cap_per_container": {
+      "id": "moisturizers.light_facial_moisturizers.content.removable_cap_per_container",
+      "display_group": "features",
+      "fields": [
+        "sku.removable_cap_per_container"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screw_lid_per_container": {
+      "id": "moisturizers.light_facial_moisturizers.content.screw_lid_per_container",
+      "display_group": "features",
+      "fields": [
+        "sku.screw_lid_per_container"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "separate_applicator_count": {
+      "id": "moisturizers.light_facial_moisturizers.content.separate_applicator_count",
+      "display_group": "features",
+      "fields": [
+        "sku.separate_applicator_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "extra_usable_items_supplied": {
+      "id": "moisturizers.light_facial_moisturizers.content.extra_usable_items_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.extra_usable_items_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "retail_wrapping_counted_as_units": {
+      "id": "moisturizers.light_facial_moisturizers.content.retail_wrapping_counted_as_units",
+      "display_group": "features",
+      "fields": [
+        "sku.retail_wrapping_counted_as_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spf_declared": {
+      "id": "moisturizers.light_facial_moisturizers.content.spf_declared",
+      "display_group": "features",
+      "fields": [
+        "sku.spf_declared"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sunscreen_supplied": {
+      "id": "moisturizers.light_facial_moisturizers.content.sunscreen_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.sunscreen_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "ingredients": {
+      "label": "Ingredients",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 94,
+    "roles": {
+      "identity": 6,
+      "descriptive": 12,
+      "omit_placeholder": 23,
+      "literal": 8,
+      "buying_choice": 2,
+      "commerce": 1,
+      "internal": 18,
+      "qualifier": 3,
+      "private_support": 21
+    },
+    "display_groups": 6,
+    "highlight_candidates": 3,
+    "unmapped_descriptive_fields": 10
+  }
+}

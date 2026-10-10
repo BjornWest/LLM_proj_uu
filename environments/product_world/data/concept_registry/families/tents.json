@@ -1,0 +1,202 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "tents",
+  "review_id": "F38",
+  "label": "Tents",
+  "section": "Outdoor equipment and family travel",
+  "store_type_ids": [
+    "outdoors"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Sleeping-person count is not generous usable-space evidence. Season rating and waterproof claims require definitions; flysheet, vestibule and separate poles are conditional.",
+  "shared_dimension_ids": [
+    "sleeping_capacity",
+    "dimensions",
+    "weight",
+    "component_materials",
+    "exposure_protection",
+    "ventilation",
+    "vestibule_layout",
+    "included_bundle"
+  ],
+  "dimensions": [
+    {
+      "id": "sleeping_capacity",
+      "label": "Sleeping capacity",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "integer",
+      "unit": "people",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "dimensions",
+      "label": "Dimensions",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "weight",
+      "label": "Weight",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "g",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "exposure_protection",
+      "label": "Exposure protection",
+      "module_id": "exposure",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "ventilation",
+      "label": "Ventilation",
+      "module_id": "exposure",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "vestibule_layout",
+      "label": "Vestibule layout",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "included_bundle",
+      "label": "Included bundle",
+      "module_id": "compatibility",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "tents.light_trekking_tents",
+      "label": "Light trekking tents",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "tents.freestanding_dome_tents",
+      "label": "Freestanding dome tents",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "tents.larger_campsite_tunnel_tents",
+      "label": "Larger campsite/tunnel tents",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "tents.quick_pitch_pop_up_tents",
+      "label": "Quick-pitch/pop-up tents",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

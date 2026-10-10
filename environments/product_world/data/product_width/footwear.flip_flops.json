@@ -1,0 +1,955 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.flip_flops",
+  "random_namespace": "product-width-footwear.flip_flops-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.materials": {
+      "type": "object",
+      "properties": {
+        "strap": {
+          "type": "string"
+        },
+        "footbed": {
+          "type": "string"
+        },
+        "outsole": {
+          "type": "string"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "open thong flip-flop",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "casual wear",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_toe": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.toe_post": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rear_strap": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ankle_strap": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.strap": {
+      "type": "enum",
+      "values": [
+        "PVC",
+        "EVA"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.footbed": {
+      "type": "enum",
+      "values": [
+        "rubber",
+        "EVA"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "enum",
+      "values": [
+        "rubber",
+        "EVA"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "enum",
+      "values": [
+        "fixed thong",
+        "adjustable instep buckle"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.footbed_shape": {
+      "type": "enum",
+      "values": [
+        "flat textured",
+        "contoured"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one item, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 80,
+      "max": 195,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.closure": {
+      "type": "string",
+      "optional": true
+    },
+    "request.footbed_shape": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "material_bundle",
+      "target": "internal.materials",
+      "sample": "weighted_choice",
+      "weights": {
+        "classic": 3,
+        "EVA": 2
+      },
+      "values": {
+        "classic": {
+          "strap": "PVC",
+          "footbed": "rubber",
+          "outsole": "rubber",
+          "mass_g": 160
+        },
+        "EVA": {
+          "strap": "EVA",
+          "footbed": "EVA",
+          "outsole": "EVA",
+          "mass_g": 110
+        }
+      }
+    },
+    {
+      "id": "strap",
+      "target": "product.facts.component_materials.strap",
+      "derive": "internal.materials.strap"
+    },
+    {
+      "id": "footbed",
+      "target": "product.facts.component_materials.footbed",
+      "derive": "internal.materials.footbed"
+    },
+    {
+      "id": "outsole",
+      "target": "product.facts.component_materials.outsole",
+      "derive": "internal.materials.outsole"
+    },
+    {
+      "id": "closure",
+      "target": "product.facts.fastening",
+      "sample": "weighted_choice",
+      "weights": {
+        "fixed thong": 5,
+        "adjustable instep buckle": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.component_materials.strap == 'EVA'",
+          "weights": {
+            "fixed thong": 3,
+            "adjustable instep buckle": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "footbed_shape",
+      "target": "product.facts.footbed_shape",
+      "sample": "weighted_choice",
+      "weights": {
+        "flat textured": 4,
+        "contoured": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.component_materials.footbed == 'EVA'",
+          "weights": {
+            "flat textured": 1,
+            "contoured": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -10,
+      "max": 10
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.materials.mass_g + internal.mass_noise_g + (15 if product.facts.fastening == 'adjustable instep buckle' else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.contact",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.construction",
+          "product.facts.closed_toe",
+          "product.facts.closed_heel",
+          "product.facts.toe_post",
+          "product.facts.rear_strap",
+          "product.facts.ankle_strap",
+          "product.facts.fastening"
+        ]
+      },
+      "slots": {
+        "closure": "product.facts.fastening"
+      },
+      "formulations": [
+        "Open-toe, open-heel thong flip-flop with a toe post and {closure}; no rear or ankle strap.",
+        "Toe-post flip-flop: toes and heel exposed, {closure}, with neither rear nor ankle strap."
+      ]
+    },
+    {
+      "id": "description.materials",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.component_materials.strap",
+          "product.facts.component_materials.footbed",
+          "product.facts.component_materials.outsole",
+          "product.facts.footbed_shape"
+        ]
+      },
+      "slots": {
+        "strap": "product.facts.component_materials.strap",
+        "footbed": "product.facts.component_materials.footbed",
+        "sole": "product.facts.component_materials.outsole",
+        "shape": "product.facts.footbed_shape"
+      },
+      "formulations": [
+        "Strap: {strap}; {shape} footbed in {footbed}; outsole: {sole}.",
+        "A {strap} strap above a {shape} {footbed} footbed and {sole} outsole."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One EU40 reference item weighs {mass} g.",
+        "Reference mass: {mass} g for a single item in EU40."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.flip_flops' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "closure",
+      "role": "filter",
+      "predicate": "product.facts.fastening == request.closure",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "footbed",
+      "role": "task_requirement",
+      "predicate": "product.facts.footbed_shape == request.footbed_shape",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "short_casual_comfort",
+              "toe_post_pressure",
+              "instep_rubbing",
+              "buckle_adjustment"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 100,
+          "max": 1300
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 100
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 1300
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_short_casual_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_toe_post_pressure": {
+          "type": "boolean"
+        },
+        "review.positive_instep_rubbing": {
+          "type": "boolean"
+        },
+        "review.positive_buckle_adjustment": {
+          "type": "boolean"
+        },
+        "product.facts.fastening": {
+          "type": "enum",
+          "values": [
+            "fixed thong",
+            "adjustable instep buckle"
+          ],
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "general": 1,
+            "adjustable": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.fastening == 'adjustable instep buckle'",
+              "weights": {
+                "general": 0,
+                "adjustable": 1
+              }
+            }
+          ],
+          "values": {
+            "general": [
+              "value",
+              "short_casual_comfort",
+              "toe_post_pressure",
+              "instep_rubbing"
+            ],
+            "adjustable": [
+              "value",
+              "short_casual_comfort",
+              "toe_post_pressure",
+              "instep_rubbing",
+              "buckle_adjustment"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_short_casual_comfort",
+          "target": "review.positive_short_casual_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_toe_post_pressure",
+          "target": "review.positive_toe_post_pressure",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_instep_rubbing",
+          "target": "review.positive_instep_rubbing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_buckle_adjustment",
+          "target": "review.positive_buckle_adjustment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "short_casual_comfort.positive",
+          "when": "'short_casual_comfort' in review.topics and review.positive_short_casual_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "short_casual_comfort",
+            "polarity": "positive",
+            "context": "short casual wear",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt comfortable during short casual wear.",
+            "Comfort was good during the short casual wear I tried."
+          ]
+        },
+        {
+          "id": "short_casual_comfort.negative",
+          "when": "'short_casual_comfort' in review.topics and not review.positive_short_casual_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "short_casual_comfort",
+            "polarity": "negative",
+            "context": "short casual wear",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt uncomfortable during short casual wear.",
+            "Comfort was poor during the short casual wear I tried."
+          ]
+        },
+        {
+          "id": "toe_post_pressure.positive",
+          "when": "'toe_post_pressure' in review.topics and review.positive_toe_post_pressure",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "toe_post_pressure",
+            "polarity": "positive",
+            "context": {
+              "use": "short casual wear",
+              "aspect": "uncomfortable toe-post pressure"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The toe post did not press uncomfortably during short casual wear.",
+            "I had no uncomfortable toe-post pressure during short casual wear."
+          ]
+        },
+        {
+          "id": "toe_post_pressure.negative",
+          "when": "'toe_post_pressure' in review.topics and not review.positive_toe_post_pressure",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "toe_post_pressure",
+            "polarity": "negative",
+            "context": {
+              "use": "short casual wear",
+              "aspect": "uncomfortable toe-post pressure"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The toe post pressed uncomfortably during short casual wear.",
+            "I had uncomfortable toe-post pressure during short casual wear."
+          ]
+        },
+        {
+          "id": "instep_rubbing.positive",
+          "when": "'instep_rubbing' in review.topics and review.positive_instep_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "instep_rubbing",
+            "polarity": "positive",
+            "context": {
+              "use": "short casual wear",
+              "contact": "top of instep",
+              "aspect": "uncomfortable strap rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The strap did not rub uncomfortably at the top of my instep during short casual wear.",
+            "I had no uncomfortable strap rubbing on top of my instep during short casual wear."
+          ]
+        },
+        {
+          "id": "instep_rubbing.negative",
+          "when": "'instep_rubbing' in review.topics and not review.positive_instep_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "instep_rubbing",
+            "polarity": "negative",
+            "context": {
+              "use": "short casual wear",
+              "contact": "top of instep",
+              "aspect": "uncomfortable strap rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The strap rubbed uncomfortably at the top of my instep during short casual wear.",
+            "I had uncomfortable strap rubbing on top of my instep during short casual wear."
+          ]
+        },
+        {
+          "id": "buckle_adjustment.positive",
+          "when": "'buckle_adjustment' in review.topics and review.positive_buckle_adjustment and product.facts.fastening == 'adjustable instep buckle'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "buckle_adjustment",
+            "polarity": "positive",
+            "context": "adjusting the instep buckle",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the instep buckle easy to adjust.",
+            "Adjusting the instep buckle was easy for me."
+          ]
+        },
+        {
+          "id": "buckle_adjustment.negative",
+          "when": "'buckle_adjustment' in review.topics and not review.positive_buckle_adjustment and product.facts.fastening == 'adjustable instep buckle'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "buckle_adjustment",
+            "polarity": "negative",
+            "context": "adjusting the instep buckle",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the instep buckle difficult to adjust.",
+            "Adjusting the instep buckle was difficult for me."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 100,
+          "max_sek": 1300
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.flip_flops.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "footwear",
+      "apparel",
+      "outdoors"
+    ],
+    "scope_exceptions": [
+      "Brazilian pairs/brand width label not translated into manufactured EU tuples",
+      "No upper heel contact, rear strap or ankle strap; plantar heel contact remains",
+      "No medical/wet-floor or foot-dryness guarantee; unknown quantitative waterproof test"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 100,
+      "max": 350,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 250,
+          "max": 650
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 500,
+          "max": 1300
+        }
+      ]
+    }
+  }
+}

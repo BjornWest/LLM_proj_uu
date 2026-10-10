@@ -1,0 +1,3257 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "cleansers.oil_balm_cleansers",
+  "family_id": "cleansers",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/cleansers.oil_balm_cleansers.json": "4805c4ff09f1c9772ccb716774c3474fe8860de6848112c241afd579c4f171bc",
+    "environments/product_world/data/product_width/_cleansers_base.json": "067957e1b6bd18a2b0b627f7b5c488ebd73e190b2d2e4d4919519fd3466833d7",
+    "environments/product_world/data/product_public_content/cleansers.oil_balm_cleansers.json": "dca895ce0446b607fe64471cad059f9836e0ce49da5e3a4be747c0bf383f1dea"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep diluted versus undiluted pH conditions and partial ingredients. A removal claim is not measured makeup-removal performance.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.product_name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.texture_label": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_texture_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_texture_label"
+    },
+    "sku.target_skin_label": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_target_skin_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_target_skin_label"
+    },
+    "sku.ingredient_declaration": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_ingredient_declaration",
+      "role": "descriptive",
+      "display_group": "ingredients",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_ingredient_declaration"
+    },
+    "sku.ingredient_concentrations_declaration": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_ingredient_concentrations_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.manufacturing_ingredient_order": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_manufacturing_ingredient_order",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.water_fraction_percent": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_water_fraction_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_density_g_per_ml": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_measured_density_g_per_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g/mL",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.undiluted_aqueous_ph": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_undiluted_aqueous_ph",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "unit": "pH",
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.water_diluted_ph": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_water_diluted_ph",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "unit": "pH",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.ph_dilution_conditions": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_ph_dilution_conditions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.fragrance_label": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_fragrance_label",
+      "role": "descriptive",
+      "display_group": "ingredients",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_fragrance_label"
+    },
+    "sku.added_fragrance_mixture_details": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_added_fragrance_mixture_details",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.filled_container_count": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_filled_container_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.nominal_net_volume_per_container_ml": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_nominal_net_volume_per_container_ml",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_nominal_net_volume_per_container_ml"
+    },
+    "sku.nominal_total_net_volume_ml": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_nominal_total_net_volume_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_nominal_total_net_volume_ml"
+    },
+    "sku.nominal_net_mass_per_container_g": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_nominal_net_mass_per_container_g",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_nominal_net_mass_per_container_g"
+    },
+    "sku.nominal_total_net_mass_g": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_nominal_total_net_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_nominal_total_net_mass_g"
+    },
+    "sku.actual_net_volume_per_container_ml": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_actual_net_volume_per_container_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_total_net_volume_ml": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_actual_total_net_volume_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_net_mass_per_container_g": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_actual_net_mass_per_container_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_total_net_mass_g": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_actual_total_net_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.container_body_material": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_container_body_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "container_body"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_container_body_material"
+    },
+    "sku.pump_head_material": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_pump_head_material",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "external_pump_head"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.lid_material": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_lid_material",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "primary_lid"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.spatula_material": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_spatula_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "enclosed_spatula"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_spatula_material"
+    },
+    "sku.pump_internal_materials": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_pump_internal_materials",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "unspecified"
+        ],
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "pump_internals"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.pump_volume_per_press_ml": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_pump_volume_per_press_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "pump"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.pump_lock_type": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_pump_lock_type",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.oil_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "pump"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_pump_lock_type"
+    },
+    "sku.spatula_length_mm": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_spatula_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "enclosed_spatula"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.balm_mass_per_scoop_g": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_balm_mass_per_scoop_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "enclosed_spatula"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.directions": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_directions",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "For external adult facial use, start with clean dry hands and a dry face. Apply a small amount and massage gently, add lukewarm water and massage again, rinse thoroughly and pat dry. Avoid eyes and broken skin. Stop use if irritation occurs.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_directions"
+    },
+    "sku.package_access": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_package_access",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_package_access"
+    },
+    "sku.storage": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_storage",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Secure the primary closure and keep the container cool and dry, away from direct sunlight. Do not put water into the container.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_storage"
+    },
+    "sku.spatula_care": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_spatula_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "enclosed_spatula"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_product_spatula_care"
+    },
+    "sku.individual_tolerance_declaration": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_individual_tolerance_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.sensitive_skin_label": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_sensitive_skin_label",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.makeup_removal_performance": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_makeup_removal_performance",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "unspecified"
+        ],
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_cleansing_removal_percent": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_measured_cleansing_removal_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "contents"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "SEK",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.pack_label": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.sku_pack_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "review.purchase_price_sek": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.review_purchase_price_sek",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.pack_label": {
+      "semantic_id": "cleansers.oil_balm_cleansers.semantic.review_subject_pack_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "sku.intended_user": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "adults"
+        ],
+        "optional": true,
+        "constant": "adults",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.adult_external_face_rinse_off"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "external facial cleansing followed by rinsing"
+        ],
+        "optional": true,
+        "constant": "external facial cleansing followed by rinsing",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.adult_external_face_rinse_off"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.leave_on_use_declared": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.adult_external_face_rinse_off"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_leave_on_use_declared"
+    },
+    "sku.non_aqueous_declaration": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.non_aqueous_declared"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_non_aqueous_declaration"
+    },
+    "sku.pump_per_container": {
+      "semantic_id": null,
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.balm_parts",
+        "cleansers.oil_balm_cleansers.predicate.oil_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.pump_attached_during_use": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.oil_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_pump_attached_during_use"
+    },
+    "sku.lid_per_container": {
+      "semantic_id": null,
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.balm_parts",
+        "cleansers.oil_balm_cleansers.predicate.oil_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.spatula_per_container": {
+      "semantic_id": null,
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.balm_parts",
+        "cleansers.oil_balm_cleansers.predicate.oil_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "sku.lid_detachable_for_access": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.balm_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_lid_detachable_for_access"
+    },
+    "sku.primary_closure_type": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "attached twist-lock pump",
+          "detachable screw lid"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.balm_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_primary_closure_type"
+    },
+    "sku.spare_closure_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.pack_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.refill_supplied_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.pack_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.cloth_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.pack_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.inner_cover_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.pack_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.other_usable_extras_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.pack_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.retail_wrapping_counted_as_units": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "cleansers.oil_balm_cleansers.predicate.pack_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "product.facts.family_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "cleansers"
+        ],
+        "constant": "cleansers",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.concept_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "cleansers.oil_balm_cleansers"
+        ],
+        "constant": "cleansers.oil_balm_cleansers",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.product_kind": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "oil/balm rinse-off facial cleanser"
+        ],
+        "constant": "oil/balm rinse-off facial cleanser",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_user": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "adults"
+        ],
+        "constant": "adults",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "external facial cleansing followed by rinsing"
+        ],
+        "constant": "external facial cleansing followed by rinsing",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.non_aqueous_declaration": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.leave_on_use_declared": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.eye_area_use_declared": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.ingredient_declaration_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "complete authored ingredient presence, alphabetical; not concentration or manufacturing order"
+        ],
+        "constant": "complete authored ingredient presence, alphabetical; not concentration or manufacturing order",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.ingredient_concentrations_declaration": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.ingredient_concentrations_declaration_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.manufacturing_ingredient_order": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.manufacturing_ingredient_order_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.water_fraction_percent": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "%",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.water_fraction_percent_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.undiluted_aqueous_ph": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "pH",
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.undiluted_aqueous_ph_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.water_diluted_ph": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "pH",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.water_diluted_ph_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.ph_dilution_conditions": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.ph_dilution_conditions_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.measured_density_g_per_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g/mL",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.measured_density_g_per_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.viscosity_or_melting_behavior": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.viscosity_or_melting_behavior_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.individual_tolerance_declaration": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.individual_tolerance_declaration_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.sensitive_skin_label": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.sensitive_skin_label_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.makeup_removal_performance": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.makeup_removal_performance_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.measured_cleansing_removal_percent": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "%",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.measured_cleansing_removal_percent_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.period_after_opening_months": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.period_after_opening_months_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_net_volume_per_container_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_net_volume_per_container_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_total_net_volume_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_total_net_volume_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_net_mass_per_container_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_net_mass_per_container_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.actual_total_net_mass_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.actual_total_net_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.pack_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "identical filled containers of one formula and one nominal size; installed closures and enclosed applicable spatulas included, retail wrapping excluded"
+        ],
+        "constant": "identical filled containers of one formula and one nominal size; installed closures and enclosed applicable spatulas included, retail wrapping excluded",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.spare_closure_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.refill_supplied_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.cloth_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.inner_cover_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.other_usable_extras_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.retail_wrapping_counted_as_units": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.directions": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "For external adult facial use, start with clean dry hands and a dry face. Apply a small amount and massage gently, add lukewarm water and massage again, rinse thoroughly and pat dry. Avoid eyes and broken skin. Stop use if irritation occurs.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.storage": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Secure the primary closure and keep the container cool and dry, away from direct sunlight. Do not put water into the container.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "liquid_oil_pump",
+          "soft_balm_jar"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.texture_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.target_skin_types": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "normal",
+            "combination",
+            "dry"
+          ]
+        },
+        "min_items": 2,
+        "max_items": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.target_skin_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.ingredients": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "Caprylic/Capric Triglyceride",
+            "Helianthus Annuus (Sunflower) Seed Oil",
+            "PEG-20 Glyceryl Triisostearate",
+            "Squalane",
+            "Tocopherol",
+            "Cera Alba",
+            "Ethylhexyl Palmitate",
+            "Parfum"
+          ]
+        },
+        "min_items": 5,
+        "max_items": 7
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.fragrance_added": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.fragrance_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.added_fragrance_mixture_details": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.added_fragrance_mixture_details_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "unknown"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.container_type": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "pump bottle",
+          "screw-lid jar"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.container_body_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.primary_closure_type": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "attached twist-lock pump",
+          "detachable screw lid"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.nominal_quantity_unit": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "mL",
+          "g"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.compact_nominal_quantity": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.larger_nominal_quantity": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pump_per_container": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.lid_per_container": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.spatula_per_container": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 5000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pump_attached_during_use": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.lid_detachable_for_access": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pump_head_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pump_head_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "not_applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.pump_lock_type": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pump_lock_type_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "not_applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.pump_internal_materials": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.pump_internal_materials_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown",
+          "not_applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.pump_volume_per_press_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mL"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.pump_volume_per_press_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown",
+          "not_applicable"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.lid_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.lid_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.spatula_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.spatula_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.spatula_length_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "mm"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.spatula_length_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "unknown"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.balm_mass_per_scoop_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000,
+        "unit": "g"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "product.facts.balm_mass_per_scoop_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "unknown"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.spatula_care": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.spatula_care_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "known"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.package_access": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_price_multiplier": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 5000
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.ingredient_declaration": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    }
+  },
+  "disclosure_groups": {
+    "sku_texture_label": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_texture_label",
+      "display_group": "features",
+      "fields": [
+        "sku.texture_label"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_target_skin_label": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_target_skin_label",
+      "display_group": "features",
+      "fields": [
+        "sku.target_skin_label"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_ingredient_declaration": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_ingredient_declaration",
+      "display_group": "ingredients",
+      "fields": [
+        "sku.ingredient_declaration"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_fragrance_label": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_fragrance_label",
+      "display_group": "ingredients",
+      "fields": [
+        "sku.fragrance_label"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_nominal_net_volume_per_container_ml": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_nominal_net_volume_per_container_ml",
+      "display_group": "features",
+      "fields": [
+        "sku.nominal_net_volume_per_container_ml"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_nominal_total_net_volume_ml": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_nominal_total_net_volume_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_total_net_volume_ml"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_nominal_net_mass_per_container_g": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_nominal_net_mass_per_container_g",
+      "display_group": "features",
+      "fields": [
+        "sku.nominal_net_mass_per_container_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_nominal_total_net_mass_g": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_nominal_total_net_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_total_net_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_container_body_material": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_container_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.container_body_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_spatula_material": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_spatula_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.spatula_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_pump_lock_type": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_pump_lock_type",
+      "display_group": "features",
+      "fields": [
+        "sku.pump_lock_type"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_directions": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_product_directions",
+      "display_group": "care",
+      "fields": [
+        "sku.directions"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_package_access": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_package_access",
+      "display_group": "features",
+      "fields": [
+        "sku.package_access"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_storage": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_storage",
+      "display_group": "features",
+      "fields": [
+        "sku.storage"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_spatula_care": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_product_spatula_care",
+      "display_group": "care",
+      "fields": [
+        "sku.spatula_care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_leave_on_use_declared": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_leave_on_use_declared",
+      "display_group": "features",
+      "fields": [
+        "sku.leave_on_use_declared"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_non_aqueous_declaration": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_non_aqueous_declaration",
+      "display_group": "features",
+      "fields": [
+        "sku.non_aqueous_declaration"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_pump_attached_during_use": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_pump_attached_during_use",
+      "display_group": "features",
+      "fields": [
+        "sku.pump_attached_during_use"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_lid_detachable_for_access": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_lid_detachable_for_access",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_detachable_for_access"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_primary_closure_type": {
+      "id": "cleansers.oil_balm_cleansers.content.sku_primary_closure_type",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.primary_closure_type"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "ingredients": {
+      "label": "Ingredients",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 152,
+    "roles": {
+      "identity": 6,
+      "descriptive": 16,
+      "omit_placeholder": 42,
+      "buying_choice": 2,
+      "omit_low_value_detail": 5,
+      "literal": 4,
+      "commerce": 1,
+      "review_only": 2,
+      "omit_fixed_detail": 6,
+      "internal": 30,
+      "private_support": 36,
+      "qualifier": 2
+    },
+    "display_groups": 5,
+    "highlight_candidates": 5,
+    "unmapped_descriptive_fields": 5
+  },
+  "semantic_review_note": "Keep rinse-off versus leave-on instructions, texture, ingredients and added fragrance. Package access/spatula care can matter, but pump/cap arithmetic is not a feature. Skin labels remain declarations rather than clinical outcomes."
+}

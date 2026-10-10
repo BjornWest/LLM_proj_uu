@@ -1,0 +1,1807 @@
+{
+  "schema": "product-public-content-v1",
+  "concept_id": "tops.t_shirts",
+  "status": "independently_accepted_local_companion_not_production_integrated",
+  "source_files": {
+    "environments/product_world/data/product_width/_tops_base.json": "51e32a831e1723b60c6e5d7ed71820eee5e785d67cdbeec4a5a765b368a91a8c",
+    "environments/product_world/data/product_width/tops.t_shirts.json": "0afcdd2425a284372948918844e05618c8accc34263124da26baa1830872e6f7"
+  },
+  "source_prose_files": {
+    "docs/agents/product-width-specs/tops.t_shirts.md": "0b671265b55abc628b20e13ebf8ef737224f88e5cb6a6aae080c2c3b98a3d5c0",
+    ".local/product-width/research/t_shirts.md": "00a1e37aa0c5f022d0bc35a92b52aea755131cf38701100b9e6400f834e91975",
+    ".local/product-width/next-lane-A-t-shirts-prose-v1.json": "6a5607385941fae1d47ba499140d32fb5bc77ec7d42225c79e256043ba92aee9",
+    ".local/product-width/annotations/tops.t_shirts/language-plan-v2.json": "5e793383453ac41fa419a9c80fde2d4ff601e95c71f8620bf0f54f0b3546df05"
+  },
+  "fields": {
+    "product.name": {
+      "id": "tops.t_shirts.product.name",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "sku.colour": {
+      "id": "tops.t_shirts.sku.colour",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "white"
+        ]
+      }
+    },
+    "sku.size_label": {
+      "id": "tops.t_shirts.sku.size_label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Commercial label; no wearer-body or actual garment measurement."
+      }
+    },
+    "sku.pack_count": {
+      "id": "tops.t_shirts.sku.pack_count",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "integer",
+        "min": 1,
+        "max": 2,
+        "basis": "Whole purchase of same-style, same-colour, same-label assembled shirts; wrapping/attached parts excluded."
+      }
+    },
+    "sku.nominal_chart_back_length_cm": {
+      "id": "tops.t_shirts.sku.nominal_chart_back_length_cm",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "basis": "Nominal finished-shirt chart back length before washing; not an actual bought-shirt or wearer measurement."
+      }
+    },
+    "sku.actual_back_length_cm": {
+      "id": "tops.t_shirts.sku.actual_back_length_cm",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual back length of the purchased selected shirt, unspecified."
+      }
+    },
+    "sku.actual_half_chest_width_cm": {
+      "id": "tops.t_shirts.sku.actual_half_chest_width_cm",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual laid-flat half-chest width of the purchased selected shirt, unspecified; not body circumference."
+      }
+    },
+    "sku.actual_single_shirt_mass_g": {
+      "id": "tops.t_shirts.sku.actual_single_shirt_mass_g",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "One complete selected shirt with attached parts, without packaging; not fabric g/m²."
+      }
+    },
+    "sku.actual_whole_purchase_textile_mass_g": {
+      "id": "tops.t_shirts.sku.actual_whole_purchase_textile_mass_g",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "All supplied complete shirts with attached parts, excluding packaging; independently unspecified."
+      }
+    },
+    "sku.reference_price_sek": {
+      "id": "tops.t_shirts.sku.reference_price_sek",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "Authored reference price of the whole exact selected shirt purchase, excluding an invented delivery/service fee."
+      }
+    },
+    "review.purchase_price_sek": {
+      "id": "tops.t_shirts.review.purchase_price_sek",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "Whole selected purchase paid amount in this authored owner history."
+      }
+    },
+    "product.facts.form": {
+      "id": "tops.t_shirts.product.facts.form",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.intended_use": {
+      "id": "tops.t_shirts.product.facts.intended_use",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.intended_user": {
+      "id": "tops.t_shirts.product.facts.intended_user",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.fabric_structure": {
+      "id": "tops.t_shirts.product.facts.fabric_structure",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.main_fabric_cotton_percent": {
+      "id": "tops.t_shirts.product.facts.main_fabric_cotton_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "basis": "Main body and sleeve cloth only, excluding neck trim, sewing thread and labels."
+      }
+    },
+    "product.facts.neck_trim_present": {
+      "id": "tops.t_shirts.product.facts.neck_trim_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.neck_trim_count_per_shirt": {
+      "id": "tops.t_shirts.product.facts.neck_trim_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "basis": "Per assembled shirt, not an additional supplied garment or pack total."
+      }
+    },
+    "product.facts.neck_trim_structure": {
+      "id": "tops.t_shirts.product.facts.neck_trim_structure",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.sewing_thread_composition": {
+      "id": "tops.t_shirts.product.facts.sewing_thread_composition",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ]
+      }
+    },
+    "product.facts.whole_garment_cotton_percent": {
+      "id": "tops.t_shirts.product.facts.whole_garment_cotton_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Whole complete-shirt fibre mass percentage cannot be calculated from component declarations without their masses."
+      }
+    },
+    "product.facts.whole_garment_elastane_percent": {
+      "id": "tops.t_shirts.product.facts.whole_garment_elastane_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Whole complete-shirt fibre mass percentage cannot be calculated from component declarations without their masses."
+      }
+    },
+    "product.facts.actual_main_fabric_areal_mass_g_m2": {
+      "id": "tops.t_shirts.product.facts.actual_main_fabric_areal_mass_g_m2",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "g/m2",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual main-fabric mass per area, unspecified; not complete-shirt mass."
+      }
+    },
+    "product.facts.sleeve_length": {
+      "id": "tops.t_shirts.product.facts.sleeve_length",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.sleeve_count_per_shirt": {
+      "id": "tops.t_shirts.product.facts.sleeve_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "basis": "Per assembled shirt, not an additional supplied garment or pack total."
+      }
+    },
+    "product.facts.lower_hem": {
+      "id": "tops.t_shirts.product.facts.lower_hem",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.pull_on": {
+      "id": "tops.t_shirts.product.facts.pull_on",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.fixed_neckline": {
+      "id": "tops.t_shirts.product.facts.fixed_neckline",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.front_opening_present": {
+      "id": "tops.t_shirts.product.facts.front_opening_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.button_count_per_shirt": {
+      "id": "tops.t_shirts.product.facts.button_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "basis": "Per assembled shirt, not an additional supplied garment or pack total."
+      }
+    },
+    "product.facts.zip_count_per_shirt": {
+      "id": "tops.t_shirts.product.facts.zip_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "basis": "Per assembled shirt, not an additional supplied garment or pack total."
+      }
+    },
+    "product.facts.hook_bar_count_per_shirt": {
+      "id": "tops.t_shirts.product.facts.hook_bar_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "basis": "Per assembled shirt, not an additional supplied garment or pack total."
+      }
+    },
+    "product.facts.pocket_count_per_shirt": {
+      "id": "tops.t_shirts.product.facts.pocket_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "basis": "Per assembled shirt, not an additional supplied garment or pack total."
+      }
+    },
+    "product.facts.lining_present": {
+      "id": "tops.t_shirts.product.facts.lining_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.lining_material": {
+      "id": "tops.t_shirts.product.facts.lining_material",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "component": "lining",
+        "basis": "No garment lining is fitted."
+      }
+    },
+    "product.facts.print_present": {
+      "id": "tops.t_shirts.product.facts.print_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.removable_garment_part_count_per_shirt": {
+      "id": "tops.t_shirts.product.facts.removable_garment_part_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "basis": "Per assembled shirt, not an additional supplied garment or pack total."
+      }
+    },
+    "product.facts.hanger_supplied_count": {
+      "id": "tops.t_shirts.product.facts.hanger_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer"
+      }
+    },
+    "product.facts.care_product_supplied_count": {
+      "id": "tops.t_shirts.product.facts.care_product_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer"
+      }
+    },
+    "product.facts.spare_neck_trim_supplied_count": {
+      "id": "tops.t_shirts.product.facts.spare_neck_trim_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer"
+      }
+    },
+    "product.facts.other_garment_type_supplied_count": {
+      "id": "tops.t_shirts.product.facts.other_garment_type_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer"
+      }
+    },
+    "product.facts.measured_stretch_extension_percent": {
+      "id": "tops.t_shirts.product.facts.measured_stretch_extension_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "No numerical purchased-shirt mechanical-stretch/first-wash shrinkage measurement is supplied."
+      }
+    },
+    "product.facts.measured_wash_shrinkage_percent": {
+      "id": "tops.t_shirts.product.facts.measured_wash_shrinkage_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "No numerical purchased-shirt mechanical-stretch/first-wash shrinkage measurement is supplied."
+      }
+    },
+    "product.facts.colourfastness_test_result": {
+      "id": "tops.t_shirts.product.facts.colourfastness_test_result",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ]
+      }
+    },
+    "product.facts.wash_machine_allowed": {
+      "id": "tops.t_shirts.product.facts.wash_machine_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.line_drying_allowed": {
+      "id": "tops.t_shirts.product.facts.line_drying_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.bleach_allowed": {
+      "id": "tops.t_shirts.product.facts.bleach_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.tumble_drying_allowed": {
+      "id": "tops.t_shirts.product.facts.tumble_drying_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.dry_cleaning_allowed": {
+      "id": "tops.t_shirts.product.facts.dry_cleaning_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.iron_main_cloth_only": {
+      "id": "tops.t_shirts.product.facts.iron_main_cloth_only",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.iron_neck_trim_allowed": {
+      "id": "tops.t_shirts.product.facts.iron_neck_trim_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "boolean"
+      }
+    },
+    "product.facts.cut": {
+      "id": "tops.t_shirts.product.facts.cut",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.neckline": {
+      "id": "tops.t_shirts.product.facts.neckline",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.shoulder_style": {
+      "id": "tops.t_shirts.product.facts.shoulder_style",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.neck_trim_cotton_percent": {
+      "id": "tops.t_shirts.product.facts.neck_trim_cotton_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "basis": "The single attached neckline trim only; not main fabric or whole garment.",
+        "component": "neck_trim"
+      }
+    },
+    "product.facts.neck_trim_elastane_percent": {
+      "id": "tops.t_shirts.product.facts.neck_trim_elastane_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "basis": "The single attached neckline trim only; not main fabric or whole garment.",
+        "component": "neck_trim"
+      }
+    },
+    "product.facts.fabric_weight_label": {
+      "id": "tops.t_shirts.product.facts.fabric_weight_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.nominal_main_fabric_areal_mass_g_m2": {
+      "id": "tops.t_shirts.product.facts.nominal_main_fabric_areal_mass_g_m2",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "g/m2",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Nominal declaration for main fabric only, excluding trim/thread; not shirt mass."
+      }
+    },
+    "product.facts.wash_temperature_max_c": {
+      "id": "tops.t_shirts.product.facts.wash_temperature_max_c",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "basis": "Maximum declared whole-shirt machine-wash setting; no care outcome guarantee."
+      }
+    },
+    "product.facts.wash_cycle": {
+      "id": "tops.t_shirts.product.facts.wash_cycle",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    },
+    "product.facts.iron_main_cloth_temperature_max_c": {
+      "id": "tops.t_shirts.product.facts.iron_main_cloth_temperature_max_c",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "basis": "Maximum iron temperature for main cloth only, avoiding neck trim."
+      }
+    },
+    "product.facts.market_range": {
+      "id": "catalog.market_range",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "definition": {
+        "type": "enum",
+        "values": [
+          "women",
+          "men",
+          "unisex"
+        ],
+        "basis": "Commercial model range only; not wearer anatomy, size conversion or measured fit."
+      }
+    },
+    "review.subject.colour": {
+      "id": "tops.t_shirts.review.subject.colour",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "white"
+        ]
+      }
+    },
+    "review.subject.size_label": {
+      "id": "tops.t_shirts.review.subject.size_label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Commercial label; no wearer-body or actual garment measurement."
+      }
+    },
+    "review.subject.pack_count": {
+      "id": "tops.t_shirts.review.subject.pack_count",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "definition": {
+        "type": "integer",
+        "min": 1,
+        "max": 2,
+        "basis": "Whole purchase of same-style, same-colour, same-label assembled shirts; wrapping/attached parts excluded."
+      }
+    },
+    "review.subject.facts.neckline": {
+      "id": "tops.t_shirts.review.subject.facts.neckline",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "definition": {
+        "type": "string"
+      }
+    }
+  },
+  "assertions": {
+    "tops.t_shirts.field.product_name": {
+      "kind": "field_value",
+      "field": "product.name",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_form": {
+      "kind": "field_value",
+      "field": "product.facts.form",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_intended_user": {
+      "kind": "field_value",
+      "field": "product.facts.intended_user",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_intended_use": {
+      "kind": "field_value",
+      "field": "product.facts.intended_use",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "catalog.market_range": {
+      "kind": "field_value",
+      "field": "product.facts.market_range",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_cut": {
+      "kind": "field_value",
+      "field": "product.facts.cut",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_neckline": {
+      "kind": "field_value",
+      "field": "product.facts.neckline",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_shoulder_style": {
+      "kind": "field_value",
+      "field": "product.facts.shoulder_style",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_sleeve_length": {
+      "kind": "field_value",
+      "field": "product.facts.sleeve_length",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_sleeve_count_per_shirt": {
+      "kind": "field_value",
+      "field": "product.facts.sleeve_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_lower_hem": {
+      "kind": "field_value",
+      "field": "product.facts.lower_hem",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_fabric_structure": {
+      "kind": "field_value",
+      "field": "product.facts.fabric_structure",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_main_fabric_cotton_percent": {
+      "kind": "field_value",
+      "field": "product.facts.main_fabric_cotton_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_neck_trim_present": {
+      "kind": "field_value",
+      "field": "product.facts.neck_trim_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_neck_trim_count_per_shirt": {
+      "kind": "field_value",
+      "field": "product.facts.neck_trim_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_neck_trim_structure": {
+      "kind": "field_value",
+      "field": "product.facts.neck_trim_structure",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_neck_trim_cotton_percent": {
+      "kind": "field_value",
+      "field": "product.facts.neck_trim_cotton_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_neck_trim_elastane_percent": {
+      "kind": "field_value",
+      "field": "product.facts.neck_trim_elastane_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_nominal_main_fabric_areal_mass_g_m2": {
+      "kind": "field_value",
+      "field": "product.facts.nominal_main_fabric_areal_mass_g_m2",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_fabric_weight_label": {
+      "kind": "field_value",
+      "field": "product.facts.fabric_weight_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_sewing_thread_composition": {
+      "kind": "field_value",
+      "field": "product.facts.sewing_thread_composition",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_actual_main_fabric_areal_mass_g_m2": {
+      "kind": "field_value",
+      "field": "product.facts.actual_main_fabric_areal_mass_g_m2",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_whole_garment_cotton_percent": {
+      "kind": "field_value",
+      "field": "product.facts.whole_garment_cotton_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_whole_garment_elastane_percent": {
+      "kind": "field_value",
+      "field": "product.facts.whole_garment_elastane_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_pull_on": {
+      "kind": "field_value",
+      "field": "product.facts.pull_on",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_fixed_neckline": {
+      "kind": "field_value",
+      "field": "product.facts.fixed_neckline",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_front_opening_present": {
+      "kind": "field_value",
+      "field": "product.facts.front_opening_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_button_count_per_shirt": {
+      "kind": "field_value",
+      "field": "product.facts.button_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_zip_count_per_shirt": {
+      "kind": "field_value",
+      "field": "product.facts.zip_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_hook_bar_count_per_shirt": {
+      "kind": "field_value",
+      "field": "product.facts.hook_bar_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_pocket_count_per_shirt": {
+      "kind": "field_value",
+      "field": "product.facts.pocket_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_lining_present": {
+      "kind": "field_value",
+      "field": "product.facts.lining_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_print_present": {
+      "kind": "field_value",
+      "field": "product.facts.print_present",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_removable_garment_part_count_per_shirt": {
+      "kind": "field_value",
+      "field": "product.facts.removable_garment_part_count_per_shirt",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_lining_material": {
+      "kind": "field_value",
+      "field": "product.facts.lining_material",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_colour": {
+      "kind": "field_value",
+      "field": "sku.colour",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_size_label": {
+      "kind": "field_value",
+      "field": "sku.size_label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_nominal_chart_back_length_cm": {
+      "kind": "field_value",
+      "field": "sku.nominal_chart_back_length_cm",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_actual_back_length_cm": {
+      "kind": "field_value",
+      "field": "sku.actual_back_length_cm",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_pack_count": {
+      "kind": "field_value",
+      "field": "sku.pack_count",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_hanger_supplied_count": {
+      "kind": "field_value",
+      "field": "product.facts.hanger_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_care_product_supplied_count": {
+      "kind": "field_value",
+      "field": "product.facts.care_product_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_spare_neck_trim_supplied_count": {
+      "kind": "field_value",
+      "field": "product.facts.spare_neck_trim_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_other_garment_type_supplied_count": {
+      "kind": "field_value",
+      "field": "product.facts.other_garment_type_supplied_count",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_actual_half_chest_width_cm": {
+      "kind": "field_value",
+      "field": "sku.actual_half_chest_width_cm",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_actual_single_shirt_mass_g": {
+      "kind": "field_value",
+      "field": "sku.actual_single_shirt_mass_g",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_actual_whole_purchase_textile_mass_g": {
+      "kind": "field_value",
+      "field": "sku.actual_whole_purchase_textile_mass_g",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_wash_machine_allowed": {
+      "kind": "field_value",
+      "field": "product.facts.wash_machine_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_wash_temperature_max_c": {
+      "kind": "field_value",
+      "field": "product.facts.wash_temperature_max_c",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_wash_cycle": {
+      "kind": "field_value",
+      "field": "product.facts.wash_cycle",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_line_drying_allowed": {
+      "kind": "field_value",
+      "field": "product.facts.line_drying_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_bleach_allowed": {
+      "kind": "field_value",
+      "field": "product.facts.bleach_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_tumble_drying_allowed": {
+      "kind": "field_value",
+      "field": "product.facts.tumble_drying_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_dry_cleaning_allowed": {
+      "kind": "field_value",
+      "field": "product.facts.dry_cleaning_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_iron_main_cloth_only": {
+      "kind": "field_value",
+      "field": "product.facts.iron_main_cloth_only",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_iron_main_cloth_temperature_max_c": {
+      "kind": "field_value",
+      "field": "product.facts.iron_main_cloth_temperature_max_c",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_iron_neck_trim_allowed": {
+      "kind": "field_value",
+      "field": "product.facts.iron_neck_trim_allowed",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_measured_stretch_extension_percent": {
+      "kind": "field_value",
+      "field": "product.facts.measured_stretch_extension_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_measured_wash_shrinkage_percent": {
+      "kind": "field_value",
+      "field": "product.facts.measured_wash_shrinkage_percent",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.product_facts_colourfastness_test_result": {
+      "kind": "field_value",
+      "field": "product.facts.colourfastness_test_result",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.sku_reference_price_sek": {
+      "kind": "field_value",
+      "field": "sku.reference_price_sek",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.experience.value.positive": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "value",
+        "polarity": "positive",
+        "context": {
+          "purchase_basis": "whole selected shirt pack",
+          "paid_amount": "selected whole-purchase paid amount",
+          "commercial_choice": "selected colour, size label and shirt count"
+        },
+        "source": "first_hand"
+      }
+    },
+    "tops.t_shirts.field.owner_review_subject_colour": {
+      "kind": "field_value",
+      "field": "review.subject.colour",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.owner_review_subject_size_label": {
+      "kind": "field_value",
+      "field": "review.subject.size_label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.owner_review_subject_pack_count": {
+      "kind": "field_value",
+      "field": "review.subject.pack_count",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.field.owner_review_purchase_price_sek": {
+      "kind": "field_value",
+      "field": "review.purchase_price_sek",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.experience.value.negative": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "value",
+        "polarity": "negative",
+        "context": {
+          "purchase_basis": "whole selected shirt pack",
+          "paid_amount": "selected whole-purchase paid amount",
+          "commercial_choice": "selected colour, size label and shirt count"
+        },
+        "source": "first_hand"
+      }
+    },
+    "tops.t_shirts.experience.wear_feel.positive": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id",
+        "component_key": "tested_shirt",
+        "component_id_expr": "review.tested_shirt_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "wear_feel",
+        "polarity": "positive",
+        "context": {
+          "wear_context": "first afternoon at home",
+          "observed_part": "one shirt",
+          "experience": "fabric feel against the wearer's skin"
+        },
+        "source": "first_hand"
+      }
+    },
+    "tops.t_shirts.experience.wear_feel.negative": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id",
+        "component_key": "tested_shirt",
+        "component_id_expr": "review.tested_shirt_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "wear_feel",
+        "polarity": "negative",
+        "context": {
+          "wear_context": "first afternoon at home",
+          "observed_part": "one shirt",
+          "experience": "fabric feel against the wearer's skin"
+        },
+        "source": "first_hand"
+      }
+    },
+    "tops.t_shirts.experience.neck_feel.positive": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id",
+        "component_key": "tested_shirt",
+        "component_id_expr": "review.tested_shirt_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "neck_feel",
+        "polarity": "positive",
+        "context": {
+          "wear_context": "first afternoon at home",
+          "observed_part": "one shirt",
+          "experience": "neckline feel around the wearer's neck"
+        },
+        "source": "first_hand"
+      }
+    },
+    "tops.t_shirts.field.owner_review_subject_facts_neckline": {
+      "kind": "field_value",
+      "field": "review.subject.facts.neckline",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tops.t_shirts.experience.neck_feel.negative": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id",
+        "component_key": "tested_shirt",
+        "component_id_expr": "review.tested_shirt_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "neck_feel",
+        "polarity": "negative",
+        "context": {
+          "wear_context": "first afternoon at home",
+          "observed_part": "one shirt",
+          "experience": "neckline feel around the wearer's neck"
+        },
+        "source": "first_hand"
+      }
+    },
+    "tops.t_shirts.experience.first_care_neck.positive": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id",
+        "component_key": "tested_shirt",
+        "component_id_expr": "review.tested_shirt_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "first_care_neck",
+        "polarity": "positive",
+        "context": {
+          "wash": "first gentle 30°C wash of the same shirt",
+          "drying": "line dried",
+          "observation": "neck trim appearance when shirt laid flat"
+        },
+        "source": "first_hand"
+      }
+    },
+    "tops.t_shirts.experience.first_care_neck.negative": {
+      "kind": "customer_experience",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id",
+        "component_key": "tested_shirt",
+        "component_id_expr": "review.tested_shirt_id"
+      },
+      "authority": "attributed_experience",
+      "experience": {
+        "aspect": "first_care_neck",
+        "polarity": "negative",
+        "context": {
+          "wash": "first gentle 30°C wash of the same shirt",
+          "drying": "line dried",
+          "observation": "neck trim appearance when shirt laid flat"
+        },
+        "source": "first_hand"
+      }
+    }
+  },
+  "language": {
+    "description.introduction": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_name",
+        "tops.t_shirts.field.product_facts_form",
+        "tops.t_shirts.field.product_facts_intended_user",
+        "tops.t_shirts.field.product_facts_intended_use"
+      ],
+      "formulation_extras": {}
+    },
+    "description.market_range": {
+      "common_assertions": [
+        "catalog.market_range"
+      ],
+      "formulation_extras": {}
+    },
+    "description.shape": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_cut",
+        "tops.t_shirts.field.product_facts_neckline",
+        "tops.t_shirts.field.product_facts_shoulder_style",
+        "tops.t_shirts.field.product_facts_sleeve_length",
+        "tops.t_shirts.field.product_facts_sleeve_count_per_shirt",
+        "tops.t_shirts.field.product_facts_lower_hem"
+      ],
+      "formulation_extras": {}
+    },
+    "description.main_cloth": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_fabric_structure",
+        "tops.t_shirts.field.product_facts_main_fabric_cotton_percent"
+      ],
+      "formulation_extras": {}
+    },
+    "description.neck_trim": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_neck_trim_present",
+        "tops.t_shirts.field.product_facts_neck_trim_count_per_shirt",
+        "tops.t_shirts.field.product_facts_neck_trim_structure",
+        "tops.t_shirts.field.product_facts_neck_trim_cotton_percent",
+        "tops.t_shirts.field.product_facts_neck_trim_elastane_percent"
+      ],
+      "formulation_extras": {}
+    },
+    "description.cloth_mass_declared": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_nominal_main_fabric_areal_mass_g_m2"
+      ],
+      "formulation_extras": {}
+    },
+    "description.cloth_mass_unknown": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_fabric_weight_label",
+        "tops.t_shirts.field.product_facts_nominal_main_fabric_areal_mass_g_m2"
+      ],
+      "formulation_extras": {}
+    },
+    "description.component_unknowns": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_sewing_thread_composition",
+        "tops.t_shirts.field.product_facts_actual_main_fabric_areal_mass_g_m2",
+        "tops.t_shirts.field.product_facts_whole_garment_cotton_percent",
+        "tops.t_shirts.field.product_facts_whole_garment_elastane_percent"
+      ],
+      "formulation_extras": {}
+    },
+    "description.pull_on": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_pull_on",
+        "tops.t_shirts.field.product_facts_fixed_neckline",
+        "tops.t_shirts.field.product_facts_front_opening_present",
+        "tops.t_shirts.field.product_facts_button_count_per_shirt",
+        "tops.t_shirts.field.product_facts_zip_count_per_shirt",
+        "tops.t_shirts.field.product_facts_hook_bar_count_per_shirt"
+      ],
+      "formulation_extras": {}
+    },
+    "description.unlined_plain": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_pocket_count_per_shirt",
+        "tops.t_shirts.field.product_facts_lining_present",
+        "tops.t_shirts.field.product_facts_print_present",
+        "tops.t_shirts.field.product_facts_removable_garment_part_count_per_shirt",
+        "tops.t_shirts.field.product_facts_lining_material"
+      ],
+      "formulation_extras": {}
+    },
+    "description.size_colour": {
+      "common_assertions": [
+        "tops.t_shirts.field.sku_colour",
+        "tops.t_shirts.field.sku_size_label"
+      ],
+      "formulation_extras": {}
+    },
+    "description.chart_length": {
+      "common_assertions": [
+        "tops.t_shirts.field.sku_size_label",
+        "tops.t_shirts.field.sku_nominal_chart_back_length_cm",
+        "tops.t_shirts.field.sku_actual_back_length_cm"
+      ],
+      "formulation_extras": {}
+    },
+    "description.pack": {
+      "common_assertions": [
+        "tops.t_shirts.field.sku_pack_count",
+        "tops.t_shirts.field.product_facts_hanger_supplied_count",
+        "tops.t_shirts.field.product_facts_care_product_supplied_count",
+        "tops.t_shirts.field.product_facts_spare_neck_trim_supplied_count",
+        "tops.t_shirts.field.product_facts_other_garment_type_supplied_count"
+      ],
+      "formulation_extras": {}
+    },
+    "description.actual_quantities_unknown": {
+      "common_assertions": [
+        "tops.t_shirts.field.sku_actual_half_chest_width_cm",
+        "tops.t_shirts.field.sku_actual_single_shirt_mass_g",
+        "tops.t_shirts.field.sku_actual_whole_purchase_textile_mass_g"
+      ],
+      "formulation_extras": {}
+    },
+    "description.wash": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_wash_machine_allowed",
+        "tops.t_shirts.field.product_facts_wash_temperature_max_c",
+        "tops.t_shirts.field.product_facts_wash_cycle"
+      ],
+      "formulation_extras": {}
+    },
+    "description.drying": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_line_drying_allowed",
+        "tops.t_shirts.field.product_facts_bleach_allowed",
+        "tops.t_shirts.field.product_facts_tumble_drying_allowed",
+        "tops.t_shirts.field.product_facts_dry_cleaning_allowed"
+      ],
+      "formulation_extras": {}
+    },
+    "description.ironing": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_iron_main_cloth_only",
+        "tops.t_shirts.field.product_facts_iron_main_cloth_temperature_max_c",
+        "tops.t_shirts.field.product_facts_iron_neck_trim_allowed"
+      ],
+      "formulation_extras": {}
+    },
+    "description.care_measurements_unknown": {
+      "common_assertions": [
+        "tops.t_shirts.field.product_facts_measured_stretch_extension_percent",
+        "tops.t_shirts.field.product_facts_measured_wash_shrinkage_percent",
+        "tops.t_shirts.field.product_facts_colourfastness_test_result"
+      ],
+      "formulation_extras": {}
+    },
+    "description.reference_price": {
+      "common_assertions": [
+        "tops.t_shirts.field.sku_pack_count",
+        "tops.t_shirts.field.sku_reference_price_sek"
+      ],
+      "formulation_extras": {}
+    },
+    "value.positive": {
+      "common_assertions": [
+        "tops.t_shirts.experience.value.positive",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label",
+        "tops.t_shirts.field.owner_review_subject_pack_count",
+        "tops.t_shirts.field.owner_review_purchase_price_sek"
+      ],
+      "formulation_extras": {}
+    },
+    "value.negative": {
+      "common_assertions": [
+        "tops.t_shirts.experience.value.negative",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label",
+        "tops.t_shirts.field.owner_review_subject_pack_count",
+        "tops.t_shirts.field.owner_review_purchase_price_sek"
+      ],
+      "formulation_extras": {}
+    },
+    "wear_feel.positive": {
+      "common_assertions": [
+        "tops.t_shirts.experience.wear_feel.positive",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label"
+      ],
+      "formulation_extras": {}
+    },
+    "wear_feel.negative": {
+      "common_assertions": [
+        "tops.t_shirts.experience.wear_feel.negative",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label"
+      ],
+      "formulation_extras": {}
+    },
+    "neck_feel.positive": {
+      "common_assertions": [
+        "tops.t_shirts.experience.neck_feel.positive",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label",
+        "tops.t_shirts.field.owner_review_subject_facts_neckline"
+      ],
+      "formulation_extras": {}
+    },
+    "neck_feel.negative": {
+      "common_assertions": [
+        "tops.t_shirts.experience.neck_feel.negative",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label",
+        "tops.t_shirts.field.owner_review_subject_facts_neckline"
+      ],
+      "formulation_extras": {}
+    },
+    "first_care_neck.positive": {
+      "common_assertions": [
+        "tops.t_shirts.experience.first_care_neck.positive",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label"
+      ],
+      "formulation_extras": {}
+    },
+    "first_care_neck.negative": {
+      "common_assertions": [
+        "tops.t_shirts.experience.first_care_neck.negative",
+        "tops.t_shirts.field.owner_review_subject_colour",
+        "tops.t_shirts.field.owner_review_subject_size_label"
+      ],
+      "formulation_extras": {}
+    }
+  },
+  "limits": [
+    "Before-DSL literal author fixtures only; no compiler/customer/model sampling evidence.",
+    "Final executable companion pins actual source, actual full tested review.subject/component and exact executable meanings.",
+    "Root independently gates finite/Decimal/native/public and semantic scope before conversion; final acceptance remains independent."
+  ],
+  "required_completed_consumer": {
+    "version": "t-shirts-completed-original-manufacture-market-root-v1",
+    "path": ".local/product-width/annotations/tops.t_shirts/root_completed_caller_v2.py",
+    "factory": "make_package(*, authoritative_inputs)",
+    "raw_package_without_actual_factory_is_not_accepted": true
+  },
+  "historical_required_consumer_before_Root_adoption": {
+    "version": "t-shirts-completed-original-manufacture-market-v2",
+    "path": ".local/product-width/annotations/tops.t_shirts/context_caller_v2.py",
+    "factory": "make_package(*, authoritative_inputs)",
+    "raw_package_without_actual_factory_is_not_accepted": true
+  },
+  "metadata": {
+    "required_completed_consumer": {
+      "path": ".local/product-width/annotations/tops.t_shirts/root_completed_caller_v2.py",
+      "version": "t-shirts-private-actual-manufacture-root-v1"
+    },
+    "runtime_manifest": {
+      "path": ".local/product-width/annotations/tops.t_shirts/root-caller-source-manifest-v2.json",
+      "integrity": "Exact digest embedded in required caller; full current companion guarded. Caller and manifest externally pinned."
+    },
+    "execution_qualification": "Historical genuine original20 retained; final source adoption uses saved successful raw returns, no new model/owner draws.",
+    "adoption": "Opt-in local authoring only; no website/task/training/default integration."
+  }
+}

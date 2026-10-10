@@ -1,0 +1,870 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.casual_trainers",
+  "random_namespace": "product-width-footwear.casual_trainers-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "brand.emphasis_weights": {
+      "type": "object",
+      "input": true
+    },
+    "profile.emphasis": {
+      "type": "enum",
+      "values": [
+        "cushioning",
+        "lightness",
+        "support"
+      ]
+    },
+    "internal.construction": {
+      "type": "object",
+      "properties": {
+        "sole_structure": {
+          "type": "string"
+        },
+        "cushioning": {
+          "type": "string"
+        },
+        "base_mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "enclosed casual trainer",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "casual everyday wear",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one shoe, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "enum",
+      "values": [
+        "canvas",
+        "smooth leather",
+        "suede and textile",
+        "synthetic mesh"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "string",
+      "constant": "rubber",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "enum",
+      "values": [
+        "laces",
+        "elastic slip-on"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_tread": {
+      "type": "enum",
+      "values": [
+        "shallow",
+        "moderate"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cushioning": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 180,
+      "max": 550,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.upper_material": {
+      "type": "string",
+      "optional": true
+    },
+    "request.fastening": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "emphasis",
+      "target": "profile.emphasis",
+      "sample": "weighted_choice",
+      "weights_from": "brand.emphasis_weights"
+    },
+    {
+      "id": "casual_construction",
+      "target": "internal.construction",
+      "sample": "weighted_choice",
+      "weights": {
+        "cupsole": 4,
+        "vulcanized": 3,
+        "foam_midsole": 3
+      },
+      "adjustments": [
+        {
+          "when": "profile.emphasis == 'cushioning'",
+          "multiply": {
+            "foam_midsole": 2
+          }
+        },
+        {
+          "when": "profile.emphasis == 'support'",
+          "multiply": {
+            "cupsole": 1.5
+          }
+        },
+        {
+          "when": "profile.emphasis == 'lightness'",
+          "multiply": {
+            "foam_midsole": 1.5
+          }
+        }
+      ],
+      "values": {
+        "cupsole": {
+          "sole_structure": "rubber cupsole",
+          "cushioning": "modest",
+          "base_mass_g": 370
+        },
+        "vulcanized": {
+          "sole_structure": "vulcanized-style rubber sole",
+          "cushioning": "minimal",
+          "base_mass_g": 330
+        },
+        "foam_midsole": {
+          "sole_structure": "foam midsole with rubber outsole",
+          "cushioning": "substantial",
+          "base_mass_g": 275
+        }
+      }
+    },
+    {
+      "id": "sole_structure",
+      "target": "product.facts.sole_structure",
+      "derive": "internal.construction.sole_structure"
+    },
+    {
+      "id": "cushioning",
+      "target": "product.facts.cushioning",
+      "derive": "internal.construction.cushioning"
+    },
+    {
+      "id": "upper",
+      "target": "product.facts.component_materials.upper",
+      "sample": "weighted_choice",
+      "weights": {
+        "canvas": 3,
+        "smooth leather": 3,
+        "suede and textile": 2,
+        "synthetic mesh": 2
+      },
+      "adjustments": [
+        {
+          "when": "profile.positioning == 'premium'",
+          "multiply": {
+            "smooth leather": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "closure",
+      "target": "product.facts.fastening",
+      "sample": "weighted_choice",
+      "weights": {
+        "laces": 8,
+        "elastic slip-on": 2
+      }
+    },
+    {
+      "id": "tread",
+      "target": "product.facts.sole_tread",
+      "sample": "weighted_choice",
+      "weights": {
+        "shallow": 4,
+        "moderate": 1
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -25,
+      "max": 25
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.construction.base_mass_g + internal.mass_noise_g"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.construction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.intended_use",
+          "product.facts.component_materials.upper",
+          "product.facts.sole_structure",
+          "product.facts.fastening"
+        ]
+      },
+      "slots": {
+        "upper": "product.facts.component_materials.upper",
+        "sole": "product.facts.sole_structure",
+        "closure": "product.facts.fastening"
+      },
+      "formulations": [
+        "A casual trainer with a {upper} upper, {sole} and {closure}.",
+        "For everyday casual wear: {upper}, with {closure} over a {sole}."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "Reference weight: {mass} g per shoe in EU 40.",
+        "One EU 40 reference shoe weighs {mass} g."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.casual_trainers' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "match_upper",
+      "role": "task_requirement",
+      "predicate": "product.facts.component_materials.upper == request.upper_material",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "match_closure",
+      "role": "filter",
+      "predicate": "product.facts.fastening == request.fastening",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "everyday_comfort",
+            "forefoot_fit",
+            "upper_upkeep",
+            "sole_durability"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "everyday_comfort",
+              "forefoot_fit",
+              "upper_upkeep",
+              "sole_durability"
+            ]
+          }
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_everyday_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_forefoot_fit": {
+          "type": "boolean"
+        },
+        "review.positive_upper_upkeep": {
+          "type": "boolean"
+        },
+        "review.positive_sole_durability": {
+          "type": "boolean"
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 350,
+          "max": 2400
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 350
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 2400
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_everyday_comfort",
+          "target": "review.positive_everyday_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_forefoot_fit",
+          "target": "review.positive_forefoot_fit",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_upper_upkeep",
+          "target": "review.positive_upper_upkeep",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_sole_durability",
+          "target": "review.positive_sole_durability",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "everyday_comfort.positive",
+          "when": "'everyday_comfort' in review.topics and review.positive_everyday_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "everyday_comfort",
+            "polarity": "positive",
+            "context": "casual everyday wear",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I wore these through an ordinary day and they stayed comfortable.",
+            "Comfort was good for my daily errands."
+          ]
+        },
+        {
+          "id": "everyday_comfort.negative",
+          "when": "'everyday_comfort' in review.topics and not review.positive_everyday_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "everyday_comfort",
+            "polarity": "negative",
+            "context": "casual everyday wear",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My feet felt sore by the end of an ordinary day.",
+            "They became uncomfortable during routine daily wear."
+          ]
+        },
+        {
+          "id": "forefoot_fit.positive",
+          "when": "'forefoot_fit' in review.topics and review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "positive",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "There was enough room across my forefoot in the size I tried.",
+            "The front of the shoe did not squeeze my foot."
+          ]
+        },
+        {
+          "id": "forefoot_fit.negative",
+          "when": "'forefoot_fit' in review.topics and not review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "negative",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They squeezed across my forefoot.",
+            "The front felt too narrow for my foot."
+          ]
+        },
+        {
+          "id": "upper_upkeep.positive",
+          "when": "'upper_upkeep' in review.topics and review.positive_upper_upkeep",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "upper_upkeep",
+            "polarity": "positive",
+            "context": "cleaning after everyday wear",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Routine marks were straightforward to clean off the upper.",
+            "The upper was easy to keep looking tidy."
+          ]
+        },
+        {
+          "id": "upper_upkeep.negative",
+          "when": "'upper_upkeep' in review.topics and not review.positive_upper_upkeep",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "upper_upkeep",
+            "polarity": "negative",
+            "context": "cleaning after everyday wear",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Everyday marks were difficult to remove from the upper.",
+            "Keeping the upper clean took more effort than I expected."
+          ]
+        },
+        {
+          "id": "sole_durability.positive",
+          "when": "'sole_durability' in review.topics and review.positive_sole_durability",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "sole_durability",
+            "polarity": "positive",
+            "context": {
+              "use": "routine everyday wear",
+              "duration": "several months",
+              "aspect": "sole wear"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The sole held up well through several months of ordinary wear.",
+            "After months of errands the sole was still in good shape."
+          ]
+        },
+        {
+          "id": "sole_durability.negative",
+          "when": "'sole_durability' in review.topics and not review.positive_sole_durability",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "sole_durability",
+            "polarity": "negative",
+            "context": {
+              "use": "routine everyday wear",
+              "duration": "several months",
+              "aspect": "sole wear"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "After several months of everyday use, the sole had worn down sooner than I expected.",
+            "The sole showed more wear than I expected after several months of routine use."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent, concentration1.5, protected mention frequency; value score reuses pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote or checkout record",
+        "relative_price_basis": {
+          "min_sek": 350,
+          "max_sek": 2400
+        },
+        "value_not_quality": "Price changes only value sentiment; not star draw, execution or every topic"
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.casual_trainers.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "store_type_ids": [
+      "footwear",
+      "apparel",
+      "outdoors"
+    ],
+    "fixed_trait_boundary": "Everyday marketed use, not performance-running or long-walk proof",
+    "research_status": "Primary examples recorded in .local/product-width/research/casual_trainers.md; semantic review corrections applied",
+    "review_policy_revision": "width-review-policy-v2"
+  }
+}

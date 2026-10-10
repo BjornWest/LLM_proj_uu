@@ -1,0 +1,128 @@
+{
+  "schema": "product-feature-concept-exceptions-v1",
+  "notes": [
+    "These exceptions affect publication and highlights only; they do not invent manufacturing values.",
+    "A retained negative compatibility/care fact is still useful when explicitly selected; it is not a promotional highlight."
+  ],
+  "concepts": {
+    "furniture.fixed_height_desks": {
+      "omit_names": [
+        "height_adjustable",
+        "foldable",
+        "height_adjustment_mechanism",
+        "height_range_min_mm",
+        "height_range_max_mm",
+        "memory_setting_count"
+      ],
+      "note": "Fixed-height desks have no height-adjustment/folding menu; exclude those fixed absences and NA adjustment ranges. Preserve actual desktop geometry and load."
+    },
+    "furniture.folding_space_saving_desks": {
+      "no_highlight_names": [
+        "height_adjustable_in_use",
+        "drawer_count",
+        "suitable_wall_construction"
+      ],
+      "note": "Lead with folding mechanism, usable/folded geometry and mounting conditions; fixed absence of drawers/height adjustment is not a highlight."
+    },
+    "furniture.sit_stand_desks": {
+      "no_highlight_names": [
+        "foldable",
+        "drawer_count"
+      ],
+      "note": "Height range/drive/memory are distinctive; fixed absence of folding/drawers is not promotional."
+    },
+    "toothbrushes.manual_toothbrushes": {
+      "omit_names": [
+        "timer_present",
+        "pressure_feedback_present",
+        "head_replaceable",
+        "powered",
+        "motor_count_per_brush",
+        "battery_count_per_brush",
+        "charger_count",
+        "charging_cable_count",
+        "spare_head_count",
+        "toothpaste_count",
+        "floss_count",
+        "holder_count",
+        "travel_case_count",
+        "rubber_grip_insert_present",
+        "neck_adjustable"
+      ],
+      "note": "Manual brush care, head shape and bristle firmness matter; do not list absent motor/app/charging/extras as product features."
+    },
+    "toothbrushes.electric_toothbrushes": {
+      "no_highlight_names": [
+        "incompatible_head_platforms"
+      ],
+      "note": "Publish compatibility exclusions with their supported platform when needed; do not use excluded platforms as highlights."
+    },
+    "pet_bowls.standard_bowls": {
+      "omit_names": [
+        "feeding_obstacles"
+      ],
+      "note": "No feeding obstacles is ordinary bowl anatomy. Material, removable liner/care and nominal capacity remain useful."
+    },
+    "pet_bowls.drinking_fountains": {
+      "omit_names": [
+        "feeding_obstacles"
+      ],
+      "note": "Publish the water/pump/filter power and care; ordinary absence of feeding obstacles is not a fountain feature."
+    },
+    "pet_bowls.raised_feeding_stations": {
+      "omit_names": [
+        "feeding_obstacles"
+      ],
+      "note": "Focus on height, removable bowls and materials; no slow-feed obstacles is ordinary station anatomy."
+    },
+    "pet_toys.chew_toys": {
+      "no_highlight_names": [
+        "puzzle_mechanism",
+        "treat_dispensing"
+      ],
+      "note": "Known absence of a puzzle/dispenser is not a chew-toy selling point; do not force every toy into every family function."
+    },
+    "pet_toys.soft_toys": {
+      "no_highlight_names": [
+        "food_compartment_present"
+      ],
+      "note": "Plush construction, stuffing, squeaker/catnip and care matter; no food compartment is not promotional."
+    },
+    "cookware.woks": {
+      "no_highlight_names": [
+        "lid_body_material"
+      ],
+      "note": "The wok surface/shape and hob compatibility dominate; optional lid details remain contents/construction."
+    },
+    "pots.casserole_dutch_oven_pots": {
+      "no_highlight_names": [
+        "lid_body_material"
+      ],
+      "note": "Body/coating/capacity and assembled heat suitability dominate; lid material remains a secondary detail."
+    },
+    "pots.saucepans": {
+      "no_highlight_names": [
+        "lid_body_material"
+      ],
+      "note": "Body/base/hob/capacity dominate; lid material stays a detail."
+    },
+    "pots.stockpots": {
+      "no_highlight_names": [
+        "lid_body_material"
+      ],
+      "note": "Capacity/body/hob/care dominate; lid material stays a detail."
+    },
+    "footwear.flip_flops": {
+      "no_highlight_names": [
+        "fastening"
+      ],
+      "note": "A toe-post/slip-on construction is part of product identity; do not promote absence of fastening hardware."
+    },
+    "footwear.rubber_boots": {
+      "no_highlight_names": [
+        "fastening"
+      ],
+      "note": "Pull-on rubber boots need shaft/lining/waterproof declarations, not fastening absence as a headline."
+    }
+  }
+}

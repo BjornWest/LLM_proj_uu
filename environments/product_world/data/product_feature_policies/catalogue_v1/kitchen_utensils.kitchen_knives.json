@@ -1,0 +1,1015 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "kitchen_utensils.kitchen_knives",
+  "family_id": "kitchen_utensils",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/kitchen_utensils.kitchen_knives.json": "48d3dde360dc15d8f6c8056b341ebe4f3d154f7e45ee636ad6e0a8ee627164f5",
+    "environments/product_world/data/product_width/_kitchen_utensils_base.json": "0d3b6bb90cb1061d33594e34a163cd84614b28216c00ce13a6de6a7e39e2d43f",
+    "environments/product_world/data/product_public_content/kitchen_utensils.kitchen_knives.json": "cd3ad8a55d183392e5030eacc9c869cf0286f5e49afce8f9ead2d5a361fba577"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Function/material/contact surface first. Component-specific heat and cleaning are scoped groups, not whole-tool guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "kitchen_knives.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.pack_count": {
+      "semantic_id": "kitchen_knives.product.facts.pack_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "assembled functional knives; fitted blade and handle are not separate items",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pack_count"
+    },
+    "product.facts.manual": {
+      "semantic_id": "kitchen_knives.product.facts.manual",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "manual"
+    },
+    "product.facts.fixed_blade": {
+      "semantic_id": "kitchen_knives.product.facts.fixed_blade",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fixed_blade"
+    },
+    "product.facts.blade_material": {
+      "semantic_id": "kitchen_knives.product.facts.blade_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "stainless steel",
+        "component": "fitted blade",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "blade_material"
+    },
+    "product.facts.blade_user_removable": {
+      "semantic_id": "kitchen_knives.product.facts.blade_user_removable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "blade_user_removable"
+    },
+    "product.facts.handle_user_removable": {
+      "semantic_id": "kitchen_knives.product.facts.handle_user_removable",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handle_user_removable"
+    },
+    "product.facts.steel_grade_declaration": {
+      "semantic_id": "kitchen_knives.product.facts.steel_grade_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "component": "fitted steel blade",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fastening_method": {
+      "semantic_id": "kitchen_knives.product.facts.fastening_method",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "component": "fitted blade/handle assembly",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.storage_guard_count": {
+      "semantic_id": "kitchen_knives.product.facts.storage_guard_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0,
+        "unit": "count",
+        "basis": "separate supplied storage guards, not fitted hand guards",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_guard_count"
+    },
+    "product.facts.storage_guard_material": {
+      "semantic_id": "kitchen_knives.product.facts.storage_guard_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not applicable",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.storage_guard_count > 0",
+        "component": "separate storage guard",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.storage_guard_care": {
+      "semantic_id": "kitchen_knives.product.facts.storage_guard_care",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not applicable",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.storage_guard_count > 0",
+        "component": "separate storage guard",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.supplied_item_count": {
+      "semantic_id": "kitchen_knives.product.facts.supplied_item_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "complete usable supplied items; fitted parts and retail packing excluded",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_item_count"
+    },
+    "product.facts.supplied_contents": {
+      "semantic_id": "kitchen_knives.product.facts.supplied_contents",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one assembled fixed-blade knife with its fitted handle; no separate guard, board, food, cloth, brush, sharpener, honing rod or spare blade",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_contents"
+    },
+    "product.facts.actual_blade_length_mm": {
+      "semantic_id": "kitchen_knives.product.facts.actual_blade_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "unit": "mm",
+        "basis": "actual purchased-unit straight-line blade/handle junction to tip",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_overall_length_mm": {
+      "semantic_id": "kitchen_knives.product.facts.actual_overall_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "unit": "mm",
+        "basis": "actual purchased assembled knife end to end, excluding packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_purchase_mass_g": {
+      "semantic_id": "kitchen_knives.product.facts.actual_purchase_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "unit": "g",
+        "basis": "actual complete supplied knife mass including fitted handle, excluding packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.knife_form": {
+      "semantic_id": "kitchen_knives.product.facts.knife_form",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "chef’s knife",
+          "santoku knife",
+          "paring knife",
+          "bread knife"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "knife_form"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "kitchen_knives.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ordinary vegetable preparation",
+          "trimming small fruit and vegetables",
+          "slicing bread"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.edge_profile": {
+      "semantic_id": "kitchen_knives.product.facts.edge_profile",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "plain edge",
+          "serrated edge"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "edge_profile"
+    },
+    "product.facts.handle_material": {
+      "semantic_id": "kitchen_knives.product.facts.handle_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene",
+          "beech wood"
+        ],
+        "component": "hand-contact fitted handle",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "handle_material"
+    },
+    "product.facts.colour_scope": {
+      "semantic_id": "kitchen_knives.product.facts.colour_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fitted hand-contact handle"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.dishwasher_allowed": {
+      "semantic_id": "kitchen_knives.product.facts.dishwasher_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "component": "whole assembled knife including blade and fitted handle",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dishwasher_allowed"
+    },
+    "product.facts.care_declaration": {
+      "semantic_id": "kitchen_knives.product.facts.care_declaration",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Handwash the blade and fitted handle with mild washing-up liquid and a soft sponge or cloth, rinse and dry promptly; do not soak, and keep fingers clear of the edge. Dishwasher use is permitted without a rack restriction; handwashing recommended.",
+          "Handwash the blade and fitted handle with mild washing-up liquid and a soft sponge or cloth, rinse and dry promptly; do not soak, and keep fingers clear of the edge. Handwash only; dishwasher use is not permitted."
+        ],
+        "component": "whole assembled knife including blade and fitted handle",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "care_declaration"
+    },
+    "product.facts.nominal_blade_length_mm": {
+      "semantic_id": "kitchen_knives.product.facts.nominal_blade_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "catalogue nominal straight-line blade/handle junction to tip; not developed edge or overall length",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_blade_length_mm"
+    },
+    "product.facts.nominal_overall_length_mm": {
+      "semantic_id": "kitchen_knives.product.facts.nominal_overall_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "catalogue nominal assembled knife end to end including fitted handle, without packing",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_overall_length_mm"
+    },
+    "sku.colour": {
+      "semantic_id": "kitchen_knives.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "blue",
+          "natural wood",
+          "red"
+        ],
+        "component": "fitted hand-contact handle",
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "kitchen_knives.sku.pack_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "assembled functional knives; fitted blade and handle are not separate items"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.pack_count"
+    },
+    "sku.supplied_contents": {
+      "semantic_id": "kitchen_knives.sku.supplied_contents",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one assembled fixed-blade knife with its fitted handle; no separate guard, board, food, cloth, brush, sharpener, honing rod or spare blade"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supplied_contents"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "kitchen_knives.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "reference for complete single supplied knife with fitted handle; not retailer offer, shipping total or actual payment",
+        "min": 80,
+        "max": 1020
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "chef_polymer",
+          "santoku_wood",
+          "paring_polymer",
+          "bread_polymer"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "pack_count": {
+      "id": "kitchen_utensils.kitchen_knives.content.pack_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.pack_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "manual": {
+      "id": "kitchen_utensils.kitchen_knives.content.manual",
+      "display_group": "features",
+      "fields": [
+        "product.facts.manual"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fixed_blade": {
+      "id": "kitchen_utensils.kitchen_knives.content.fixed_blade",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fixed_blade"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "blade_material": {
+      "id": "kitchen_utensils.kitchen_knives.content.blade_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.blade_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "blade_user_removable": {
+      "id": "kitchen_utensils.kitchen_knives.content.blade_user_removable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.blade_user_removable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_user_removable": {
+      "id": "kitchen_utensils.kitchen_knives.content.handle_user_removable",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_user_removable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_guard_count": {
+      "id": "kitchen_utensils.kitchen_knives.content.storage_guard_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.storage_guard_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_item_count": {
+      "id": "kitchen_utensils.kitchen_knives.content.supplied_item_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_item_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_contents": {
+      "id": "kitchen_utensils.kitchen_knives.content.supplied_contents",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_contents"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "knife_form": {
+      "id": "kitchen_utensils.kitchen_knives.content.knife_form",
+      "display_group": "features",
+      "fields": [
+        "product.facts.knife_form"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "edge_profile": {
+      "id": "kitchen_utensils.kitchen_knives.content.edge_profile",
+      "display_group": "features",
+      "fields": [
+        "product.facts.edge_profile"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "handle_material": {
+      "id": "kitchen_utensils.kitchen_knives.content.handle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dishwasher_allowed": {
+      "id": "kitchen_utensils.kitchen_knives.content.dishwasher_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dishwasher_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_declaration": {
+      "id": "kitchen_utensils.kitchen_knives.content.care_declaration",
+      "display_group": "care",
+      "fields": [
+        "product.facts.care_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_blade_length_mm": {
+      "id": "kitchen_utensils.kitchen_knives.content.nominal_blade_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.nominal_blade_length_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "nominal_overall_length_mm": {
+      "id": "kitchen_utensils.kitchen_knives.content.nominal_overall_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.nominal_overall_length_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 32,
+    "roles": {
+      "identity": 2,
+      "literal": 9,
+      "omit_placeholder": 7,
+      "descriptive": 7,
+      "qualifier": 1,
+      "buying_choice": 1,
+      "alias": 2,
+      "commerce": 1,
+      "operational": 1,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 4,
+    "unmapped_descriptive_fields": 0
+  }
+}

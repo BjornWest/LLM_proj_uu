@@ -1,0 +1,2804 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "pots.stockpots",
+  "family_id": "pots",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pots.stockpots.json": "fbf31913bc243c0cc4154d58f40eedcf379fa4bf26c2fa6cdc60314ac1b39a1d",
+    "environments/product_world/data/product_width/_cookware_base.json": "6608f450b998c44b734332a64615cfff4c6533e204506ec6a39a0cf3eb4a8acc",
+    "environments/product_world/data/product_public_content/pots.stockpots.json": "a81e353c27f8400af24b83fbc91b58a60a19b2fa5a6f613f758851c645f0e064"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep lid/handle/component heat and care distinctions. Capacity labels, working fill and measured volume are not interchangeable.",
+  "concept_note": "Capacity/body/hob/care dominate; lid material stays a detail.",
+  "fields": {
+    "product.name": {
+      "semantic_id": "stockpots.public.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.intended_use": {
+      "semantic_id": "stockpots.public.sku.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "stovetop preparation of soups and stocks",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "stockpot purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.body_shape": {
+      "semantic_id": "stockpots.public.sku.body_shape",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "round, straight-sided body",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_shape"
+    },
+    "sku.body_material": {
+      "semantic_id": "stockpots.public.sku.body_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "body_material"
+    },
+    "sku.base_construction": {
+      "semantic_id": "stockpots.public.sku.base_construction",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot base"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "base_construction"
+    },
+    "sku.manufactured_coating_present": {
+      "semantic_id": "stockpots.public.sku.manufactured_coating_present",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot cooking surface"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "manufactured_coating_present"
+    },
+    "sku.metal_grade_declaration": {
+      "semantic_id": "stockpots.public.sku.metal_grade_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.coating_kind": {
+      "semantic_id": "stockpots.public.sku.coating_kind",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot cooking surface and exterior"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "coating_kind"
+    },
+    "sku.coating_chemistry_declaration": {
+      "semantic_id": "stockpots.public.sku.coating_chemistry_declaration",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "manufactured enamel coating"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "coating_chemistry_declaration"
+    },
+    "sku.coating_thickness_mm": {
+      "semantic_id": "stockpots.public.sku.coating_thickness_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.coating_thickness_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "manufactured enamel coating"
+        },
+        "measurement_basis": {
+          "literal": "actual coating thickness; not applicable when no coating exists"
+        },
+        "declared_status": {
+          "expr": "sku.coating_thickness_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.side_handle_count": {
+      "semantic_id": "stockpots.public.sku.side_handle_count",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fixed side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "side_handle_count"
+    },
+    "sku.side_handle_shape": {
+      "semantic_id": "stockpots.public.sku.side_handle_shape",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "loop handles",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fixed side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "side_handle_shape"
+    },
+    "sku.side_handle_materials": {
+      "semantic_id": "stockpots.public.sku.side_handle_materials",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fixed side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "side_handle_materials"
+    },
+    "sku.side_handle_attachment": {
+      "semantic_id": "stockpots.public.sku.side_handle_attachment",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "fixed non-removable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "side_handle_attachment"
+    },
+    "sku.handle_fastening_detail": {
+      "semantic_id": "stockpots.public.sku.handle_fastening_detail",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "side handle attachments"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.lid_count": {
+      "semantic_id": "stockpots.public.sku.lid_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied separate lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_count"
+    },
+    "sku.lid_supplied_separately": {
+      "semantic_id": "stockpots.public.sku.lid_supplied_separately",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_supplied_separately"
+    },
+    "sku.lid_body_material": {
+      "semantic_id": "stockpots.public.sku.lid_body_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied lid body"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_body_material"
+    },
+    "sku.lid_knob_count": {
+      "semantic_id": "stockpots.public.sku.lid_knob_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied lid knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_knob_count"
+    },
+    "sku.lid_knob_fitted": {
+      "semantic_id": "stockpots.public.sku.lid_knob_fitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied lid knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_knob_fitted"
+    },
+    "sku.lid_knob_material": {
+      "semantic_id": "stockpots.public.sku.lid_knob_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fitted supplied lid knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_knob_material"
+    },
+    "sku.lid_steam_vent_present": {
+      "semantic_id": "stockpots.public.sku.lid_steam_vent_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_steam_vent_present"
+    },
+    "sku.lid_rim_material": {
+      "semantic_id": "stockpots.public.sku.lid_rim_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied lid rim"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_rim_material"
+    },
+    "sku.nominal_capacity_ml": {
+      "semantic_id": "stockpots.public.sku.nominal_capacity_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.nominal_capacity_ml_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "declared nominal vessel capacity; brim versus working basis unspecified"
+        },
+        "declared_status": {
+          "expr": "sku.nominal_capacity_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_capacity_ml"
+    },
+    "sku.brim_capacity_ml": {
+      "semantic_id": "stockpots.public.sku.brim_capacity_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.brim_capacity_ml_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "actual liquid volume to the brim, not nominal or working fill"
+        },
+        "declared_status": {
+          "expr": "sku.brim_capacity_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.recommended_working_fill_ml": {
+      "semantic_id": "stockpots.public.sku.recommended_working_fill_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.recommended_working_fill_ml_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "recommended maximum working fill, not nominal or brim volume"
+        },
+        "declared_status": {
+          "expr": "sku.recommended_working_fill_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.nominal_diameter_mm": {
+      "semantic_id": "stockpots.public.sku.nominal_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.nominal_diameter_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "nominal catalogue diameter; measurement location unspecified"
+        },
+        "declared_status": {
+          "expr": "sku.nominal_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_diameter_mm"
+    },
+    "sku.reference_body_height_mm": {
+      "semantic_id": "stockpots.public.sku.reference_body_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_body_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "exterior body height excluding lid and side handles"
+        },
+        "declared_status": {
+          "expr": "sku.reference_body_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_body_height_mm"
+    },
+    "sku.reference_overall_width_mm": {
+      "semantic_id": "stockpots.public.sku.reference_overall_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_overall_width_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "overall width including both fixed side handles"
+        },
+        "declared_status": {
+          "expr": "sku.reference_overall_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_overall_width_mm"
+    },
+    "sku.reference_lidded_height_mm": {
+      "semantic_id": "stockpots.public.sku.reference_lidded_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_lidded_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot with supplied complete lid seated"
+        },
+        "measurement_basis": {
+          "literal": "supplied lid seated, including its fitted knob"
+        },
+        "declared_status": {
+          "expr": "sku.reference_lidded_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_lidded_height_mm"
+    },
+    "sku.actual_diameter_mm": {
+      "semantic_id": "stockpots.public.sku.actual_diameter_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_diameter_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "actual purchased body diameter; measurement location unspecified"
+        },
+        "declared_status": {
+          "expr": "sku.actual_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_body_height_mm": {
+      "semantic_id": "stockpots.public.sku.actual_body_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_body_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "actual exterior body height excluding lid and side handles"
+        },
+        "declared_status": {
+          "expr": "sku.actual_body_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_overall_width_mm": {
+      "semantic_id": "stockpots.public.sku.actual_overall_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_overall_width_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "actual overall width including both fixed side handles"
+        },
+        "declared_status": {
+          "expr": "sku.actual_overall_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_lidded_height_mm": {
+      "semantic_id": "stockpots.public.sku.actual_lidded_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_lidded_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot with supplied complete lid seated"
+        },
+        "measurement_basis": {
+          "literal": "actual height including seated supplied lid and fitted knob"
+        },
+        "declared_status": {
+          "expr": "sku.actual_lidded_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_interior_depth_mm": {
+      "semantic_id": "stockpots.public.sku.actual_interior_depth_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_interior_depth_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "actual interior depth"
+        },
+        "declared_status": {
+          "expr": "sku.actual_interior_depth_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_base_contact_diameter_mm": {
+      "semantic_id": "stockpots.public.sku.actual_base_contact_diameter_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_base_contact_diameter_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot base"
+        },
+        "measurement_basis": {
+          "literal": "actual hob-contact footprint diameter"
+        },
+        "declared_status": {
+          "expr": "sku.actual_base_contact_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.assembled_pot_mass_g": {
+      "semantic_id": "stockpots.public.sku.assembled_pot_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.assembled_pot_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "actual pot plus its two fitted side handles, excluding lid and packing"
+        },
+        "declared_status": {
+          "expr": "sku.assembled_pot_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.complete_lid_mass_g": {
+      "semantic_id": "stockpots.public.sku.complete_lid_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.complete_lid_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid"
+        },
+        "measurement_basis": {
+          "literal": "actual lid including fitted knob and rim, excluding pot and packing"
+        },
+        "declared_status": {
+          "expr": "sku.complete_lid_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.usable_set_mass_g": {
+      "semantic_id": "stockpots.public.sku.usable_set_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.usable_set_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete usable supplied set"
+        },
+        "measurement_basis": {
+          "literal": "actual assembled pot and complete supplied lid together, excluding packing"
+        },
+        "declared_status": {
+          "expr": "sku.usable_set_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.assembled_pot_oven_suitability": {
+      "semantic_id": "stockpots.public.sku.assembled_pot_oven_suitability",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete pot including fitted side handles, excluding lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_pot_oven_suitability"
+    },
+    "sku.assembled_lid_oven_suitability": {
+      "semantic_id": "stockpots.public.sku.assembled_lid_oven_suitability",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid including rim and fitted knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_lid_oven_suitability"
+    },
+    "sku.assembled_pot_oven_limit_c": {
+      "semantic_id": "stockpots.public.sku.assembled_pot_oven_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.assembled_pot_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "maximum for complete assembled pot; not applicable when assembly is explicitly oven-unsuitable"
+        },
+        "declared_status": {
+          "expr": "sku.assembled_pot_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.assembled_lid_oven_limit_c": {
+      "semantic_id": "stockpots.public.sku.assembled_lid_oven_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.assembled_lid_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid"
+        },
+        "measurement_basis": {
+          "literal": "maximum for lid including rim and fitted knob; not applicable when assembly is explicitly oven-unsuitable"
+        },
+        "declared_status": {
+          "expr": "sku.assembled_lid_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.body_only_heat_permission": {
+      "semantic_id": "stockpots.public.sku.body_only_heat_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body only, excluding side handles and lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.side_handle_heat_permission": {
+      "semantic_id": "stockpots.public.sku.side_handle_heat_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fitted side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.lid_body_heat_permission": {
+      "semantic_id": "stockpots.public.sku.lid_body_heat_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "lid body only, excluding rim and fitted knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.lid_knob_heat_permission": {
+      "semantic_id": "stockpots.public.sku.lid_knob_heat_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fitted supplied lid knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.body_only_heat_limit_c": {
+      "semantic_id": "stockpots.public.sku.body_only_heat_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.body_only_heat_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body only"
+        },
+        "measurement_basis": {
+          "literal": "separate heat maximum excluding side handles and lid"
+        },
+        "declared_status": {
+          "expr": "sku.body_only_heat_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.side_handle_heat_limit_c": {
+      "semantic_id": "stockpots.public.sku.side_handle_heat_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.side_handle_heat_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "separate heat maximum for the fitted side handles"
+        },
+        "declared_status": {
+          "expr": "sku.side_handle_heat_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.lid_body_heat_limit_c": {
+      "semantic_id": "stockpots.public.sku.lid_body_heat_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.lid_body_heat_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "lid body only"
+        },
+        "measurement_basis": {
+          "literal": "separate heat maximum excluding rim and knob"
+        },
+        "declared_status": {
+          "expr": "sku.lid_body_heat_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.lid_knob_heat_limit_c": {
+      "semantic_id": "stockpots.public.sku.lid_knob_heat_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.lid_knob_heat_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fitted lid knob"
+        },
+        "measurement_basis": {
+          "literal": "separate heat maximum for the fitted knob"
+        },
+        "declared_status": {
+          "expr": "sku.lid_knob_heat_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.compatible_hobs": {
+      "semantic_id": "stockpots.public.sku.compatible_hobs",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 4,
+        "max_items": 4,
+        "optional": true,
+        "constant": [
+          "induction",
+          "gas",
+          "radiant electric",
+          "glass ceramic"
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete assembled pot"
+        },
+        "basis": {
+          "literal": "explicit declared hob list; actual fit not established by declaration"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "compatible_hobs"
+    },
+    "sku.first_use_care": {
+      "semantic_id": "stockpots.public.sku.first_use_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Remove retail packing and labels; handwash the supplied pot and lid, rinse and dry before use.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied pot and complete lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "first_use_care"
+    },
+    "sku.body_care": {
+      "semantic_id": "stockpots.public.sku.body_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "After cooling, handwash the cooking surface with washing-up liquid and a soft sponge, rinse and dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot cooking surface"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_care"
+    },
+    "sku.handle_care": {
+      "semantic_id": "stockpots.public.sku.handle_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Handwash the attached side handles, rinse and dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "attached pot side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handle_care"
+    },
+    "sku.lid_care": {
+      "semantic_id": "stockpots.public.sku.lid_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Handwash the complete lid with its fitted knob, rinse and dry; avoid sudden temperature changes.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid including fitted knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_care"
+    },
+    "sku.utensil_care": {
+      "semantic_id": "stockpots.public.sku.utensil_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Use wooden or blunt plastic utensils; avoid scratching abrasives.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot cooking surface"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "utensil_care"
+    },
+    "sku.heating_care": {
+      "semantic_id": "stockpots.public.sku.heating_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Keep liquid in the pot while heating; do not heat dry or allow it to boil dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "heating_care"
+    },
+    "sku.impact_care": {
+      "semantic_id": "stockpots.public.sku.impact_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Avoid impacts and sudden temperature changes.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied pot and lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "impact_care"
+    },
+    "sku.assembled_pot_dishwasher_allowed": {
+      "semantic_id": "stockpots.public.sku.assembled_pot_dishwasher_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete assembled pot including fitted side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_pot_dishwasher_allowed"
+    },
+    "sku.assembled_lid_dishwasher_allowed": {
+      "semantic_id": "stockpots.public.sku.assembled_lid_dishwasher_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid including rim and fitted knob"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_lid_dishwasher_allowed"
+    },
+    "sku.handwashing_recommended": {
+      "semantic_id": "stockpots.public.sku.handwashing_recommended",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied pot and lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handwashing_recommended"
+    },
+    "sku.pot_immersion_permission": {
+      "semantic_id": "stockpots.public.sku.pot_immersion_permission",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete pot including its attached side handles"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pot_immersion_permission"
+    },
+    "sku.pot_count": {
+      "semantic_id": "stockpots.public.sku.pot_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pot_count"
+    },
+    "sku.usable_supplied_item_count": {
+      "semantic_id": "stockpots.public.sku.usable_supplied_item_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied pot and separate complete lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usable_supplied_item_count"
+    },
+    "sku.fitted_parts_excluded_from_usable_count": {
+      "semantic_id": "stockpots.public.sku.fitted_parts_excluded_from_usable_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable item count"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.packaging_excluded_from_usable_count": {
+      "semantic_id": "stockpots.public.sku.packaging_excluded_from_usable_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable item count"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "packaging_excluded_from_usable_count"
+    },
+    "sku.long_handle_count": {
+      "semantic_id": "stockpots.public.sku.long_handle_count",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "long_handle_count"
+    },
+    "sku.loose_spare_handle_count": {
+      "semantic_id": "stockpots.public.sku.loose_spare_handle_count",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "loose_spare_handle_count"
+    },
+    "sku.loose_spare_knob_count": {
+      "semantic_id": "stockpots.public.sku.loose_spare_knob_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "loose_spare_knob_count"
+    },
+    "sku.strainer_count": {
+      "semantic_id": "stockpots.public.sku.strainer_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "strainer_count"
+    },
+    "sku.steamer_insert_count": {
+      "semantic_id": "stockpots.public.sku.steamer_insert_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "steamer_insert_count"
+    },
+    "sku.ladle_count": {
+      "semantic_id": "stockpots.public.sku.ladle_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ladle_count"
+    },
+    "sku.oven_mitt_count": {
+      "semantic_id": "stockpots.public.sku.oven_mitt_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.trivet_count": {
+      "semantic_id": "stockpots.public.sku.trivet_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "trivet_count"
+    },
+    "sku.cleaning_tool_count": {
+      "semantic_id": "stockpots.public.sku.cleaning_tool_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.hob_count": {
+      "semantic_id": "stockpots.public.sku.hob_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied usable purchase"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.pouring_rim": {
+      "semantic_id": "stockpots.public.sku.pouring_rim",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "plain unnotched rim",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot rim"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pouring_rim"
+    },
+    "sku.graduated_fill_scale_present": {
+      "semantic_id": "stockpots.public.sku.graduated_fill_scale_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "graduated_fill_scale_present"
+    },
+    "sku.lid_pressure_sealing": {
+      "semantic_id": "stockpots.public.sku.lid_pressure_sealing",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "supplied lid"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_pressure_sealing"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "stockpots.public.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 200,
+        "max": 1500,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "price_basis": {
+          "literal": "authored whole-purchase reference; one pot with fitted side handles and one supplied lid with fitted knob; not retailer quote or per-part price"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.recipe": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "steel_5l",
+          "enamel_8l"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "body_shape": {
+      "id": "pots.stockpots.content.body_shape",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_shape"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_material": {
+      "id": "pots.stockpots.content.body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "base_construction": {
+      "id": "pots.stockpots.content.base_construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.base_construction"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "manufactured_coating_present": {
+      "id": "pots.stockpots.content.manufactured_coating_present",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.manufactured_coating_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "coating_kind": {
+      "id": "pots.stockpots.content.coating_kind",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.coating_kind"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "coating_chemistry_declaration": {
+      "id": "pots.stockpots.content.coating_chemistry_declaration",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.coating_chemistry_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_count": {
+      "id": "pots.stockpots.content.side_handle_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_shape": {
+      "id": "pots.stockpots.content.side_handle_shape",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_shape"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_materials": {
+      "id": "pots.stockpots.content.side_handle_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_materials"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_attachment": {
+      "id": "pots.stockpots.content.side_handle_attachment",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_attachment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_count": {
+      "id": "pots.stockpots.content.lid_count",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_supplied_separately": {
+      "id": "pots.stockpots.content.lid_supplied_separately",
+      "display_group": "contents",
+      "fields": [
+        "sku.lid_supplied_separately"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_body_material": {
+      "id": "pots.stockpots.content.lid_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lid_body_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_knob_count": {
+      "id": "pots.stockpots.content.lid_knob_count",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_knob_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_knob_fitted": {
+      "id": "pots.stockpots.content.lid_knob_fitted",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_knob_fitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_knob_material": {
+      "id": "pots.stockpots.content.lid_knob_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lid_knob_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_steam_vent_present": {
+      "id": "pots.stockpots.content.lid_steam_vent_present",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_steam_vent_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_rim_material": {
+      "id": "pots.stockpots.content.lid_rim_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lid_rim_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_capacity_ml": {
+      "id": "pots.stockpots.content.nominal_capacity_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_capacity_ml"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "nominal_diameter_mm": {
+      "id": "pots.stockpots.content.nominal_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_diameter_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_body_height_mm": {
+      "id": "pots.stockpots.content.reference_body_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_body_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_overall_width_mm": {
+      "id": "pots.stockpots.content.reference_overall_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_overall_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_lidded_height_mm": {
+      "id": "pots.stockpots.content.reference_lidded_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_lidded_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "assembled_pot_oven_suitability": {
+      "id": "pots.stockpots.content.assembled_pot_oven_suitability",
+      "display_group": "features",
+      "fields": [
+        "sku.assembled_pot_oven_suitability"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "assembled_lid_oven_suitability": {
+      "id": "pots.stockpots.content.assembled_lid_oven_suitability",
+      "display_group": "features",
+      "fields": [
+        "sku.assembled_lid_oven_suitability"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "compatible_hobs": {
+      "id": "pots.stockpots.content.compatible_hobs",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.compatible_hobs"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "first_use_care": {
+      "id": "pots.stockpots.content.first_use_care",
+      "display_group": "care",
+      "fields": [
+        "sku.first_use_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_care": {
+      "id": "pots.stockpots.content.body_care",
+      "display_group": "care",
+      "fields": [
+        "sku.body_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_care": {
+      "id": "pots.stockpots.content.handle_care",
+      "display_group": "care",
+      "fields": [
+        "sku.handle_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_care": {
+      "id": "pots.stockpots.content.lid_care",
+      "display_group": "care",
+      "fields": [
+        "sku.lid_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "utensil_care": {
+      "id": "pots.stockpots.content.utensil_care",
+      "display_group": "care",
+      "fields": [
+        "sku.utensil_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heating_care": {
+      "id": "pots.stockpots.content.heating_care",
+      "display_group": "care",
+      "fields": [
+        "sku.heating_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "impact_care": {
+      "id": "pots.stockpots.content.impact_care",
+      "display_group": "care",
+      "fields": [
+        "sku.impact_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "assembled_pot_dishwasher_allowed": {
+      "id": "pots.stockpots.content.assembled_pot_dishwasher_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.assembled_pot_dishwasher_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "assembled_lid_dishwasher_allowed": {
+      "id": "pots.stockpots.content.assembled_lid_dishwasher_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.assembled_lid_dishwasher_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handwashing_recommended": {
+      "id": "pots.stockpots.content.handwashing_recommended",
+      "display_group": "care",
+      "fields": [
+        "sku.handwashing_recommended"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pot_immersion_permission": {
+      "id": "pots.stockpots.content.pot_immersion_permission",
+      "display_group": "care",
+      "fields": [
+        "sku.pot_immersion_permission"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pot_count": {
+      "id": "pots.stockpots.content.pot_count",
+      "display_group": "features",
+      "fields": [
+        "sku.pot_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usable_supplied_item_count": {
+      "id": "pots.stockpots.content.usable_supplied_item_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.usable_supplied_item_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "packaging_excluded_from_usable_count": {
+      "id": "pots.stockpots.content.packaging_excluded_from_usable_count",
+      "display_group": "features",
+      "fields": [
+        "sku.packaging_excluded_from_usable_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "long_handle_count": {
+      "id": "pots.stockpots.content.long_handle_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.long_handle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_spare_handle_count": {
+      "id": "pots.stockpots.content.loose_spare_handle_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.loose_spare_handle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_spare_knob_count": {
+      "id": "pots.stockpots.content.loose_spare_knob_count",
+      "display_group": "features",
+      "fields": [
+        "sku.loose_spare_knob_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "strainer_count": {
+      "id": "pots.stockpots.content.strainer_count",
+      "display_group": "features",
+      "fields": [
+        "sku.strainer_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "steamer_insert_count": {
+      "id": "pots.stockpots.content.steamer_insert_count",
+      "display_group": "features",
+      "fields": [
+        "sku.steamer_insert_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ladle_count": {
+      "id": "pots.stockpots.content.ladle_count",
+      "display_group": "features",
+      "fields": [
+        "sku.ladle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "trivet_count": {
+      "id": "pots.stockpots.content.trivet_count",
+      "display_group": "features",
+      "fields": [
+        "sku.trivet_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pouring_rim": {
+      "id": "pots.stockpots.content.pouring_rim",
+      "display_group": "features",
+      "fields": [
+        "sku.pouring_rim"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "graduated_fill_scale_present": {
+      "id": "pots.stockpots.content.graduated_fill_scale_present",
+      "display_group": "features",
+      "fields": [
+        "sku.graduated_fill_scale_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_pressure_sealing": {
+      "id": "pots.stockpots.content.lid_pressure_sealing",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_pressure_sealing"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 82,
+    "roles": {
+      "identity": 2,
+      "literal": 30,
+      "descriptive": 20,
+      "omit_placeholder": 24,
+      "omit_fixed_detail": 4,
+      "commerce": 1,
+      "internal": 1
+    },
+    "display_groups": 6,
+    "highlight_candidates": 7,
+    "unmapped_descriptive_fields": 0
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "beer",
+  "review_id": "F17",
+  "label": "Beer",
+  "section": "Beer and wine",
+  "store_type_ids": [
+    "drinks"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Style is not a guaranteed taste verdict. Bitterness intensity and how long it persists are different aspects. Hop/aroma notes can vary; food-pairing context is optional. Do not copy wine grape/vintage fields.",
+  "shared_dimension_ids": [
+    "style_variant",
+    "production_origin",
+    "recipe",
+    "alcohol_content",
+    "filtration",
+    "flavour_description",
+    "bitterness_profile",
+    "container_type",
+    "net_volume",
+    "pack_count"
+  ],
+  "dimensions": [
+    {
+      "id": "style_variant",
+      "label": "Style variant",
+      "module_id": "sensory",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "production_origin",
+      "label": "Production origin",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "recipe",
+      "label": "Recipe",
+      "module_id": "formula",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "alcohol_content",
+      "label": "Alcohol content",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "percent_abv",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "filtration",
+      "label": "Filtration",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "flavour_description",
+      "label": "Flavour description",
+      "module_id": "sensory",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "bitterness_profile",
+      "label": "Bitterness profile",
+      "module_id": "sensory",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "container_type",
+      "label": "Container type",
+      "module_id": "quantity",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "net_volume",
+      "label": "Net volume",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "number",
+      "unit": "ml",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "beer.lager_pilsner",
+      "label": "Lager/pilsner",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "beer.pale_ale_ipa",
+      "label": "Pale ale/IPA",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "beer.wheat_beer",
+      "label": "Wheat beer",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "beer.stout_porter",
+      "label": "Stout/porter",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "beer.sour_beer",
+      "label": "Sour beer",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "beer.strong_dark_ale",
+      "label": "Strong/dark ale",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

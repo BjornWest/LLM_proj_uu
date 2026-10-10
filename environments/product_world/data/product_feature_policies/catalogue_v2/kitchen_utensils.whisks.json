@@ -1,0 +1,857 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "kitchen_utensils.whisks",
+  "family_id": "kitchen_utensils",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/kitchen_utensils.whisks.json": "848eecd9f31c262a8c76e0b79867c8a4a365e3fd6d01cde462df6f723954867e",
+    "environments/product_world/data/product_width/_kitchen_utensils_base.json": "0d3b6bb90cb1061d33594e34a163cd84614b28216c00ce13a6de6a7e39e2d43f",
+    "environments/product_world/data/product_public_content/kitchen_utensils.whisks.json": "e72782ad82f9fea36d11e2b8f99b05a6887f5f9a1982c41518ebb843560c12d7"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Function/material/contact surface first. Component-specific heat and cleaning are scoped groups, not whole-tool guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "utensils.whisks.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "input": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": true,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.function": {
+      "semantic_id": "utensils.whisks.product.facts.function",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "mixing batters and whisking cream or eggs",
+          "mixing soft bread dough",
+          "stirring sauces in shallow pans"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_function"
+    },
+    "product.facts.wire_core_material": {
+      "semantic_id": "utensils.whisks.product.facts.wire_core_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "metal alloy unspecified",
+          "stainless steel"
+        ],
+        "component": "wire core",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_wire_core_material"
+    },
+    "product.facts.wire_contact_material": {
+      "semantic_id": "utensils.whisks.product.facts.wire_contact_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "bare metal alloy unspecified",
+          "bare stainless steel",
+          "silicone"
+        ],
+        "component": "wire-contact surface",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_wire_contact_material"
+    },
+    "product.facts.handle_material": {
+      "semantic_id": "utensils.whisks.product.facts.handle_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "beech wood",
+          "polypropylene",
+          "stainless steel"
+        ],
+        "component": "handle",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_handle_material"
+    },
+    "product.facts.head_geometry": {
+      "semantic_id": "utensils.whisks.product.facts.head_geometry",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "balloon wire head",
+          "flat wire head",
+          "open-loop dough head"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_head_geometry"
+    },
+    "product.facts.length_mm": {
+      "semantic_id": "utensils.whisks.product.facts.length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "nominal whole-tool length, not packaging or measured length",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_length_mm"
+    },
+    "product.facts.head_width_mm": {
+      "semantic_id": "utensils.whisks.product.facts.head_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "nominal maximum working-head width",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_head_width_mm"
+    },
+    "product.facts.head_attachment": {
+      "semantic_id": "utensils.whisks.product.facts.head_attachment",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "fixed non-removable"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_head_attachment"
+    },
+    "product.facts.fastening_method": {
+      "semantic_id": "utensils.whisks.product.facts.fastening_method",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.care": {
+      "semantic_id": "utensils.whisks.product.facts.care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Dishwasher safe; keep the handle away from hot surfaces and do not leave the whisk resting in cookware.",
+          "Handwash and dry promptly; do not soak, use a dishwasher or leave the whisk resting in cookware."
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_product_care"
+    },
+    "product.facts.dishwasher_safe": {
+      "semantic_id": "utensils.whisks.product.facts.dishwasher_safe",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "whole supplied-tool care declaration",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.nonstick_suitable": {
+      "semantic_id": "utensils.whisks.product.facts.nonstick_suitable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "basis": "declared ordinary-use suitability for coated cookware; false means not declared suitable, not guaranteed scratching",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_nonstick_suitable"
+    },
+    "product.facts.heat_limit_c": {
+      "semantic_id": "utensils.whisks.product.facts.heat_limit_c",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1
+        ],
+        "component": "wire-contact surface",
+        "qualifiers": [
+          "heat_limit_scope",
+          "heat_use"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_heat_limit_c"
+    },
+    "product.facts.heat_limit_scope": {
+      "semantic_id": "utensils.whisks.product.facts.heat_limit_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not specified",
+          "wire-contact surface"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.heat_use": {
+      "semantic_id": "utensils.whisks.product.facts.heat_use",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "brief food contact; not oven use or resting in cookware",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_heat_use"
+    },
+    "sku.pack_count": {
+      "semantic_id": "utensils.whisks.sku.pack_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.pack_count"
+    },
+    "sku.supplied_contents": {
+      "semantic_id": "utensils.whisks.sku.supplied_contents",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one complete non-powered whisk; no stand, spare part or cookware"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supplied_contents"
+    },
+    "sku.colour": {
+      "semantic_id": "utensils.whisks.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "blue",
+          "green",
+          "grey",
+          "natural",
+          "red",
+          "silver"
+        ],
+        "basis": "one colour token; scope is product.facts.colour_scope",
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "product.facts.colour_scope": {
+      "semantic_id": "utensils.whisks.product.facts.colour_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "bare steel finish",
+          "handle colour",
+          "matching handle and wire-coating colour",
+          "natural wood handle finish"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.actual_mass_g": {
+      "semantic_id": "utensils.whisks.product.facts.actual_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "basis": "actual supplied whole whisk, not packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "utensils.whisks.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "reference price of one complete whisk, not offer or shipping total",
+        "min": 25,
+        "max": 310
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "bare_steel_balloon",
+          "coated_steel_balloon",
+          "bare_steel_flat",
+          "coated_steel_flat",
+          "wood_handled_dough"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.pack_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.supplied_contents": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "regular"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    }
+  },
+  "disclosure_groups": {
+    "product_function": {
+      "id": "kitchen_utensils.whisks.content.product_function",
+      "display_group": "features",
+      "fields": [
+        "product.facts.function"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_wire_core_material": {
+      "id": "kitchen_utensils.whisks.content.product_wire_core_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.wire_core_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_wire_contact_material": {
+      "id": "kitchen_utensils.whisks.content.product_wire_contact_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.wire_contact_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_handle_material": {
+      "id": "kitchen_utensils.whisks.content.product_handle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_head_geometry": {
+      "id": "kitchen_utensils.whisks.content.product_head_geometry",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.head_geometry"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_length_mm": {
+      "id": "kitchen_utensils.whisks.content.product_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_head_width_mm": {
+      "id": "kitchen_utensils.whisks.content.product_head_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.head_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_head_attachment": {
+      "id": "kitchen_utensils.whisks.content.product_head_attachment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.head_attachment"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_care": {
+      "id": "kitchen_utensils.whisks.content.product_product_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_washing": {
+      "id": "kitchen_utensils.whisks.content.product_product_washing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dishwasher_safe"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_nonstick_suitable": {
+      "id": "kitchen_utensils.whisks.content.product_nonstick_suitable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.nonstick_suitable"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_heat_limit_c": {
+      "id": "kitchen_utensils.whisks.content.product_heat_limit_c",
+      "display_group": "features",
+      "fields": [
+        "product.facts.heat_limit_c"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_heat_use": {
+      "id": "kitchen_utensils.whisks.content.product_heat_use",
+      "display_group": "features",
+      "fields": [
+        "product.facts.heat_use"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 26,
+    "roles": {
+      "identity": 1,
+      "descriptive": 12,
+      "literal": 1,
+      "omit_placeholder": 2,
+      "qualifier": 2,
+      "alias": 2,
+      "buying_choice": 1,
+      "commerce": 1,
+      "internal": 1,
+      "private_support": 2,
+      "operational": 1
+    },
+    "display_groups": 4,
+    "highlight_candidates": 5,
+    "unmapped_descriptive_fields": 0
+  },
+  "semantic_review_note": "Keep function, contact material, size and real heat/nonstick/cleaning limits. Capacity applies to a ladle, not every utensil. Counts of feet/grips/holes are subordinate to construction. Geometry is not cutting performance."
+}

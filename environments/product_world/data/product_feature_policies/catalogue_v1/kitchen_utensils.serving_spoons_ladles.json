@@ -1,0 +1,862 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "kitchen_utensils.serving_spoons_ladles",
+  "family_id": "kitchen_utensils",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/kitchen_utensils.serving_spoons_ladles.json": "07353b49d37bed4d5a2a5bf0c9e093e4596c16c89622cb170ef5596e1539288b",
+    "environments/product_world/data/product_width/_kitchen_utensils_base.json": "0d3b6bb90cb1061d33594e34a163cd84614b28216c00ce13a6de6a7e39e2d43f",
+    "environments/product_world/data/product_public_content/kitchen_utensils.serving_spoons_ladles.json": "07118dec6390d3e3e4bdcdc5c99223a24391a8de039ebdb3a9e9c73147af74af"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Function/material/contact surface first. Component-specific heat and cleaning are scoped groups, not whole-tool guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "utensils.serving.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "input": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": true,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.function": {
+      "semantic_id": "utensils.serving.product.facts.function",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "serving solid food",
+          "serving soup"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "function"
+    },
+    "product.facts.head_material": {
+      "semantic_id": "utensils.serving.product.facts.head_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "beech wood",
+          "nylon",
+          "stainless steel",
+          "silicone"
+        ],
+        "component": "working head surface",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "head_material"
+    },
+    "product.facts.handle_material": {
+      "semantic_id": "utensils.serving.product.facts.handle_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "beech wood",
+          "polypropylene",
+          "stainless steel"
+        ],
+        "component": "handle",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "handle_material"
+    },
+    "product.facts.core_material": {
+      "semantic_id": "utensils.serving.product.facts.core_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "stainless steel"
+        ],
+        "component": "internal head core",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "core_material"
+    },
+    "product.facts.length_mm": {
+      "semantic_id": "utensils.serving.product.facts.length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "nominal whole-tool length, not packaging",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "length_mm"
+    },
+    "product.facts.head_width_mm": {
+      "semantic_id": "utensils.serving.product.facts.head_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "basis": "nominal maximum working-head width",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "head_width_mm"
+    },
+    "product.facts.head_geometry": {
+      "semantic_id": "utensils.serving.product.facts.head_geometry",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "deep bowl with flexible front edge",
+          "deep bowl with two pouring lips",
+          "slotted oval spoon",
+          "solid oval spoon"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "head_geometry"
+    },
+    "product.facts.care": {
+      "semantic_id": "utensils.serving.product.facts.care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "basis": "whole supplied tool, including restrictions",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "care"
+    },
+    "product.facts.dishwasher_safe": {
+      "semantic_id": "utensils.serving.product.facts.dishwasher_safe",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "whole supplied-tool care declaration",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dishwasher_safe"
+    },
+    "product.facts.nonstick_suitable": {
+      "semantic_id": "utensils.serving.product.facts.nonstick_suitable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "basis": "declared suitability for coated cookware, not measured scratch resistance",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nonstick_suitable"
+    },
+    "product.facts.heat_limit_c": {
+      "semantic_id": "utensils.serving.product.facts.heat_limit_c",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1
+        ],
+        "qualifiers": [
+          "heat_limit_scope",
+          "heat_use"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "heat_limit_c"
+    },
+    "product.facts.heat_limit_scope": {
+      "semantic_id": "utensils.serving.product.facts.heat_limit_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "working head",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.heat_use": {
+      "semantic_id": "utensils.serving.product.facts.heat_use",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "heat_use"
+    },
+    "product.facts.bowl_capacity_ml": {
+      "semantic_id": "utensils.serving.product.facts.bowl_capacity_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "ml",
+        "unknown_values": [
+          -1
+        ],
+        "applicability": "capacity_applicable == True; otherwise unused placeholder",
+        "qualifiers": [
+          "capacity_basis"
+        ],
+        "basis": "declared nominal maximum fill mark when known, not measured/calibrated/brim volume",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "bowl_capacity_ml"
+    },
+    "product.facts.capacity_basis": {
+      "semantic_id": "utensils.serving.product.facts.capacity_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "not specified",
+          "nominal maximum fill mark"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.volume_markings": {
+      "semantic_id": "utensils.serving.product.facts.volume_markings",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "presence of volume markings, not calibration accuracy",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "volume_markings"
+    },
+    "product.facts.capacity_applicable": {
+      "semantic_id": "utensils.serving.product.facts.capacity_applicable",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "ladle capacity is applicable; serving spoon has no ladle capacity requirement",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.colour": {
+      "semantic_id": "utensils.serving.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "basis": "one manufactured colour of the canonical SKU",
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "utensils.serving.sku.pack_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.pack_count"
+    },
+    "sku.supplied_contents": {
+      "semantic_id": "utensils.serving.sku.supplied_contents",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one complete utensil; no stand, spare part or cookware"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supplied_contents"
+    },
+    "product.facts.actual_mass_g": {
+      "semantic_id": "utensils.serving.product.facts.actual_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "basis": "actual supplied tool, not package weight",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "utensils.serving.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "one complete utensil reference price, not offer or payment",
+        "min": 25,
+        "max": 300
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "beech_serving_spoon",
+          "nylon_slotted_spoon",
+          "steel_serving_spoon",
+          "steel_wood_graduated_ladle",
+          "silicone_ladle"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.pack_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.supplied_contents": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "regular"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    }
+  },
+  "disclosure_groups": {
+    "function": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.function",
+      "display_group": "features",
+      "fields": [
+        "product.facts.function"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "head_material": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.head_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.head_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "handle_material": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.handle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "core_material": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.core_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.core_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "length_mm": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.length_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "head_width_mm": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.head_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.head_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "head_geometry": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.head_geometry",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.head_geometry"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "care": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dishwasher_safe": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.dishwasher_safe",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dishwasher_safe"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nonstick_suitable": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.nonstick_suitable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.nonstick_suitable"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "heat_limit_c": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.heat_limit_c",
+      "display_group": "features",
+      "fields": [
+        "product.facts.heat_limit_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heat_use": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.heat_use",
+      "display_group": "features",
+      "fields": [
+        "product.facts.heat_use"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bowl_capacity_ml": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.bowl_capacity_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.bowl_capacity_ml"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "volume_markings": {
+      "id": "kitchen_utensils.serving_spoons_ladles.content.volume_markings",
+      "display_group": "features",
+      "fields": [
+        "product.facts.volume_markings"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 27,
+    "roles": {
+      "identity": 1,
+      "descriptive": 14,
+      "qualifier": 2,
+      "internal": 2,
+      "buying_choice": 1,
+      "alias": 2,
+      "omit_placeholder": 1,
+      "commerce": 1,
+      "private_support": 2,
+      "operational": 1
+    },
+    "display_groups": 4,
+    "highlight_candidates": 5,
+    "unmapped_descriptive_fields": 0
+  }
+}

@@ -1,0 +1,1757 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "cookware.frying_pans",
+  "family_id": "cookware",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/cookware.frying_pans.json": "484c4b0d82cbf4f756ebcb5e665ac5bbc58c649d4d6687d8376e28e86bd8ec17",
+    "environments/product_world/data/product_width/_cookware_base.json": "6608f450b998c44b734332a64615cfff4c6533e204506ec6a39a0cf3eb4a8acc",
+    "environments/product_world/data/product_public_content/cookware.frying_pans.json": "a2a4f6b6cc44e60e0f8abc10a8a1de7d4f82cce5fb16eb63d72b69a6e1fb9d2c"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Whole assembled cookware, body-only and lid-only heat limits remain different. Hob compatibility is not inferred from material names.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "pan.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Norvik Frying-pan width fixture"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.body_layers": {
+      "semantic_id": "pan.body_layers",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 1,
+        "max_items": 3,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "declared body layers,not measured composition"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "body"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_body_layers"
+    },
+    "sku.cooking_surface": {
+      "semantic_id": "pan.cooking_surface",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "declared surface construction,not a release-performance guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "cooking_surface"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_cooking_surface"
+    },
+    "sku.coating_thickness_status": {
+      "semantic_id": "pan.coating_thickness_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable",
+          "unknown"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "NA for absent coating,unknown for present ceramic coating"
+        }
+      },
+      "supporting_assertion_ids": [
+        "pan.surface_status"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "coating"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.hob_compatibility": {
+      "semantic_id": "pan.hob_compatibility",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 4,
+        "max_items": 4,
+        "optional": true,
+        "constant": [
+          "induction",
+          "gas",
+          "radiant_electric",
+          "glass_ceramic"
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit complete-pan declaration,not inferred from body/coating/handle material or nominal size"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_pan"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_hob_compatibility"
+    },
+    "sku.ferromagnetic_part_identity_status": {
+      "semantic_id": "pan.ferromagnetic_part_identity_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "identity/location/grade unspecified,not an absence or compatibility inference"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hob_contact_part"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.rim_diameter_mm": {
+      "semantic_id": "pan.rim_diameter",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "mm",
+        "optional": true,
+        "constant": 240,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal upper-rim diameter,not interior flat cooking surface or actual supplied-unit measurement"
+        },
+        "semantic_status": {
+          "expr": "sku.rim_diameter_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "pan_rim"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_rim_diameter_mm"
+    },
+    "sku.reference_bottom_diameter_mm": {
+      "semantic_id": "pan.external_bottom_diameter",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "reference external bottom diameter facing the hob,not the interior flat cooking surface"
+        },
+        "semantic_status": {
+          "expr": "sku.reference_bottom_diameter_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "pan_bottom"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_bottom_diameter_mm"
+    },
+    "sku.reference_external_pan_height_mm": {
+      "semantic_id": "pan.external_height",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "reference overall pan height,not usable interior depth"
+        },
+        "semantic_status": {
+          "expr": "sku.reference_external_pan_height_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_pan"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_external_pan_height_mm"
+    },
+    "sku.reference_pan_mass_g": {
+      "semantic_id": "pan.reference_net_mass",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "g",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "reference net mass of one assembled pan including installed long handle,excluding packaging"
+        },
+        "semantic_status": {
+          "expr": "sku.reference_pan_mass_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_pan"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_reference_pan_mass_g"
+    },
+    "sku.actual_pan_mass_status": {
+      "semantic_id": "pan.actual_pan_mass_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied assembled-pan mass,not reference net mass"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_pan"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.handle_mass_status": {
+      "semantic_id": "pan.handle_mass_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "installed handle component mass,not assembled-pan mass"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "installed_handle"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.whole_pan_oven_limit_c": {
+      "semantic_id": "pan.whole_pan_oven_limit",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "degC",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "declared oven limit of the assembled pan including its installed handle;not a stovetop surface or food temperature"
+        },
+        "semantic_status": {
+          "expr": "sku.whole_pan_oven_limit_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_pan"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_whole_pan_oven_limit_c"
+    },
+    "sku.handle_heat_resistance_c": {
+      "semantic_id": "pan.handle_heat_resistance",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "degC",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "declared component heat resistance;not separate whole-pan oven permission"
+        },
+        "semantic_status": {
+          "expr": "sku.handle_heat_resistance_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "installed_handle"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_handle_heat_resistance_c"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "pan.price",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 200,
+        "max": 1600,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one complete assembled pan including its installed long handle,not a separate handle,lid or utensil"
+        },
+        "selected_item": {
+          "expr": "sku.sku_label"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_pan"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.pan_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.complete_pan_contents",
+        "pan.full_pan_price",
+        "pan.one_pan_and_installed_handle"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.handle_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.complete_pan_contents",
+        "pan.full_pan_price",
+        "pan.nonremovable_handle",
+        "pan.one_pan_and_installed_handle"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.handle_detachable": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.nonremovable_handle",
+        "pan.one_pan_and_installed_handle"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_handle_detachable"
+    },
+    "sku.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "stovetop frying",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.one_pan_and_installed_handle"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.handle_insulated": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handle_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_handle_insulated"
+    },
+    "sku.recipe": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handle_construction",
+        "pan.induction_base_construction",
+        "pan.whole_pan_dishwasher_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.handle_material": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handle_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_handle_material"
+    },
+    "sku.handle_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handle_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.handle_attachment": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handle_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_handle_attachment"
+    },
+    "sku.handle_attachment_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handle_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.coating_present": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.coating_care",
+        "pan.surface_status"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_coating_present"
+    },
+    "sku.coating_kind": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.surface_status"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_coating_kind"
+    },
+    "sku.body_construction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.induction_base_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_body_construction"
+    },
+    "sku.interior_flat_cooking_diameter_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.interior_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.usable_interior_depth_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.interior_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.usable_volume_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.interior_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.actual_rim_diameter_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.reference_geometry_limit"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.actual_bottom_diameter_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.reference_geometry_limit"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.actual_external_height_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unknown"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.reference_geometry_limit"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.whole_pan_oven_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.oven_applicability_and_scope"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_whole_pan_oven_allowed"
+    },
+    "sku.handle_heat_resistance_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "declared component heat resistance;not separate whole-pan oven permission",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.oven_applicability_and_scope"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.lid_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.box_exclusions",
+        "pan.lid_quantities_NA",
+        "pan.no_lid"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_lid_count"
+    },
+    "sku.loose_handle_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.box_exclusions",
+        "pan.complete_pan_contents"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of unrelated extras; not an automatic retail fact."
+    },
+    "sku.usable_supplied_item_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.complete_pan_contents",
+        "pan.full_pan_price"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "sku.packaging_excluded_from_usable_counts": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.utensil_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.oven_mitt_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.cleaning_tool_count": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -1,
+        "max": 100000,
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.lid_mass_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.lid_quantities_NA"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.lid_oven_limit_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.lid_quantities_NA"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.lid_care_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.lid_quantities_NA"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.dishwasher_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.whole_pan_dishwasher_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_handwash_recommended": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.whole_pan_dishwasher_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.dishwasher_scope": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "complete assembled pan including installed handle",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.whole_pan_dishwasher_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.dishwasher_conditions": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.whole_pan_dishwasher_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_wash_before_first_use": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_dry_before_heating": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_drying"
+    },
+    "sku.care_cool_before_washing": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_gentle_handwash": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_rinse_after_washing": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_dry_after_washing": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_handwash_detergent": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "washing-up liquid",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_handwash_tool": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "soft sponge or cloth",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_washing"
+    },
+    "sku.care_detach_handle_for_cleaning": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.handwash_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_care_detach_handle_for_cleaning"
+    },
+    "sku.care_coating_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "applicable",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.coating_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.care_coating_abrasives_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.coating_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_care_coating_abrasives_allowed"
+    },
+    "sku.care_empty_high_heat_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.no_empty_high_heat"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sku_product_care_empty_high_heat_allowed"
+    },
+    "sku.price_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "one complete assembled pan including its installed long handle,not a separate handle,lid or utensil",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "pan.full_pan_price"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.recipe": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "uncoated_24",
+          "ceramic_24"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "sku_body_layers": {
+      "id": "cookware.frying_pans.content.sku_body_layers",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_layers"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_cooking_surface": {
+      "id": "cookware.frying_pans.content.sku_cooking_surface",
+      "display_group": "features",
+      "fields": [
+        "sku.cooking_surface"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_hob_compatibility": {
+      "id": "cookware.frying_pans.content.sku_hob_compatibility",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hob_compatibility"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_rim_diameter_mm": {
+      "id": "cookware.frying_pans.content.sku_rim_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.rim_diameter_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_bottom_diameter_mm": {
+      "id": "cookware.frying_pans.content.sku_reference_bottom_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_bottom_diameter_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_external_pan_height_mm": {
+      "id": "cookware.frying_pans.content.sku_reference_external_pan_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_external_pan_height_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_reference_pan_mass_g": {
+      "id": "cookware.frying_pans.content.sku_reference_pan_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_pan_mass_g"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_whole_pan_oven_limit_c": {
+      "id": "cookware.frying_pans.content.sku_whole_pan_oven_limit_c",
+      "display_group": "features",
+      "fields": [
+        "sku.whole_pan_oven_limit_c"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_handle_heat_resistance_c": {
+      "id": "cookware.frying_pans.content.sku_handle_heat_resistance_c",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_heat_resistance_c"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_handle_detachable": {
+      "id": "cookware.frying_pans.content.sku_handle_detachable",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_detachable"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_handle_insulated": {
+      "id": "cookware.frying_pans.content.sku_handle_insulated",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_insulated"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_handle_material": {
+      "id": "cookware.frying_pans.content.sku_handle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_handle_attachment": {
+      "id": "cookware.frying_pans.content.sku_handle_attachment",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_attachment"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_coating_present": {
+      "id": "cookware.frying_pans.content.sku_coating_present",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.coating_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sku_coating_kind": {
+      "id": "cookware.frying_pans.content.sku_coating_kind",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.coating_kind"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sku_body_construction": {
+      "id": "cookware.frying_pans.content.sku_body_construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_construction"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_whole_pan_oven_allowed": {
+      "id": "cookware.frying_pans.content.sku_whole_pan_oven_allowed",
+      "display_group": "features",
+      "fields": [
+        "sku.whole_pan_oven_allowed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_lid_count": {
+      "id": "cookware.frying_pans.content.sku_lid_count",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_washing": {
+      "id": "cookware.frying_pans.content.sku_product_washing",
+      "display_group": "care",
+      "fields": [
+        "sku.dishwasher_allowed",
+        "sku.care_handwash_recommended",
+        "sku.dishwasher_conditions",
+        "sku.care_wash_before_first_use",
+        "sku.care_cool_before_washing",
+        "sku.care_gentle_handwash",
+        "sku.care_rinse_after_washing",
+        "sku.care_dry_after_washing",
+        "sku.care_handwash_detergent",
+        "sku.care_handwash_tool"
+      ],
+      "atomic": true,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_drying": {
+      "id": "cookware.frying_pans.content.sku_product_drying",
+      "display_group": "care",
+      "fields": [
+        "sku.care_dry_before_heating"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_care_detach_handle_for_cleaning": {
+      "id": "cookware.frying_pans.content.sku_product_care_detach_handle_for_cleaning",
+      "display_group": "care",
+      "fields": [
+        "sku.care_detach_handle_for_cleaning"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_care_coating_abrasives_allowed": {
+      "id": "cookware.frying_pans.content.sku_product_care_coating_abrasives_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.care_coating_abrasives_allowed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_product_care_empty_high_heat_allowed": {
+      "id": "cookware.frying_pans.content.sku_product_care_empty_high_heat_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.care_empty_high_heat_allowed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 64,
+    "roles": {
+      "identity": 2,
+      "descriptive": 14,
+      "internal": 18,
+      "literal": 18,
+      "commerce": 1,
+      "omit_fixed_detail": 8,
+      "qualifier": 3
+    },
+    "display_groups": 5,
+    "highlight_candidates": 6,
+    "unmapped_descriptive_fields": 23
+  },
+  "semantic_review_note": "Keep cooking surface/coating, hob compatibility, capacity/size and whole-assembly heat limits. Pan-only, handle, lid and covered-set limits stay distinct. Lid inclusion matters; ordinary installed handles and missing mitts/cleaning tools do not."
+}

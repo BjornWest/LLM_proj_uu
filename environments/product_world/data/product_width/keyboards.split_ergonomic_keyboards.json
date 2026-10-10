@@ -1,0 +1,4826 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "keyboards.split_ergonomic_keyboards",
+  "random_namespace": "product-width-keyboards.split_ergonomic_keyboards-v1",
+  "extends": "_keyboards_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "assembly": {
+          "type": "enum",
+          "values": [
+            "fixed_curve",
+            "separated_membrane",
+            "separated_columnar"
+          ]
+        },
+        "body_units": {
+          "type": "integer",
+          "unit": "count",
+          "min": 1,
+          "max": 2
+        },
+        "key_mechanism": {
+          "type": "enum",
+          "values": [
+            "low-profile scissor",
+            "rubber-dome membrane",
+            "low-profile linear mechanical"
+          ]
+        },
+        "mechanical": {
+          "type": "boolean"
+        },
+        "number_pad": {
+          "type": "boolean"
+        },
+        "separation_adjustable": {
+          "type": "boolean"
+        },
+        "splay_adjustable": {
+          "type": "boolean"
+        },
+        "front_pitch_adjustable": {
+          "type": "boolean"
+        },
+        "tenting_adjustable": {
+          "type": "boolean"
+        },
+        "palm_supports_included": {
+          "type": "boolean"
+        },
+        "tent_supports_included": {
+          "type": "boolean"
+        },
+        "battery_included": {
+          "type": "boolean"
+        },
+        "user_replaceable_battery": {
+          "type": "boolean"
+        },
+        "bluetooth": {
+          "type": "boolean"
+        },
+        "receiver_included": {
+          "type": "boolean"
+        },
+        "usb_keyboard_data": {
+          "type": "boolean"
+        },
+        "host_powered": {
+          "type": "boolean"
+        },
+        "host_lead_included": {
+          "type": "boolean"
+        },
+        "bridge_included": {
+          "type": "boolean"
+        },
+        "host_lead_detachable": {
+          "type": "boolean"
+        },
+        "bridge_detachable": {
+          "type": "boolean"
+        },
+        "backlight": {
+          "type": "boolean"
+        },
+        "hot_swap": {
+          "type": "boolean"
+        },
+        "logical_layers": {
+          "type": "boolean"
+        },
+        "remapping_support": {
+          "type": "set",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remapping_scope": {
+          "type": "string"
+        },
+        "box_hardware_label": {
+          "type": "string"
+        },
+        "box_hardware": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assembly_price_factor": {
+          "type": "number",
+          "min": 1,
+          "max": 1.7
+        }
+      }
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK",
+      "min": 300,
+      "max": 3000
+    },
+    "product.language_layouts": {
+      "type": "set",
+      "items": {
+        "type": "enum",
+        "values": [
+          "US English ANSI",
+          "UK English ISO",
+          "US English columnar",
+          "UK English columnar"
+        ]
+      },
+      "min_items": 1
+    },
+    "group.language_layout": {
+      "type": "enum",
+      "values": [
+        "US English ANSI",
+        "UK English ISO",
+        "US English columnar",
+        "UK English columnar"
+      ]
+    },
+    "sku.language_layout": {
+      "type": "enum",
+      "values": [
+        "US English ANSI",
+        "UK English ISO",
+        "US English columnar",
+        "UK English columnar"
+      ],
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "language_layout"
+      }
+    },
+    "product.facts.assembly": {
+      "type": "enum",
+      "values": [
+        "fixed_curve",
+        "separated_membrane",
+        "separated_columnar"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_units": {
+      "type": "integer",
+      "unit": "count",
+      "min": 1,
+      "max": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.key_mechanism": {
+      "type": "enum",
+      "values": [
+        "low-profile scissor",
+        "rubber-dome membrane",
+        "low-profile linear mechanical"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mechanical": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.number_pad": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.separation_adjustable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.splay_adjustable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.front_pitch_adjustable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tenting_adjustable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.palm_supports_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tent_supports_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.user_replaceable_battery": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_keyboard_data": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_powered": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_lead_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bridge_included": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_lead_detachable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bridge_detachable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hot_swap": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.logical_layers": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.remapping_support": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "unknown_values": [
+        [
+          "not specified"
+        ]
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.remapping_scope": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.box_hardware_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.box_hardware": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.assembly_price_factor": {
+      "type": "number",
+      "min": 1,
+      "max": 1.7,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_material": {
+      "type": "string",
+      "constant": "ABS",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keycap_material": {
+      "type": "string",
+      "constant": "ABS",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.gap_basis": {
+      "type": "string",
+      "constant": "declared maximum clear gap between inner module edges; flat parallel modules and supplied bridge without tension; not cable length or configured footprint",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.basic_host_support": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "constant": [
+        "Windows",
+        "macOS",
+        "Linux"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.box_exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "constant": [
+        "mouse",
+        "wall charger",
+        "host adapter",
+        "extension",
+        "separate number pad",
+        "extra battery",
+        "carrying case",
+        "spare keycaps/switches",
+        "puller",
+        "tripod/mount",
+        "trackpad/display",
+        "knob",
+        "powered hub"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.split_key_groups": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keyboard_included": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rechargeable": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.folding": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.trackpad": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.display": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.knob": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.powered_usb_hub": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mouse_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wall_charger_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_adapter_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.extension_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.separate_number_pad_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.extra_battery_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.carrying_case_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.spare_keycaps_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.spare_switches_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.puller_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tripod_mount_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keyboard_units": {
+      "type": "integer",
+      "unit": "count",
+      "constant": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.configured_dimensions_declaration": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_declaration": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.switch_performance_tests": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keyboard_care": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.full_key_matrix": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.exact_legend_inventory": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_os_firmware_versions": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.platform_hotkeys": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.clinical_effects": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.utility_setup_result": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.default_keymap": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.max_clear_gap_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.separation_adjustable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.splay_limit_deg": {
+      "type": "number",
+      "unit": "deg",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.separation_adjustable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.front_pitch_positions_deg": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "unit": "deg"
+      },
+      "applicable_when": "product.facts.front_pitch_adjustable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fixed_transverse_curve_deg": {
+      "type": "number",
+      "unit": "deg",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.assembly == 'fixed_curve'",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tent_positions_deg": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "unit": "deg"
+      },
+      "applicable_when": "product.facts.tenting_adjustable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tent_support_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.tent_supports_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.tent_support_care": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.tent_supports_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.palm_support_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.palm_supports_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.palm_support_removable": {
+      "type": "boolean",
+      "applicable_when": "product.facts.palm_supports_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.palm_support_construction": {
+      "type": "enum",
+      "values": [
+        "fabric/foam",
+        "foam/ABS"
+      ],
+      "applicable_when": "product.facts.palm_supports_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.palm_support_care": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.palm_supports_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lower_baseplate_material": {
+      "type": "enum",
+      "values": [
+        "steel"
+      ],
+      "applicable_when": "product.facts.mechanical",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.replacement_compatibility": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.mechanical",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keycap_removal": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "True",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.aaa_cell_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_type": {
+      "type": "enum",
+      "values": [
+        "AAA alkaline"
+      ],
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_capacity_wh": {
+      "type": "number",
+      "unit": "Wh",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_runtime_h": {
+      "type": "number",
+      "unit": "h",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_nominal_voltage_v": {
+      "type": "number",
+      "unit": "V",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_charge_capacity_mah": {
+      "type": "number",
+      "unit": "mAh",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_arrangement": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_compartment": {
+      "type": "string",
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charge_time_h": {
+      "type": "number",
+      "unit": "h",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charging_socket": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.rechargeable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.on_off_control": {
+      "type": "boolean",
+      "applicable_when": "product.facts.battery_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_selection_controls": {
+      "type": "boolean",
+      "applicable_when": "product.facts.bluetooth",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.remembered_bluetooth_hosts": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.bluetooth",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_version": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.bluetooth",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.radio_range": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.bluetooth",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_host_plug": {
+      "type": "enum",
+      "values": [
+        "USB-A"
+      ],
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_model_match": {
+      "type": "string",
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_interchangeability": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.receiver_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_lead_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.host_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bridge_units": {
+      "type": "integer",
+      "unit": "count",
+      "applicable_when": "product.facts.bridge_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_lead_length_m": {
+      "type": "number",
+      "unit": "m",
+      "applicable_when": "product.facts.host_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_plug": {
+      "type": "enum",
+      "values": [
+        "USB-A"
+      ],
+      "applicable_when": "product.facts.host_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.keyboard_socket": {
+      "type": "enum",
+      "values": [
+        "USB-C"
+      ],
+      "applicable_when": "product.facts.host_lead_detachable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lead_keyboard_plug": {
+      "type": "enum",
+      "values": [
+        "USB-C"
+      ],
+      "applicable_when": "product.facts.host_lead_detachable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bridge_length_m": {
+      "type": "number",
+      "unit": "m",
+      "applicable_when": "product.facts.bridge_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bridge_connector": {
+      "type": "string",
+      "applicable_when": "product.facts.bridge_detachable",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_input_voltage_v": {
+      "type": "number",
+      "unit": "V",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.host_powered",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_input_current_a": {
+      "type": "number",
+      "unit": "A",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.host_powered",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_input_power_w": {
+      "type": "number",
+      "unit": "W",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.host_powered",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cable_electrical_rating": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.host_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cable_data_speed": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.host_lead_included",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_family": {
+      "type": "enum",
+      "values": [
+        "RGB"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_brightness": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_modes": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_controls": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.backlight_spectrum": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "product.facts.backlight",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.max_layers": {
+      "type": "integer",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "product.facts.logical_layers",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "language_layout": {
+            "type": "enum",
+            "values": [
+              "US English ANSI",
+              "UK English ISO",
+              "US English columnar",
+              "UK English columnar"
+            ]
+          },
+          "physical_layout": {
+            "type": "enum",
+            "values": [
+              "ANSI",
+              "ISO",
+              "columnar"
+            ]
+          },
+          "enter_geometry": {
+            "type": "enum",
+            "values": [
+              "horizontal single-row Enter",
+              "tall two-row Enter",
+              "one-unit rectangular Enter"
+            ]
+          },
+          "key_count": {
+            "type": "integer",
+            "unit": "count",
+            "min": 52,
+            "max": 105
+          },
+          "number_pad": {
+            "type": "boolean"
+          },
+          "max_clear_gap_mm": {
+            "type": "number",
+            "unit": "mm",
+            "min": -1,
+            "unknown_values": [
+              -1
+            ]
+          },
+          "gap_status": {
+            "type": "enum",
+            "values": [
+              "declared maximum",
+              "not applicable"
+            ]
+          },
+          "gap_basis": {
+            "type": "string"
+          },
+          "front_pitch_positions_deg": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "unit": "deg"
+            }
+          },
+          "tent_positions_deg": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "unit": "deg"
+            }
+          },
+          "palm_support_units": {
+            "type": "integer",
+            "unit": "count",
+            "min": 0,
+            "max": 2
+          },
+          "host_lead_length_m": {
+            "type": "number",
+            "unit": "m",
+            "min": -1,
+            "unknown_values": [
+              -1
+            ]
+          },
+          "bridge_length_m": {
+            "type": "number",
+            "unit": "m",
+            "min": -1,
+            "unknown_values": [
+              -1
+            ]
+          },
+          "lead_status": {
+            "type": "enum",
+            "values": [
+              "nominal included",
+              "not applicable"
+            ]
+          },
+          "receiver_model_match": {
+            "type": "string"
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 300,
+            "max": 5100
+          },
+          "assembly": {
+            "type": "enum",
+            "values": [
+              "fixed_curve",
+              "separated_membrane",
+              "separated_columnar"
+            ]
+          },
+          "body_units": {
+            "type": "integer",
+            "unit": "count",
+            "min": 1,
+            "max": 2
+          },
+          "separation_adjustable": {
+            "type": "boolean"
+          },
+          "splay_adjustable": {
+            "type": "boolean"
+          },
+          "front_pitch_adjustable": {
+            "type": "boolean"
+          },
+          "tenting_adjustable": {
+            "type": "boolean"
+          },
+          "battery_included": {
+            "type": "boolean"
+          },
+          "host_powered": {
+            "type": "boolean"
+          },
+          "bluetooth": {
+            "type": "boolean"
+          },
+          "receiver_included": {
+            "type": "boolean"
+          },
+          "usb_keyboard_data": {
+            "type": "boolean"
+          },
+          "host_lead_included": {
+            "type": "boolean"
+          },
+          "bridge_included": {
+            "type": "boolean"
+          },
+          "host_lead_detachable": {
+            "type": "boolean"
+          },
+          "bridge_detachable": {
+            "type": "boolean"
+          },
+          "palm_supports_included": {
+            "type": "boolean"
+          },
+          "tent_supports_included": {
+            "type": "boolean"
+          },
+          "box_hardware": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assembly_price_factor": {
+            "type": "number",
+            "min": 1,
+            "max": 1.7
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "sku.sku_id": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.product_id": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.physical_layout": {
+      "type": "enum",
+      "values": [
+        "ANSI",
+        "ISO",
+        "columnar"
+      ],
+      "optional": true
+    },
+    "sku.enter_geometry": {
+      "type": "enum",
+      "values": [
+        "horizontal single-row Enter",
+        "tall two-row Enter",
+        "one-unit rectangular Enter"
+      ],
+      "optional": true
+    },
+    "sku.key_count": {
+      "type": "integer",
+      "unit": "count",
+      "min": 52,
+      "max": 105,
+      "optional": true
+    },
+    "sku.number_pad": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.max_clear_gap_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "optional": true
+    },
+    "sku.gap_status": {
+      "type": "enum",
+      "values": [
+        "declared maximum",
+        "not applicable"
+      ],
+      "optional": true
+    },
+    "sku.gap_basis": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.front_pitch_positions_deg": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "unit": "deg"
+      },
+      "optional": true
+    },
+    "sku.tent_positions_deg": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "unit": "deg"
+      },
+      "optional": true
+    },
+    "sku.palm_support_units": {
+      "type": "integer",
+      "unit": "count",
+      "min": 0,
+      "max": 2,
+      "optional": true
+    },
+    "sku.host_lead_length_m": {
+      "type": "number",
+      "unit": "m",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "optional": true
+    },
+    "sku.bridge_length_m": {
+      "type": "number",
+      "unit": "m",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "optional": true
+    },
+    "sku.lead_status": {
+      "type": "enum",
+      "values": [
+        "nominal included",
+        "not applicable"
+      ],
+      "optional": true
+    },
+    "sku.receiver_model_match": {
+      "type": "string",
+      "optional": true
+    },
+    "sku.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK",
+      "min": 300,
+      "max": 5100,
+      "optional": true
+    },
+    "sku.assembly": {
+      "type": "enum",
+      "values": [
+        "fixed_curve",
+        "separated_membrane",
+        "separated_columnar"
+      ],
+      "optional": true
+    },
+    "sku.body_units": {
+      "type": "integer",
+      "unit": "count",
+      "min": 1,
+      "max": 2,
+      "optional": true
+    },
+    "sku.separation_adjustable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.splay_adjustable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.front_pitch_adjustable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.tenting_adjustable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.battery_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.host_powered": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.bluetooth": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.receiver_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.usb_keyboard_data": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.host_lead_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.bridge_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.host_lead_detachable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.bridge_detachable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.palm_supports_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.tent_supports_included": {
+      "type": "boolean",
+      "optional": true
+    },
+    "sku.box_hardware": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "optional": true
+    },
+    "sku.assembly_price_factor": {
+      "type": "number",
+      "min": 1,
+      "max": 1.7,
+      "optional": true
+    },
+    "request.language_layout": {
+      "type": "enum",
+      "values": [
+        "US English ANSI",
+        "UK English ISO",
+        "US English columnar",
+        "UK English columnar"
+      ],
+      "optional": true
+    },
+    "request.colour": {
+      "type": "string",
+      "optional": true
+    },
+    "request.min_key_count": {
+      "type": "integer",
+      "unit": "count",
+      "optional": true
+    },
+    "request.number_pad": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.key_mechanism": {
+      "type": "string",
+      "optional": true
+    },
+    "request.separate_modules": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.max_required_gap_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 0,
+      "optional": true
+    },
+    "request.gap_basis": {
+      "type": "string",
+      "optional": true
+    },
+    "request.tent_deg": {
+      "type": "number",
+      "unit": "deg",
+      "optional": true
+    },
+    "request.front_pitch_deg": {
+      "type": "number",
+      "unit": "deg",
+      "optional": true
+    },
+    "request.palm_supports": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.palm_removable": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.input_route": {
+      "type": "enum",
+      "values": [
+        "Bluetooth",
+        "receiver",
+        "USB keyboard data"
+      ],
+      "optional": true
+    },
+    "request.supplied_receiver": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.backlight": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.hot_swap": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.remapping_system": {
+      "type": "string",
+      "optional": true
+    },
+    "request.assignment_scope": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 300,
+      "max": 650,
+      "round_to": 5,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 600,
+          "max": 1500
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1400,
+          "max": 3000
+        }
+      ]
+    },
+    {
+      "id": "assembly_joint",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "fixed_curve": 4,
+        "separated_membrane": 3,
+        "separated_columnar": 3
+      },
+      "cases": [
+        {
+          "when": "profile.positioning == 'budget'",
+          "weights": {
+            "fixed_curve": 6,
+            "separated_membrane": 3,
+            "separated_columnar": 1
+          }
+        },
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "weights": {
+            "fixed_curve": 4,
+            "separated_membrane": 4,
+            "separated_columnar": 4
+          }
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "weights": {
+            "fixed_curve": 2,
+            "separated_membrane": 3,
+            "separated_columnar": 6
+          }
+        }
+      ],
+      "values": {
+        "fixed_curve": {
+          "assembly": "fixed_curve",
+          "body_units": 1,
+          "key_mechanism": "low-profile scissor",
+          "mechanical": false,
+          "number_pad": true,
+          "separation_adjustable": false,
+          "splay_adjustable": false,
+          "front_pitch_adjustable": true,
+          "tenting_adjustable": false,
+          "palm_supports_included": true,
+          "tent_supports_included": false,
+          "battery_included": true,
+          "user_replaceable_battery": true,
+          "bluetooth": true,
+          "receiver_included": true,
+          "usb_keyboard_data": false,
+          "host_powered": false,
+          "host_lead_included": false,
+          "bridge_included": false,
+          "host_lead_detachable": false,
+          "bridge_detachable": false,
+          "backlight": false,
+          "hot_swap": false,
+          "logical_layers": false,
+          "remapping_support": [
+            "not specified"
+          ],
+          "remapping_scope": "not specified",
+          "box_hardware": [
+            "one complete one-body keyboard",
+            "two installed AAA cells",
+            "one matched USB-A receiver",
+            "one integrated nonremovable fabric/foam palm rest",
+            "installed front-edge lift"
+          ],
+          "box_hardware_label": "one complete one-body keyboard; two installed AAA cells; one matched USB-A receiver; one integrated nonremovable fabric/foam palm rest; installed front-edge lift",
+          "assembly_price_factor": 1
+        },
+        "separated_membrane": {
+          "assembly": "separated_membrane",
+          "body_units": 2,
+          "key_mechanism": "rubber-dome membrane",
+          "mechanical": false,
+          "number_pad": false,
+          "separation_adjustable": true,
+          "splay_adjustable": true,
+          "front_pitch_adjustable": false,
+          "tenting_adjustable": true,
+          "palm_supports_included": true,
+          "tent_supports_included": true,
+          "battery_included": false,
+          "user_replaceable_battery": false,
+          "bluetooth": false,
+          "receiver_included": false,
+          "usb_keyboard_data": true,
+          "host_powered": true,
+          "host_lead_included": true,
+          "bridge_included": true,
+          "host_lead_detachable": false,
+          "bridge_detachable": false,
+          "backlight": false,
+          "hot_swap": false,
+          "logical_layers": false,
+          "remapping_support": [
+            "not specified"
+          ],
+          "remapping_scope": "not specified",
+          "box_hardware": [
+            "one complete keyboard of two modules",
+            "one fixed nominal2m USB-A host lead",
+            "one fixed nominal0.5m bridge",
+            "two removable foam/ABS palm supports",
+            "two tent supports"
+          ],
+          "box_hardware_label": "one complete keyboard of two modules; one fixed nominal2m USB-A host lead; one fixed nominal0.5m bridge; two removable foam/ABS palm supports; two tent supports",
+          "assembly_price_factor": 1.15
+        },
+        "separated_columnar": {
+          "assembly": "separated_columnar",
+          "body_units": 2,
+          "key_mechanism": "low-profile linear mechanical",
+          "mechanical": true,
+          "number_pad": false,
+          "separation_adjustable": true,
+          "splay_adjustable": true,
+          "front_pitch_adjustable": false,
+          "tenting_adjustable": true,
+          "palm_supports_included": false,
+          "tent_supports_included": true,
+          "battery_included": false,
+          "user_replaceable_battery": false,
+          "bluetooth": false,
+          "receiver_included": false,
+          "usb_keyboard_data": true,
+          "host_powered": true,
+          "host_lead_included": true,
+          "bridge_included": true,
+          "host_lead_detachable": true,
+          "bridge_detachable": true,
+          "backlight": true,
+          "hot_swap": true,
+          "logical_layers": true,
+          "remapping_support": [
+            "split_keymap_utility"
+          ],
+          "remapping_scope": "physical-key assignments and logical layers on compatible configured USB host",
+          "box_hardware": [
+            "one complete keyboard of two modules",
+            "one detachable nominal1.5m USB-A-to-USB-C host data lead",
+            "one detachable nominal1m matched3.5mm four-contact bridge",
+            "two magnetic tent supports"
+          ],
+          "box_hardware_label": "one complete keyboard of two modules; one detachable nominal1.5m USB-A-to-USB-C host data lead; one detachable nominal1m matched3.5mm four-contact bridge; two magnetic tent supports",
+          "assembly_price_factor": 1.7
+        }
+      }
+    },
+    {
+      "id": "assembly_assembly",
+      "target": "product.facts.assembly",
+      "derive": "internal.assembly.assembly"
+    },
+    {
+      "id": "assembly_body_units",
+      "target": "product.facts.body_units",
+      "derive": "internal.assembly.body_units"
+    },
+    {
+      "id": "assembly_key_mechanism",
+      "target": "product.facts.key_mechanism",
+      "derive": "internal.assembly.key_mechanism"
+    },
+    {
+      "id": "assembly_mechanical",
+      "target": "product.facts.mechanical",
+      "derive": "internal.assembly.mechanical"
+    },
+    {
+      "id": "assembly_number_pad",
+      "target": "product.facts.number_pad",
+      "derive": "internal.assembly.number_pad"
+    },
+    {
+      "id": "assembly_separation_adjustable",
+      "target": "product.facts.separation_adjustable",
+      "derive": "internal.assembly.separation_adjustable"
+    },
+    {
+      "id": "assembly_splay_adjustable",
+      "target": "product.facts.splay_adjustable",
+      "derive": "internal.assembly.splay_adjustable"
+    },
+    {
+      "id": "assembly_front_pitch_adjustable",
+      "target": "product.facts.front_pitch_adjustable",
+      "derive": "internal.assembly.front_pitch_adjustable"
+    },
+    {
+      "id": "assembly_tenting_adjustable",
+      "target": "product.facts.tenting_adjustable",
+      "derive": "internal.assembly.tenting_adjustable"
+    },
+    {
+      "id": "assembly_palm_supports_included",
+      "target": "product.facts.palm_supports_included",
+      "derive": "internal.assembly.palm_supports_included"
+    },
+    {
+      "id": "assembly_tent_supports_included",
+      "target": "product.facts.tent_supports_included",
+      "derive": "internal.assembly.tent_supports_included"
+    },
+    {
+      "id": "assembly_battery_included",
+      "target": "product.facts.battery_included",
+      "derive": "internal.assembly.battery_included"
+    },
+    {
+      "id": "assembly_user_replaceable_battery",
+      "target": "product.facts.user_replaceable_battery",
+      "derive": "internal.assembly.user_replaceable_battery"
+    },
+    {
+      "id": "assembly_bluetooth",
+      "target": "product.facts.bluetooth",
+      "derive": "internal.assembly.bluetooth"
+    },
+    {
+      "id": "assembly_receiver_included",
+      "target": "product.facts.receiver_included",
+      "derive": "internal.assembly.receiver_included"
+    },
+    {
+      "id": "assembly_usb_keyboard_data",
+      "target": "product.facts.usb_keyboard_data",
+      "derive": "internal.assembly.usb_keyboard_data"
+    },
+    {
+      "id": "assembly_host_powered",
+      "target": "product.facts.host_powered",
+      "derive": "internal.assembly.host_powered"
+    },
+    {
+      "id": "assembly_host_lead_included",
+      "target": "product.facts.host_lead_included",
+      "derive": "internal.assembly.host_lead_included"
+    },
+    {
+      "id": "assembly_bridge_included",
+      "target": "product.facts.bridge_included",
+      "derive": "internal.assembly.bridge_included"
+    },
+    {
+      "id": "assembly_host_lead_detachable",
+      "target": "product.facts.host_lead_detachable",
+      "derive": "internal.assembly.host_lead_detachable"
+    },
+    {
+      "id": "assembly_bridge_detachable",
+      "target": "product.facts.bridge_detachable",
+      "derive": "internal.assembly.bridge_detachable"
+    },
+    {
+      "id": "assembly_backlight",
+      "target": "product.facts.backlight",
+      "derive": "internal.assembly.backlight"
+    },
+    {
+      "id": "assembly_hot_swap",
+      "target": "product.facts.hot_swap",
+      "derive": "internal.assembly.hot_swap"
+    },
+    {
+      "id": "assembly_logical_layers",
+      "target": "product.facts.logical_layers",
+      "derive": "internal.assembly.logical_layers"
+    },
+    {
+      "id": "assembly_remapping_support",
+      "target": "product.facts.remapping_support",
+      "derive": "internal.assembly.remapping_support"
+    },
+    {
+      "id": "assembly_remapping_scope",
+      "target": "product.facts.remapping_scope",
+      "derive": "internal.assembly.remapping_scope"
+    },
+    {
+      "id": "assembly_box_hardware_label",
+      "target": "product.facts.box_hardware_label",
+      "derive": "internal.assembly.box_hardware_label"
+    },
+    {
+      "id": "assembly_box_hardware",
+      "target": "product.facts.box_hardware",
+      "derive": "internal.assembly.box_hardware"
+    },
+    {
+      "id": "assembly_assembly_price_factor",
+      "target": "product.facts.assembly_price_factor",
+      "derive": "internal.assembly.assembly_price_factor"
+    },
+    {
+      "id": "status_max_clear_gap_mm",
+      "target": "product.facts.max_clear_gap_mm",
+      "derive": "200 if product.facts.assembly == 'separated_membrane' else 300"
+    },
+    {
+      "id": "status_splay_limit_deg",
+      "target": "product.facts.splay_limit_deg",
+      "derive": "-1"
+    },
+    {
+      "id": "status_front_pitch_positions_deg",
+      "target": "product.facts.front_pitch_positions_deg",
+      "derive": "[0,-4,-7]"
+    },
+    {
+      "id": "status_fixed_transverse_curve_deg",
+      "target": "product.facts.fixed_transverse_curve_deg",
+      "derive": "-1"
+    },
+    {
+      "id": "status_tent_positions_deg",
+      "target": "product.facts.tent_positions_deg",
+      "derive": "[0,10] if product.facts.assembly == 'separated_membrane' else [0,5]"
+    },
+    {
+      "id": "status_tent_support_units",
+      "target": "product.facts.tent_support_units",
+      "derive": "2"
+    },
+    {
+      "id": "status_tent_support_care",
+      "target": "product.facts.tent_support_care",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_palm_support_units",
+      "target": "product.facts.palm_support_units",
+      "derive": "1 if product.facts.assembly == 'fixed_curve' else 2"
+    },
+    {
+      "id": "status_palm_support_removable",
+      "target": "product.facts.palm_support_removable",
+      "derive": "product.facts.assembly == 'separated_membrane'"
+    },
+    {
+      "id": "status_palm_support_construction",
+      "target": "product.facts.palm_support_construction",
+      "derive": "'fabric/foam' if product.facts.assembly == 'fixed_curve' else 'foam/ABS'"
+    },
+    {
+      "id": "status_palm_support_care",
+      "target": "product.facts.palm_support_care",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_lower_baseplate_material",
+      "target": "product.facts.lower_baseplate_material",
+      "derive": "'steel'"
+    },
+    {
+      "id": "status_replacement_compatibility",
+      "target": "product.facts.replacement_compatibility",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_keycap_removal",
+      "target": "product.facts.keycap_removal",
+      "derive": "'declared removable' if product.facts.mechanical else 'not specified'"
+    },
+    {
+      "id": "status_aaa_cell_units",
+      "target": "product.facts.aaa_cell_units",
+      "derive": "2"
+    },
+    {
+      "id": "status_battery_type",
+      "target": "product.facts.battery_type",
+      "derive": "'AAA alkaline'"
+    },
+    {
+      "id": "status_battery_capacity_wh",
+      "target": "product.facts.battery_capacity_wh",
+      "derive": "-1"
+    },
+    {
+      "id": "status_battery_runtime_h",
+      "target": "product.facts.battery_runtime_h",
+      "derive": "-1"
+    },
+    {
+      "id": "status_battery_nominal_voltage_v",
+      "target": "product.facts.battery_nominal_voltage_v",
+      "derive": "-1"
+    },
+    {
+      "id": "status_battery_charge_capacity_mah",
+      "target": "product.facts.battery_charge_capacity_mah",
+      "derive": "-1"
+    },
+    {
+      "id": "status_battery_arrangement",
+      "target": "product.facts.battery_arrangement",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_battery_compartment",
+      "target": "product.facts.battery_compartment",
+      "derive": "'authored rear compartment'"
+    },
+    {
+      "id": "status_charge_time_h",
+      "target": "product.facts.charge_time_h",
+      "derive": "-1"
+    },
+    {
+      "id": "status_charging_socket",
+      "target": "product.facts.charging_socket",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_on_off_control",
+      "target": "product.facts.on_off_control",
+      "derive": "True"
+    },
+    {
+      "id": "status_host_selection_controls",
+      "target": "product.facts.host_selection_controls",
+      "derive": "True"
+    },
+    {
+      "id": "status_remembered_bluetooth_hosts",
+      "target": "product.facts.remembered_bluetooth_hosts",
+      "derive": "3"
+    },
+    {
+      "id": "status_bluetooth_version",
+      "target": "product.facts.bluetooth_version",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_radio_range",
+      "target": "product.facts.radio_range",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_receiver_units",
+      "target": "product.facts.receiver_units",
+      "derive": "1"
+    },
+    {
+      "id": "status_receiver_host_plug",
+      "target": "product.facts.receiver_host_plug",
+      "derive": "'USB-A'"
+    },
+    {
+      "id": "status_receiver_model_match",
+      "target": "product.facts.receiver_model_match",
+      "derive": "product.product_id"
+    },
+    {
+      "id": "status_receiver_interchangeability",
+      "target": "product.facts.receiver_interchangeability",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_host_lead_units",
+      "target": "product.facts.host_lead_units",
+      "derive": "1"
+    },
+    {
+      "id": "status_bridge_units",
+      "target": "product.facts.bridge_units",
+      "derive": "1"
+    },
+    {
+      "id": "status_host_lead_length_m",
+      "target": "product.facts.host_lead_length_m",
+      "derive": "2 if product.facts.assembly == 'separated_membrane' else 1.5"
+    },
+    {
+      "id": "status_host_plug",
+      "target": "product.facts.host_plug",
+      "derive": "'USB-A'"
+    },
+    {
+      "id": "status_keyboard_socket",
+      "target": "product.facts.keyboard_socket",
+      "derive": "'USB-C'"
+    },
+    {
+      "id": "status_lead_keyboard_plug",
+      "target": "product.facts.lead_keyboard_plug",
+      "derive": "'USB-C'"
+    },
+    {
+      "id": "status_bridge_length_m",
+      "target": "product.facts.bridge_length_m",
+      "derive": "0.5 if product.facts.assembly == 'separated_membrane' else 1"
+    },
+    {
+      "id": "status_bridge_connector",
+      "target": "product.facts.bridge_connector",
+      "derive": "'matched3.5mm four-contact keyboard intermodule'"
+    },
+    {
+      "id": "status_device_input_voltage_v",
+      "target": "product.facts.device_input_voltage_v",
+      "derive": "-1"
+    },
+    {
+      "id": "status_device_input_current_a",
+      "target": "product.facts.device_input_current_a",
+      "derive": "-1"
+    },
+    {
+      "id": "status_device_input_power_w",
+      "target": "product.facts.device_input_power_w",
+      "derive": "-1"
+    },
+    {
+      "id": "status_cable_electrical_rating",
+      "target": "product.facts.cable_electrical_rating",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_cable_data_speed",
+      "target": "product.facts.cable_data_speed",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_family",
+      "target": "product.facts.backlight_family",
+      "derive": "'RGB'"
+    },
+    {
+      "id": "status_backlight_brightness",
+      "target": "product.facts.backlight_brightness",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_modes",
+      "target": "product.facts.backlight_modes",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_controls",
+      "target": "product.facts.backlight_controls",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_backlight_spectrum",
+      "target": "product.facts.backlight_spectrum",
+      "derive": "'not specified'"
+    },
+    {
+      "id": "status_max_layers",
+      "target": "product.facts.max_layers",
+      "derive": "-1"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 1,
+        "white": 1
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      }
+    },
+    {
+      "id": "layouts",
+      "target": "product.language_layouts",
+      "sample": "weighted_subset",
+      "weights": {
+        "US English ANSI": 1,
+        "UK English ISO": 1,
+        "US English columnar": 0,
+        "UK English columnar": 0
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      },
+      "cases": [
+        {
+          "when": "product.facts.assembly == 'separated_columnar'",
+          "weights": {
+            "US English ANSI": 0,
+            "UK English ISO": 0,
+            "US English columnar": 1,
+            "UK English columnar": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "layout_groups",
+      "for_each": {
+        "binding": "group.language_layout",
+        "from": "product.language_layouts"
+      },
+      "steps": [
+        {
+          "id": "colour_groups",
+          "for_each": {
+            "binding": "group.colour",
+            "from": "product.colours"
+          },
+          "steps": [
+            {
+              "id": "skus",
+              "target": "product.skus",
+              "emit": {
+                "assembly": "product.facts.assembly",
+                "body_units": "product.facts.body_units",
+                "separation_adjustable": "product.facts.separation_adjustable",
+                "splay_adjustable": "product.facts.splay_adjustable",
+                "front_pitch_adjustable": "product.facts.front_pitch_adjustable",
+                "tenting_adjustable": "product.facts.tenting_adjustable",
+                "battery_included": "product.facts.battery_included",
+                "host_powered": "product.facts.host_powered",
+                "bluetooth": "product.facts.bluetooth",
+                "receiver_included": "product.facts.receiver_included",
+                "usb_keyboard_data": "product.facts.usb_keyboard_data",
+                "host_lead_included": "product.facts.host_lead_included",
+                "bridge_included": "product.facts.bridge_included",
+                "host_lead_detachable": "product.facts.host_lead_detachable",
+                "bridge_detachable": "product.facts.bridge_detachable",
+                "palm_supports_included": "product.facts.palm_supports_included",
+                "tent_supports_included": "product.facts.tent_supports_included",
+                "box_hardware": "product.facts.box_hardware",
+                "assembly_price_factor": "product.facts.assembly_price_factor",
+                "sku_id": "product.product_id + '-' + product.facts.assembly + '-' + group.language_layout + '-' + group.colour",
+                "product_id": "product.product_id",
+                "colour": "group.colour",
+                "language_layout": "group.language_layout",
+                "physical_layout": "'columnar' if product.facts.assembly == 'separated_columnar' else ('ANSI' if group.language_layout == 'US English ANSI' else 'ISO')",
+                "enter_geometry": "'one-unit rectangular Enter' if product.facts.assembly == 'separated_columnar' else ('horizontal single-row Enter' if group.language_layout == 'US English ANSI' else 'tall two-row Enter')",
+                "key_count": "52 if product.facts.assembly == 'separated_columnar' else ((104 if group.language_layout == 'US English ANSI' else 105) if product.facts.assembly == 'fixed_curve' else (94 if group.language_layout == 'US English ANSI' else 95))",
+                "number_pad": "product.facts.assembly == 'fixed_curve'",
+                "max_clear_gap_mm": "product.facts.max_clear_gap_mm if applicable(product.facts.max_clear_gap_mm) else -1",
+                "gap_status": "'declared maximum' if product.facts.separation_adjustable else 'not applicable'",
+                "gap_basis": "product.facts.gap_basis",
+                "front_pitch_positions_deg": "product.facts.front_pitch_positions_deg if applicable(product.facts.front_pitch_positions_deg) else []",
+                "tent_positions_deg": "product.facts.tent_positions_deg if applicable(product.facts.tent_positions_deg) else []",
+                "palm_support_units": "product.facts.palm_support_units if applicable(product.facts.palm_support_units) else 0",
+                "host_lead_length_m": "product.facts.host_lead_length_m if applicable(product.facts.host_lead_length_m) else -1",
+                "bridge_length_m": "product.facts.bridge_length_m if applicable(product.facts.bridge_length_m) else -1",
+                "lead_status": "'nominal included' if product.facts.host_lead_included else 'not applicable'",
+                "receiver_model_match": "product.facts.receiver_model_match if applicable(product.facts.receiver_model_match) else 'not applicable'",
+                "reference_price_sek": "product.reference_price_sek * product.facts.assembly_price_factor"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "description.layout",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "sku.language_layout",
+          "sku.physical_layout",
+          "sku.key_count",
+          "sku.enter_geometry",
+          "sku.number_pad"
+        ]
+      },
+      "slots": {
+        "language": "sku.language_layout",
+        "geometry": "sku.physical_layout",
+        "count": "sku.key_count",
+        "enter": "sku.enter_geometry",
+        "pad": "'integrated number pad' if sku.number_pad else 'no number pad'"
+      },
+      "formulations": [
+        "Selected {language}, {geometry}: {count} physical keys with {enter}; {pad}.",
+        "{count} installed physical keys and {enter} for {language}, with {geometry} geometry; {pad}."
+      ]
+    },
+    {
+      "id": "description.fixed_split",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.body_units",
+          "product.facts.split_key_groups"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "The split key groups share one rigid body.",
+        "One rigid body carries both split key groups; they cannot be separated."
+      ],
+      "when": "product.facts.assembly == 'fixed_curve'"
+    },
+    {
+      "id": "description.separate_split",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.body_units",
+          "product.facts.separation_adjustable",
+          "product.facts.splay_adjustable"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Two separate keying modules can be repositioned for spacing and in-plane splay on the desk.",
+        "Spacing and in-plane splay can be changed by repositioning the two separate keying modules."
+      ],
+      "when": "product.facts.separation_adjustable"
+    },
+    {
+      "id": "description.gap",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.max_clear_gap_mm"
+        ]
+      },
+      "slots": {
+        "gap": "product.facts.max_clear_gap_mm"
+      },
+      "formulations": [
+        "Declared maximum clear gap {gap:g} mm between inner module edges, flat and parallel with the supplied bridge routed without tension; not cable length or total keyboard width.",
+        "With both modules flat and parallel and the supplied bridge routed without tension, maximum declared inner-edge clear gap is {gap:g} mm. It is not the bridge length or total footprint."
+      ],
+      "when": "product.facts.separation_adjustable"
+    },
+    {
+      "id": "description.front_pitch",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.front_pitch_positions_deg",
+          "product.facts.front_pitch_adjustable"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "The fixed frame front-edge lift adjusts between nominal0/−4/−7 degree pitch positions; this is not inward-roll tenting.",
+        "Nominal front-edge pitch can be adjusted to0,−4 or−7 degrees using the fixed frame lift, distinct from inward-roll tenting."
+      ],
+      "when": "product.facts.front_pitch_adjustable"
+    },
+    {
+      "id": "description.tent",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.tent_support_units",
+          "product.facts.tent_supports_included",
+          "product.facts.tent_positions_deg",
+          "product.facts.tenting_adjustable"
+        ]
+      },
+      "slots": {
+        "angles": "str(product.facts.tent_positions_deg)"
+      },
+      "formulations": [
+        "Two supplied tent supports let you adjust inward roll to nominal positions {angles} degrees, raising the inner module edges; not front-edge pitch.",
+        "Using the two supplied supports, you can adjust the inner edges to nominal inward-roll positions {angles} degrees. These are tent positions, not front-edge pitch."
+      ],
+      "when": "product.facts.tenting_adjustable"
+    },
+    {
+      "id": "description.materials",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.body_material",
+          "product.facts.keycap_material",
+          "product.facts.key_mechanism"
+        ]
+      },
+      "slots": {
+        "mechanism": "product.facts.key_mechanism"
+      },
+      "formulations": [
+        "ABS bodies and keycaps; declared key mechanism {mechanism}.",
+        "Declared {mechanism} keys in ABS bodies with ABS keycaps."
+      ]
+    },
+    {
+      "id": "description.mechanical",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.lower_baseplate_material",
+          "product.facts.hot_swap",
+          "product.facts.replacement_compatibility"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Steel lower baseplates and declared hot-swap sockets for the authored low-profile switch family; broader replacement compatibility unknown.",
+        "Declared sockets support hot-swap within this authored low-profile switch family; lower baseplates are steel. Other replacement compatibility is unspecified."
+      ],
+      "when": "product.facts.mechanical"
+    },
+    {
+      "id": "description.palm_fixed",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.palm_support_units",
+          "product.facts.palm_supports_included",
+          "product.facts.palm_support_removable",
+          "product.facts.palm_support_construction",
+          "product.facts.palm_support_care"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "One integrated nonremovable fabric/foam palm rest is included; its care instructions are unspecified.",
+        "The included fabric/foam palm rest is integrated and nonremovable. Care instructions for this one support are unknown."
+      ],
+      "when": "product.facts.assembly == 'fixed_curve'"
+    },
+    {
+      "id": "description.palm_separate",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.palm_support_units",
+          "product.facts.palm_supports_included",
+          "product.facts.palm_support_removable",
+          "product.facts.palm_support_construction",
+          "product.facts.palm_support_care"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Two removable foam/ABS palm supports are included; their care instructions are unknown.",
+        "Included palm hardware is two removable foam/ABS supports, with no supplied care declaration."
+      ],
+      "when": "product.facts.assembly == 'separated_membrane'"
+    },
+    {
+      "id": "description.palm_absent",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.palm_supports_included",
+          "product.facts.palm_support_construction",
+          "product.facts.palm_support_removable",
+          "product.facts.palm_support_care"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Palm supports are explicitly absent; their material, removal and care properties are not applicable.",
+        "No palm rest is included in this fixture. Palm-support material/removal/care properties are inapplicable."
+      ],
+      "when": "product.facts.assembly == 'separated_columnar'"
+    },
+    {
+      "id": "description.power_cell",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.battery_included",
+          "product.facts.aaa_cell_units",
+          "product.facts.battery_type",
+          "product.facts.user_replaceable_battery",
+          "product.facts.battery_capacity_wh",
+          "product.facts.charge_time_h"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Two installed replaceable AAA alkaline cells; battery energy in Wh is unknown, and on-device charging and charge time are not applicable.",
+        "This authored supply uses two installed user-replaceable AAA alkaline cells. Aggregate Wh unspecified; on-device charging and charge time inapplicable."
+      ],
+      "when": "product.facts.battery_included"
+    },
+    {
+      "id": "description.power_wired",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.battery_included",
+          "product.facts.usb_keyboard_data",
+          "product.facts.host_powered",
+          "product.facts.battery_capacity_wh",
+          "product.facts.battery_runtime_h",
+          "product.facts.charge_time_h"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Battery-free host-powered USB keyboard input; battery Wh, battery runtime and charge time are not applicable.",
+        "Host USB provides wired keyboard input without a battery; battery energy/runtime/charging quantities are inapplicable, not zero-valued ratings."
+      ],
+      "when": "not product.facts.battery_included"
+    },
+    {
+      "id": "description.wireless",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bluetooth",
+          "product.facts.remembered_bluetooth_hosts",
+          "product.facts.receiver_included",
+          "product.facts.receiver_units",
+          "product.facts.receiver_host_plug",
+          "product.facts.receiver_interchangeability",
+          "product.facts.bluetooth_version",
+          "product.facts.radio_range",
+          "product.facts.receiver_model_match"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Bluetooth input with three remembered host slots, plus one supplied USB-A receiver matched to this keyboard model. Receiver interchangeability and radio range/version are unknown.",
+        "Select between three remembered Bluetooth hosts or use the one included USB-A receiver matched to this keyboard model. Radio version/range and interchangeable receiver compatibility unspecified."
+      ],
+      "when": "product.facts.bluetooth"
+    },
+    {
+      "id": "description.membrane_leads",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.host_lead_included",
+          "product.facts.host_lead_length_m",
+          "product.facts.host_plug",
+          "product.facts.host_lead_detachable",
+          "product.facts.bridge_included",
+          "product.facts.bridge_length_m",
+          "product.facts.bridge_detachable",
+          "product.facts.host_lead_units",
+          "product.facts.bridge_units"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "One supplied fixed nominal2m USB-A host lead and one fixed nominal0.5m intermodule bridge; bridge length does not establish maximum clear gap.",
+        "Supplied fixed leads: one nominal2m USB-A host lead and one nominal0.5m intermodule bridge. Maximum clear gap is a separate declaration."
+      ],
+      "when": "product.facts.assembly == 'separated_membrane'"
+    },
+    {
+      "id": "description.columnar_leads",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.host_lead_included",
+          "product.facts.host_lead_length_m",
+          "product.facts.host_plug",
+          "product.facts.host_lead_detachable",
+          "product.facts.bridge_included",
+          "product.facts.bridge_length_m",
+          "product.facts.bridge_detachable",
+          "product.facts.bridge_connector",
+          "product.facts.host_lead_units",
+          "product.facts.bridge_units",
+          "product.facts.lead_keyboard_plug"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Supplied detachable leads: one nominal1.5m USB-A host to USB-C keyboard data lead and one nominal1m matched3.5mm four-contact intermodule bridge; bridge is not an audio or host USB connection.",
+        "One detachable nominal1.5m USB-A-to-USB-C keyboard data lead and one detachable nominal1m matched3.5mm four-contact bridge are included. The intermodule bridge is not an audio/host USB route."
+      ],
+      "when": "product.facts.assembly == 'separated_columnar'"
+    },
+    {
+      "id": "description.light",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.backlight",
+          "product.facts.backlight_family",
+          "product.facts.backlight_brightness",
+          "product.facts.backlight_modes",
+          "product.facts.backlight_controls",
+          "product.facts.backlight_spectrum"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "RGB key backlight declared; brightness, modes, controls and spectrum are unknown.",
+        "Declared RGB lighting on the keys, without specified brightness, mode, control or spectrum values."
+      ],
+      "when": "product.facts.backlight"
+    },
+    {
+      "id": "description.light_na",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.backlight",
+          "product.facts.backlight_family",
+          "product.facts.backlight_brightness",
+          "product.facts.backlight_modes",
+          "product.facts.backlight_controls",
+          "product.facts.backlight_spectrum"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Key backlight explicitly absent; light family, brightness, modes, controls and spectrum not applicable.",
+        "No key lighting in this fixture; related family/brightness/mode/control/spectrum properties are inapplicable."
+      ],
+      "when": "not product.facts.backlight"
+    },
+    {
+      "id": "description.remap",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.remapping_support",
+          "product.facts.remapping_scope",
+          "product.facts.logical_layers",
+          "product.facts.max_layers",
+          "product.facts.default_keymap",
+          "product.facts.utility_setup_result"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Synthetic split_keymap_utility support covers physical-key assignments and logical layers on a compatible configured USB host; maximum layers, default map and setup outcome unknown.",
+        "Declared physical-key assignment/layer support uses synthetic split_keymap_utility with a compatible configured USB host. Default keymap, layer limit and actual setup result unspecified."
+      ],
+      "when": "known(product.facts.remapping_support)"
+    },
+    {
+      "id": "description.remap_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.remapping_support",
+          "product.facts.remapping_scope"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Remapping-system support and assignment scope unspecified, rather than a known empty support set.",
+        "No declared remapping system or assignment scope for this fixture; capability remains unknown."
+      ],
+      "when": "not known(product.facts.remapping_support)"
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.configured_dimensions_declaration",
+          "product.facts.mass_declaration",
+          "product.facts.switch_performance_tests",
+          "product.facts.keyboard_care"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Configured dimensions, body/component masses, switch/performance tests and keyboard-care instructions are unspecified.",
+        "No configured-footprint/body or component mass, measured switch/performance result or keyboard-care declaration is supplied."
+      ]
+    },
+    {
+      "id": "description.box",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.box_hardware",
+          "product.facts.box_exclusions"
+        ]
+      },
+      "slots": {
+        "included": "product.facts.box_hardware_label"
+      },
+      "formulations": [
+        "Included hardware: {included}. No mouse, wall charger, host adapter, extension, separate number pad, extra battery, carrying case, spare keys/switches, puller, tripod/mount, trackpad/display, knob or powered hub.",
+        "Box hardware is {included}; mouse/charger/adapter/extension, separate number pad, extra batteries/case/spares/puller, tripod or mount, trackpad/display/knob/hub are explicitly excluded."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'keyboards.split_ergonomic_keyboards' in brand.eligible_concepts"
+    },
+    {
+      "id": "layout_joint",
+      "require": "(('US English ANSI' not in product.language_layouts and 'UK English ISO' not in product.language_layouts) if product.facts.assembly == 'separated_columnar' else ('US English columnar' not in product.language_layouts and 'UK English columnar' not in product.language_layouts))"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "language",
+      "role": "filter",
+      "predicate": "sku.language_layout == request.language_layout",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "colour",
+      "role": "filter",
+      "predicate": "sku.colour == request.colour",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "key_count",
+      "role": "filter",
+      "predicate": "sku.key_count >= request.min_key_count",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "number_pad",
+      "role": "filter",
+      "predicate": "sku.number_pad == request.number_pad",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "mechanism",
+      "role": "filter",
+      "predicate": "product.facts.key_mechanism == request.key_mechanism",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "split",
+      "role": "filter",
+      "predicate": "(sku.body_units == 2) == request.separate_modules",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "gap",
+      "role": "filter",
+      "predicate": "applicable(product.facts.max_clear_gap_mm) and known(product.facts.max_clear_gap_mm) and sku.gap_basis == request.gap_basis and product.facts.max_clear_gap_mm >= request.max_required_gap_mm",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "tent",
+      "role": "filter",
+      "predicate": "applicable(product.facts.tent_positions_deg) and request.tent_deg in product.facts.tent_positions_deg",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "front_pitch",
+      "role": "filter",
+      "predicate": "applicable(product.facts.front_pitch_positions_deg) and request.front_pitch_deg in product.facts.front_pitch_positions_deg",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "palm",
+      "role": "filter",
+      "predicate": "sku.palm_supports_included == request.palm_supports",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "palm_removal",
+      "role": "filter",
+      "predicate": "applicable(product.facts.palm_support_removable) and product.facts.palm_support_removable == request.palm_removable",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "input_route",
+      "role": "filter",
+      "predicate": "(request.input_route == 'Bluetooth' and sku.bluetooth) or (request.input_route == 'receiver' and sku.receiver_included) or (request.input_route == 'USB keyboard data' and sku.usb_keyboard_data)",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "receiver",
+      "role": "filter",
+      "predicate": "sku.receiver_included == request.supplied_receiver",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "backlight",
+      "role": "filter",
+      "predicate": "product.facts.backlight == request.backlight",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "hot_swap",
+      "role": "filter",
+      "predicate": "product.facts.hot_swap == request.hot_swap",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "remap",
+      "role": "filter",
+      "predicate": "known(product.facts.remapping_support) and request.remapping_system in product.facts.remapping_support and known(product.facts.remapping_scope) and product.facts.remapping_scope == request.assignment_scope",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "language_layout": {
+                "type": "enum",
+                "values": [
+                  "US English ANSI",
+                  "UK English ISO",
+                  "US English columnar",
+                  "UK English columnar"
+                ]
+              },
+              "physical_layout": {
+                "type": "enum",
+                "values": [
+                  "ANSI",
+                  "ISO",
+                  "columnar"
+                ]
+              },
+              "enter_geometry": {
+                "type": "enum",
+                "values": [
+                  "horizontal single-row Enter",
+                  "tall two-row Enter",
+                  "one-unit rectangular Enter"
+                ]
+              },
+              "key_count": {
+                "type": "integer",
+                "unit": "count",
+                "min": 52,
+                "max": 105
+              },
+              "number_pad": {
+                "type": "boolean"
+              },
+              "max_clear_gap_mm": {
+                "type": "number",
+                "unit": "mm",
+                "min": -1,
+                "unknown_values": [
+                  -1
+                ]
+              },
+              "gap_status": {
+                "type": "enum",
+                "values": [
+                  "declared maximum",
+                  "not applicable"
+                ]
+              },
+              "gap_basis": {
+                "type": "string"
+              },
+              "front_pitch_positions_deg": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "unit": "deg"
+                }
+              },
+              "tent_positions_deg": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "unit": "deg"
+                }
+              },
+              "palm_support_units": {
+                "type": "integer",
+                "unit": "count",
+                "min": 0,
+                "max": 2
+              },
+              "host_lead_length_m": {
+                "type": "number",
+                "unit": "m",
+                "min": -1,
+                "unknown_values": [
+                  -1
+                ]
+              },
+              "bridge_length_m": {
+                "type": "number",
+                "unit": "m",
+                "min": -1,
+                "unknown_values": [
+                  -1
+                ]
+              },
+              "lead_status": {
+                "type": "enum",
+                "values": [
+                  "nominal included",
+                  "not applicable"
+                ]
+              },
+              "receiver_model_match": {
+                "type": "string"
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 300,
+                "max": 5100
+              },
+              "assembly": {
+                "type": "enum",
+                "values": [
+                  "fixed_curve",
+                  "separated_membrane",
+                  "separated_columnar"
+                ]
+              },
+              "body_units": {
+                "type": "integer",
+                "unit": "count",
+                "min": 1,
+                "max": 2
+              },
+              "separation_adjustable": {
+                "type": "boolean"
+              },
+              "splay_adjustable": {
+                "type": "boolean"
+              },
+              "front_pitch_adjustable": {
+                "type": "boolean"
+              },
+              "tenting_adjustable": {
+                "type": "boolean"
+              },
+              "battery_included": {
+                "type": "boolean"
+              },
+              "host_powered": {
+                "type": "boolean"
+              },
+              "bluetooth": {
+                "type": "boolean"
+              },
+              "receiver_included": {
+                "type": "boolean"
+              },
+              "usb_keyboard_data": {
+                "type": "boolean"
+              },
+              "host_lead_included": {
+                "type": "boolean"
+              },
+              "bridge_included": {
+                "type": "boolean"
+              },
+              "host_lead_detachable": {
+                "type": "boolean"
+              },
+              "bridge_detachable": {
+                "type": "boolean"
+              },
+              "palm_supports_included": {
+                "type": "boolean"
+              },
+              "tent_supports_included": {
+                "type": "boolean"
+              },
+              "box_hardware": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "assembly_price_factor": {
+                "type": "number",
+                "min": 1,
+                "max": 1.7
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "language_layout": {
+              "type": "enum",
+              "values": [
+                "US English ANSI",
+                "UK English ISO",
+                "US English columnar",
+                "UK English columnar"
+              ]
+            },
+            "physical_layout": {
+              "type": "enum",
+              "values": [
+                "ANSI",
+                "ISO",
+                "columnar"
+              ]
+            },
+            "enter_geometry": {
+              "type": "enum",
+              "values": [
+                "horizontal single-row Enter",
+                "tall two-row Enter",
+                "one-unit rectangular Enter"
+              ]
+            },
+            "key_count": {
+              "type": "integer",
+              "unit": "count",
+              "min": 52,
+              "max": 105
+            },
+            "number_pad": {
+              "type": "boolean"
+            },
+            "max_clear_gap_mm": {
+              "type": "number",
+              "unit": "mm",
+              "min": -1,
+              "unknown_values": [
+                -1
+              ]
+            },
+            "gap_status": {
+              "type": "enum",
+              "values": [
+                "declared maximum",
+                "not applicable"
+              ]
+            },
+            "gap_basis": {
+              "type": "string"
+            },
+            "front_pitch_positions_deg": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "unit": "deg"
+              }
+            },
+            "tent_positions_deg": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "unit": "deg"
+              }
+            },
+            "palm_support_units": {
+              "type": "integer",
+              "unit": "count",
+              "min": 0,
+              "max": 2
+            },
+            "host_lead_length_m": {
+              "type": "number",
+              "unit": "m",
+              "min": -1,
+              "unknown_values": [
+                -1
+              ]
+            },
+            "bridge_length_m": {
+              "type": "number",
+              "unit": "m",
+              "min": -1,
+              "unknown_values": [
+                -1
+              ]
+            },
+            "lead_status": {
+              "type": "enum",
+              "values": [
+                "nominal included",
+                "not applicable"
+              ]
+            },
+            "receiver_model_match": {
+              "type": "string"
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 300,
+              "max": 5100
+            },
+            "assembly": {
+              "type": "enum",
+              "values": [
+                "fixed_curve",
+                "separated_membrane",
+                "separated_columnar"
+              ]
+            },
+            "body_units": {
+              "type": "integer",
+              "unit": "count",
+              "min": 1,
+              "max": 2
+            },
+            "separation_adjustable": {
+              "type": "boolean"
+            },
+            "splay_adjustable": {
+              "type": "boolean"
+            },
+            "front_pitch_adjustable": {
+              "type": "boolean"
+            },
+            "tenting_adjustable": {
+              "type": "boolean"
+            },
+            "battery_included": {
+              "type": "boolean"
+            },
+            "host_powered": {
+              "type": "boolean"
+            },
+            "bluetooth": {
+              "type": "boolean"
+            },
+            "receiver_included": {
+              "type": "boolean"
+            },
+            "usb_keyboard_data": {
+              "type": "boolean"
+            },
+            "host_lead_included": {
+              "type": "boolean"
+            },
+            "bridge_included": {
+              "type": "boolean"
+            },
+            "host_lead_detachable": {
+              "type": "boolean"
+            },
+            "bridge_detachable": {
+              "type": "boolean"
+            },
+            "palm_supports_included": {
+              "type": "boolean"
+            },
+            "tent_supports_included": {
+              "type": "boolean"
+            },
+            "box_hardware": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "assembly_price_factor": {
+              "type": "number",
+              "min": 1,
+              "max": 1.7
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "number_pad",
+              "front_lift",
+              "palm_contact",
+              "module_spacing",
+              "tent_supports",
+              "host_lead",
+              "intermodule_link",
+              "key_assignment",
+              "number_layer"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 300,
+          "max": 5100
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 300
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 5100
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_typing_feel": {
+          "type": "boolean"
+        },
+        "review.positive_key_sound": {
+          "type": "boolean"
+        },
+        "review.positive_printed_punctuation": {
+          "type": "boolean"
+        },
+        "review.positive_number_pad": {
+          "type": "boolean"
+        },
+        "review.positive_front_lift": {
+          "type": "boolean"
+        },
+        "review.positive_palm_contact": {
+          "type": "boolean"
+        },
+        "review.positive_module_spacing": {
+          "type": "boolean"
+        },
+        "review.positive_tent_supports": {
+          "type": "boolean"
+        },
+        "review.positive_host_lead": {
+          "type": "boolean"
+        },
+        "review.positive_intermodule_link": {
+          "type": "boolean"
+        },
+        "review.positive_key_assignment": {
+          "type": "boolean"
+        },
+        "review.positive_number_layer": {
+          "type": "boolean"
+        },
+        "product.facts.assembly": {
+          "type": "enum",
+          "values": [
+            "fixed_curve",
+            "separated_membrane",
+            "separated_columnar"
+          ],
+          "input": true
+        },
+        "product.facts.number_pad": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.palm_supports_included": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.separation_adjustable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.tenting_adjustable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.usb_keyboard_data": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.bridge_detachable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.remapping_support": {
+          "type": "set",
+          "items": {
+            "type": "string"
+          },
+          "unknown_values": [
+            [
+              "not specified"
+            ]
+          ],
+          "input": true
+        },
+        "product.facts.logical_layers": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.front_pitch_adjustable": {
+          "type": "boolean",
+          "input": true
+        },
+        "review.setup_label": {
+          "type": "string"
+        },
+        "review.connection_label": {
+          "type": "string"
+        },
+        "review.input_map_label": {
+          "type": "enum",
+          "values": [
+            "US English",
+            "UK English"
+          ]
+        },
+        "review.raised_tent_deg": {
+          "type": "number",
+          "unit": "deg",
+          "applicable_when": "product.facts.tenting_adjustable"
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "tested_setup",
+          "target": "review.setup_label",
+          "derive": "'the fixed frame at0° front pitch on my already paired Bluetooth laptop' if review.subject.assembly == 'fixed_curve' else 'both linked halves flat and parallel at100mm clear gap, using the supplied USB lead at my matching laptop port'"
+        },
+        {
+          "id": "tested_connection",
+          "target": "review.connection_label",
+          "derive": "'my already paired Bluetooth laptop' if review.subject.assembly == 'fixed_curve' else 'the supplied USB lead at my matching laptop port'"
+        },
+        {
+          "id": "tested_input_map",
+          "target": "review.input_map_label",
+          "derive": "'US English' if review.subject.language_layout in ['US English ANSI','US English columnar'] else 'UK English'"
+        },
+        {
+          "id": "tested_tent_angle",
+          "target": "review.raised_tent_deg",
+          "derive": "10 if review.subject.assembly == 'separated_membrane' else 5"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "fixed_curve": 1,
+            "separated_membrane": 0,
+            "separated_columnar": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.assembly == 'separated_membrane'",
+              "weights": {
+                "fixed_curve": 0,
+                "separated_membrane": 1,
+                "separated_columnar": 0
+              }
+            },
+            {
+              "when": "product.facts.assembly == 'separated_columnar'",
+              "weights": {
+                "fixed_curve": 0,
+                "separated_membrane": 0,
+                "separated_columnar": 1
+              }
+            }
+          ],
+          "values": {
+            "fixed_curve": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "number_pad",
+              "front_lift",
+              "palm_contact"
+            ],
+            "separated_membrane": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "palm_contact",
+              "module_spacing",
+              "tent_supports",
+              "host_lead"
+            ],
+            "separated_columnar": [
+              "value",
+              "typing_feel",
+              "key_sound",
+              "printed_punctuation",
+              "module_spacing",
+              "tent_supports",
+              "host_lead",
+              "intermodule_link",
+              "key_assignment",
+              "number_layer"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_typing_feel",
+          "target": "review.positive_typing_feel",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_key_sound",
+          "target": "review.positive_key_sound",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_printed_punctuation",
+          "target": "review.positive_printed_punctuation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_number_pad",
+          "target": "review.positive_number_pad",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_front_lift",
+          "target": "review.positive_front_lift",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_palm_contact",
+          "target": "review.positive_palm_contact",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_module_spacing",
+          "target": "review.positive_module_spacing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_tent_supports",
+          "target": "review.positive_tent_supports",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_host_lead",
+          "target": "review.positive_host_lead",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_intermodule_link",
+          "target": "review.positive_intermodule_link",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_key_assignment",
+          "target": "review.positive_key_assignment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_number_layer",
+          "target": "review.positive_number_layer",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": {
+              "operation": "value at exact selected synthetic SEK reference price",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "value at exact selected synthetic SEK reference price",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "purchase_price_binding": "review.purchase_price_sek"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": {
+              "operation": "value at exact selected synthetic SEK reference price",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "value at exact selected synthetic SEK reference price",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "purchase_price_binding": "review.purchase_price_sek"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "typing_feel.positive",
+          "when": "'typing_feel' in review.topics and review.positive_typing_feel",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "typing_feel",
+            "polarity": "positive",
+            "context": {
+              "operation": "type a short passage at usual desk with stated physical setup and actual connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "actual selected review.setup_label, resolved by typed public qualifier",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "configuration_binding": "review.setup_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {setup}, typing a short passage at my usual desk felt comfortable.",
+            "The keys felt comfortable while I typed a short passage at my usual desk with {setup}."
+          ],
+          "slots": {
+            "setup": "review.setup_label"
+          }
+        },
+        {
+          "id": "typing_feel.negative",
+          "when": "'typing_feel' in review.topics and not review.positive_typing_feel",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "typing_feel",
+            "polarity": "negative",
+            "context": {
+              "operation": "type a short passage at usual desk with stated physical setup and actual connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "actual selected review.setup_label, resolved by typed public qualifier",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "configuration_binding": "review.setup_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {setup}, typing a short passage at my usual desk felt uncomfortable.",
+            "The keys felt uncomfortable while I typed a short passage at my usual desk with {setup}."
+          ],
+          "slots": {
+            "setup": "review.setup_label"
+          }
+        },
+        {
+          "id": "key_sound.positive",
+          "when": "'key_sound' in review.topics and review.positive_key_sound",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_sound",
+            "polarity": "positive",
+            "context": {
+              "operation": "hear keys typing short passage in quiet room with stated physical setup and connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "actual selected review.setup_label, resolved by typed public qualifier",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "configuration_binding": "review.setup_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {setup}, I liked the key sound while typing a short passage in my quiet room.",
+            "The key sound was pleasant as I typed a short passage in my quiet room with {setup}."
+          ],
+          "slots": {
+            "setup": "review.setup_label"
+          }
+        },
+        {
+          "id": "key_sound.negative",
+          "when": "'key_sound' in review.topics and not review.positive_key_sound",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_sound",
+            "polarity": "negative",
+            "context": {
+              "operation": "hear keys typing short passage in quiet room with stated physical setup and connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "actual selected review.setup_label, resolved by typed public qualifier",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "configuration_binding": "review.setup_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {setup}, I disliked the key sound while typing a short passage in my quiet room.",
+            "The key sound was distracting as I typed a short passage in my quiet room with {setup}."
+          ],
+          "slots": {
+            "setup": "review.setup_label"
+          }
+        },
+        {
+          "id": "printed_punctuation.positive",
+          "when": "'printed_punctuation' in review.topics and review.positive_printed_punctuation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "printed_punctuation",
+            "polarity": "positive",
+            "context": {
+              "operation": "find printed punctuation using selected matching active computer input map and actual connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "find printed punctuation using selected matching active computer input map and actual connection",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "connection_binding": "review.connection_label",
+              "active_input_map_binding": "review.input_map_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {input_map} input active and {connection}, the printed punctuation keys were easy to find.",
+            "Finding printed punctuation was straightforward with {input_map} input active and {connection}."
+          ],
+          "slots": {
+            "input_map": "review.input_map_label",
+            "connection": "review.connection_label"
+          }
+        },
+        {
+          "id": "printed_punctuation.negative",
+          "when": "'printed_punctuation' in review.topics and not review.positive_printed_punctuation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "printed_punctuation",
+            "polarity": "negative",
+            "context": {
+              "operation": "find printed punctuation using selected matching active computer input map and actual connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "find printed punctuation using selected matching active computer input map and actual connection",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "connection_binding": "review.connection_label",
+              "active_input_map_binding": "review.input_map_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {input_map} input active and {connection}, the printed punctuation keys were hard to find.",
+            "Finding printed punctuation was difficult with {input_map} input active and {connection}."
+          ],
+          "slots": {
+            "input_map": "review.input_map_label",
+            "connection": "review.connection_label"
+          }
+        },
+        {
+          "id": "number_pad.positive",
+          "when": "'number_pad' in review.topics and review.positive_number_pad and product.facts.number_pad",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "number_pad",
+            "polarity": "positive",
+            "context": {
+              "operation": "enter spreadsheet numbers on actual integrated number pad, fixed frame at0° front pitch and already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "enter spreadsheet numbers on actual integrated number pad, fixed frame at0° front pitch and already paired Bluetooth laptop",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "At0° front pitch on my already paired Bluetooth laptop, entering spreadsheet numbers with this number pad felt easy.",
+            "Using the number pad for spreadsheet numbers felt straightforward at0° front pitch on my already paired Bluetooth laptop."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "number_pad.negative",
+          "when": "'number_pad' in review.topics and not review.positive_number_pad and product.facts.number_pad",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "number_pad",
+            "polarity": "negative",
+            "context": {
+              "operation": "enter spreadsheet numbers on actual integrated number pad, fixed frame at0° front pitch and already paired Bluetooth laptop",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "enter spreadsheet numbers on actual integrated number pad, fixed frame at0° front pitch and already paired Bluetooth laptop",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "At0° front pitch on my already paired Bluetooth laptop, entering spreadsheet numbers with this number pad felt awkward.",
+            "Using the number pad for spreadsheet numbers felt difficult at0° front pitch on my already paired Bluetooth laptop."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "front_lift.positive",
+          "when": "'front_lift' in review.topics and review.positive_front_lift and product.facts.front_pitch_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_lift",
+            "polarity": "positive",
+            "context": {
+              "operation": "change actual fixed-frame front pitch0→−4° at usual desk",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "change actual fixed-frame front pitch0→−4° at usual desk",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Changing the front lift from0° to−4° at my usual desk felt easy.",
+            "At my usual desk, I found the front lift easy to change from0° to−4°."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "front_lift.negative",
+          "when": "'front_lift' in review.topics and not review.positive_front_lift and product.facts.front_pitch_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_lift",
+            "polarity": "negative",
+            "context": {
+              "operation": "change actual fixed-frame front pitch0→−4° at usual desk",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "change actual fixed-frame front pitch0→−4° at usual desk",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Changing the front lift from0° to−4° at my usual desk felt awkward.",
+            "At my usual desk, I found the front lift awkward to change from0° to−4°."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "palm_contact.positive",
+          "when": "'palm_contact' in review.topics and review.positive_palm_contact and product.facts.palm_supports_included",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "palm_contact",
+            "polarity": "positive",
+            "context": {
+              "operation": "contact actual supplied palm support during typing pauses at usual desk with stated setup/connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "actual selected review.setup_label, resolved by typed public qualifier",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "configuration_binding": "review.setup_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {setup}, the supplied palm support felt comfortable during typing pauses at my usual desk.",
+            "During typing pauses at my usual desk, contact with the supplied palm support felt comfortable with {setup}."
+          ],
+          "slots": {
+            "setup": "review.setup_label"
+          }
+        },
+        {
+          "id": "palm_contact.negative",
+          "when": "'palm_contact' in review.topics and not review.positive_palm_contact and product.facts.palm_supports_included",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "palm_contact",
+            "polarity": "negative",
+            "context": {
+              "operation": "contact actual supplied palm support during typing pauses at usual desk with stated setup/connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "actual selected review.setup_label, resolved by typed public qualifier",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "configuration_binding": "review.setup_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With {setup}, the supplied palm support felt uncomfortable during typing pauses at my usual desk.",
+            "During typing pauses at my usual desk, contact with the supplied palm support felt uncomfortable with {setup}."
+          ],
+          "slots": {
+            "setup": "review.setup_label"
+          }
+        },
+        {
+          "id": "module_spacing.positive",
+          "when": "'module_spacing' in review.topics and review.positive_module_spacing and product.facts.separation_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "module_spacing",
+            "polarity": "positive",
+            "context": {
+              "operation": "move two linked modules100→200mm clear inner-edge gap, parallel/flat, supplied bridge untensioned, at usual desk",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "move two linked modules100→200mm clear inner-edge gap, parallel/flat, supplied bridge untensioned, at usual desk",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving the two flat, parallel halves from100mm to200mm clear inner-edge gap, with the supplied bridge untensioned at my usual desk, felt easy.",
+            "I found it easy to change the clear inner-edge gap from100mm to200mm at my usual desk, keeping both halves flat and parallel and the supplied bridge untensioned."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "module_spacing.negative",
+          "when": "'module_spacing' in review.topics and not review.positive_module_spacing and product.facts.separation_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "module_spacing",
+            "polarity": "negative",
+            "context": {
+              "operation": "move two linked modules100→200mm clear inner-edge gap, parallel/flat, supplied bridge untensioned, at usual desk",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "move two linked modules100→200mm clear inner-edge gap, parallel/flat, supplied bridge untensioned, at usual desk",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving the two flat, parallel halves from100mm to200mm clear inner-edge gap, with the supplied bridge untensioned at my usual desk, felt awkward.",
+            "I found it awkward to change the clear inner-edge gap from100mm to200mm at my usual desk, keeping both halves flat and parallel and the supplied bridge untensioned."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "tent_supports.positive",
+          "when": "'tent_supports' in review.topics and review.positive_tent_supports and product.facts.tenting_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "tent_supports",
+            "polarity": "positive",
+            "context": {
+              "operation": "change supplied inner-edge tent supports0→declared raised roll, modules parallel100mm gap at usual desk",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "change supplied inner-edge tent supports0→declared raised roll, modules parallel100mm gap at usual desk",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "raised_roll_binding": "review.raised_tent_deg"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the halves parallel and100mm apart at my usual desk, changing the supplied inner-edge tent supports from0° to{angle:g}° felt easy.",
+            "Changing the supplied supports from flat to{angle:g}° inward roll felt straightforward with the halves parallel and100mm apart at my usual desk."
+          ],
+          "slots": {
+            "angle": "review.raised_tent_deg"
+          }
+        },
+        {
+          "id": "tent_supports.negative",
+          "when": "'tent_supports' in review.topics and not review.positive_tent_supports and product.facts.tenting_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "tent_supports",
+            "polarity": "negative",
+            "context": {
+              "operation": "change supplied inner-edge tent supports0→declared raised roll, modules parallel100mm gap at usual desk",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "change supplied inner-edge tent supports0→declared raised roll, modules parallel100mm gap at usual desk",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "raised_roll_binding": "review.raised_tent_deg"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the halves parallel and100mm apart at my usual desk, changing the supplied inner-edge tent supports from0° to{angle:g}° felt awkward.",
+            "Changing the supplied supports from flat to{angle:g}° inward roll felt difficult with the halves parallel and100mm apart at my usual desk."
+          ],
+          "slots": {
+            "angle": "review.raised_tent_deg"
+          }
+        },
+        {
+          "id": "host_lead.positive",
+          "when": "'host_lead' in review.topics and review.positive_host_lead and product.facts.usb_keyboard_data",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "host_lead",
+            "polarity": "positive",
+            "context": {
+              "operation": "connect/remove actual supplied USB-A host lead at matching laptop port in USB keyboard mode",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "connect/remove actual supplied USB-A host lead at matching laptop port in USB keyboard mode",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "In USB keyboard mode, I found the supplied USB-A host lead easy to connect and remove at my matching laptop port.",
+            "Connecting and removing the supplied USB-A host lead at my matching laptop port felt easy when using USB keyboard input."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "host_lead.negative",
+          "when": "'host_lead' in review.topics and not review.positive_host_lead and product.facts.usb_keyboard_data",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "host_lead",
+            "polarity": "negative",
+            "context": {
+              "operation": "connect/remove actual supplied USB-A host lead at matching laptop port in USB keyboard mode",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "connect/remove actual supplied USB-A host lead at matching laptop port in USB keyboard mode",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "In USB keyboard mode, I found the supplied USB-A host lead awkward to connect and remove at my matching laptop port.",
+            "Connecting and removing the supplied USB-A host lead at my matching laptop port felt awkward when using USB keyboard input."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "intermodule_link.positive",
+          "when": "'intermodule_link' in review.topics and review.positive_intermodule_link and product.facts.bridge_detachable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "intermodule_link",
+            "polarity": "positive",
+            "context": {
+              "operation": "connect/remove actual supplied matched3.5mm four-contact bridge at actual two-module sockets with host USB unplugged",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "connect/remove actual supplied matched3.5mm four-contact bridge at actual two-module sockets with host USB unplugged",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With host USB unplugged, connecting and removing the supplied matched3.5mm four-contact bridge at the two module sockets felt easy.",
+            "I found the supplied matched3.5mm four-contact bridge easy to connect and remove at both module sockets with host USB unplugged."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "intermodule_link.negative",
+          "when": "'intermodule_link' in review.topics and not review.positive_intermodule_link and product.facts.bridge_detachable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "intermodule_link",
+            "polarity": "negative",
+            "context": {
+              "operation": "connect/remove actual supplied matched3.5mm four-contact bridge at actual two-module sockets with host USB unplugged",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "connect/remove actual supplied matched3.5mm four-contact bridge at actual two-module sockets with host USB unplugged",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With host USB unplugged, connecting and removing the supplied matched3.5mm four-contact bridge at the two module sockets felt awkward.",
+            "I found the supplied matched3.5mm four-contact bridge awkward to connect and remove at both module sockets with host USB unplugged."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "key_assignment.positive",
+          "when": "'key_assignment' in review.topics and review.positive_key_assignment and known(product.facts.remapping_support) and 'split_keymap_utility' in product.facts.remapping_support",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_assignment",
+            "polarity": "positive",
+            "context": {
+              "operation": "change one physical key with compatible split_keymap_utility configured on host connected by supplied USB lead",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "change one physical key with compatible split_keymap_utility configured on host connected by supplied USB lead",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the compatible split keymap utility configured on my computer connected by the supplied USB lead, changing one physical key assignment felt easy.",
+            "Changing one physical key assignment felt straightforward with the compatible split keymap utility configured on my computer using the supplied USB lead."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "key_assignment.negative",
+          "when": "'key_assignment' in review.topics and not review.positive_key_assignment and known(product.facts.remapping_support) and 'split_keymap_utility' in product.facts.remapping_support",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "key_assignment",
+            "polarity": "negative",
+            "context": {
+              "operation": "change one physical key with compatible split_keymap_utility configured on host connected by supplied USB lead",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "change one physical key with compatible split_keymap_utility configured on host connected by supplied USB lead",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With the compatible split keymap utility configured on my computer connected by the supplied USB lead, changing one physical key assignment felt difficult.",
+            "Changing one physical key assignment felt hard with the compatible split keymap utility configured on my computer using the supplied USB lead."
+          ],
+          "slots": {}
+        },
+        {
+          "id": "number_layer.positive",
+          "when": "'number_layer' in review.topics and review.positive_number_layer and product.facts.logical_layers",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "number_layer",
+            "polarity": "positive",
+            "context": {
+              "operation": "type numbers with matching keymap loaded, configured number layer, selected active computer input map and supplied USB host connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "type numbers with matching keymap loaded, configured number layer, selected active computer input map and supplied USB host connection",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "active_input_map_binding": "review.input_map_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With my matching keymap loaded, {input_map} input active and the supplied USB connection, typing numbers on my configured number layer felt easy.",
+            "Typing numbers on my configured number layer felt straightforward with the matching keymap loaded, {input_map} input active and the supplied USB connection."
+          ],
+          "slots": {
+            "input_map": "review.input_map_label"
+          }
+        },
+        {
+          "id": "number_layer.negative",
+          "when": "'number_layer' in review.topics and not review.positive_number_layer and product.facts.logical_layers",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "number_layer",
+            "polarity": "negative",
+            "context": {
+              "operation": "type numbers with matching keymap loaded, configured number layer, selected active computer input map and supplied USB host connection",
+              "subject": "exact selected language/colour SKU",
+              "configuration": "type numbers with matching keymap loaded, configured number layer, selected active computer input map and supplied USB host connection",
+              "limit": "No medical, speed, accuracy, endurance, electrical, safety or production-interoperability guarantee",
+              "active_input_map_binding": "review.input_map_label"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "With my matching keymap loaded, {input_map} input active and the supplied USB connection, typing numbers on my configured number layer felt awkward.",
+            "Typing numbers on my configured number layer felt difficult with the matching keymap loaded, {input_map} input active and the supplied USB connection."
+          ],
+          "slots": {
+            "input_map": "review.input_map_label"
+          }
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Exact selected canonical assembly/layout/colour price; global300–5100SEK bounds",
+        "relative_price_basis": {
+          "min_sek": 300,
+          "max_sek": 5100
+        },
+        "public_assertion_qualifiers": "Dynamic physical setup, connection, map and raised roll are declared typed review fields, not default renderer contexts"
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "keyboards",
+    "store_type_ids": [
+      "electronics",
+      "office"
+    ],
+    "spec_path": "docs/agents/product-width-specs/keyboards.split_ergonomic_keyboards.md",
+    "source_notes": ".local/product-width/research/split_ergonomic_keyboards.md",
+    "heuristic_status": "Tunable authored assemblies and nonzero profile associations; not observed probabilities",
+    "sku_formulation_contract": "Bind exact existing canonical row; only language_layout and colour are presentation axes",
+    "price_effects": "Full-menu1/1.15/1.7 assembly factors before sparse manufacture; global300–5100SEK selected-SKU bounds",
+    "review_policy_revision": "width-review-policy-v2",
+    "public_assertion_contract": "docs/agents/product-public-assertions.md",
+    "public_assertion_adoption": "Prepared source-bound companion only; formal Product producer validation/export/publication/adoption pending",
+    "limits": "No clinical/performance/care/runtime/geometry/mass/interoperability guarantees; exact consumer adoption deferred"
+  }
+}

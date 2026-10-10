@@ -1,0 +1,312 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.apparel_base",
+  "random_namespace": "product-width-apparel-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.colours": {
+      "type": "set",
+      "items": {
+        "type": "enum",
+        "values": [
+          "black",
+          "navy",
+          "brown",
+          "olive",
+          "stone",
+          "white",
+          "grey",
+          "burgundy",
+          "blue",
+          "pink"
+        ]
+      },
+      "min_items": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "sku.colour": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "colour"
+      }
+    },
+    "product.name": {
+      "type": "string",
+      "optional": true
+    },
+    "request.colour": {
+      "type": "string",
+      "optional": true
+    },
+    "product.sizes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "size_label": {
+            "type": "string"
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "sku.size_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector"
+        ],
+        "policy_key": "size_label"
+      }
+    },
+    "group.colour": {
+      "type": "string"
+    },
+    "group.size_mode": {
+      "type": "enum",
+      "values": [
+        "full",
+        "subrange",
+        "alternating"
+      ]
+    },
+    "group.sizes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "group.size": {
+      "type": "string"
+    },
+    "product.facts.size_system": {
+      "type": "string",
+      "constant": "nominal adult alpha labels",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shipping_class": {
+      "type": "string",
+      "constant": "regular",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.size_label": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights",
+      "stream": "product/apparel/positioning"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95,
+      "stream": "product/apparel/execution"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 5,
+        "navy": 3,
+        "brown": 2,
+        "olive": 2,
+        "stone": 3,
+        "white": 3,
+        "grey": 3,
+        "burgundy": 1,
+        "blue": 2,
+        "pink": 1
+      },
+      "count_weights": {
+        "1": 25,
+        "2": 40,
+        "3": 25,
+        "4": 10
+      },
+      "streams": {
+        "count": "product/apparel/colour_count",
+        "item": "product/apparel/colour_{index}"
+      }
+    },
+    {
+      "id": "size_range",
+      "target": "product.sizes",
+      "sample": "weighted_choice",
+      "weights": {
+        "compact": 3,
+        "larger": 3,
+        "broad": 1
+      },
+      "values": {
+        "compact": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL"
+        ],
+        "larger": [
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL"
+        ],
+        "broad": [
+          "XS",
+          "S",
+          "M",
+          "L",
+          "XL",
+          "XXL",
+          "XXXL"
+        ]
+      }
+    },
+    {
+      "id": "colour_groups",
+      "for_each": {
+        "binding": "group.colour",
+        "from": "product.colours"
+      },
+      "steps": [
+        {
+          "id": "size_mode",
+          "target": "group.size_mode",
+          "sample": "weighted_choice",
+          "weights": {
+            "full": 75,
+            "subrange": 20,
+            "alternating": 5
+          }
+        },
+        {
+          "id": "size_coverage",
+          "target": "group.sizes",
+          "sample": "uniform_choice",
+          "values_from": "coverage_groups(product.sizes, group.size_mode)"
+        },
+        {
+          "id": "sku_sizes",
+          "for_each": {
+            "binding": "group.size",
+            "from": "group.sizes"
+          },
+          "steps": [
+            {
+              "id": "skus",
+              "target": "product.skus",
+              "emit": {
+                "sku_id": "product.product_id + '-' + group.colour + '-' + group.size",
+                "product_id": "product.product_id",
+                "colour": "group.colour",
+                "size_label": "group.size"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 350,
+      "max": 1000,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 700,
+          "max": 1600
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1300,
+          "max": 3000
+        }
+      ]
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Nominal adult alpha label/colour manufacture and neutral positioning/execution only",
+    "heuristics": "Authored grids/weights; no gender/cut/measurement conversion",
+    "separation": "Manufacturer identity and sparse tuples only; no retailer stock"
+  }
+}

@@ -1,0 +1,2665 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "chargers.plug_in_wall_chargers",
+  "random_namespace": "product-width-chargers.plug_in_wall_chargers-v1",
+  "extends": "_chargers_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "assembly": {
+          "type": "enum",
+          "values": [
+            "single45",
+            "dual65"
+          ]
+        },
+        "usb_c_port_count": {
+          "type": "integer",
+          "unit": "count",
+          "min": 1,
+          "max": 2
+        },
+        "c1_label": {
+          "type": "string"
+        },
+        "c2_label": {
+          "type": "string"
+        },
+        "c1_solo_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "c2_solo_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "c1_simultaneous_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "c2_simultaneous_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "combined_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "input_min_v": {
+          "type": "number",
+          "unit": "V",
+          "min": -1
+        },
+        "input_max_v": {
+          "type": "number",
+          "unit": "V",
+          "min": -1
+        },
+        "c1_solo_pdo": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "voltage_v": {
+                "type": "number",
+                "unit": "V",
+                "min": 0
+              },
+              "current_max_a": {
+                "type": "number",
+                "unit": "A",
+                "min": 0
+              }
+            }
+          }
+        },
+        "c1_solo_pdo_label": {
+          "type": "string"
+        },
+        "c1_solo_pps_min_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c1_solo_pps_max_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c1_solo_pps_max_a": {
+          "type": "number",
+          "unit": "A",
+          "min": 0
+        },
+        "c1_solo_pps_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "c2_solo_pdo": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "voltage_v": {
+                "type": "number",
+                "unit": "V",
+                "min": 0
+              },
+              "current_max_a": {
+                "type": "number",
+                "unit": "A",
+                "min": 0
+              }
+            }
+          }
+        },
+        "c2_solo_pdo_label": {
+          "type": "string"
+        },
+        "c2_solo_pps_min_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c2_solo_pps_max_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c2_solo_pps_max_a": {
+          "type": "number",
+          "unit": "A",
+          "min": 0
+        },
+        "c2_solo_pps_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "c1_simultaneous_pdo": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "voltage_v": {
+                "type": "number",
+                "unit": "V",
+                "min": 0
+              },
+              "current_max_a": {
+                "type": "number",
+                "unit": "A",
+                "min": 0
+              }
+            }
+          }
+        },
+        "c1_simultaneous_pdo_label": {
+          "type": "string"
+        },
+        "c1_simultaneous_pps_min_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c1_simultaneous_pps_max_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c1_simultaneous_pps_max_a": {
+          "type": "number",
+          "unit": "A",
+          "min": 0
+        },
+        "c1_simultaneous_pps_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        },
+        "c2_simultaneous_pdo": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "voltage_v": {
+                "type": "number",
+                "unit": "V",
+                "min": 0
+              },
+              "current_max_a": {
+                "type": "number",
+                "unit": "A",
+                "min": 0
+              }
+            }
+          }
+        },
+        "c2_simultaneous_pdo_label": {
+          "type": "string"
+        },
+        "c2_simultaneous_pps_min_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c2_simultaneous_pps_max_v": {
+          "type": "number",
+          "unit": "V",
+          "min": 0
+        },
+        "c2_simultaneous_pps_max_a": {
+          "type": "number",
+          "unit": "A",
+          "min": 0
+        },
+        "c2_simultaneous_pps_max_w": {
+          "type": "number",
+          "unit": "W",
+          "min": 0
+        }
+      }
+    },
+    "product.facts.assembly": {
+      "type": "enum",
+      "values": [
+        "single45",
+        "dual65"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_c_port_count": {
+      "type": "integer",
+      "unit": "count",
+      "min": 1,
+      "max": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c2_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c1_solo_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c2_solo_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c1_simultaneous_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c2_simultaneous_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.combined_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.input_min_v": {
+      "type": "number",
+      "unit": "V",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.input_max_v": {
+      "type": "number",
+      "unit": "V",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_solo_pdo": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "voltage_v": {
+            "type": "number",
+            "unit": "V",
+            "min": 0
+          },
+          "current_max_a": {
+            "type": "number",
+            "unit": "A",
+            "min": 0
+          }
+        }
+      },
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_solo_pdo_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_solo_pps_min_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_solo_pps_max_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_solo_pps_max_a": {
+      "type": "number",
+      "unit": "A",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_solo_pps_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c2_solo_pdo": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "voltage_v": {
+            "type": "number",
+            "unit": "V",
+            "min": 0
+          },
+          "current_max_a": {
+            "type": "number",
+            "unit": "A",
+            "min": 0
+          }
+        }
+      },
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_solo_pdo_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_solo_pps_min_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_solo_pps_max_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_solo_pps_max_a": {
+      "type": "number",
+      "unit": "A",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_solo_pps_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c1_simultaneous_pdo": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "voltage_v": {
+            "type": "number",
+            "unit": "V",
+            "min": 0
+          },
+          "current_max_a": {
+            "type": "number",
+            "unit": "A",
+            "min": 0
+          }
+        }
+      },
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_simultaneous_pdo_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_simultaneous_pps_min_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_simultaneous_pps_max_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_simultaneous_pps_max_a": {
+      "type": "number",
+      "unit": "A",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c1_simultaneous_pps_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.c2_simultaneous_pdo": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "voltage_v": {
+            "type": "number",
+            "unit": "V",
+            "min": 0
+          },
+          "current_max_a": {
+            "type": "number",
+            "unit": "A",
+            "min": 0
+          }
+        }
+      },
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_simultaneous_pdo_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_simultaneous_pps_min_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_simultaneous_pps_max_v": {
+      "type": "number",
+      "unit": "V",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_simultaneous_pps_max_a": {
+      "type": "number",
+      "unit": "A",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.c2_simultaneous_pps_max_w": {
+      "type": "number",
+      "unit": "W",
+      "min": 0,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.usb_c_port_count == 2"
+    },
+    "product.facts.protocols": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "constant": [
+        "USB PD 3.0 fixed PDO",
+        "PPS"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.adapter_units": {
+      "type": "integer",
+      "unit": "count",
+      "constant": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bundled_cable_units": {
+      "type": "integer",
+      "unit": "count",
+      "constant": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bundle_cable_length_m": {
+      "type": "number",
+      "unit": "m",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "'cable_bundle' in product.bundles"
+    },
+    "product.facts.bundle_cable_connector": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "'cable_bundle' in product.bundles"
+    },
+    "product.facts.phone_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mains_extension_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.travel_adapter_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wireless_pad_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.input_frequency_hz": {
+      "type": "number",
+      "unit": "Hz",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.input_current_a": {
+      "type": "number",
+      "unit": "A",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_width_mm": {
+      "type": "number",
+      "unit": "mm",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_height_mm": {
+      "type": "number",
+      "unit": "mm",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_depth_mm": {
+      "type": "number",
+      "unit": "mm",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.folding_pins": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.plug_dimensions": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.efficiency": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.safety_certification": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.reallocation_interruptions": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.priority": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.achieved_output": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charging_time": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "sku.cable_included": {
+      "type": "boolean"
+    },
+    "sku.cable_length_status": {
+      "type": "string"
+    },
+    "sku.cable_length_label": {
+      "type": "string"
+    },
+    "sku.cable_capability_status": {
+      "type": "string"
+    },
+    "sku.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK",
+      "min": 150,
+      "max": 1375
+    },
+    "sku.cable_current_a": {
+      "type": "number",
+      "unit": "A",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "sku.cable_included"
+    },
+    "sku.cable_power_w": {
+      "type": "number",
+      "unit": "W",
+      "min": -1,
+      "unknown_values": [
+        -1
+      ],
+      "applicable_when": "sku.cable_included"
+    },
+    "sku.cable_data_capability": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "sku.cable_included"
+    },
+    "sku.cable_emarker": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "applicable_when": "sku.cable_included"
+    },
+    "sku.cable_length_m": {
+      "type": "number",
+      "unit": "m",
+      "applicable_when": "sku.cable_included"
+    },
+    "request.plug_type": {
+      "type": "string",
+      "optional": true
+    },
+    "request.min_c1_solo_w": {
+      "type": "number",
+      "unit": "W",
+      "optional": true
+    },
+    "request.min_combined_w": {
+      "type": "number",
+      "unit": "W",
+      "optional": true
+    },
+    "request.min_c1_simultaneous_w": {
+      "type": "number",
+      "unit": "W",
+      "optional": true
+    },
+    "request.min_c2_simultaneous_w": {
+      "type": "number",
+      "unit": "W",
+      "optional": true
+    },
+    "request.cable_included": {
+      "type": "boolean",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "assembly_joint",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "single45": 3,
+        "dual65": 2
+      },
+      "cases": [
+        {
+          "when": "profile.positioning == 'budget'",
+          "weights": {
+            "single45": 5,
+            "dual65": 2
+          }
+        },
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "weights": {
+            "single45": 3,
+            "dual65": 4
+          }
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "weights": {
+            "single45": 2,
+            "dual65": 5
+          }
+        }
+      ],
+      "values": {
+        "single45": {
+          "assembly": "single45",
+          "usb_c_port_count": 1,
+          "c1_label": "C1",
+          "c2_label": "",
+          "c1_solo_max_w": 45,
+          "c2_solo_max_w": 0,
+          "c1_simultaneous_max_w": 45,
+          "c2_simultaneous_max_w": 0,
+          "combined_max_w": 45,
+          "input_min_v": 100,
+          "input_max_v": 240,
+          "c1_solo_pdo": [
+            {
+              "voltage_v": 5,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 9,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 15,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 20,
+              "current_max_a": 2.25
+            }
+          ],
+          "c1_solo_pdo_label": "5 V / 3 A; 9 V / 3 A; 15 V / 3 A; 20 V / 2.25 A",
+          "c1_solo_pps_min_v": 5,
+          "c1_solo_pps_max_v": 20,
+          "c1_solo_pps_max_a": 2.25,
+          "c1_solo_pps_max_w": 45,
+          "c2_solo_pdo": [],
+          "c2_solo_pdo_label": "",
+          "c2_solo_pps_min_v": 0,
+          "c2_solo_pps_max_v": 0,
+          "c2_solo_pps_max_a": 0,
+          "c2_solo_pps_max_w": 0,
+          "c1_simultaneous_pdo": [
+            {
+              "voltage_v": 5,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 9,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 15,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 20,
+              "current_max_a": 2.25
+            }
+          ],
+          "c1_simultaneous_pdo_label": "5 V / 3 A; 9 V / 3 A; 15 V / 3 A; 20 V / 2.25 A",
+          "c1_simultaneous_pps_min_v": 5,
+          "c1_simultaneous_pps_max_v": 20,
+          "c1_simultaneous_pps_max_a": 2.25,
+          "c1_simultaneous_pps_max_w": 45,
+          "c2_simultaneous_pdo": [],
+          "c2_simultaneous_pdo_label": "",
+          "c2_simultaneous_pps_min_v": 0,
+          "c2_simultaneous_pps_max_v": 0,
+          "c2_simultaneous_pps_max_a": 0,
+          "c2_simultaneous_pps_max_w": 0
+        },
+        "dual65": {
+          "assembly": "dual65",
+          "usb_c_port_count": 2,
+          "c1_label": "C1 upper",
+          "c2_label": "C2 lower",
+          "c1_solo_max_w": 65,
+          "c2_solo_max_w": 65,
+          "c1_simultaneous_max_w": 45,
+          "c2_simultaneous_max_w": 20,
+          "combined_max_w": 65,
+          "input_min_v": -1,
+          "input_max_v": -1,
+          "c1_solo_pdo": [
+            {
+              "voltage_v": 5,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 15,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 20,
+              "current_max_a": 3.25
+            }
+          ],
+          "c1_solo_pdo_label": "5 V / 3 A; 15 V / 3 A; 20 V / 3.25 A",
+          "c1_solo_pps_min_v": 3.3,
+          "c1_solo_pps_max_v": 21,
+          "c1_solo_pps_max_a": 3.25,
+          "c1_solo_pps_max_w": 65,
+          "c2_solo_pdo": [
+            {
+              "voltage_v": 5,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 15,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 20,
+              "current_max_a": 3.25
+            }
+          ],
+          "c2_solo_pdo_label": "5 V / 3 A; 15 V / 3 A; 20 V / 3.25 A",
+          "c2_solo_pps_min_v": 3.3,
+          "c2_solo_pps_max_v": 21,
+          "c2_solo_pps_max_a": 3.25,
+          "c2_solo_pps_max_w": 65,
+          "c1_simultaneous_pdo": [
+            {
+              "voltage_v": 5,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 9,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 15,
+              "current_max_a": 3
+            }
+          ],
+          "c1_simultaneous_pdo_label": "5 V / 3 A; 9 V / 3 A; 15 V / 3 A",
+          "c1_simultaneous_pps_min_v": 3.3,
+          "c1_simultaneous_pps_max_v": 16,
+          "c1_simultaneous_pps_max_a": 2.81,
+          "c1_simultaneous_pps_max_w": 45,
+          "c2_simultaneous_pdo": [
+            {
+              "voltage_v": 5,
+              "current_max_a": 3
+            },
+            {
+              "voltage_v": 9,
+              "current_max_a": 2.22
+            }
+          ],
+          "c2_simultaneous_pdo_label": "5 V / 3 A; 9 V / 2.22 A",
+          "c2_simultaneous_pps_min_v": 3.3,
+          "c2_simultaneous_pps_max_v": 11,
+          "c2_simultaneous_pps_max_a": 3,
+          "c2_simultaneous_pps_max_w": 20
+        }
+      }
+    },
+    {
+      "id": "assembly_assembly",
+      "target": "product.facts.assembly",
+      "derive": "internal.assembly.assembly"
+    },
+    {
+      "id": "assembly_usb_c_port_count",
+      "target": "product.facts.usb_c_port_count",
+      "derive": "internal.assembly.usb_c_port_count"
+    },
+    {
+      "id": "assembly_c1_label",
+      "target": "product.facts.c1_label",
+      "derive": "internal.assembly.c1_label"
+    },
+    {
+      "id": "assembly_c2_label",
+      "target": "product.facts.c2_label",
+      "derive": "internal.assembly.c2_label"
+    },
+    {
+      "id": "assembly_c1_solo_max_w",
+      "target": "product.facts.c1_solo_max_w",
+      "derive": "internal.assembly.c1_solo_max_w"
+    },
+    {
+      "id": "assembly_c2_solo_max_w",
+      "target": "product.facts.c2_solo_max_w",
+      "derive": "internal.assembly.c2_solo_max_w"
+    },
+    {
+      "id": "assembly_c1_simultaneous_max_w",
+      "target": "product.facts.c1_simultaneous_max_w",
+      "derive": "internal.assembly.c1_simultaneous_max_w"
+    },
+    {
+      "id": "assembly_c2_simultaneous_max_w",
+      "target": "product.facts.c2_simultaneous_max_w",
+      "derive": "internal.assembly.c2_simultaneous_max_w"
+    },
+    {
+      "id": "assembly_combined_max_w",
+      "target": "product.facts.combined_max_w",
+      "derive": "internal.assembly.combined_max_w"
+    },
+    {
+      "id": "assembly_input_min_v",
+      "target": "product.facts.input_min_v",
+      "derive": "internal.assembly.input_min_v"
+    },
+    {
+      "id": "assembly_input_max_v",
+      "target": "product.facts.input_max_v",
+      "derive": "internal.assembly.input_max_v"
+    },
+    {
+      "id": "assembly_c1_solo_pdo",
+      "target": "product.facts.c1_solo_pdo",
+      "derive": "internal.assembly.c1_solo_pdo"
+    },
+    {
+      "id": "assembly_c1_solo_pdo_label",
+      "target": "product.facts.c1_solo_pdo_label",
+      "derive": "internal.assembly.c1_solo_pdo_label"
+    },
+    {
+      "id": "assembly_c1_solo_pps_min_v",
+      "target": "product.facts.c1_solo_pps_min_v",
+      "derive": "internal.assembly.c1_solo_pps_min_v"
+    },
+    {
+      "id": "assembly_c1_solo_pps_max_v",
+      "target": "product.facts.c1_solo_pps_max_v",
+      "derive": "internal.assembly.c1_solo_pps_max_v"
+    },
+    {
+      "id": "assembly_c1_solo_pps_max_a",
+      "target": "product.facts.c1_solo_pps_max_a",
+      "derive": "internal.assembly.c1_solo_pps_max_a"
+    },
+    {
+      "id": "assembly_c1_solo_pps_max_w",
+      "target": "product.facts.c1_solo_pps_max_w",
+      "derive": "internal.assembly.c1_solo_pps_max_w"
+    },
+    {
+      "id": "assembly_c2_solo_pdo",
+      "target": "product.facts.c2_solo_pdo",
+      "derive": "internal.assembly.c2_solo_pdo"
+    },
+    {
+      "id": "assembly_c2_solo_pdo_label",
+      "target": "product.facts.c2_solo_pdo_label",
+      "derive": "internal.assembly.c2_solo_pdo_label"
+    },
+    {
+      "id": "assembly_c2_solo_pps_min_v",
+      "target": "product.facts.c2_solo_pps_min_v",
+      "derive": "internal.assembly.c2_solo_pps_min_v"
+    },
+    {
+      "id": "assembly_c2_solo_pps_max_v",
+      "target": "product.facts.c2_solo_pps_max_v",
+      "derive": "internal.assembly.c2_solo_pps_max_v"
+    },
+    {
+      "id": "assembly_c2_solo_pps_max_a",
+      "target": "product.facts.c2_solo_pps_max_a",
+      "derive": "internal.assembly.c2_solo_pps_max_a"
+    },
+    {
+      "id": "assembly_c2_solo_pps_max_w",
+      "target": "product.facts.c2_solo_pps_max_w",
+      "derive": "internal.assembly.c2_solo_pps_max_w"
+    },
+    {
+      "id": "assembly_c1_simultaneous_pdo",
+      "target": "product.facts.c1_simultaneous_pdo",
+      "derive": "internal.assembly.c1_simultaneous_pdo"
+    },
+    {
+      "id": "assembly_c1_simultaneous_pdo_label",
+      "target": "product.facts.c1_simultaneous_pdo_label",
+      "derive": "internal.assembly.c1_simultaneous_pdo_label"
+    },
+    {
+      "id": "assembly_c1_simultaneous_pps_min_v",
+      "target": "product.facts.c1_simultaneous_pps_min_v",
+      "derive": "internal.assembly.c1_simultaneous_pps_min_v"
+    },
+    {
+      "id": "assembly_c1_simultaneous_pps_max_v",
+      "target": "product.facts.c1_simultaneous_pps_max_v",
+      "derive": "internal.assembly.c1_simultaneous_pps_max_v"
+    },
+    {
+      "id": "assembly_c1_simultaneous_pps_max_a",
+      "target": "product.facts.c1_simultaneous_pps_max_a",
+      "derive": "internal.assembly.c1_simultaneous_pps_max_a"
+    },
+    {
+      "id": "assembly_c1_simultaneous_pps_max_w",
+      "target": "product.facts.c1_simultaneous_pps_max_w",
+      "derive": "internal.assembly.c1_simultaneous_pps_max_w"
+    },
+    {
+      "id": "assembly_c2_simultaneous_pdo",
+      "target": "product.facts.c2_simultaneous_pdo",
+      "derive": "internal.assembly.c2_simultaneous_pdo"
+    },
+    {
+      "id": "assembly_c2_simultaneous_pdo_label",
+      "target": "product.facts.c2_simultaneous_pdo_label",
+      "derive": "internal.assembly.c2_simultaneous_pdo_label"
+    },
+    {
+      "id": "assembly_c2_simultaneous_pps_min_v",
+      "target": "product.facts.c2_simultaneous_pps_min_v",
+      "derive": "internal.assembly.c2_simultaneous_pps_min_v"
+    },
+    {
+      "id": "assembly_c2_simultaneous_pps_max_v",
+      "target": "product.facts.c2_simultaneous_pps_max_v",
+      "derive": "internal.assembly.c2_simultaneous_pps_max_v"
+    },
+    {
+      "id": "assembly_c2_simultaneous_pps_max_a",
+      "target": "product.facts.c2_simultaneous_pps_max_a",
+      "derive": "internal.assembly.c2_simultaneous_pps_max_a"
+    },
+    {
+      "id": "assembly_c2_simultaneous_pps_max_w",
+      "target": "product.facts.c2_simultaneous_pps_max_w",
+      "derive": "internal.assembly.c2_simultaneous_pps_max_w"
+    },
+    {
+      "id": "plugs",
+      "target": "product.plug_types",
+      "sample": "weighted_subset",
+      "weights": {
+        "UK type G": 1,
+        "EU type C": 1
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      }
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 1,
+        "white": 1
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      }
+    },
+    {
+      "id": "bundles",
+      "target": "product.bundles",
+      "sample": "weighted_subset",
+      "weights": {
+        "adapter_only": 1,
+        "cable_bundle": 1
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      }
+    },
+    {
+      "id": "represented_bundle_length",
+      "target": "product.facts.bundle_cable_length_m",
+      "derive": "2"
+    },
+    {
+      "id": "represented_bundle_connector",
+      "target": "product.facts.bundle_cable_connector",
+      "derive": "'USB-C to USB-C'"
+    },
+    {
+      "id": "plug_groups",
+      "for_each": {
+        "binding": "group.plug_type",
+        "from": "product.plug_types"
+      },
+      "steps": [
+        {
+          "id": "colour_groups",
+          "for_each": {
+            "binding": "group.colour",
+            "from": "product.colours"
+          },
+          "steps": [
+            {
+              "id": "bundle_groups",
+              "for_each": {
+                "binding": "group.bundle",
+                "from": "product.bundles"
+              },
+              "steps": [
+                {
+                  "id": "skus",
+                  "target": "product.skus",
+                  "emit": {
+                    "sku_id": "product.product_id + '-' + group.plug_type + '-' + group.colour + '-' + group.bundle",
+                    "product_id": "product.product_id",
+                    "plug_type": "group.plug_type",
+                    "colour": "group.colour",
+                    "bundle": "group.bundle",
+                    "cable_included": "group.bundle == 'cable_bundle'",
+                    "cable_length_status": "'declared' if group.bundle == 'cable_bundle' else 'not applicable'",
+                    "cable_length_label": "'2 m' if group.bundle == 'cable_bundle' else 'not applicable'",
+                    "cable_capability_status": "'unknown' if group.bundle == 'cable_bundle' else 'not applicable'",
+                    "bundle_price_factor": "1.25 if group.bundle == 'cable_bundle' else 1",
+                    "reference_price_sek": "product.reference_price_sek * (1.25 if group.bundle == 'cable_bundle' else 1)"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "description.ports",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.usb_c_port_count",
+          "product.facts.protocols",
+          "product.facts.c1_label"
+        ]
+      },
+      "slots": {
+        "count": "product.facts.usb_c_port_count",
+        "c1": "product.facts.c1_label"
+      },
+      "formulations": [
+        "{count} USB-C output port(s), labelled {c1}. USB PD 3.0 fixed PDO and PPS declarations; achieved charging depends on matching device, protocol and cable.",
+        "USB PD 3.0 PDO/PPS adapter with {count} USB-C port(s); first port {c1}. Declared capability is not an achieved device charging rate."
+      ]
+    },
+    {
+      "id": "description.c2_absent",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.usb_c_port_count",
+          "product.facts.c2_label"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "C1 is the only output; C2 is absent, not a zero-power socket.",
+        "No second physical output port is represented."
+      ],
+      "when": "product.facts.usb_c_port_count == 1"
+    },
+    {
+      "id": "description.c2_present",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.c2_label"
+        ]
+      },
+      "slots": {
+        "c2": "product.facts.c2_label"
+      },
+      "formulations": [
+        "Second output labelled {c2}; upper/lower identity is an authored declaration.",
+        "Named second USB-C port: {c2}, explicitly authored position."
+      ],
+      "when": "product.facts.usb_c_port_count == 2"
+    },
+    {
+      "id": "description.total",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.combined_max_w",
+          "product.facts.c1_simultaneous_max_w"
+        ]
+      },
+      "slots": {
+        "total": "product.facts.combined_max_w"
+      },
+      "formulations": [
+        "Combined adapter output ceiling {total} W, not energy or achieved charging.",
+        "Total declared maximum {total} W across active outputs; no speed or Wh claim."
+      ]
+    },
+    {
+      "id": "description.input",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.input_min_v",
+          "product.facts.input_max_v"
+        ]
+      },
+      "slots": {
+        "lo": "product.facts.input_min_v",
+        "hi": "product.facts.input_max_v"
+      },
+      "formulations": [
+        "Declared input {lo}–{hi} V; input frequency/current unspecified.",
+        "Input voltage range {lo} to {hi} V; no frequency/current declaration."
+      ],
+      "when": "known(product.facts.input_min_v) and known(product.facts.input_max_v)"
+    },
+    {
+      "id": "description.input_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.input_min_v",
+          "product.facts.input_max_v"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Input voltage range unspecified, not inferred from the plug or sales country.",
+        "No input-voltage declaration; regional plug does not establish universal mains compatibility."
+      ],
+      "when": "not known(product.facts.input_min_v)"
+    },
+    {
+      "id": "description.sku",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "sku.plug_type",
+          "sku.colour",
+          "sku.bundle",
+          "sku.cable_included",
+          "sku.cable_length_status",
+          "sku.cable_length_label",
+          "sku.cable_capability_status"
+        ]
+      },
+      "slots": {
+        "plug": "sku.plug_type",
+        "colour": "sku.colour",
+        "bundle": "sku.bundle",
+        "length": "sku.cable_length_label"
+      },
+      "formulations": [
+        "Selected {colour} SKU: {plug}, {bundle}. Included-cable length: {length}. Cable current/power/data/e-marker capabilities unspecified when included; inapplicable when absent.",
+        "Exact bundle {bundle}, colour {colour}, plug {plug}; cable length {length}. Any included cable has no current, power, data or e-marker declaration."
+      ]
+    },
+    {
+      "id": "description.box",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.adapter_units",
+          "product.facts.phone_included",
+          "product.facts.mains_extension_included",
+          "product.facts.travel_adapter_included",
+          "product.facts.wireless_pad_included"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "One adapter; adapter-only excludes cable, cable bundle adds one USB-C-to-USB-C cable. Phone, mains extension, travel adapter and wireless pad excluded.",
+        "Authored box: one wall adapter and only the selected bundle cable, if any. No phone, extension, travel adapter or wireless pad."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.body_mass_g",
+          "product.facts.input_frequency_hz",
+          "product.facts.input_current_a",
+          "product.facts.folding_pins",
+          "product.facts.plug_dimensions",
+          "product.facts.efficiency",
+          "product.facts.reallocation_interruptions",
+          "product.facts.achieved_output",
+          "product.facts.charging_time"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Body/plug dimensions, mass, folding pins, input current/frequency, efficiency, safety certification, priority/reconnection behavior and achieved watts/time unspecified.",
+        "No supplied size/mass/folding hardware, frequency/current, safety/efficiency test, reallocation continuity or charging-speed result."
+      ]
+    },
+    {
+      "id": "description.c1_solo",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.c1_solo_pdo",
+          "product.facts.c1_solo_pdo_label",
+          "product.facts.c1_solo_pps_min_v",
+          "product.facts.c1_solo_pps_max_v",
+          "product.facts.c1_solo_pps_max_a",
+          "product.facts.c1_solo_pps_max_w"
+        ]
+      },
+      "slots": {
+        "pdo_label": "product.facts.c1_solo_pdo_label",
+        "pps_min_v": "product.facts.c1_solo_pps_min_v",
+        "pps_max_v": "product.facts.c1_solo_pps_max_v",
+        "pps_max_a": "product.facts.c1_solo_pps_max_a",
+        "pps_max_w": "product.facts.c1_solo_pps_max_w"
+      },
+      "formulations": [
+        "c1 solo: fixed alternatives {pdo_label}. PPS {pps_min_v}–{pps_max_v} V, ≤{pps_max_a} A AND ≤{pps_max_w} W jointly; not every V/A pair promised.",
+        "c1 solo fixed PDO choices: {pdo_label}; PPS range {pps_min_v} to {pps_max_v} V subject to both {pps_max_a} A and {pps_max_w} W ceilings. Not Cartesian support or negotiated maximum."
+      ],
+      "when": "product.facts.usb_c_port_count >= 1"
+    },
+    {
+      "id": "description.c2_solo",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.c2_solo_pdo",
+          "product.facts.c2_solo_pdo_label",
+          "product.facts.c2_solo_pps_min_v",
+          "product.facts.c2_solo_pps_max_v",
+          "product.facts.c2_solo_pps_max_a",
+          "product.facts.c2_solo_pps_max_w"
+        ]
+      },
+      "slots": {
+        "pdo_label": "product.facts.c2_solo_pdo_label",
+        "pps_min_v": "product.facts.c2_solo_pps_min_v",
+        "pps_max_v": "product.facts.c2_solo_pps_max_v",
+        "pps_max_a": "product.facts.c2_solo_pps_max_a",
+        "pps_max_w": "product.facts.c2_solo_pps_max_w"
+      },
+      "formulations": [
+        "c2 solo: fixed alternatives {pdo_label}. PPS {pps_min_v}–{pps_max_v} V, ≤{pps_max_a} A AND ≤{pps_max_w} W jointly; not every V/A pair promised.",
+        "c2 solo fixed PDO choices: {pdo_label}; PPS range {pps_min_v} to {pps_max_v} V subject to both {pps_max_a} A and {pps_max_w} W ceilings. Not Cartesian support or negotiated maximum."
+      ],
+      "when": "product.facts.usb_c_port_count == 2"
+    },
+    {
+      "id": "description.c1_simultaneous",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.c1_simultaneous_pdo",
+          "product.facts.c1_simultaneous_pdo_label",
+          "product.facts.c1_simultaneous_pps_min_v",
+          "product.facts.c1_simultaneous_pps_max_v",
+          "product.facts.c1_simultaneous_pps_max_a",
+          "product.facts.c1_simultaneous_pps_max_w"
+        ]
+      },
+      "slots": {
+        "pdo_label": "product.facts.c1_simultaneous_pdo_label",
+        "pps_min_v": "product.facts.c1_simultaneous_pps_min_v",
+        "pps_max_v": "product.facts.c1_simultaneous_pps_max_v",
+        "pps_max_a": "product.facts.c1_simultaneous_pps_max_a",
+        "pps_max_w": "product.facts.c1_simultaneous_pps_max_w"
+      },
+      "formulations": [
+        "c1 simultaneous: fixed alternatives {pdo_label}. PPS {pps_min_v}–{pps_max_v} V, ≤{pps_max_a} A AND ≤{pps_max_w} W jointly; not every V/A pair promised.",
+        "c1 simultaneous fixed PDO choices: {pdo_label}; PPS range {pps_min_v} to {pps_max_v} V subject to both {pps_max_a} A and {pps_max_w} W ceilings. Not Cartesian support or negotiated maximum."
+      ],
+      "when": "product.facts.usb_c_port_count >= 1"
+    },
+    {
+      "id": "description.c2_simultaneous",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.c2_simultaneous_pdo",
+          "product.facts.c2_simultaneous_pdo_label",
+          "product.facts.c2_simultaneous_pps_min_v",
+          "product.facts.c2_simultaneous_pps_max_v",
+          "product.facts.c2_simultaneous_pps_max_a",
+          "product.facts.c2_simultaneous_pps_max_w"
+        ]
+      },
+      "slots": {
+        "pdo_label": "product.facts.c2_simultaneous_pdo_label",
+        "pps_min_v": "product.facts.c2_simultaneous_pps_min_v",
+        "pps_max_v": "product.facts.c2_simultaneous_pps_max_v",
+        "pps_max_a": "product.facts.c2_simultaneous_pps_max_a",
+        "pps_max_w": "product.facts.c2_simultaneous_pps_max_w"
+      },
+      "formulations": [
+        "c2 simultaneous: fixed alternatives {pdo_label}. PPS {pps_min_v}–{pps_max_v} V, ≤{pps_max_a} A AND ≤{pps_max_w} W jointly; not every V/A pair promised.",
+        "c2 simultaneous fixed PDO choices: {pdo_label}; PPS range {pps_min_v} to {pps_max_v} V subject to both {pps_max_a} A and {pps_max_w} W ceilings. Not Cartesian support or negotiated maximum."
+      ],
+      "when": "product.facts.usb_c_port_count == 2"
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'chargers.plug_in_wall_chargers' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "plug",
+      "role": "filter",
+      "predicate": "sku.plug_type == request.plug_type",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "c1_solo",
+      "role": "filter",
+      "predicate": "known(product.facts.c1_solo_max_w) and product.facts.c1_solo_max_w >= request.min_c1_solo_w",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "combined",
+      "role": "filter",
+      "predicate": "known(product.facts.combined_max_w) and product.facts.combined_max_w >= request.min_combined_w",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "simultaneous",
+      "role": "filter",
+      "predicate": "known(product.facts.c2_simultaneous_max_w) and product.facts.usb_c_port_count == 2 and product.facts.c1_simultaneous_max_w >= request.min_c1_simultaneous_w and product.facts.c2_simultaneous_max_w >= request.min_c2_simultaneous_w",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "cable",
+      "role": "filter",
+      "predicate": "sku.cable_included == request.cable_included",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "plug_type": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "bundle": {
+                "type": "string"
+              },
+              "cable_included": {
+                "type": "boolean"
+              },
+              "cable_length_status": {
+                "type": "enum",
+                "values": [
+                  "declared",
+                  "not applicable"
+                ]
+              },
+              "cable_length_label": {
+                "type": "string"
+              },
+              "cable_capability_status": {
+                "type": "enum",
+                "values": [
+                  "unknown",
+                  "not applicable"
+                ]
+              },
+              "bundle_price_factor": {
+                "type": "number",
+                "min": 1,
+                "max": 1.25
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 150,
+                "max": 1375
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "plug_type": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "bundle": {
+              "type": "string"
+            },
+            "cable_included": {
+              "type": "boolean"
+            },
+            "cable_length_status": {
+              "type": "enum",
+              "values": [
+                "declared",
+                "not applicable"
+              ]
+            },
+            "cable_length_label": {
+              "type": "string"
+            },
+            "cable_capability_status": {
+              "type": "enum",
+              "values": [
+                "unknown",
+                "not applicable"
+              ]
+            },
+            "bundle_price_factor": {
+              "type": "number",
+              "min": 1,
+              "max": 1.25
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 150,
+              "max": 1375
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "socket_handling",
+              "c1_cable_handling",
+              "desk_port_access",
+              "adjacent_socket_handling",
+              "bag_handling",
+              "dual_cable_handling",
+              "bundle_cable_handling"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 150,
+          "max": 1375
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 150
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 1375
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_socket_handling": {
+          "type": "boolean"
+        },
+        "review.positive_c1_cable_handling": {
+          "type": "boolean"
+        },
+        "review.positive_desk_port_access": {
+          "type": "boolean"
+        },
+        "review.positive_adjacent_socket_handling": {
+          "type": "boolean"
+        },
+        "review.positive_bag_handling": {
+          "type": "boolean"
+        },
+        "review.positive_dual_cable_handling": {
+          "type": "boolean"
+        },
+        "review.positive_bundle_cable_handling": {
+          "type": "boolean"
+        },
+        "product.facts.usb_c_port_count": {
+          "type": "integer",
+          "unit": "count",
+          "min": 1,
+          "max": 2,
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "single_only": 1,
+            "single_bundle": 0,
+            "dual_only": 0,
+            "dual_bundle": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.usb_c_port_count == 1 and review.subject.cable_included",
+              "weights": {
+                "single_only": 0,
+                "single_bundle": 1,
+                "dual_only": 0,
+                "dual_bundle": 0
+              }
+            },
+            {
+              "when": "product.facts.usb_c_port_count == 2 and not review.subject.cable_included",
+              "weights": {
+                "single_only": 0,
+                "single_bundle": 0,
+                "dual_only": 1,
+                "dual_bundle": 0
+              }
+            },
+            {
+              "when": "product.facts.usb_c_port_count == 2 and review.subject.cable_included",
+              "weights": {
+                "single_only": 0,
+                "single_bundle": 0,
+                "dual_only": 0,
+                "dual_bundle": 1
+              }
+            }
+          ],
+          "values": {
+            "single_only": [
+              "value",
+              "socket_handling",
+              "c1_cable_handling",
+              "desk_port_access",
+              "adjacent_socket_handling",
+              "bag_handling"
+            ],
+            "single_bundle": [
+              "value",
+              "socket_handling",
+              "c1_cable_handling",
+              "desk_port_access",
+              "adjacent_socket_handling",
+              "bag_handling",
+              "bundle_cable_handling"
+            ],
+            "dual_only": [
+              "value",
+              "socket_handling",
+              "c1_cable_handling",
+              "desk_port_access",
+              "adjacent_socket_handling",
+              "bag_handling",
+              "dual_cable_handling"
+            ],
+            "dual_bundle": [
+              "value",
+              "socket_handling",
+              "c1_cable_handling",
+              "desk_port_access",
+              "adjacent_socket_handling",
+              "bag_handling",
+              "dual_cable_handling",
+              "bundle_cable_handling"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_socket_handling",
+          "target": "review.positive_socket_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_c1_cable_handling",
+          "target": "review.positive_c1_cable_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_desk_port_access",
+          "target": "review.positive_desk_port_access",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_adjacent_socket_handling",
+          "target": "review.positive_adjacent_socket_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bag_handling",
+          "target": "review.positive_bag_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_dual_cable_handling",
+          "target": "review.positive_dual_cable_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bundle_cable_handling",
+          "target": "review.positive_bundle_cable_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "socket_handling.positive",
+          "when": "'socket_handling' in review.topics and review.positive_socket_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "socket_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "insert/remove adapter at owner matching wall socket",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "This {plug} adapter was easy to plug into my wall socket and pull out again.",
+            "I found it easy to plug this {plug} adapter into my wall socket and remove it."
+          ],
+          "slots": {
+            "plug": "review.subject.plug_type"
+          }
+        },
+        {
+          "id": "socket_handling.negative",
+          "when": "'socket_handling' in review.topics and not review.positive_socket_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "socket_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "insert/remove adapter at owner matching wall socket",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "This {plug} adapter was awkward to plug into my wall socket and pull out again.",
+            "I found it awkward to plug this {plug} adapter into my wall socket and remove it."
+          ],
+          "slots": {
+            "plug": "review.subject.plug_type"
+          }
+        },
+        {
+          "id": "c1_cable_handling.positive",
+          "when": "'c1_cable_handling' in review.topics and review.positive_c1_cable_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "c1_cable_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "attach/remove owner USB-C cable specifically at C1",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My USB-C cable was easy to attach to and remove from C1.",
+            "At C1, I found attaching and removing my own USB-C cable straightforward."
+          ]
+        },
+        {
+          "id": "c1_cable_handling.negative",
+          "when": "'c1_cable_handling' in review.topics and not review.positive_c1_cable_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "c1_cable_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "attach/remove owner USB-C cable specifically at C1",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My USB-C cable was awkward to attach to and remove from C1.",
+            "At C1, I found attaching and removing my own USB-C cable difficult."
+          ]
+        },
+        {
+          "id": "desk_port_access.positive",
+          "when": "'desk_port_access' in review.topics and review.positive_desk_port_access",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "desk_port_access",
+            "polarity": "positive",
+            "context": {
+              "operation": "reach actual C1 at owner usual desk",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "C1 was easy to reach at my usual desk.",
+            "At my usual desk, reaching C1 felt straightforward."
+          ]
+        },
+        {
+          "id": "desk_port_access.negative",
+          "when": "'desk_port_access' in review.topics and not review.positive_desk_port_access",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "desk_port_access",
+            "polarity": "negative",
+            "context": {
+              "operation": "reach actual C1 at owner usual desk",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "C1 was awkward to reach at my usual desk.",
+            "At my usual desk, reaching C1 felt difficult."
+          ]
+        },
+        {
+          "id": "adjacent_socket_handling.positive",
+          "when": "'adjacent_socket_handling' in review.topics and review.positive_adjacent_socket_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "adjacent_socket_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "handle adapter body beside owner usual adjacent socket, no universal clearance",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Beside the neighbouring socket I use, the adapter was easy to handle.",
+            "I found the adapter easy to handle next to my neighbouring wall socket."
+          ]
+        },
+        {
+          "id": "adjacent_socket_handling.negative",
+          "when": "'adjacent_socket_handling' in review.topics and not review.positive_adjacent_socket_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "adjacent_socket_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "handle adapter body beside owner usual adjacent socket, no universal clearance",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Beside the neighbouring socket I use, the adapter was awkward to handle.",
+            "I found the adapter awkward to handle next to my neighbouring wall socket."
+          ]
+        },
+        {
+          "id": "bag_handling.positive",
+          "when": "'bag_handling' in review.topics and review.positive_bag_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bag_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "pack/unpack actual adapter in owner bag",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "This adapter was easy to put into and take out of my bag.",
+            "Packing and unpacking this adapter in my bag felt straightforward."
+          ]
+        },
+        {
+          "id": "bag_handling.negative",
+          "when": "'bag_handling' in review.topics and not review.positive_bag_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bag_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "pack/unpack actual adapter in owner bag",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "This adapter was awkward to put into and take out of my bag.",
+            "Packing and unpacking this adapter in my bag felt difficult."
+          ]
+        },
+        {
+          "id": "dual_cable_handling.positive",
+          "when": "'dual_cable_handling' in review.topics and review.positive_dual_cable_handling and product.facts.usb_c_port_count == 2",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "dual_cable_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "attach/remove two owned compatible devices using owner USB-C cables at named C1/C2; no achieved W/continuity",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Using my USB-C cables for two compatible devices, attaching and removing them at C1 and C2 felt easy.",
+            "With my two compatible devices and USB-C cables, C1 and C2 were straightforward to connect and disconnect."
+          ]
+        },
+        {
+          "id": "dual_cable_handling.negative",
+          "when": "'dual_cable_handling' in review.topics and not review.positive_dual_cable_handling and product.facts.usb_c_port_count == 2",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "dual_cable_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "attach/remove two owned compatible devices using owner USB-C cables at named C1/C2; no achieved W/continuity",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Using my USB-C cables for two compatible devices, attaching and removing them at C1 and C2 felt awkward.",
+            "With my two compatible devices and USB-C cables, C1 and C2 were difficult to connect and disconnect."
+          ]
+        },
+        {
+          "id": "bundle_cable_handling.positive",
+          "when": "'bundle_cable_handling' in review.topics and review.positive_bundle_cable_handling and review.subject.cable_included",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bundle_cable_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "place actual included2m cable between matching USB-C ports at owner usual desk",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The included 2 m USB-C cable was easy to arrange between matching USB-C ports at my usual desk.",
+            "At my usual desk, arranging the included 2 m cable between matching USB-C ports felt straightforward."
+          ]
+        },
+        {
+          "id": "bundle_cable_handling.negative",
+          "when": "'bundle_cable_handling' in review.topics and not review.positive_bundle_cable_handling and review.subject.cable_included",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bundle_cable_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "place actual included2m cable between matching USB-C ports at owner usual desk",
+              "subject": "exact selected plug/colour/bundle SKU; first-hand mechanical experience, not electrical result"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The included 2 m USB-C cable was awkward to arrange between matching USB-C ports at my usual desk.",
+            "At my usual desk, arranging the included 2 m cable between matching USB-C ports felt difficult."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Selected canonical bundle price;global150–1375bounds, never subset rebased",
+        "relative_price_basis": {
+          "min_sek": 150,
+          "max_sek": 1375
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "chargers",
+    "spec_path": "docs/agents/product-width-specs/chargers.plug_in_wall_chargers.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Selected canonical bundle price;1.25cable multiplier anchored to parent reference before manufacture",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "electronics",
+      "office"
+    ],
+    "source_notes": ".local/product-width/research/wall_chargers.md",
+    "unit_limit": "Finite typed V/A/W declarations; independent physical checks, no unsupported DSL dimensional multiplication",
+    "canonical_cable": "Explicit per-SKU inclusion/length label/status; typed2m represented-model field and candidate alias. Numeric current/power unknown only if cable exists; absent aliases not applicable.",
+    "authored_exceptions": [
+      "Dual common solo-port profiles/stable upper-lower identity,regional Cartesian manufacture,2m cable/exclusions are authored",
+      "Internal absent C2 zero/empty placeholders never public physical ports; derived fields not applicable",
+      "No device/cable electrical join or achieved charging; cablecapability unknown"
+    ]
+  }
+}

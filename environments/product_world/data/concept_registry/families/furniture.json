@@ -1,0 +1,230 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "furniture",
+  "review_id": "F36",
+  "label": "Desks",
+  "section": "Home, kitchen and appliances",
+  "store_type_ids": [
+    "office"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Height range for adjustable desks; motors/power only electric sit-stand. Folding hardware only folding desks. This family remains desks, not all furniture.",
+  "shared_dimension_ids": [
+    "dimensions",
+    "component_materials",
+    "colour",
+    "rated_load",
+    "storage_configuration",
+    "cable_management",
+    "assembly_method"
+  ],
+  "dimensions": [
+    {
+      "id": "dimensions",
+      "label": "Dimensions",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "rated_load",
+      "label": "Rated load",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "kg",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "storage_configuration",
+      "label": "Storage configuration",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "cable_management",
+      "label": "Cable management",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "assembly_method",
+      "label": "Assembly method",
+      "module_id": "assembly",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "height_range",
+      "label": "Height range",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "adjustment_mechanism",
+      "label": "Adjustment mechanism",
+      "module_id": "assembly",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "power_source",
+      "label": "Power source",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fold_mechanism",
+      "label": "Fold mechanism",
+      "module_id": "assembly",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "furniture.fixed_height_desks",
+      "label": "Fixed-height desks",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "furniture.sit_stand_desks",
+      "label": "Sit–stand desks",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "height_range",
+        "adjustment_mechanism",
+        "power_source"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "power_source": "Height adjustment mechanism is powered."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "furniture.folding_space_saving_desks",
+      "label": "Folding/space-saving desks",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "fold_mechanism"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

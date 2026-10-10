@@ -1,0 +1,4758 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "laptops.creator_workstation_laptops",
+  "family_id": "laptops",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/laptops.creator_workstation_laptops.json": "c18b337de35019b99d879b7ed3f164ff216f37113636487a6807ef52a9aa767d",
+    "environments/product_world/data/product_width/_laptops_base.json": "cead3114c52ce3550c007fa5f6b4703648f097b78c6997fb8e79cd438a389031",
+    "environments/product_world/data/product_public_content/laptops.creator_workstation_laptops.json": "53eecd098e1dfc5f52f4245d52ac2bc6d077e7a2cf6c5489626d664534944f05"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "RAM/storage may be choices. Keep reference configuration on weight/geometry and avoid claiming game or editing performance from components.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.laptop_units": {
+      "semantic_id": "laptops.creator.laptop_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "laptop_units"
+    },
+    "product.facts.construction": {
+      "semantic_id": "laptops.creator.construction",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "hinged clamshell"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.assortment_scope": {
+      "semantic_id": "laptops.creator.assortment_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "creator/workstation assortment"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.touchpad": {
+      "semantic_id": "laptops.creator.touchpad",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "touchpad"
+    },
+    "product.facts.processor_label": {
+      "semantic_id": "laptops.creator.processor_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "processor_label"
+    },
+    "product.facts.os_label": {
+      "semantic_id": "laptops.creator.os_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "os_label"
+    },
+    "product.facts.os_release": {
+      "semantic_id": "laptops.creator.os_release",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.activation_declaration": {
+      "semantic_id": "laptops.creator.activation_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.application_inventory": {
+      "semantic_id": "laptops.creator.application_inventory",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.application_setup": {
+      "semantic_id": "laptops.creator.application_setup",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.ram_gb": {
+      "semantic_id": "laptops.creator.sku.ram_gb",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.ram_attachment": {
+      "semantic_id": "laptops.creator.sku.ram_attachment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ram_attachment"
+    },
+    "sku.storage_label": {
+      "semantic_id": "laptops.creator.sku.storage_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "storage_label"
+    },
+    "sku.storage_kind": {
+      "semantic_id": "laptops.creator.sku.storage_kind",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "NVMe SSD",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_kind"
+    },
+    "sku.storage_gb": {
+      "semantic_id": "laptops.creator.sku.storage_gb",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.populated_storage_position_units": {
+      "semantic_id": "laptops.creator.sku.populated_storage_position_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "populated_storage_position_units"
+    },
+    "product.facts.free_ram_gb": {
+      "semantic_id": "laptops.creator.free_ram_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.formatted_storage_gb": {
+      "semantic_id": "laptops.creator.sku.formatted_storage_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.integrated_graphics_label": {
+      "semantic_id": "laptops.creator.integrated_graphics_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "integrated_graphics_label"
+    },
+    "product.facts.graphics_shared_memory": {
+      "semantic_id": "laptops.creator.graphics_shared_memory",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "graphics_shared_memory"
+    },
+    "product.facts.dedicated_gpu": {
+      "semantic_id": "laptops.creator.dedicated_gpu",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dedicated_gpu"
+    },
+    "product.facts.discrete_graphics_label": {
+      "semantic_id": "laptops.creator.discrete_graphics_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "discrete_graphics_label"
+    },
+    "product.facts.dedicated_vram_gb": {
+      "semantic_id": "laptops.creator.dedicated_vram_gb",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 8
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dedicated_vram_gb"
+    },
+    "product.facts.dedicated_vram_type": {
+      "semantic_id": "laptops.creator.dedicated_vram_type",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "GDDR6"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dedicated_vram_type"
+    },
+    "product.facts.graphics_routing": {
+      "semantic_id": "laptops.creator.graphics_routing",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.free_vram_gb": {
+      "semantic_id": "laptops.creator.free_vram_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_diagonal_in": {
+      "semantic_id": "laptops.creator.screen_diagonal_in",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "inch",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 16,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "screen_diagonal_in"
+    },
+    "product.facts.screen_width_px": {
+      "semantic_id": "laptops.creator.screen_width_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_width_px"
+    },
+    "product.facts.screen_height_px": {
+      "semantic_id": "laptops.creator.screen_height_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_height_px"
+    },
+    "product.facts.screen_technology": {
+      "semantic_id": "laptops.creator.screen_technology",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_technology"
+    },
+    "product.facts.screen_surface": {
+      "semantic_id": "laptops.creator.screen_surface",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_surface"
+    },
+    "product.facts.refresh_rate_hz": {
+      "semantic_id": "laptops.creator.refresh_rate_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "refresh_rate_hz"
+    },
+    "product.facts.touchscreen": {
+      "semantic_id": "laptops.creator.touchscreen",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "touchscreen"
+    },
+    "product.facts.viewable_area_declaration": {
+      "semantic_id": "laptops.creator.viewable_area_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_brightness_nit": {
+      "semantic_id": "laptops.creator.screen_brightness_nit",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "nit",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_gamut": {
+      "semantic_id": "laptops.creator.screen_gamut",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.colour_calibration_error": {
+      "semantic_id": "laptops.creator.colour_calibration_error",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_backlight": {
+      "semantic_id": "laptops.creator.screen_backlight",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_backlight"
+    },
+    "product.facts.lcd_backlight_properties": {
+      "semantic_id": "laptops.creator.lcd_backlight_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.screen_backlight",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.touch_capabilities": {
+      "semantic_id": "laptops.creator.touch_capabilities",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.touchscreen",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reference_configuration": {
+      "semantic_id": "laptops.creator.reference_configuration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_configuration"
+    },
+    "product.facts.reference_width_mm": {
+      "semantic_id": "laptops.creator.reference_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_width_mm"
+    },
+    "product.facts.reference_depth_mm": {
+      "semantic_id": "laptops.creator.reference_depth_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_depth_mm"
+    },
+    "product.facts.reference_max_height_mm": {
+      "semantic_id": "laptops.creator.reference_max_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_max_height_mm"
+    },
+    "product.facts.reference_mass_g": {
+      "semantic_id": "laptops.creator.reference_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_mass_g"
+    },
+    "sku.actual_mass_g": {
+      "semantic_id": "laptops.creator.sku.actual_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_dimensions_declaration": {
+      "semantic_id": "laptops.creator.sku.actual_dimensions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.carried_kit_mass_declaration": {
+      "semantic_id": "laptops.creator.carried_kit_mass_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.lid_colour": {
+      "semantic_id": "laptops.creator.lid_colour",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_colour"
+    },
+    "product.facts.lid_material": {
+      "semantic_id": "laptops.creator.lid_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_material"
+    },
+    "product.facts.base_colour": {
+      "semantic_id": "laptops.creator.base_colour",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "black",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "base_colour"
+    },
+    "product.facts.base_material": {
+      "semantic_id": "laptops.creator.base_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "base_material"
+    },
+    "product.facts.finish_durability": {
+      "semantic_id": "laptops.creator.finish_durability",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_included": {
+      "semantic_id": "laptops.creator.battery_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_included"
+    },
+    "product.facts.battery_location": {
+      "semantic_id": "laptops.creator.battery_location",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "internal installed pack"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_location"
+    },
+    "product.facts.battery_rechargeable": {
+      "semantic_id": "laptops.creator.battery_rechargeable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_rechargeable"
+    },
+    "product.facts.battery_energy_wh": {
+      "semantic_id": "laptops.creator.battery_energy_wh",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "battery_energy_wh"
+    },
+    "product.facts.battery_service": {
+      "semantic_id": "laptops.creator.battery_service",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usb_a_units": {
+      "semantic_id": "laptops.creator.usb_a_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_a_units"
+    },
+    "product.facts.usb_c_units": {
+      "semantic_id": "laptops.creator.usb_c_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_c_units"
+    },
+    "product.facts.usb_c_roles_label": {
+      "semantic_id": "laptops.creator.usb_c_roles_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_c_roles_label"
+    },
+    "product.facts.c1_interface_label": {
+      "semantic_id": "laptops.creator.c1_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_interface_label"
+    },
+    "product.facts.c2_interface_label": {
+      "semantic_id": "laptops.creator.c2_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_interface_label"
+    },
+    "product.facts.c3_interface_label": {
+      "semantic_id": "laptops.creator.c3_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_c_units > 2",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c3_interface_label"
+    },
+    "product.facts.c1_data": {
+      "semantic_id": "laptops.creator.c1_data",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c1_data"
+    },
+    "product.facts.c1_video": {
+      "semantic_id": "laptops.creator.c1_video",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_video"
+    },
+    "product.facts.c2_data": {
+      "semantic_id": "laptops.creator.c2_data",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c2_data"
+    },
+    "product.facts.c2_video": {
+      "semantic_id": "laptops.creator.c2_video",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c2_video"
+    },
+    "product.facts.c3_data": {
+      "semantic_id": "laptops.creator.c3_data",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_c_units > 2",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c3_data"
+    },
+    "product.facts.c3_video": {
+      "semantic_id": "laptops.creator.c3_video",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_c_units > 2",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c3_video"
+    },
+    "product.facts.c1_laptop_charge_declaration": {
+      "semantic_id": "laptops.creator.c1_laptop_charge_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_laptop_charge_declaration"
+    },
+    "product.facts.c2_laptop_charge_declaration": {
+      "semantic_id": "laptops.creator.c2_laptop_charge_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_laptop_charge_declaration"
+    },
+    "product.facts.c3_laptop_charge_declaration": {
+      "semantic_id": "laptops.creator.c3_laptop_charge_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_c_units > 2",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c3_laptop_charge_declaration"
+    },
+    "product.facts.hdmi_units": {
+      "semantic_id": "laptops.creator.hdmi_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_units"
+    },
+    "product.facts.sd_reader_units": {
+      "semantic_id": "laptops.creator.sd_reader_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sd_reader_units"
+    },
+    "product.facts.audio_combo_units": {
+      "semantic_id": "laptops.creator.audio_combo_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "audio_combo_units"
+    },
+    "product.facts.dc_socket_units": {
+      "semantic_id": "laptops.creator.dc_socket_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dc_socket_units"
+    },
+    "product.facts.dc_connector_label": {
+      "semantic_id": "laptops.creator.dc_connector_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dc_connector_label"
+    },
+    "product.facts.ethernet_units": {
+      "semantic_id": "laptops.creator.ethernet_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ethernet_units"
+    },
+    "product.facts.magnetic_socket_units": {
+      "semantic_id": "laptops.creator.magnetic_socket_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "magnetic_socket_units"
+    },
+    "product.facts.port_power_profiles": {
+      "semantic_id": "laptops.creator.port_power_profiles",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.port_input_ceilings": {
+      "semantic_id": "laptops.creator.port_input_ceilings",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.port_throughput": {
+      "semantic_id": "laptops.creator.port_throughput",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.external_display_limits": {
+      "semantic_id": "laptops.creator.external_display_limits",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ram_socket_units": {
+      "semantic_id": "laptops.creator.ram_socket_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ram_socket_units"
+    },
+    "sku.populated_ram_socket_units": {
+      "semantic_id": "laptops.creator.sku.populated_ram_socket_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "populated_ram_socket_units"
+    },
+    "sku.spare_ram_socket_units": {
+      "semantic_id": "laptops.creator.sku.spare_ram_socket_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "spare_ram_socket_units"
+    },
+    "sku.ram_module_quantity_status": {
+      "semantic_id": "laptops.creator.sku.ram_module_quantity_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.per_socket_ram_capacity_gb": {
+      "semantic_id": "laptops.creator.per_socket_ram_capacity_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "applicable_when": "product.facts.ram_socket_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.ram_module_capacity_gb": {
+      "semantic_id": "laptops.creator.sku.ram_module_capacity_gb",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ram_module_capacity_gb"
+    },
+    "sku.ram_channels": {
+      "semantic_id": "laptops.creator.sku.ram_channels",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ram_channels"
+    },
+    "product.facts.ram_access_procedure": {
+      "semantic_id": "laptops.creator.ram_access_procedure",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.storage_position_units": {
+      "semantic_id": "laptops.creator.sku.storage_position_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_position_units"
+    },
+    "sku.spare_storage_position_units": {
+      "semantic_id": "laptops.creator.sku.spare_storage_position_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spare_storage_position_units"
+    },
+    "sku.storage_attachment": {
+      "semantic_id": "laptops.creator.sku.storage_attachment",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "removable M.2 NVMe module",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_attachment"
+    },
+    "sku.storage_connector_declaration": {
+      "semantic_id": "laptops.creator.sku.storage_connector_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.storage_service_declaration": {
+      "semantic_id": "laptops.creator.sku.storage_service_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.storage_replacement_limits": {
+      "semantic_id": "laptops.creator.sku.storage_replacement_limits",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.adapter_included": {
+      "semantic_id": "laptops.creator.sku.adapter_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_included"
+    },
+    "sku.adapter_units": {
+      "semantic_id": "laptops.creator.sku.adapter_units",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_units"
+    },
+    "sku.adapter_model_match": {
+      "semantic_id": "laptops.creator.sku.adapter_model_match",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_model_match"
+    },
+    "sku.adapter_nominal_output_w": {
+      "semantic_id": "laptops.creator.sku.adapter_nominal_output_w",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_nominal_output_w"
+    },
+    "sku.adapter_output_voltage_v": {
+      "semantic_id": "laptops.creator.sku.adapter_output_voltage_v",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_output_voltage_v"
+    },
+    "sku.adapter_output_current_a": {
+      "semantic_id": "laptops.creator.sku.adapter_output_current_a",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_output_current_a"
+    },
+    "sku.adapter_input_min_v": {
+      "semantic_id": "laptops.creator.sku.adapter_input_min_v",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "optional": true,
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_input_min_v"
+    },
+    "sku.adapter_input_max_v": {
+      "semantic_id": "laptops.creator.sku.adapter_input_max_v",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "optional": true,
+        "constant": 240,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_input_max_v"
+    },
+    "sku.adapter_input_frequency_label": {
+      "semantic_id": "laptops.creator.sku.adapter_input_frequency_label",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "50–60Hz",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_input_frequency_label"
+    },
+    "sku.adapter_input_current_a": {
+      "semantic_id": "laptops.creator.sku.adapter_input_current_a",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.adapter_extra_output_modes": {
+      "semantic_id": "laptops.creator.sku.adapter_extra_output_modes",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.device_lead_units": {
+      "semantic_id": "laptops.creator.sku.device_lead_units",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "device_lead_units"
+    },
+    "sku.device_lead_length_m": {
+      "semantic_id": "laptops.creator.sku.device_lead_length_m",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "device_lead_length_m"
+    },
+    "sku.device_lead_detachable": {
+      "semantic_id": "laptops.creator.sku.device_lead_detachable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "device_lead_detachable"
+    },
+    "sku.device_lead_laptop_connector": {
+      "semantic_id": "laptops.creator.sku.device_lead_laptop_connector",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "device_lead_laptop_connector"
+    },
+    "sku.mains_lead_units": {
+      "semantic_id": "laptops.creator.sku.mains_lead_units",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mains_lead_units"
+    },
+    "sku.mains_lead_length_m": {
+      "semantic_id": "laptops.creator.sku.mains_lead_length_m",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mains_lead_length_m"
+    },
+    "sku.mains_lead_detachable": {
+      "semantic_id": "laptops.creator.sku.mains_lead_detachable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mains_lead_detachable"
+    },
+    "sku.mains_region_label": {
+      "semantic_id": "laptops.creator.sku.mains_region_label",
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "detachable EU grounded mains lead",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "sku.lead_electrical_ratings": {
+      "semantic_id": "laptops.creator.sku.lead_electrical_ratings",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.keyboard_layout": {
+      "semantic_id": "laptops.creator.sku.keyboard_layout",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "US English",
+          "UK English"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "keyboard_layout"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "product.facts.keyboard_included": {
+      "semantic_id": "laptops.creator.keyboard_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keyboard_included"
+    },
+    "product.facts.number_pad": {
+      "semantic_id": "laptops.creator.number_pad",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "number_pad"
+    },
+    "product.facts.keyboard_backlight": {
+      "semantic_id": "laptops.creator.keyboard_backlight",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keyboard_backlight"
+    },
+    "product.facts.keyboard_backlight_family": {
+      "semantic_id": "laptops.creator.keyboard_backlight_family",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "white"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keyboard_backlight_family"
+    },
+    "product.facts.key_geometry_declaration": {
+      "semantic_id": "laptops.creator.key_geometry_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.keyboard_light_properties": {
+      "semantic_id": "laptops.creator.keyboard_light_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cooling_design": {
+      "semantic_id": "laptops.creator.cooling_design",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "fan-cooled"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cooling_design"
+    },
+    "product.facts.fan_present": {
+      "semantic_id": "laptops.creator.fan_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fan_present"
+    },
+    "product.facts.fan_properties": {
+      "semantic_id": "laptops.creator.fan_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.fan_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.acoustic_thermal_declaration": {
+      "semantic_id": "laptops.creator.acoustic_thermal_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.device_input_ceiling_w": {
+      "semantic_id": "laptops.creator.device_input_ceiling_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_voltage_v": {
+      "semantic_id": "laptops.creator.battery_voltage_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_charge_mah": {
+      "semantic_id": "laptops.creator.battery_charge_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_runtime_h": {
+      "semantic_id": "laptops.creator.battery_runtime_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.charge_time_h": {
+      "semantic_id": "laptops.creator.charge_time_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.performance_declaration": {
+      "semantic_id": "laptops.creator.performance_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.software_support_declaration": {
+      "semantic_id": "laptops.creator.software_support_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.certifications": {
+      "semantic_id": "laptops.creator.certifications",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.care_declaration": {
+      "semantic_id": "laptops.creator.care_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cleaning_permissions": {
+      "semantic_id": "laptops.creator.cleaning_permissions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.box_hardware_label": {
+      "semantic_id": "laptops.creator.sku.box_hardware_label",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "box_hardware_label"
+    },
+    "sku.box_exclusions": {
+      "semantic_id": "laptops.creator.sku.box_exclusions",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "bag/case; mouse; dock/hub; external Ethernet adapter/display; SD card; USB drive; HDMI/Ethernet lead; pen; spare hardware; paid software subscription",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "box_exclusions"
+    },
+    "sku.configuration": {
+      "semantic_id": "laptops.creator.sku.configuration",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "32GB / 1TB",
+          "64GB / 2TB"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "configuration"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.configuration_label": {
+      "semantic_id": "laptops.creator.sku.configuration_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "configuration_label"
+    },
+    "sku.colour": {
+      "semantic_id": "laptops.creator.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "gray lid / black base"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.adapter_output_label": {
+      "semantic_id": "laptops.creator.sku.adapter_output_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_output_label"
+    },
+    "review.tested_configuration_label": {
+      "semantic_id": "laptops.creator.review.tested_configuration_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.input_map_label": {
+      "semantic_id": "laptops.creator.review.input_map_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.carried_kit_label": {
+      "semantic_id": "laptops.creator.review.carried_kit_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.charge_setup_label": {
+      "semantic_id": "laptops.creator.review.charge_setup_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.work_mains_label": {
+      "semantic_id": "laptops.creator.review.work_mains_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.photo_editor_setup_label": {
+      "semantic_id": "laptops.creator.review.photo_editor_setup_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.video_editor_setup_label": {
+      "semantic_id": "laptops.creator.review.video_editor_setup_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.touch_viewer_setup_label": {
+      "semantic_id": "laptops.creator.review.touch_viewer_setup_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.purchase_price_sek": {
+      "semantic_id": "laptops.creator.review.purchase_price_sek",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "product.facts.model": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "creator_oled_16",
+          "workstation_ips_16"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.wifi_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.bluetooth_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.colour": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "gray lid / black base"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.model_price_factor": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 1,
+        "max": 1.3,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.camera_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.microphone_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.speakers_included": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.camera_performance": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.microphone_performance": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.speaker_performance": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wireless_regional_driver_declaration": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cellular_sim_declaration": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "laptop_units": {
+      "id": "laptops.creator_workstation_laptops.content.laptop_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.laptop_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "construction": {
+      "id": "laptops.creator_workstation_laptops.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "touchpad": {
+      "id": "laptops.creator_workstation_laptops.content.touchpad",
+      "display_group": "features",
+      "fields": [
+        "product.facts.touchpad"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "processor_label": {
+      "id": "laptops.creator_workstation_laptops.content.processor_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.processor_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "os_label": {
+      "id": "laptops.creator_workstation_laptops.content.os_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.os_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "ram_attachment": {
+      "id": "laptops.creator_workstation_laptops.content.ram_attachment",
+      "display_group": "features",
+      "fields": [
+        "sku.ram_attachment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_label": {
+      "id": "laptops.creator_workstation_laptops.content.storage_label",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_kind": {
+      "id": "laptops.creator_workstation_laptops.content.storage_kind",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "populated_storage_position_units": {
+      "id": "laptops.creator_workstation_laptops.content.populated_storage_position_units",
+      "display_group": "features",
+      "fields": [
+        "sku.populated_storage_position_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "integrated_graphics_label": {
+      "id": "laptops.creator_workstation_laptops.content.integrated_graphics_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.integrated_graphics_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "graphics_shared_memory": {
+      "id": "laptops.creator_workstation_laptops.content.graphics_shared_memory",
+      "display_group": "features",
+      "fields": [
+        "product.facts.graphics_shared_memory"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dedicated_gpu": {
+      "id": "laptops.creator_workstation_laptops.content.dedicated_gpu",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dedicated_gpu"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "discrete_graphics_label": {
+      "id": "laptops.creator_workstation_laptops.content.discrete_graphics_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.discrete_graphics_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "dedicated_vram_gb": {
+      "id": "laptops.creator_workstation_laptops.content.dedicated_vram_gb",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dedicated_vram_gb"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dedicated_vram_type": {
+      "id": "laptops.creator_workstation_laptops.content.dedicated_vram_type",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dedicated_vram_type"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_diagonal_in": {
+      "id": "laptops.creator_workstation_laptops.content.screen_diagonal_in",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_diagonal_in"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "screen_width_px": {
+      "id": "laptops.creator_workstation_laptops.content.screen_width_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_width_px"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_height_px": {
+      "id": "laptops.creator_workstation_laptops.content.screen_height_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_height_px"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_technology": {
+      "id": "laptops.creator_workstation_laptops.content.screen_technology",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_technology"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "screen_surface": {
+      "id": "laptops.creator_workstation_laptops.content.screen_surface",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_surface"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "refresh_rate_hz": {
+      "id": "laptops.creator_workstation_laptops.content.refresh_rate_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.refresh_rate_hz"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "touchscreen": {
+      "id": "laptops.creator_workstation_laptops.content.touchscreen",
+      "display_group": "features",
+      "fields": [
+        "product.facts.touchscreen"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "screen_backlight": {
+      "id": "laptops.creator_workstation_laptops.content.screen_backlight",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_backlight"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_configuration": {
+      "id": "laptops.creator_workstation_laptops.content.reference_configuration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.reference_configuration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_width_mm": {
+      "id": "laptops.creator_workstation_laptops.content.reference_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_depth_mm": {
+      "id": "laptops.creator_workstation_laptops.content.reference_depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_depth_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_max_height_mm": {
+      "id": "laptops.creator_workstation_laptops.content.reference_max_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_max_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_mass_g": {
+      "id": "laptops.creator_workstation_laptops.content.reference_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "lid_colour": {
+      "id": "laptops.creator_workstation_laptops.content.lid_colour",
+      "display_group": "features",
+      "fields": [
+        "product.facts.lid_colour"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_material": {
+      "id": "laptops.creator_workstation_laptops.content.lid_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.lid_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "base_colour": {
+      "id": "laptops.creator_workstation_laptops.content.base_colour",
+      "display_group": "features",
+      "fields": [
+        "product.facts.base_colour"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "base_material": {
+      "id": "laptops.creator_workstation_laptops.content.base_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.base_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_included": {
+      "id": "laptops.creator_workstation_laptops.content.battery_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.battery_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_location": {
+      "id": "laptops.creator_workstation_laptops.content.battery_location",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_location"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_rechargeable": {
+      "id": "laptops.creator_workstation_laptops.content.battery_rechargeable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_rechargeable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_energy_wh": {
+      "id": "laptops.creator_workstation_laptops.content.battery_energy_wh",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_energy_wh"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "usb_a_units": {
+      "id": "laptops.creator_workstation_laptops.content.usb_a_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_a_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_c_units": {
+      "id": "laptops.creator_workstation_laptops.content.usb_c_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_c_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_c_roles_label": {
+      "id": "laptops.creator_workstation_laptops.content.usb_c_roles_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_c_roles_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_interface_label": {
+      "id": "laptops.creator_workstation_laptops.content.c1_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.c1_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_interface_label": {
+      "id": "laptops.creator_workstation_laptops.content.c2_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.c2_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c3_interface_label": {
+      "id": "laptops.creator_workstation_laptops.content.c3_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.c3_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_data": {
+      "id": "laptops.creator_workstation_laptops.content.c1_data",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_data"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_video": {
+      "id": "laptops.creator_workstation_laptops.content.c1_video",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_video"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_data": {
+      "id": "laptops.creator_workstation_laptops.content.c2_data",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_data"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_video": {
+      "id": "laptops.creator_workstation_laptops.content.c2_video",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_video"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c3_data": {
+      "id": "laptops.creator_workstation_laptops.content.c3_data",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c3_data"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c3_video": {
+      "id": "laptops.creator_workstation_laptops.content.c3_video",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c3_video"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_laptop_charge_declaration": {
+      "id": "laptops.creator_workstation_laptops.content.c1_laptop_charge_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_laptop_charge_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_laptop_charge_declaration": {
+      "id": "laptops.creator_workstation_laptops.content.c2_laptop_charge_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_laptop_charge_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c3_laptop_charge_declaration": {
+      "id": "laptops.creator_workstation_laptops.content.c3_laptop_charge_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c3_laptop_charge_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_units": {
+      "id": "laptops.creator_workstation_laptops.content.hdmi_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hdmi_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sd_reader_units": {
+      "id": "laptops.creator_workstation_laptops.content.sd_reader_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.sd_reader_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "audio_combo_units": {
+      "id": "laptops.creator_workstation_laptops.content.audio_combo_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.audio_combo_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dc_socket_units": {
+      "id": "laptops.creator_workstation_laptops.content.dc_socket_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dc_socket_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dc_connector_label": {
+      "id": "laptops.creator_workstation_laptops.content.dc_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.dc_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ethernet_units": {
+      "id": "laptops.creator_workstation_laptops.content.ethernet_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.ethernet_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "magnetic_socket_units": {
+      "id": "laptops.creator_workstation_laptops.content.magnetic_socket_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.magnetic_socket_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ram_socket_units": {
+      "id": "laptops.creator_workstation_laptops.content.ram_socket_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ram_socket_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "populated_ram_socket_units": {
+      "id": "laptops.creator_workstation_laptops.content.populated_ram_socket_units",
+      "display_group": "features",
+      "fields": [
+        "sku.populated_ram_socket_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_ram_socket_units": {
+      "id": "laptops.creator_workstation_laptops.content.spare_ram_socket_units",
+      "display_group": "features",
+      "fields": [
+        "sku.spare_ram_socket_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ram_module_capacity_gb": {
+      "id": "laptops.creator_workstation_laptops.content.ram_module_capacity_gb",
+      "display_group": "features",
+      "fields": [
+        "sku.ram_module_capacity_gb"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ram_channels": {
+      "id": "laptops.creator_workstation_laptops.content.ram_channels",
+      "display_group": "features",
+      "fields": [
+        "sku.ram_channels"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_position_units": {
+      "id": "laptops.creator_workstation_laptops.content.storage_position_units",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_position_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_storage_position_units": {
+      "id": "laptops.creator_workstation_laptops.content.spare_storage_position_units",
+      "display_group": "features",
+      "fields": [
+        "sku.spare_storage_position_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_attachment": {
+      "id": "laptops.creator_workstation_laptops.content.storage_attachment",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_attachment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_included": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_included",
+      "display_group": "contents",
+      "fields": [
+        "sku.adapter_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_units": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_units",
+      "display_group": "contents",
+      "fields": [
+        "sku.adapter_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_model_match": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_model_match",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_model_match"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_nominal_output_w": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_nominal_output_w",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_nominal_output_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_output_voltage_v": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_output_voltage_v",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_output_voltage_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_output_current_a": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_output_current_a",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_output_current_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_input_min_v": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_input_min_v",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_input_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_input_max_v": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_input_max_v",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_input_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_input_frequency_label": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_input_frequency_label",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_input_frequency_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "device_lead_units": {
+      "id": "laptops.creator_workstation_laptops.content.device_lead_units",
+      "display_group": "contents",
+      "fields": [
+        "sku.device_lead_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "device_lead_length_m": {
+      "id": "laptops.creator_workstation_laptops.content.device_lead_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.device_lead_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "device_lead_detachable": {
+      "id": "laptops.creator_workstation_laptops.content.device_lead_detachable",
+      "display_group": "features",
+      "fields": [
+        "sku.device_lead_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "device_lead_laptop_connector": {
+      "id": "laptops.creator_workstation_laptops.content.device_lead_laptop_connector",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.device_lead_laptop_connector"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_lead_units": {
+      "id": "laptops.creator_workstation_laptops.content.mains_lead_units",
+      "display_group": "contents",
+      "fields": [
+        "sku.mains_lead_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_lead_length_m": {
+      "id": "laptops.creator_workstation_laptops.content.mains_lead_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.mains_lead_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_lead_detachable": {
+      "id": "laptops.creator_workstation_laptops.content.mains_lead_detachable",
+      "display_group": "features",
+      "fields": [
+        "sku.mains_lead_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_included": {
+      "id": "laptops.creator_workstation_laptops.content.keyboard_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.keyboard_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "number_pad": {
+      "id": "laptops.creator_workstation_laptops.content.number_pad",
+      "display_group": "features",
+      "fields": [
+        "product.facts.number_pad"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_backlight": {
+      "id": "laptops.creator_workstation_laptops.content.keyboard_backlight",
+      "display_group": "features",
+      "fields": [
+        "product.facts.keyboard_backlight"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_backlight_family": {
+      "id": "laptops.creator_workstation_laptops.content.keyboard_backlight_family",
+      "display_group": "features",
+      "fields": [
+        "product.facts.keyboard_backlight_family"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cooling_design": {
+      "id": "laptops.creator_workstation_laptops.content.cooling_design",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cooling_design"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fan_present": {
+      "id": "laptops.creator_workstation_laptops.content.fan_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fan_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "box_hardware_label": {
+      "id": "laptops.creator_workstation_laptops.content.box_hardware_label",
+      "display_group": "contents",
+      "fields": [
+        "sku.box_hardware_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "box_exclusions": {
+      "id": "laptops.creator_workstation_laptops.content.box_exclusions",
+      "display_group": "contents",
+      "fields": [
+        "sku.box_exclusions"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "configuration_label": {
+      "id": "laptops.creator_workstation_laptops.content.configuration_label",
+      "display_group": "features",
+      "fields": [
+        "sku.configuration_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_output_label": {
+      "id": "laptops.creator_workstation_laptops.content.adapter_output_label",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_output_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 167,
+    "roles": {
+      "literal": 44,
+      "qualifier": 1,
+      "descriptive": 48,
+      "omit_placeholder": 50,
+      "buying_choice": 5,
+      "internal": 1,
+      "operational": 1,
+      "review_only": 9,
+      "private_support": 8
+    },
+    "display_groups": 5,
+    "highlight_candidates": 11,
+    "unmapped_descriptive_fields": 0
+  }
+}

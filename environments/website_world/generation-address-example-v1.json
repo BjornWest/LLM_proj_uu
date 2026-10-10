@@ -1,0 +1,30 @@
+{
+  "schema": "website-world-generation-v1",
+  "seed": 1,
+  "world": {
+    "objective": "cheapest_delivered",
+    "concept_id": "footwear.walking_sandals",
+    "city_id": "uppsala",
+    "controls": {"world_size": 1}
+  },
+  "difficulty": {
+    "address_probabilities": {
+      "autofill_probability": 1,
+      "incorrect_probability": 1,
+      "missing_probability": 0
+    }
+  },
+  "requirements": [
+    {
+      "id": "best-store-usable-stale-home",
+      "target": {"kind": "best_matching_retailers"},
+      "initial_form": {
+        "autofill": [true],
+        "wrong_mode": ["previous_home"],
+        "home_delivery_available": [true]
+      }
+    }
+  ],
+  "budget": {"max_proposals": 64, "max_seconds": 60},
+  "episode": {"start": {"kind": "directory"}}
+}

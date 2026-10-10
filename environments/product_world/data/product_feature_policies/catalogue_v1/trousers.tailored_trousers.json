@@ -1,0 +1,2182 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "trousers.tailored_trousers",
+  "family_id": "trousers",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/trousers.tailored_trousers.json": "ea3a76fad330a257701c65ffdaa5011f23a306d912533071ce88c1764a27a759",
+    "environments/product_world/data/product_width/_trousers_base.json": "e570bed914434be23619e2f3ad189274e25939df49d74b7943c6e13091401a5e",
+    "environments/product_world/data/product_public_content/trousers.tailored_trousers.json": "7c2197b35bd63a78d40e610f59553bc6456a44f07d89dafdcdefd4098b7662a2"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Material, cut and useful pockets/conversion matter. Hardware inventories and ordinary belt-loop anatomy do not warrant independent highlights.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "trousers.tailored_trousers.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.market_range": {
+      "semantic_id": "catalog.market_range",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "women",
+          "men",
+          "unisex"
+        ],
+        "basis": "Commercial model range.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.colour": {
+      "semantic_id": "trousers.tailored_trousers.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "charcoal"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "colour"
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.size_label": {
+      "semantic_id": "trousers.tailored_trousers.sku.size_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "EU46",
+          "EU48",
+          "EU50"
+        ],
+        "basis": "Commercial EU size label.",
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "size_label"
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.nominal_inseam_cm": {
+      "semantic_id": "trousers.tailored_trousers.sku.nominal_inseam_cm",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "min": 0,
+        "max": 200,
+        "basis": "Declared nominal finished inside-leg garment reference, not a measurement of the bought pair or wearer.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_inseam_cm"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "trousers.tailored_trousers.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 0,
+        "basis": "Whole-pair catalogue reference price.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.form": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.form",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "tailored trousers",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ordinary office and dress wear",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.fabric_structure": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.fabric_structure",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "woven twill",
+        "component": "main cloth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fabric_structure"
+    },
+    "product.facts.front_style": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.front_style",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "flat front",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_style"
+    },
+    "product.facts.rise": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.rise",
+      "role": "literal",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "mid rise",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rise"
+    },
+    "product.facts.centre_crease_present": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.centre_crease_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "centre_crease_present"
+    },
+    "product.facts.crease_persistence_result": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.crease_persistence_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "component": "pressed centre crease",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pocket_bags_fitted": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.pocket_bags_fitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pocket_bags_fitted"
+    },
+    "product.facts.belt_loop_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.belt_loop_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 5,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "belt_loop_count"
+    },
+    "product.facts.front_hand_pocket_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.front_hand_pocket_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_hand_pocket_count"
+    },
+    "product.facts.front_pocket_form": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.front_pocket_form",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "slanted hand pockets",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_pocket_form"
+    },
+    "product.facts.front_pocket_closure": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.front_pocket_closure",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "open",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_pocket_closure"
+    },
+    "product.facts.rear_pocket_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.rear_pocket_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rear_pocket_count"
+    },
+    "product.facts.rear_pocket_form": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.rear_pocket_form",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "welt pockets",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rear_pocket_form"
+    },
+    "product.facts.coin_pocket_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.coin_pocket_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "coin_pocket_count"
+    },
+    "product.facts.total_pocket_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.total_pocket_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "total_pocket_count"
+    },
+    "product.facts.pocket_bag_material": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.pocket_bag_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "polyester",
+        "component": "pocket bags",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pocket_bag_material"
+    },
+    "product.facts.pocket_bag_polyester_percent": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.pocket_bag_polyester_percent",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 100,
+        "unit": "%",
+        "component": "pocket bags",
+        "basis": "Pocket-bag fibre percentage, separate from main cloth and leg lining.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pocket_bag_polyester_percent"
+    },
+    "product.facts.hardware_material": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.hardware_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "component": "fastening hardware",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.garment_finish": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.garment_finish",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "component": "garment finishing treatment",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.garment_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.garment_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 1,
+        "unit": "count",
+        "basis": "One assembled wearable garment, called one pair.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "garment_count"
+    },
+    "product.facts.belt_supplied_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.belt_supplied_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "belt_supplied_count"
+    },
+    "product.facts.spare_fastener_supplied_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.spare_fastener_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.care_product_supplied_count": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.care_product_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.supplied_contents": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.supplied_contents",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one assembled pair of tailored trousers with fitted pockets and hardware; no belt, spare fasteners or care products",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_contents"
+    },
+    "product.facts.main_fabric_areal_mass_g_m2": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.main_fabric_areal_mass_g_m2",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "constant": -1,
+        "unit": "g/m²",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Main cloth mass per area; value unspecified.",
+        "component": "main cloth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_stretch_extension_percent": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.measured_stretch_extension_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "constant": -1,
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Tested extension of main cloth; result unspecified.",
+        "component": "main cloth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.body_fit_chart_supplied": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.body_fit_chart_supplied",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_fit_chart_supplied"
+    },
+    "product.facts.cut": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.cut",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "tapered leg",
+          "straight leg"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cut"
+    },
+    "product.facts.thigh_fit": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.thigh_fit",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "slim",
+          "regular"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "thigh_fit"
+    },
+    "product.facts.stretch_declaration": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.stretch_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "stretch",
+          "non-stretch"
+        ],
+        "component": "main cloth",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "stretch_declaration"
+    },
+    "product.facts.main_fabric_polyester_percent": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.main_fabric_polyester_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 100,
+        "unit": "%",
+        "component": "main cloth",
+        "basis": "Main cloth fibre percentage; lining, pocket bags and hardware excluded.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_viscose_percent": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.main_fabric_viscose_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 100,
+        "unit": "%",
+        "component": "main cloth",
+        "basis": "Main cloth fibre percentage; lining, pocket bags and hardware excluded.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_elastane_percent": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.main_fabric_elastane_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 100,
+        "unit": "%",
+        "component": "main cloth",
+        "basis": "Main cloth fibre percentage; lining, pocket bags and hardware excluded.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_wool_percent": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.main_fabric_wool_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 100,
+        "unit": "%",
+        "component": "main cloth",
+        "basis": "Main cloth fibre percentage; lining, pocket bags and hardware excluded.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.front_closure": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.front_closure",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "zip fly and concealed hook-and-bar",
+          "zip fly and one waistband button"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "front_closure"
+    },
+    "product.facts.rear_pocket_closure": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.rear_pocket_closure",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "open",
+          "buttoned"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "rear_pocket_closure"
+    },
+    "product.facts.lining_present": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.lining_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lining_present"
+    },
+    "product.facts.lining_material": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.lining_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "viscose"
+        ],
+        "component": "garment lining",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.lining_present",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lining_material"
+    },
+    "product.facts.lining_scope": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.lining_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable",
+          "upper front legs only"
+        ],
+        "component": "garment lining",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "applicable_when": "product.facts.lining_present",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.lining_viscose_percent": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.lining_viscose_percent",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 100,
+        "unit": "%",
+        "component": "garment lining",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "product.facts.lining_present",
+        "basis": "Fibre content of upper-front-leg lining only, not whole garment or coverage fraction.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lining_composition"
+    },
+    "product.facts.home_washing_allowed": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.home_washing_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "home_washing_allowed"
+    },
+    "product.facts.wash_machine_allowed": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.wash_machine_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wash_machine_allowed"
+    },
+    "product.facts.wash_temperature_max_c": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.wash_temperature_max_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 100,
+        "unit": "°C",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "product.facts.wash_machine_allowed",
+        "basis": "Maximum declared machine-wash programme setting.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wash_temperature_max_c"
+    },
+    "product.facts.wash_gentle_cycle": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.wash_gentle_cycle",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.wash_machine_allowed",
+        "basis": "Instruction for the permitted home machine-wash route.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wash_gentle_cycle"
+    },
+    "product.facts.wash_inside_out": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.wash_inside_out",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.wash_machine_allowed",
+        "basis": "Instruction for the permitted home machine-wash route.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wash_inside_out"
+    },
+    "product.facts.wash_with_similar_colours": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.wash_with_similar_colours",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.wash_machine_allowed",
+        "basis": "Instruction for the permitted home machine-wash route.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wash_with_similar_colours"
+    },
+    "product.facts.bleach_allowed": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.bleach_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bleach_allowed"
+    },
+    "product.facts.tumble_dry_allowed": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.tumble_dry_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tumble_dry_allowed"
+    },
+    "product.facts.drying_method": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.drying_method",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "shape and hang to dry",
+          "not applicable: no home washing"
+        ],
+        "applicable_when": "product.facts.wash_machine_allowed",
+        "not_applicable_values": [
+          "not applicable: no home washing"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "drying_method"
+    },
+    "product.facts.professional_cleaning_only": {
+      "semantic_id": "trousers.tailored_trousers.product.facts.professional_cleaning_only",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "professional_cleaning_only"
+    },
+    "sku.actual_waist_circumference_cm": {
+      "semantic_id": "trousers.tailored_trousers.sku.actual_waist_circumference_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "constant": -1,
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased garment waist circumference; value unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_inseam_cm": {
+      "semantic_id": "trousers.tailored_trousers.sku.actual_inseam_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "constant": -1,
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased garment inside-leg length; value unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_garment_mass_g": {
+      "semantic_id": "trousers.tailored_trousers.sku.actual_garment_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "constant": -1,
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual complete purchased garment mass, excluding packaging; value unspecified.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "optional": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "review.subject.colour": {
+      "semantic_id": "trousers.tailored_trousers.review.subject.colour",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "charcoal"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.size_label": {
+      "semantic_id": "trousers.tailored_trousers.review.subject.size_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "EU46",
+          "EU48",
+          "EU50"
+        ],
+        "basis": "Commercial EU size label."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.facts.front_closure": {
+      "semantic_id": "trousers.tailored_trousers.review.subject.facts.front_closure",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "zip fly and concealed hook-and-bar",
+          "zip fly and one waistband button"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "product.facts.size_system": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "fictional commercial EU labels",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.fully_hemmed": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.waistband_button_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.care_route": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "machine wash",
+          "professional dry cleaning"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "tapered_stretch",
+          "straight_wool"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "nominal_inseam_cm": {
+      "id": "trousers.tailored_trousers.content.nominal_inseam_cm",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "sku.nominal_inseam_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fabric_structure": {
+      "id": "trousers.tailored_trousers.content.fabric_structure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fabric_structure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_style": {
+      "id": "trousers.tailored_trousers.content.front_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_style"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "rise": {
+      "id": "trousers.tailored_trousers.content.rise",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.rise"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "centre_crease_present": {
+      "id": "trousers.tailored_trousers.content.centre_crease_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.centre_crease_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pocket_bags_fitted": {
+      "id": "trousers.tailored_trousers.content.pocket_bags_fitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pocket_bags_fitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "belt_loop_count": {
+      "id": "trousers.tailored_trousers.content.belt_loop_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.belt_loop_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_hand_pocket_count": {
+      "id": "trousers.tailored_trousers.content.front_hand_pocket_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_hand_pocket_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_pocket_form": {
+      "id": "trousers.tailored_trousers.content.front_pocket_form",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_pocket_form"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_pocket_closure": {
+      "id": "trousers.tailored_trousers.content.front_pocket_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.front_pocket_closure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rear_pocket_count": {
+      "id": "trousers.tailored_trousers.content.rear_pocket_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rear_pocket_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rear_pocket_form": {
+      "id": "trousers.tailored_trousers.content.rear_pocket_form",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rear_pocket_form"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "coin_pocket_count": {
+      "id": "trousers.tailored_trousers.content.coin_pocket_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.coin_pocket_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "total_pocket_count": {
+      "id": "trousers.tailored_trousers.content.total_pocket_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.total_pocket_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pocket_bag_material": {
+      "id": "trousers.tailored_trousers.content.pocket_bag_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.pocket_bag_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pocket_bag_polyester_percent": {
+      "id": "trousers.tailored_trousers.content.pocket_bag_polyester_percent",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pocket_bag_polyester_percent"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "garment_count": {
+      "id": "trousers.tailored_trousers.content.garment_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.garment_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "belt_supplied_count": {
+      "id": "trousers.tailored_trousers.content.belt_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.belt_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_contents": {
+      "id": "trousers.tailored_trousers.content.supplied_contents",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_contents"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_fit_chart_supplied": {
+      "id": "trousers.tailored_trousers.content.body_fit_chart_supplied",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.body_fit_chart_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cut": {
+      "id": "trousers.tailored_trousers.content.cut",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.cut"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "thigh_fit": {
+      "id": "trousers.tailored_trousers.content.thigh_fit",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.thigh_fit"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "stretch_declaration": {
+      "id": "trousers.tailored_trousers.content.stretch_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stretch_declaration"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "main_fabric_composition": {
+      "id": "trousers.tailored_trousers.content.main_fabric_composition",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.main_fabric_polyester_percent",
+        "product.facts.main_fabric_viscose_percent",
+        "product.facts.main_fabric_elastane_percent",
+        "product.facts.main_fabric_wool_percent"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "front_closure": {
+      "id": "trousers.tailored_trousers.content.front_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.front_closure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rear_pocket_closure": {
+      "id": "trousers.tailored_trousers.content.rear_pocket_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.rear_pocket_closure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lining_present": {
+      "id": "trousers.tailored_trousers.content.lining_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.lining_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lining_material": {
+      "id": "trousers.tailored_trousers.content.lining_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.lining_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lining_composition": {
+      "id": "trousers.tailored_trousers.content.lining_composition",
+      "display_group": "features",
+      "fields": [
+        "product.facts.lining_viscose_percent"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "home_washing_allowed": {
+      "id": "trousers.tailored_trousers.content.home_washing_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.home_washing_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_machine_allowed": {
+      "id": "trousers.tailored_trousers.content.wash_machine_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_machine_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_temperature_max_c": {
+      "id": "trousers.tailored_trousers.content.wash_temperature_max_c",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_temperature_max_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_gentle_cycle": {
+      "id": "trousers.tailored_trousers.content.wash_gentle_cycle",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_gentle_cycle"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_inside_out": {
+      "id": "trousers.tailored_trousers.content.wash_inside_out",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_inside_out"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_with_similar_colours": {
+      "id": "trousers.tailored_trousers.content.wash_with_similar_colours",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_with_similar_colours"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bleach_allowed": {
+      "id": "trousers.tailored_trousers.content.bleach_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tumble_dry_allowed": {
+      "id": "trousers.tailored_trousers.content.tumble_dry_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tumble_dry_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "drying_method": {
+      "id": "trousers.tailored_trousers.content.drying_method",
+      "display_group": "care",
+      "fields": [
+        "product.facts.drying_method"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "professional_cleaning_only": {
+      "id": "trousers.tailored_trousers.content.professional_cleaning_only",
+      "display_group": "care",
+      "fields": [
+        "product.facts.professional_cleaning_only"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 69,
+    "roles": {
+      "identity": 3,
+      "buying_choice": 3,
+      "descriptive": 21,
+      "commerce": 1,
+      "literal": 21,
+      "omit_placeholder": 8,
+      "omit_fixed_detail": 2,
+      "qualifier": 1,
+      "review_only": 3,
+      "operational": 2,
+      "private_support": 3,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 6,
+    "unmapped_descriptive_fields": 0
+  }
+}

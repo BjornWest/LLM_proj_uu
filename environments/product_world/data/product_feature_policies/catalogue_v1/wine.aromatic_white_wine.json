@@ -1,0 +1,1691 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "wine.aromatic_white_wine",
+  "family_id": "wine",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/wine.aromatic_white_wine.json": "f8e35271b0e884c6659e58507ddddc22e1772de85ea29802b3b8acbc38f9bebb",
+    "environments/product_world/data/product_width/_wine_base.json": "acbefa80b96f84e53ab205365133b1d956dc2c74b29ed5389ff88874e007b43a",
+    "environments/product_world/data/product_public_content/wine.aromatic_white_wine.json": "fddaa96a009a20ad5b0f177e676969d428f74d3b805a68245fdba49316b1c320"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep grape-list completeness, vintage status, label sweetness and residual sugar distinct; deposit is commerce, not a descriptive highlight.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.style_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.style_label",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "still white wine",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "style_label"
+    },
+    "product.facts.abv_pct": {
+      "semantic_id": "wine.aromatic_white.product.facts.abv_pct",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "percent_abv",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "abv_pct"
+    },
+    "product.facts.production_region": {
+      "semantic_id": "wine.aromatic_white.product.facts.production_region",
+      "role": "descriptive",
+      "display_group": "origin_and_production",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "production_region"
+    },
+    "product.facts.production_country": {
+      "semantic_id": "wine.aromatic_white.product.facts.production_country",
+      "role": "descriptive",
+      "display_group": "origin_and_production",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "production_country"
+    },
+    "product.facts.production_site": {
+      "semantic_id": "wine.aromatic_white.product.facts.production_site",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.grape_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.grape_label",
+      "role": "descriptive",
+      "display_group": "origin_and_production",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "grape_label"
+    },
+    "product.facts.grape_list_scope": {
+      "semantic_id": "wine.aromatic_white.product.facts.grape_list_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.grape_proportion_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.grape_proportion_declaration",
+      "role": "descriptive",
+      "display_group": "origin_and_production",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "grape_proportion_declaration"
+    },
+    "product.facts.vintage_status": {
+      "semantic_id": "wine.aromatic_white.product.facts.vintage_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.vintage_year": {
+      "semantic_id": "wine.aromatic_white.product.facts.vintage_year",
+      "role": "descriptive",
+      "display_group": "origin_and_production",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "vintage_year"
+    },
+    "product.facts.vinification_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.vinification_label",
+      "role": "descriptive",
+      "display_group": "origin_and_production",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "vinification_label"
+    },
+    "product.facts.maturation_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.maturation_declaration",
+      "role": "descriptive",
+      "display_group": "origin_and_production",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "maturation_declaration"
+    },
+    "product.facts.oak_use_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.oak_use_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.filtration_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.filtration_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "filtration_declaration"
+    },
+    "product.facts.process_details_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.process_details_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.colour_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.colour_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "colour_label"
+    },
+    "product.facts.aroma_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.aroma_label",
+      "role": "descriptive",
+      "display_group": "taste",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "aroma_label"
+    },
+    "product.facts.flavour_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.flavour_label",
+      "role": "descriptive",
+      "display_group": "taste",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "flavour_label"
+    },
+    "product.facts.body_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.body_label",
+      "role": "descriptive",
+      "display_group": "taste",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "body_label"
+    },
+    "product.facts.sweetness_class": {
+      "semantic_id": "wine.aromatic_white.product.facts.sweetness_class",
+      "role": "descriptive",
+      "display_group": "taste",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sweetness_class"
+    },
+    "product.facts.residual_sugar_g_per_l": {
+      "semantic_id": "wine.aromatic_white.product.facts.residual_sugar_g_per_l",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g/L",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.titratable_acidity_g_per_l": {
+      "semantic_id": "wine.aromatic_white.product.facts.titratable_acidity_g_per_l",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g/L",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_ph": {
+      "semantic_id": "wine.aromatic_white.product.facts.measured_ph",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.titratable_acidity_basis": {
+      "semantic_id": "wine.aromatic_white.product.facts.titratable_acidity_basis",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.allergen_label": {
+      "semantic_id": "wine.aromatic_white.product.facts.allergen_label",
+      "role": "literal",
+      "display_group": "ingredients",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "contains sulphites",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "allergen_label"
+    },
+    "product.facts.ingredient_list_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.ingredient_list_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.complete_allergen_list_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.complete_allergen_list_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.installed_insert_units_per_container": {
+      "semantic_id": "wine.aromatic_white.sku.installed_insert_units_per_container",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "installed_insert_units_per_container"
+    },
+    "sku.installed_insert_kind": {
+      "semantic_id": "wine.aromatic_white.sku.installed_insert_kind",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "none",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "installed_insert_kind"
+    },
+    "sku.pack_count": {
+      "semantic_id": "wine.aromatic_white.sku.pack_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "pack_count"
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.sealed": {
+      "semantic_id": "wine.aromatic_white.sku.sealed",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sealed"
+    },
+    "sku.container_type": {
+      "semantic_id": "wine.aromatic_white.sku.container_type",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "glass bottle",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "container_type"
+    },
+    "sku.container_material": {
+      "semantic_id": "wine.aromatic_white.sku.container_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "glass",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "container_material"
+    },
+    "sku.unit_net_volume_ml": {
+      "semantic_id": "wine.aromatic_white.sku.unit_net_volume_ml",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "ml",
+        "optional": true,
+        "constant": 750,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_net_volume_ml": {
+      "semantic_id": "wine.aromatic_white.sku.pack_net_volume_ml",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "ml",
+        "optional": true,
+        "constant": 750,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pack_net_volume_ml"
+    },
+    "sku.closure_kind": {
+      "semantic_id": "wine.aromatic_white.sku.closure_kind",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "closure_kind"
+    },
+    "sku.closure_units_per_container": {
+      "semantic_id": "wine.aromatic_white.sku.closure_units_per_container",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "closure_units_per_container"
+    },
+    "sku.reclosure_declaration": {
+      "semantic_id": "wine.aromatic_white.sku.reclosure_declaration",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reclosure_declaration"
+    },
+    "sku.serving_glass_units": {
+      "semantic_id": "wine.aromatic_white.sku.serving_glass_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "serving_glass_units"
+    },
+    "sku.bottle_opener_units": {
+      "semantic_id": "wine.aromatic_white.sku.bottle_opener_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bottle_opener_units"
+    },
+    "sku.outer_carrier_units": {
+      "semantic_id": "wine.aromatic_white.sku.outer_carrier_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "outer_carrier_units"
+    },
+    "sku.outer_carrier_kind": {
+      "semantic_id": "wine.aromatic_white.sku.outer_carrier_kind",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "none",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "outer_carrier_kind"
+    },
+    "sku.actual_unit_liquid_mass_g": {
+      "semantic_id": "wine.aromatic_white.sku.actual_unit_liquid_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_empty_container_mass_g": {
+      "semantic_id": "wine.aromatic_white.sku.actual_empty_container_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_pack_mass_g": {
+      "semantic_id": "wine.aromatic_white.sku.actual_pack_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_pack_dimensions": {
+      "semantic_id": "wine.aromatic_white.sku.actual_pack_dimensions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.fill_tolerance_declaration": {
+      "semantic_id": "wine.aromatic_white.product.facts.fill_tolerance_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.wine_price_excludes_deposit": {
+      "semantic_id": "wine.aromatic_white.sku.wine_price_excludes_deposit",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.deposit_requirement": {
+      "semantic_id": "wine.aromatic_white.sku.deposit_requirement",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.deposit_amount_sek": {
+      "semantic_id": "wine.aromatic_white.sku.deposit_amount_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.deposit_refund_terms": {
+      "semantic_id": "wine.aromatic_white.sku.deposit_refund_terms",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.container_type": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "glass bottle",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.container_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "glass",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.closure_kind": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.reclosure_declaration": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.unit_net_volume_ml": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "ml",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 750,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_price_factor": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "floral_gewurz",
+          "orchard_riesling"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "style_label": {
+      "id": "wine.aromatic_white_wine.content.style_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.style_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "abv_pct": {
+      "id": "wine.aromatic_white_wine.content.abv_pct",
+      "display_group": "features",
+      "fields": [
+        "product.facts.abv_pct"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "production_region": {
+      "id": "wine.aromatic_white_wine.content.production_region",
+      "display_group": "origin_and_production",
+      "fields": [
+        "product.facts.production_region"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "production_country": {
+      "id": "wine.aromatic_white_wine.content.production_country",
+      "display_group": "origin_and_production",
+      "fields": [
+        "product.facts.production_country"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "grape_label": {
+      "id": "wine.aromatic_white_wine.content.grape_label",
+      "display_group": "origin_and_production",
+      "fields": [
+        "product.facts.grape_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "grape_proportion_declaration": {
+      "id": "wine.aromatic_white_wine.content.grape_proportion_declaration",
+      "display_group": "origin_and_production",
+      "fields": [
+        "product.facts.grape_proportion_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "vintage_year": {
+      "id": "wine.aromatic_white_wine.content.vintage_year",
+      "display_group": "origin_and_production",
+      "fields": [
+        "product.facts.vintage_year"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "vinification_label": {
+      "id": "wine.aromatic_white_wine.content.vinification_label",
+      "display_group": "origin_and_production",
+      "fields": [
+        "product.facts.vinification_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "maturation_declaration": {
+      "id": "wine.aromatic_white_wine.content.maturation_declaration",
+      "display_group": "origin_and_production",
+      "fields": [
+        "product.facts.maturation_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filtration_declaration": {
+      "id": "wine.aromatic_white_wine.content.filtration_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.filtration_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "colour_label": {
+      "id": "wine.aromatic_white_wine.content.colour_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.colour_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "aroma_label": {
+      "id": "wine.aromatic_white_wine.content.aroma_label",
+      "display_group": "taste",
+      "fields": [
+        "product.facts.aroma_label"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "flavour_label": {
+      "id": "wine.aromatic_white_wine.content.flavour_label",
+      "display_group": "taste",
+      "fields": [
+        "product.facts.flavour_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "body_label": {
+      "id": "wine.aromatic_white_wine.content.body_label",
+      "display_group": "taste",
+      "fields": [
+        "product.facts.body_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sweetness_class": {
+      "id": "wine.aromatic_white_wine.content.sweetness_class",
+      "display_group": "taste",
+      "fields": [
+        "product.facts.sweetness_class"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "allergen_label": {
+      "id": "wine.aromatic_white_wine.content.allergen_label",
+      "display_group": "ingredients",
+      "fields": [
+        "product.facts.allergen_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "installed_insert_units_per_container": {
+      "id": "wine.aromatic_white_wine.content.installed_insert_units_per_container",
+      "display_group": "features",
+      "fields": [
+        "sku.installed_insert_units_per_container"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "installed_insert_kind": {
+      "id": "wine.aromatic_white_wine.content.installed_insert_kind",
+      "display_group": "features",
+      "fields": [
+        "sku.installed_insert_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sealed": {
+      "id": "wine.aromatic_white_wine.content.sealed",
+      "display_group": "features",
+      "fields": [
+        "sku.sealed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "container_type": {
+      "id": "wine.aromatic_white_wine.content.container_type",
+      "display_group": "features",
+      "fields": [
+        "sku.container_type"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "container_material": {
+      "id": "wine.aromatic_white_wine.content.container_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.container_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pack_net_volume_ml": {
+      "id": "wine.aromatic_white_wine.content.pack_net_volume_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.pack_net_volume_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closure_kind": {
+      "id": "wine.aromatic_white_wine.content.closure_kind",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.closure_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closure_units_per_container": {
+      "id": "wine.aromatic_white_wine.content.closure_units_per_container",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.closure_units_per_container"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reclosure_declaration": {
+      "id": "wine.aromatic_white_wine.content.reclosure_declaration",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.reclosure_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "serving_glass_units": {
+      "id": "wine.aromatic_white_wine.content.serving_glass_units",
+      "display_group": "features",
+      "fields": [
+        "sku.serving_glass_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bottle_opener_units": {
+      "id": "wine.aromatic_white_wine.content.bottle_opener_units",
+      "display_group": "features",
+      "fields": [
+        "sku.bottle_opener_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "outer_carrier_units": {
+      "id": "wine.aromatic_white_wine.content.outer_carrier_units",
+      "display_group": "features",
+      "fields": [
+        "sku.outer_carrier_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "outer_carrier_kind": {
+      "id": "wine.aromatic_white_wine.content.outer_carrier_kind",
+      "display_group": "features",
+      "fields": [
+        "sku.outer_carrier_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "ingredients": {
+      "label": "Ingredients",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "origin_and_production": {
+      "label": "Origin and production",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "taste": {
+      "label": "Taste",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 58,
+    "roles": {
+      "literal": 13,
+      "descriptive": 16,
+      "omit_placeholder": 14,
+      "qualifier": 1,
+      "internal": 2,
+      "buying_choice": 2,
+      "commerce": 4,
+      "private_support": 6
+    },
+    "display_groups": 6,
+    "highlight_candidates": 9,
+    "unmapped_descriptive_fields": 0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": "product-market-range-policy-v1",
+  "field": "product.facts.market_range",
+  "values": ["women", "men", "unisex"],
+  "default_weights": {"women": 4, "men": 4, "unisex": 2},
+  "family_ids": ["footwear", "jackets", "trousers", "tops", "knitwear", "fragrance"],
+  "conditional_concepts": {
+    "backpacks.running_hydration_packs": {
+      "field": "product.facts.pack_format",
+      "values": ["running_vest", "backpack"],
+      "applicable_values": ["running_vest"]
+    }
+  },
+  "premium_fragrance_weights": {"women": 1, "men": 1, "unisex": 0},
+  "identity_level": "product",
+  "assertion_id": "catalog.market_range",
+  "excluded_family_ids": ["sleeping_bags", "sleeping_mats"],
+  "notes": "Commercial range, independent of fit/chart/colour/execution. Other families are not applicable. Exact range filters do not silently include unisex."
+}

@@ -1,0 +1,2314 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "tops.button_up_shirts_blouses",
+  "family_id": "tops",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/tops.button_up_shirts_blouses.json": "4ec3122db61f9b3b079775ac19bfaf3d0d25559fbb6984571f22f0f00f0eac37",
+    "environments/product_world/data/product_width/_tops_base.json": "51e32a831e1723b60c6e5d7ed71820eee5e785d67cdbeec4a5a765b368a91a8c",
+    "environments/product_world/data/product_public_content/tops.button_up_shirts_blouses.json": "14a2390927dca852b015b0d100d40f250cc6044ad84c7aebb56e0d1b41912290"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Main fabric, fit and neckline dominate; whole-garment versus trim composition must stay distinct. All care statements share one display area.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.colour": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "white"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "colour"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.size_label": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.size_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Synthetic commercial label, not wearer anatomy or an actual garment measurement.",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "size_label"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.pack_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": 1,
+        "max": 2,
+        "basis": "Whole purchase of same-construction, same-colour and same-label assembled garments; attached parts and wrapping excluded.",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "pack_count"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.nominal_chart_back_length_cm": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.nominal_chart_back_length_cm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "basis": "Nominal finished-garment chart back length before washing, not an actual purchased or wearer measurement.",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_chart_back_length_cm"
+    },
+    "sku.nominal_chart_sleeve_length_cm": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.nominal_chart_sleeve_length_cm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "basis": "Nominal finished-garment sleeve length from shoulder seam to cuff outer edge laid flat before washing; not an actual purchased measurement.",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_chart_sleeve_length_cm"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "Authored reference price of the whole exact selected purchase, not a retailer quote or delivery fee.",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "review.purchase_price_sek": {
+      "semantic_id": "tops.button_up_shirts_blouses.review.purchase_price_sek",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "Paid amount for the whole exact selected garment purchase in this authored owner history."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "sku.actual_back_length_cm": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.actual_back_length_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased garment back length, unspecified.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_sleeve_length_cm": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.actual_sleeve_length_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased garment shoulder-seam-to-cuff sleeve length, unspecified.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_half_chest_width_cm": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.actual_half_chest_width_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "Actual purchased laid-flat half-chest width, unspecified; not body circumference.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_single_garment_mass_g": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.actual_single_garment_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "One complete purchased garment with attached parts, excluding packaging; independently unspecified.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_whole_purchase_textile_mass_g": {
+      "semantic_id": "tops.button_up_shirts_blouses.sku.actual_whole_purchase_textile_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "basis": "All supplied complete garments with attached parts, excluding packaging; independently unspecified, not count times an unknown mass.",
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "ordinary everyday wear"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_user": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.intended_user",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "adults"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.collar_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.collar_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "One complete collar per assembled garment.",
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.cuff_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.cuff_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Two complete attached cuffs per assembled garment.",
+        "constant": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.collar_outer_cloth_same_as_main": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.collar_outer_cloth_same_as_main",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "Declared relation for collar outer cloth only, not unknown inner reinforcement.",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "collar_outer_cloth_same_as_main"
+    },
+    "product.facts.cuff_outer_cloth_same_as_main": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.cuff_outer_cloth_same_as_main",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "Declared relation for cuff outer cloth only, not unknown inner reinforcement.",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cuff_outer_cloth_same_as_main"
+    },
+    "product.facts.reinforcement_presence": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.reinforcement_presence",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "basis": "Whether inner collar/cuff reinforcement exists is unspecified; never assumed absent.",
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reinforcement_material": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.reinforcement_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.sewing_thread_composition": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.sewing_thread_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.nominal_main_fabric_areal_mass_g_m2": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.nominal_main_fabric_areal_mass_g_m2",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "g/m²",
+        "basis": "Nominal declaration for body/sleeve cloth only, excluding other components; not complete garment mass.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_main_fabric_areal_mass_g_m2": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.actual_main_fabric_areal_mass_g_m2",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "g/m²",
+        "basis": "Actual purchased value for body/sleeve cloth only, excluding other components; not complete garment mass.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.sleeve_length": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.sleeve_length",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "long"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sleeve_length"
+    },
+    "product.facts.sleeve_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.sleeve_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Two attached long sleeves per assembled garment.",
+        "constant": 2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.lower_hem": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.lower_hem",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "curved hem"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lower_hem"
+    },
+    "product.facts.front_opening_present": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.front_opening_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_opening_present"
+    },
+    "product.facts.closure": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.closure",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "full button-through front"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "closure"
+    },
+    "product.facts.front_buttons_exposed": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.front_buttons_exposed",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_buttons_exposed"
+    },
+    "product.facts.front_neck_button_included": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.front_neck_button_included",
+      "role": "literal",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "front_neck_button_included"
+    },
+    "product.facts.button_material": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.button_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "component": "all_attached_buttons",
+        "constant": "polyester resin"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "button_material"
+    },
+    "product.facts.cuff_style": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.cuff_style",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "barrel cuff"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cuff_style"
+    },
+    "product.facts.zip_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.zip_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.hook_bar_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.hook_bar_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.pocket_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.pocket_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.lining_present": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.lining_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.lining_material": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.lining_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "constant": "not applicable"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.print_present": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.print_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "print_present"
+    },
+    "product.facts.removable_garment_part_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.removable_garment_part_count_per_garment",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.hanger_supplied_count": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.hanger_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.care_product_supplied_count": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.care_product_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.spare_button_supplied_count": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.spare_button_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.spare_collar_stay_supplied_count": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.spare_collar_stay_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.other_garment_type_supplied_count": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.other_garment_type_supplied_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.measured_stretch_extension_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.measured_stretch_extension_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Actual garment measurement unspecified; no mechanical or care outcome inferred.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_wash_shrinkage_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.measured_wash_shrinkage_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Actual garment measurement unspecified; no mechanical or care outcome inferred.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.colourfastness_test_result": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.colourfastness_test_result",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wash_machine_allowed": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.wash_machine_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wash_machine_allowed"
+    },
+    "product.facts.wash_cycle": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.wash_cycle",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "gentle"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wash_cycle"
+    },
+    "product.facts.line_drying_allowed": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.line_drying_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "line_drying_allowed"
+    },
+    "product.facts.bleach_allowed": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.bleach_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bleach_allowed"
+    },
+    "product.facts.tumble_drying_allowed": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.tumble_drying_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tumble_drying_allowed"
+    },
+    "product.facts.dry_cleaning_allowed": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.dry_cleaning_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dry_cleaning_allowed"
+    },
+    "product.facts.iron_garment_cloth_only": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.iron_garment_cloth_only",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "iron_garment_cloth_only"
+    },
+    "product.facts.iron_garment_cloth_temperature_max_c": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.iron_garment_cloth_temperature_max_c",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C",
+        "basis": "Authored maximum care setting, not a measured result.",
+        "constant": 110
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "iron_garment_cloth_temperature_max_c"
+    },
+    "product.facts.iron_hardware_allowed": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.iron_hardware_allowed",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "iron_hardware_allowed"
+    },
+    "product.facts.whole_garment_cotton_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.whole_garment_cotton_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Complete assembled garment fibre mass percentage unspecified; component/hardware/thread masses do not exist to combine declarations.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.whole_garment_polyamide_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.whole_garment_polyamide_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Complete assembled garment fibre mass percentage unspecified; component/hardware/thread masses do not exist to combine declarations.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.whole_garment_viscose_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.whole_garment_viscose_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Complete assembled garment fibre mass percentage unspecified; component/hardware/thread masses do not exist to combine declarations.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.whole_garment_polyester_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.whole_garment_polyester_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Complete assembled garment fibre mass percentage unspecified; component/hardware/thread masses do not exist to combine declarations.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.whole_garment_elastane_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.whole_garment_elastane_percent",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unknown_values": [
+          -1
+        ],
+        "unit": "%",
+        "basis": "Complete assembled garment fibre mass percentage unspecified; component/hardware/thread masses do not exist to combine declarations.",
+        "constant": -1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.form": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.form",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.fabric_structure": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.fabric_structure",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fabric_structure"
+    },
+    "product.facts.main_fabric_cotton_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.main_fabric_cotton_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "basis": "Body and long-sleeve cloth only, excluding collar/cuff outer cloth, interlining, buttons, stays, thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_polyamide_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.main_fabric_polyamide_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "basis": "Body and long-sleeve cloth only, excluding collar/cuff outer cloth, interlining, buttons, stays, thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_viscose_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.main_fabric_viscose_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "basis": "Body and long-sleeve cloth only, excluding collar/cuff outer cloth, interlining, buttons, stays, thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_polyester_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.main_fabric_polyester_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "basis": "Body and long-sleeve cloth only, excluding collar/cuff outer cloth, interlining, buttons, stays, thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.main_fabric_elastane_percent": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.main_fabric_elastane_percent",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "basis": "Body and long-sleeve cloth only, excluding collar/cuff outer cloth, interlining, buttons, stays, thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "main_fabric_composition"
+    },
+    "product.facts.cut": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.cut",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cut"
+    },
+    "product.facts.collar_style": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.collar_style",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_style"
+    },
+    "product.facts.shoulder_style": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.shoulder_style",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shoulder_style"
+    },
+    "product.facts.front_button_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.front_button_count_per_garment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Front buttons per complete garment including the neck-level front button, excluding cuff/placket buttons and stays."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "front_button_count_per_garment"
+    },
+    "product.facts.cuff_button_count_per_cuff": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.cuff_button_count_per_cuff",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Buttons on one barrel cuff, not all garment hardware."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cuff_button_count_per_cuff"
+    },
+    "product.facts.total_cuff_button_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.total_cuff_button_count_per_garment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Buttons across the two cuffs of one complete garment."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "total_cuff_button_count_per_garment"
+    },
+    "product.facts.sleeve_placket_button_count_per_sleeve": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.sleeve_placket_button_count_per_sleeve",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Buttons on one sleeve placket, excluding cuff/front buttons."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sleeve_placket_button_count_per_sleeve"
+    },
+    "product.facts.total_sleeve_placket_button_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.total_sleeve_placket_button_count_per_garment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Sleeve-placket buttons across both sleeves of one complete garment."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "total_sleeve_placket_button_count_per_garment"
+    },
+    "product.facts.total_button_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.total_button_count_per_garment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "All attached front, cuff and sleeve-placket buttons per complete garment; collar stays and packaging excluded."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "total_button_count_per_garment"
+    },
+    "product.facts.collar_stays_present": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.collar_stays_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_stays_present"
+    },
+    "product.facts.collar_stay_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.collar_stay_count_per_garment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Fixed collar stays per complete garment, not buttons; zero explicitly means no stays."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_stay_count_per_garment"
+    },
+    "product.facts.collar_stay_material": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.collar_stay_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "component": "collar_stays"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_stay_material"
+    },
+    "product.facts.wash_temperature_max_c": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.wash_temperature_max_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C",
+        "basis": "Authored maximum care setting, not a measured result."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wash_temperature_max_c"
+    },
+    "product.facts.collar_stay_attachment": {
+      "semantic_id": "tops.button_up_shirts_blouses.product.facts.collar_stay_attachment",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "not_applicable_values": [
+          "not applicable"
+        ],
+        "component": "collar_stays"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "collar_stay_attachment"
+    },
+    "product.facts.market_range": {
+      "semantic_id": "catalog.market_range",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "women",
+          "men",
+          "unisex"
+        ],
+        "basis": "Commercial product-level range, not wearer anatomy, a size conversion or fit result.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "review.subject.colour": {
+      "semantic_id": "tops.button_up_shirts_blouses.review.subject.colour",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "navy",
+          "white"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.size_label": {
+      "semantic_id": "tops.button_up_shirts_blouses.review.subject.size_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "S",
+          "M",
+          "L"
+        ],
+        "basis": "Synthetic commercial label, not wearer anatomy or an actual garment measurement."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.pack_count": {
+      "semantic_id": "tops.button_up_shirts_blouses.review.subject.pack_count",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": 1,
+        "max": 2,
+        "basis": "Whole purchase of same-construction, same-colour and same-label assembled garments; attached parts and wrapping excluded."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.facts.garment_label": {
+      "semantic_id": "tops.button_up_shirts_blouses.review.subject.facts.garment_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "review.subject.facts.front_button_count_per_garment": {
+      "semantic_id": "tops.button_up_shirts_blouses.review.subject.facts.front_button_count_per_garment",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "basis": "Front buttons per complete garment including the neck-level front button, excluding cuff/placket buttons and stays."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "product.facts.main_fabric_composition_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Body and long-sleeve cloth only, excluding collar/cuff outer cloth, interlining, buttons, stays, thread and labels."
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.size_system": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "fictional commercial labels"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.garment_label": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "regular_blend_poplin",
+          "relaxed_viscose_crepe"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "nominal_chart_back_length_cm": {
+      "id": "tops.button_up_shirts_blouses.content.nominal_chart_back_length_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_chart_back_length_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_chart_sleeve_length_cm": {
+      "id": "tops.button_up_shirts_blouses.content.nominal_chart_sleeve_length_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_chart_sleeve_length_cm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "collar_outer_cloth_same_as_main": {
+      "id": "tops.button_up_shirts_blouses.content.collar_outer_cloth_same_as_main",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_outer_cloth_same_as_main"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cuff_outer_cloth_same_as_main": {
+      "id": "tops.button_up_shirts_blouses.content.cuff_outer_cloth_same_as_main",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cuff_outer_cloth_same_as_main"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sleeve_length": {
+      "id": "tops.button_up_shirts_blouses.content.sleeve_length",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.sleeve_length"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "lower_hem": {
+      "id": "tops.button_up_shirts_blouses.content.lower_hem",
+      "display_group": "features",
+      "fields": [
+        "product.facts.lower_hem"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_opening_present": {
+      "id": "tops.button_up_shirts_blouses.content.front_opening_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_opening_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closure": {
+      "id": "tops.button_up_shirts_blouses.content.closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "front_buttons_exposed": {
+      "id": "tops.button_up_shirts_blouses.content.front_buttons_exposed",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_buttons_exposed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_neck_button_included": {
+      "id": "tops.button_up_shirts_blouses.content.front_neck_button_included",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.front_neck_button_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "button_material": {
+      "id": "tops.button_up_shirts_blouses.content.button_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.button_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cuff_style": {
+      "id": "tops.button_up_shirts_blouses.content.cuff_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cuff_style"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "print_present": {
+      "id": "tops.button_up_shirts_blouses.content.print_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.print_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_machine_allowed": {
+      "id": "tops.button_up_shirts_blouses.content.wash_machine_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_machine_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_cycle": {
+      "id": "tops.button_up_shirts_blouses.content.wash_cycle",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_cycle"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "line_drying_allowed": {
+      "id": "tops.button_up_shirts_blouses.content.line_drying_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.line_drying_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bleach_allowed": {
+      "id": "tops.button_up_shirts_blouses.content.bleach_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tumble_drying_allowed": {
+      "id": "tops.button_up_shirts_blouses.content.tumble_drying_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tumble_drying_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dry_cleaning_allowed": {
+      "id": "tops.button_up_shirts_blouses.content.dry_cleaning_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dry_cleaning_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "iron_garment_cloth_only": {
+      "id": "tops.button_up_shirts_blouses.content.iron_garment_cloth_only",
+      "display_group": "care",
+      "fields": [
+        "product.facts.iron_garment_cloth_only"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "iron_garment_cloth_temperature_max_c": {
+      "id": "tops.button_up_shirts_blouses.content.iron_garment_cloth_temperature_max_c",
+      "display_group": "care",
+      "fields": [
+        "product.facts.iron_garment_cloth_temperature_max_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "iron_hardware_allowed": {
+      "id": "tops.button_up_shirts_blouses.content.iron_hardware_allowed",
+      "display_group": "care",
+      "fields": [
+        "product.facts.iron_hardware_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fabric_structure": {
+      "id": "tops.button_up_shirts_blouses.content.fabric_structure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fabric_structure"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "main_fabric_composition": {
+      "id": "tops.button_up_shirts_blouses.content.main_fabric_composition",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.main_fabric_cotton_percent",
+        "product.facts.main_fabric_polyamide_percent",
+        "product.facts.main_fabric_viscose_percent",
+        "product.facts.main_fabric_polyester_percent",
+        "product.facts.main_fabric_elastane_percent"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "cut": {
+      "id": "tops.button_up_shirts_blouses.content.cut",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.cut"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "collar_style": {
+      "id": "tops.button_up_shirts_blouses.content.collar_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_style"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "shoulder_style": {
+      "id": "tops.button_up_shirts_blouses.content.shoulder_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.shoulder_style"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "front_button_count_per_garment": {
+      "id": "tops.button_up_shirts_blouses.content.front_button_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.front_button_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cuff_button_count_per_cuff": {
+      "id": "tops.button_up_shirts_blouses.content.cuff_button_count_per_cuff",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cuff_button_count_per_cuff"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "total_cuff_button_count_per_garment": {
+      "id": "tops.button_up_shirts_blouses.content.total_cuff_button_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.total_cuff_button_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sleeve_placket_button_count_per_sleeve": {
+      "id": "tops.button_up_shirts_blouses.content.sleeve_placket_button_count_per_sleeve",
+      "display_group": "features",
+      "fields": [
+        "product.facts.sleeve_placket_button_count_per_sleeve"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "total_sleeve_placket_button_count_per_garment": {
+      "id": "tops.button_up_shirts_blouses.content.total_sleeve_placket_button_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.total_sleeve_placket_button_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "total_button_count_per_garment": {
+      "id": "tops.button_up_shirts_blouses.content.total_button_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.total_button_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_stays_present": {
+      "id": "tops.button_up_shirts_blouses.content.collar_stays_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_stays_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_stay_count_per_garment": {
+      "id": "tops.button_up_shirts_blouses.content.collar_stay_count_per_garment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_stay_count_per_garment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_stay_material": {
+      "id": "tops.button_up_shirts_blouses.content.collar_stay_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.collar_stay_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wash_temperature_max_c": {
+      "id": "tops.button_up_shirts_blouses.content.wash_temperature_max_c",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wash_temperature_max_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_stay_attachment": {
+      "id": "tops.button_up_shirts_blouses.content.collar_stay_attachment",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_stay_attachment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 94,
+    "roles": {
+      "identity": 5,
+      "buying_choice": 4,
+      "descriptive": 22,
+      "commerce": 1,
+      "review_only": 6,
+      "omit_placeholder": 19,
+      "omit_fixed_detail": 13,
+      "literal": 20,
+      "qualifier": 1,
+      "operational": 2,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 7,
+    "unmapped_descriptive_fields": 0
+  }
+}

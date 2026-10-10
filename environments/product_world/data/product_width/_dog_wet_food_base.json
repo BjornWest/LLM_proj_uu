@@ -1,0 +1,188 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.dog_wet_food_base",
+  "random_namespace": "product-width-dog-wet-packs-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "product.facts.reference_price_basis": {
+      "type": "string",
+      "constant": "synthetic one-kilogram formula anchor; exact pack prices are separate SKU facts",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.pack_keys": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "group.pack_key": {
+      "type": "string"
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "unit_net_mass_g": {
+            "type": "integer",
+            "unit": "g",
+            "min": 140,
+            "max": 400
+          },
+          "unit_count": {
+            "type": "integer",
+            "min": 1,
+            "max": 10
+          },
+          "total_net_mass_g": {
+            "type": "integer",
+            "unit": "g",
+            "min": 140,
+            "max": 2400
+          },
+          "price_multiplier": {
+            "type": "number",
+            "min": 0.14,
+            "max": 2.16
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 6.3,
+            "max": 691.2
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "sku.unit_net_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "unit_net_mass_g"
+      }
+    },
+    "sku.unit_count": {
+      "type": "integer",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "unit_count"
+      }
+    },
+    "group.unit_net_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "group.unit_count": {
+      "type": "integer"
+    },
+    "group.total_net_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "group.price_multiplier": {
+      "type": "number"
+    },
+    "group.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 45,
+      "max": 90,
+      "round_to": 1,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 80,
+          "max": 180
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 160,
+          "max": 320
+        }
+      ]
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Neutral profiles, price anchor and typed dog wet-pack fields; inheriting concept supplies manufacture",
+    "heuristics": "Authored bands and menu choices, not empirical estimates",
+    "unit_boundary": "Food grams/count/canonical reference price separate from animal/daily ration"
+  }
+}

@@ -1,0 +1,5081 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "printer_ink.ink_cartridges_and_cartridge_sets",
+  "family_id": "printer_ink",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/printer_ink.ink_cartridges_and_cartridge_sets.json": "baabe97ffcd6bc20c6a05aa26990799bba7757aa52d23685385e473bc355a30d",
+    "environments/product_world/data/product_width/_printer_ink_base.json": "f126e4cc6a83e5af96c223edcfca995f12078e619205543f10d5aeef0b3eed53",
+    "environments/product_world/data/product_public_content/printer_ink.ink_cartridges_and_cartridge_sets.json": "b146cdf4ca4830b305a1852a3a33c46775a0bc072d297a21afef8d097569d3f1"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep per-colour declared yield with its protocol; do not sum colour yields into a combined print yield. Region/model compatibility stays explicit.",
+  "concept_note": null,
+  "fields": {
+    "sku.sku_id": {
+      "semantic_id": "ink.field.sku_id",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.product_id": {
+      "semantic_id": "ink.field.product_id",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.recipe": {
+      "semantic_id": "ink.field.recipe",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.origin",
+        "ink.per_colour_page_yields",
+        "ink.per_colour_volumes"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.supply": {
+      "semantic_id": "ink.field.supply",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.manufacturer_original": {
+      "semantic_id": "ink.field.manufacturer_original",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.origin",
+        "ink.yield_protocol_status"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "manufacturer_original"
+    },
+    "sku.supplier_relation": {
+      "semantic_id": "ink.field.supplier_relation",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.origin"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplier_relation"
+    },
+    "sku.remanufactured": {
+      "semantic_id": "ink.field.remanufactured",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.origin"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "remanufactured"
+    },
+    "sku.yield_version": {
+      "semantic_id": "ink.field.yield_version",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "yield_version"
+    },
+    "sku.compatible_platform": {
+      "semantic_id": "ink.field.compatible_platform",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "p4desk_individual_ink_v1",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.platform_scope",
+        "ink.printer_models"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "compatible_platform"
+    },
+    "sku.declared_printer_models": {
+      "semantic_id": "ink.field.declared_printer_models",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "max_items": 4,
+        "optional": true,
+        "constant": [
+          "P4Desk 210",
+          "P4Desk 310"
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.printer_models"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "declared_printer_models"
+    },
+    "sku.region": {
+      "semantic_id": "ink.field.region",
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "fixture_EU",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "sku.contained_colours": {
+      "semantic_id": "ink.field.contained_colours",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "max_items": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges",
+        "ink.per_colour_page_yields",
+        "ink.per_colour_volumes"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "contained_colours"
+    },
+    "sku.complete_cartridge_count": {
+      "semantic_id": "ink.field.complete_cartridge_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges",
+        "ink.installed_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "complete_cartridge_count"
+    },
+    "sku.chip_count": {
+      "semantic_id": "ink.field.chip_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.installed_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "chip_count"
+    },
+    "sku.housing_count": {
+      "semantic_id": "ink.field.housing_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.installed_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "housing_count"
+    },
+    "sku.reservoir_count": {
+      "semantic_id": "ink.field.reservoir_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.installed_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reservoir_count"
+    },
+    "sku.latch_count": {
+      "semantic_id": "ink.field.latch_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.installed_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "latch_count"
+    },
+    "sku.ink_supply_port_count": {
+      "semantic_id": "ink.field.ink_supply_port_count",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.installed_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ink_supply_port_count"
+    },
+    "sku.designated_removable_vent_tape_count": {
+      "semantic_id": "ink.field.designated_removable_vent_tape_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "designated_removable_vent_tape_count"
+    },
+    "sku.integrated_printhead_count": {
+      "semantic_id": "ink.field.integrated_printhead_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_integrated_head"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "integrated_printhead_count"
+    },
+    "sku.volume_basis": {
+      "semantic_id": "ink.field.volume_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "per-contained-colour per-cartridge declared label volume,mL;not measured or post-priming usable volume",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.yield_protocol": {
+      "semantic_id": "ink.field.yield_protocol",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.yield_protocol_status"
+        },
+        "yield_basis": {
+          "expr": "sku.yield_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.yield_protocol_status"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "yield_protocol"
+    },
+    "sku.yield_basis": {
+      "semantic_id": "ink.field.yield_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.combined_pack_page_yield": {
+      "semantic_id": "ink.field.combined_pack_page_yield",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "pages",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.combined_pack_page_yield_status"
+        },
+        "yield_basis": {
+          "literal": "actual complete-supply output unspecified;not sum of per-colour declarations"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_pack_yield_sum"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.sum_colour_yields_as_pack_yield_permitted": {
+      "semantic_id": "ink.field.sum_colour_yields_as_pack_yield_permitted",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_pack_yield_sum"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sum_colour_yields_as_pack_yield_permitted"
+    },
+    "sku.full_coefficient": {
+      "semantic_id": "ink.field.full_coefficient",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": null,
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.chip_present": {
+      "semantic_id": "ink.field.chip_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.chip_power",
+        "ink.installed_parts"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "chip_present"
+    },
+    "sku.cartridge_head_separate": {
+      "semantic_id": "ink.field.cartridge_head_separate",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_integrated_head"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cartridge_head_separate"
+    },
+    "sku.matching_model_region_slot_chip_current_firmware_required": {
+      "semantic_id": "ink.field.matching_model_region_slot_chip_current_firmware_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.printer_models"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "matching_model_region_slot_chip_current_firmware_required"
+    },
+    "sku.battery_present": {
+      "semantic_id": "ink.field.battery_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.chip_power"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_present"
+    },
+    "sku.external_power_adapter_supplied": {
+      "semantic_id": "ink.field.external_power_adapter_supplied",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.chip_power"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "external_power_adapter_supplied"
+    },
+    "sku.black_cartridge_count": {
+      "semantic_id": "ink.field.black_cartridge_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "black"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "black_cartridge_count"
+    },
+    "sku.black_ink_volume_ml": {
+      "semantic_id": "ink.field.black_ink_volume_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.black_ink_volume_ml_status"
+        },
+        "volume_basis": {
+          "expr": "sku.volume_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "black"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "black_ink_volume_ml"
+    },
+    "sku.black_page_yield": {
+      "semantic_id": "ink.field.black_page_yield",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "pages",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.black_page_yield_status"
+        },
+        "yield_basis": {
+          "expr": "sku.yield_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "black"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "black_page_yield"
+    },
+    "sku.cyan_cartridge_count": {
+      "semantic_id": "ink.field.cyan_cartridge_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "cyan"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cyan_cartridge_count"
+    },
+    "sku.cyan_ink_volume_ml": {
+      "semantic_id": "ink.field.cyan_ink_volume_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.cyan_ink_volume_ml_status"
+        },
+        "volume_basis": {
+          "expr": "sku.volume_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "cyan"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cyan_ink_volume_ml"
+    },
+    "sku.cyan_page_yield": {
+      "semantic_id": "ink.field.cyan_page_yield",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "pages",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.cyan_page_yield_status"
+        },
+        "yield_basis": {
+          "expr": "sku.yield_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "cyan"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cyan_page_yield"
+    },
+    "sku.magenta_cartridge_count": {
+      "semantic_id": "ink.field.magenta_cartridge_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "magenta"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "magenta_cartridge_count"
+    },
+    "sku.magenta_ink_volume_ml": {
+      "semantic_id": "ink.field.magenta_ink_volume_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.magenta_ink_volume_ml_status"
+        },
+        "volume_basis": {
+          "expr": "sku.volume_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "magenta"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "magenta_ink_volume_ml"
+    },
+    "sku.magenta_page_yield": {
+      "semantic_id": "ink.field.magenta_page_yield",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "pages",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.magenta_page_yield_status"
+        },
+        "yield_basis": {
+          "expr": "sku.yield_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "magenta"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "magenta_page_yield"
+    },
+    "sku.yellow_cartridge_count": {
+      "semantic_id": "ink.field.yellow_cartridge_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "yellow"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "yellow_cartridge_count"
+    },
+    "sku.yellow_ink_volume_ml": {
+      "semantic_id": "ink.field.yellow_ink_volume_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.yellow_ink_volume_ml_status"
+        },
+        "volume_basis": {
+          "expr": "sku.volume_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "yellow"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "yellow_ink_volume_ml"
+    },
+    "sku.yellow_page_yield": {
+      "semantic_id": "ink.field.yellow_page_yield",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "pages",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.yellow_page_yield_status"
+        },
+        "yield_basis": {
+          "expr": "sku.yield_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "yellow"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "yellow_page_yield"
+    },
+    "sku.volume_label_sum_ml": {
+      "semantic_id": "ink.field.volume_label_sum_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "unit": {
+          "literal": "mL"
+        },
+        "volume_basis": {
+          "expr": "sku.volume_sum_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "volume_label_sum_ml"
+    },
+    "sku.chip_revision": {
+      "semantic_id": "ink.field.chip_revision",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.chip_revision_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.chip_future_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.future_firmware_support": {
+      "semantic_id": "ink.field.future_firmware_support",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.future_firmware_support_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.chip_future_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.contained_cartridge_length_mm": {
+      "semantic_id": "ink.field.contained_cartridge_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.contained_cartridge_length_mm_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.physical_quantity_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.contained_cartridge_width_mm": {
+      "semantic_id": "ink.field.contained_cartridge_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.contained_cartridge_width_mm_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.physical_quantity_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.contained_cartridge_height_mm": {
+      "semantic_id": "ink.field.contained_cartridge_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.contained_cartridge_height_mm_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.physical_quantity_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.whole_supply_mass_g": {
+      "semantic_id": "ink.field.whole_supply_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.whole_supply_mass_g_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.physical_quantity_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.housing_mass_g": {
+      "semantic_id": "ink.field.housing_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.housing_mass_g_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.component_mass_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.reservoir_mass_g": {
+      "semantic_id": "ink.field.reservoir_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.reservoir_mass_g_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.component_mass_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.chip_mass_g": {
+      "semantic_id": "ink.field.chip_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.chip_mass_g_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.component_mass_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.ink_density_g_ml": {
+      "semantic_id": "ink.field.ink_density_g_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g/mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.ink_density_g_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "contained_inks"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.ink_chemistry": {
+      "semantic_id": "ink.field.ink_chemistry",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.ink_chemistry_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "contained_inks"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.usable_ink_after_priming_ml": {
+      "semantic_id": "ink.field.usable_ink_after_priming_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.usable_ink_after_priming_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.remaining_ink_ml": {
+      "semantic_id": "ink.field.remaining_ink_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.remaining_ink_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.expiry_date": {
+      "semantic_id": "ink.field.expiry_date",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.expiry_date_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.storage_duration_days": {
+      "semantic_id": "ink.field.storage_duration_days",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "days",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.storage_duration_days_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.sealed_storage"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.nozzle_count": {
+      "semantic_id": "ink.field.nozzle_count",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.nozzle_count_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.drop_size_pl": {
+      "semantic_id": "ink.field.drop_size_pl",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "pL",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.drop_size_pl_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.chip_voltage_v": {
+      "semantic_id": "ink.field.chip_voltage_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.chip_voltage_v_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.electrical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.chip_current_ma": {
+      "semantic_id": "ink.field.chip_current_ma",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mA",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.chip_current_ma_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.electrical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.chip_power_w": {
+      "semantic_id": "ink.field.chip_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.chip_power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.electrical_quantities_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.achieved_print_speed_pages_min": {
+      "semantic_id": "ink.field.achieved_print_speed_pages_min",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "pages/min",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.achieved_print_speed_pages_min_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_lifetime_pages": {
+      "semantic_id": "ink.field.actual_lifetime_pages",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "pages",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.actual_lifetime_pages_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.cost_per_achieved_page_sek": {
+      "semantic_id": "ink.field.cost_per_achieved_page_sek",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK/page",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.cost_per_achieved_page_sek_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.battery_capacity_mah": {
+      "semantic_id": "ink.field.battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.battery_capacity_mah_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.motor_speed_rpm": {
+      "semantic_id": "ink.field.motor_speed_rpm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "rpm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.motor_speed_rpm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.fan_power_w": {
+      "semantic_id": "ink.field.fan_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.fan_power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.heater_power_w": {
+      "semantic_id": "ink.field.heater_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.heater_power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.toner_powder_mass_g": {
+      "semantic_id": "ink.field.toner_powder_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.toner_powder_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.refill_bottle_dimensions_mm": {
+      "semantic_id": "ink.field.refill_bottle_dimensions_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "min_items": 3,
+        "max_items": 3,
+        "unknown_values": [
+          [
+            -1,
+            -1,
+            -1
+          ]
+        ],
+        "optional": true,
+        "constant": [
+          -1,
+          -1,
+          -1
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.refill_bottle_dimensions_mm_status"
+        },
+        "quantity_basis": {
+          "expr": "sku.physical_quantity_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.ink_channel_basis": {
+      "semantic_id": "ink.field.ink_channel_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "functional_ink_channels_not_cosmetic_body_colour",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.quantity_basis": {
+      "semantic_id": "ink.field.quantity_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "complete_contained_cartridges",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.contained_cartridges"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.volume_sum_basis": {
+      "semantic_id": "ink.field.volume_sum_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "sum_of_contained_label_volumes_not_usable_or_measured_volume",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.physical_quantity_basis": {
+      "semantic_id": "ink.field.physical_quantity_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "bare_complete_supplied_cartridges;packaging_excluded",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.component_mass_basis": {
+      "semantic_id": "ink.field.component_mass_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "per_contained_cartridge_installed_part;all_unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.chip_power_source": {
+      "semantic_id": "ink.field.chip_power_source",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "printer_electrical_contacts",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.chip_power"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "chip_power_source"
+    },
+    "sku.ink_scope": {
+      "semantic_id": "ink.field.ink_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "replacement_consumer_ink",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.platform_scope"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.toner_present": {
+      "semantic_id": "ink.field.toner_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.platform_scope"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "toner_present"
+    },
+    "sku.bottled_refill_system": {
+      "semantic_id": "ink.field.bottled_refill_system",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.platform_scope"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bottled_refill_system"
+    },
+    "sku.starter_supply": {
+      "semantic_id": "ink.field.starter_supply",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.platform_scope"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "starter_supply"
+    },
+    "sku.motor_present": {
+      "semantic_id": "ink.field.motor_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "motor_present"
+    },
+    "sku.active_fan_present": {
+      "semantic_id": "ink.field.active_fan_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "active_fan_present"
+    },
+    "sku.heater_present": {
+      "semantic_id": "ink.field.heater_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "heater_present"
+    },
+    "sku.packaging_in_cartridge_count": {
+      "semantic_id": "ink.field.packaging_in_cartridge_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "packaging_in_cartridge_count"
+    },
+    "sku.wrappers_in_cartridge_count": {
+      "semantic_id": "ink.field.wrappers_in_cartridge_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wrappers_in_cartridge_count"
+    },
+    "sku.inserts_in_cartridge_count": {
+      "semantic_id": "ink.field.inserts_in_cartridge_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "inserts_in_cartridge_count"
+    },
+    "sku.removed_vent_tape_in_usable_count": {
+      "semantic_id": "ink.field.removed_vent_tape_in_usable_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "removed_vent_tape_in_usable_count"
+    },
+    "sku.keep_sealed_until_ready": {
+      "semantic_id": "ink.field.keep_sealed_until_ready",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.sealed_storage"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keep_sealed_until_ready"
+    },
+    "sku.protect_from_sunlight": {
+      "semantic_id": "ink.field.protect_from_sunlight",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.sealed_storage"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "protect_from_sunlight"
+    },
+    "sku.protect_from_freezing_excessive_heat": {
+      "semantic_id": "ink.field.protect_from_freezing_excessive_heat",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.sealed_storage"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "protect_from_freezing_excessive_heat"
+    },
+    "sku.powered_guided_replacement_required": {
+      "semantic_id": "ink.field.powered_guided_replacement_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.guided_handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "powered_guided_replacement_required"
+    },
+    "sku.only_designated_vent_tape_removed": {
+      "semantic_id": "ink.field.only_designated_vent_tape_removed",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.guided_handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "only_designated_vent_tape_removed"
+    },
+    "sku.avoid_chip_outlet_contact": {
+      "semantic_id": "ink.field.avoid_chip_outlet_contact",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.guided_handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "avoid_chip_outlet_contact"
+    },
+    "sku.correct_slot_required": {
+      "semantic_id": "ink.field.correct_slot_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.guided_handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "correct_slot_required"
+    },
+    "sku.power_kept_on_through_priming_required": {
+      "semantic_id": "ink.field.power_kept_on_through_priming_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.guided_handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_kept_on_through_priming_required"
+    },
+    "sku.other_labels_bottom_seals_peeling_permitted": {
+      "semantic_id": "ink.field.other_labels_bottom_seals_peeling_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.guided_handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "other_labels_bottom_seals_peeling_permitted"
+    },
+    "sku.head_hand_movement_permitted": {
+      "semantic_id": "ink.field.head_hand_movement_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.guided_handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "head_hand_movement_permitted"
+    },
+    "sku.dismantling_permitted": {
+      "semantic_id": "ink.field.dismantling_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_refill_wash"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dismantling_permitted"
+    },
+    "sku.refilling_permitted": {
+      "semantic_id": "ink.field.refilling_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_refill_wash"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "refilling_permitted"
+    },
+    "sku.washing_permitted": {
+      "semantic_id": "ink.field.washing_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_refill_wash"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "washing_permitted"
+    },
+    "sku.immersion_permitted": {
+      "semantic_id": "ink.field.immersion_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_refill_wash"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "immersion_permitted"
+    },
+    "sku.machine_wash_permitted": {
+      "semantic_id": "ink.field.machine_wash_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_refill_wash"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "machine_wash_permitted"
+    },
+    "sku.dishwasher_permitted": {
+      "semantic_id": "ink.field.dishwasher_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.no_refill_wash"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dishwasher_permitted"
+    },
+    "sku.printer_supplied_count": {
+      "semantic_id": "ink.field.printer_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions",
+        "ink.no_printer_supplied"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "printer_supplied_count"
+    },
+    "sku.printer_head_supplied_count": {
+      "semantic_id": "ink.field.printer_head_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions",
+        "ink.no_integrated_head"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "printer_head_supplied_count"
+    },
+    "sku.paper_supplied_count": {
+      "semantic_id": "ink.field.paper_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "paper_supplied_count"
+    },
+    "sku.cable_supplied_count": {
+      "semantic_id": "ink.field.cable_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cable_supplied_count"
+    },
+    "sku.refill_bottle_supplied_count": {
+      "semantic_id": "ink.field.refill_bottle_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "refill_bottle_supplied_count"
+    },
+    "sku.loose_chip_supplied_count": {
+      "semantic_id": "ink.field.loose_chip_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "loose_chip_supplied_count"
+    },
+    "sku.chip_reset_tool_supplied_count": {
+      "semantic_id": "ink.field.chip_reset_tool_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "chip"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "chip_reset_tool_supplied_count"
+    },
+    "sku.spare_housing_supplied_count": {
+      "semantic_id": "ink.field.spare_housing_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "spare_housing_supplied_count"
+    },
+    "sku.maintenance_box_supplied_count": {
+      "semantic_id": "ink.field.maintenance_box_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "maintenance_box_supplied_count"
+    },
+    "sku.power_adapter_supplied_count": {
+      "semantic_id": "ink.field.power_adapter_supplied_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "ink.box_exclusions"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "power_adapter_supplied_count"
+    },
+    "sku.price_multiplier": {
+      "semantic_id": "ink.field.price_multiplier",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 0.75,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "ink.field.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 75,
+        "max": 2000,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual supplied canonical SKU/component;explicit matching status required,not raw applicable()"
+        },
+        "price_basis": {
+          "literal": "entire actual supplied SKU"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supply"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.name": {
+      "semantic_id": "ink.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Norvik P4Desk Ink"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.black_ink_volume_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "known",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.cyan_ink_volume_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.magenta_ink_volume_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.yellow_ink_volume_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_volumes"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.black_page_yield_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "known",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.cyan_page_yield_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.magenta_page_yield_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.yellow_page_yield_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.per_colour_page_yields"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.yield_protocol_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.yield_protocol_status"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.combined_pack_page_yield_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.no_pack_yield_sum"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.chip_revision_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.chip_future_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.future_firmware_support_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.chip_future_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.contained_cartridge_length_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.contained_cartridge_width_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.contained_cartridge_height_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.whole_supply_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.housing_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.reservoir_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.chip_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.ink_density_g_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.ink_chemistry_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.usable_ink_after_priming_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.remaining_ink_ml_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.physical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.chip_voltage_v_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.electrical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.chip_current_ma_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.electrical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.chip_power_w_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.electrical_quantities_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.storage_duration_days_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "ink.sealed_storage"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.recipe": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "original_standard",
+          "original_high",
+          "compatible_standard"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "manufacturer_original": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.manufacturer_original",
+      "display_group": "features",
+      "fields": [
+        "sku.manufacturer_original"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "supplier_relation": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.supplier_relation",
+      "display_group": "features",
+      "fields": [
+        "sku.supplier_relation"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "remanufactured": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.remanufactured",
+      "display_group": "features",
+      "fields": [
+        "sku.remanufactured"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "yield_version": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.yield_version",
+      "display_group": "features",
+      "fields": [
+        "sku.yield_version"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "compatible_platform": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.compatible_platform",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.compatible_platform"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_printer_models": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.declared_printer_models",
+      "display_group": "features",
+      "fields": [
+        "sku.declared_printer_models"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "contained_colours": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.contained_colours",
+      "display_group": "features",
+      "fields": [
+        "sku.contained_colours"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "complete_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.complete_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.complete_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "chip_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.chip_count",
+      "display_group": "features",
+      "fields": [
+        "sku.chip_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "housing_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.housing_count",
+      "display_group": "features",
+      "fields": [
+        "sku.housing_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reservoir_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.reservoir_count",
+      "display_group": "features",
+      "fields": [
+        "sku.reservoir_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "latch_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.latch_count",
+      "display_group": "features",
+      "fields": [
+        "sku.latch_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ink_supply_port_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.ink_supply_port_count",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.ink_supply_port_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "designated_removable_vent_tape_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.designated_removable_vent_tape_count",
+      "display_group": "features",
+      "fields": [
+        "sku.designated_removable_vent_tape_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "integrated_printhead_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.integrated_printhead_count",
+      "display_group": "features",
+      "fields": [
+        "sku.integrated_printhead_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "yield_protocol": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.yield_protocol",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.yield_protocol"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sum_colour_yields_as_pack_yield_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.sum_colour_yields_as_pack_yield_permitted",
+      "display_group": "contents",
+      "fields": [
+        "sku.sum_colour_yields_as_pack_yield_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "chip_present": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.chip_present",
+      "display_group": "features",
+      "fields": [
+        "sku.chip_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cartridge_head_separate": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.cartridge_head_separate",
+      "display_group": "features",
+      "fields": [
+        "sku.cartridge_head_separate"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "matching_model_region_slot_chip_current_firmware_required": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.matching_model_region_slot_chip_current_firmware_required",
+      "display_group": "features",
+      "fields": [
+        "sku.matching_model_region_slot_chip_current_firmware_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_present": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.battery_present",
+      "display_group": "features",
+      "fields": [
+        "sku.battery_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "external_power_adapter_supplied": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.external_power_adapter_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.external_power_adapter_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "black_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.black_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.black_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "black_ink_volume_ml": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.black_ink_volume_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.black_ink_volume_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "black_page_yield": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.black_page_yield",
+      "display_group": "features",
+      "fields": [
+        "sku.black_page_yield"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "cyan_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.cyan_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.cyan_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cyan_ink_volume_ml": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.cyan_ink_volume_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.cyan_ink_volume_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cyan_page_yield": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.cyan_page_yield",
+      "display_group": "features",
+      "fields": [
+        "sku.cyan_page_yield"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "magenta_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.magenta_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.magenta_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "magenta_ink_volume_ml": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.magenta_ink_volume_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.magenta_ink_volume_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "magenta_page_yield": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.magenta_page_yield",
+      "display_group": "features",
+      "fields": [
+        "sku.magenta_page_yield"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "yellow_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.yellow_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.yellow_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "yellow_ink_volume_ml": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.yellow_ink_volume_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.yellow_ink_volume_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "yellow_page_yield": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.yellow_page_yield",
+      "display_group": "features",
+      "fields": [
+        "sku.yellow_page_yield"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "volume_label_sum_ml": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.volume_label_sum_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.volume_label_sum_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "chip_power_source": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.chip_power_source",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.chip_power_source"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "toner_present": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.toner_present",
+      "display_group": "features",
+      "fields": [
+        "sku.toner_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bottled_refill_system": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.bottled_refill_system",
+      "display_group": "features",
+      "fields": [
+        "sku.bottled_refill_system"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "starter_supply": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.starter_supply",
+      "display_group": "features",
+      "fields": [
+        "sku.starter_supply"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "motor_present": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.motor_present",
+      "display_group": "features",
+      "fields": [
+        "sku.motor_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "active_fan_present": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.active_fan_present",
+      "display_group": "features",
+      "fields": [
+        "sku.active_fan_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heater_present": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.heater_present",
+      "display_group": "features",
+      "fields": [
+        "sku.heater_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "packaging_in_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.packaging_in_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.packaging_in_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wrappers_in_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.wrappers_in_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.wrappers_in_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "inserts_in_cartridge_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.inserts_in_cartridge_count",
+      "display_group": "features",
+      "fields": [
+        "sku.inserts_in_cartridge_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "removed_vent_tape_in_usable_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.removed_vent_tape_in_usable_count",
+      "display_group": "features",
+      "fields": [
+        "sku.removed_vent_tape_in_usable_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keep_sealed_until_ready": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.keep_sealed_until_ready",
+      "display_group": "features",
+      "fields": [
+        "sku.keep_sealed_until_ready"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "protect_from_sunlight": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.protect_from_sunlight",
+      "display_group": "care",
+      "fields": [
+        "sku.protect_from_sunlight"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "protect_from_freezing_excessive_heat": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.protect_from_freezing_excessive_heat",
+      "display_group": "care",
+      "fields": [
+        "sku.protect_from_freezing_excessive_heat"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "powered_guided_replacement_required": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.powered_guided_replacement_required",
+      "display_group": "features",
+      "fields": [
+        "sku.powered_guided_replacement_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "only_designated_vent_tape_removed": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.only_designated_vent_tape_removed",
+      "display_group": "features",
+      "fields": [
+        "sku.only_designated_vent_tape_removed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "avoid_chip_outlet_contact": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.avoid_chip_outlet_contact",
+      "display_group": "features",
+      "fields": [
+        "sku.avoid_chip_outlet_contact"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "correct_slot_required": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.correct_slot_required",
+      "display_group": "features",
+      "fields": [
+        "sku.correct_slot_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_kept_on_through_priming_required": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.power_kept_on_through_priming_required",
+      "display_group": "features",
+      "fields": [
+        "sku.power_kept_on_through_priming_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "other_labels_bottom_seals_peeling_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.other_labels_bottom_seals_peeling_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.other_labels_bottom_seals_peeling_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "head_hand_movement_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.head_hand_movement_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.head_hand_movement_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dismantling_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.dismantling_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.dismantling_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "refilling_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.refilling_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.refilling_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "washing_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.washing_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.washing_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "immersion_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.immersion_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.immersion_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "machine_wash_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.machine_wash_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.machine_wash_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dishwasher_permitted": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.dishwasher_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.dishwasher_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "printer_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.printer_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.printer_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "printer_head_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.printer_head_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.printer_head_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "paper_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.paper_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.paper_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cable_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.cable_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.cable_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "refill_bottle_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.refill_bottle_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.refill_bottle_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_chip_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.loose_chip_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.loose_chip_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "chip_reset_tool_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.chip_reset_tool_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.chip_reset_tool_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_housing_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.spare_housing_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.spare_housing_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "maintenance_box_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.maintenance_box_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.maintenance_box_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_adapter_supplied_count": {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets.content.power_adapter_supplied_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.power_adapter_supplied_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 147,
+    "roles": {
+      "identity": 3,
+      "internal": 31,
+      "buying_choice": 1,
+      "descriptive": 37,
+      "literal": 35,
+      "operational": 1,
+      "qualifier": 8,
+      "omit_placeholder": 30,
+      "commerce": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 9,
+    "unmapped_descriptive_fields": 0
+  }
+}

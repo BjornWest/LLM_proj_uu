@@ -1,0 +1,212 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.dog_dry_food_base",
+  "random_namespace": "product-width-dog-dry-bags-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "product.facts.reference_price_basis": {
+      "type": "string",
+      "constant": "synthetic one-kilogram formula anchor; exact pack prices are separate SKU facts",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.pack_keys": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "net_mass_g": {
+            "type": "integer",
+            "unit": "g",
+            "min": 1000,
+            "max": 14000
+          },
+          "price_multiplier": {
+            "type": "number",
+            "min": 1,
+            "max": 10.5
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 40,
+            "max": 2730
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "sku.net_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "net_mass_g"
+      }
+    },
+    "group.pack_key": {
+      "type": "string"
+    },
+    "group.net_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "group.price_multiplier": {
+      "type": "number"
+    },
+    "group.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 40,
+      "max": 90,
+      "round_to": 1,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 80,
+          "max": 150
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 140,
+          "max": 260
+        }
+      ]
+    },
+    {
+      "id": "pack_menu",
+      "target": "product.pack_keys",
+      "sample": "weighted_subset",
+      "weights": {
+        "1kg": 3,
+        "3kg": 4,
+        "8kg": 3,
+        "14kg": 2
+      },
+      "count_weights": {
+        "1": 35,
+        "2": 40,
+        "3": 20,
+        "4": 5
+      }
+    },
+    {
+      "id": "pack_skus",
+      "for_each": {
+        "binding": "group.pack_key",
+        "from": "product.pack_keys"
+      },
+      "steps": [
+        {
+          "id": "pack_mass",
+          "target": "group.net_mass_g",
+          "derive": "1000 if group.pack_key == '1kg' else (3000 if group.pack_key == '3kg' else (8000 if group.pack_key == '8kg' else 14000))"
+        },
+        {
+          "id": "pack_multiplier",
+          "target": "group.price_multiplier",
+          "derive": "1 if group.pack_key == '1kg' else (2.7 if group.pack_key == '3kg' else (6.4 if group.pack_key == '8kg' else 10.5))"
+        },
+        {
+          "id": "pack_reference_price",
+          "target": "group.reference_price_sek",
+          "derive": "product.reference_price_sek * group.price_multiplier"
+        },
+        {
+          "id": "skus",
+          "target": "product.skus",
+          "emit": {
+            "sku_id": "product.product_id + '-' + group.pack_key",
+            "product_id": "product.product_id",
+            "net_mass_g": "group.net_mass_g",
+            "price_multiplier": "group.price_multiplier",
+            "reference_price_sek": "group.reference_price_sek"
+          }
+        }
+      ]
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Neutral profiles and sparse dog dry-bag manufacture; no species/target/nutrition assumption",
+    "price_basis": "One-kilogram formula anchor; exact bag prices are separate canonical facts",
+    "heuristics": "Tunable authored weights/bands, not observed population estimates"
+  }
+}

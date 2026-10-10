@@ -1,0 +1,1841 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "headphones.open_ear_sport_headphones",
+  "random_namespace": "product-width-headphones.open_ear_sport_headphones-v1",
+  "extends": "_electronics_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "transmission": {
+          "type": "enum",
+          "values": [
+            "bone",
+            "air"
+          ]
+        },
+        "support": {
+          "type": "enum",
+          "values": [
+            "connected rear band",
+            "independent ear hooks",
+            "independent cuffs"
+          ]
+        },
+        "case": {
+          "type": "boolean"
+        }
+      }
+    },
+    "product.facts.transmission": {
+      "type": "enum",
+      "values": [
+        "bone",
+        "air"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.support_geometry": {
+      "type": "enum",
+      "values": [
+        "connected rear band",
+        "independent ear hooks",
+        "independent cuffs"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charging_case": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ear_canal": {
+      "type": "string",
+      "constant": "open without sealing tips",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.contact_layer_material": {
+      "type": "string",
+      "constant": "silicone at wearable contact surfaces; complete composition unspecified",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_version": {
+      "type": "enum",
+      "values": [
+        "5.2",
+        "5.3"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rechargeable": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.playback_controls": {
+      "type": "string",
+      "constant": "buttons",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_call_microphone": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.anc": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analogue_audio": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_audio": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.direct_charge_connector": {
+      "type": "enum",
+      "values": [
+        "magnetic contacts",
+        "USB-C"
+      ],
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bud_charge_interface": {
+      "type": "string",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_charge_interface": {
+      "type": "string",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_wireless_charging": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.nominal_wearable_energy": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wearable_energy_basis": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.nominal_case_energy": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_music_per_charge_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 6,
+      "max": 12,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_case_assisted_music_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 18,
+      "max": 30,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_wearable_empty_charge_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 1,
+      "max": 1.5,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wearable_charge_basis": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_case_usb_empty_charge_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 2,
+      "max": 3,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_test_protocol": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.call_runtime": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wearable_ip_label": {
+      "type": "enum",
+      "values": [
+        "not specified",
+        "IPX4",
+        "IP55",
+        "IP67"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ip_scope": {
+      "type": "string",
+      "constant": "wearable units only; charging case and hardware excluded; no swimming claim",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.environmental_awareness_guarantee": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.acoustic_dimensions_protocols": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.wearable_mass_centre_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "internal.wearable_mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.wearable_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 10,
+      "max": 31,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wearable_mass_basis": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.case_mass_centre_g": {
+      "type": "integer",
+      "unit": "g",
+      "optional": true
+    },
+    "internal.case_mass_noise_g": {
+      "type": "integer",
+      "unit": "g",
+      "optional": true
+    },
+    "product.facts.case_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 37,
+      "max": 58,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_mass_basis": {
+      "type": "string",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.transmission": {
+      "type": "string",
+      "optional": true
+    },
+    "request.support_geometry": {
+      "type": "string",
+      "optional": true
+    },
+    "request.ip_label": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "assembly",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "band": 3,
+        "hooks": 3,
+        "cuffs": 2
+      },
+      "values": {
+        "band": {
+          "transmission": "bone",
+          "support": "connected rear band",
+          "case": false
+        },
+        "hooks": {
+          "transmission": "air",
+          "support": "independent ear hooks",
+          "case": true
+        },
+        "cuffs": {
+          "transmission": "air",
+          "support": "independent cuffs",
+          "case": true
+        }
+      }
+    },
+    {
+      "id": "transmission",
+      "target": "product.facts.transmission",
+      "derive": "internal.assembly.transmission"
+    },
+    {
+      "id": "support_geometry",
+      "target": "product.facts.support_geometry",
+      "derive": "internal.assembly.support"
+    },
+    {
+      "id": "charging_case",
+      "target": "product.facts.charging_case",
+      "derive": "internal.assembly.case"
+    },
+    {
+      "id": "bt_version",
+      "target": "product.facts.bluetooth_version",
+      "sample": "weighted_choice",
+      "weights": {
+        "5.2": 1,
+        "5.3": 1
+      }
+    },
+    {
+      "id": "direct_charging",
+      "target": "product.facts.direct_charge_connector",
+      "sample": "weighted_choice",
+      "weights": {
+        "magnetic contacts": 1,
+        "USB-C": 1
+      },
+      "when": "not product.facts.charging_case"
+    },
+    {
+      "id": "bud_interface",
+      "target": "product.facts.bud_charge_interface",
+      "derive": "'matching case contacts'",
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "case_interface",
+      "target": "product.facts.case_charge_interface",
+      "derive": "'USB-C charging, not USB audio'",
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "qi",
+      "target": "product.facts.case_wireless_charging",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 0,
+        "no": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.charging_case",
+          "weights": {
+            "yes": 1,
+            "no": 3
+          }
+        }
+      ],
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "energy_basis",
+      "target": "product.facts.wearable_energy_basis",
+      "derive": "'each independent bud' if product.facts.charging_case else 'one connected device'"
+    },
+    {
+      "id": "case_energy",
+      "target": "product.facts.nominal_case_energy",
+      "derive": "'not specified'",
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "music",
+      "target": "product.facts.declared_music_per_charge_h",
+      "sample": "weighted_choice",
+      "weights": {
+        "6": 0,
+        "8": 1,
+        "10": 1,
+        "12": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.charging_case",
+          "weights": {
+            "6": 1,
+            "8": 1,
+            "10": 1,
+            "12": 0
+          }
+        }
+      ],
+      "values": {
+        "6": 6,
+        "8": 8,
+        "10": 10,
+        "12": 12
+      }
+    },
+    {
+      "id": "case_music",
+      "target": "product.facts.declared_case_assisted_music_h",
+      "derive": "3 * product.facts.declared_music_per_charge_h",
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "wearable_charge",
+      "target": "product.facts.declared_wearable_empty_charge_h",
+      "sample": "weighted_choice",
+      "weights": {
+        "1": 1,
+        "1.5": 1
+      },
+      "values": {
+        "1": 1,
+        "1.5": 1.5
+      }
+    },
+    {
+      "id": "charge_basis",
+      "target": "product.facts.wearable_charge_basis",
+      "derive": "'buds inside matching case' if product.facts.charging_case else 'connected device charged directly'"
+    },
+    {
+      "id": "case_charge",
+      "target": "product.facts.declared_case_usb_empty_charge_h",
+      "sample": "weighted_choice",
+      "weights": {
+        "2": 1,
+        "3": 1
+      },
+      "when": "product.facts.charging_case",
+      "values": {
+        "2": 2,
+        "3": 3
+      }
+    },
+    {
+      "id": "ip",
+      "target": "product.facts.wearable_ip_label",
+      "sample": "weighted_choice",
+      "weights": {
+        "not specified": 2,
+        "IPX4": 4,
+        "IP55": 3,
+        "IP67": 1
+      }
+    },
+    {
+      "id": "wearable_mass_centre",
+      "target": "internal.wearable_mass_centre_g",
+      "sample": "weighted_choice",
+      "weights": {
+        "28": 1,
+        "20": 0,
+        "12": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.support_geometry == 'independent ear hooks'",
+          "weights": {
+            "28": 0,
+            "20": 1,
+            "12": 0
+          }
+        },
+        {
+          "when": "product.facts.support_geometry == 'independent cuffs'",
+          "weights": {
+            "28": 0,
+            "20": 0,
+            "12": 1
+          }
+        }
+      ],
+      "values": {
+        "28": 28,
+        "20": 20,
+        "12": 12
+      }
+    },
+    {
+      "id": "wearable_mass_noise",
+      "target": "internal.wearable_mass_noise_g",
+      "sample": "uniform_int",
+      "min": -3,
+      "max": 3,
+      "cases": [
+        {
+          "when": "product.facts.charging_case",
+          "min": -2,
+          "max": 2
+        }
+      ]
+    },
+    {
+      "id": "wearable_mass",
+      "target": "product.facts.wearable_mass_g",
+      "derive": "internal.wearable_mass_centre_g + internal.wearable_mass_noise_g"
+    },
+    {
+      "id": "mass_basis",
+      "target": "product.facts.wearable_mass_basis",
+      "derive": "'pair excluding cable, charger and case' if product.facts.charging_case else 'one connected device excluding cable, charger and case'"
+    },
+    {
+      "id": "case_mass_centre",
+      "target": "internal.case_mass_centre_g",
+      "sample": "weighted_choice",
+      "weights": {
+        "40": 1,
+        "55": 1
+      },
+      "when": "product.facts.charging_case",
+      "values": {
+        "40": 40,
+        "55": 55
+      }
+    },
+    {
+      "id": "case_mass_noise",
+      "target": "internal.case_mass_noise_g",
+      "sample": "uniform_int",
+      "min": -3,
+      "max": 3,
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "case_mass",
+      "target": "product.facts.case_mass_g",
+      "derive": "internal.case_mass_centre_g + internal.case_mass_noise_g",
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "case_mass_basis",
+      "target": "product.facts.case_mass_basis",
+      "derive": "'case excluding buds'",
+      "when": "product.facts.charging_case"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.assembly",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.transmission",
+          "product.facts.support_geometry",
+          "product.facts.ear_canal",
+          "product.facts.contact_layer_material"
+        ]
+      },
+      "slots": {
+        "transmission": "product.facts.transmission",
+        "support": "product.facts.support_geometry"
+      },
+      "formulations": [
+        "Open ear canal without sealing tips: {transmission} conduction, {support}. Silicone at contact surfaces; complete composition unspecified.",
+        "{support} with {transmission} conduction; ear canals remain open, no sealing tips. Contact surfaces use silicone; full material composition unknown."
+      ]
+    },
+    {
+      "id": "description.capabilities",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bluetooth_version",
+          "product.facts.rechargeable",
+          "product.facts.playback_controls",
+          "product.facts.bluetooth_call_microphone",
+          "product.facts.anc",
+          "product.facts.analogue_audio",
+          "product.facts.usb_audio"
+        ]
+      },
+      "slots": {
+        "version": "product.facts.bluetooth_version"
+      },
+      "formulations": [
+        "Rechargeable Bluetooth {version}, playback buttons and Bluetooth call microphone. This recipe has no ANC, analogue audio or USB audio.",
+        "Bluetooth {version} with buttons and call mic; rechargeable. ANC, analogue and USB audio explicitly unsupported in this recipe."
+      ]
+    },
+    {
+      "id": "description.direct_charging",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.direct_charge_connector",
+          "product.facts.declared_wearable_empty_charge_h",
+          "product.facts.wearable_charge_basis"
+        ]
+      },
+      "slots": {
+        "connector": "product.facts.direct_charge_connector",
+        "h": "product.facts.declared_wearable_empty_charge_h"
+      },
+      "formulations": [
+        "Connected device charges directly via {connector}; declared empty-charge time {h} h. Charging interface does not provide audio.",
+        "Direct {connector} charging of the connected device: declared {h} h from empty, not an audio interface."
+      ],
+      "when": "not product.facts.charging_case"
+    },
+    {
+      "id": "description.case",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bud_charge_interface",
+          "product.facts.case_charge_interface",
+          "product.facts.case_wireless_charging",
+          "product.facts.declared_wearable_empty_charge_h",
+          "product.facts.wearable_charge_basis",
+          "product.facts.declared_case_usb_empty_charge_h",
+          "product.facts.declared_case_assisted_music_h",
+          "product.facts.nominal_case_energy"
+        ]
+      },
+      "slots": {
+        "qi": "'compatible Qi pad supported; pad not included' if product.facts.case_wireless_charging else 'wireless case charging absent'",
+        "bud": "product.facts.declared_wearable_empty_charge_h",
+        "case": "product.facts.declared_case_usb_empty_charge_h",
+        "total": "product.facts.declared_case_assisted_music_h"
+      },
+      "formulations": [
+        "Buds charge through matching case contacts; case USB-C charges, not audio. {qi}. Bud-in-case empty-charge {bud} h, case USB empty-charge {case} h. Case-assisted music maximum {total} h with recharge interruptions; nominal case energy unknown.",
+        "Matching case charges buds in a declared {bud} h from empty; case USB-C charging only takes {case} h from empty. {qi}. Cumulative case-assisted music up to {total} h requiring recharge breaks, not uninterrupted playback; case energy unspecified."
+      ],
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "description.music_energy",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.declared_music_per_charge_h",
+          "product.facts.nominal_wearable_energy",
+          "product.facts.wearable_energy_basis",
+          "product.facts.battery_test_protocol",
+          "product.facts.call_runtime"
+        ]
+      },
+      "slots": {
+        "h": "product.facts.declared_music_per_charge_h",
+        "basis": "product.facts.wearable_energy_basis"
+      },
+      "formulations": [
+        "Declared music maximum {h} h per charge; nominal cell energy for {basis}, battery protocol and call runtime unspecified.",
+        "Music up to {h} h on one charge. Energy of {basis} is unknown; no comparable battery protocol or call-runtime declaration."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wearable_mass_g",
+          "product.facts.wearable_mass_basis"
+        ]
+      },
+      "slots": {
+        "g": "product.facts.wearable_mass_g",
+        "basis": "product.facts.wearable_mass_basis"
+      },
+      "formulations": [
+        "Wearable mass {g} g, {basis}.",
+        "Reference wearable mass: {g} g for {basis}."
+      ]
+    },
+    {
+      "id": "description.case_mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.case_mass_g",
+          "product.facts.case_mass_basis"
+        ]
+      },
+      "slots": {
+        "g": "product.facts.case_mass_g"
+      },
+      "formulations": [
+        "Case excluding buds weighs {g} g.",
+        "Case mass without buds: {g} g."
+      ],
+      "when": "product.facts.charging_case"
+    },
+    {
+      "id": "description.ip",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wearable_ip_label",
+          "product.facts.ip_scope"
+        ]
+      },
+      "slots": {
+        "label": "product.facts.wearable_ip_label"
+      },
+      "formulations": [
+        "Wearable IP label {label}; wearable units only, excludes charging case/hardware. No swimming claim.",
+        "Published wearable IP code: {label}, not a case/hardware declaration or swimming recommendation."
+      ],
+      "when": "known(product.facts.wearable_ip_label)"
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.environmental_awareness_guarantee",
+          "product.facts.acoustic_dimensions_protocols"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Environmental-awareness guarantee, acoustic dimensions and measured protocols unspecified. Open ear is not a traffic-safety guarantee.",
+        "No guaranteed hazard awareness or specified acoustic dimensions/measurement protocols. Open-ear geometry does not establish traffic safety."
+      ]
+    },
+    {
+      "id": "description.ip_unknown",
+      "when": "not known(product.facts.wearable_ip_label)",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wearable_ip_label",
+          "product.facts.ip_scope"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "No published wearable IP code; protection rating is unspecified. Charging case/hardware are not covered by a declaration, and no swimming claim is made.",
+        "Wearable IP rating is not specified; there is no declared charging-case/hardware protection or swimming recommendation."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'headphones.open_ear_sport_headphones' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "transmission",
+      "role": "filter",
+      "predicate": "product.facts.transmission == request.transmission",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "support",
+      "role": "filter",
+      "predicate": "product.facts.support_geometry == request.support_geometry",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "ip",
+      "role": "filter",
+      "predicate": "known(product.facts.wearable_ip_label) and product.facts.wearable_ip_label == request.ip_label",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "wearing_comfort",
+              "bass_preference",
+              "jog_retention",
+              "bt_pairing",
+              "playback_controls",
+              "case_insertion",
+              "direct_charge_handling",
+              "bone_vibration_preference"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 400,
+          "max": 3500
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 400
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 3500
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_wearing_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_bass_preference": {
+          "type": "boolean"
+        },
+        "review.positive_jog_retention": {
+          "type": "boolean"
+        },
+        "review.positive_bt_pairing": {
+          "type": "boolean"
+        },
+        "review.positive_playback_controls": {
+          "type": "boolean"
+        },
+        "review.positive_case_insertion": {
+          "type": "boolean"
+        },
+        "review.positive_direct_charge_handling": {
+          "type": "boolean"
+        },
+        "review.positive_bone_vibration_preference": {
+          "type": "boolean"
+        },
+        "product.facts.charging_case": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.transmission": {
+          "type": "enum",
+          "values": [
+            "bone",
+            "air"
+          ],
+          "input": true
+        },
+        "product.facts.direct_charge_connector": {
+          "type": "enum",
+          "values": [
+            "magnetic contacts",
+            "USB-C"
+          ],
+          "optional": true,
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "00": 1,
+            "01": 0,
+            "10": 0,
+            "11": 0
+          },
+          "cases": [
+            {
+              "when": "not product.facts.charging_case and product.facts.transmission == 'air'",
+              "weights": {
+                "00": 1,
+                "01": 0,
+                "10": 0,
+                "11": 0
+              }
+            },
+            {
+              "when": "not product.facts.charging_case and product.facts.transmission == 'bone'",
+              "weights": {
+                "00": 0,
+                "01": 1,
+                "10": 0,
+                "11": 0
+              }
+            },
+            {
+              "when": "product.facts.charging_case and product.facts.transmission == 'air'",
+              "weights": {
+                "00": 0,
+                "01": 0,
+                "10": 1,
+                "11": 0
+              }
+            },
+            {
+              "when": "product.facts.charging_case and product.facts.transmission == 'bone'",
+              "weights": {
+                "00": 0,
+                "01": 0,
+                "10": 0,
+                "11": 1
+              }
+            }
+          ],
+          "values": {
+            "00": [
+              "value",
+              "wearing_comfort",
+              "bass_preference",
+              "jog_retention",
+              "bt_pairing",
+              "playback_controls",
+              "direct_charge_handling"
+            ],
+            "01": [
+              "value",
+              "wearing_comfort",
+              "bass_preference",
+              "jog_retention",
+              "bt_pairing",
+              "playback_controls",
+              "direct_charge_handling",
+              "bone_vibration_preference"
+            ],
+            "10": [
+              "value",
+              "wearing_comfort",
+              "bass_preference",
+              "jog_retention",
+              "bt_pairing",
+              "playback_controls",
+              "case_insertion"
+            ],
+            "11": [
+              "value",
+              "wearing_comfort",
+              "bass_preference",
+              "jog_retention",
+              "bt_pairing",
+              "playback_controls",
+              "case_insertion",
+              "bone_vibration_preference"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_wearing_comfort",
+          "target": "review.positive_wearing_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bass_preference",
+          "target": "review.positive_bass_preference",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_jog_retention",
+          "target": "review.positive_jog_retention",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bt_pairing",
+          "target": "review.positive_bt_pairing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_playback_controls",
+          "target": "review.positive_playback_controls",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_case_insertion",
+          "target": "review.positive_case_insertion",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_direct_charge_handling",
+          "target": "review.positive_direct_charge_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bone_vibration_preference",
+          "target": "review.positive_bone_vibration_preference",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "wearing_comfort.positive",
+          "when": "'wearing_comfort' in review.topics and review.positive_wearing_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "wearing_comfort",
+            "polarity": "positive",
+            "context": {
+              "duration": "30 minutes",
+              "use": "seated indoors",
+              "aspect": "wearing comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Wearing this was comfortable during thirty minutes seated indoors.",
+            "It felt comfortable to wear for thirty minutes seated indoors."
+          ]
+        },
+        {
+          "id": "wearing_comfort.negative",
+          "when": "'wearing_comfort' in review.topics and not review.positive_wearing_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "wearing_comfort",
+            "polarity": "negative",
+            "context": {
+              "duration": "30 minutes",
+              "use": "seated indoors",
+              "aspect": "wearing comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Wearing this was uncomfortable during thirty minutes seated indoors.",
+            "It felt uncomfortable to wear for thirty minutes seated indoors."
+          ]
+        },
+        {
+          "id": "bass_preference.positive",
+          "when": "'bass_preference' in review.topics and review.positive_bass_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bass_preference",
+            "polarity": "positive",
+            "context": {
+              "audio": "familiar playlist",
+              "level": "usual comfortable listening level",
+              "environment": "quiet room",
+              "aspect": "preference for perceived bass balance"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked the bass balance on my familiar playlist at my usual comfortable level in a quiet room.",
+            "The bass balance suited my preference on a familiar playlist at my usual comfortable level in a quiet room."
+          ]
+        },
+        {
+          "id": "bass_preference.negative",
+          "when": "'bass_preference' in review.topics and not review.positive_bass_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bass_preference",
+            "polarity": "negative",
+            "context": {
+              "audio": "familiar playlist",
+              "level": "usual comfortable listening level",
+              "environment": "quiet room",
+              "aspect": "preference for perceived bass balance"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked the bass balance on my familiar playlist at my usual comfortable level in a quiet room.",
+            "The bass balance did not suit my preference on a familiar playlist at my usual comfortable level in a quiet room."
+          ]
+        },
+        {
+          "id": "jog_retention.positive",
+          "when": "'jog_retention' in review.topics and review.positive_jog_retention",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "jog_retention",
+            "polarity": "positive",
+            "context": {
+              "use": "10 minute easy jog",
+              "route": "dry level route",
+              "aspect": "remaining in position"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "It stayed in position for me during a ten-minute easy jog on a dry level route.",
+            "During a ten-minute easy jog on a dry level route, it remained in position for me."
+          ]
+        },
+        {
+          "id": "jog_retention.negative",
+          "when": "'jog_retention' in review.topics and not review.positive_jog_retention",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "jog_retention",
+            "polarity": "negative",
+            "context": {
+              "use": "10 minute easy jog",
+              "route": "dry level route",
+              "aspect": "remaining in position"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "It shifted and needed readjusting during my ten-minute easy jog on a dry level route.",
+            "During a ten-minute easy jog on a dry level route, I had to readjust it after it shifted."
+          ]
+        },
+        {
+          "id": "bt_pairing.positive",
+          "when": "'bt_pairing' in review.topics and review.positive_bt_pairing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bt_pairing",
+            "polarity": "positive",
+            "context": "pairing by Bluetooth to a compatible phone",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Bluetooth pairing with my compatible phone was easy.",
+            "I found pairing by Bluetooth with my compatible phone easy."
+          ]
+        },
+        {
+          "id": "bt_pairing.negative",
+          "when": "'bt_pairing' in review.topics and not review.positive_bt_pairing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bt_pairing",
+            "polarity": "negative",
+            "context": "pairing by Bluetooth to a compatible phone",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Bluetooth pairing with my compatible phone was difficult.",
+            "I found pairing by Bluetooth with my compatible phone difficult."
+          ]
+        },
+        {
+          "id": "playback_controls.positive",
+          "when": "'playback_controls' in review.topics and review.positive_playback_controls",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "playback_controls",
+            "polarity": "positive",
+            "context": "operating the represented playback buttons",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The playback buttons were easy for me to operate.",
+            "I found the playback buttons easy to operate."
+          ]
+        },
+        {
+          "id": "playback_controls.negative",
+          "when": "'playback_controls' in review.topics and not review.positive_playback_controls",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "playback_controls",
+            "polarity": "negative",
+            "context": "operating the represented playback buttons",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The playback buttons were difficult for me to operate.",
+            "I found the playback buttons difficult to operate."
+          ]
+        },
+        {
+          "id": "case_insertion.positive",
+          "when": "'case_insertion' in review.topics and review.positive_case_insertion and (product.facts.charging_case)",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "case_insertion",
+            "polarity": "positive",
+            "context": "inserting both independent units into matching case slots",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Inserting both units into their matching charging-case slots was easy for me.",
+            "I found both units easy to insert into their matching charging-case slots."
+          ]
+        },
+        {
+          "id": "case_insertion.negative",
+          "when": "'case_insertion' in review.topics and not review.positive_case_insertion and (product.facts.charging_case)",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "case_insertion",
+            "polarity": "negative",
+            "context": "inserting both independent units into matching case slots",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Inserting both units into their matching charging-case slots was difficult for me.",
+            "I found both units difficult to insert into their matching charging-case slots."
+          ]
+        },
+        {
+          "id": "direct_charge_handling.positive",
+          "when": "'direct_charge_handling' in review.topics and review.positive_direct_charge_handling and (not product.facts.charging_case)",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "direct_charge_handling",
+            "polarity": "positive",
+            "context": "connecting and disconnecting the represented direct charging interface",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the direct {connector} charging connection was easy for me.",
+            "I found the direct {connector} charging connection easy to connect and disconnect."
+          ],
+          "slots": {
+            "connector": "product.facts.direct_charge_connector"
+          }
+        },
+        {
+          "id": "direct_charge_handling.negative",
+          "when": "'direct_charge_handling' in review.topics and not review.positive_direct_charge_handling and (not product.facts.charging_case)",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "direct_charge_handling",
+            "polarity": "negative",
+            "context": "connecting and disconnecting the represented direct charging interface",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the direct {connector} charging connection was difficult for me.",
+            "I found the direct {connector} charging connection difficult to connect and disconnect."
+          ],
+          "slots": {
+            "connector": "product.facts.direct_charge_connector"
+          }
+        },
+        {
+          "id": "bone_vibration_preference.positive",
+          "when": "'bone_vibration_preference' in review.topics and review.positive_bone_vibration_preference and (product.facts.transmission == 'bone')",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bone_vibration_preference",
+            "polarity": "positive",
+            "context": {
+              "audio": "familiar music",
+              "level": "usual comfortable listening level",
+              "aspect": "preference for bone-conduction contact vibration"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The bone-conduction contact vibration felt pleasant to me during familiar music at my usual comfortable listening level.",
+            "I liked the bone-conduction contact vibration during familiar music at my usual comfortable listening level."
+          ]
+        },
+        {
+          "id": "bone_vibration_preference.negative",
+          "when": "'bone_vibration_preference' in review.topics and not review.positive_bone_vibration_preference and (product.facts.transmission == 'bone')",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bone_vibration_preference",
+            "polarity": "negative",
+            "context": {
+              "audio": "familiar music",
+              "level": "usual comfortable listening level",
+              "aspect": "preference for bone-conduction contact vibration"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The bone-conduction contact vibration felt unpleasant to me during familiar music at my usual comfortable listening level.",
+            "I disliked the bone-conduction contact vibration during familiar music at my usual comfortable listening level."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 400,
+          "max_sek": 3500
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "headphones",
+    "spec_path": "docs/agents/product-width-specs/headphones.open_ear_sport_headphones.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "electronics"
+    ],
+    "scope_exceptions": [
+      "Wireless/noANC/buttons are bounded recipe facts, not universal open-ear properties",
+      "Fixed nominal rear-band configuration; band/hardware variants are separate future models",
+      "Wearable IP label does not establish case protection or traffic/swimming safety",
+      "Bone contact vibration is not air-driver pressure or a measured acoustic effect"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 400,
+      "max": 1000,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 900,
+          "max": 2000
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1800,
+          "max": 3500
+        }
+      ]
+    }
+  }
+}

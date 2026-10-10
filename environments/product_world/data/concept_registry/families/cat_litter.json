@@ -1,0 +1,114 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "cat_litter",
+  "review_id": "F45",
+  "label": "Cat litter",
+  "section": "Pet supplies",
+  "store_type_ids": [
+    "pets"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Do not compare kg and litres as equivalent without density data. Low-dust and odour-control claims need a source; clumping cleanup differs from non-clumping replacement.",
+  "shared_dimension_ids": [
+    "base_material",
+    "granule_size",
+    "fragrance_variant",
+    "net_amount"
+  ],
+  "dimensions": [
+    {
+      "id": "base_material",
+      "label": "Base material",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "granule_size",
+      "label": "Granule size",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fragrance_variant",
+      "label": "Fragrance variant",
+      "module_id": "formula",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "net_amount",
+      "label": "Net amount",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "cat_litter.clumping_litter",
+      "label": "Clumping litter",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "clumping": true
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "cat_litter.non_clumping_litter",
+      "label": "Non-clumping litter",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "clumping": false
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

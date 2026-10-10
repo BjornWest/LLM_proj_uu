@@ -1,0 +1,2618 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "phones.smartphones",
+  "random_namespace": "product-width-phones.smartphones-v1",
+  "extends": "_phones_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "assembly": {
+          "type": "string"
+        },
+        "os": {
+          "type": "enum",
+          "values": [
+            "Android",
+            "iOS"
+          ]
+        },
+        "height_mm": {
+          "type": "number",
+          "unit": "mm"
+        },
+        "width_mm": {
+          "type": "number",
+          "unit": "mm"
+        },
+        "depth_mm": {
+          "type": "number",
+          "unit": "mm"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        },
+        "diagonal_unit": {
+          "type": "enum",
+          "values": [
+            "inch",
+            "mm"
+          ]
+        },
+        "diagonal_inch": {
+          "type": "number",
+          "unit": "inch"
+        },
+        "diagonal_mm": {
+          "type": "number",
+          "unit": "mm"
+        },
+        "diagonal_label": {
+          "type": "string"
+        },
+        "screen_technology": {
+          "type": "string"
+        },
+        "refresh_label": {
+          "type": "string"
+        },
+        "processor": {
+          "type": "string"
+        },
+        "ram_gb": {
+          "type": "integer",
+          "unit": "GB"
+        },
+        "capacity_typical_mah": {
+          "type": "integer",
+          "unit": "mAh"
+        },
+        "capacity_lower_mah": {
+          "type": "integer",
+          "unit": "mAh"
+        },
+        "capacity_lower_basis": {
+          "type": "string"
+        },
+        "adapter_basis_w": {
+          "type": "number",
+          "unit": "W"
+        },
+        "adapter_basis_label": {
+          "type": "string"
+        },
+        "wireless_support": {
+          "type": "enum",
+          "values": [
+            "supported",
+            "not specified"
+          ]
+        },
+        "wireless_route": {
+          "type": "string"
+        },
+        "wireless_max_w": {
+          "type": "number",
+          "unit": "W"
+        },
+        "port_data": {
+          "type": "string"
+        },
+        "cable_data": {
+          "type": "string"
+        },
+        "sim": {
+          "type": "string"
+        },
+        "wifi": {
+          "type": "string"
+        },
+        "bluetooth": {
+          "type": "string"
+        },
+        "camera_description": {
+          "type": "string"
+        },
+        "rear_lens_count": {
+          "type": "integer"
+        },
+        "main_ois": {
+          "type": "boolean"
+        },
+        "os_generations": {
+          "type": "integer",
+          "unit": "count"
+        },
+        "os_years": {
+          "type": "number",
+          "unit": "years"
+        },
+        "security_years": {
+          "type": "number",
+          "unit": "years"
+        },
+        "support_origin": {
+          "type": "string"
+        },
+        "support_qualifier": {
+          "type": "string"
+        },
+        "ip_label": {
+          "type": "string"
+        },
+        "ip_protocol": {
+          "type": "string"
+        }
+      }
+    },
+    "product.facts.assembly": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.os": {
+      "type": "enum",
+      "values": [
+        "Android",
+        "iOS"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.height_mm": {
+      "type": "number",
+      "unit": "mm",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.width_mm": {
+      "type": "number",
+      "unit": "mm",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.depth_mm": {
+      "type": "number",
+      "unit": "mm",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.diagonal_unit": {
+      "type": "enum",
+      "values": [
+        "inch",
+        "mm"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.diagonal_inch": {
+      "type": "number",
+      "unit": "inch",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.diagonal_unit == 'inch'"
+    },
+    "product.facts.diagonal_mm": {
+      "type": "number",
+      "unit": "mm",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "applicable_when": "product.facts.diagonal_unit == 'mm'"
+    },
+    "product.facts.diagonal_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.screen_technology": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.refresh_label": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.processor": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ram_gb": {
+      "type": "integer",
+      "unit": "GB",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.capacity_typical_mah": {
+      "type": "integer",
+      "unit": "mAh",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.capacity_lower_mah": {
+      "type": "integer",
+      "unit": "mAh",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.capacity_lower_basis": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.adapter_basis_w": {
+      "type": "number",
+      "unit": "W",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.adapter_basis_label": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wireless_support": {
+      "type": "enum",
+      "values": [
+        "supported",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wireless_route": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wireless_max_w": {
+      "type": "number",
+      "unit": "W",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.port_data": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cable_data": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sim": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wifi": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.camera_description": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rear_lens_count": {
+      "type": "integer",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.main_ois": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.os_generations": {
+      "type": "integer",
+      "unit": "count",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.os_years": {
+      "type": "number",
+      "unit": "years",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.security_years": {
+      "type": "number",
+      "unit": "years",
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.support_origin": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.support_qualifier": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.region": {
+      "type": "string",
+      "constant": "UK fixture",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charge_connector": {
+      "type": "string",
+      "constant": "USB-C",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.network_5g": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.advertised_storage_basis": {
+      "type": "string",
+      "constant": "nominal decimal GB; 1 TB = 1000 GB, not usable storage",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usable_storage_gb": {
+      "type": "number",
+      "unit": "GB",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_energy_wh": {
+      "type": "number",
+      "unit": "Wh",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cell_voltage": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.actual_runtime": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_input_ceiling_w": {
+      "type": "number",
+      "unit": "W",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charge_cable_included": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.power_adapter_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wireless_pad_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.unlocked": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.support_launch_date": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.remaining_support_years": {
+      "type": "number",
+      "unit": "years",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.installed_os_version": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ip_disclosed": {
+      "type": "boolean"
+    },
+    "product.facts.ip_label": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ip_protocol": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.storage_keys": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "product.colours": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "request.storage_gb": {
+      "type": "integer",
+      "unit": "GB",
+      "optional": true
+    },
+    "request.os": {
+      "type": "string",
+      "optional": true
+    },
+    "request.min_typical_charge_mah": {
+      "type": "integer",
+      "unit": "mAh",
+      "optional": true
+    },
+    "request.ip_label": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "assembly_joint",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "entry": 3,
+        "mid": 3,
+        "large": 2,
+        "ios": 2
+      },
+      "values": {
+        "entry": {
+          "assembly": "entry",
+          "os": "Android",
+          "diagonal_unit": "inch",
+          "diagonal_mm": 0,
+          "ram_gb": 4,
+          "capacity_typical_mah": 5000,
+          "capacity_lower_mah": 4860,
+          "capacity_lower_basis": "rated",
+          "adapter_basis_w": 25,
+          "adapter_basis_label": "25 W separately sold adapter in vendor charging description; not a device-input ceiling",
+          "wireless_support": "not specified",
+          "wireless_route": "not specified",
+          "wireless_max_w": -1,
+          "port_data": "USB 2.0",
+          "cable_data": "not specified",
+          "os_generations": 6,
+          "os_years": -1,
+          "security_years": 6,
+          "support_origin": "original model launch; calendar date unspecified",
+          "support_qualifier": "up to",
+          "ip_protocol": "freshwater spray 10 L/min for 5 min; resistance not permanent",
+          "height_mm": 164.4,
+          "width_mm": 77.9,
+          "depth_mm": 7.9,
+          "mass_g": 200,
+          "diagonal_inch": 6.7,
+          "diagonal_label": "6.7-inch full-rectangle diagonal",
+          "screen_technology": "AMOLED",
+          "refresh_label": "maximum 90 Hz",
+          "processor": "authored entry Android processor",
+          "sim": "dual nano-SIM; second slot is nano-SIM OR microSD, not both simultaneously",
+          "wifi": "802.11ac",
+          "bluetooth": "5.3",
+          "camera_description": "50 MP main, 5 MP ultrawide, 2 MP macro",
+          "rear_lens_count": 3,
+          "main_ois": false,
+          "ip_label": "IP54"
+        },
+        "mid": {
+          "assembly": "mid",
+          "os": "Android",
+          "diagonal_unit": "mm",
+          "diagonal_mm": 160,
+          "ram_gb": 8,
+          "capacity_typical_mah": 5100,
+          "capacity_lower_mah": 5000,
+          "capacity_lower_basis": "minimum",
+          "adapter_basis_w": -1,
+          "adapter_basis_label": "not specified",
+          "wireless_support": "supported",
+          "wireless_route": "compatible Qi charging pad",
+          "wireless_max_w": -1,
+          "port_data": "USB 3.2",
+          "cable_data": "USB 2.0",
+          "os_generations": -1,
+          "os_years": 7,
+          "security_years": 7,
+          "support_origin": "original model launch (explicit authored origin); calendar date unspecified",
+          "support_qualifier": "declared period",
+          "ip_protocol": "not specified",
+          "height_mm": 154.7,
+          "width_mm": 73.3,
+          "depth_mm": 8.9,
+          "mass_g": 186,
+          "diagonal_inch": 0,
+          "diagonal_label": "160 mm supplied display diagonal",
+          "screen_technology": "pOLED",
+          "refresh_label": "60–120 Hz",
+          "processor": "authored mid Android processor",
+          "sim": "nano-SIM plus eSIM; simultaneous-profile limits unspecified",
+          "wifi": "6E",
+          "bluetooth": "5.3",
+          "camera_description": "48 MP main, 13 MP ultrawide",
+          "rear_lens_count": 2,
+          "main_ois": true,
+          "ip_label": "IP68"
+        },
+        "large": {
+          "assembly": "large",
+          "os": "Android",
+          "diagonal_unit": "inch",
+          "diagonal_mm": 0,
+          "ram_gb": 12,
+          "capacity_typical_mah": 5000,
+          "capacity_lower_mah": 4855,
+          "capacity_lower_basis": "minimum",
+          "adapter_basis_w": 45,
+          "adapter_basis_label": "45 W separately sold adapter used for vendor charging test; not a device-input ceiling",
+          "wireless_support": "supported",
+          "wireless_route": "compatible Qi charging pad",
+          "wireless_max_w": -1,
+          "port_data": "not specified",
+          "cable_data": "not specified",
+          "os_generations": 7,
+          "os_years": -1,
+          "security_years": 7,
+          "support_origin": "original global model launch; calendar date unspecified",
+          "support_qualifier": "declared generations/period",
+          "ip_protocol": "1.5 m freshwater for 30 min; resistance not permanent",
+          "height_mm": 162.8,
+          "width_mm": 77.6,
+          "depth_mm": 8.2,
+          "mass_g": 218,
+          "diagonal_inch": 6.9,
+          "diagonal_label": "6.9-inch full-rectangle diagonal",
+          "screen_technology": "AMOLED",
+          "refresh_label": "1–120 Hz",
+          "processor": "authored large Android processor",
+          "sim": "not specified",
+          "wifi": "7",
+          "bluetooth": "5.4",
+          "camera_description": "200 MP main, 50 MP ultrawide, 50 MP 5× telephoto, 10 MP 3× telephoto",
+          "rear_lens_count": 4,
+          "main_ois": true,
+          "ip_label": "IP68"
+        },
+        "ios": {
+          "assembly": "ios",
+          "os": "iOS",
+          "diagonal_unit": "inch",
+          "diagonal_mm": 0,
+          "ram_gb": -1,
+          "capacity_typical_mah": -1,
+          "capacity_lower_mah": -1,
+          "capacity_lower_basis": "not specified",
+          "adapter_basis_w": 20,
+          "adapter_basis_label": "20 W or higher separately available wired adapter requirement; not a device-input ceiling",
+          "wireless_support": "supported",
+          "wireless_route": "compatible MagSafe/Qi2 pad and adapter",
+          "wireless_max_w": 25,
+          "port_data": "USB 2.0",
+          "cable_data": "not specified",
+          "os_generations": -1,
+          "os_years": -1,
+          "security_years": -1,
+          "support_origin": "not specified",
+          "support_qualifier": "not specified",
+          "ip_protocol": "6 m freshwater for 30 min; resistance not permanent",
+          "height_mm": 147.6,
+          "width_mm": 71.6,
+          "depth_mm": 7.8,
+          "mass_g": 170,
+          "diagonal_inch": 6.12,
+          "diagonal_label": "6.12-inch standard-rectangle diagonal; nominal marketed label 6.1 inches",
+          "screen_technology": "OLED",
+          "refresh_label": "not specified",
+          "processor": "authored compact iOS processor",
+          "sim": "UK nano-SIM/eSIM or dual eSIM; not a universal regional configuration",
+          "wifi": "7",
+          "bluetooth": "5.3",
+          "camera_description": "48 MP main, 12 MP ultrawide; main-sensor 2× mode is not a third physical lens",
+          "rear_lens_count": 2,
+          "main_ois": true,
+          "ip_label": "IP68"
+        }
+      },
+      "cases": [
+        {
+          "when": "profile.positioning == 'budget'",
+          "weights": {
+            "entry": 8,
+            "mid": 3,
+            "large": 1,
+            "ios": 2
+          }
+        },
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "weights": {
+            "entry": 3,
+            "mid": 6,
+            "large": 2,
+            "ios": 2
+          }
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "weights": {
+            "entry": 1,
+            "mid": 3,
+            "large": 6,
+            "ios": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "assembly_assembly",
+      "target": "product.facts.assembly",
+      "derive": "internal.assembly.assembly"
+    },
+    {
+      "id": "assembly_os",
+      "target": "product.facts.os",
+      "derive": "internal.assembly.os"
+    },
+    {
+      "id": "assembly_height_mm",
+      "target": "product.facts.height_mm",
+      "derive": "internal.assembly.height_mm"
+    },
+    {
+      "id": "assembly_width_mm",
+      "target": "product.facts.width_mm",
+      "derive": "internal.assembly.width_mm"
+    },
+    {
+      "id": "assembly_depth_mm",
+      "target": "product.facts.depth_mm",
+      "derive": "internal.assembly.depth_mm"
+    },
+    {
+      "id": "assembly_mass_g",
+      "target": "product.facts.mass_g",
+      "derive": "internal.assembly.mass_g"
+    },
+    {
+      "id": "assembly_diagonal_unit",
+      "target": "product.facts.diagonal_unit",
+      "derive": "internal.assembly.diagonal_unit"
+    },
+    {
+      "id": "assembly_diagonal_inch",
+      "target": "product.facts.diagonal_inch",
+      "derive": "internal.assembly.diagonal_inch",
+      "when": "product.facts.diagonal_unit == 'inch'"
+    },
+    {
+      "id": "assembly_diagonal_mm",
+      "target": "product.facts.diagonal_mm",
+      "derive": "internal.assembly.diagonal_mm",
+      "when": "product.facts.diagonal_unit == 'mm'"
+    },
+    {
+      "id": "assembly_diagonal_label",
+      "target": "product.facts.diagonal_label",
+      "derive": "internal.assembly.diagonal_label"
+    },
+    {
+      "id": "assembly_screen_technology",
+      "target": "product.facts.screen_technology",
+      "derive": "internal.assembly.screen_technology"
+    },
+    {
+      "id": "assembly_refresh_label",
+      "target": "product.facts.refresh_label",
+      "derive": "internal.assembly.refresh_label"
+    },
+    {
+      "id": "assembly_processor",
+      "target": "product.facts.processor",
+      "derive": "internal.assembly.processor"
+    },
+    {
+      "id": "assembly_ram_gb",
+      "target": "product.facts.ram_gb",
+      "derive": "internal.assembly.ram_gb"
+    },
+    {
+      "id": "assembly_capacity_typical_mah",
+      "target": "product.facts.capacity_typical_mah",
+      "derive": "internal.assembly.capacity_typical_mah"
+    },
+    {
+      "id": "assembly_capacity_lower_mah",
+      "target": "product.facts.capacity_lower_mah",
+      "derive": "internal.assembly.capacity_lower_mah"
+    },
+    {
+      "id": "assembly_capacity_lower_basis",
+      "target": "product.facts.capacity_lower_basis",
+      "derive": "internal.assembly.capacity_lower_basis"
+    },
+    {
+      "id": "assembly_adapter_basis_w",
+      "target": "product.facts.adapter_basis_w",
+      "derive": "internal.assembly.adapter_basis_w"
+    },
+    {
+      "id": "assembly_adapter_basis_label",
+      "target": "product.facts.adapter_basis_label",
+      "derive": "internal.assembly.adapter_basis_label"
+    },
+    {
+      "id": "assembly_wireless_support",
+      "target": "product.facts.wireless_support",
+      "derive": "internal.assembly.wireless_support"
+    },
+    {
+      "id": "assembly_wireless_route",
+      "target": "product.facts.wireless_route",
+      "derive": "internal.assembly.wireless_route"
+    },
+    {
+      "id": "assembly_wireless_max_w",
+      "target": "product.facts.wireless_max_w",
+      "derive": "internal.assembly.wireless_max_w"
+    },
+    {
+      "id": "assembly_port_data",
+      "target": "product.facts.port_data",
+      "derive": "internal.assembly.port_data"
+    },
+    {
+      "id": "assembly_cable_data",
+      "target": "product.facts.cable_data",
+      "derive": "internal.assembly.cable_data"
+    },
+    {
+      "id": "assembly_sim",
+      "target": "product.facts.sim",
+      "derive": "internal.assembly.sim"
+    },
+    {
+      "id": "assembly_wifi",
+      "target": "product.facts.wifi",
+      "derive": "internal.assembly.wifi"
+    },
+    {
+      "id": "assembly_bluetooth",
+      "target": "product.facts.bluetooth",
+      "derive": "internal.assembly.bluetooth"
+    },
+    {
+      "id": "assembly_camera_description",
+      "target": "product.facts.camera_description",
+      "derive": "internal.assembly.camera_description"
+    },
+    {
+      "id": "assembly_rear_lens_count",
+      "target": "product.facts.rear_lens_count",
+      "derive": "internal.assembly.rear_lens_count"
+    },
+    {
+      "id": "assembly_main_ois",
+      "target": "product.facts.main_ois",
+      "derive": "internal.assembly.main_ois"
+    },
+    {
+      "id": "assembly_os_generations",
+      "target": "product.facts.os_generations",
+      "derive": "internal.assembly.os_generations"
+    },
+    {
+      "id": "assembly_os_years",
+      "target": "product.facts.os_years",
+      "derive": "internal.assembly.os_years"
+    },
+    {
+      "id": "assembly_security_years",
+      "target": "product.facts.security_years",
+      "derive": "internal.assembly.security_years"
+    },
+    {
+      "id": "assembly_support_origin",
+      "target": "product.facts.support_origin",
+      "derive": "internal.assembly.support_origin"
+    },
+    {
+      "id": "assembly_support_qualifier",
+      "target": "product.facts.support_qualifier",
+      "derive": "internal.assembly.support_qualifier"
+    },
+    {
+      "id": "ip_disclosure",
+      "target": "product.facts.ip_disclosed",
+      "sample": "weighted_choice",
+      "weights": {
+        "known": 3,
+        "unknown": 1
+      },
+      "values": {
+        "known": true,
+        "unknown": false
+      }
+    },
+    {
+      "id": "ip_label",
+      "target": "product.facts.ip_label",
+      "derive": "internal.assembly.ip_label if product.facts.ip_disclosed else 'not specified'"
+    },
+    {
+      "id": "ip_protocol",
+      "target": "product.facts.ip_protocol",
+      "derive": "internal.assembly.ip_protocol if product.facts.ip_disclosed else 'not specified'"
+    },
+    {
+      "id": "storage_menu",
+      "target": "product.storage_keys",
+      "sample": "weighted_subset",
+      "weights": {
+        "128GB": 1,
+        "256GB": 0,
+        "512GB": 0,
+        "1TB": 0
+      },
+      "count_weights": {
+        "1": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.assembly == 'mid'",
+          "weights": {
+            "128GB": 3,
+            "256GB": 2,
+            "512GB": 0,
+            "1TB": 0
+          },
+          "count_weights": {
+            "1": 2,
+            "2": 3
+          }
+        },
+        {
+          "when": "product.facts.assembly == 'large'",
+          "weights": {
+            "128GB": 0,
+            "256GB": 3,
+            "512GB": 2,
+            "1TB": 1
+          },
+          "count_weights": {
+            "1": 2,
+            "2": 3,
+            "3": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 5,
+        "white": 3,
+        "blue": 2
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 4,
+        "3": 2
+      }
+    },
+    {
+      "id": "storage_groups",
+      "for_each": {
+        "binding": "group.storage_key",
+        "from": "product.storage_keys"
+      },
+      "steps": [
+        {
+          "id": "storage_numeric",
+          "target": "group.storage_gb",
+          "derive": "128 if group.storage_key == '128GB' else (256 if group.storage_key == '256GB' else (512 if group.storage_key == '512GB' else 1000))"
+        },
+        {
+          "id": "storage_label",
+          "target": "group.storage_label",
+          "derive": "group.storage_key"
+        },
+        {
+          "id": "storage_price_factor",
+          "target": "group.storage_price_factor",
+          "derive": "(1 if group.storage_key == '256GB' else (1.12 if group.storage_key == '512GB' else 1.25)) if product.facts.assembly == 'large' else (1.12 if group.storage_key == '256GB' else 1)"
+        },
+        {
+          "id": "sku_reference_price",
+          "target": "group.reference_price_sek",
+          "derive": "product.reference_price_sek * group.storage_price_factor"
+        },
+        {
+          "id": "colour_groups",
+          "for_each": {
+            "binding": "group.colour",
+            "from": "product.colours"
+          },
+          "steps": [
+            {
+              "id": "skus",
+              "target": "product.skus",
+              "emit": {
+                "sku_id": "product.product_id + '-' + group.storage_key + '-' + group.colour",
+                "product_id": "product.product_id",
+                "colour": "group.colour",
+                "storage_gb": "group.storage_gb",
+                "storage_label": "group.storage_label",
+                "ram_gb": "internal.assembly.ram_gb",
+                "storage_price_factor": "group.storage_price_factor",
+                "reference_price_sek": "group.reference_price_sek"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.os",
+          "product.facts.region",
+          "product.facts.height_mm",
+          "product.facts.width_mm",
+          "product.facts.depth_mm",
+          "product.facts.mass_g",
+          "product.facts.screen_technology",
+          "product.facts.diagonal_label",
+          "product.facts.processor"
+        ]
+      },
+      "slots": {
+        "os": "product.facts.os",
+        "h": "product.facts.height_mm",
+        "w": "product.facts.width_mm",
+        "d": "product.facts.depth_mm",
+        "mass": "product.facts.mass_g",
+        "screen": "product.facts.screen_technology",
+        "diagonal": "product.facts.diagonal_label",
+        "chip": "product.facts.processor"
+      },
+      "formulations": [
+        "{os} UK-fixture phone, H×W×D {h:g}×{w:g}×{d:g} mm, device mass {mass} g. {screen}; {diagonal}; {chip}.",
+        "UK-fixture {os}; whole device {mass} g, height {h:g}, width {w:g}, depth {d:g} mm. Display {screen}, {diagonal}; processor {chip}."
+      ]
+    },
+    {
+      "id": "description.refresh",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.refresh_label"
+        ]
+      },
+      "slots": {
+        "label": "product.facts.refresh_label"
+      },
+      "formulations": [
+        "Display refresh declaration: {label}.",
+        "Supplied display refresh label: {label}."
+      ],
+      "when": "known(product.facts.refresh_label)"
+    },
+    {
+      "id": "description.refresh_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.refresh_label"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Display refresh-rate declaration unspecified.",
+        "No supplied numerical refresh-rate declaration."
+      ],
+      "when": "not known(product.facts.refresh_label)"
+    },
+    {
+      "id": "description.ram",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.ram_gb"
+        ]
+      },
+      "slots": {
+        "ram": "product.facts.ram_gb"
+      },
+      "formulations": [
+        "Model RAM {ram} GB, constant across its authored storage SKUs.",
+        "All this model’s storage variants use {ram} GB RAM."
+      ],
+      "when": "known(product.facts.ram_gb)"
+    },
+    {
+      "id": "description.ram_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.ram_gb"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "RAM declaration unspecified, not zero.",
+        "No supplied RAM quantity."
+      ],
+      "when": "not known(product.facts.ram_gb)"
+    },
+    {
+      "id": "description.storage",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.advertised_storage_basis",
+          "product.facts.usable_storage_gb"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Canonical SKUs retain advertised storage labels and decimal GB; 1 TB means 1000 GB. User-available space is unspecified.",
+        "Storage and colour are exact manufactured SKU choices; nominal decimal storage is not user-available free space, which is unspecified."
+      ]
+    },
+    {
+      "id": "description.capacity",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.capacity_typical_mah",
+          "product.facts.capacity_lower_mah",
+          "product.facts.capacity_lower_basis",
+          "product.facts.battery_energy_wh",
+          "product.facts.cell_voltage",
+          "product.facts.actual_runtime"
+        ]
+      },
+      "slots": {
+        "typical": "product.facts.capacity_typical_mah",
+        "lower": "product.facts.capacity_lower_mah",
+        "basis": "product.facts.capacity_lower_basis"
+      },
+      "formulations": [
+        "Charge-capacity declaration {typical} mAh typical, {lower} mAh {basis}; not energy or runtime. Wh, voltage and actual endurance unspecified.",
+        "Nominal charge capacity: typical {typical} mAh; {basis} {lower} mAh. No declared Wh/voltage or actual battery endurance."
+      ],
+      "when": "known(product.facts.capacity_typical_mah)"
+    },
+    {
+      "id": "description.capacity_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.capacity_typical_mah",
+          "product.facts.capacity_lower_mah",
+          "product.facts.battery_energy_wh",
+          "product.facts.cell_voltage",
+          "product.facts.actual_runtime"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Charge capacity, Wh, voltage and actual endurance unspecified.",
+        "No charge-capacity/energy/voltage or actual-runtime declarations."
+      ],
+      "when": "not known(product.facts.capacity_typical_mah)"
+    },
+    {
+      "id": "description.charging",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.charge_connector",
+          "product.facts.device_input_ceiling_w",
+          "product.facts.charge_cable_included",
+          "product.facts.power_adapter_included",
+          "product.facts.wireless_pad_included"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "USB-C charging cable included; power adapter and wireless pad not included (authored box choice). Device wired-input ceiling and achieved charging speed unspecified.",
+        "Charges through USB-C. Authored box includes cable, excludes adapter/pad; device-input maximum and achieved charging rate unspecified."
+      ]
+    },
+    {
+      "id": "description.adapter",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.adapter_basis_w",
+          "product.facts.adapter_basis_label"
+        ]
+      },
+      "slots": {
+        "basis": "product.facts.adapter_basis_label"
+      },
+      "formulations": [
+        "Adapter recommendation/test basis: {basis}.",
+        "Supplied adapter/test context: {basis}."
+      ],
+      "when": "known(product.facts.adapter_basis_w)"
+    },
+    {
+      "id": "description.adapter_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.adapter_basis_w",
+          "product.facts.adapter_basis_label"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Compatible adapter power/test basis unspecified.",
+        "No numerical adapter-rating recommendation or test basis supplied."
+      ],
+      "when": "not known(product.facts.adapter_basis_w)"
+    },
+    {
+      "id": "description.wireless",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wireless_support",
+          "product.facts.wireless_route",
+          "product.facts.wireless_pad_included"
+        ]
+      },
+      "slots": {
+        "route": "product.facts.wireless_route"
+      },
+      "formulations": [
+        "Wireless charging supported using {route}; pad not included.",
+        "Compatible wireless route: {route}; charging pad excluded."
+      ],
+      "when": "known(product.facts.wireless_support)"
+    },
+    {
+      "id": "description.wireless_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wireless_support",
+          "product.facts.wireless_route"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Wireless-charge support unspecified, not declared unsupported.",
+        "No wireless charging support declaration."
+      ],
+      "when": "not known(product.facts.wireless_support)"
+    },
+    {
+      "id": "description.wireless_power",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wireless_max_w"
+        ]
+      },
+      "slots": {
+        "watts": "product.facts.wireless_max_w"
+      },
+      "formulations": [
+        "Declared wireless charging maximum up to {watts:g} W with compatible equipment.",
+        "Compatible-equipment wireless maximum: up to {watts:g} W."
+      ],
+      "when": "known(product.facts.wireless_max_w)"
+    },
+    {
+      "id": "description.wireless_power_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wireless_max_w"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Wireless charging power ceiling unspecified.",
+        "No numerical wireless-power maximum supplied."
+      ],
+      "when": "not known(product.facts.wireless_max_w)"
+    },
+    {
+      "id": "description.port",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.port_data"
+        ]
+      },
+      "slots": {
+        "data": "product.facts.port_data"
+      },
+      "formulations": [
+        "Device USB-C data declaration {data}; actual bandwidth unspecified.",
+        "USB-C device data generation {data}; not achieved transfer rate."
+      ],
+      "when": "known(product.facts.port_data)"
+    },
+    {
+      "id": "description.port_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.port_data"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Device USB data generation unspecified.",
+        "No declared device USB data generation."
+      ],
+      "when": "not known(product.facts.port_data)"
+    },
+    {
+      "id": "description.cable",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.cable_data"
+        ]
+      },
+      "slots": {
+        "data": "product.facts.cable_data"
+      },
+      "formulations": [
+        "Included cable data generation {data}, distinct from the device port.",
+        "Supplied cable data: {data}; this does not replace the port declaration."
+      ],
+      "when": "known(product.facts.cable_data)"
+    },
+    {
+      "id": "description.cable_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.cable_data"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Included cable data capability unspecified.",
+        "No data-generation declaration for the included cable."
+      ],
+      "when": "not known(product.facts.cable_data)"
+    },
+    {
+      "id": "description.networks",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.region",
+          "product.facts.network_5g",
+          "product.facts.wifi",
+          "product.facts.bluetooth",
+          "product.facts.unlocked"
+        ]
+      },
+      "slots": {
+        "wifi": "product.facts.wifi",
+        "bt": "product.facts.bluetooth"
+      },
+      "formulations": [
+        "Unlocked UK-fixture phone with regional 5G, Wi-Fi {wifi}, Bluetooth {bt}; compatible networks/router required, no coverage or speed guarantee.",
+        "Regional 5G; Wi-Fi {wifi}, Bluetooth {bt}. Authored unlocked UK fixture, not universal carrier compatibility."
+      ]
+    },
+    {
+      "id": "description.sim",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.sim"
+        ]
+      },
+      "slots": {
+        "sim": "product.facts.sim"
+      },
+      "formulations": [
+        "Regional SIM configuration: {sim}.",
+        "UK-fixture SIM declaration: {sim}."
+      ],
+      "when": "known(product.facts.sim)"
+    },
+    {
+      "id": "description.sim_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.sim"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Regional SIM configuration unspecified.",
+        "No supplied regional SIM arrangement."
+      ],
+      "when": "not known(product.facts.sim)"
+    },
+    {
+      "id": "description.camera",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.camera_description",
+          "product.facts.rear_lens_count",
+          "product.facts.main_ois"
+        ]
+      },
+      "slots": {
+        "camera": "product.facts.camera_description",
+        "count": "product.facts.rear_lens_count",
+        "ois": "'present' if product.facts.main_ois else 'absent'"
+      },
+      "formulations": [
+        "{count} physical rear lenses: {camera}; main-camera OIS {ois}. Specifications do not establish image quality.",
+        "Rear construction {camera}; {count} physical lenses, main OIS {ois}. No inferred camera-quality rating."
+      ]
+    },
+    {
+      "id": "description.ip",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.ip_label"
+        ]
+      },
+      "slots": {
+        "ip": "product.facts.ip_label"
+      },
+      "formulations": [
+        "Declared protection label {ip}; not permanent waterproofness or immersion-use permission.",
+        "Supplied IP label {ip}; resistance is not permanent and does not authorize immersion use."
+      ],
+      "when": "known(product.facts.ip_label)"
+    },
+    {
+      "id": "description.ip_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.ip_label",
+          "product.facts.ip_protocol"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "IP label and test protocol unspecified; no protection inferred.",
+        "No supplied IP/test declaration; unknown does not mean unprotected."
+      ],
+      "when": "not known(product.facts.ip_label)"
+    },
+    {
+      "id": "description.ip_protocol",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.ip_protocol"
+        ]
+      },
+      "slots": {
+        "protocol": "product.facts.ip_protocol"
+      },
+      "formulations": [
+        "IP test context: {protocol}.",
+        "Supplied protection-test context: {protocol}."
+      ],
+      "when": "known(product.facts.ip_protocol)"
+    },
+    {
+      "id": "description.ip_protocol_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.ip_protocol"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Numerical IP test conditions unspecified.",
+        "No supplied numerical IP test conditions."
+      ],
+      "when": "known(product.facts.ip_label) and not known(product.facts.ip_protocol)"
+    },
+    {
+      "id": "description.os_generations",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.os_generations",
+          "product.facts.support_qualifier",
+          "product.facts.support_origin"
+        ]
+      },
+      "slots": {
+        "n": "product.facts.os_generations",
+        "q": "product.facts.support_qualifier",
+        "origin": "product.facts.support_origin"
+      },
+      "formulations": [
+        "OS-update claim {q}: {n} generations, origin {origin}; not remaining years.",
+        "Supplied OS generations {n}, qualifier {q}, basis {origin}; generations are not years."
+      ],
+      "when": "known(product.facts.os_generations)"
+    },
+    {
+      "id": "description.os_years",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.os_years",
+          "product.facts.support_origin"
+        ]
+      },
+      "slots": {
+        "n": "product.facts.os_years",
+        "origin": "product.facts.support_origin"
+      },
+      "formulations": [
+        "OS-update period {n:g} years, origin {origin}; generation count unspecified.",
+        "Declared OS-support years {n:g}, basis {origin}; no OS-generation count."
+      ],
+      "when": "known(product.facts.os_years)"
+    },
+    {
+      "id": "description.security",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.security_years",
+          "product.facts.support_qualifier",
+          "product.facts.support_origin",
+          "product.facts.support_launch_date",
+          "product.facts.remaining_support_years"
+        ]
+      },
+      "slots": {
+        "n": "product.facts.security_years",
+        "q": "product.facts.support_qualifier",
+        "origin": "product.facts.support_origin"
+      },
+      "formulations": [
+        "Security-support claim {q}: {n:g} years, origin {origin}; launch date and remaining years unspecified.",
+        "Security period {n:g} years, qualifier {q}, basis {origin}; not years remaining from purchase."
+      ],
+      "when": "known(product.facts.security_years)"
+    },
+    {
+      "id": "description.support_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.os_generations",
+          "product.facts.os_years",
+          "product.facts.security_years"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Fixed OS/security support duration unspecified; not zero support.",
+        "No fixed OS-generation/year or security-year commitment supplied."
+      ],
+      "when": "not known(product.facts.security_years)"
+    },
+    {
+      "id": "description.software_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.installed_os_version",
+          "product.facts.support_launch_date",
+          "product.facts.remaining_support_years"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Installed OS version, launch calendar date and remaining support period unspecified.",
+        "No installed-version, exact launch date or purchase-time remaining-support declaration."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'phones.smartphones' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "storage",
+      "role": "filter",
+      "predicate": "sku.storage_gb >= request.storage_gb",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "platform",
+      "role": "filter",
+      "predicate": "product.facts.os == request.os",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "minimum_typical_charge",
+      "role": "filter",
+      "predicate": "known(product.facts.capacity_typical_mah) and product.facts.capacity_typical_mah >= request.min_typical_charge_mah",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "ip_label",
+      "role": "filter",
+      "predicate": "known(product.facts.ip_label) and product.facts.ip_label == request.ip_label",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "storage_gb": {
+                "type": "integer",
+                "unit": "GB",
+                "min": 128,
+                "max": 1000
+              },
+              "storage_label": {
+                "type": "string"
+              },
+              "ram_gb": {
+                "type": "integer",
+                "unit": "GB",
+                "min": -1,
+                "max": 12,
+                "unknown_values": [
+                  -1
+                ]
+              },
+              "storage_price_factor": {
+                "type": "number",
+                "min": 1,
+                "max": 1.25
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 1500,
+                "max": 22500
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "storage_gb": {
+              "type": "integer",
+              "unit": "GB",
+              "min": 128,
+              "max": 1000
+            },
+            "storage_label": {
+              "type": "string"
+            },
+            "ram_gb": {
+              "type": "integer",
+              "unit": "GB",
+              "min": -1,
+              "max": 12,
+              "unknown_values": [
+                -1
+              ]
+            },
+            "storage_price_factor": {
+              "type": "number",
+              "min": 1,
+              "max": 1.25
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 1500,
+              "max": 22500
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "daylight_camera",
+            "lowlight_motion_camera",
+            "usual_day_charge",
+            "ordinary_app_handling",
+            "onehand_grip",
+            "cable_attachment"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "daylight_camera",
+              "lowlight_motion_camera",
+              "usual_day_charge",
+              "ordinary_app_handling",
+              "onehand_grip",
+              "cable_attachment"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 1500,
+          "max": 18000
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "max": 22500
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 1500
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 22500
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_daylight_camera": {
+          "type": "boolean"
+        },
+        "review.positive_lowlight_motion_camera": {
+          "type": "boolean"
+        },
+        "review.positive_usual_day_charge": {
+          "type": "boolean"
+        },
+        "review.positive_ordinary_app_handling": {
+          "type": "boolean"
+        },
+        "review.positive_onehand_grip": {
+          "type": "boolean"
+        },
+        "review.positive_cable_attachment": {
+          "type": "boolean"
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_daylight_camera",
+          "target": "review.positive_daylight_camera",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_lowlight_motion_camera",
+          "target": "review.positive_lowlight_motion_camera",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_usual_day_charge",
+          "target": "review.positive_usual_day_charge",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_ordinary_app_handling",
+          "target": "review.positive_ordinary_app_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_onehand_grip",
+          "target": "review.positive_onehand_grip",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_cable_attachment",
+          "target": "review.positive_cable_attachment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "daylight_camera.positive",
+          "when": "'daylight_camera' in review.topics and review.positive_daylight_camera",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "daylight_camera",
+            "polarity": "positive",
+            "context": {
+              "camera": "main rear",
+              "scene": "static subject outdoors in daylight",
+              "aspect": "subjective image satisfaction"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked the main rear camera pictures of a static subject outdoors in daylight.",
+            "For a static subject outside in daylight, I liked the pictures from the main rear camera."
+          ]
+        },
+        {
+          "id": "daylight_camera.negative",
+          "when": "'daylight_camera' in review.topics and not review.positive_daylight_camera",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "daylight_camera",
+            "polarity": "negative",
+            "context": {
+              "camera": "main rear",
+              "scene": "static subject outdoors in daylight",
+              "aspect": "subjective image satisfaction"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked the main rear camera pictures of a static subject outdoors in daylight.",
+            "For a static subject outside in daylight, I disliked the pictures from the main rear camera."
+          ]
+        },
+        {
+          "id": "lowlight_motion_camera.positive",
+          "when": "'lowlight_motion_camera' in review.topics and review.positive_lowlight_motion_camera",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lowlight_motion_camera",
+            "polarity": "positive",
+            "context": {
+              "camera": "main rear handheld",
+              "scene": "moving subject indoors in low light",
+              "aspect": "subjective image satisfaction"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked the handheld main-rear-camera results for a moving subject indoors in low light.",
+            "Indoors in low light, I liked my handheld main-rear-camera pictures of a moving subject."
+          ]
+        },
+        {
+          "id": "lowlight_motion_camera.negative",
+          "when": "'lowlight_motion_camera' in review.topics and not review.positive_lowlight_motion_camera",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "lowlight_motion_camera",
+            "polarity": "negative",
+            "context": {
+              "camera": "main rear handheld",
+              "scene": "moving subject indoors in low light",
+              "aspect": "subjective image satisfaction"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked the handheld main-rear-camera results for a moving subject indoors in low light.",
+            "Indoors in low light, I disliked my handheld main-rear-camera pictures of a moving subject."
+          ]
+        },
+        {
+          "id": "usual_day_charge.positive",
+          "when": "'usual_day_charge' in review.topics and review.positive_usual_day_charge",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usual_day_charge",
+            "polarity": "positive",
+            "context": {
+              "use": "owner usual day of calls/messages/navigation",
+              "time": "end of that day",
+              "aspect": "observed remaining charge, not measured endurance"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "At the end of my usual day of calls, messages and navigation, the phone still had charge left.",
+            "After my usual day of calling, messaging and navigation, I still had charge remaining."
+          ]
+        },
+        {
+          "id": "usual_day_charge.negative",
+          "when": "'usual_day_charge' in review.topics and not review.positive_usual_day_charge",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usual_day_charge",
+            "polarity": "negative",
+            "context": {
+              "use": "owner usual day of calls/messages/navigation",
+              "time": "end of that day",
+              "aspect": "observed remaining charge, not measured endurance"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "At the end of my usual day of calls, messages and navigation, the phone had no charge left.",
+            "After my usual day of calling, messaging and navigation, I had no charge remaining."
+          ]
+        },
+        {
+          "id": "ordinary_app_handling.positive",
+          "when": "'ordinary_app_handling' in review.topics and review.positive_ordinary_app_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "ordinary_app_handling",
+            "polarity": "positive",
+            "context": {
+              "operation": "ordinary app switching and typing",
+              "device": "tested exact storage/colour SKU",
+              "aspect": "subjective interaction ease"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Ordinary app switching and typing felt smooth to me on this configuration.",
+            "I found ordinary switching between apps and typing smooth on my tested configuration."
+          ]
+        },
+        {
+          "id": "ordinary_app_handling.negative",
+          "when": "'ordinary_app_handling' in review.topics and not review.positive_ordinary_app_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "ordinary_app_handling",
+            "polarity": "negative",
+            "context": {
+              "operation": "ordinary app switching and typing",
+              "device": "tested exact storage/colour SKU",
+              "aspect": "subjective interaction ease"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Ordinary app switching and typing felt sluggish to me on this configuration.",
+            "I found ordinary switching between apps and typing sluggish on my tested configuration."
+          ]
+        },
+        {
+          "id": "onehand_grip.positive",
+          "when": "'onehand_grip' in review.topics and review.positive_onehand_grip",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "onehand_grip",
+            "polarity": "positive",
+            "context": {
+              "operation": "holding phone in one hand",
+              "aspect": "subjective grip preference, not universal fit"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked holding this phone in one hand during ordinary use.",
+            "For ordinary use, holding this phone in one hand felt comfortable to me."
+          ]
+        },
+        {
+          "id": "onehand_grip.negative",
+          "when": "'onehand_grip' in review.topics and not review.positive_onehand_grip",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "onehand_grip",
+            "polarity": "negative",
+            "context": {
+              "operation": "holding phone in one hand",
+              "aspect": "subjective grip preference, not universal fit"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked holding this phone in one hand during ordinary use.",
+            "For ordinary use, holding this phone in one hand felt uncomfortable to me."
+          ]
+        },
+        {
+          "id": "cable_attachment.positive",
+          "when": "'cable_attachment' in review.topics and review.positive_cable_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cable_attachment",
+            "polarity": "positive",
+            "context": {
+              "operation": "attaching included USB-C cable to actual charging port",
+              "aspect": "handling, not measured charging success"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found attaching the included USB-C cable to the phone easy.",
+            "For me, plugging the included USB-C cable into the phone was straightforward."
+          ]
+        },
+        {
+          "id": "cable_attachment.negative",
+          "when": "'cable_attachment' in review.topics and not review.positive_cable_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cable_attachment",
+            "polarity": "negative",
+            "context": {
+              "operation": "attaching included USB-C cable to actual charging port",
+              "aspect": "handling, not measured charging success"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found attaching the included USB-C cable to the phone difficult.",
+            "For me, plugging the included USB-C cable into the phone was awkward."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Exact selected manufactured storage/colour SKU price; global category bounds include all capacity factors",
+        "relative_price_basis": {
+          "min_sek": 1500,
+          "max_sek": 22500
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "phones",
+    "spec_path": "docs/agents/product-width-specs/phones.smartphones.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Exact supported-menu storage coefficients anchored before manufactured-subset selection; colour no surcharge",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "electronics"
+    ],
+    "authored_exceptions": [
+      "UK bounded assemblies, unlocked and box exclusions; not source-exhaustive manufacture",
+      "Decimal1TB=1000GB comparison, nominal label retained",
+      "Mid update origin explicitly authored; unknown generation counts and all device-input ceilings",
+      "Independent IP missing-disclosure3:1, not physical protection loss or prevalence"
+    ],
+    "source_notes": ".local/product-width/research/smartphones.md",
+    "positioning_assembly_policy": {
+      "conditional_weights": {
+        "budget": {
+          "entry": 8,
+          "mid": 3,
+          "large": 1,
+          "ios": 2
+        },
+        "mainstream": {
+          "entry": 3,
+          "mid": 6,
+          "large": 2,
+          "ios": 2
+        },
+        "premium": {
+          "entry": 1,
+          "mid": 3,
+          "large": 6,
+          "ios": 2
+        }
+      },
+      "heuristic_status": "Soft authored cost-related bundle correlations; nonzero alternatives at every positioning; no quality ranking from size or platform"
+    }
+  }
+}

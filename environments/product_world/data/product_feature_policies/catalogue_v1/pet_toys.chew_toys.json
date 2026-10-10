@@ -1,0 +1,2010 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "pet_toys.chew_toys",
+  "family_id": "pet_toys",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pet_toys.chew_toys.json": "8ce85e0680b301ae3bebb7f4548649dbbb0c2ec40677fad3137f8f631ed67d7f",
+    "environments/product_world/data/product_width/_pet_toys_base.json": "e29f03458136d223052afad9efd88874fd961e3c38401771248c3baa6253b73b"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Chew, tug, soft, puzzle and teaser functions differ. Keep supervision/inspection instructions as care/use details, without claiming durability or clinical effects.",
+  "concept_note": "Known absence of a puzzle/dispenser is not a chew-toy selling point; do not force every toy into every family function.",
+  "fields": {
+    "product.facts.ring_aperture_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "applicable_when": "product.facts.ring_shape",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "rubber_ring",
+          "nylon_bone"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.component_materials": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "natural rubber",
+            "nylon"
+          ]
+        },
+        "min_items": 1,
+        "max_items": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "component_materials"
+    },
+    "product.facts.body_description": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "body_description"
+    },
+    "product.facts.texture": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "texture"
+    },
+    "product.facts.declared_chewing_style": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "moderate",
+          "strong"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_chewing_style"
+    },
+    "product.facts.top_rack_dishwasher": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "top_rack_dishwasher"
+    },
+    "product.facts.heated_drying_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "heated_drying_permitted"
+    },
+    "product.facts.ring_shape": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ring_shape"
+    },
+    "product.facts.intended_species": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "dog",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_life_stage": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "adult",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "intended_life_stage"
+    },
+    "product.facts.size_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "nominal exterior length/width/height per individual toy",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.weight_guide_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "synthetic declared inclusive adult-dog kg guide; not individual animal fit",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.handwash_care": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "warm water, mild soap and own soft brush; rinse and air dry",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handwash_care"
+    },
+    "product.facts.use_instruction": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "remove packaging; supervise; inspect before/during use; discontinue on visible damage, loose pieces or material wear/too-small condition",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "use_instruction"
+    },
+    "product.facts.single_body_per_toy": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.toys_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "toys_included"
+    },
+    "product.facts.packaging_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "packaging_included"
+    },
+    "product.facts.identical_toys_per_pack": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "identical_toys_per_pack"
+    },
+    "product.facts.non_edible": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "non_edible"
+    },
+    "product.facts.supervised_use": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supervised_use"
+    },
+    "product.facts.inspect_before_during_use": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "inspect_before_during_use"
+    },
+    "product.facts.discontinue_on_damage": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "discontinue_on_damage"
+    },
+    "product.facts.unflavoured": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "taste",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "unflavoured"
+    },
+    "product.facts.unfilled": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "unfilled"
+    },
+    "product.facts.handwash_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handwash_permitted"
+    },
+    "product.facts.detachable_functional_component": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "detachable_functional_component"
+    },
+    "product.facts.stuffing": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stuffing"
+    },
+    "product.facts.fabric": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fabric"
+    },
+    "product.facts.rope": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rope"
+    },
+    "product.facts.squeaker": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "squeaker"
+    },
+    "product.facts.electronics": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "electronics"
+    },
+    "product.facts.battery": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery"
+    },
+    "product.facts.added_edible_coating": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "added_edible_coating"
+    },
+    "product.facts.treat_cavity": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "treat_cavity"
+    },
+    "product.facts.treat_dispensing": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "treat_dispensing"
+    },
+    "product.facts.food_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "food_included"
+    },
+    "product.facts.refills_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "refills_included"
+    },
+    "product.facts.spare_parts_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spare_parts_included"
+    },
+    "product.facts.brush_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "brush_included"
+    },
+    "product.facts.holder_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "holder_included"
+    },
+    "product.facts.rope_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rope_included"
+    },
+    "product.facts.charger_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charger_included"
+    },
+    "product.facts.battery_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_included"
+    },
+    "product.facts.puzzle_equipment_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "puzzle_equipment_included"
+    },
+    "product.facts.boiling_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "boiling_permitted"
+    },
+    "product.facts.microwave_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "microwave_permitted"
+    },
+    "product.facts.oven_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "oven_permitted"
+    },
+    "product.facts.bleach_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bleach_permitted"
+    },
+    "product.facts.solvent_cleaning_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "solvent_cleaning_permitted"
+    },
+    "product.facts.toy_mass_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_hardness": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "hardness",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_strength": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "strength",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wear_life_days": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "day",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.full_cad": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dimensional_tolerances": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.material_grade": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.chemical_formulation": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.allergy_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.certification": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.individual_mouth_tooth_bite_fit": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ingestion_outcomes": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dental_effect": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.clinical_effect": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.unsupervised_use_guarantee": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.replacement_interval": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.float_or_fetch_tug_performance": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.treat_capacity_ml": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "applicable_when": "False",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "treat_capacity_ml"
+    },
+    "product.facts.electronic_power_w": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "False",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "electronic_power_w"
+    },
+    "product.facts.puzzle_mechanism": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "False",
+        "constant": "none",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "puzzle_mechanism"
+    }
+  },
+  "disclosure_groups": {
+    "construction": {
+      "id": "pet_toys.chew_toys.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_materials": {
+      "id": "pet_toys.chew_toys.content.component_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_description": {
+      "id": "pet_toys.chew_toys.content.body_description",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_description"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "texture": {
+      "id": "pet_toys.chew_toys.content.texture",
+      "display_group": "features",
+      "fields": [
+        "product.facts.texture"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_chewing_style": {
+      "id": "pet_toys.chew_toys.content.declared_chewing_style",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_chewing_style"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "top_rack_dishwasher": {
+      "id": "pet_toys.chew_toys.content.top_rack_dishwasher",
+      "display_group": "care",
+      "fields": [
+        "product.facts.top_rack_dishwasher"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heated_drying_permitted": {
+      "id": "pet_toys.chew_toys.content.heated_drying_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.heated_drying_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ring_shape": {
+      "id": "pet_toys.chew_toys.content.ring_shape",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.ring_shape"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "intended_life_stage": {
+      "id": "pet_toys.chew_toys.content.intended_life_stage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.intended_life_stage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handwash_care": {
+      "id": "pet_toys.chew_toys.content.handwash_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.handwash_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "use_instruction": {
+      "id": "pet_toys.chew_toys.content.use_instruction",
+      "display_group": "features",
+      "fields": [
+        "product.facts.use_instruction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "toys_included": {
+      "id": "pet_toys.chew_toys.content.toys_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.toys_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "packaging_included": {
+      "id": "pet_toys.chew_toys.content.packaging_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.packaging_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "identical_toys_per_pack": {
+      "id": "pet_toys.chew_toys.content.identical_toys_per_pack",
+      "display_group": "features",
+      "fields": [
+        "product.facts.identical_toys_per_pack"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "non_edible": {
+      "id": "pet_toys.chew_toys.content.non_edible",
+      "display_group": "features",
+      "fields": [
+        "product.facts.non_edible"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supervised_use": {
+      "id": "pet_toys.chew_toys.content.supervised_use",
+      "display_group": "features",
+      "fields": [
+        "product.facts.supervised_use"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "inspect_before_during_use": {
+      "id": "pet_toys.chew_toys.content.inspect_before_during_use",
+      "display_group": "features",
+      "fields": [
+        "product.facts.inspect_before_during_use"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "discontinue_on_damage": {
+      "id": "pet_toys.chew_toys.content.discontinue_on_damage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.discontinue_on_damage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "unflavoured": {
+      "id": "pet_toys.chew_toys.content.unflavoured",
+      "display_group": "taste",
+      "fields": [
+        "product.facts.unflavoured"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "unfilled": {
+      "id": "pet_toys.chew_toys.content.unfilled",
+      "display_group": "features",
+      "fields": [
+        "product.facts.unfilled"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handwash_permitted": {
+      "id": "pet_toys.chew_toys.content.handwash_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.handwash_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "detachable_functional_component": {
+      "id": "pet_toys.chew_toys.content.detachable_functional_component",
+      "display_group": "features",
+      "fields": [
+        "product.facts.detachable_functional_component"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stuffing": {
+      "id": "pet_toys.chew_toys.content.stuffing",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stuffing"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fabric": {
+      "id": "pet_toys.chew_toys.content.fabric",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fabric"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rope": {
+      "id": "pet_toys.chew_toys.content.rope",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rope"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "squeaker": {
+      "id": "pet_toys.chew_toys.content.squeaker",
+      "display_group": "features",
+      "fields": [
+        "product.facts.squeaker"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "electronics": {
+      "id": "pet_toys.chew_toys.content.electronics",
+      "display_group": "features",
+      "fields": [
+        "product.facts.electronics"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery": {
+      "id": "pet_toys.chew_toys.content.battery",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "added_edible_coating": {
+      "id": "pet_toys.chew_toys.content.added_edible_coating",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.added_edible_coating"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "treat_cavity": {
+      "id": "pet_toys.chew_toys.content.treat_cavity",
+      "display_group": "features",
+      "fields": [
+        "product.facts.treat_cavity"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "treat_dispensing": {
+      "id": "pet_toys.chew_toys.content.treat_dispensing",
+      "display_group": "features",
+      "fields": [
+        "product.facts.treat_dispensing"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "food_included": {
+      "id": "pet_toys.chew_toys.content.food_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.food_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "refills_included": {
+      "id": "pet_toys.chew_toys.content.refills_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.refills_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_parts_included": {
+      "id": "pet_toys.chew_toys.content.spare_parts_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.spare_parts_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "brush_included": {
+      "id": "pet_toys.chew_toys.content.brush_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.brush_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "holder_included": {
+      "id": "pet_toys.chew_toys.content.holder_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.holder_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rope_included": {
+      "id": "pet_toys.chew_toys.content.rope_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.rope_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charger_included": {
+      "id": "pet_toys.chew_toys.content.charger_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.charger_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_included": {
+      "id": "pet_toys.chew_toys.content.battery_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.battery_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "puzzle_equipment_included": {
+      "id": "pet_toys.chew_toys.content.puzzle_equipment_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.puzzle_equipment_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "boiling_permitted": {
+      "id": "pet_toys.chew_toys.content.boiling_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.boiling_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "microwave_permitted": {
+      "id": "pet_toys.chew_toys.content.microwave_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.microwave_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "oven_permitted": {
+      "id": "pet_toys.chew_toys.content.oven_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.oven_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bleach_permitted": {
+      "id": "pet_toys.chew_toys.content.bleach_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "solvent_cleaning_permitted": {
+      "id": "pet_toys.chew_toys.content.solvent_cleaning_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.solvent_cleaning_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "treat_capacity_ml": {
+      "id": "pet_toys.chew_toys.content.treat_capacity_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.treat_capacity_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "electronic_power_w": {
+      "id": "pet_toys.chew_toys.content.electronic_power_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.electronic_power_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "puzzle_mechanism": {
+      "id": "pet_toys.chew_toys.content.puzzle_mechanism",
+      "display_group": "features",
+      "fields": [
+        "product.facts.puzzle_mechanism"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "taste": {
+      "label": "Taste",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 70,
+    "roles": {
+      "omit_placeholder": 17,
+      "descriptive": 7,
+      "literal": 41,
+      "identity": 1,
+      "qualifier": 2,
+      "omit_fixed_detail": 1,
+      "internal": 1
+    },
+    "display_groups": 6,
+    "highlight_candidates": 3,
+    "unmapped_descriptive_fields": 48
+  }
+}

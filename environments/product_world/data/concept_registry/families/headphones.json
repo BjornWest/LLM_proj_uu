@@ -1,0 +1,228 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "headphones",
+  "review_id": "F08",
+  "label": "Headphones and headsets",
+  "section": "Electronics and computing",
+  "store_type_ids": [
+    "electronics"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Passive wired models need no charging/runtime; ANC, app and multipoint are optional. Headset mic behaviour and earbud fit require different wording.",
+  "shared_dimension_ids": [
+    "colour",
+    "connection",
+    "driver_design",
+    "microphone_configuration",
+    "noise_cancellation",
+    "fit_geometry",
+    "battery_capacity",
+    "charging_capability",
+    "exposure_protection"
+  ],
+  "dimensions": [
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "connection",
+      "label": "Connection",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "driver_design",
+      "label": "Driver design",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "microphone_configuration",
+      "label": "Microphone configuration",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "noise_cancellation",
+      "label": "Noise cancellation",
+      "module_id": "digital",
+      "identity_level": "model",
+      "value_kind": "boolean",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fit_geometry",
+      "label": "Fit geometry",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "battery_capacity",
+      "label": "Battery capacity",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "Wh",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "charging_capability",
+      "label": "Charging capability",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "exposure_protection",
+      "label": "Exposure protection",
+      "module_id": "exposure",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "headphones.over_ear_on_ear_headphones",
+      "label": "Over-ear/on-ear headphones",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "battery_capacity": "Active/powered configuration is present.",
+        "charging_capability": "Rechargeable configuration is present."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "headphones.in_ear_earbuds",
+      "label": "In-ear earbuds",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "battery_capacity": "Active/powered configuration is present.",
+        "charging_capability": "Rechargeable configuration is present."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "headphones.open_ear_sport_headphones",
+      "label": "Open-ear/sport headphones",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "battery_capacity": "Active/powered configuration is present.",
+        "charging_capability": "Rechargeable configuration is present."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "headphones.call_gaming_headsets",
+      "label": "Call/gaming headsets",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {
+        "battery_capacity": "Active/powered configuration is present.",
+        "charging_capability": "Rechargeable configuration is present."
+      },
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}
