@@ -152,7 +152,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         raise ValueError('Clarification callback requires an opt-in clarification tool profile')
     discovery_enabled = bool(harness_profile and getattr(harness_profile.tools,'site_discovery_tools',False))
     if discovery_enabled:
-        if not callable(site_discovery): raise ValueError('Site discovery tools require a task-scoped callable')
+        if not callable(site_discovery):
+            raise ValueError('Site discovery tools require a task-scoped callable')
+        if not harness_profile.ax_config or not hasattr(harness_profile.tools,'parse_completion'):
+            raise ValueError('Site discovery requires native tools and an AX tokenizer')
         if site_discovery_audit_id is not None and (
                 not isinstance(site_discovery_audit_id,str) or not site_discovery_audit_id.strip()):
             raise ValueError('site_discovery_audit_id must be a nonempty string or None')
@@ -334,8 +337,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     if discovery_enabled:
         profile_metadata['site_discovery'] = {
             'version':'public-site-discovery-v1','audit_id':site_discovery_audit_id,
-            'scope':'Explicitly bound public directory; no grader/task answers or navigation',
-            'feedback_tokens':1500,'helpers':'Same task-scoped directory; separate trace evidence'}
+            'source':'trusted task-scoped public directory','default_limit':5,'maximum_limit':20,
+            'helpers':'inherit the supplied directory; separate callback artifacts',
+            'scope':'Public names, kinds, URLs and descriptions only; no task answer or grading evidence.'}
     if retry_policy is not None:
         profile_metadata['decision_retry_policy'] = retry_policy.describe()
     if native_tools:
