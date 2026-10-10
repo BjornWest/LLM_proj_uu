@@ -92,3 +92,18 @@ recognized historical recordings without rewriting them; a viewer tag removal
 can suppress it. Custom scripted drivers must pass the tag explicitly. Missing
 models/zero counters and real model episodes launched by Python do not establish
 scripted behavior and are not automatically tagged.
+
+
+The trace heading and sidebar show the recorded episode end reason independently
+of the grade. Turn limits (`max_steps`), input context token limits
+(`max_input_tokens`), interruptions and manual close reasons are labeled directly;
+recorded turn counts and configured limits appear when recorded. A turn-budget
+stop can occur below the configured turn limit (for example, a shared helper-call
+budget); the viewer preserves the recorded code rather than claiming the limit
+was reached. **Recorded end details** shows the exact
+reason, source and execution error. A saved `episode.json` is authoritative;
+`episode_finished` lifecycle events provide a fallback. Missing reasons are
+reported as unrecorded, never inferred from counters or a model response's
+`finish_reason`. A hard process kill without a terminal record cannot establish
+why the episode ended. The lazy hub catalog reads this from small summary/lifecycle
+files without loading conversation history.

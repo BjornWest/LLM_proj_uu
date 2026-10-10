@@ -303,3 +303,25 @@ def test_hub_client_preserves_renderer_and_scroll_behavior():
     assert 'if(follow)scrollTraceToBottom();else restoreTracePosition(anchor)' in html
     assert 'Max ISL: load trace to view' in html
     assert 'Open trace to load totals' in html
+
+
+@pytest.mark.parametrize('reason',['max_steps','max_input_tokens','interrupted','user_close'])
+def test_lazy_stop_reason_matches_full_trace_without_loading_steps(setup,monkeypatch,reason):
+    from agent_trace.adapters import browsergym
+    h,a,b=setup
+    (b/'new/episode.json').write_text(json.dumps({'stop_reason':reason,'max_steps':24,'max_input_tokens':32000}))
+    with monkeypatch.context() as scoped:
+        scoped.setattr(h,'project',lambda *args:pytest.fail('Catalog projected full trace'))
+        rows=json.loads(h.snapshot()[0])
+    row=next(r for r in rows if r['id']==trace_id('new'))
+    assert row['summary_pending']
+    assert row['episode_end']==dict(reason=reason,source='episode.json',max_steps=24,max_input_tokens=32000)
+    body,_=h.load(h.lookup(row['id']))
+    assert json.loads(body)['episode_end']==row['episode_end']
+
+
+def test_lazy_stop_reason_appears_on_completion_without_stale_counters_overwriting_it(setup):
+    h,a,b=setup;h.snapshot();h.load(h.lookup(trace_id('new')))
+    (b/'new/episode.json').write_text(json.dumps({'stop_reason':'max_steps','max_steps':1}))
+    row=next(r for r in json.loads(h.snapshot()[0]) if r['id']==trace_id('new'))
+    assert row['summary_stale'] and row['episode_end']['reason']=='max_steps'

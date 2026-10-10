@@ -27,7 +27,7 @@ async function refresh({background=false,navigate=false}={}){
     }
     const chosen=chooseSession(desired);
     if(typeof sidebarSessions==='undefined'||sidebarSessions!==sessions)list();
-    if(!chosen){current=null;loaded='';pageStart=0;list();el('title').textContent=desired&&desired!=='latest'?'Session not found':selectedCollection?'No episodes in this folder':'No traces recorded yet';renderRecordingLocation(null);el('chat').replaceChildren();el('notices').replaceChildren();el('meta').textContent='';el('count').textContent='';el('page-info').textContent='No matching episodes';return}
+    if(!chosen){current=null;loaded='';pageStart=0;list();el('title').textContent=desired&&desired!=='latest'?'Session not found':selectedCollection?'No episodes in this folder':'No traces recorded yet';renderRecordingLocation(null);renderEpisodeEnd(null);el('chat').replaceChildren();el('notices').replaceChildren();el('meta').textContent='';el('count').textContent='';el('page-info').textContent='No matching episodes';return}
     const cacheKey=parser+':'+chosen.id;
     if(current?.id!==chosen.id||loaded!==cacheKey+':'+chosen.revision){
       el('connection').textContent='Loading trace…';

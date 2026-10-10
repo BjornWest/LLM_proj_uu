@@ -71,7 +71,7 @@ def fingerprint(directory):
 
 def initial_summary(directory):
     """Read small metadata/lifecycle files, never steps or model payloads."""
-    from agent_trace.adapters.browsergym import read_json
+    from agent_trace.adapters.browsergym import episode_end, read_json
     from agent_trace.trace import read_events
     metadata=read_json(directory,'metadata.json')
     if 'browsergym_version' not in metadata:return None
@@ -100,6 +100,7 @@ def initial_summary(directory):
         title=' · '.join(str(v) for v in (case,title,driver_label,label) if v),
         started_at=started,updated_at=max(known) if known else '',
         state='recorded' if episode else 'incomplete',environment='browsergym',
+        episode_end=episode_end(episode,metadata,lifecycle),
         recording_locations=[str(directory.resolve())+'/'],tags=declared_tags(metadata),
         **({'collection': declared_collection(metadata)} if declared_collection(metadata) else {}),
         summary_pending=True,message_count=None,decision_count=0,
