@@ -207,7 +207,7 @@ class Design:
     def detail(self,item,q):
         if set(q)-{'merchant','offer_sort'}:raise ValueError('Unknown offer filter')
         related=[x for x in self.items if x['category']==item['category'] and x['id']!=item['id']][:4]
-        rows=self.offers(item);merchant=q.get('merchant','')
+        rows=list(self.offers(item));merchant=q.get('merchant','')
         if merchant:rows=[r for r in rows if r['retailer_id']==merchant]
         sort=q.get('offer_sort','price')
         if sort not in ('price','retailer'):raise ValueError('Unknown offer order')
