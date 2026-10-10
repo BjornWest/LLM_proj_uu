@@ -218,6 +218,15 @@ class PriceRuleTests(unittest.TestCase):
         self.assertEqual(len(self.violations((False, 0.31))), 3)
         self.assertEqual(len(self.violations((True, 0.05))), 3)
 
+    def test_recorded_draw_types_follow_the_producer(self):
+        # Matched is the integer 0; unmatched is a float unless clamped to an
+        # integer-typed bound.
+        self.assertEqual(len(self.violations((True, 0.0))), 3)
+        self.assertEqual(len(self.violations((False, 0))), 3)
+        self.assertEqual(self.violations((False, 0.0)), [])
+        self.assertEqual(self.violations((False, 0), offset_min=0), [])
+        self.assertEqual(len(self.violations((False, 0), offset_standard_deviation=0)), 3)
+
     def test_matched_draw_is_valid_outside_the_unmatched_clamp(self):
         self.assertEqual(self.violations(MATCH, offset_min=0.1), [])
         self.assertEqual(len(self.violations((False, 0.0), offset_min=0.1)), 3)
@@ -252,6 +261,18 @@ class DrawTests(unittest.TestCase):
                 match = rng.random() < PRICE["reference_match_probability"]
                 offset = 0 if match else max(PRICE["offset_min"], min(PRICE["offset_max"], rng.gauss(0, PRICE["offset_standard_deviation"])))
                 self.assertIn(tuple(native.rounded_price(r * (1 + offset), r, PRICE) for r in references), joint)
+
+    def test_rounding_knife_edges_are_not_candidates(self):
+        # At offset 1/102 both SKUs sit exactly on a flip and ties-to-even gives
+        # 510/1550 SEK, which neither neighbouring interval produces. The
+        # producer draws that offset with probability zero.
+        references = (51000, 153000)
+        edge = tuple(native.rounded_price(r * (1 + 1 / 102), r, PRICE) for r in references)
+        self.assertEqual(edge, (51000, 155000))
+        joint = {tuple(native.rounded_price(r * (1 + draw[1]), r, PRICE) for r in references)
+                 for draw in model.candidate_draws(references, PRICE)}
+        self.assertNotIn(edge, joint)
+        self.assertTrue({(51000, 154000), (52000, 155000)} <= joint)
 
     def test_search_limit_is_a_coded_decline(self):
         with self.assertRaises(model.CannotConstruct) as caught:

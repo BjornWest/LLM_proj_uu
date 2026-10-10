@@ -67,19 +67,27 @@ def _draw(offer):
 
 
 def _producible(draw, config):
-    """Whether the producer's `_offer_price` can record this draw."""
+    """Whether the producer's `_offer_price` can record this draw, type included.
+
+    JSON keeps 0 and 0.0 apart, and so does the producer: a matched draw is the
+    integer 0, an unmatched one a float unless it was clamped to an
+    integer-typed bound.
+    """
     match, offset = draw
     if type(match) is not bool or type(offset) not in (int, float):
         return False
     probability = config["reference_match_probability"]
     if match:
         # The matched branch sets zero without applying the clamp.
-        return probability > 0 and offset == 0
+        return probability > 0 and type(offset) is int and offset == 0
     if probability >= 1:
         return False
     lo, hi = config["offset_min"], config["offset_max"]
     if config["offset_standard_deviation"] == 0:
-        return offset == max(lo, min(hi, 0.0))
+        clamped = max(lo, min(hi, 0.0))
+        return type(offset) is type(clamped) and offset == clamped
+    if type(offset) is int:
+        return any(type(bound) is int and bound == offset for bound in (lo, hi))
     return lo <= offset <= hi
 
 
@@ -122,13 +130,19 @@ def check_price_rule(world, native_round):
 
 
 def candidate_draws(references, config):
-    """One representative draw for every price combination the producer can emit.
+    """One representative draw for every price combination of positive probability.
 
     A SKU's rounded price flips where reference*offset/step crosses a half
     step. Between two neighbouring flips of any SKU, every SKU's price is
     constant, so one offset per interval covers the joint outcomes; bin centres
     of single references would miss combinations of differently rounded SKUs.
-    Clamped draws land exactly on the endpoints.
+    Clamped draws land exactly on the endpoints, with positive probability.
+
+    Offsets exactly on a flip are deliberately not candidates. Ties-to-even can
+    give a few floats there a price combination of their own, but the producer
+    draws them with probability zero, and an authored world should not sit on
+    a rounding knife-edge. The choice among prices is therefore optimal over
+    positive-probability draws only.
     """
     lo, hi = config["offset_min"], config["offset_max"]
     if not -1 < lo <= hi:

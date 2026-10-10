@@ -30,13 +30,16 @@ draws the producer can emit: the matched reference draw, the clamp endpoints,
 and one offset from each interval between neighbouring rounding flips of any
 SKU in the pair. The intervals matter when SKUs have their own reference
 prices and round in different steps; per-SKU bin centres would miss some of
-their joint prices.
+their joint prices. Offsets exactly on a rounding flip are deliberately
+excluded: the producer draws them with probability zero, and an authored world
+should not sit on a rounding knife-edge.
 
 Among the prices all designated retailers can reach below the unchanged
 competitors, it picks the one that reprices the fewest retailers, then has the
 smallest total movement over every repriced SKU price (unavailable siblings
-included), then is lowest. This is a deterministic choice, not a random
-feasible one. Declining means this operator cannot construct the request; it
+included), then is lowest. The choice is optimal over the candidate draws
+above, so a knife-edge draw could occasionally move prices less. This is a
+deterministic choice, not a random feasible one. Declining means this operator cannot construct the request; it
 does not prove that no world satisfies it. Each decline carries a reason code
 (`price_rule`, `unavailable`, `already_holds`, `no_common_price`,
 `not_sampled`, `winners`, `operator_limit`).
@@ -44,7 +47,8 @@ does not prove that no world satisfies it. Each decline carries a reason code
 `price_rule_violations` checks the pricing rule over the whole world: every
 price follows from its recorded draw and a positive manufacturer reference, the
 draw is one the producer's matched or unmatched branch can record under the
-world's own price config, and all SKUs of a product at a retailer share it. The
+world's own price config (including whether the offset is written as an
+integer or a float), and all SKUs of a product at a retailer share it. The
 operator requires this of the parent and of the result. The native commerce
 validator does not check it.
 
@@ -89,10 +93,10 @@ a separate declared requirement if a scenario needs it.
 ## Evidence and cost
 
 Evidence is under `.local/coordination/world-requirement-construction-20261010/`:
-`native-v7/receipt.json` (with negative controls) and
-`native-v7-construct-only/receipt.json`. The requirement is `requirement-v2.json`.
-`native-v6*` are the same case on the first draw-level commit, before the Codex
-review fixes; the emitted world is the same.
+`native-v8/receipt.json` (with negative controls) and
+`native-v8-construct-only/receipt.json`. The requirement is `requirement-v2.json`.
+`native-v6*` and `native-v7*` are the same case on earlier commits, before Codex
+review fixes; the emitted world is the same in all three.
 
 The edit itself is cheap: about 0.2 s for `construct` on this world, most of it
 the native oracle hashing the 6.4 MB world. A whole runner invocation is
