@@ -125,3 +125,31 @@ def test_stock_still_checks_producer_collector_conflict(saved_publication):
     with pytest.raises(ValueError, match='Producer/saved-answer source conflict'):
         f.prepare({})
     assert len(f.calls) == 1
+
+@pytest.mark.parametrize('shape', ['feature_task', 'declarations', 'requirements', 'scenarios'])
+def test_nested_native_dependencies_remain_in_frozen_union(saved_publication, shape):
+    f = saved_publication
+    row = {'field_source_sha256': {'fields.json': f.hashes['fields.json']}}
+    if shape == 'feature_task': pins = {shape: row}
+    elif shape == 'declarations': pins = {shape: {'requirement-1': row}}
+    else: pins = {shape: [row]}
+    manifest, _ = f.prepare(pins)
+    assert manifest['source_sha256']['fields.json'] == f.hashes['fields.json']
+    assert (f.output/'pin/source-snapshot/fields.json').read_bytes() == (f.root/'fields.json').read_bytes()
+
+
+def test_wrong_nested_policy_rejects_before_freeze(saved_publication):
+    f = saved_publication
+    with pytest.raises(ValueError, match='dependency changed'):
+        f.prepare({'feature_task': {'field_source_sha256': {'fields.json':'0'*64}}})
+    assert not f.output.exists() and not f.calls
+
+
+def test_nested_reference_maps_preserve_conflict_checks(saved_publication):
+    f = saved_publication
+    assert publication.declared_sources({'requirements': [{'source_sha256': {'fields.json':f.hashes['fields.json']}}]}) == {'fields.json':f.hashes['fields.json']}
+    with pytest.raises(ValueError, match='Conflicting'):
+        publication.declared_sources({'field_source_sha256':{'fields.json':f.hashes['fields.json']}},
+                                    {'sources': [{'source_sha256':{'fields.json':'0'*64}}]})
+    with pytest.raises(ValueError, match='escaped'):
+        publication.declared_sources({'nested': {'source_sha256':{'../outside.json':'0'*64}}})

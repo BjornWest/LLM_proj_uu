@@ -42,8 +42,39 @@ def read_recipe(saved, *, expected_manifest_sha256):
     return saved, manifest, buffers
 
 
+def declared_sources(*records):
+    """Collect every native dependency map, including nested task/reference rows."""
+    result = {}
+    def visit(value):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key in ('source_sha256', 'field_source_sha256'):
+                    if type(child) is not dict:
+                        raise ValueError('Saved native input dependency map changed: '+key)
+                    for name, expected in child.items():
+                        if type(name) is not str or type(expected) is not str:
+                            raise ValueError('Malformed saved native dependency')
+                        relative = PurePosixPath(name)
+                        path = (ROOT/name).resolve()
+                        if (relative.is_absolute() or str(relative) != name or '..' in relative.parts
+                                or '\\' in name or not path.is_relative_to(ROOT)
+                                or len(expected) != 64 or any(c not in '0123456789abcdef' for c in expected)):
+                            raise ValueError('Saved native dependency escaped or malformed: '+name)
+                        if name in result and result[name] != expected:
+                            raise ValueError('Saved native input dependency changed: Conflicting '+name)
+                        result[name] = expected
+                else:
+                    visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+    for record in records:
+        visit(record)
+    return result
+
+
 def prepare_saved(snapshot, output, *, expected_manifest_sha256, setup,
-                  task_filename, adapter_file):
+                  task_filename, adapter_file, dependency_records=()):
     """Rebind current reviewed code while preserving native data and every site.
 
     The adapter validates the native task/reference first. Setup is a separate
@@ -63,17 +94,12 @@ def prepare_saved(snapshot, output, *, expected_manifest_sha256, setup,
     sources['scripts/trace_grades.py'] = file_hash(ROOT/'scripts/trace_grades.py')
     if (ROOT/'scripts/__init__.py').is_file():
         sources['scripts/__init__.py'] = file_hash(ROOT/'scripts/__init__.py')
-    # Native schemas declare either ordinary pins, feature inventory pins, or
-    # neither (stock). The complete collected/producer closure is always bound.
-    for field in ('source_sha256', 'field_source_sha256'):
-        if field not in task:
-            continue
-        if type(task[field]) is not dict:
-            raise ValueError('Saved native input dependency map changed: '+field)
-        for name, expected in task[field].items():
-            if file_hash(ROOT/name) != expected or (name in sources and sources[name] != expected):
-                raise ValueError('Saved native input dependency changed: '+name)
-            sources[name] = expected
+    # Native semantics often embed feature declarations in task/reference rows.
+    # Replay alone is insufficient: retain their data bytes in the source union.
+    for name, expected in declared_sources(task, *dependency_records).items():
+        if file_hash(ROOT/name) != expected or (name in sources and sources[name] != expected):
+            raise ValueError('Saved native input dependency changed: '+name)
+        sources[name] = expected
     world_bytes = buffers['pin/world.private.json']
     world = json.loads(world_bytes)
     execution = Execution(validation='off')
