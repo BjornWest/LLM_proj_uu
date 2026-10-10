@@ -21,6 +21,20 @@ class PlanMismatch(RuntimeError):
     """The producer did not make the calls the plan was written for."""
 
 
+STATUS = "steered_conditional_sample"
+
+
+class Reseeded:
+    """Plan entry that opens a stream under another seed: a natural redraw of that draw.
+
+    Unlike a script it makes no claim about which calls the producer makes,
+    and a reseeded key the producer never opens is not an error.
+    """
+
+    def __init__(self, seed):
+        self.seed = seed
+
+
 class Scripted:
     """Stands in for one named stream and replays its planned results in order."""
 
@@ -81,6 +95,8 @@ def steered(population, plan, opened=None):
             opened.append(key)
         if key not in plan:
             return natural(seed, key)
+        if isinstance(plan[key], Reseeded):
+            return natural(plan[key].seed, key)
         instances.append(Scripted(key, plan[key]))
         return instances[-1]
 
@@ -89,10 +105,22 @@ def steered(population, plan, opened=None):
         yield
     finally:
         population.stream = natural
-    unused = set(plan) - {s.key for s in instances}
+    unused = {key for key, entry in plan.items() if not isinstance(entry, Reseeded)} - {s.key for s in instances}
     partial = {s.key for s in instances if s.used != len(s.script)}
     if unused or partial:
         raise PlanMismatch(f"planned draws not made: {sorted(unused)[:3]}; partly used: {sorted(partial)[:3]}")
+
+
+def relabel(world, record, api):
+    """Mark a world from a steered pass: its seed alone no longer reproduces it."""
+    world["provenance"]["steered_generation"] = record
+    world["status"] = STATUS
+    # The producer's own statements (such as "no winner or seed repair")
+    # describe the natural draw, not this world.
+    world["limitations"] = ["Natural-draw declaration: " + note for note in world["limitations"]] + [
+        "Steered conditional sample: the seed alone does not reproduce this world; see provenance.steered_generation."]
+    world.pop("world_id")
+    world["world_id"] = api.native.digest(world)
 
 
 class Manufacture:

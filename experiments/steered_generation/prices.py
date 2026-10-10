@@ -15,11 +15,10 @@ from types import SimpleNamespace
 
 from experiments.world_requirement_construction import model as edits
 
-from .streams import PlanMismatch
+from .streams import STATUS, PlanMismatch, relabel
 
 # A `random()` result that is never below a match probability smaller than 1.
 UNMATCHED = 1 - 2 ** -53
-STATUS = "steered_conditional_sample"
 
 
 class ZeroMass(ValueError):
@@ -171,13 +170,15 @@ def model(world, requirement, api):
 
 
 def plan(world, requirement, api, rng):
-    """Sample every price draw of the concept given that the designated retailers are cheapest.
+    """Sample the block's price draws given that the designated retailers are cheapest.
 
+    The block is every retailer/product pair of the concept with an available
+    offer; a pair with none cannot be cheapest and keeps the seed's own draw.
     Returns a draw for each pair in the block, the probability of the
     requirement given this world's upstream draws, and the sampled winning
-    price. The world's own price draws are not consulted: every pair is drawn
-    afresh from its conditional distribution, so repeated plans for one world
-    are independent samples of the same conditional distribution.
+    price. The world's own price draws are not consulted: every pair in the
+    block is drawn afresh from its conditional distribution, so repeated plans
+    for one world are independent samples of the same conditional distribution.
     """
     block_model = model(world, requirement, api)
     prices = sorted(block_model.terms)
@@ -221,18 +222,13 @@ def steer(session, natural, requirement, api, rng):
               "natural_world_id": natural["world_id"],
               "probability_given_upstream": probability, "winning_price_minor": winning,
               "streams_opened": len(opened), "streams_steered": len(draws), "repriced": repriced,
-              "distribution_claim": "Every price draw of the concept is sampled from its distribution given the "
-                                    "requirement and all upstream draws, under the price model in prices.atoms. "
+              "distribution_claim": "The price draw of every retailer/product pair of the concept with an "
+                                    "available offer is sampled from its distribution given the requirement and "
+                                    "all upstream draws, under the price model in prices.atoms. Pairs with no "
+                                    "available offer keep the seed's own draw. "
                                     "Upstream draws are not reweighted; use probability_given_upstream as the "
                                     "importance weight across seeds."}
-    world["provenance"]["steered_generation"] = record
-    world["status"] = STATUS
-    # The producer's own statements (such as "no winner or seed repair")
-    # describe the natural draw, not this world.
-    world["limitations"] = ["Natural-draw declaration: " + note for note in world["limitations"]] + [
-        "Steered conditional sample: the seed alone does not reproduce this world; see provenance.steered_generation."]
-    world.pop("world_id")
-    world["world_id"] = api.native.digest(world)
+    relabel(world, record, api)
     task, reference = edits.check(world, requirement, api)
     return world, task, reference, record
 
