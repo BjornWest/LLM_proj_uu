@@ -12,7 +12,10 @@ the **only** cheapest available offers, tied at the same listed price.
 Other available offers of that concept must be more expensive. All unrelated
 products, retailers, stock, reviews and native manufacture remain unchanged.
 
-The constructor edits exactly two price leaves in an immutable sampled world.
+The constructor edits at most two price leaves in an immutable sampled world
+(exactly two in the demonstrated case), recording only actual changes. Already
+satisfied parents are declined without mutation; authored parent chains are
+explicitly outside this first operator's scope.
 Both new prices must belong to the native rounded output grid inside the existing
 clamped offset support. It chooses the highest common feasible price below the
 unchanged competitors. Failure means this particular operator cannot construct
@@ -35,8 +38,9 @@ derivative; no adjusted price is attributed to the old random draw.
 
 The existing independent `basic_offer_task.make/reference` evaluates the complete
 candidate domain. A separate direct full-population scan checks its winner set.
-The requirement additionally insists on physical stock at both targets, so
-supplier-only offers cannot satisfy it. This is not a review-quality requirement.
+The requirement additionally insists on physical stock and native `in_stock`
+status at both targets. A non-shipping branch plus supplier ordering classified
+as `backorder` does not satisfy it. This is not a review-quality requirement.
 
 ## Dependency reconstruction and confidence boundary
 
@@ -44,7 +48,8 @@ The derivative rebuilds its world identity, native task/reference, basket-plan
 binding with every original policy retained, and checkout-domain binding with
 the exact original quantity limits retained. The parent's original plan/domain
 are independently revalidated; both reject when applied to the derivative.
-The old task also rejects the new world. Reversing the two price edits and
+The basic task created from the parent also rejects the new world; the saved
+feature/publication sidecar validators are not exercised here. Reversing the two price edits and
 explicit identity/provenance/status/limitation changes reproduces the parent
 object exactly. Original source files and original artifact bytes are rechecked.
 
@@ -168,7 +173,9 @@ python3 scripts/run_bounded_job.py --memory-mib 2048 \
   timeout 90s .venv/bin/python experiments/world_requirement_construction/run.py \
   --native-root /home/bjorn/code/LLM_proj_uu-worktrees/eval-diverse-offers-20261008-r1 \
   --native-commit e3fbfadd84d3b16a26895d62abb66f61df433697 \
+  --constructor-commit EXACT_REVIEWED_CONSTRUCTOR_COMMIT \
   --recipe .local/coordination/task-testing-20261008/Evaluation-diverse-offers-acceptance-v1/feature-recipe \
+  --expected-parent-manifest-sha256 4381a4e6047e4370833f8b2f2d95135f2511b5a0bfb59f31a341cd2d42128ba5 \
   --requirement .local/coordination/world-requirement-construction-20261010/requirement-v1.json \
   --output .local/world-construction-reproduce
 ```

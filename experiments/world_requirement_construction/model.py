@@ -85,14 +85,18 @@ def check(world, requirement, api):
         raise CannotConstruct("Native winner set does not equal the two designated offers")
     offers = {o["offer_id"]: o for r in world["retailers"] for o in r["offers"]}
     # This requirement strengthens the basic purchasable oracle to physical stock.
-    if any(not any(offers[oid]["stock_by_source"].values()) for oid in expected):
-        raise CannotConstruct("Both designated offers must have physical stock")
+    native_availability = {row["offer_id"]: row["availability"] for row in reference["winners"]}
+    if any(not any(offers[oid]["stock_by_source"].values()) or
+           native_availability[oid] != "in_stock" for oid in expected):
+        raise CannotConstruct("Both designated offers must have physical stock and native in_stock status")
     return task, reference
 
 
 def construct(parent, requirement, api, *, parent_bytes_sha256):
     requirement = resolve(requirement)
     api.commerce.validate(parent)
+    if parent.get("status") != "opt_in_candidate_commerce" or "authored_derivative" in parent["provenance"]:
+        raise CannotConstruct("This operator only accepts an original sampled parent, not authored chains")
     before = deepcopy(parent)
     _, initial = _reference(parent, requirement, api)
     candidates = {row["offer_id"]: row for row in initial["candidates"]}
@@ -100,8 +104,11 @@ def construct(parent, requirement, api, *, parent_bytes_sha256):
     if not target <= set(candidates):
         raise CannotConstruct("Targets must already be available and belong to the task concept")
     offers = {o["offer_id"]: o for r in parent["retailers"] for o in r["offers"]}
-    if any(not any(offers[oid]["stock_by_source"].values()) for oid in target):
+    if any(not any(offers[oid]["stock_by_source"].values()) or
+           candidates[oid]["availability"] != "in_stock" for oid in target):
         raise CannotConstruct("Price-only operator cannot create physical stock")
+    if {row["offer_id"] for row in initial["winners"]} == target:
+        raise CannotConstruct("Requirement already holds; retain the original world without authoring")
     competitor_prices = [r["price_minor"] for oid, r in candidates.items() if oid not in target]
     if not competitor_prices:
         raise CannotConstruct("This pilot requires a real competing offer")
@@ -116,12 +123,14 @@ def construct(parent, requirement, api, *, parent_bytes_sha256):
     world = deepcopy(parent)
     edited = {o["offer_id"]: o for r in world["retailers"] for o in r["offers"]}
     changes = []
-    for oid in requirement["offer_ids"]:
+    for oid, domain in zip(requirement["offer_ids"], domains):
+        if edited[oid]["price_minor"] == chosen:
+            continue
         changes.append({"offer_id": oid, "field": "price_minor",
                         "before": edited[oid]["price_minor"], "after": chosen,
                         "preserved_original_price_trace_sha256": digest(edited[oid]["price_trace"]),
-                        "native_price_grid_min": min(domains[len(changes)]),
-                        "native_price_grid_max": max(domains[len(changes)])})
+                        "native_price_grid_min": min(domain),
+                        "native_price_grid_max": max(domain)})
         edited[oid]["price_minor"] = chosen
     provenance = {"schema": VERSION, "method": "deterministic_authored_derivative",
                   "parent_world_id": parent["world_id"],

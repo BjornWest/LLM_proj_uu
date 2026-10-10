@@ -1,6 +1,9 @@
 import unittest
 
-from model import VERSION, price_domain, resolve
+if __package__:
+    from .model import VERSION, price_domain, resolve
+else:
+    from model import VERSION, price_domain, resolve
 
 
 class RequirementTests(unittest.TestCase):
