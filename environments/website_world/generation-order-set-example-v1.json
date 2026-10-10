@@ -1,0 +1,58 @@
+{
+  "schema": "website-world-generation-v1",
+  "seed": 2,
+  "world": {
+    "controls": {
+      "world_size": 1
+    }
+  },
+  "basket_shipping": {
+    "enabled": true
+  },
+  "checkout_domain": {},
+  "difficulty": {
+    "reset_weights": {
+      "preserve": 0,
+      "services": 1,
+      "delivery": 0,
+      "checkout": 0
+    }
+  },
+  "order_set_task": {
+    "schema_version": "native-order-set-task-v1",
+    "objective": "min_total_payable_order_set",
+    "requirements": [
+      {
+        "requirement_id": "sandals",
+        "quantity": 1,
+        "concept_id": "footwear.walking_sandals",
+        "size_eu": 42
+      },
+      {
+        "requirement_id": "shoes",
+        "quantity": 1,
+        "concept_id": "footwear.walking_shoes",
+        "size_eu": 44
+      }
+    ],
+    "domain": {
+      "destination": "user_home",
+      "allowed_destination_types": [
+        "home"
+      ]
+    }
+  },
+  "requirements": [
+    {
+      "id": "reset",
+      "target": {
+        "kind": "all_retailers"
+      },
+      "conditions": {
+        "site.resetPolicy": [
+          "services"
+        ]
+      }
+    }
+  ]
+}

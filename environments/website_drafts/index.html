@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Composable retail drafts</title><link rel="stylesheet" href="base.css"></head>
+<body><main class="reviewer">
+<h1>Composable retail drafts</h1>
+<p><strong>51 page units · 3 site-wide conventions · boutique, typical and huge profiles.</strong> Mix the units below, then browse the resulting shop. All combinations use the same 54-product authoring assortment: 24 original examples and 30 generated catalog models with local offer fixtures. Scale describes the page architecture; production assortment scale is separate.</p>
+<p>The differences are information order, navigation and controls. CSS only makes the preview readable. This is a working authoring demo; production world export, shipping-oracle integration and weighted conditioned sampling are pending.</p>
+<p><a href="boutique.html">Two boutique drafts and AX counts</a> · <a href="huge.html">Two huge-retailer drafts and AX counts</a> · <a href="briefs.html">Design briefs and reference links</a> · <a href="density.html">Typical product AX density and depth</a> · <a href="homes.html">Typical home structures and AX comparison</a> · <a href="evidence/index.html">AX and composition checks</a> · <a href="http://localhost:8876/retail-reference-research-20261001/index.html">Captured real retailers</a></p>
+<section aria-label="Composition controls"><h2>Choose the pieces</h2>
+<form id="compose"><div class="row"><label>Seed<input name="seed" type="number" value="41" min="0" max="2147483647"></label><label>Sampling profile<select name="scale"><option value="typical">Typical</option><option value="huge">Huge</option><option value="boutique">Boutique</option></select></label><label>Site-wide conventions<select name="global" id="global"></select></label></div>
+<div id="modules" class="row"></div>
+<details><summary>Shared capabilities and smaller variations</summary><div class="row">
+<label><input name="search" type="checkbox" checked> Site search</label>
+<label><input name="iconCart" type="checkbox"> Icon-only cart entry</label>
+<label><input name="split" type="checkbox" checked> Optional arrival-group splitting</label>
+<label><input name="reset" type="checkbox"> Reset checkout details on back navigation</label>
+<label><input name="opaque" type="checkbox"> Less explicit coupon feedback</label>
+<label>Variant URLs<select name="url"><option value="all">Encode all selected options</option><option value="colour">Encode colour only</option><option value="none">Keep the URL unchanged</option></select></label>
+<label>Delivery policy entry<select name="policy"><option value="footer">Footer entry</option><option value="checkout">Checkout entry</option><option value="help">Customer-help route</option></select></label>
+<label>Free-delivery qualification<select name="qualification"><option value="basket">Checkout subtotal</option><option value="shipment">Each shipment subtotal</option></select></label>
+<label>Shop order payment<select name="collectionPayment"><option value="online">Pay online</option><option value="collection">Pay at collection</option></select></label>
+</div></details>
+<details><summary>Page structure variations (explicit authoring settings)</summary><p>These choices are applied to the selected modules. Choose pieces from seed preserves them; weighted variation sampling is separate.</p><div id="variation-controls" class="row"></div></details>
+<button type="submit">Open this composition</button><button type="button" id="sample">Choose pieces from seed</button><button type="button" id="empty">Clear this shop’s basket and remembered state</button>
+</form><button type="button" id="copy-config" disabled>Copy open composition</button><p id="copy-status" role="status" aria-live="polite"></p>
+<p>Huge starting compositions: <button type="button" data-huge="marketplace">Marketplace mosaic</button> <button type="button" data-huge="superstore">Department superstore</button>. Every page unit can still be changed independently.</p>
+<p>Boutique starting compositions: <button type="button" data-boutique="atelier">Collection journal</button> <button type="button" data-boutique="counter">Independent shop</button>. <a href="index.html?scale=typical&amp;seed=41">Open the typical profile</a> for comparison.</p>
+<details id="manual-copy" hidden><summary>Copy configuration manually</summary><label>Open composition configuration<textarea id="copy-config-text" readonly rows="12" style="width:100%"></textarea></label></details>
+<p id="status" role="status"></p><p id="shop-link"></p></section>
+<div class="row"><label>Example basket<select id="example"><option value="arrival">Two inexpensive items with different arrivals</option><option value="bulky">Bulky item and two supplier brands</option></select></label><button id="load-example">Load example basket</button></div>
+<nav aria-label="Preview entry"><button data-page="home">Home</button><button data-page="results">Catalog</button><button data-page="product/mela">Product</button><button data-page="cart">Cart</button><button data-page="checkout">Checkout</button><button data-page="info/shipping">Information</button></nav>
+<iframe id="preview" title="Composed Northline shop"></iframe>
+<details><summary>What to try</summary><ol>
+<li>Use “Load example basket”, then Cart or Checkout, to compare those units immediately. This review control replaces only the current preview’s basket.</li>
+<li>Switch global conventions without changing the units. Labels, currency notation and option controls should stay consistent across the shop.</li>
+<li>Choose different product, cart and checkout units. Add Granvik Mela and Granvik Task Lamp, then inspect delivery together and in separate arrival groups.</li>
+<li>Choose another shoe size. Its mass and scope change together. EU 44 of Granvik Mela is unavailable; Granvik Ridge is an orderable supplier backorder.</li>
+<li>Use WELCOME10 with products totaling at least 500 SEK. Totals and free-delivery qualification update after changes.</li>
+<li>Save postcode 11122 in checkout, then revisit a product. Its estimate uses that explicitly saved address. Browser back/reload normally preserves the draft.</li>
+<li>Try home delivery, pickup boxes, staffed parcel points or shop collection. Each service row shows its arrival and cost before you select it; pickup services offer multiple locations.</li>
+<li>The final review includes payment and Complete purchase. Inspection tasks stop before submission. Preview purchases create a local simulated order; no external payment service is called.</li>
+</ol></details>
+<details><summary>Scope of this review</summary><p>These are original modular drafts inspired by captured retail structures, not imported upstream sites. Boutique, typical and huge are authoring profiles, not a fitted distribution. The added models use a bounded projection of the pinned product-generator example; their prices and stock are local authoring offers. Each page-role selection is independent. Manual overrides are review controls; the seed button supplies reproducible illustrative choices with uniform base priors and scoped conditional permutations. Production world export, weights and SAT/weighted completion are not implemented here.</p></details>
+</main><script type="module" src="reviewer.js"></script></body></html>

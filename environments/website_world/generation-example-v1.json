@@ -1,0 +1,30 @@
+{
+  "schema": "website-world-generation-v1",
+  "seed": 1,
+  "world": {
+    "objective": "cheapest_delivered",
+    "concept_id": "footwear.walking_sandals",
+    "city_id": "uppsala",
+    "controls": {"world_size": 1}
+  },
+  "difficulty": {
+    "reset_weights": {"preserve": 0.9, "services": 0.05, "delivery": 0.03, "checkout": 0.02},
+    "variant_url_weights": {"all": 1, "colour": 1, "none": 1},
+    "policy_entry_weights": {"footer": 1, "checkout": 1, "help": 1},
+    "search_probabilities": {"boutique": 0.85, "typical": 0.98, "huge": 1}
+  },
+  "requirements": [
+    {
+      "id": "best-store-navigation-difficulty",
+      "target": {"kind": "best_matching_retailers"},
+      "conditions": {
+        "site.resetPolicy": ["services", "delivery", "checkout"],
+        "site.url": ["none"],
+        "site.policyEntry": ["help"],
+        "module.product": ["tabs"]
+      }
+    }
+  ],
+  "budget": {"max_proposals": 64, "max_seconds": 60},
+  "episode": {"start": {"kind": "directory"}}
+}
