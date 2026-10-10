@@ -107,3 +107,10 @@ reported as unrecorded, never inferred from counters or a model response's
 `finish_reason`. A hard process kill without a terminal record cannot establish
 why the episode ended. The lazy hub catalog reads this from small summary/lifecycle
 files without loading conversation history.
+
+Abnormal endings also appear as a red message at the end of the conversation,
+on its final displayed page (including tool-only and problem filters). The message
+uses recorded stop metadata; it does not become a recorded model input or affect
+turn, event or token counts. Normal agent, chat and environment completion, active
+episodes and completed episodes without a recorded reason do not get this message,
+regardless of their task grade. Its recorded details remain collapsed by default.

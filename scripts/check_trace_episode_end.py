@@ -23,6 +23,10 @@ async def check_mode(mode,output):
                ('interrupt',None,'Interrupted'),
                ('error',{'stop_reason':'error','execution_error':'\n\r\n<img src=x onerror=alert(1)> browser error'},'Run error'),
                ('normal',{'stop_reason':'agent_finished','error':'Grading failure'},'Agent finished'),
+               ('chat',{'stop_reason':'chat_answered'},'Chat answered'),
+               ('terminated',{'stop_reason':'terminated'},'Environment terminated'),
+               ('environment',{'stop_reason':'environment_terminated'},'Environment terminated'),
+               ('long',{'stop_reason':'max_steps','max_steps':120,'step_count':120},'Turn limit stop (120 / 120 turns)'),
                ('unknown',{'step_count':24},'End reason not recorded'),
                ('active',None,None)]
         for name,episode,label in cases:
@@ -33,7 +37,9 @@ async def check_mode(mode,output):
                     'events.jsonl':{'event':'episode_finished','stop_reason':'interrupted','error':'KeyboardInterrupt'} if name=='interrupt' else {'event':'episode_started'}}
             if episode is not None:values['episode.json']=episode
             for filename,data in values.items():
-                path=run/filename;path.write_text(json.dumps(data)+'\n');pins[path]=hashlib.sha256(path.read_bytes()).hexdigest()
+                path=run/filename
+                records=[{**data,'step':step} for step in range(120)] if name=='long' and filename=='steps.jsonl' else [data]
+                path.write_text(''.join(json.dumps(record)+'\n' for record in records));pins[path]=hashlib.sha256(path.read_bytes()).hexdigest()
         registry=root/'sources.json';registry.write_text(json.dumps({'project_root':str(root),'roots':[str(runs)]}))
         server=ThreadingHTTPServer(('127.0.0.1',0),make_handler(runs) if mode=='shared' else hub_handler(registry))
         worker=threading.Thread(target=server.serve_forever,daemon=True);worker.start();base='http://localhost:'+str(server.server_port)
@@ -51,10 +57,34 @@ async def check_mode(mode,output):
                     await page.goto(base+'/#'+ids[name]);await page.wait_for_function('(id)=>current?.id===id',arg=ids[name])
                     if label is None:
                         check('unfinished trace clears previous end banner',await page.locator('#episode-end').is_hidden())
+                        check('unfinished trace has no ending message',await page.locator('.episode-end-message').count()==0)
                         continue
                     check(name+' end reason visible with diagnostics off',await page.locator('#episode-end .episode-end-label').inner_text()=='Episode ended: '+label and not await page.locator('#diagnostics').is_checked())
                     sidebar=page.locator('#sessions [data-session-id='+json.dumps(ids[name])+'] .episode-end-label')
                     check(name+' end reason in sidebar',await sidebar.inner_text()=='Ended: '+label)
+                    ending=page.locator('#chat .episode-end-message')
+                    if name=='long':
+                        check('long trace has multiple pages',await page.evaluate('filtered.length>PAGE_SIZE'))
+                        check('ending message absent on earlier page',await ending.count()==0)
+                        await page.locator('#bottom').click()
+                    abnormal=name not in ('normal','chat','terminated','environment','unknown')
+                    check(name+' abnormal-only ending message',await ending.count()==int(abnormal))
+                    if abnormal:
+                        check(name+' ending message last and red',await ending.evaluate('(el)=>el===el.parentElement.lastElementChild&&getComputedStyle(el).backgroundColor==="rgb(56, 36, 38)"&&getComputedStyle(el.querySelector(".badge")).color==="rgb(255, 141, 141)"'))
+                        check(name+' ending message explains reason',await ending.locator('.content').inner_text()=='Episode ended: '+label)
+                        check(name+' ending details collapsed',not await ending.locator('details').evaluate('(el)=>el.open'))
+                        await ending.locator('summary').click()
+                        check(name+' ending details rendered JSON',await ending.get_by_role('button',name='Readable JSON',exact=True).get_attribute('aria-pressed')=='true')
+                        await page.locator('#search').fill('fixture')
+                        check(name+' ending details survive filtering',await ending.locator(':scope > details').evaluate('(el)=>el.open'))
+                        await page.locator('#search').fill('')
+                        await page.locator('#filter').select_option('tools')
+                        check(name+' ending message visible in tools filter',await ending.count()==1)
+                        await page.locator('#filter').select_option('problems')
+                        check(name+' ending message visible in problems filter',await ending.count()==1)
+                        await page.locator('#filter').select_option('all')
+                        if name=='long':await page.locator('#bottom').click()
+                    check(name+' display does not inject recorded messages',await page.evaluate('current.messages.every(m=>!m.id.endsWith(":episode-end-message"))'))
                     details=page.locator('#episode-end > details')
                     check(name+' raw end details collapsed',not await details.evaluate('(el)=>el.open'))
                     await details.locator(':scope > summary').click()
@@ -67,6 +97,7 @@ async def check_mode(mode,output):
                     if name=='error':
                         check('recorded error renders as inert text',await page.locator('#episode-end img').count()==0 and '<img src=x onerror=alert(1)>' in await page.locator('#episode-end').inner_text())
                         check('error preview uses first nonempty line',await page.locator('#episode-end > .muted').inner_text()=='Recorded error: <img src=x onerror=alert(1)> browser error')
+                        check('ending error is inert text',await ending.locator('img').count()==0 and '<img src=x onerror=alert(1)>' in await ending.inner_text())
                     if name=='normal':check('grading failure does not masquerade as execution error','Grading failure' not in await page.locator('#episode-end').inner_text())
                 completed=runs/'active'/'episode.json';completed.write_text(json.dumps({'stop_reason':'user_close'})+'\n')
                 pins[completed]=hashlib.sha256(completed.read_bytes()).hexdigest()
@@ -75,12 +106,14 @@ async def check_mode(mode,output):
                 await page.wait_for_function('current?.episode_end?.reason==="user_close"',timeout=10000)
                 await page.locator('#live').uncheck()
                 check('live completion shows recorded reason',await page.locator('#episode-end .episode-end-label').inner_text()=='Episode ended: Manually closed')
+                check('live completion appends one red ending message',await page.locator('#chat .episode-end-message.failed').count()==1)
                 card=page.locator('#sessions [data-session-id='+json.dumps(ids['active'])+']')
                 order=await card.evaluate('(el)=>Array.from(el.children).map(child=>child.className)')
                 check('live completion keeps sidebar order',order.index('episode-end-label')<order.index('max-isl'))
                 await page.reload();await page.wait_for_function('(id)=>current?.id===id',arg=ids['active']);await page.locator('#live').uncheck()
                 check('reload keeps same sidebar order',order==await card.evaluate('(el)=>Array.from(el.children).map(child=>child.className)'))
                 await page.goto(base+'/#'+ids['tokens']);await page.wait_for_function('(id)=>current?.id===id',arg=ids['tokens'])
+                await page.locator('#bottom').click()
                 await page.screenshot(path=str(output/'desktop.png'))
                 await page.set_viewport_size({'width':390,'height':844})
                 check('mobile layout fits',await page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
