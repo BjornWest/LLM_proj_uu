@@ -1,4 +1,5 @@
 import time
+from itertools import count as decision_indices
 import hashlib
 import json
 from copy import deepcopy
@@ -54,6 +55,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     limit counts flattened AX characters, excluding the URL/error envelope and
     truncation marker; callers must budget the actual serialized request bytes.
     Neither option repairs model output or changes parsing or verification.
+    max_steps=None explicitly disables the total decision cap and requires an
+    input-token limit. Delegation must also explicitly disable its shared call
+    cap; external wall-time/resource bounds remain the caller's responsibility.
     """
     from .automatic_grading import GradingGate, validate_options, failure_evaluation
     auxiliary_grading = None
@@ -170,10 +174,17 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             raise ValueError('Memory with delegation is not supported')
         from .memory import description
         description(memory_adapter)
-    if type(max_steps) is not int or max_steps < 1:
-        raise ValueError('max_steps must be a positive integer')
+    if max_steps is not None and (type(max_steps) is not int or max_steps < 1):
+        raise ValueError('max_steps must be a positive integer or None')
     if max_input_tokens is not None and (type(max_input_tokens) is not int or max_input_tokens < 1):
         raise ValueError('max_input_tokens must be a positive integer or None')
+    if max_steps is None:
+        if max_input_tokens is None:
+            raise ValueError('max_steps=None requires a positive max_input_tokens limit')
+        limits = (agent_runtime.limits if agent_runtime is not None else
+                  getattr(harness_profile, 'agent_limits', None))
+        if limits is not None and limits.total_model_calls is not None:
+            raise ValueError('max_steps=None requires delegation total_model_calls=None')
     if max_input_tokens is not None and input_counter is None:
         from .model_input_budget import model_matched_input_counter
         ax_config = getattr(harness_profile, 'ax_config', None)
@@ -342,12 +353,14 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             'scope':'Public names, kinds, URLs and descriptions only; no task answer or grading evidence.'}
     if retry_policy is not None:
         profile_metadata['decision_retry_policy'] = retry_policy.describe()
+        if max_steps is None:
+            profile_metadata['decision_retry_policy']['counts_toward_max_steps'] = False
     if native_tools:
         profile_metadata['native_tool_request_options'] = native_options
         profile_metadata['invalid_argument_feedback'] = {
             'version':'native-argument-rejection-v1','whole_batch_rejected':True,
             'browser_action_replay':False,'argument_clamping':False,
-            'counts_toward_max_steps':True,'provider_retry_policy_unchanged':True,
+            'counts_toward_max_steps':max_steps is not None,'provider_retry_policy_unchanged':True,
             'malformed_json_history':'inert controller notice; exact response retained'}
     trace = Trace(output, {**metadata, **profile_metadata, "runtime_selection": runtime_selection, "seed": seed, "max_steps": max_steps,
                            "max_input_tokens": max_input_tokens,
@@ -409,7 +422,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     navigation = None
     reward = 0.0
     terminated = truncated = False
-    stop_reason = "max_steps"
+    stop_reason = "max_steps" if max_steps is not None else "running"
     history = []
     final_ref = None
     error = None
@@ -837,10 +850,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
 
         grading_gate.bind(env,obs)
         final_ref = trace.observation(0, obs, render_observation(obs))
-        for index in range(max_steps):
+        for index in (range(max_steps) if max_steps is not None else decision_indices()):
             if fact_recorder is not None: fact_recorder.step=index
             fact_observation_output=None
-            if agent_runtime and agent_runtime.calls >= agent_runtime.limits.total_model_calls:
+            if (agent_runtime and agent_runtime.limits.total_model_calls is not None
+                    and agent_runtime.calls >= agent_runtime.limits.total_model_calls):
                 break  # Shared call guard includes parent and helpers.
             event = {"step": index, "observation": None, "transition_observation": final_ref, "messages": None,
                      "model_output": None, "model_request": None, "model_response": None,
@@ -1331,9 +1345,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         event['policy_evidence_error'] = f'{type(evidence_error).__name__}: {evidence_error}'
                 trace.event("decision_error", step=index, error=event["error"],
                     failure_phase=phase, **({'document_scan_detail':scan_detail} if scan_detail is not None else {}))
+                remaining_calls = None if max_steps is None else max_steps-index-1
                 retry = (retry_policy.select(exc, phase, event, used=retries_used,
                             consecutive_used=consecutive_retries_used,
-                            remaining_calls=max_steps-index-1) if retry_policy is not None else None)
+                            remaining_calls=remaining_calls) if retry_policy is not None else None)
                 if retry is not None:
                     conversation.recover(event.get('model_response'), retry['notice'],
                         preserve_reasoning=harness_profile.tools.reasoning_replay == 'preserve')
@@ -1347,10 +1362,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     continue  # finally persists this failed attempt before any further request
                 if retry_policy is not None and retry_policy.scope == 'failure_chain':
                     event['decision_retry_unavailable'] = {
-                        'reason': ('episode_call_limit' if max_steps-index-1 <= 0 else
+                        'reason': ('episode_call_limit' if remaining_calls is not None and remaining_calls <= 0 else
                                    'failure_chain_limit' if consecutive_retries_used >= retry_policy.max_retries else
                                    'failure_not_recoverable'),
-                        'remaining_calls': max(0, max_steps-index-1),
+                        'remaining_calls': None if remaining_calls is None else max(0, remaining_calls),
                         'consecutive_retries_used': consecutive_retries_used,
                         'failure_phase': phase}
                 raise

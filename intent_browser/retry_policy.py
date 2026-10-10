@@ -101,10 +101,13 @@ class DecisionRetryPolicy:
                 'browser_action_replay': False, 'provider_exclusion': False}
 
     def select(self, exc, phase, event, *, used, remaining_calls, consecutive_used=0):
+        # None means no total episode decision ceiling; retry-chain bounds remain.
         if not isinstance(exc, Exception):
             return None
         limit_used = consecutive_used if self.scope == 'failure_chain' else used
-        if limit_used >= self.max_retries or remaining_calls <= 0 or event.get('browser_stepped'):
+        if (limit_used >= self.max_retries
+                or (remaining_calls is not None and remaining_calls <= 0)
+                or event.get('browser_stepped')):
             return None
         delay, reason = 0.0, None
         raw = event.get('model_response') or {}

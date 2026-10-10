@@ -23,12 +23,16 @@ TOOLS=('spawn_agent','get_agent','wait_agent','cancel_agent')
 class AgentLimits:
     max_active: int = 2
     max_launches: int = 4
-    child_steps: int = 10
+    child_steps: int | None = 10
     child_seconds: float = 180
-    total_model_calls: int = DEFAULT_MAX_STEPS
+    total_model_calls: int | None = DEFAULT_MAX_STEPS
     def __post_init__(self):
-        for name in ('max_active','max_launches','child_steps','total_model_calls'):
+        for name in ('max_active','max_launches'):
             if type(getattr(self,name)) is not int or getattr(self,name)<1:raise ValueError('Positive agent limit required: '+name)
+        for name in ('child_steps','total_model_calls'):
+            value = getattr(self,name)
+            if value is not None and (type(value) is not int or value < 1):
+                raise ValueError('Positive agent limit or None required: '+name)
         if type(self.child_seconds) not in (float,int) or not math.isfinite(self.child_seconds) or not 0<self.child_seconds<=1800:raise ValueError('Invalid helper deadline')
     def describe(self):return {**vars(self),'max_depth':1,'inference':'shared backend, serialized requests','browser_ownership':'exclusive per agent'}
 
@@ -75,7 +79,8 @@ class AgentRuntime:
             actor=view.actor
             if method=='complete':
                 self.guard(actor)
-                if self.calls>=self.limits.total_model_calls:raise ValueError('Shared parent/helper model-call limit reached')
+                if self.limits.total_model_calls is not None and self.calls>=self.limits.total_model_calls:
+                    raise ValueError('Shared parent/helper model-call limit reached')
                 self.calls+=1
             b=self.backend
             old={k:getattr(b,k,None) for k in ('request_options','session_id','ready','last_request')}
