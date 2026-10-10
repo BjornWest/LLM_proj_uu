@@ -37,6 +37,10 @@ const extraModels = ['luna', 'sol'].map(tier => ({ id: `gpt-6-${tier}`, name: `G
   reasoning: true, input: ['text', 'image'], contextWindow: 272000, maxTokens: 16384,
   cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } }));
 
+// Explicit 6.1 descriptor: exact slug, Responses tool transport, no paid probe.
+extraModels.push({ ...extraModels.find(m => m.id === 'gpt-6-sol'),
+  id: 'gpt-6.1-sol', name: 'GPT-6.1 Sol', contextWindow: 1050000, maxTokens: 128000 });
+
 export async function run(envelope, { fixture, fetchImpl = globalThis.fetch } = {}) {
   const { id, payload, artifact_dir: directory, pi_cli: cli, timeout_ms: timeout } = envelope;
   if (envelope.version !== 1 || !id || !Number.isInteger(timeout) || timeout <= 0)
