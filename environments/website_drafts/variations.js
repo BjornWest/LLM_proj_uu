@@ -1,3 +1,4 @@
+import {rangeLabels} from './market-range.js';
 // Explicit authoring options only. Distribution/conditioning adoption is separate.
 export const variationControls = {
   site:{skipLinks:['main','none','regions'],navigation:['base','flat','grouped'],navigationGrouping:['departments','shopping-services'],selectors:['inherit','select','radio','buttons']},
@@ -82,7 +83,7 @@ export function variedCard(p,h) {
   const status=orderable.some(v=>v.state==='in_stock')?'In-stock options':orderable.length?'Supplier backorder':'Currently unavailable';
   const pairs=[['Brand',e(p.brand)],['Product type',e(p.type)],['Price from',money(v.price)],['Ordering',e(status)]];
   if(options.detail==='full') {
-    if(p.marketRange?.status==='known')pairs.push(['Market range',e(p.marketRange.value)]);
+    if(p.marketRange?.status==='known')pairs.push(['Market range',e(rangeLabels[p.marketRange.value])]);
     if(p.options.length)pairs.push(['Available options',p.options.map(o=>`${e(o.label)}: ${o.values.map(e).join(', ')}`).join(' · ')]);
   }
   const details=options.grouping==='paragraphs'?pairs.map(([label,value])=>`<p><strong>${label}:</strong> ${value}</p>`).join(''):`<dl>${pairs.map(([label,value])=>`<dt>${label}</dt><dd>${value}</dd>`).join('')}</dl>`;

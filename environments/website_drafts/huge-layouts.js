@@ -19,10 +19,11 @@ const corporateGroups = [
   ['From the archives',['Timeline collection','Historic catalogues','Early advertising','Packaging archive','Correspondence collection','Archive highlights','Document library','Preserving stories']],
   ['Northline network',['Northline Studio','Northline Editions','Northline Audio','Northline Journal','Northline Archives','Northline Design Library','Northline Conversations','Northline Collections']],
 ];
+const articleName=title=>title.startsWith('Northline ')?title:title.toLowerCase();
 export const peripheralPages = corporateGroups.flatMap(([group,titles],g)=>titles.map((title,i)=>({
   id:`company-${g}-${i}`,title,group,
-  summary:`Notes, essays and background reading from our ${title.toLowerCase()}.`,
-  text:`The ${title.toLowerCase()} brings together short essays, reading lists and observations from the wider world of ${group.toLowerCase()}. Familiar places and everyday objects offer starting points for exploring how ideas develop over time.`,
+  summary:`Notes, essays and background reading from our ${articleName(title)}.`,
+  text:`The ${articleName(title)} brings together short essays, reading lists and observations from the wider world of ${articleName(group)}. Familiar places and everyday objects offer starting points for exploring how ideas develop over time.`,
   continuation:'Collections grow through conversations, notebooks and the careful preservation of older material. Some entries focus on a single object or place; others follow a theme across several years. Browse at your own pace and return to the shop whenever you wish.',
 })));
 export function peripheralArticle(id,{e,link}) {

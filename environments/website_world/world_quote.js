@@ -136,6 +136,7 @@ export const worldBinding={
     if(id==='sizing')return '<p>Check the EU size, width and fit guidance on the selected product page. Regular-width task requests correspond to the standard width label. Reference mass describes the specified reference configuration.</p>';
     if(id==='care')return '<p>Follow the care instructions supplied with your footwear. Material and construction details are listed on each product page.</p>';
     if(id==='about')return `<p>${e(data.siteName)} offers the products listed in this catalog.</p>`;
+    if(id==='stores'&&!Object.keys(branches).length)return '<p>No physical shops are listed for this retailer.</p>';
     if(id==='stores')return Object.values(branches).map(b=>`<section><h3>${e(b.name)}</h3><address>${e(b.address)}</address><p>${e(b.hours)}</p></section>`).join('');
     if(id==='contact')return `<p>Contact details are not published in this catalog.</p>${link('info/stores','Our shops')}`;
     if(id==='returns'){
