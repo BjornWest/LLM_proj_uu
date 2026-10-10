@@ -1,0 +1,253 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.wet_pet_food_base",
+  "random_namespace": "product-width-wet-pet-food-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "product.facts.reference_price_basis": {
+      "type": "string",
+      "constant": "synthetic one-kilogram formula anchor; exact pack prices are separate SKU facts",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.pack_keys": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "group.pack_key": {
+      "type": "string"
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "unit_net_mass_g": {
+            "type": "integer",
+            "unit": "g",
+            "min": 70,
+            "max": 85
+          },
+          "unit_count": {
+            "type": "integer",
+            "min": 1,
+            "max": 12
+          },
+          "total_net_mass_g": {
+            "type": "integer",
+            "unit": "g",
+            "min": 70,
+            "max": 1020
+          },
+          "price_multiplier": {
+            "type": "number",
+            "min": 0.1,
+            "max": 1.2
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 7,
+            "max": 480
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "sku.unit_net_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "unit_net_mass_g"
+      }
+    },
+    "sku.unit_count": {
+      "type": "integer",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "unit_count"
+      }
+    },
+    "group.unit_net_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "group.unit_count": {
+      "type": "integer"
+    },
+    "group.total_net_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "group.price_multiplier": {
+      "type": "number"
+    },
+    "group.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 70,
+      "max": 130,
+      "round_to": 1,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 110,
+          "max": 220
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 200,
+          "max": 400
+        }
+      ]
+    },
+    {
+      "id": "pack_menu",
+      "target": "product.pack_keys",
+      "sample": "weighted_subset",
+      "weights": {
+        "1x70g": 2,
+        "1x85g": 4,
+        "6x85g": 3,
+        "12x85g": 2
+      },
+      "count_weights": {
+        "1": 35,
+        "2": 40,
+        "3": 20,
+        "4": 5
+      }
+    },
+    {
+      "id": "pack_skus",
+      "for_each": {
+        "binding": "group.pack_key",
+        "from": "product.pack_keys"
+      },
+      "steps": [
+        {
+          "id": "inner_mass",
+          "target": "group.unit_net_mass_g",
+          "derive": "70 if group.pack_key == '1x70g' else 85"
+        },
+        {
+          "id": "unit_count",
+          "target": "group.unit_count",
+          "derive": "12 if group.pack_key == '12x85g' else (6 if group.pack_key == '6x85g' else 1)"
+        },
+        {
+          "id": "total_mass",
+          "target": "group.total_net_mass_g",
+          "derive": "group.unit_net_mass_g * group.unit_count"
+        },
+        {
+          "id": "multiplier",
+          "target": "group.price_multiplier",
+          "derive": "0.10 if group.pack_key == '1x70g' else (0.12 if group.pack_key == '1x85g' else (0.66 if group.pack_key == '6x85g' else 1.20))"
+        },
+        {
+          "id": "pack_price",
+          "target": "group.reference_price_sek",
+          "derive": "product.reference_price_sek * group.price_multiplier"
+        },
+        {
+          "id": "skus",
+          "target": "product.skus",
+          "emit": {
+            "sku_id": "product.product_id + '-' + group.pack_key",
+            "product_id": "product.product_id",
+            "unit_net_mass_g": "group.unit_net_mass_g",
+            "unit_count": "group.unit_count",
+            "total_net_mass_g": "group.total_net_mass_g",
+            "price_multiplier": "group.price_multiplier",
+            "reference_price_sek": "group.reference_price_sek"
+          }
+        }
+      ]
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Neutral profiles and finite joint same-formula pouch packs; no species/texture/nutrition assumption",
+    "quantity": "Unit count is a dimensionless integer; net unit/total mass retain grams",
+    "price_basis": "One-kilogram anchor with exact selected-pack coefficients, not quotes",
+    "heuristics": "Tunable authored pack/price choices, not source frequencies"
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.electronics_base",
+  "random_namespace": "product-width-electronics-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "sku.colour": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "colour"
+      }
+    },
+    "product.name": {
+      "type": "string",
+      "optional": true
+    },
+    "request.colour": {
+      "type": "string",
+      "optional": true
+    },
+    "product.colours": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "group.colour": {
+      "type": "string"
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights",
+      "stream": "product/electronics/positioning"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95,
+      "stream": "product/electronics/execution"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 5,
+        "white": 3,
+        "silver": 2,
+        "blue": 2
+      },
+      "count_weights": {
+        "1": 35,
+        "2": 40,
+        "3": 20,
+        "4": 5
+      }
+    },
+    {
+      "id": "colour_skus",
+      "for_each": {
+        "binding": "group.colour",
+        "from": "product.colours"
+      },
+      "steps": [
+        {
+          "id": "skus",
+          "target": "product.skus",
+          "emit": {
+            "sku_id": "product.product_id + '-' + group.colour",
+            "product_id": "product.product_id",
+            "colour": "group.colour"
+          }
+        }
+      ]
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 200,
+      "max": 800,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 600,
+          "max": 1800
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1500,
+          "max": 4500
+        }
+      ]
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Colour-only canonical manufacturer identity, neutral positioning/execution",
+    "heuristics": "Authored palette/weights, not empirical distribution",
+    "separation": "No retail stock/price, body geometry or electrical capability assumptions"
+  }
+}

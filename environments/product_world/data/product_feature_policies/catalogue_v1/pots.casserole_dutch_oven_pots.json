@@ -1,0 +1,3155 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "pots.casserole_dutch_oven_pots",
+  "family_id": "pots",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pots.casserole_dutch_oven_pots.json": "f5049ce20f6e39367e182ad58db4e92c5b4d0ab6a3c02c2c5b39b66733367800",
+    "environments/product_world/data/product_width/_cookware_base.json": "6608f450b998c44b734332a64615cfff4c6533e204506ec6a39a0cf3eb4a8acc",
+    "environments/product_world/data/product_public_content/pots.casserole_dutch_oven_pots.json": "2cb43a88cfcfa0cc51cb5bcd97ef44799a5e6205d6c40602c18e34b57b930a71"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep lid/handle/component heat and care distinctions. Capacity labels, working fill and measured volume are not interchangeable.",
+  "concept_note": "Body/coating/capacity and assembled heat suitability dominate; lid material remains a secondary detail.",
+  "fields": {
+    "product.name": {
+      "semantic_id": "casserole_dutch_oven_pots.public.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.intended_use": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "stews and braised meals on compatible hobs and in a conventional oven",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.body_shape": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.body_shape",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "round body with gently rounded walls",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_shape"
+    },
+    "sku.body_material": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.body_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "body_material"
+    },
+    "sku.base_construction": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.base_construction",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "base_construction"
+    },
+    "sku.manufactured_coating_present": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.manufactured_coating_present",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "manufactured_coating_present"
+    },
+    "sku.coating_kind": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.coating_kind",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "coating_kind"
+    },
+    "sku.exterior_finish": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.exterior_finish",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "exterior_finish"
+    },
+    "sku.metal_grade_declaration": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.metal_grade_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.coating_chemistry_declaration": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.coating_chemistry_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.enamel_coating_thickness_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.enamel_coating_thickness_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.enamel_coating_thickness_mm_status",
+        "applicability_predicate": "sku.enamel_coating_thickness_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.enamel_coating_thickness_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "enamel coating"
+        },
+        "measurement_basis": {
+          "literal": "actual enamel thickness; not applicable where no enamel is present"
+        },
+        "declared_status": {
+          "expr": "sku.enamel_coating_thickness_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.nonstick_coating_thickness_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.nonstick_coating_thickness_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.nonstick_coating_thickness_mm_status",
+        "applicability_predicate": "sku.nonstick_coating_thickness_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.nonstick_coating_thickness_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "polymer nonstick coating"
+        },
+        "measurement_basis": {
+          "literal": "actual polymer coating thickness; not applicable where no polymer nonstick coating is present"
+        },
+        "declared_status": {
+          "expr": "sku.nonstick_coating_thickness_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.side_handle_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.side_handle_count",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "side_handle_count"
+    },
+    "sku.side_handle_shape": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.side_handle_shape",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "loop handles",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "side_handle_shape"
+    },
+    "sku.side_handle_materials": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.side_handle_materials",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "side_handle_materials"
+    },
+    "sku.side_handle_attachment": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.side_handle_attachment",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "fixed non-removable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "side_handle_attachment"
+    },
+    "sku.side_handles_integral_with_body": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.side_handles_integral_with_body",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "side_handles_integral_with_body"
+    },
+    "sku.handle_fastening_detail": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.handle_fastening_detail",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "handle_fastening_detail"
+    },
+    "sku.lid_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_count"
+    },
+    "sku.lid_supplied_separately": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_supplied_separately",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_supplied_separately"
+    },
+    "sku.lid_body_material": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_body_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_body_material"
+    },
+    "sku.lid_rim_material": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_rim_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_rim_material"
+    },
+    "sku.lid_knob_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_knob_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_knob_count"
+    },
+    "sku.lid_knob_fitted": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_knob_fitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_knob_fitted"
+    },
+    "sku.lid_knob_material": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_knob_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_knob_material"
+    },
+    "sku.lid_steam_vent_present": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_steam_vent_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lid_steam_vent_present"
+    },
+    "sku.glass_treatment_declaration": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.glass_treatment_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "glass_treatment_declaration"
+    },
+    "sku.glass_lid_thickness_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.glass_lid_thickness_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.glass_lid_thickness_mm_status",
+        "applicability_predicate": "sku.glass_lid_thickness_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.glass_lid_thickness_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "glass lid body"
+        },
+        "measurement_basis": {
+          "literal": "actual glass thickness; not applicable where no glass lid is present"
+        },
+        "declared_status": {
+          "expr": "sku.glass_lid_thickness_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.nominal_capacity_ml": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.nominal_capacity_ml",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.nominal_capacity_ml_status",
+        "applicability_predicate": "sku.nominal_capacity_ml_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.nominal_capacity_ml_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "declared nominal vessel capacity; brim versus working basis unspecified"
+        },
+        "declared_status": {
+          "expr": "sku.nominal_capacity_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_capacity_ml"
+    },
+    "sku.brim_capacity_ml": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.brim_capacity_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.brim_capacity_ml_status",
+        "applicability_predicate": "sku.brim_capacity_ml_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.brim_capacity_ml_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "actual liquid volume to the brim, not nominal or working fill"
+        },
+        "declared_status": {
+          "expr": "sku.brim_capacity_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.recommended_working_fill_ml": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.recommended_working_fill_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mL",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.recommended_working_fill_ml_status",
+        "applicability_predicate": "sku.recommended_working_fill_ml_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.recommended_working_fill_ml_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "recommended maximum working fill, not nominal or brim volume"
+        },
+        "declared_status": {
+          "expr": "sku.recommended_working_fill_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.nominal_diameter_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.nominal_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.nominal_diameter_mm_status",
+        "applicability_predicate": "sku.nominal_diameter_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.nominal_diameter_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "nominal catalogue diameter; measurement location unspecified"
+        },
+        "declared_status": {
+          "expr": "sku.nominal_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_diameter_mm"
+    },
+    "sku.reference_body_height_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.reference_body_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_body_height_mm_status",
+        "applicability_predicate": "sku.reference_body_height_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_body_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "exterior body height excluding lid and side handles"
+        },
+        "declared_status": {
+          "expr": "sku.reference_body_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_body_height_mm"
+    },
+    "sku.reference_overall_width_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.reference_overall_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_overall_width_mm_status",
+        "applicability_predicate": "sku.reference_overall_width_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_overall_width_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "overall width including both fixed side handles"
+        },
+        "declared_status": {
+          "expr": "sku.reference_overall_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_overall_width_mm"
+    },
+    "sku.reference_lidded_height_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.reference_lidded_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_lidded_height_mm_status",
+        "applicability_predicate": "sku.reference_lidded_height_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_lidded_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot with supplied complete lid seated"
+        },
+        "measurement_basis": {
+          "literal": "supplied lid seated, including its fitted knob"
+        },
+        "declared_status": {
+          "expr": "sku.reference_lidded_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_lidded_height_mm"
+    },
+    "sku.reference_assembled_pot_mass_g": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.reference_assembled_pot_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_assembled_pot_mass_g_status",
+        "applicability_predicate": "sku.reference_assembled_pot_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_assembled_pot_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "authored catalogue reference for pot including both fitted side handles, excluding lid and retail packing; not actual weighing"
+        },
+        "declared_status": {
+          "expr": "sku.reference_assembled_pot_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembled_pot_mass_g"
+    },
+    "sku.reference_complete_lid_mass_g": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.reference_complete_lid_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_complete_lid_mass_g_status",
+        "applicability_predicate": "sku.reference_complete_lid_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_complete_lid_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid"
+        },
+        "measurement_basis": {
+          "literal": "authored catalogue reference for supplied lid including rim or edge and fitted knob, excluding pot and retail packing; not actual weighing"
+        },
+        "declared_status": {
+          "expr": "sku.reference_complete_lid_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_complete_lid_mass_g"
+    },
+    "sku.reference_usable_set_mass_g": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.reference_usable_set_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.reference_usable_set_mass_g_status",
+        "applicability_predicate": "sku.reference_usable_set_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.reference_usable_set_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete usable supplied set"
+        },
+        "measurement_basis": {
+          "literal": "authored catalogue reference sum for assembled pot and complete lid together, excluding retail packing; not actual weighing"
+        },
+        "declared_status": {
+          "expr": "sku.reference_usable_set_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_usable_set_mass_g"
+    },
+    "sku.actual_diameter_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.actual_diameter_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_diameter_mm_status",
+        "applicability_predicate": "sku.actual_diameter_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_diameter_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "actual purchased body diameter; measurement location unspecified"
+        },
+        "declared_status": {
+          "expr": "sku.actual_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_body_height_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.actual_body_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_body_height_mm_status",
+        "applicability_predicate": "sku.actual_body_height_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_body_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body"
+        },
+        "measurement_basis": {
+          "literal": "actual exterior body height excluding lid and side handles"
+        },
+        "declared_status": {
+          "expr": "sku.actual_body_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_overall_width_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.actual_overall_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_overall_width_mm_status",
+        "applicability_predicate": "sku.actual_overall_width_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_overall_width_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "actual overall width including both fixed side handles"
+        },
+        "declared_status": {
+          "expr": "sku.actual_overall_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_lidded_height_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.actual_lidded_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_lidded_height_mm_status",
+        "applicability_predicate": "sku.actual_lidded_height_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_lidded_height_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot with supplied complete lid seated"
+        },
+        "measurement_basis": {
+          "literal": "actual height including seated supplied lid and fitted knob"
+        },
+        "declared_status": {
+          "expr": "sku.actual_lidded_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_interior_depth_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.actual_interior_depth_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_interior_depth_mm_status",
+        "applicability_predicate": "sku.actual_interior_depth_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_interior_depth_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot vessel"
+        },
+        "measurement_basis": {
+          "literal": "actual interior depth"
+        },
+        "declared_status": {
+          "expr": "sku.actual_interior_depth_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_base_contact_diameter_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.actual_base_contact_diameter_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.actual_base_contact_diameter_mm_status",
+        "applicability_predicate": "sku.actual_base_contact_diameter_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.actual_base_contact_diameter_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot base"
+        },
+        "measurement_basis": {
+          "literal": "actual hob-contact footprint diameter"
+        },
+        "declared_status": {
+          "expr": "sku.actual_base_contact_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.base_thickness_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.base_thickness_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.base_thickness_mm_status",
+        "applicability_predicate": "sku.base_thickness_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.base_thickness_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot base"
+        },
+        "measurement_basis": {
+          "literal": "actual present base thickness"
+        },
+        "declared_status": {
+          "expr": "sku.base_thickness_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.wall_thickness_mm": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.wall_thickness_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.wall_thickness_mm_status",
+        "applicability_predicate": "sku.wall_thickness_mm_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.wall_thickness_mm_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body wall"
+        },
+        "measurement_basis": {
+          "literal": "actual present wall thickness"
+        },
+        "declared_status": {
+          "expr": "sku.wall_thickness_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.assembled_pot_mass_g": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.assembled_pot_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.assembled_pot_mass_g_status",
+        "applicability_predicate": "sku.assembled_pot_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.assembled_pot_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "actual pot plus its two fitted side handles, excluding lid and retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.assembled_pot_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.complete_lid_mass_g": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.complete_lid_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.complete_lid_mass_g_status",
+        "applicability_predicate": "sku.complete_lid_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.complete_lid_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid"
+        },
+        "measurement_basis": {
+          "literal": "actual lid including fitted knob and rim or edge, excluding pot and retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.complete_lid_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.usable_set_mass_g": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.usable_set_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.usable_set_mass_g_status",
+        "applicability_predicate": "sku.usable_set_mass_g_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.usable_set_mass_g_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete usable supplied set"
+        },
+        "measurement_basis": {
+          "literal": "actual assembled pot and complete supplied lid together, excluding retail packing"
+        },
+        "declared_status": {
+          "expr": "sku.usable_set_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.assembled_pot_oven_suitability": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.assembled_pot_oven_suitability",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "suitable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "assembled_pot_oven_suitability"
+    },
+    "sku.assembled_lid_oven_suitability": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.assembled_lid_oven_suitability",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "suitable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "assembled_lid_oven_suitability"
+    },
+    "sku.assembled_pot_oven_limit_c": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.assembled_pot_oven_limit_c",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.assembled_pot_oven_limit_c_status",
+        "applicability_predicate": "sku.assembled_pot_oven_limit_c_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.assembled_pot_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "assembled pot including fitted side handles"
+        },
+        "measurement_basis": {
+          "literal": "declared maximum conventional-oven temperature for complete pot including both side handles; independent assembly permission"
+        },
+        "declared_status": {
+          "expr": "sku.assembled_pot_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_pot_oven_limit_c"
+    },
+    "sku.assembled_lid_oven_limit_c": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.assembled_lid_oven_limit_c",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.assembled_lid_oven_limit_c_status",
+        "applicability_predicate": "sku.assembled_lid_oven_limit_c_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.assembled_lid_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "complete supplied lid"
+        },
+        "measurement_basis": {
+          "literal": "declared maximum conventional-oven temperature for lid including rim or edge and fitted knob; independent assembly permission"
+        },
+        "declared_status": {
+          "expr": "sku.assembled_lid_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_lid_oven_limit_c"
+    },
+    "sku.microwave_use_permission": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.microwave_use_permission",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "unsuitable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "microwave_use_permission"
+    },
+    "sku.grill_broiler_use_permission": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.grill_broiler_use_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.body_only_oven_permission": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.body_only_oven_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.side_handle_only_oven_permission": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.side_handle_only_oven_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.lid_body_only_oven_permission": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_body_only_oven_permission",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.body_only_oven_limit_c": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.body_only_oven_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.body_only_oven_limit_c_status",
+        "applicability_predicate": "sku.body_only_oven_limit_c_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.body_only_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "pot body only"
+        },
+        "measurement_basis": {
+          "literal": "separate oven maximum excluding side handles and lid"
+        },
+        "declared_status": {
+          "expr": "sku.body_only_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.side_handle_only_oven_limit_c": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.side_handle_only_oven_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.side_handle_only_oven_limit_c_status",
+        "applicability_predicate": "sku.side_handle_only_oven_limit_c_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.side_handle_only_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fitted side handles alone"
+        },
+        "measurement_basis": {
+          "literal": "separate oven maximum for fitted side handles alone"
+        },
+        "declared_status": {
+          "expr": "sku.side_handle_only_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.lid_body_only_oven_limit_c": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_body_only_oven_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.lid_body_only_oven_limit_c_status",
+        "applicability_predicate": "sku.lid_body_only_oven_limit_c_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.lid_body_only_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "lid body only"
+        },
+        "measurement_basis": {
+          "literal": "separate oven maximum excluding rim or edge and fitted knob"
+        },
+        "declared_status": {
+          "expr": "sku.lid_body_only_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.knob_only_oven_permission": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.knob_only_oven_permission",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "suitable within separately declared knob maximum",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "knob_only_oven_permission"
+    },
+    "sku.knob_only_oven_limit_c": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.knob_only_oven_limit_c",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "semantic_status_field": "sku.knob_only_oven_limit_c_status",
+        "applicability_predicate": "sku.knob_only_oven_limit_c_status != 'not_applicable'",
+        "not_applicable_values": [
+          -2
+        ],
+        "applicable_when": "sku.knob_only_oven_limit_c_status != 'not_applicable'",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "component": {
+          "literal": "fitted lid knob alone"
+        },
+        "measurement_basis": {
+          "literal": "separately declared oven maximum for knob alone; does not raise complete lid or pot maximum"
+        },
+        "declared_status": {
+          "expr": "sku.knob_only_oven_limit_c_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "knob_only_oven_limit_c"
+    },
+    "sku.compatible_hobs": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.compatible_hobs",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "induction",
+            "gas",
+            "radiant electric",
+            "glass ceramic"
+          ]
+        },
+        "min_items": 3,
+        "max_items": 4,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "compatible_hobs"
+    },
+    "sku.induction_suitable": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.induction_suitable",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "induction_suitable"
+    },
+    "sku.first_use_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.first_use_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Remove retail packing and labels; handwash the supplied pot and lid, rinse and dry before use.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "first_use_care"
+    },
+    "sku.body_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.body_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "After cooling, handwash the cooking surface with washing-up liquid and a soft sponge, rinse and dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_care"
+    },
+    "sku.handle_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.handle_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Handwash the attached side handles, rinse and dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handle_care"
+    },
+    "sku.lid_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Handwash the complete lid with its fitted knob, rinse and dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_care"
+    },
+    "sku.utensil_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.utensil_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Use wooden or blunt plastic utensils; avoid scratching abrasives.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "utensil_care"
+    },
+    "sku.heating_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.heating_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Heat gently with ingredients and liquid present, keep gas flames within the base, and never let the pot boil dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "heating_care"
+    },
+    "sku.impact_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.impact_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Avoid impacts and sudden temperature changes.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "impact_care"
+    },
+    "sku.hot_handling_care": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.hot_handling_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "Use own oven mitts on hot handles and knob, use a supported oven rack, and rest hot cookware on own heat-resistant trivet.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hot_handling_care"
+    },
+    "sku.handwashing_recommended": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.handwashing_recommended",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handwashing_recommended"
+    },
+    "sku.assembled_pot_dishwasher_allowed": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.assembled_pot_dishwasher_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_pot_dishwasher_allowed"
+    },
+    "sku.assembled_lid_dishwasher_allowed": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.assembled_lid_dishwasher_allowed",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembled_lid_dishwasher_allowed"
+    },
+    "sku.pot_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.pot_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pot_count"
+    },
+    "sku.usable_supplied_item_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.usable_supplied_item_count",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usable_supplied_item_count"
+    },
+    "sku.fitted_parts_excluded_from_usable_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.fitted_parts_excluded_from_usable_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.packaging_excluded_from_usable_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.packaging_excluded_from_usable_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "packaging_excluded_from_usable_count"
+    },
+    "sku.long_handle_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.long_handle_count",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "long_handle_count"
+    },
+    "sku.loose_spare_handle_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.loose_spare_handle_count",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "loose_spare_handle_count"
+    },
+    "sku.loose_spare_knob_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.loose_spare_knob_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "loose_spare_knob_count"
+    },
+    "sku.strainer_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.strainer_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "strainer_count"
+    },
+    "sku.steamer_insert_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.steamer_insert_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "steamer_insert_count"
+    },
+    "sku.ladle_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.ladle_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ladle_count"
+    },
+    "sku.oven_mitt_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.oven_mitt_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.trivet_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.trivet_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "trivet_count"
+    },
+    "sku.cleaning_tool_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.cleaning_tool_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.hob_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.hob_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.oven_count": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.oven_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "sku.pouring_rim": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.pouring_rim",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "plain unnotched rim",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pouring_rim"
+    },
+    "sku.graduated_fill_scale_present": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.graduated_fill_scale_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "graduated_fill_scale_present"
+    },
+    "sku.lid_pressure_sealing": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.lid_pressure_sealing",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_pressure_sealing"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "casserole_dutch_oven_pots.public.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 400,
+        "max": 3300,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "price_basis": {
+          "literal": "authored whole-purchase reference for one pot with fitted side handles and supplied complete lid with fitted knob; not per-part price or retailer offer"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.recipe": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "enamel_cast_iron_4l",
+          "coated_aluminium_5l"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "body_shape": {
+      "id": "pots.casserole_dutch_oven_pots.content.body_shape",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_shape"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_material": {
+      "id": "pots.casserole_dutch_oven_pots.content.body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "base_construction": {
+      "id": "pots.casserole_dutch_oven_pots.content.base_construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.base_construction"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "manufactured_coating_present": {
+      "id": "pots.casserole_dutch_oven_pots.content.manufactured_coating_present",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.manufactured_coating_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "coating_kind": {
+      "id": "pots.casserole_dutch_oven_pots.content.coating_kind",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.coating_kind"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "exterior_finish": {
+      "id": "pots.casserole_dutch_oven_pots.content.exterior_finish",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.exterior_finish"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.side_handle_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_shape": {
+      "id": "pots.casserole_dutch_oven_pots.content.side_handle_shape",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_shape"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_materials": {
+      "id": "pots.casserole_dutch_oven_pots.content.side_handle_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_materials"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handle_attachment": {
+      "id": "pots.casserole_dutch_oven_pots.content.side_handle_attachment",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handle_attachment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "side_handles_integral_with_body": {
+      "id": "pots.casserole_dutch_oven_pots.content.side_handles_integral_with_body",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.side_handles_integral_with_body"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_fastening_detail": {
+      "id": "pots.casserole_dutch_oven_pots.content.handle_fastening_detail",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_fastening_detail"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_count",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_supplied_separately": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_supplied_separately",
+      "display_group": "contents",
+      "fields": [
+        "sku.lid_supplied_separately"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_body_material": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lid_body_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_rim_material": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_rim_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lid_rim_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_knob_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_knob_count",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_knob_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_knob_fitted": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_knob_fitted",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_knob_fitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_knob_material": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_knob_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lid_knob_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_steam_vent_present": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_steam_vent_present",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_steam_vent_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "glass_treatment_declaration": {
+      "id": "pots.casserole_dutch_oven_pots.content.glass_treatment_declaration",
+      "display_group": "features",
+      "fields": [
+        "sku.glass_treatment_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_capacity_ml": {
+      "id": "pots.casserole_dutch_oven_pots.content.nominal_capacity_ml",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_capacity_ml"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "nominal_diameter_mm": {
+      "id": "pots.casserole_dutch_oven_pots.content.nominal_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_diameter_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_body_height_mm": {
+      "id": "pots.casserole_dutch_oven_pots.content.reference_body_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_body_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_overall_width_mm": {
+      "id": "pots.casserole_dutch_oven_pots.content.reference_overall_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_overall_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_lidded_height_mm": {
+      "id": "pots.casserole_dutch_oven_pots.content.reference_lidded_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_lidded_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembled_pot_mass_g": {
+      "id": "pots.casserole_dutch_oven_pots.content.reference_assembled_pot_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_assembled_pot_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_complete_lid_mass_g": {
+      "id": "pots.casserole_dutch_oven_pots.content.reference_complete_lid_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_complete_lid_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_usable_set_mass_g": {
+      "id": "pots.casserole_dutch_oven_pots.content.reference_usable_set_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_usable_set_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "assembled_pot_oven_suitability": {
+      "id": "pots.casserole_dutch_oven_pots.content.assembled_pot_oven_suitability",
+      "display_group": "features",
+      "fields": [
+        "sku.assembled_pot_oven_suitability"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "assembled_lid_oven_suitability": {
+      "id": "pots.casserole_dutch_oven_pots.content.assembled_lid_oven_suitability",
+      "display_group": "features",
+      "fields": [
+        "sku.assembled_lid_oven_suitability"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "assembled_pot_oven_limit_c": {
+      "id": "pots.casserole_dutch_oven_pots.content.assembled_pot_oven_limit_c",
+      "display_group": "features",
+      "fields": [
+        "sku.assembled_pot_oven_limit_c"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "assembled_lid_oven_limit_c": {
+      "id": "pots.casserole_dutch_oven_pots.content.assembled_lid_oven_limit_c",
+      "display_group": "features",
+      "fields": [
+        "sku.assembled_lid_oven_limit_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "microwave_use_permission": {
+      "id": "pots.casserole_dutch_oven_pots.content.microwave_use_permission",
+      "display_group": "features",
+      "fields": [
+        "sku.microwave_use_permission"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "knob_only_oven_permission": {
+      "id": "pots.casserole_dutch_oven_pots.content.knob_only_oven_permission",
+      "display_group": "features",
+      "fields": [
+        "sku.knob_only_oven_permission"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "knob_only_oven_limit_c": {
+      "id": "pots.casserole_dutch_oven_pots.content.knob_only_oven_limit_c",
+      "display_group": "features",
+      "fields": [
+        "sku.knob_only_oven_limit_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "compatible_hobs": {
+      "id": "pots.casserole_dutch_oven_pots.content.compatible_hobs",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.compatible_hobs"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "induction_suitable": {
+      "id": "pots.casserole_dutch_oven_pots.content.induction_suitable",
+      "display_group": "features",
+      "fields": [
+        "sku.induction_suitable"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "first_use_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.first_use_care",
+      "display_group": "care",
+      "fields": [
+        "sku.first_use_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.body_care",
+      "display_group": "care",
+      "fields": [
+        "sku.body_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.handle_care",
+      "display_group": "care",
+      "fields": [
+        "sku.handle_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_care",
+      "display_group": "care",
+      "fields": [
+        "sku.lid_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "utensil_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.utensil_care",
+      "display_group": "care",
+      "fields": [
+        "sku.utensil_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heating_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.heating_care",
+      "display_group": "care",
+      "fields": [
+        "sku.heating_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "impact_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.impact_care",
+      "display_group": "care",
+      "fields": [
+        "sku.impact_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hot_handling_care": {
+      "id": "pots.casserole_dutch_oven_pots.content.hot_handling_care",
+      "display_group": "care",
+      "fields": [
+        "sku.hot_handling_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handwashing_recommended": {
+      "id": "pots.casserole_dutch_oven_pots.content.handwashing_recommended",
+      "display_group": "care",
+      "fields": [
+        "sku.handwashing_recommended"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "assembled_pot_dishwasher_allowed": {
+      "id": "pots.casserole_dutch_oven_pots.content.assembled_pot_dishwasher_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.assembled_pot_dishwasher_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "assembled_lid_dishwasher_allowed": {
+      "id": "pots.casserole_dutch_oven_pots.content.assembled_lid_dishwasher_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.assembled_lid_dishwasher_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pot_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.pot_count",
+      "display_group": "features",
+      "fields": [
+        "sku.pot_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usable_supplied_item_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.usable_supplied_item_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.usable_supplied_item_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "packaging_excluded_from_usable_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.packaging_excluded_from_usable_count",
+      "display_group": "features",
+      "fields": [
+        "sku.packaging_excluded_from_usable_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "long_handle_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.long_handle_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.long_handle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_spare_handle_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.loose_spare_handle_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.loose_spare_handle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_spare_knob_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.loose_spare_knob_count",
+      "display_group": "features",
+      "fields": [
+        "sku.loose_spare_knob_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "strainer_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.strainer_count",
+      "display_group": "features",
+      "fields": [
+        "sku.strainer_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "steamer_insert_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.steamer_insert_count",
+      "display_group": "features",
+      "fields": [
+        "sku.steamer_insert_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ladle_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.ladle_count",
+      "display_group": "features",
+      "fields": [
+        "sku.ladle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "trivet_count": {
+      "id": "pots.casserole_dutch_oven_pots.content.trivet_count",
+      "display_group": "features",
+      "fields": [
+        "sku.trivet_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pouring_rim": {
+      "id": "pots.casserole_dutch_oven_pots.content.pouring_rim",
+      "display_group": "features",
+      "fields": [
+        "sku.pouring_rim"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "graduated_fill_scale_present": {
+      "id": "pots.casserole_dutch_oven_pots.content.graduated_fill_scale_present",
+      "display_group": "features",
+      "fields": [
+        "sku.graduated_fill_scale_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_pressure_sealing": {
+      "id": "pots.casserole_dutch_oven_pots.content.lid_pressure_sealing",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_pressure_sealing"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 96,
+    "roles": {
+      "identity": 2,
+      "literal": 35,
+      "descriptive": 27,
+      "omit_placeholder": 25,
+      "omit_fixed_detail": 5,
+      "commerce": 1,
+      "internal": 1
+    },
+    "display_groups": 6,
+    "highlight_candidates": 9,
+    "unmapped_descriptive_fields": 0
+  }
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.phone_cases_base",
+  "random_namespace": "product-width-phone-cases-base-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "product.name": {
+      "type": "string",
+      "optional": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK",
+      "min": 70,
+      "max": 900
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "supported_device_id": {
+            "type": "string"
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 70,
+            "max": 900
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "product.colours": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "sku.colour": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ]
+      }
+    },
+    "group.colour": {
+      "type": "string"
+    },
+    "product.facts.shipping_class": {
+      "type": "string",
+      "constant": "regular",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 70,
+      "max": 180,
+      "round_to": 5,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 150,
+          "max": 400
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 300,
+          "max": 900
+        }
+      ]
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Neutral case model/profile and canonical colour/device-ID SKU facts; no smartphone performance or stock. Child binds exact fit/construction/manufacture."
+  }
+}

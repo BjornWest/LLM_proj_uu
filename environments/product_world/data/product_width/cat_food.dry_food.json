@@ -1,0 +1,1280 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "cat_food.dry_food",
+  "random_namespace": "product-width-cat_food.dry_food-v1",
+  "extends": "_pet_food_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "product.facts.species": {
+      "type": "string",
+      "constant": "cat",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.presentation": {
+      "type": "string",
+      "constant": "dry kibble in a bag",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.life_stage": {
+      "type": "enum",
+      "values": [
+        "kitten",
+        "adult",
+        "senior"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_target": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.named_ingredient": {
+      "type": "enum",
+      "values": [
+        "dried chicken protein",
+        "dried salmon"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.named_ingredient_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": 12,
+      "max": 25,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.other_named_ingredients": {
+      "type": "string",
+      "constant": "rice, maize, animal fat, vegetable fibre and minerals",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.composition_scope": {
+      "type": "string",
+      "constant": "partial unordered disclosure; other animal ingredients not excluded",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.nutrition": {
+      "type": "object",
+      "properties": {
+        "protein": {
+          "type": "number",
+          "unit": "%"
+        },
+        "fat": {
+          "type": "number",
+          "unit": "%"
+        },
+        "fibre": {
+          "type": "number",
+          "unit": "%"
+        },
+        "ash": {
+          "type": "number",
+          "unit": "%"
+        }
+      }
+    },
+    "product.facts.protein_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": 0,
+      "max": 100,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fat_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": 0,
+      "max": 100,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fibre_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": 0,
+      "max": 100,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ash_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": 0,
+      "max": 100,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analytical_basis": {
+      "type": "string",
+      "constant": "label percent of food as sold",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.moisture": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.calorific_energy": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analysis_protocol": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.total_taurine_assay": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.individual_dietary_suitability": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.added_taurine_mg_per_kg": {
+      "type": "integer",
+      "unit": "mg/kg",
+      "min": -1,
+      "max": 1000,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.taurine_panel": {
+      "type": "string",
+      "constant": "nutritional additive dose, not total finished-food assay",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.dietary_role": {
+      "type": "enum",
+      "values": [
+        "complete",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bag_closure": {
+      "type": "enum",
+      "values": [
+        "tear-open non-reclosable",
+        "resealable zipper"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.life_stage": {
+      "type": "string",
+      "optional": true
+    },
+    "request.named_ingredient": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "life_stage",
+      "target": "product.facts.life_stage",
+      "sample": "weighted_choice",
+      "weights": {
+        "kitten": 1,
+        "adult": 5,
+        "senior": 2
+      }
+    },
+    {
+      "id": "target_label",
+      "target": "product.facts.declared_target",
+      "derive": "'from weaning to 12 months' if product.facts.life_stage == 'kitten' else ('ages 1-7 years' if product.facts.life_stage == 'adult' else 'ages 11+ years')"
+    },
+    {
+      "id": "named_ingredient",
+      "target": "product.facts.named_ingredient",
+      "sample": "weighted_choice",
+      "weights": {
+        "dried chicken protein": 3,
+        "dried salmon": 1
+      }
+    },
+    {
+      "id": "ingredient_share",
+      "target": "product.facts.named_ingredient_pct",
+      "sample": "weighted_choice",
+      "weights": {
+        "12": 0,
+        "15": 1,
+        "18": 0,
+        "20": 1,
+        "22": 0,
+        "25": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.named_ingredient == 'dried salmon'",
+          "weights": {
+            "12": 1,
+            "15": 0,
+            "18": 1,
+            "20": 0,
+            "22": 1,
+            "25": 0
+          }
+        }
+      ],
+      "values": {
+        "12": 12,
+        "15": 15,
+        "18": 18,
+        "20": 20,
+        "22": 22,
+        "25": 25
+      }
+    },
+    {
+      "id": "nutrition",
+      "target": "internal.nutrition",
+      "sample": "weighted_choice",
+      "weights": {
+        "kitten_a": 0,
+        "kitten_b": 0,
+        "adult_a": 1,
+        "adult_b": 1,
+        "senior_a": 0,
+        "senior_b": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.life_stage == 'kitten'",
+          "weights": {
+            "kitten_a": 1,
+            "kitten_b": 1,
+            "adult_a": 0,
+            "adult_b": 0,
+            "senior_a": 0,
+            "senior_b": 0
+          }
+        },
+        {
+          "when": "product.facts.life_stage == 'senior'",
+          "weights": {
+            "kitten_a": 0,
+            "kitten_b": 0,
+            "adult_a": 0,
+            "adult_b": 0,
+            "senior_a": 1,
+            "senior_b": 1
+          }
+        }
+      ],
+      "values": {
+        "kitten_a": {
+          "protein": 38,
+          "fat": 18,
+          "fibre": 2,
+          "ash": 7.5
+        },
+        "kitten_b": {
+          "protein": 41,
+          "fat": 20,
+          "fibre": 2.5,
+          "ash": 8
+        },
+        "adult_a": {
+          "protein": 27,
+          "fat": 13,
+          "fibre": 4,
+          "ash": 7.7
+        },
+        "adult_b": {
+          "protein": 32,
+          "fat": 15,
+          "fibre": 3,
+          "ash": 7
+        },
+        "senior_a": {
+          "protein": 31.6,
+          "fat": 18.8,
+          "fibre": 1.1,
+          "ash": 4.9
+        },
+        "senior_b": {
+          "protein": 34,
+          "fat": 16,
+          "fibre": 2,
+          "ash": 6
+        }
+      }
+    },
+    {
+      "id": "analysis_protein",
+      "target": "product.facts.protein_pct",
+      "derive": "internal.nutrition.protein"
+    },
+    {
+      "id": "analysis_fat",
+      "target": "product.facts.fat_pct",
+      "derive": "internal.nutrition.fat"
+    },
+    {
+      "id": "analysis_fibre",
+      "target": "product.facts.fibre_pct",
+      "derive": "internal.nutrition.fibre"
+    },
+    {
+      "id": "analysis_ash",
+      "target": "product.facts.ash_pct",
+      "derive": "internal.nutrition.ash"
+    },
+    {
+      "id": "taurine",
+      "target": "product.facts.added_taurine_mg_per_kg",
+      "sample": "weighted_choice",
+      "weights": {
+        "unknown": 2,
+        "700": 1,
+        "1000": 1
+      },
+      "values": {
+        "unknown": -1,
+        "700": 700,
+        "1000": 1000
+      }
+    },
+    {
+      "id": "dietary_role",
+      "target": "product.facts.dietary_role",
+      "sample": "weighted_choice",
+      "weights": {
+        "complete": 5,
+        "not specified": 1
+      }
+    },
+    {
+      "id": "bag_closure",
+      "target": "product.facts.bag_closure",
+      "sample": "weighted_choice",
+      "weights": {
+        "tear-open non-reclosable": 1,
+        "resealable zipper": 2
+      }
+    }
+  ],
+  "language": [
+    {
+      "id": "description.target",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.species",
+          "product.facts.presentation",
+          "product.facts.life_stage",
+          "product.facts.declared_target"
+        ]
+      },
+      "slots": {
+        "stage": "product.facts.life_stage",
+        "target": "product.facts.declared_target"
+      },
+      "formulations": [
+        "Dry bagged cat kibble; declared {stage} target, {target}. This label is not an individual dietary assessment.",
+        "Cat dry kibble in a bag, labelled for {stage} cats: {target}; individual suitability is not established."
+      ]
+    },
+    {
+      "id": "description.formula",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.named_ingredient",
+          "product.facts.named_ingredient_pct",
+          "product.facts.other_named_ingredients",
+          "product.facts.composition_scope"
+        ]
+      },
+      "slots": {
+        "ingredient": "product.facts.named_ingredient",
+        "pct": "product.facts.named_ingredient_pct",
+        "other": "product.facts.other_named_ingredients"
+      },
+      "formulations": [
+        "Declared {ingredient} {pct:g}%; also named: {other}. Partial unordered composition; other animal ingredients are not excluded.",
+        "Partial composition disclosure includes {ingredient} ({pct:g}%) and {other}; this is unordered, not an exhaustive ingredient or animal-protein list."
+      ]
+    },
+    {
+      "id": "description.analysis",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.protein_pct",
+          "product.facts.fat_pct",
+          "product.facts.fibre_pct",
+          "product.facts.ash_pct",
+          "product.facts.analytical_basis",
+          "product.facts.moisture",
+          "product.facts.calorific_energy",
+          "product.facts.analysis_protocol"
+        ]
+      },
+      "slots": {
+        "protein": "product.facts.protein_pct",
+        "fat": "product.facts.fat_pct",
+        "fibre": "product.facts.fibre_pct",
+        "ash": "product.facts.ash_pct"
+      },
+      "formulations": [
+        "Analytical label, percent of food as sold: protein {protein:g}%, fat {fat:g}%, crude fibre {fibre:g}%, crude ash {ash:g}%. Moisture, calories and analysis protocol unspecified.",
+        "Food-as-sold label percentages: protein {protein:g}; fat {fat:g}; crude fibre {fibre:g}; crude ash {ash:g}. No moisture, calorific-energy or method declaration."
+      ]
+    },
+    {
+      "id": "description.taurine",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.added_taurine_mg_per_kg",
+          "product.facts.taurine_panel",
+          "product.facts.total_taurine_assay"
+        ]
+      },
+      "slots": {
+        "dose": "product.facts.added_taurine_mg_per_kg"
+      },
+      "formulations": [
+        "Added taurine {dose} mg/kg in the nutritional-additive panel; total finished-food taurine assay unspecified.",
+        "Nutritional additive dose: taurine {dose} mg/kg. This is not a declared total taurine assay."
+      ],
+      "when": "known(product.facts.added_taurine_mg_per_kg)"
+    },
+    {
+      "id": "description.taurine_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.added_taurine_mg_per_kg",
+          "product.facts.taurine_panel",
+          "product.facts.total_taurine_assay"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Added taurine dose and total finished-food taurine assay unspecified.",
+        "No specified taurine additive quantity or total taurine assay."
+      ],
+      "when": "not known(product.facts.added_taurine_mg_per_kg)"
+    },
+    {
+      "id": "description.complete",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.dietary_role",
+          "product.facts.individual_dietary_suitability"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Labelled complete cat food; this label is not independent adequacy validation or individual dietary advice.",
+        "Declared dietary role: complete cat food. Individual suitability and independent nutrient adequacy are not established."
+      ],
+      "when": "known(product.facts.dietary_role)"
+    },
+    {
+      "id": "description.role_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.dietary_role"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Complete/complementary dietary role not specified; missing information does not mean complementary.",
+        "Dietary-role declaration unspecified, not an assertion of complementary food."
+      ],
+      "when": "not known(product.facts.dietary_role)"
+    },
+    {
+      "id": "description.bag",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bag_closure"
+        ]
+      },
+      "slots": {
+        "closure": "product.facts.bag_closure"
+      },
+      "formulations": [
+        "Bag closure: {closure}. Bag sizes are net food mass, not cat body weight or daily feeding grams.",
+        "Supplied bag uses {closure}; manufactured pack mass is distinct from animal weight and daily portion size."
+      ]
+    },
+    {
+      "id": "description.price",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_price_basis"
+        ]
+      },
+      "slots": {
+        "anchor": "product.reference_price_sek"
+      },
+      "formulations": [
+        "Synthetic one-kilogram formula anchor {anchor} SEK; exact pack masses and reference prices are SKU facts, not seller quotes.",
+        "One-kilogram reference anchor {anchor} SEK. Each canonical bag has its own net mass/reference price; these are not current retail offers."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'cat_food.dry_food' in brand.eligible_concepts"
+    },
+    {
+      "id": "partial_analysis_mass",
+      "require": "product.facts.protein_pct + product.facts.fat_pct + product.facts.fibre_pct + product.facts.ash_pct <= 100"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "life_stage",
+      "role": "filter",
+      "predicate": "product.facts.life_stage == request.life_stage",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "complete",
+      "role": "filter",
+      "predicate": "known(product.facts.dietary_role) and product.facts.dietary_role == 'complete'",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "named_ingredient",
+      "role": "filter",
+      "predicate": "product.facts.named_ingredient == request.named_ingredient",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "net_mass_g": {
+                "type": "integer",
+                "unit": "g",
+                "min": 400,
+                "max": 6000
+              },
+              "price_multiplier": {
+                "type": "number",
+                "min": 0.5,
+                "max": 4.8
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 20,
+                "max": 1104
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "net_mass_g": {
+              "type": "integer",
+              "unit": "g",
+              "min": 400,
+              "max": 6000
+            },
+            "price_multiplier": {
+              "type": "number",
+              "min": 0.5,
+              "max": 4.8
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 20,
+              "max": 1104
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "meal_acceptance",
+              "pouring",
+              "smell_preference",
+              "zipper_handling"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 40,
+          "max": 230
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_meal_acceptance": {
+          "type": "boolean"
+        },
+        "review.positive_pouring": {
+          "type": "boolean"
+        },
+        "review.positive_smell_preference": {
+          "type": "boolean"
+        },
+        "review.positive_zipper_handling": {
+          "type": "boolean"
+        },
+        "product.facts.life_stage": {
+          "type": "enum",
+          "values": [
+            "kitten",
+            "adult",
+            "senior"
+          ],
+          "input": true
+        },
+        "product.facts.bag_closure": {
+          "type": "enum",
+          "values": [
+            "tear-open non-reclosable",
+            "resealable zipper"
+          ],
+          "input": true
+        },
+        "review.reference_bound_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 40
+        },
+        "review.reference_bound_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 230
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "plain": 1,
+            "zipper": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.bag_closure == 'resealable zipper'",
+              "weights": {
+                "plain": 0,
+                "zipper": 1
+              }
+            }
+          ],
+          "values": {
+            "plain": [
+              "value",
+              "meal_acceptance",
+              "pouring",
+              "smell_preference"
+            ],
+            "zipper": [
+              "value",
+              "meal_acceptance",
+              "pouring",
+              "smell_preference",
+              "zipper_handling"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "pack_lower_price_bound",
+          "target": "review.price_min_sek",
+          "derive": "review.reference_bound_min_sek * review.subject.price_multiplier"
+        },
+        {
+          "id": "pack_upper_price_bound",
+          "target": "review.price_max_sek",
+          "derive": "review.reference_bound_max_sek * review.subject.price_multiplier"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_meal_acceptance",
+          "target": "review.positive_meal_acceptance",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_pouring",
+          "target": "review.positive_pouring",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_smell_preference",
+          "target": "review.positive_smell_preference",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_zipper_handling",
+          "target": "review.positive_zipper_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "meal_acceptance.positive",
+          "when": "'meal_acceptance' in review.topics and review.positive_meal_acceptance",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "meal_acceptance",
+            "polarity": "positive",
+            "context": {
+              "observer": "owner",
+              "animal": "declared target-stage cat",
+              "use": "ordinary meals in usual bowl",
+              "aspect": "observed eating or leaving food"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I observed my {stage} cat eat this food during ordinary meals in its usual bowl.",
+            "At ordinary meals in its usual bowl, I saw my {stage} cat eat this food."
+          ],
+          "slots": {
+            "stage": "product.facts.life_stage"
+          }
+        },
+        {
+          "id": "meal_acceptance.negative",
+          "when": "'meal_acceptance' in review.topics and not review.positive_meal_acceptance",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "meal_acceptance",
+            "polarity": "negative",
+            "context": {
+              "observer": "owner",
+              "animal": "declared target-stage cat",
+              "use": "ordinary meals in usual bowl",
+              "aspect": "observed eating or leaving food"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I observed my {stage} cat leave this food during ordinary meals in its usual bowl.",
+            "At ordinary meals in its usual bowl, I saw my {stage} cat leave this food."
+          ],
+          "slots": {
+            "stage": "product.facts.life_stage"
+          }
+        },
+        {
+          "id": "pouring.positive",
+          "when": "'pouring' in review.topics and review.positive_pouring",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "pouring",
+            "polarity": "positive",
+            "context": "owner pouring dry food from tested bag into usual feeding bowl",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pouring this dry food from the bag into the usual feeding bowl was easy for me.",
+            "I found this dry food easy to pour from the bag into the usual feeding bowl."
+          ]
+        },
+        {
+          "id": "pouring.negative",
+          "when": "'pouring' in review.topics and not review.positive_pouring",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "pouring",
+            "polarity": "negative",
+            "context": "owner pouring dry food from tested bag into usual feeding bowl",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pouring this dry food from the bag into the usual feeding bowl was difficult for me.",
+            "I found this dry food difficult to pour from the bag into the usual feeding bowl."
+          ]
+        },
+        {
+          "id": "smell_preference.positive",
+          "when": "'smell_preference' in review.topics and review.positive_smell_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "smell_preference",
+            "polarity": "positive",
+            "context": "owner smell preference when opening bag in usual feeding area",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked the smell when opening this bag in the usual feeding area.",
+            "On opening this bag in the usual feeding area, I liked its smell."
+          ]
+        },
+        {
+          "id": "smell_preference.negative",
+          "when": "'smell_preference' in review.topics and not review.positive_smell_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "smell_preference",
+            "polarity": "negative",
+            "context": "owner smell preference when opening bag in usual feeding area",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked the smell when opening this bag in the usual feeding area.",
+            "On opening this bag in the usual feeding area, I disliked its smell."
+          ]
+        },
+        {
+          "id": "zipper_handling.positive",
+          "when": "'zipper_handling' in review.topics and review.positive_zipper_handling and product.facts.bag_closure == 'resealable zipper'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "zipper_handling",
+            "polarity": "positive",
+            "context": "owner opening and reclosing the represented bag zipper",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and reclosing the bag zipper was easy for me.",
+            "I found the bag zipper easy to open and reclose."
+          ]
+        },
+        {
+          "id": "zipper_handling.negative",
+          "when": "'zipper_handling' in review.topics and not review.positive_zipper_handling and product.facts.bag_closure == 'resealable zipper'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "zipper_handling",
+            "polarity": "negative",
+            "context": "owner opening and reclosing the represented bag zipper",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and reclosing the bag zipper was difficult for me.",
+            "I found the bag zipper difficult to open and reclose."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Selected canonical pack reference price; explicit synthetic transaction fixture, not retailer quote",
+        "relative_price_basis": {
+          "anchor_min_sek": 40,
+          "anchor_max_sek": 230,
+          "bounds_scaled_by": "review.subject.price_multiplier",
+          "purpose": "compare formula-price position within same pack basis; no small-pack cheapness bias"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "cat_food",
+    "spec_path": "docs/agents/product-width-specs/cat_food.dry_food.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Explicit one-kilogram anchor with exact pack reference multipliers; seller prices deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "pets"
+    ],
+    "scope_exceptions": [
+      "Dry bag manufacture only; formula/target at model level",
+      "Label completeness is not an adequacy or individual suitability test",
+      "Partial ingredient disclosure, analytical label and additive doses remain separate"
+    ]
+  }
+}

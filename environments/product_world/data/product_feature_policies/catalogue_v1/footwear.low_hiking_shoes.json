@@ -1,0 +1,553 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "footwear.low_hiking_shoes",
+  "family_id": "footwear",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/footwear.low_hiking_shoes.json": "d9374d6f3b12ea0b6ea33bc5424e859402406623a05c1b53c64053fdc28b13af",
+    "environments/product_world/data/product_width/_footwear_base.json": "9cc64c801b6420d286547eebee18d78bc9d8fe454fdcde32fb7aebfcad7deac8"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Emphasize the actual use: cushioning for running, terrain/protection for hiking, shape/heel for dress shoes, insulation for winter. Fixed closed-heel anatomy is not a selling point.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": true,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.construction": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "enclosed low hiking shoe",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.collar_height": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "low",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "collar_height"
+    },
+    "product.facts.closed_heel": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "closed_heel"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "day hiking on ordinary trails",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one shoe, EU 40 reference configuration",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.waterproof_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.component_materials.upper": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "component_materials.upper"
+    },
+    "product.facts.component_materials.outsole": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "rubber",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "component_materials.outsole"
+    },
+    "product.facts.fastening": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "laces",
+          "quick-lace cord"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fastening"
+    },
+    "product.facts.sole_structure": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sole_structure"
+    },
+    "product.facts.cushioning": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cushioning"
+    },
+    "product.facts.sole_tread": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "constant": "hiking lugs",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sole_tread"
+    },
+    "product.facts.lug_depth_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "min": 3,
+        "max": 5,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lug_depth_mm"
+    },
+    "product.facts.arch_shank": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "arch_shank"
+    },
+    "product.facts.reinforced_toe": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reinforced_toe"
+    },
+    "product.facts.waterproof_membrane": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "waterproof_membrane"
+    },
+    "product.facts.reference_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "min": 300,
+        "max": 550,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_mass_g"
+    }
+  },
+  "disclosure_groups": {
+    "construction": {
+      "id": "footwear.low_hiking_shoes.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_height": {
+      "id": "footwear.low_hiking_shoes.content.collar_height",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.collar_height"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closed_heel": {
+      "id": "footwear.low_hiking_shoes.content.closed_heel",
+      "display_group": "features",
+      "fields": [
+        "product.facts.closed_heel"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "component_materials.upper": {
+      "id": "footwear.low_hiking_shoes.content.component_materials.upper",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials.upper"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "component_materials.outsole": {
+      "id": "footwear.low_hiking_shoes.content.component_materials.outsole",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.component_materials.outsole"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "fastening": {
+      "id": "footwear.low_hiking_shoes.content.fastening",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fastening"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "sole_structure": {
+      "id": "footwear.low_hiking_shoes.content.sole_structure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.sole_structure"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cushioning": {
+      "id": "footwear.low_hiking_shoes.content.cushioning",
+      "display_group": "features",
+      "fields": [
+        "product.facts.cushioning"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sole_tread": {
+      "id": "footwear.low_hiking_shoes.content.sole_tread",
+      "display_group": "features",
+      "fields": [
+        "product.facts.sole_tread"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "lug_depth_mm": {
+      "id": "footwear.low_hiking_shoes.content.lug_depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.lug_depth_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "arch_shank": {
+      "id": "footwear.low_hiking_shoes.content.arch_shank",
+      "display_group": "features",
+      "fields": [
+        "product.facts.arch_shank"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "reinforced_toe": {
+      "id": "footwear.low_hiking_shoes.content.reinforced_toe",
+      "display_group": "features",
+      "fields": [
+        "product.facts.reinforced_toe"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "waterproof_membrane": {
+      "id": "footwear.low_hiking_shoes.content.waterproof_membrane",
+      "display_group": "features",
+      "fields": [
+        "product.facts.waterproof_membrane"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "reference_mass_g": {
+      "id": "footwear.low_hiking_shoes.content.reference_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    }
+  },
+  "display_groups": {
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 18,
+    "roles": {
+      "operational": 1,
+      "literal": 5,
+      "identity": 1,
+      "qualifier": 1,
+      "omit_placeholder": 1,
+      "descriptive": 9
+    },
+    "display_groups": 3,
+    "highlight_candidates": 10,
+    "unmapped_descriptive_fields": 14
+  }
+}

@@ -1,0 +1,4315 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "tablets.pen_work_focused_tablets",
+  "family_id": "tablets",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/tablets.pen_work_focused_tablets.json": "3b69ee46878a3be8408ad36010c3be3fa6f5303a9acff07a7d0272e8739217ec",
+    "environments/product_world/data/product_width/_tablets_base.json": "356e92422c148f5f0dca52baadb94235b4882b52ede1e2d93447d84f73279871",
+    "environments/product_world/data/product_public_content/tablets.pen_work_focused_tablets.json": "37e4b75de346f59f05956770b02093d078ed3aebfd02df1f2a5b491729624667"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Pen platform/power and included pen are distinct. Storage/cellular/bundle controls must retain their existing presentation annotations.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.tablet_units": {
+      "semantic_id": "tablets.penwork.product.facts.tablet_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tablet_units"
+    },
+    "product.facts.construction": {
+      "semantic_id": "tablets.penwork.product.facts.construction",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "slate tablet"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "tablets.penwork.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "prepared native PDF and note use"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.touchscreen": {
+      "semantic_id": "tablets.penwork.product.facts.touchscreen",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "touchscreen"
+    },
+    "product.facts.processor_label": {
+      "semantic_id": "tablets.penwork.product.facts.processor_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "processor_label"
+    },
+    "product.facts.os_label": {
+      "semantic_id": "tablets.penwork.product.facts.os_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "os_label"
+    },
+    "product.facts.os_release": {
+      "semantic_id": "tablets.penwork.product.facts.os_release",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.application_inventory": {
+      "semantic_id": "tablets.penwork.product.facts.application_inventory",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.application_setup": {
+      "semantic_id": "tablets.penwork.product.facts.application_setup",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.support_duration_years": {
+      "semantic_id": "tablets.penwork.product.facts.support_duration_years",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "year",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.configuration": {
+      "semantic_id": "tablets.penwork.sku.configuration",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "8GB / 128GB",
+          "12GB / 256GB",
+          "8GB / 256GB"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "configuration"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.ram_gb": {
+      "semantic_id": "tablets.penwork.sku.ram_gb",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.ram_attachment": {
+      "semantic_id": "tablets.penwork.sku.ram_attachment",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "soldered RAM",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ram_attachment"
+    },
+    "sku.storage_label": {
+      "semantic_id": "tablets.penwork.sku.storage_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "storage_label"
+    },
+    "sku.storage_gb": {
+      "semantic_id": "tablets.penwork.sku.storage_gb",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.storage_kind": {
+      "semantic_id": "tablets.penwork.sku.storage_kind",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "onboard flash",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_kind"
+    },
+    "sku.storage_attachment": {
+      "semantic_id": "tablets.penwork.sku.storage_attachment",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "onboard storage",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_attachment"
+    },
+    "product.facts.ram_socket_units": {
+      "semantic_id": "tablets.penwork.product.facts.ram_socket_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ram_socket_units"
+    },
+    "product.facts.storage_module_position_units": {
+      "semantic_id": "tablets.penwork.product.facts.storage_module_position_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_module_position_units"
+    },
+    "product.facts.free_ram_gb": {
+      "semantic_id": "tablets.penwork.product.facts.free_ram_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.formatted_storage_gb": {
+      "semantic_id": "tablets.penwork.sku.formatted_storage_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.service_access_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.service_access_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.graphics_label": {
+      "semantic_id": "tablets.penwork.product.facts.graphics_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "graphics_label"
+    },
+    "product.facts.graphics_variant": {
+      "semantic_id": "tablets.penwork.product.facts.graphics_variant",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "graphics_variant"
+    },
+    "product.facts.graphics_shared_memory": {
+      "semantic_id": "tablets.penwork.product.facts.graphics_shared_memory",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "graphics_shared_memory"
+    },
+    "product.facts.discrete_gpu": {
+      "semantic_id": "tablets.penwork.product.facts.discrete_gpu",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "discrete_gpu"
+    },
+    "product.facts.dedicated_vram_gb": {
+      "semantic_id": "tablets.penwork.product.facts.dedicated_vram_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "applicable_when": "product.facts.discrete_gpu",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.graphics_routing": {
+      "semantic_id": "tablets.penwork.product.facts.graphics_routing",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.performance_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.performance_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_size_label": {
+      "semantic_id": "tablets.penwork.product.facts.screen_size_label",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_size_label"
+    },
+    "product.facts.screen_rectangle_diagonal_in": {
+      "semantic_id": "tablets.penwork.product.facts.screen_rectangle_diagonal_in",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "inch",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_rectangle_diagonal_in"
+    },
+    "product.facts.screen_width_px": {
+      "semantic_id": "tablets.penwork.product.facts.screen_width_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_width_px"
+    },
+    "product.facts.screen_height_px": {
+      "semantic_id": "tablets.penwork.product.facts.screen_height_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_height_px"
+    },
+    "product.facts.screen_technology": {
+      "semantic_id": "tablets.penwork.product.facts.screen_technology",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_technology"
+    },
+    "product.facts.screen_surface": {
+      "semantic_id": "tablets.penwork.product.facts.screen_surface",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "glossy glass"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "screen_surface"
+    },
+    "product.facts.viewable_area_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.viewable_area_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.touch_capabilities": {
+      "semantic_id": "tablets.penwork.product.facts.touch_capabilities",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.touchscreen",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_brightness_nit": {
+      "semantic_id": "tablets.penwork.product.facts.screen_brightness_nit",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "nit",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_gamut": {
+      "semantic_id": "tablets.penwork.product.facts.screen_gamut",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.colour_calibration_error": {
+      "semantic_id": "tablets.penwork.product.facts.colour_calibration_error",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.screen_backlight": {
+      "semantic_id": "tablets.penwork.product.facts.screen_backlight",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "screen_backlight"
+    },
+    "product.facts.lcd_backlight_properties": {
+      "semantic_id": "tablets.penwork.product.facts.lcd_backlight_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.screen_backlight",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.refresh_rate_hz": {
+      "semantic_id": "tablets.penwork.product.facts.refresh_rate_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "refresh_rate_hz"
+    },
+    "product.facts.achieved_frame_rate_hz": {
+      "semantic_id": "tablets.penwork.product.facts.achieved_frame_rate_hz",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reference_configuration": {
+      "semantic_id": "tablets.penwork.product.facts.reference_configuration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_configuration"
+    },
+    "product.facts.reference_width_mm": {
+      "semantic_id": "tablets.penwork.product.facts.reference_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_width_mm"
+    },
+    "product.facts.reference_height_mm": {
+      "semantic_id": "tablets.penwork.product.facts.reference_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_height_mm"
+    },
+    "product.facts.reference_max_thickness_mm": {
+      "semantic_id": "tablets.penwork.product.facts.reference_max_thickness_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_max_thickness_mm"
+    },
+    "product.facts.reference_mass_g": {
+      "semantic_id": "tablets.penwork.product.facts.reference_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_mass_g"
+    },
+    "sku.actual_mass_g": {
+      "semantic_id": "tablets.penwork.sku.actual_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_dimensions_declaration": {
+      "semantic_id": "tablets.penwork.sku.actual_dimensions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.carried_kit_mass_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.carried_kit_mass_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.colour": {
+      "semantic_id": "tablets.penwork.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "gray",
+          "blue",
+          "silver",
+          "purple"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "colour"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "product.facts.back_material": {
+      "semantic_id": "tablets.penwork.product.facts.back_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "metal",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "back_material"
+    },
+    "product.facts.touch_surface_material": {
+      "semantic_id": "tablets.penwork.product.facts.touch_surface_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "glass"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "touch_surface_material"
+    },
+    "product.facts.finish_durability": {
+      "semantic_id": "tablets.penwork.product.facts.finish_durability",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_included": {
+      "semantic_id": "tablets.penwork.product.facts.battery_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_included"
+    },
+    "product.facts.battery_location": {
+      "semantic_id": "tablets.penwork.product.facts.battery_location",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "internal installed operating pack"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_location"
+    },
+    "product.facts.battery_rechargeable": {
+      "semantic_id": "tablets.penwork.product.facts.battery_rechargeable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_rechargeable"
+    },
+    "product.facts.battery_chemistry": {
+      "semantic_id": "tablets.penwork.product.facts.battery_chemistry",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "battery_chemistry"
+    },
+    "product.facts.battery_charge_mah": {
+      "semantic_id": "tablets.penwork.product.facts.battery_charge_mah",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "battery_charge_mah"
+    },
+    "product.facts.battery_energy_wh": {
+      "semantic_id": "tablets.penwork.product.facts.battery_energy_wh",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "battery_energy_wh"
+    },
+    "product.facts.battery_service": {
+      "semantic_id": "tablets.penwork.product.facts.battery_service",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_voltage_v": {
+      "semantic_id": "tablets.penwork.product.facts.battery_voltage_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_runtime_h": {
+      "semantic_id": "tablets.penwork.product.facts.battery_runtime_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.charge_time_h": {
+      "semantic_id": "tablets.penwork.product.facts.charge_time_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.device_input_ceiling_w": {
+      "semantic_id": "tablets.penwork.product.facts.device_input_ceiling_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usb_c_units": {
+      "semantic_id": "tablets.penwork.product.facts.usb_c_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_c_units"
+    },
+    "product.facts.c1_interface_label": {
+      "semantic_id": "tablets.penwork.product.facts.c1_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_interface_label"
+    },
+    "product.facts.c1_data": {
+      "semantic_id": "tablets.penwork.product.facts.c1_data",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c1_data"
+    },
+    "product.facts.c1_tablet_input_charging": {
+      "semantic_id": "tablets.penwork.product.facts.c1_tablet_input_charging",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c1_tablet_input_charging"
+    },
+    "product.facts.c1_video_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.c1_video_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_video_declaration"
+    },
+    "product.facts.c1_video_conditions": {
+      "semantic_id": "tablets.penwork.product.facts.c1_video_conditions",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_video_conditions"
+    },
+    "product.facts.audio_combo_units": {
+      "semantic_id": "tablets.penwork.product.facts.audio_combo_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "audio_combo_units"
+    },
+    "product.facts.port_power_profiles": {
+      "semantic_id": "tablets.penwork.product.facts.port_power_profiles",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.c1_output_charging_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.c1_output_charging_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wireless_charging_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.wireless_charging_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.achieved_link_rate_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.achieved_link_rate_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.external_display_limits": {
+      "semantic_id": "tablets.penwork.product.facts.external_display_limits",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wifi_label": {
+      "semantic_id": "tablets.penwork.product.facts.wifi_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wifi_label"
+    },
+    "product.facts.bluetooth_label": {
+      "semantic_id": "tablets.penwork.product.facts.bluetooth_label",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "5.3",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bluetooth_label"
+    },
+    "sku.region_label": {
+      "semantic_id": "tablets.penwork.sku.region_label",
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "EEA",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "sku.cellular_configuration": {
+      "semantic_id": "tablets.penwork.sku.cellular_configuration",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Wi-Fi only",
+          "Wi-Fi + 5G"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "cellular_configuration"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.cellular_present": {
+      "semantic_id": "tablets.penwork.sku.cellular_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cellular_present"
+    },
+    "sku.physical_sim_tray_units": {
+      "semantic_id": "tablets.penwork.sku.physical_sim_tray_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "physical_sim_tray_units"
+    },
+    "product.facts.memory_card_reader_units": {
+      "semantic_id": "tablets.penwork.product.facts.memory_card_reader_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "memory_card_reader_units"
+    },
+    "product.facts.maximum_card_capacity_gb": {
+      "semantic_id": "tablets.penwork.product.facts.maximum_card_capacity_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "applicable_when": "product.facts.memory_card_reader_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.memory_card_units": {
+      "semantic_id": "tablets.penwork.sku.memory_card_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "memory_card_units"
+    },
+    "product.facts.stylus_platform_label": {
+      "semantic_id": "tablets.penwork.product.facts.stylus_platform_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "stylus_platform_label"
+    },
+    "product.facts.stylus_compatibility_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.stylus_compatibility_declaration",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "declared compatible platform"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stylus_compatibility_declaration"
+    },
+    "product.facts.pen_feature_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.pen_feature_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.compatible_pen_power_class": {
+      "semantic_id": "tablets.penwork.product.facts.compatible_pen_power_class",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "compatible_pen_power_class"
+    },
+    "product.facts.compatible_pen_rechargeable": {
+      "semantic_id": "tablets.penwork.product.facts.compatible_pen_rechargeable",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "compatible_pen_rechargeable"
+    },
+    "product.facts.pen_storage_attachment_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.pen_storage_attachment_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pen_storage_attachment_declaration"
+    },
+    "product.facts.pen_charging_interface_units": {
+      "semantic_id": "tablets.penwork.product.facts.pen_charging_interface_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pen_charging_interface_units"
+    },
+    "product.facts.pen_charging_interface_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.pen_charging_interface_declaration",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.pen_charging_interface_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pen_charging_interface_declaration"
+    },
+    "product.facts.compatible_pen_battery_chemistry": {
+      "semantic_id": "tablets.penwork.product.facts.compatible_pen_battery_chemistry",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.compatible_pen_rechargeable",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.compatible_pen_charge_mah": {
+      "semantic_id": "tablets.penwork.product.facts.compatible_pen_charge_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "applicable_when": "product.facts.compatible_pen_rechargeable",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.compatible_pen_energy_wh": {
+      "semantic_id": "tablets.penwork.product.facts.compatible_pen_energy_wh",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "applicable_when": "product.facts.compatible_pen_rechargeable",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.compatible_pen_runtime_h": {
+      "semantic_id": "tablets.penwork.product.facts.compatible_pen_runtime_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "applicable_when": "product.facts.compatible_pen_rechargeable",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.compatible_pen_charge_time_h": {
+      "semantic_id": "tablets.penwork.product.facts.compatible_pen_charge_time_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "applicable_when": "product.facts.compatible_pen_rechargeable",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.supplied_pen_units": {
+      "semantic_id": "tablets.penwork.sku.supplied_pen_units",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supplied_pen_units"
+    },
+    "product.facts.bluetooth_keyboard_compatibility": {
+      "semantic_id": "tablets.penwork.product.facts.bluetooth_keyboard_compatibility",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "already-compatible Bluetooth HID keyboard"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bluetooth_keyboard_compatibility"
+    },
+    "product.facts.keyboard_contact_units": {
+      "semantic_id": "tablets.penwork.product.facts.keyboard_contact_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "keyboard_contact_units"
+    },
+    "product.facts.keyboard_contact_platform": {
+      "semantic_id": "tablets.penwork.product.facts.keyboard_contact_platform",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.keyboard_contact_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "keyboard_contact_platform"
+    },
+    "product.facts.keyboard_contact_power_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.keyboard_contact_power_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.keyboard_contact_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.keyboard_contact_protocol_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.keyboard_contact_protocol_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.keyboard_contact_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.keyboard_units": {
+      "semantic_id": "tablets.penwork.sku.keyboard_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keyboard_units"
+    },
+    "sku.cable_units": {
+      "semantic_id": "tablets.penwork.sku.cable_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cable_units"
+    },
+    "sku.cable_connector_label": {
+      "semantic_id": "tablets.penwork.sku.cable_connector_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "USB-C to USB-C",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cable_connector_label"
+    },
+    "sku.cable_detachable": {
+      "semantic_id": "tablets.penwork.sku.cable_detachable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cable_detachable"
+    },
+    "sku.cable_length_m": {
+      "semantic_id": "tablets.penwork.sku.cable_length_m",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cable_length_m"
+    },
+    "sku.adapter_units": {
+      "semantic_id": "tablets.penwork.sku.adapter_units",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_units"
+    },
+    "sku.cable_ratings_declaration": {
+      "semantic_id": "tablets.penwork.sku.cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.own_charger_requirement": {
+      "semantic_id": "tablets.penwork.product.facts.own_charger_requirement",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "already-compatible own USB-C adapter required"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "own_charger_requirement"
+    },
+    "sku.case_units": {
+      "semantic_id": "tablets.penwork.sku.case_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "case_units"
+    },
+    "sku.sim_units": {
+      "semantic_id": "tablets.penwork.sku.sim_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sim_units"
+    },
+    "sku.display_lead_units": {
+      "semantic_id": "tablets.penwork.sku.display_lead_units",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "display_lead_units"
+    },
+    "sku.paid_note_subscription_included": {
+      "semantic_id": "tablets.penwork.sku.paid_note_subscription_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "paid_note_subscription_included"
+    },
+    "sku.document_rights_included": {
+      "semantic_id": "tablets.penwork.sku.document_rights_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "document_rights_included"
+    },
+    "product.facts.care_declaration": {
+      "semantic_id": "tablets.penwork.product.facts.care_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.cleaning_permissions": {
+      "semantic_id": "tablets.penwork.product.facts.cleaning_permissions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ip_rating": {
+      "semantic_id": "tablets.penwork.product.facts.ip_rating",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.logical_modem_family": {
+      "semantic_id": "tablets.penwork.sku.modem_family",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "sku.modem_family_status != 'not_applicable'",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_modem_family"
+    },
+    "sku.logical_esim_declaration": {
+      "semantic_id": "tablets.penwork.sku.esim_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "sku.esim_declaration_status != 'not_applicable'",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_esim_declaration"
+    },
+    "sku.logical_regional_bands_declaration": {
+      "semantic_id": "tablets.penwork.sku.regional_bands_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "sku.regional_bands_declaration_status != 'not_applicable'",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_regional_bands_declaration"
+    },
+    "sku.logical_cellular_service_declaration": {
+      "semantic_id": "tablets.penwork.sku.cellular_service_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "sku.cellular_service_declaration_status != 'not_applicable'",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_cellular_service_declaration"
+    },
+    "sku.logical_supplied_pen_platform": {
+      "semantic_id": "tablets.penwork.sku.supplied_pen_platform",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "sku.supplied_pen_platform_status != 'not_applicable'",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_supplied_pen_platform"
+    },
+    "sku.logical_supplied_pen_power_declaration": {
+      "semantic_id": "tablets.penwork.sku.supplied_pen_power_declaration",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "sku.supplied_pen_power_declaration_status != 'not_applicable'",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_supplied_pen_power_declaration"
+    },
+    "sku.logical_supplied_pen_charge_mah": {
+      "semantic_id": "tablets.penwork.sku.supplied_pen_charge_mah",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "applicable_when": "sku.supplied_pen_charge_mah_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_supplied_pen_charge_mah"
+    },
+    "sku.logical_supplied_pen_energy_wh": {
+      "semantic_id": "tablets.penwork.sku.supplied_pen_energy_wh",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "applicable_when": "sku.supplied_pen_energy_wh_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_supplied_pen_energy_wh"
+    },
+    "sku.logical_supplied_pen_charge_time_h": {
+      "semantic_id": "tablets.penwork.sku.supplied_pen_charge_time_h",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "applicable_when": "sku.supplied_pen_charge_time_h_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_supplied_pen_charge_time_h"
+    },
+    "sku.logical_supplied_pen_actual_mass_g": {
+      "semantic_id": "tablets.penwork.sku.supplied_pen_actual_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "applicable_when": "sku.supplied_pen_actual_mass_g_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_supplied_pen_actual_mass_g"
+    },
+    "sku.logical_adapter_output_w": {
+      "semantic_id": "tablets.penwork.sku.adapter_output_w",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "sku.adapter_output_w_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_adapter_output_w"
+    },
+    "sku.logical_adapter_output_v": {
+      "semantic_id": "tablets.penwork.sku.adapter_output_v",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "applicable_when": "sku.adapter_output_v_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_adapter_output_v"
+    },
+    "sku.logical_adapter_output_a": {
+      "semantic_id": "tablets.penwork.sku.adapter_output_a",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "applicable_when": "sku.adapter_output_a_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_adapter_output_a"
+    },
+    "sku.logical_adapter_input_declaration": {
+      "semantic_id": "tablets.penwork.sku.adapter_input_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "sku.adapter_input_declaration_status != 'not_applicable'",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_adapter_input_declaration"
+    },
+    "product.facts.battery_quantities_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.video_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pen_attachment_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.keyboard_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.supplied_pen_units": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.model": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "android_pen_13",
+          "ios_work_11"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.model_price_factor": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 1,
+        "max": 1.5
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    }
+  },
+  "disclosure_groups": {
+    "tablet_units": {
+      "id": "tablets.pen_work_focused_tablets.content.tablet_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tablet_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "construction": {
+      "id": "tablets.pen_work_focused_tablets.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "touchscreen": {
+      "id": "tablets.pen_work_focused_tablets.content.touchscreen",
+      "display_group": "features",
+      "fields": [
+        "product.facts.touchscreen"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "processor_label": {
+      "id": "tablets.pen_work_focused_tablets.content.processor_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.processor_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "os_label": {
+      "id": "tablets.pen_work_focused_tablets.content.os_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.os_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "ram_attachment": {
+      "id": "tablets.pen_work_focused_tablets.content.ram_attachment",
+      "display_group": "features",
+      "fields": [
+        "sku.ram_attachment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_label": {
+      "id": "tablets.pen_work_focused_tablets.content.storage_label",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_kind": {
+      "id": "tablets.pen_work_focused_tablets.content.storage_kind",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_attachment": {
+      "id": "tablets.pen_work_focused_tablets.content.storage_attachment",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_attachment"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ram_socket_units": {
+      "id": "tablets.pen_work_focused_tablets.content.ram_socket_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ram_socket_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_module_position_units": {
+      "id": "tablets.pen_work_focused_tablets.content.storage_module_position_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.storage_module_position_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "graphics_label": {
+      "id": "tablets.pen_work_focused_tablets.content.graphics_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.graphics_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "graphics_variant": {
+      "id": "tablets.pen_work_focused_tablets.content.graphics_variant",
+      "display_group": "features",
+      "fields": [
+        "product.facts.graphics_variant"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "graphics_shared_memory": {
+      "id": "tablets.pen_work_focused_tablets.content.graphics_shared_memory",
+      "display_group": "features",
+      "fields": [
+        "product.facts.graphics_shared_memory"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "discrete_gpu": {
+      "id": "tablets.pen_work_focused_tablets.content.discrete_gpu",
+      "display_group": "features",
+      "fields": [
+        "product.facts.discrete_gpu"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_size_label": {
+      "id": "tablets.pen_work_focused_tablets.content.screen_size_label",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "product.facts.screen_size_label"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "screen_rectangle_diagonal_in": {
+      "id": "tablets.pen_work_focused_tablets.content.screen_rectangle_diagonal_in",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_rectangle_diagonal_in"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "screen_width_px": {
+      "id": "tablets.pen_work_focused_tablets.content.screen_width_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_width_px"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_height_px": {
+      "id": "tablets.pen_work_focused_tablets.content.screen_height_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_height_px"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_technology": {
+      "id": "tablets.pen_work_focused_tablets.content.screen_technology",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_technology"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "screen_surface": {
+      "id": "tablets.pen_work_focused_tablets.content.screen_surface",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_surface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_backlight": {
+      "id": "tablets.pen_work_focused_tablets.content.screen_backlight",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_backlight"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "refresh_rate_hz": {
+      "id": "tablets.pen_work_focused_tablets.content.refresh_rate_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.refresh_rate_hz"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "reference_configuration": {
+      "id": "tablets.pen_work_focused_tablets.content.reference_configuration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.reference_configuration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_width_mm": {
+      "id": "tablets.pen_work_focused_tablets.content.reference_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_height_mm": {
+      "id": "tablets.pen_work_focused_tablets.content.reference_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_max_thickness_mm": {
+      "id": "tablets.pen_work_focused_tablets.content.reference_max_thickness_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.reference_max_thickness_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_mass_g": {
+      "id": "tablets.pen_work_focused_tablets.content.reference_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "back_material": {
+      "id": "tablets.pen_work_focused_tablets.content.back_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.back_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "touch_surface_material": {
+      "id": "tablets.pen_work_focused_tablets.content.touch_surface_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.touch_surface_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_included": {
+      "id": "tablets.pen_work_focused_tablets.content.battery_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.battery_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_location": {
+      "id": "tablets.pen_work_focused_tablets.content.battery_location",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_location"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_rechargeable": {
+      "id": "tablets.pen_work_focused_tablets.content.battery_rechargeable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_rechargeable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_chemistry": {
+      "id": "tablets.pen_work_focused_tablets.content.battery_chemistry",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_chemistry"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_charge_mah": {
+      "id": "tablets.pen_work_focused_tablets.content.battery_charge_mah",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_charge_mah"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_energy_wh": {
+      "id": "tablets.pen_work_focused_tablets.content.battery_energy_wh",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_energy_wh"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "usb_c_units": {
+      "id": "tablets.pen_work_focused_tablets.content.usb_c_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_c_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_interface_label": {
+      "id": "tablets.pen_work_focused_tablets.content.c1_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.c1_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_data": {
+      "id": "tablets.pen_work_focused_tablets.content.c1_data",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_data"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_tablet_input_charging": {
+      "id": "tablets.pen_work_focused_tablets.content.c1_tablet_input_charging",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.c1_tablet_input_charging"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_video_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.c1_video_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_video_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_video_conditions": {
+      "id": "tablets.pen_work_focused_tablets.content.c1_video_conditions",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_video_conditions"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "audio_combo_units": {
+      "id": "tablets.pen_work_focused_tablets.content.audio_combo_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.audio_combo_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wifi_label": {
+      "id": "tablets.pen_work_focused_tablets.content.wifi_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wifi_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth_label": {
+      "id": "tablets.pen_work_focused_tablets.content.bluetooth_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bluetooth_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cellular_present": {
+      "id": "tablets.pen_work_focused_tablets.content.cellular_present",
+      "display_group": "features",
+      "fields": [
+        "sku.cellular_present"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "physical_sim_tray_units": {
+      "id": "tablets.pen_work_focused_tablets.content.physical_sim_tray_units",
+      "display_group": "features",
+      "fields": [
+        "sku.physical_sim_tray_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "memory_card_reader_units": {
+      "id": "tablets.pen_work_focused_tablets.content.memory_card_reader_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.memory_card_reader_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "memory_card_units": {
+      "id": "tablets.pen_work_focused_tablets.content.memory_card_units",
+      "display_group": "features",
+      "fields": [
+        "sku.memory_card_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stylus_platform_label": {
+      "id": "tablets.pen_work_focused_tablets.content.stylus_platform_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.stylus_platform_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stylus_compatibility_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.stylus_compatibility_declaration",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.stylus_compatibility_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "compatible_pen_power_class": {
+      "id": "tablets.pen_work_focused_tablets.content.compatible_pen_power_class",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.compatible_pen_power_class"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "compatible_pen_rechargeable": {
+      "id": "tablets.pen_work_focused_tablets.content.compatible_pen_rechargeable",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.compatible_pen_rechargeable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pen_storage_attachment_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.pen_storage_attachment_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pen_storage_attachment_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pen_charging_interface_units": {
+      "id": "tablets.pen_work_focused_tablets.content.pen_charging_interface_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.pen_charging_interface_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pen_charging_interface_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.pen_charging_interface_declaration",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.pen_charging_interface_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth_keyboard_compatibility": {
+      "id": "tablets.pen_work_focused_tablets.content.bluetooth_keyboard_compatibility",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.bluetooth_keyboard_compatibility"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_contact_units": {
+      "id": "tablets.pen_work_focused_tablets.content.keyboard_contact_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.keyboard_contact_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_contact_platform": {
+      "id": "tablets.pen_work_focused_tablets.content.keyboard_contact_platform",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.keyboard_contact_platform"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_units": {
+      "id": "tablets.pen_work_focused_tablets.content.keyboard_units",
+      "display_group": "features",
+      "fields": [
+        "sku.keyboard_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cable_units": {
+      "id": "tablets.pen_work_focused_tablets.content.cable_units",
+      "display_group": "features",
+      "fields": [
+        "sku.cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cable_connector_label": {
+      "id": "tablets.pen_work_focused_tablets.content.cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cable_detachable": {
+      "id": "tablets.pen_work_focused_tablets.content.cable_detachable",
+      "display_group": "features",
+      "fields": [
+        "sku.cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cable_length_m": {
+      "id": "tablets.pen_work_focused_tablets.content.cable_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_units": {
+      "id": "tablets.pen_work_focused_tablets.content.adapter_units",
+      "display_group": "contents",
+      "fields": [
+        "sku.adapter_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "own_charger_requirement": {
+      "id": "tablets.pen_work_focused_tablets.content.own_charger_requirement",
+      "display_group": "features",
+      "fields": [
+        "product.facts.own_charger_requirement"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "case_units": {
+      "id": "tablets.pen_work_focused_tablets.content.case_units",
+      "display_group": "features",
+      "fields": [
+        "sku.case_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sim_units": {
+      "id": "tablets.pen_work_focused_tablets.content.sim_units",
+      "display_group": "features",
+      "fields": [
+        "sku.sim_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "display_lead_units": {
+      "id": "tablets.pen_work_focused_tablets.content.display_lead_units",
+      "display_group": "contents",
+      "fields": [
+        "sku.display_lead_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "paid_note_subscription_included": {
+      "id": "tablets.pen_work_focused_tablets.content.paid_note_subscription_included",
+      "display_group": "contents",
+      "fields": [
+        "sku.paid_note_subscription_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "document_rights_included": {
+      "id": "tablets.pen_work_focused_tablets.content.document_rights_included",
+      "display_group": "contents",
+      "fields": [
+        "sku.document_rights_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_modem_family": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_modem_family",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_modem_family"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_esim_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_esim_declaration",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_esim_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_regional_bands_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_regional_bands_declaration",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_regional_bands_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_cellular_service_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_cellular_service_declaration",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_cellular_service_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_supplied_pen_platform": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_supplied_pen_platform",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.logical_supplied_pen_platform"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_supplied_pen_power_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_supplied_pen_power_declaration",
+      "display_group": "contents",
+      "fields": [
+        "sku.logical_supplied_pen_power_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_supplied_pen_charge_mah": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_supplied_pen_charge_mah",
+      "display_group": "contents",
+      "fields": [
+        "sku.logical_supplied_pen_charge_mah"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_supplied_pen_energy_wh": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_supplied_pen_energy_wh",
+      "display_group": "contents",
+      "fields": [
+        "sku.logical_supplied_pen_energy_wh"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_supplied_pen_charge_time_h": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_supplied_pen_charge_time_h",
+      "display_group": "contents",
+      "fields": [
+        "sku.logical_supplied_pen_charge_time_h"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_supplied_pen_actual_mass_g": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_supplied_pen_actual_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.logical_supplied_pen_actual_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_adapter_output_w": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_adapter_output_w",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_adapter_output_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_adapter_output_v": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_adapter_output_v",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_adapter_output_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_adapter_output_a": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_adapter_output_a",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_adapter_output_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_adapter_input_declaration": {
+      "id": "tablets.pen_work_focused_tablets.content.logical_adapter_input_declaration",
+      "display_group": "features",
+      "fields": [
+        "sku.logical_adapter_input_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 144,
+    "roles": {
+      "literal": 37,
+      "identity": 1,
+      "descriptive": 48,
+      "omit_placeholder": 44,
+      "buying_choice": 5,
+      "operational": 1,
+      "alias": 1,
+      "private_support": 7
+    },
+    "display_groups": 6,
+    "highlight_candidates": 9,
+    "unmapped_descriptive_fields": 0
+  }
+}

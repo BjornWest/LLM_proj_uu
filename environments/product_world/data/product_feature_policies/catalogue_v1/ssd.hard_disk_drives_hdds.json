@@ -1,0 +1,5362 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "ssd.hard_disk_drives_hdds",
+  "family_id": "ssd",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/ssd.hard_disk_drives_hdds.json": "51bb6181cc28e4bb0c0a7df18c15a6cad341c5af847a4c45a3d2d3d3e41b3d74",
+    "environments/product_world/data/product_width/_hdd_base.json": "a4d63424f578f600ccdb1feff875ebf08b27cbd595bb632d15ac309941e8ee3a",
+    "environments/product_world/data/product_public_content/ssd.hard_disk_drives_hdds.json": "b8bf3687c5eb974062702e6881b11a52f70418b1fbbb13f203d51f94e33d01d0"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "NVMe, SATA and HDD remain distinct. Capacity is a buying choice; advertised versus achieved speeds and raw versus usable storage stay separate.",
+  "concept_note": null,
+  "fields": {
+    "sku.sku_id": {
+      "semantic_id": "hdd.field.sku_id",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.product_id": {
+      "semantic_id": "hdd.field.product_id",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.assembly": {
+      "semantic_id": "hdd.field.assembly",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.mass_status",
+        "hdd.nominal_tolerance_basis"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembly"
+    },
+    "sku.capacity_gb": {
+      "semantic_id": "hdd.field.capacity_gb",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "decimal label,not usable/free capacity"
+        },
+        "unit_basis": {
+          "expr": "sku.storage_label_basis"
+        },
+        "unit": {
+          "literal": "GB"
+        },
+        "semantic_status": {
+          "literal": "known"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.mass_status"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.storage_label_basis": {
+      "semantic_id": "hdd.field.storage_label_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "decimal GB per complete drive;1GB=1000000000bytes",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.complete_hdd_count": {
+      "semantic_id": "hdd.field.complete_hdd_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack",
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "complete_hdd_count"
+    },
+    "sku.case_count": {
+      "semantic_id": "hdd.field.case_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack",
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "case"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "case_count"
+    },
+    "sku.placement": {
+      "semantic_id": "hdd.field.placement",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "internal",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.internal_hdd_form"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "placement"
+    },
+    "sku.storage_technology": {
+      "semantic_id": "hdd.field.storage_technology",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "magnetic_hdd",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.internal_hdd_form"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "storage_technology"
+    },
+    "sku.rotating_disk_present": {
+      "semantic_id": "hdd.field.rotating_disk_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rotating_disk_present"
+    },
+    "sku.spindle_motor_present": {
+      "semantic_id": "hdd.field.spindle_motor_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "spindle_motor_present"
+    },
+    "sku.read_write_mechanism_present": {
+      "semantic_id": "hdd.field.read_write_mechanism_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "read_write_mechanism_present"
+    },
+    "sku.controller_present": {
+      "semantic_id": "hdd.field.controller_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "controller_present"
+    },
+    "sku.circuit_board_present": {
+      "semantic_id": "hdd.field.circuit_board_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "circuit_board_present"
+    },
+    "sku.case_condition": {
+      "semantic_id": "hdd.field.case_condition",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "installed_closed",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "case"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "case_condition"
+    },
+    "sku.form_factor": {
+      "semantic_id": "hdd.field.form_factor",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.internal_hdd_form"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "form_factor"
+    },
+    "sku.form_factor_basis": {
+      "semantic_id": "hdd.field.form_factor_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "class,not body diagonal or converted geometry",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.protocol": {
+      "semantic_id": "hdd.field.protocol",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "SATA",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.internal_hdd_form",
+        "hdd.signaling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "protocol"
+    },
+    "sku.interface": {
+      "semantic_id": "hdd.field.interface",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "SATA 6 Gb/s",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.signaling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "interface"
+    },
+    "sku.signaling_gb_s": {
+      "semantic_id": "hdd.field.signaling_gb_s",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Gb/s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.signaling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "signaling_gb_s"
+    },
+    "sku.signaling_basis": {
+      "semantic_id": "hdd.field.signaling_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "decimal gigabit signaling,not payload/read/write MB/s",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.signaling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.connector_route": {
+      "semantic_id": "hdd.field.connector_route",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "separate_SATA_data_and_power",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.connection_route"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "connector_route"
+    },
+    "sku.power_source": {
+      "semantic_id": "hdd.field.power_source",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "own_host_SATA_power_lead",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.power_source"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_source"
+    },
+    "sku.rotation_speed_rpm": {
+      "semantic_id": "hdd.field.rotation_speed_rpm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "rpm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "revolutions per minute,not rate/noise"
+        },
+        "semantic_status": {
+          "expr": "sku.rotation_speed_status"
+        },
+        "unit": {
+          "literal": "rpm"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "rotation_speed_rpm"
+    },
+    "sku.rotation_basis": {
+      "semantic_id": "hdd.field.rotation_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "revolutions per minute,not noise/rate/lifespan",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.recording_method": {
+      "semantic_id": "hdd.field.recording_method",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "recording method,no performance/suitability guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.recording_method_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "recording_method"
+    },
+    "sku.read_max_mb_s": {
+      "semantic_id": "hdd.field.read_max_mb_s",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "decimalMB,ODread,not alltracks/random/writes/achieved"
+        },
+        "semantic_status": {
+          "expr": "sku.read_max_status"
+        },
+        "unit": {
+          "literal": "MB/s"
+        },
+        "read_basis": {
+          "expr": "sku.read_rate_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "read_max_mb_s"
+    },
+    "sku.read_rate_basis": {
+      "semantic_id": "hdd.field.read_rate_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "source maximum sustained outer-diameter read;decimal1MB=1000000bytes;not all tracks/random/writes/achieved owner rate",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.cache_label": {
+      "semantic_id": "hdd.field.cache_label",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "unconverted MB label,not storage GB or inferred bytes"
+        },
+        "semantic_status": {
+          "expr": "sku.cache_label_status"
+        },
+        "unit_basis": {
+          "expr": "sku.cache_label_basis"
+        },
+        "cache_basis": {
+          "expr": "sku.cache_label_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "buffer_cache"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cache_label"
+    },
+    "sku.cache_label_basis": {
+      "semantic_id": "hdd.field.cache_label_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "unconverted buffer-cache MB label,not storageGB or inferred bytes",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "buffer_cache"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.cache_present": {
+      "semantic_id": "hdd.field.cache_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "buffer_cache"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cache_present"
+    },
+    "sku.nominal_dimensions_mm": {
+      "semantic_id": "hdd.field.nominal_dimensions_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "min_items": 3,
+        "max_items": 3,
+        "unknown_values": [
+          [
+            -1,
+            -1,
+            -1
+          ]
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.nominal_dimensions_status"
+        },
+        "dimension_basis": {
+          "expr": "sku.dimension_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.nominal_tolerance_basis"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_dimensions_mm"
+    },
+    "sku.lower_tolerances_mm": {
+      "semantic_id": "hdd.field.lower_tolerances_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "min_items": 3,
+        "max_items": 3,
+        "unknown_values": [
+          [
+            -1,
+            -1,
+            -1
+          ]
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.tolerance_status"
+        },
+        "dimension_basis": {
+          "expr": "sku.dimension_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.nominal_tolerance_basis"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lower_tolerances_mm"
+    },
+    "sku.upper_tolerances_mm": {
+      "semantic_id": "hdd.field.upper_tolerances_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "min_items": 3,
+        "max_items": 3,
+        "unknown_values": [
+          [
+            -1,
+            -1,
+            -1
+          ]
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.tolerance_status"
+        },
+        "dimension_basis": {
+          "expr": "sku.dimension_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.nominal_tolerance_basis"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "upper_tolerances_mm"
+    },
+    "sku.maximum_exterior_lwh_mm": {
+      "semantic_id": "hdd.field.maximum_exterior_lwh_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "min_items": 3,
+        "max_items": 3,
+        "unknown_values": [
+          [
+            -1,
+            -1,
+            -1
+          ]
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.maximum_exterior_status"
+        },
+        "dimension_basis": {
+          "expr": "sku.dimension_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.maximum_geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "maximum_exterior_lwh_mm"
+    },
+    "sku.dimension_basis": {
+      "semantic_id": "hdd.field.dimension_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.nominal_tolerance_basis"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.supplied_envelope_exclusions": {
+      "semantic_id": "hdd.field.supplied_envelope_exclusions",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "dry complete HDD including case/connectors;packaging/mounts/external owner cables excluded",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.maximum_geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_envelope_exclusions"
+    },
+    "sku.whole_drive_mass_g": {
+      "semantic_id": "hdd.field.whole_drive_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.whole_drive_mass_status"
+        },
+        "mass_basis": {
+          "expr": "sku.mass_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.mass_status"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "whole_drive_mass_g"
+    },
+    "sku.mass_basis": {
+      "semantic_id": "hdd.field.mass_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.mass_status"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "sku.battery_present": {
+      "semantic_id": "hdd.field.battery_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.absent_power_components"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_present"
+    },
+    "sku.active_fan_present": {
+      "semantic_id": "hdd.field.active_fan_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.absent_power_components"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "active_fan_present"
+    },
+    "sku.external_power_adapter_present": {
+      "semantic_id": "hdd.field.external_power_adapter_present",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.absent_power_components"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "external_power_adapter_present"
+    },
+    "sku.packaging_in_component_count": {
+      "semantic_id": "hdd.field.packaging_in_component_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.printed_inserts_in_component_count": {
+      "semantic_id": "hdd.field.printed_inserts_in_component_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.full_coefficient": {
+      "semantic_id": "hdd.field.full_coefficient",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": null,
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.supplied_cable_count": {
+      "semantic_id": "hdd.field.supplied_cable_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack",
+        "hdd.no_supplied_cables"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_cable_count"
+    },
+    "sku.supplied_mounting_screw_count": {
+      "semantic_id": "hdd.field.supplied_mounting_screw_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_mounting_screw_count"
+    },
+    "sku.supplied_bracket_count": {
+      "semantic_id": "hdd.field.supplied_bracket_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_bracket_count"
+    },
+    "sku.supplied_spacer_count": {
+      "semantic_id": "hdd.field.supplied_spacer_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_spacer_count"
+    },
+    "sku.supplied_adapter_count": {
+      "semantic_id": "hdd.field.supplied_adapter_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_adapter_count"
+    },
+    "sku.supplied_enclosure_count": {
+      "semantic_id": "hdd.field.supplied_enclosure_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_enclosure_count"
+    },
+    "sku.supplied_tool_count": {
+      "semantic_id": "hdd.field.supplied_tool_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_tool_count"
+    },
+    "sku.spare_case_count": {
+      "semantic_id": "hdd.field.spare_case_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "spare_case_count"
+    },
+    "sku.supplied_heatsink_count": {
+      "semantic_id": "hdd.field.supplied_heatsink_count",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.components_and_pack"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "supplied_heatsink_count"
+    },
+    "sku.controller_model": {
+      "semantic_id": "hdd.field.controller_model",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.controller_model_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.cache_controller_unknowns"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.benchmark_program": {
+      "semantic_id": "hdd.field.benchmark_program",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.benchmark_program_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.benchmark_write_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.cache_technology": {
+      "semantic_id": "hdd.field.cache_technology",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.cache_technology_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.cache_controller_unknowns"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "buffer_cache"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.flash_assisted_cache_present": {
+      "semantic_id": "hdd.field.flash_assisted_cache_present",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "present",
+          "not specified"
+        ],
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.flash_assisted_cache_presence_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.cache_controller_unknowns"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.platter_count": {
+      "semantic_id": "hdd.field.platter_count",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.platter_count_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.platter_head_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.head_count": {
+      "semantic_id": "hdd.field.head_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.head_count_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.platter_head_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.case_material": {
+      "semantic_id": "hdd.field.case_material",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.case_material_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "case"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.case_length_mm": {
+      "semantic_id": "hdd.field.case_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.case_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "case"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.case_width_mm": {
+      "semantic_id": "hdd.field.case_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.case_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "case"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.case_height_mm": {
+      "semantic_id": "hdd.field.case_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.case_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "case"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.case_mass_g": {
+      "semantic_id": "hdd.field.case_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.case_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "case"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.spindle_motor_mass_g": {
+      "semantic_id": "hdd.field.spindle_motor_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.spindle_motor_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.board_mass_g": {
+      "semantic_id": "hdd.field.board_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.board_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.magnetic_media_mass_g": {
+      "semantic_id": "hdd.field.magnetic_media_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.magnetic_media_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.formatted_usable_capacity_gb": {
+      "semantic_id": "hdd.field.formatted_usable_capacity_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.formatted_usable_capacity_gb_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.usable_free_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.initial_free_space_gb": {
+      "semantic_id": "hdd.field.initial_free_space_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.initial_free_space_gb_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.usable_free_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.supply_voltage_v": {
+      "semantic_id": "hdd.field.supply_voltage_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.supply_voltage_v_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.power_unknowns"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.current_ma": {
+      "semantic_id": "hdd.field.current_ma",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mA",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.current_ma_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.power_unknowns"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.power_w": {
+      "semantic_id": "hdd.field.power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.power_unknowns"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.write_max_mb_s": {
+      "semantic_id": "hdd.field.write_max_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.write_max_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.benchmark_write_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.achieved_read_rate_mb_s": {
+      "semantic_id": "hdd.field.achieved_read_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.achieved_read_rate_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.achieved_write_rate_mb_s": {
+      "semantic_id": "hdd.field.achieved_write_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.achieved_write_rate_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.post_cache_speed_mb_s": {
+      "semantic_id": "hdd.field.post_cache_speed_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.post_cache_speed_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.elapsed_transfer_seconds": {
+      "semantic_id": "hdd.field.elapsed_transfer_seconds",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.elapsed_transfer_seconds_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_noise_db": {
+      "semantic_id": "hdd.field.measured_noise_db",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "dB",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.measured_noise_db_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_vibration": {
+      "semantic_id": "hdd.field.measured_vibration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": null,
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.measured_vibration_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.operating_temperature_c": {
+      "semantic_id": "hdd.field.operating_temperature_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "C",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.operating_temperature_c_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.lifespan_years": {
+      "semantic_id": "hdd.field.lifespan_years",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "years",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.lifespan_years_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.pcie_generation": {
+      "semantic_id": "hdd.field.pcie_generation",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": null,
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.pcie_generation_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.pcie_lanes": {
+      "semantic_id": "hdd.field.pcie_lanes",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.pcie_lanes_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.nvme_revision": {
+      "semantic_id": "hdd.field.nvme_revision",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.nvme_revision_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.m2_keying": {
+      "semantic_id": "hdd.field.m2_keying",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.m2_keying_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.battery_capacity_mah": {
+      "semantic_id": "hdd.field.battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.battery_capacity_mah_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.supplied_fan_power_w": {
+      "semantic_id": "hdd.field.supplied_fan_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.supplied_fan_power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.heatsink_length_mm": {
+      "semantic_id": "hdd.field.heatsink_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.heatsink_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.heatsink_width_mm": {
+      "semantic_id": "hdd.field.heatsink_width_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.heatsink_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.heatsink_height_mm": {
+      "semantic_id": "hdd.field.heatsink_height_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.heatsink_height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.heatsink_mass_g": {
+      "semantic_id": "hdd.field.heatsink_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.heatsink_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.length_mm": {
+      "semantic_id": "hdd.field.length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.maximum_exterior_status"
+        },
+        "dimension_basis": {
+          "expr": "sku.dimension_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.maximum_geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "length_mm"
+    },
+    "sku.width_mm": {
+      "semantic_id": "hdd.field.width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.maximum_exterior_status"
+        },
+        "dimension_basis": {
+          "expr": "sku.dimension_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.maximum_geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "width_mm"
+    },
+    "sku.height_mm": {
+      "semantic_id": "hdd.field.height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        },
+        "semantic_status": {
+          "expr": "sku.maximum_exterior_status"
+        },
+        "dimension_basis": {
+          "expr": "sku.dimension_basis"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.maximum_geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "height_mm"
+    },
+    "sku.keep_dry": {
+      "semantic_id": "hdd.field.keep_dry",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keep_dry"
+    },
+    "sku.keep_case_closed": {
+      "semantic_id": "hdd.field.keep_case_closed",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.construction",
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keep_case_closed"
+    },
+    "sku.frame_edge_handling": {
+      "semantic_id": "hdd.field.frame_edge_handling",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "frame_edge_handling"
+    },
+    "sku.cover_pressure_permitted": {
+      "semantic_id": "hdd.field.cover_pressure_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "cover_pressure_permitted"
+    },
+    "sku.touch_contacts_pcb_permitted": {
+      "semantic_id": "hdd.field.touch_contacts_pcb_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "touch_contacts_pcb_permitted"
+    },
+    "sku.shocks_to_be_avoided": {
+      "semantic_id": "hdd.field.shocks_to_be_avoided",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "shocks_to_be_avoided"
+    },
+    "sku.moving_in_operation_permitted": {
+      "semantic_id": "hdd.field.moving_in_operation_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "moving_in_operation_permitted"
+    },
+    "sku.powered_off_unplugged_fitting_required": {
+      "semantic_id": "hdd.field.powered_off_unplugged_fitting_required",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "powered_off_unplugged_fitting_required"
+    },
+    "sku.wet_cleaning_permitted": {
+      "semantic_id": "hdd.field.wet_cleaning_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wet_cleaning_permitted"
+    },
+    "sku.immersion_permitted": {
+      "semantic_id": "hdd.field.immersion_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "immersion_permitted"
+    },
+    "sku.machine_wash_permitted": {
+      "semantic_id": "hdd.field.machine_wash_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "machine_wash_permitted"
+    },
+    "sku.dishwasher_permitted": {
+      "semantic_id": "hdd.field.dishwasher_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.handling"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dishwasher_permitted"
+    },
+    "sku.host_sata_6g_required": {
+      "semantic_id": "hdd.field.host_sata_6g_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.host_requirements"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "host_sata_6g_required"
+    },
+    "sku.host_controller_os_required": {
+      "semantic_id": "hdd.field.host_controller_os_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.host_requirements"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "host_controller_os_required"
+    },
+    "sku.host_capacity_support_required": {
+      "semantic_id": "hdd.field.host_capacity_support_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.host_requirements"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "host_capacity_support_required"
+    },
+    "sku.host_matching_bay_required": {
+      "semantic_id": "hdd.field.host_matching_bay_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.host_requirements"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "host_matching_bay_required"
+    },
+    "sku.host_clearance_fit_cable_mount_required": {
+      "semantic_id": "hdd.field.host_clearance_fit_cable_mount_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.host_requirements"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "host_clearance_fit_cable_mount_required"
+    },
+    "sku.host_enabled_nonconflicting_routing_required": {
+      "semantic_id": "hdd.field.host_enabled_nonconflicting_routing_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.host_requirements"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "host_enabled_nonconflicting_routing_required"
+    },
+    "sku.physical_seating_is_sufficient": {
+      "semantic_id": "hdd.field.physical_seating_is_sufficient",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [
+        "hdd.host_requirements"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "physical_seating_is_sufficient"
+    },
+    "sku.price_multiplier": {
+      "semantic_id": "hdd.field.price_multiplier",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 1,
+        "max": 2,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual canonical supplied-drive declaration;explicit matching status required,not raw applicable()"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "hdd.field.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 350,
+        "max": 2800,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full supply,not live seller/perGB/case/cache/cable price"
+        },
+        "unit": {
+          "literal": "SEK"
+        },
+        "semantic_status": {
+          "literal": "known"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hdd"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.name": {
+      "semantic_id": "hdd.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Norvik Archive"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.platter_count_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.platter_head_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.head_count_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.platter_head_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.formatted_usable_capacity_gb_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.usable_free_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.initial_free_space_gb_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.usable_free_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.maximum_exterior_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "known",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.maximum_geometry"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.nominal_dimensions_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.nominal_tolerance_basis"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.tolerance_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.nominal_tolerance_basis"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.whole_drive_mass_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.mass_status"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.benchmark_program_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.benchmark_write_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.write_max_mb_s_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.benchmark_write_unknown"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.cache_technology_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.cache_controller_unknowns"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.controller_model_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.cache_controller_unknowns"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.flash_assisted_cache_presence_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.cache_controller_unknowns"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.supply_voltage_v_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.power_unknowns"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.current_ma_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.power_unknowns"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.power_w_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.power_unknowns"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.case_length_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.case_width_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.case_height_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.case_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.spindle_motor_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.board_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.magnetic_media_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.case_material_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.achieved_read_rate_mb_s_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.achieved_write_rate_mb_s_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.elapsed_transfer_seconds_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.post_cache_speed_mb_s_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.measured_noise_db_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.measured_vibration_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.operating_temperature_c_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.lifespan_years_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.unknown_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.battery_capacity_mah_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.heatsink_height_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.heatsink_length_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.heatsink_mass_g_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.heatsink_width_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.m2_keying_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.nvme_revision_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.pcie_generation_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.pcie_lanes_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.supplied_fan_power_w_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "hdd.inapplicable_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.assembly": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "cased_25_hdd",
+          "cased_35_hdd"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    }
+  },
+  "disclosure_groups": {
+    "assembly": {
+      "id": "ssd.hard_disk_drives_hdds.content.assembly",
+      "display_group": "features",
+      "fields": [
+        "sku.assembly"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "complete_hdd_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.complete_hdd_count",
+      "display_group": "features",
+      "fields": [
+        "sku.complete_hdd_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "case_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.case_count",
+      "display_group": "features",
+      "fields": [
+        "sku.case_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "placement": {
+      "id": "ssd.hard_disk_drives_hdds.content.placement",
+      "display_group": "features",
+      "fields": [
+        "sku.placement"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "storage_technology": {
+      "id": "ssd.hard_disk_drives_hdds.content.storage_technology",
+      "display_group": "features",
+      "fields": [
+        "sku.storage_technology"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rotating_disk_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.rotating_disk_present",
+      "display_group": "features",
+      "fields": [
+        "sku.rotating_disk_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spindle_motor_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.spindle_motor_present",
+      "display_group": "features",
+      "fields": [
+        "sku.spindle_motor_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "read_write_mechanism_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.read_write_mechanism_present",
+      "display_group": "features",
+      "fields": [
+        "sku.read_write_mechanism_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "controller_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.controller_present",
+      "display_group": "features",
+      "fields": [
+        "sku.controller_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "circuit_board_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.circuit_board_present",
+      "display_group": "features",
+      "fields": [
+        "sku.circuit_board_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "case_condition": {
+      "id": "ssd.hard_disk_drives_hdds.content.case_condition",
+      "display_group": "features",
+      "fields": [
+        "sku.case_condition"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "form_factor": {
+      "id": "ssd.hard_disk_drives_hdds.content.form_factor",
+      "display_group": "features",
+      "fields": [
+        "sku.form_factor"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "protocol": {
+      "id": "ssd.hard_disk_drives_hdds.content.protocol",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.protocol"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "interface": {
+      "id": "ssd.hard_disk_drives_hdds.content.interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.interface"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "signaling_gb_s": {
+      "id": "ssd.hard_disk_drives_hdds.content.signaling_gb_s",
+      "display_group": "features",
+      "fields": [
+        "sku.signaling_gb_s"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "connector_route": {
+      "id": "ssd.hard_disk_drives_hdds.content.connector_route",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.connector_route"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_source": {
+      "id": "ssd.hard_disk_drives_hdds.content.power_source",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.power_source"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rotation_speed_rpm": {
+      "id": "ssd.hard_disk_drives_hdds.content.rotation_speed_rpm",
+      "display_group": "features",
+      "fields": [
+        "sku.rotation_speed_rpm"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "recording_method": {
+      "id": "ssd.hard_disk_drives_hdds.content.recording_method",
+      "display_group": "features",
+      "fields": [
+        "sku.recording_method"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "read_max_mb_s": {
+      "id": "ssd.hard_disk_drives_hdds.content.read_max_mb_s",
+      "display_group": "features",
+      "fields": [
+        "sku.read_max_mb_s"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "cache_label": {
+      "id": "ssd.hard_disk_drives_hdds.content.cache_label",
+      "display_group": "features",
+      "fields": [
+        "sku.cache_label"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "cache_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.cache_present",
+      "display_group": "features",
+      "fields": [
+        "sku.cache_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_dimensions_mm": {
+      "id": "ssd.hard_disk_drives_hdds.content.nominal_dimensions_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_dimensions_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lower_tolerances_mm": {
+      "id": "ssd.hard_disk_drives_hdds.content.lower_tolerances_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.lower_tolerances_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "upper_tolerances_mm": {
+      "id": "ssd.hard_disk_drives_hdds.content.upper_tolerances_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.upper_tolerances_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "maximum_exterior_lwh_mm": {
+      "id": "ssd.hard_disk_drives_hdds.content.maximum_exterior_lwh_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.maximum_exterior_lwh_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_envelope_exclusions": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_envelope_exclusions",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_envelope_exclusions"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "whole_drive_mass_g": {
+      "id": "ssd.hard_disk_drives_hdds.content.whole_drive_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.whole_drive_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.battery_present",
+      "display_group": "features",
+      "fields": [
+        "sku.battery_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "active_fan_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.active_fan_present",
+      "display_group": "features",
+      "fields": [
+        "sku.active_fan_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "external_power_adapter_present": {
+      "id": "ssd.hard_disk_drives_hdds.content.external_power_adapter_present",
+      "display_group": "features",
+      "fields": [
+        "sku.external_power_adapter_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_cable_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_cable_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_cable_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_mounting_screw_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_mounting_screw_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_mounting_screw_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_bracket_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_bracket_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_bracket_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_spacer_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_spacer_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_spacer_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_adapter_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_adapter_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_adapter_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_enclosure_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_enclosure_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_enclosure_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_tool_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_tool_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_tool_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_case_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.spare_case_count",
+      "display_group": "features",
+      "fields": [
+        "sku.spare_case_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_heatsink_count": {
+      "id": "ssd.hard_disk_drives_hdds.content.supplied_heatsink_count",
+      "display_group": "contents",
+      "fields": [
+        "sku.supplied_heatsink_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "length_mm": {
+      "id": "ssd.hard_disk_drives_hdds.content.length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.length_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "width_mm": {
+      "id": "ssd.hard_disk_drives_hdds.content.width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "height_mm": {
+      "id": "ssd.hard_disk_drives_hdds.content.height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keep_dry": {
+      "id": "ssd.hard_disk_drives_hdds.content.keep_dry",
+      "display_group": "care",
+      "fields": [
+        "sku.keep_dry"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keep_case_closed": {
+      "id": "ssd.hard_disk_drives_hdds.content.keep_case_closed",
+      "display_group": "features",
+      "fields": [
+        "sku.keep_case_closed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "frame_edge_handling": {
+      "id": "ssd.hard_disk_drives_hdds.content.frame_edge_handling",
+      "display_group": "features",
+      "fields": [
+        "sku.frame_edge_handling"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cover_pressure_permitted": {
+      "id": "ssd.hard_disk_drives_hdds.content.cover_pressure_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.cover_pressure_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "touch_contacts_pcb_permitted": {
+      "id": "ssd.hard_disk_drives_hdds.content.touch_contacts_pcb_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.touch_contacts_pcb_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "shocks_to_be_avoided": {
+      "id": "ssd.hard_disk_drives_hdds.content.shocks_to_be_avoided",
+      "display_group": "features",
+      "fields": [
+        "sku.shocks_to_be_avoided"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "moving_in_operation_permitted": {
+      "id": "ssd.hard_disk_drives_hdds.content.moving_in_operation_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.moving_in_operation_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "powered_off_unplugged_fitting_required": {
+      "id": "ssd.hard_disk_drives_hdds.content.powered_off_unplugged_fitting_required",
+      "display_group": "care",
+      "fields": [
+        "sku.powered_off_unplugged_fitting_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wet_cleaning_permitted": {
+      "id": "ssd.hard_disk_drives_hdds.content.wet_cleaning_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.wet_cleaning_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "immersion_permitted": {
+      "id": "ssd.hard_disk_drives_hdds.content.immersion_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.immersion_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "machine_wash_permitted": {
+      "id": "ssd.hard_disk_drives_hdds.content.machine_wash_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.machine_wash_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dishwasher_permitted": {
+      "id": "ssd.hard_disk_drives_hdds.content.dishwasher_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.dishwasher_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "host_sata_6g_required": {
+      "id": "ssd.hard_disk_drives_hdds.content.host_sata_6g_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.host_sata_6g_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "host_controller_os_required": {
+      "id": "ssd.hard_disk_drives_hdds.content.host_controller_os_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.host_controller_os_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "host_capacity_support_required": {
+      "id": "ssd.hard_disk_drives_hdds.content.host_capacity_support_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.host_capacity_support_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "host_matching_bay_required": {
+      "id": "ssd.hard_disk_drives_hdds.content.host_matching_bay_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.host_matching_bay_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "host_clearance_fit_cable_mount_required": {
+      "id": "ssd.hard_disk_drives_hdds.content.host_clearance_fit_cable_mount_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.host_clearance_fit_cable_mount_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "host_enabled_nonconflicting_routing_required": {
+      "id": "ssd.hard_disk_drives_hdds.content.host_enabled_nonconflicting_routing_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.host_enabled_nonconflicting_routing_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "physical_seating_is_sufficient": {
+      "id": "ssd.hard_disk_drives_hdds.content.physical_seating_is_sufficient",
+      "display_group": "features",
+      "fields": [
+        "sku.physical_seating_is_sufficient"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 160,
+    "roles": {
+      "identity": 3,
+      "descriptive": 26,
+      "buying_choice": 2,
+      "qualifier": 8,
+      "literal": 36,
+      "omit_fixed_detail": 2,
+      "internal": 44,
+      "omit_placeholder": 37,
+      "commerce": 1,
+      "private_support": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 7,
+    "unmapped_descriptive_fields": 0
+  }
+}

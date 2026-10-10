@@ -1,0 +1,187 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "sleeping_bags",
+  "review_id": "F54",
+  "label": "Sleeping bags",
+  "section": "Outdoor equipment and family travel",
+  "store_type_ids": [
+    "outdoors"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Quilts need no full zip or hood. Comfort/limit labels cannot be merged into one warmth number; missing test basis stays unknown.",
+  "shared_dimension_ids": [
+    "size",
+    "fill_material",
+    "fill_amount",
+    "temperature_class",
+    "shell_material",
+    "zip_side",
+    "packed_dimensions"
+  ],
+  "dimensions": [
+    {
+      "id": "size",
+      "label": "Size",
+      "module_id": "fit",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fill_material",
+      "label": "Fill material",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fill_amount",
+      "label": "Fill amount",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "g",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "temperature_class",
+      "label": "Temperature class",
+      "module_id": "exposure",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "shell_material",
+      "label": "Shell material",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "zip_side",
+      "label": "Zip side",
+      "module_id": "fit",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "packed_dimensions",
+      "label": "Packed dimensions",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "attachment_system",
+      "label": "Attachment system",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "sleeping_bags.mummy_bags",
+      "label": "Mummy bags",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "sleeping_bags.rectangular_bags",
+      "label": "Rectangular bags",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "sleeping_bags.sleeping_quilts",
+      "label": "Sleeping quilts",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "attachment_system"
+      ],
+      "excluded_dimension_ids": [
+        "zip_side"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

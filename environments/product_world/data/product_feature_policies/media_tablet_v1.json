@@ -1,0 +1,240 @@
+{
+  "schema": "media-tablet-publication-overlay-v1",
+  "concept_id": "tablets.everyday_media_tablets",
+  "base_policy_file": "environments/product_world/data/product_feature_policies/catalogue_v2/tablets.everyday_media_tablets.json",
+  "base_policy_sha256": "7e4d159eb8b8cfe5de96c048c71207ec5e8b15bfba4e08c29a6733cf12676eb8",
+  "completed_aliases": {
+    "sku.logical_modem_family": "sku.modem_family"
+  },
+  "completed_alias_basis": "Frozen context_for_sku logical_modem_family step copies known modem_family or retains unknown sentinel; consume existing logical and raw statuses, without executing the projection.",
+  "display_groups": {
+    "overview": {
+      "label": "Tablet features",
+      "preferred_representation": "renderer_choice",
+      "omit_when_empty": true
+    },
+    "connections": {
+      "label": "Connections",
+      "preferred_representation": "renderer_choice",
+      "omit_when_empty": true
+    },
+    "specifications": {
+      "label": "Specifications",
+      "preferred_representation": "renderer_choice",
+      "omit_when_empty": true
+    },
+    "contents": {
+      "label": "Compatibility and contents",
+      "preferred_representation": "renderer_choice",
+      "omit_when_empty": true
+    }
+  },
+  "groups": {
+    "platform": {
+      "display_group": "overview",
+      "fields": [
+        "product.facts.os_label",
+        "product.facts.processor_label"
+      ],
+      "priority": 3,
+      "required_fields": [
+        "product.facts.os_label",
+        "product.facts.processor_label"
+      ]
+    },
+    "screen": {
+      "display_group": "overview",
+      "fields": [
+        "product.facts.screen_size_label",
+        "product.facts.screen_technology",
+        "product.facts.screen_width_px",
+        "product.facts.screen_height_px",
+        "product.facts.screen_rectangle_diagonal_in"
+      ],
+      "priority": 3,
+      "required_fields": [
+        "product.facts.screen_size_label",
+        "product.facts.screen_technology",
+        "product.facts.screen_width_px",
+        "product.facts.screen_height_px",
+        "product.facts.screen_rectangle_diagonal_in"
+      ]
+    },
+    "refresh": {
+      "display_group": "overview",
+      "fields": [
+        "product.facts.refresh_rate_hz"
+      ],
+      "priority": 2,
+      "required_fields": [
+        "product.facts.refresh_rate_hz"
+      ]
+    },
+    "memory_storage": {
+      "display_group": "overview",
+      "fields": [
+        "sku.ram_gb",
+        "sku.storage_gb",
+        "sku.storage_kind"
+      ],
+      "priority": 2,
+      "required_fields": [
+        "sku.storage_gb",
+        "sku.storage_kind"
+      ]
+    },
+    "wireless": {
+      "display_group": "connections",
+      "fields": [
+        "product.facts.wifi_label",
+        "product.facts.bluetooth_label"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "product.facts.wifi_label",
+        "product.facts.bluetooth_label"
+      ]
+    },
+    "cellular": {
+      "display_group": "connections",
+      "fields": [
+        "sku.cellular_present",
+        "sku.physical_sim_tray_units",
+        "sku.logical_modem_family"
+      ],
+      "priority": 1,
+      "required_fields": [
+        "sku.cellular_present",
+        "sku.physical_sim_tray_units"
+      ]
+    },
+    "battery": {
+      "display_group": "specifications",
+      "fields": [
+        "product.facts.battery_charge_mah",
+        "product.facts.battery_energy_wh",
+        "product.facts.battery_chemistry"
+      ],
+      "priority": 0,
+      "required_fields": []
+    },
+    "usb": {
+      "display_group": "connections",
+      "fields": [
+        "product.facts.usb_c_units",
+        "product.facts.c1_interface_label",
+        "product.facts.c1_data",
+        "product.facts.c1_tablet_input_charging"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "product.facts.usb_c_units",
+        "product.facts.c1_interface_label",
+        "product.facts.c1_data",
+        "product.facts.c1_tablet_input_charging"
+      ]
+    },
+    "audio_card": {
+      "display_group": "connections",
+      "fields": [
+        "product.facts.audio_combo_units",
+        "product.facts.memory_card_reader_units"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "product.facts.audio_combo_units",
+        "product.facts.memory_card_reader_units"
+      ]
+    },
+    "reference_size_weight": {
+      "display_group": "specifications",
+      "fields": [
+        "product.facts.reference_configuration",
+        "product.facts.reference_width_mm",
+        "product.facts.reference_height_mm",
+        "product.facts.reference_max_thickness_mm",
+        "product.facts.reference_mass_g"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "product.facts.reference_configuration",
+        "product.facts.reference_width_mm",
+        "product.facts.reference_height_mm",
+        "product.facts.reference_max_thickness_mm",
+        "product.facts.reference_mass_g"
+      ]
+    },
+    "materials": {
+      "display_group": "specifications",
+      "fields": [
+        "product.facts.back_material",
+        "product.facts.touch_surface_material"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "product.facts.back_material",
+        "product.facts.touch_surface_material"
+      ]
+    },
+    "accessories": {
+      "display_group": "contents",
+      "fields": [
+        "product.facts.stylus_platform_label",
+        "product.facts.stylus_compatibility_declaration",
+        "product.facts.keyboard_compatibility_declaration",
+        "sku.pen_units"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "product.facts.stylus_platform_label",
+        "product.facts.stylus_compatibility_declaration",
+        "product.facts.keyboard_compatibility_declaration",
+        "sku.pen_units"
+      ]
+    },
+    "charging": {
+      "display_group": "contents",
+      "fields": [
+        "sku.adapter_units",
+        "product.facts.own_charger_requirement"
+      ],
+      "priority": 1,
+      "required_fields": [
+        "sku.adapter_units",
+        "product.facts.own_charger_requirement"
+      ]
+    },
+    "cable": {
+      "display_group": "contents",
+      "fields": [
+        "sku.cable_units",
+        "sku.cable_connector_label",
+        "sku.cable_length_m"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "sku.cable_units",
+        "sku.cable_connector_label",
+        "sku.cable_length_m"
+      ]
+    },
+    "wired_video": {
+      "display_group": "connections",
+      "fields": [
+        "product.facts.c1_video_declaration",
+        "product.facts.c1_video_conditions"
+      ],
+      "priority": 0,
+      "required_fields": [
+        "product.facts.c1_video_declaration",
+        "product.facts.c1_video_conditions"
+      ]
+    }
+  },
+  "decision": "Retain a bounded relevant set and group it into optional prose slots; native menus/price/stock remain outside selection. Internal pricing multipliers, service/module anatomy, unknown placeholders and unrelated zero-count inventory are ineligible. Fixed useful display/cable/charger declarations are content, not new variance dimensions.",
+  "references": [
+    "https://www.apple.com/ipad-11/specs/",
+    "https://www.samsung.com/us/tablets/galaxy-tab-a11-plus/"
+  ],
+  "reference_basis": "Retail information hierarchy and reference-configuration distinctions only; no external facts copied into manufactured products."
+}

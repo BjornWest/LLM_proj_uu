@@ -1,0 +1,832 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "cat_food.treats_snacks",
+  "family_id": "cat_food",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/cat_food.treats_snacks.json": "da6b5aad1e346d7d4ac10329a54b98e7f1bf3ffd51302bf4eacf6832946d1a17",
+    "environments/product_world/data/product_width/_treat_pet_food_base.json": "a086b6d5dc73c2804a6eb4359c93b34cbabe0e6cf28f6244ac63f31df7d3ca8a"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Retain complete versus complementary role and partial ingredient disclosure scope. No individual dietary-suitability guarantee.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.format": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "crunchy",
+          "puree",
+          "freeze_dried"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "format"
+    },
+    "product.facts.species": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "cat",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.dietary_role": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "complementary_treat",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dietary_role"
+    },
+    "product.facts.declared_target": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "adult cats; authored minimum age 12 months",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "declared_target"
+    },
+    "product.facts.minimum_age_months": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "months",
+        "constant": 12,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "minimum_age_months"
+    },
+    "product.facts.named_ingredient": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "ingredients",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "constant": "chicken",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "named_ingredient"
+    },
+    "product.facts.texture": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "texture"
+    },
+    "product.facts.container": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "container"
+    },
+    "product.facts.opening_method": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "opening_method"
+    },
+    "product.facts.handling_action": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "handling_action"
+    },
+    "product.facts.ingredient_pct": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "ingredients",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "min": 4,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ingredient_pct"
+    },
+    "product.facts.ingredient_scope": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.other_ingredients": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "ingredients",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "other_ingredients"
+    },
+    "product.facts.protein_pct": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "nutrition",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "protein_pct"
+    },
+    "product.facts.fat_pct": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "nutrition",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fat_pct"
+    },
+    "product.facts.fibre_pct": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "nutrition",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "fibre_pct"
+    },
+    "product.facts.ash_pct": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "nutrition",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ash_pct"
+    },
+    "product.facts.moisture_pct": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "nutrition",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "%",
+        "min": -1,
+        "max": 100,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "moisture_pct"
+    },
+    "product.facts.analytical_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "label percent of food as sold",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.energy_kcal_per100g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "nutrition",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "kcal/100g",
+        "min": 50,
+        "max": 400,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "energy_kcal_per100g"
+    },
+    "product.facts.inner_tube_energy_kcal": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "nutrition",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "kcal",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 7,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "inner_tube_energy_kcal"
+    },
+    "product.facts.loose_piece_count": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.mass_per_piece": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.calories_per_piece": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.analysis_protocol": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.additive_quantities": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.individual_dietary_suitability": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reference_price_basis": {
+      "semantic_id": null,
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "synthetic one-kilogram formula anchor; exact pack prices are separate SKU facts",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    }
+  },
+  "disclosure_groups": {
+    "format": {
+      "id": "cat_food.treats_snacks.content.format",
+      "display_group": "features",
+      "fields": [
+        "product.facts.format"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "dietary_role": {
+      "id": "cat_food.treats_snacks.content.dietary_role",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dietary_role"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_target": {
+      "id": "cat_food.treats_snacks.content.declared_target",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_target"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "minimum_age_months": {
+      "id": "cat_food.treats_snacks.content.minimum_age_months",
+      "display_group": "features",
+      "fields": [
+        "product.facts.minimum_age_months"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "named_ingredient": {
+      "id": "cat_food.treats_snacks.content.named_ingredient",
+      "display_group": "ingredients",
+      "fields": [
+        "product.facts.named_ingredient"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "texture": {
+      "id": "cat_food.treats_snacks.content.texture",
+      "display_group": "features",
+      "fields": [
+        "product.facts.texture"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "container": {
+      "id": "cat_food.treats_snacks.content.container",
+      "display_group": "features",
+      "fields": [
+        "product.facts.container"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "opening_method": {
+      "id": "cat_food.treats_snacks.content.opening_method",
+      "display_group": "features",
+      "fields": [
+        "product.facts.opening_method"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handling_action": {
+      "id": "cat_food.treats_snacks.content.handling_action",
+      "display_group": "features",
+      "fields": [
+        "product.facts.handling_action"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ingredient_pct": {
+      "id": "cat_food.treats_snacks.content.ingredient_pct",
+      "display_group": "ingredients",
+      "fields": [
+        "product.facts.ingredient_pct"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "other_ingredients": {
+      "id": "cat_food.treats_snacks.content.other_ingredients",
+      "display_group": "ingredients",
+      "fields": [
+        "product.facts.other_ingredients"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "protein_pct": {
+      "id": "cat_food.treats_snacks.content.protein_pct",
+      "display_group": "nutrition",
+      "fields": [
+        "product.facts.protein_pct"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "fat_pct": {
+      "id": "cat_food.treats_snacks.content.fat_pct",
+      "display_group": "nutrition",
+      "fields": [
+        "product.facts.fat_pct"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "fibre_pct": {
+      "id": "cat_food.treats_snacks.content.fibre_pct",
+      "display_group": "nutrition",
+      "fields": [
+        "product.facts.fibre_pct"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ash_pct": {
+      "id": "cat_food.treats_snacks.content.ash_pct",
+      "display_group": "nutrition",
+      "fields": [
+        "product.facts.ash_pct"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "moisture_pct": {
+      "id": "cat_food.treats_snacks.content.moisture_pct",
+      "display_group": "nutrition",
+      "fields": [
+        "product.facts.moisture_pct"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "energy_kcal_per100g": {
+      "id": "cat_food.treats_snacks.content.energy_kcal_per100g",
+      "display_group": "nutrition",
+      "fields": [
+        "product.facts.energy_kcal_per100g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "inner_tube_energy_kcal": {
+      "id": "cat_food.treats_snacks.content.inner_tube_energy_kcal",
+      "display_group": "nutrition",
+      "fields": [
+        "product.facts.inner_tube_energy_kcal"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    }
+  },
+  "display_groups": {
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "ingredients": {
+      "label": "Ingredients",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "nutrition": {
+      "label": "Nutrition",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 28,
+    "roles": {
+      "descriptive": 13,
+      "identity": 1,
+      "literal": 5,
+      "qualifier": 2,
+      "omit_placeholder": 6,
+      "commerce": 1
+    },
+    "display_groups": 3,
+    "highlight_candidates": 9,
+    "unmapped_descriptive_fields": 18
+  }
+}

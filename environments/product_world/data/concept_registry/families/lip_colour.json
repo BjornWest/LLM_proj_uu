@@ -1,0 +1,170 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "lip_colour",
+  "review_id": "F24",
+  "label": "Lip colour",
+  "section": "Beauty and personal care",
+  "store_type_ids": [
+    "beauty"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Gloss need not be opaque or long-wearing; liquid does not imply matte. Packaging/applicator fields are conditional and should not borrow foundation skin-coverage semantics.",
+  "shared_dimension_ids": [
+    "ingredient_formula",
+    "shade",
+    "opacity",
+    "finish",
+    "applicator",
+    "net_amount",
+    "pack_count"
+  ],
+  "dimensions": [
+    {
+      "id": "ingredient_formula",
+      "label": "Ingredient formula",
+      "module_id": "formula",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "shade",
+      "label": "Shade",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "opacity",
+      "label": "Opacity",
+      "module_id": "appearance",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "finish",
+      "label": "Finish",
+      "module_id": "appearance",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "applicator",
+      "label": "Applicator",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "net_amount",
+      "label": "Net amount",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "lip_colour.lipsticks",
+      "label": "Lipsticks",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "lip_colour.liquid_lip_colour",
+      "label": "Liquid lip colour",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "lip_colour.lip_gloss",
+      "label": "Lip gloss",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

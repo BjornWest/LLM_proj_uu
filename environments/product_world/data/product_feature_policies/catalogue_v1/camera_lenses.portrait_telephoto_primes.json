@@ -1,0 +1,2085 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "camera_lenses.portrait_telephoto_primes",
+  "family_id": "camera_lenses",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/camera_lenses.portrait_telephoto_primes.json": "43281c110e7153636a899e82b22888941bb59957533dbc27a76d9b903a30629e",
+    "environments/product_world/data/product_width/_camera_lenses_base.json": "25f430f45d605b0185aa5d0eb96dfd4855e1c589e7a7d26a1d438b58f4289595",
+    "environments/product_world/data/product_public_content/camera_lenses.portrait_telephoto_primes.json": "61a283db161adf803c9469d3e871ffe6a3b51fedcf3a27e74438157197848a88"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Mount may be a selector. Sensor coverage, nominal versus actual geometry, aperture endpoints and macro effective aperture need their original qualifications.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "portrait.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Norvik Portrait Prime"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.lens_mount": {
+      "semantic_id": "portrait.mount",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "ZM bayonet",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens_mount"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lens_mount"
+    },
+    "sku.sensor_coverage": {
+      "semantic_id": "portrait.sensor_coverage",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "full-frame 36 × 24 mm declaration",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "declared full-frame 36 × 24 mm coverage; not a field-of-view conversion"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sensor_coverage"
+    },
+    "sku.focal_length_mm": {
+      "semantic_id": "portrait.fixed_focal_length",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "fixed nominal physical focal length, mm; not body-equivalent focal length"
+        },
+        "declaration_basis": {
+          "expr": "sku.focal_length_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "focal_length_mm"
+    },
+    "sku.maximum_f_number": {
+      "semantic_id": "portrait.maximum_aperture",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": null,
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal maximum aperture as f-number; not measured opening diameter or transmitted exposure"
+        },
+        "declaration_basis": {
+          "expr": "sku.aperture_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens_iris"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "maximum_f_number"
+    },
+    "sku.minimum_f_number": {
+      "semantic_id": "portrait.minimum_aperture",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": null,
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal stopped-down aperture limit as f-number; not measured opening diameter"
+        },
+        "declaration_basis": {
+          "expr": "sku.aperture_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens_iris"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "minimum_f_number"
+    },
+    "sku.focus_mechanism": {
+      "semantic_id": "portrait.focus_mechanism",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "stepping-motor autofocus and electronic manual focus",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "focus_system"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "focus_mechanism"
+    },
+    "sku.reference_body_geometry_mm": {
+      "semantic_id": "portrait.reference_body_geometry",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "max_items": 6,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "approximate maximum outside diameter and mount-flange-to-front length, lens alone without detachable caps or hood; reference declarations"
+        },
+        "declaration_basis": {
+          "expr": "sku.geometry_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_body_geometry_mm"
+    },
+    "sku.reference_lens_only_mass_g": {
+      "semantic_id": "portrait.reference_lens_mass",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "approximate reference lens-only mass, excluding detachable supplied caps, hood and case"
+        },
+        "declaration_basis": {
+          "expr": "sku.mass_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_lens_only_mass_g"
+    },
+    "sku.declared_minimum_focus_from_focal_plane_mm": {
+      "semantic_id": "portrait.minimum_focus",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "declared nearest subject distance from camera focal plane; not lens-front working distance"
+        },
+        "declaration_basis": {
+          "expr": "sku.focus_distance_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_minimum_focus_from_focal_plane_mm"
+    },
+    "sku.filter_attachment_diameter_mm": {
+      "semantic_id": "portrait.filter_attachment",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal filter-attachment diameter; not a clear opening or lens outside diameter"
+        },
+        "declaration_basis": {
+          "expr": "sku.filter_basis"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "filter_attachment"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "filter_attachment_diameter_mm"
+    },
+    "sku.kit_contents": {
+      "semantic_id": "portrait.complete_kit_contents",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "object",
+        "properties": {
+          "lens_label": {
+            "type": "string",
+            "optional": true
+          },
+          "lens_count": {
+            "type": "integer",
+            "unit": "count",
+            "min": -1,
+            "max": 100000,
+            "unknown_values": [
+              -1
+            ],
+            "optional": true
+          },
+          "front_cap_count": {
+            "type": "integer",
+            "unit": "count",
+            "min": -1,
+            "max": 100000,
+            "unknown_values": [
+              -1
+            ],
+            "optional": true
+          },
+          "rear_cap_count": {
+            "type": "integer",
+            "unit": "count",
+            "min": -1,
+            "max": 100000,
+            "unknown_values": [
+              -1
+            ],
+            "optional": true
+          },
+          "hood_count": {
+            "type": "integer",
+            "unit": "count",
+            "min": -1,
+            "max": 100000,
+            "unknown_values": [
+              -1
+            ],
+            "optional": true
+          },
+          "soft_case_count": {
+            "type": "integer",
+            "unit": "count",
+            "min": -1,
+            "max": 100000,
+            "unknown_values": [
+              -1
+            ],
+            "optional": true
+          }
+        },
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one complete lens and exactly the stated detachable supplied accessories; packaging excluded"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supplied_kit"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "kit_contents"
+    },
+    "sku.actual_quantity_status": {
+      "semantic_id": "portrait.actual_quantities_unknown",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable",
+          "applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "applicable unspecified selected-unit geometry, lens/present-accessory/kit masses and measured performance; absent accessory masses remain NA separately"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens_and_present_accessories"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.component_care": {
+      "semantic_id": "portrait.component_cleaning",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "object",
+        "properties": {
+          "glass": {
+            "type": "string",
+            "optional": true
+          },
+          "contacts": {
+            "type": "string",
+            "optional": true
+          },
+          "caps": {
+            "type": "string",
+            "optional": true
+          },
+          "hood": {
+            "type": "string",
+            "optional": true
+          },
+          "soft_case": {
+            "type": "string",
+            "optional": true
+          }
+        },
+        "optional": true,
+        "constant": {
+          "glass": "remove loose dust then use suitable lens-cleaning material",
+          "contacts": "keep clean; do not apply lens cleaner",
+          "caps": "dry soft cloth",
+          "hood": "dry soft cloth if supplied",
+          "soft_case": "soft brush or dry soft cloth; no lens cleaner or detergents"
+        },
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "different glass/contact/accessory instructions; case cleaning only when that case is supplied"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens_glass_contacts_caps_present_hood_case"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "component_care"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "portrait.full_kit_price",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 3000,
+        "max": 36000,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "SEK price of the entire selected kit including every described supplied accessory"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supplied_kit"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.actual_body_geometry_mm": {
+      "semantic_id": "portrait.field.actual_body_geometry_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "min_items": 2,
+        "max_items": 2,
+        "unknown_values": [
+          [
+            -1,
+            -1
+          ]
+        ],
+        "optional": true,
+        "constant": [
+          -1,
+          -1
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.actual_body_geometry_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_lens_mass_g": {
+      "semantic_id": "portrait.field.actual_lens_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.actual_lens_mass_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.front_cap_mass_g": {
+      "semantic_id": "portrait.field.front_cap_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.front_cap_mass_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "front_cap"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.rear_cap_mass_g": {
+      "semantic_id": "portrait.field.rear_cap_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.rear_cap_mass_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "rear_cap"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.hood_mass_g": {
+      "semantic_id": "portrait.field.hood_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.hood_mass_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "hood"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.soft_case_mass_g": {
+      "semantic_id": "portrait.field.soft_case_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.soft_case_mass_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "soft_case"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.complete_kit_mass_g": {
+      "semantic_id": "portrait.field.complete_kit_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.complete_kit_mass_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_supplied_kit"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.autofocus_time_s": {
+      "semantic_id": "portrait.field.autofocus_time_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "s",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.autofocus_time_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.autofocus_noise_dba": {
+      "semantic_id": "portrait.field.autofocus_noise_dba",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "dBA",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.autofocus_noise_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.optical_performance": {
+      "semantic_id": "portrait.field.optical_performance",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.optical_performance_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.weather_resistance": {
+      "semantic_id": "portrait.field.weather_resistance",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.weather_resistance_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.physical_aperture_opening_diameter_mm": {
+      "semantic_id": "portrait.field.physical_aperture_opening_diameter_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.physical_aperture_opening_diameter_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens_iris"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.zoom_range_mm": {
+      "semantic_id": "portrait.field.zoom_range_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "unit": "mm",
+          "min": -1,
+          "max": 100000,
+          "unknown_values": [
+            -1
+          ]
+        },
+        "min_items": 2,
+        "max_items": 2,
+        "unknown_values": [
+          [
+            -1,
+            -1
+          ]
+        ],
+        "optional": true,
+        "constant": [
+          -1,
+          -1
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.zoom_range_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [
+        "portrait.absent_system_quantities",
+        "portrait.no_zoom"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.lens_stabilisation_performance_stops": {
+      "semantic_id": "portrait.field.lens_stabilisation_performance_stops",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "stops",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.lens_stabilisation_performance_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [
+        "portrait.absent_system_quantities"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.lens_battery_capacity_mah": {
+      "semantic_id": "portrait.field.lens_battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "semantic_status": {
+          "expr": "sku.lens_battery_capacity_status"
+        },
+        "basis": {
+          "literal": "unspecified actual selected unit/present component;absent system/component remains not applicable,never raw sentinel evidence"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "lens"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.is_prime": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.no_zoom"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "is_prime"
+    },
+    "sku.has_optical_zoom": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.no_zoom"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "has_optical_zoom"
+    },
+    "sku.zoom_range_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable",
+          "applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.absent_system_quantities",
+        "portrait.no_zoom"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.body_dependent_view": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.body_dependent_view"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_dependent_view"
+    },
+    "sku.body_support_check_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.body_dependent_view",
+        "portrait.no_lens_stabilisation"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_support_check_required"
+    },
+    "sku.universal_view_guarantee": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.body_dependent_view"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "universal_view_guarantee"
+    },
+    "sku.camera_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions",
+        "portrait.no_camera_supplied"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "camera_count"
+    },
+    "sku.power_source": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "camera contacts",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.contact_power"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_source"
+    },
+    "sku.battery_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions",
+        "portrait.contact_power"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "battery_count"
+    },
+    "sku.power_supply_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions",
+        "portrait.contact_power"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "power_supply_count"
+    },
+    "sku.lens_stabilisation": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.no_lens_stabilisation"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lens_stabilisation"
+    },
+    "sku.installed_parts": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "max_items": 6,
+        "optional": true,
+        "constant": [
+          "optical elements",
+          "iris",
+          "stepping-motor focus system",
+          "control ring",
+          "mount",
+          "electrical contacts"
+        ],
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.installed_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "installed_parts"
+    },
+    "sku.packaging_excluded_from_usable_counts": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "sku.adapter_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adapter_count"
+    },
+    "sku.filter_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "filter_count"
+    },
+    "sku.teleconverter_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "teleconverter_count"
+    },
+    "sku.tripod_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "tripod_count"
+    },
+    "sku.cleaning_kit_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": -1,
+        "max": 100000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.box_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "cleaning_kit_count"
+    },
+    "sku.lens_stabilisation_performance_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable",
+          "applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.absent_system_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.care_camera_off": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.mount_and_storage_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_camera_off"
+    },
+    "sku.care_align_mount_marks": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.mount_and_storage_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_align_mount_marks"
+    },
+    "sku.care_support_barrel": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.mount_and_storage_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_support_barrel"
+    },
+    "sku.care_keep_contacts_clean": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.mount_and_storage_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_keep_contacts_clean"
+    },
+    "sku.care_keep_dry": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.mount_and_storage_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_keep_dry"
+    },
+    "sku.care_both_caps_in_separate_storage": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.mount_and_storage_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_both_caps_in_separate_storage"
+    },
+    "sku.care_cap_or_hood_lifting_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.mount_and_storage_care"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_cap_or_hood_lifting_allowed"
+    },
+    "sku.care_immersion_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.no_immersion_disassembly"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_immersion_allowed"
+    },
+    "sku.care_disassemble_allowed": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "portrait.no_immersion_disassembly"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_disassemble_allowed"
+    },
+    "product.facts.recipe": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "short_85",
+          "long_135"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "lens_mount": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.lens_mount",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.lens_mount"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "sensor_coverage": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.sensor_coverage",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.sensor_coverage"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "focal_length_mm": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.focal_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.focal_length_mm"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "maximum_f_number": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.maximum_f_number",
+      "display_group": "features",
+      "fields": [
+        "sku.maximum_f_number"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "minimum_f_number": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.minimum_f_number",
+      "display_group": "features",
+      "fields": [
+        "sku.minimum_f_number"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "focus_mechanism": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.focus_mechanism",
+      "display_group": "features",
+      "fields": [
+        "sku.focus_mechanism"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "reference_body_geometry_mm": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.reference_body_geometry_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_body_geometry_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_lens_only_mass_g": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.reference_lens_only_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_lens_only_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "declared_minimum_focus_from_focal_plane_mm": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.declared_minimum_focus_from_focal_plane_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.declared_minimum_focus_from_focal_plane_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "filter_attachment_diameter_mm": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.filter_attachment_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.filter_attachment_diameter_mm"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "kit_contents": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.kit_contents",
+      "display_group": "contents",
+      "fields": [
+        "sku.kit_contents"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "component_care": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.component_care",
+      "display_group": "care",
+      "fields": [
+        "sku.component_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "is_prime": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.is_prime",
+      "display_group": "features",
+      "fields": [
+        "sku.is_prime"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "has_optical_zoom": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.has_optical_zoom",
+      "display_group": "features",
+      "fields": [
+        "sku.has_optical_zoom"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_dependent_view": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.body_dependent_view",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_dependent_view"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "body_support_check_required": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.body_support_check_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.body_support_check_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "universal_view_guarantee": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.universal_view_guarantee",
+      "display_group": "features",
+      "fields": [
+        "sku.universal_view_guarantee"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "camera_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.camera_count",
+      "display_group": "features",
+      "fields": [
+        "sku.camera_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_source": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.power_source",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.power_source"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.battery_count",
+      "display_group": "features",
+      "fields": [
+        "sku.battery_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_supply_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.power_supply_count",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.power_supply_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lens_stabilisation": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.lens_stabilisation",
+      "display_group": "features",
+      "fields": [
+        "sku.lens_stabilisation"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "installed_parts": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.installed_parts",
+      "display_group": "features",
+      "fields": [
+        "sku.installed_parts"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adapter_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.adapter_count",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "filter_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.filter_count",
+      "display_group": "features",
+      "fields": [
+        "sku.filter_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "teleconverter_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.teleconverter_count",
+      "display_group": "features",
+      "fields": [
+        "sku.teleconverter_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tripod_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.tripod_count",
+      "display_group": "features",
+      "fields": [
+        "sku.tripod_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "cleaning_kit_count": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.cleaning_kit_count",
+      "display_group": "care",
+      "fields": [
+        "sku.cleaning_kit_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_camera_off": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_camera_off",
+      "display_group": "care",
+      "fields": [
+        "sku.care_camera_off"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_align_mount_marks": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_align_mount_marks",
+      "display_group": "care",
+      "fields": [
+        "sku.care_align_mount_marks"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_support_barrel": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_support_barrel",
+      "display_group": "care",
+      "fields": [
+        "sku.care_support_barrel"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_keep_contacts_clean": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_keep_contacts_clean",
+      "display_group": "care",
+      "fields": [
+        "sku.care_keep_contacts_clean"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_keep_dry": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_keep_dry",
+      "display_group": "care",
+      "fields": [
+        "sku.care_keep_dry"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_both_caps_in_separate_storage": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_both_caps_in_separate_storage",
+      "display_group": "care",
+      "fields": [
+        "sku.care_both_caps_in_separate_storage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_cap_or_hood_lifting_allowed": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_cap_or_hood_lifting_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.care_cap_or_hood_lifting_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_immersion_allowed": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_immersion_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.care_immersion_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_disassemble_allowed": {
+      "id": "camera_lenses.portrait_telephoto_primes.content.care_disassemble_allowed",
+      "display_group": "care",
+      "fields": [
+        "sku.care_disassemble_allowed"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 59,
+    "roles": {
+      "identity": 1,
+      "literal": 21,
+      "descriptive": 16,
+      "internal": 4,
+      "commerce": 1,
+      "omit_placeholder": 15,
+      "omit_fixed_detail": 1
+    },
+    "display_groups": 6,
+    "highlight_candidates": 8,
+    "unmapped_descriptive_fields": 25
+  }
+}

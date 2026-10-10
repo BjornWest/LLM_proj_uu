@@ -1,0 +1,2317 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "pet_harnesses.strap_harnesses",
+  "family_id": "pet_harnesses",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pet_harnesses.strap_harnesses.json": "8eb4364eead8f39702a0206ed2853dbec6d7d8b8770b6e26d1691168862e7890",
+    "environments/product_world/data/product_width/_pet_harnesses_base.json": "b8fe3943c8d7b5937791d9b7eb4d72afcdb41fc37f58692eb3a4cdde6b0c79bf",
+    "environments/product_world/data/product_public_content/pet_harnesses.strap_harnesses.json": "e80f71f47938afa3478f86341167dc13a51bf7d1063947f9dd204cc6b4f8bf33"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Keep fit bands with size controls, front/back attachment and padding; suppress inventories of attached ordinary hardware.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "harness.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Lundvik Rem"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.layout": {
+      "semantic_id": "harness.component.layout",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "overhead_h",
+          "step_in"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.ring_roles",
+        "harness.strap_layout"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "layout"
+    },
+    "product.facts.webbing_material": {
+      "semantic_id": "harness.component.webbing_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "webbing_material"
+    },
+    "product.facts.closure_units": {
+      "semantic_id": "harness.component.closure_units",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "closure_units"
+    },
+    "product.facts.closure_type": {
+      "semantic_id": "harness.component.closure_type",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "side-release",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "closure_type"
+    },
+    "product.facts.closure_material": {
+      "semantic_id": "harness.component.closure_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "plastic",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "closure_material"
+    },
+    "product.facts.closure_location": {
+      "semantic_id": "harness.component.closure_location",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "closure_location"
+    },
+    "product.facts.adjustment_locations": {
+      "semantic_id": "harness.component.adjustment_locations",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 3,
+        "max_items": 3,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "adjustment_locations"
+    },
+    "product.facts.adjuster_material": {
+      "semantic_id": "harness.component.adjuster_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "plastic",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adjuster_material"
+    },
+    "product.facts.d_ring_units": {
+      "semantic_id": "harness.component.d_ring_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.ring_roles"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "d_ring_units"
+    },
+    "product.facts.d_ring_material": {
+      "semantic_id": "harness.component.d_ring_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "d_ring_material"
+    },
+    "product.facts.o_ring_units": {
+      "semantic_id": "harness.component.o_ring_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.ring_roles"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "o_ring_units"
+    },
+    "product.facts.o_ring_materials": {
+      "semantic_id": "harness.component.o_ring_materials",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "min_items": 0,
+        "max_items": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "o_ring_materials"
+    },
+    "product.facts.attachment_mode": {
+      "semantic_id": "harness.component.attachment_mode",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "single_back_d",
+          "paired_back_d"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.lead.attachment_use",
+        "harness.ring_roles"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "attachment_mode"
+    },
+    "sku.size_label": {
+      "semantic_id": "harness.size_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "option label, not individual fit proof"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.colour": {
+      "semantic_id": "harness.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.webbing_width_mm": {
+      "semantic_id": "harness.webbing_width",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "min": 1,
+        "max": 30,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal uncompressed strap width in mm"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "webbing"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "webbing_width_mm"
+    },
+    "sku.chest_min_cm": {
+      "semantic_id": "harness.fit.chest_min_cm",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "min": 1,
+        "max": 150,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "inclusive declared fitting/adjustment range in cm; unclothed chest around ribs immediately behind front legs"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "chest_min_cm"
+    },
+    "sku.chest_max_cm": {
+      "semantic_id": "harness.fit.chest_max_cm",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "min": 1,
+        "max": 150,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "inclusive declared fitting/adjustment range in cm; unclothed chest around ribs immediately behind front legs"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "chest_max_cm"
+    },
+    "sku.neck_fit_band.range": {
+      "semantic_id": "harness.fit.neck_band",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "object",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "inclusive H lower-neck range in cm where its loop rests; absent H neck chart is NA on step-in"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "neck_fit_band.range"
+    },
+    "sku.neck_fit_band.min_cm": {
+      "semantic_id": "harness.field.neck_min_cm",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "min": 1,
+        "max": 150,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "inclusive lower-neck fitting range in cm where H loop rests; NA without H chart"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "neck_fit_band.min_cm"
+    },
+    "sku.neck_fit_band.max_cm": {
+      "semantic_id": "harness.field.neck_max_cm",
+      "role": "descriptive",
+      "display_group": "fit_and_sizing",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "min": 1,
+        "max": 150,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "inclusive lower-neck fitting range in cm where H loop rests; NA without H chart"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "neck_fit_band.max_cm"
+    },
+    "product.facts.harness_units": {
+      "semantic_id": "harness.box.harness_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full one-complete-harness selected pack"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "harness_units"
+    },
+    "product.facts.all_functional_components_attached": {
+      "semantic_id": "harness.box.all_functional_components_attached",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full one-complete-harness selected pack"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.lead_units": {
+      "semantic_id": "harness.box.lead_units",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full one-complete-harness selected pack"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lead_units"
+    },
+    "product.facts.collar_units": {
+      "semantic_id": "harness.box.collar_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full one-complete-harness selected pack"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "collar_units"
+    },
+    "product.facts.id_tag_units": {
+      "semantic_id": "harness.box.id_tag_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full one-complete-harness selected pack"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "id_tag_units"
+    },
+    "product.facts.vehicle_tether_units": {
+      "semantic_id": "harness.box.vehicle_tether_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full one-complete-harness selected pack"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "vehicle_tether_units"
+    },
+    "product.facts.loose_spare_hardware_units": {
+      "semantic_id": "harness.box.loose_spare_hardware_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full one-complete-harness selected pack"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "loose_spare_hardware_units"
+    },
+    "product.facts.mass_g": {
+      "semantic_id": "harness.unknown.mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "status": {
+          "literal": "explicitly unspecified"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ring_internal_opening_mm": {
+      "semantic_id": "harness.unknown.ring_internal_opening_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "status": {
+          "literal": "explicitly unspecified"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "harness.price.reference",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 100,
+        "max": 942.5,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "SEK for one complete exact selected size/colour harness; not a current seller quote"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.intended_species": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "dog",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.adult_dog"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_life_stage": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "adult",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.adult_dog"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "intended_life_stage"
+    },
+    "product.facts.supervision_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.supervised_on_lead"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supervision_required"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "supervised on-lead walking",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.supervised_on_lead"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.padding_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.unpadded"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "padding_present"
+    },
+    "product.facts.air_dry_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.complete"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "air_dry_required"
+    },
+    "product.facts.machinewash_permitted": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.complete"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "machinewash_permitted"
+    },
+    "product.facts.handwash_permitted": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.complete"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "handwash_permitted"
+    },
+    "product.facts.care_max_water_c": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "C",
+        "min": 1,
+        "max": 40,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.complete"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "care_max_water_c"
+    },
+    "product.facts.bleach_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bleach_permitted"
+    },
+    "product.facts.dishwasher_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dishwasher_permitted"
+    },
+    "product.facts.tumble_dryer_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tumble_dryer_permitted"
+    },
+    "product.facts.ironing_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ironing_permitted"
+    },
+    "product.facts.heated_drying_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.care.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "heated_drying_permitted"
+    },
+    "product.facts.remove_retail_tags_ties": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.remove_retail_keep_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "remove_retail_tags_ties"
+    },
+    "product.facts.retain_functional_components": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.remove_retail_keep_parts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "retain_functional_components"
+    },
+    "product.facts.inspection_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.fit_fastening_inspection"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "inspection_required"
+    },
+    "product.facts.fit_check_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.fit_fastening_inspection"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fit_check_required"
+    },
+    "product.facts.fully_closed_buckles_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.fit_fastening_inspection"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fully_closed_buckles_required"
+    },
+    "product.facts.stop_on_unsuitable_fit_or_damage": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.fit_fastening_inspection"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stop_on_unsuitable_fit_or_damage"
+    },
+    "product.facts.unattended_wear_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "unattended_wear_permitted"
+    },
+    "product.facts.tieout_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tieout_permitted"
+    },
+    "product.facts.vehicle_restraint_use_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "harness.use.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "vehicle_restraint_use_permitted"
+    },
+    "product.facts.neck_loop_present": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.vest_panels_present": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.reflective_trim_present": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.handle_units": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.front_leash_attachment_units": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.leash_attachment_location_units": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 2,
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.strap_thickness_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.sternum_min_cm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.sternum_max_cm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.breaking_load_n": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "N",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.wear_life_days": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "day",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dimensional_tolerance": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.plastic_resin": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.restraint_certification": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.padding_material": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.padding_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.handle_material": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.handle_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.front_attachment_material": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.front_leash_attachment_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.o_ring_material": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.o_ring_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "stainless steel",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.h_head_passage_cm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "cm",
+        "applicable_when": "product.facts.neck_loop_present",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "layout": {
+      "id": "pet_harnesses.strap_harnesses.content.layout",
+      "display_group": "features",
+      "fields": [
+        "product.facts.layout"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "webbing_material": {
+      "id": "pet_harnesses.strap_harnesses.content.webbing_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.webbing_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "closure_units": {
+      "id": "pet_harnesses.strap_harnesses.content.closure_units",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closure_type": {
+      "id": "pet_harnesses.strap_harnesses.content.closure_type",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure_type"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "closure_material": {
+      "id": "pet_harnesses.strap_harnesses.content.closure_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closure_location": {
+      "id": "pet_harnesses.strap_harnesses.content.closure_location",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure_location"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "adjustment_locations": {
+      "id": "pet_harnesses.strap_harnesses.content.adjustment_locations",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adjustment_locations"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "adjuster_material": {
+      "id": "pet_harnesses.strap_harnesses.content.adjuster_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.adjuster_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "d_ring_units": {
+      "id": "pet_harnesses.strap_harnesses.content.d_ring_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.d_ring_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "d_ring_material": {
+      "id": "pet_harnesses.strap_harnesses.content.d_ring_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.d_ring_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "o_ring_units": {
+      "id": "pet_harnesses.strap_harnesses.content.o_ring_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.o_ring_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "o_ring_materials": {
+      "id": "pet_harnesses.strap_harnesses.content.o_ring_materials",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.o_ring_materials"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "attachment_mode": {
+      "id": "pet_harnesses.strap_harnesses.content.attachment_mode",
+      "display_group": "features",
+      "fields": [
+        "product.facts.attachment_mode"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "webbing_width_mm": {
+      "id": "pet_harnesses.strap_harnesses.content.webbing_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.webbing_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "chest_min_cm": {
+      "id": "pet_harnesses.strap_harnesses.content.chest_min_cm",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "sku.chest_min_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "chest_max_cm": {
+      "id": "pet_harnesses.strap_harnesses.content.chest_max_cm",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "sku.chest_max_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "neck_fit_band.range": {
+      "id": "pet_harnesses.strap_harnesses.content.neck_fit_band.range",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "sku.neck_fit_band.range"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "neck_fit_band.min_cm": {
+      "id": "pet_harnesses.strap_harnesses.content.neck_fit_band.min_cm",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "sku.neck_fit_band.min_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "neck_fit_band.max_cm": {
+      "id": "pet_harnesses.strap_harnesses.content.neck_fit_band.max_cm",
+      "display_group": "fit_and_sizing",
+      "fields": [
+        "sku.neck_fit_band.max_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "harness_units": {
+      "id": "pet_harnesses.strap_harnesses.content.harness_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.harness_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lead_units": {
+      "id": "pet_harnesses.strap_harnesses.content.lead_units",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.lead_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "collar_units": {
+      "id": "pet_harnesses.strap_harnesses.content.collar_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.collar_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "id_tag_units": {
+      "id": "pet_harnesses.strap_harnesses.content.id_tag_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.id_tag_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "vehicle_tether_units": {
+      "id": "pet_harnesses.strap_harnesses.content.vehicle_tether_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.vehicle_tether_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_spare_hardware_units": {
+      "id": "pet_harnesses.strap_harnesses.content.loose_spare_hardware_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.loose_spare_hardware_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "intended_life_stage": {
+      "id": "pet_harnesses.strap_harnesses.content.intended_life_stage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.intended_life_stage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supervision_required": {
+      "id": "pet_harnesses.strap_harnesses.content.supervision_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.supervision_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "padding_present": {
+      "id": "pet_harnesses.strap_harnesses.content.padding_present",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.padding_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "air_dry_required": {
+      "id": "pet_harnesses.strap_harnesses.content.air_dry_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.air_dry_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "machinewash_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.machinewash_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.machinewash_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handwash_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.handwash_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.handwash_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_max_water_c": {
+      "id": "pet_harnesses.strap_harnesses.content.care_max_water_c",
+      "display_group": "care",
+      "fields": [
+        "product.facts.care_max_water_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bleach_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.bleach_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dishwasher_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.dishwasher_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dishwasher_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tumble_dryer_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.tumble_dryer_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.tumble_dryer_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ironing_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.ironing_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.ironing_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heated_drying_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.heated_drying_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.heated_drying_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "remove_retail_tags_ties": {
+      "id": "pet_harnesses.strap_harnesses.content.remove_retail_tags_ties",
+      "display_group": "features",
+      "fields": [
+        "product.facts.remove_retail_tags_ties"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "retain_functional_components": {
+      "id": "pet_harnesses.strap_harnesses.content.retain_functional_components",
+      "display_group": "features",
+      "fields": [
+        "product.facts.retain_functional_components"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "inspection_required": {
+      "id": "pet_harnesses.strap_harnesses.content.inspection_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.inspection_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fit_check_required": {
+      "id": "pet_harnesses.strap_harnesses.content.fit_check_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fit_check_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fully_closed_buckles_required": {
+      "id": "pet_harnesses.strap_harnesses.content.fully_closed_buckles_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.fully_closed_buckles_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stop_on_unsuitable_fit_or_damage": {
+      "id": "pet_harnesses.strap_harnesses.content.stop_on_unsuitable_fit_or_damage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stop_on_unsuitable_fit_or_damage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "unattended_wear_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.unattended_wear_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.unattended_wear_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tieout_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.tieout_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tieout_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "vehicle_restraint_use_permitted": {
+      "id": "pet_harnesses.strap_harnesses.content.vehicle_restraint_use_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.vehicle_restraint_use_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "fit_and_sizing": {
+      "label": "Fit and sizing",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 74,
+    "roles": {
+      "identity": 3,
+      "descriptive": 19,
+      "literal": 27,
+      "buying_choice": 2,
+      "omit_fixed_detail": 1,
+      "omit_placeholder": 14,
+      "commerce": 1,
+      "private_support": 7
+    },
+    "display_groups": 6,
+    "highlight_candidates": 4,
+    "unmapped_descriptive_fields": 21
+  }
+}

@@ -1,0 +1,1652 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "bedding.duvet_cover_sets",
+  "family_id": "bedding",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/bedding.duvet_cover_sets.json": "b643820ef8b3930c07eb2e206860f8a22db282047ab4fecf9d12559d171f4684",
+    "environments/product_world/data/product_width/_bedding_base.json": "aee7093ae0a4d3a368b02b81f1f61d9b76503577578ea00c6dd230c32c7a42e8",
+    "environments/product_world/data/product_public_content/bedding.duvet_cover_sets.json": "cdb368c74a49c37eb033b724794080fba4336ac503747da447541c91b327f5b1"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Textile covers, filled duvets and pillows have different features. Keep component-care scopes and nominal versus measured warmth/loft separate.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.product_name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": true,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.intended_use": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "covering an existing duvet and pillows for ordinary sleeping"
+        ],
+        "constant": "covering an existing duvet and pillows for ordinary sleeping",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.duvet_fabric_composition": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_fabric_composition",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "100% cotton",
+          "50% cotton, 50% polyester"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "duvet_main_fabric"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "duvet_fabric_composition"
+    },
+    "sku.duvet_weave": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_weave",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "percale (plain weave)",
+          "plain weave"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "duvet_main_fabric"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "duvet_weave"
+    },
+    "sku.duvet_sewing_thread_composition": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_sewing_thread_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "duvet_sewing_thread"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.pillowcase_fabric_composition": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_pillowcase_fabric_composition",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "100% cotton",
+          "50% cotton, 50% polyester"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "pillowcase_main_fabric"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pillowcase_fabric_composition"
+    },
+    "sku.pillowcase_weave": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_pillowcase_weave",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "percale (plain weave)",
+          "plain weave"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "pillowcase_main_fabric"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pillowcase_weave"
+    },
+    "sku.pillowcase_sewing_thread_composition": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_pillowcase_sewing_thread_composition",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "pillowcase_sewing_thread"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.duvet_fastening_materials": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_fastening_materials",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "duvet_bottom_fastening"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.nominal_cover_width_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_nominal_cover_width_cm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_cover_width_cm"
+    },
+    "sku.nominal_cover_length_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_nominal_cover_length_cm",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "constant": 200,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "nominal_cover_length_cm"
+    },
+    "sku.nominal_pillowcase_width_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_nominal_pillowcase_width_cm",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "constant": 60,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_pillowcase"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "nominal_pillowcase_width_cm"
+    },
+    "sku.nominal_pillowcase_length_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_nominal_pillowcase_length_cm",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "constant": 50,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_pillowcase"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "nominal_pillowcase_length_cm"
+    },
+    "sku.set_count": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_set_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.duvet_cover_count": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_cover_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "duvet_cover_count"
+    },
+    "sku.pillowcase_count": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_pillowcase_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.textile_piece_count": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_textile_piece_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "textile_piece_count"
+    },
+    "sku.colour": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "white",
+          "navy"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.duvet_closure": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_closure",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "buttons at bottom opening",
+          "zip at bottom opening"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "duvet_bottom_fastening"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "duvet_closure"
+    },
+    "sku.pillowcase_closure": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_pillowcase_closure",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "envelope opening with overlapping fabric"
+        ],
+        "constant": "envelope opening with overlapping fabric",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_pillowcase"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pillowcase_closure"
+    },
+    "sku.duvet_buttons_count": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_buttons_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "duvet_buttons_count"
+    },
+    "sku.duvet_buttonholes_count": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_buttonholes_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "duvet_buttonholes_count"
+    },
+    "sku.duvet_zips_count": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_zips_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "duvet_zips_count"
+    },
+    "sku.duvet_corner_ties_per_cover": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_corner_ties_per_cover",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "duvet_corner_ties_per_cover"
+    },
+    "sku.duvet_top_hand_openings_per_cover": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_top_hand_openings_per_cover",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "duvet_top_hand_openings_per_cover"
+    },
+    "sku.duvet_care": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_duvet_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 60°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 80°C. Iron main fabric at maximum 200°C, avoiding fastenings. Do not bleach or dry-clean.",
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 40°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 60°C. Iron main fabric at maximum 110°C, avoiding fastenings. Do not bleach or dry-clean."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "duvet_care"
+    },
+    "sku.pillowcase_care": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_pillowcase_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 60°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 80°C. Iron main fabric at maximum 200°C, avoiding fastenings. Do not bleach or dry-clean.",
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 40°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 60°C. Iron main fabric at maximum 110°C, avoiding fastenings. Do not bleach or dry-clean."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_pillowcase"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pillowcase_care"
+    },
+    "sku.actual_cover_width_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_actual_cover_width_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_cover_length_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_actual_cover_length_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_pillowcase_width_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_actual_pillowcase_width_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_pillowcase"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_pillowcase_length_cm": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_actual_pillowcase_length_cm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "cm",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_pillowcase"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_whole_set_textile_mass_g": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_actual_whole_set_textile_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "all_supplied_textiles"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_cover_wash_shrinkage_pct": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_measured_cover_wash_shrinkage_pct",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "%",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "one_duvet_cover"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_cover_colourfastness_declaration": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_measured_cover_colourfastness_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unspecified"
+        ],
+        "unknown_values": [
+          "unspecified"
+        ],
+        "constant": "unspecified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "duvet_main_fabric"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.supplied_duvet_fill_mass_g": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_supplied_duvet_fill_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "supplied_duvet_fill"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.supplied_duvet_tog_rating": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_supplied_duvet_tog_rating",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "tog",
+        "not_applicable_values": [
+          -2
+        ],
+        "constant": -2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "supplied_duvet_fill"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.pack_label": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_pack_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "one white set: 1 empty 150×200 cm duvet cover; 1 empty 60×50 cm pillowcase",
+          "one navy set: 1 empty 150×200 cm duvet cover; 1 empty 60×50 cm pillowcase",
+          "one white set: 1 empty 200×200 cm duvet cover; 2 empty 60×50 cm pillowcases",
+          "one navy set: 1 empty 200×200 cm duvet cover; 2 empty 60×50 cm pillowcases"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 200,
+        "max": 2800
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.maximum_wash_temperature_c": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_maximum_wash_temperature_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "all_supplied_textiles"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "maximum_wash_temperature_c"
+    },
+    "sku.maximum_tumble_temperature_c": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_maximum_tumble_temperature_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "all_supplied_textiles"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "maximum_tumble_temperature_c"
+    },
+    "sku.maximum_main_fabric_iron_temperature_c": {
+      "semantic_id": "bedding.duvet_cover_sets.semantic.sku_maximum_main_fabric_iron_temperature_c",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "°C"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component_key": "all_supplied_textiles"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "maximum_main_fabric_iron_temperature_c"
+    },
+    "sku.duvet_insert_supplied": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.empty_set_no_supplied_inserts_sheets_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "duvet_insert_supplied"
+    },
+    "sku.pillow_inserts_supplied": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.empty_set_no_supplied_inserts_sheets_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pillow_inserts_supplied"
+    },
+    "sku.sheet_supplied": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.empty_set_no_supplied_inserts_sheets_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "sheet_supplied"
+    },
+    "sku.other_usable_extras_supplied": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.empty_set_no_supplied_inserts_sheets_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "other_usable_extras_supplied"
+    },
+    "sku.loose_spare_fasteners_supplied": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.empty_set_no_supplied_inserts_sheets_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "loose_spare_fasteners_supplied"
+    },
+    "sku.retail_wrapping_counted_as_textile_piece": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.empty_set_no_supplied_inserts_sheets_extras"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "retail_wrapping_counted_as_textile_piece"
+    },
+    "sku.pillowcase_separate_fastenings_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.pillowcase_no_separate_fastening"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pillowcase_separate_fastenings_present"
+    },
+    "sku.product_kind": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "unfilled duvet-cover set"
+        ],
+        "constant": "unfilled duvet-cover set",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "bedding.duvet_cover_sets.predicate.unfilled_cover_set"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "cotton_percale_buttons",
+          "polycotton_zip"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.duvet_fabric_composition": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "100% cotton",
+          "50% cotton, 50% polyester"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pillowcase_fabric_composition": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "100% cotton",
+          "50% cotton, 50% polyester"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.duvet_weave": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "percale (plain weave)",
+          "plain weave"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pillowcase_weave": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "percale (plain weave)",
+          "plain weave"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.duvet_closure": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "buttons at bottom opening",
+          "zip at bottom opening"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.duvet_buttons_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.duvet_buttonholes_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.duvet_zips_count": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.duvet_zip_present": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.duvet_care": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 60°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 80°C. Iron main fabric at maximum 200°C, avoiding fastenings. Do not bleach or dry-clean.",
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 40°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 60°C. Iron main fabric at maximum 110°C, avoiding fastenings. Do not bleach or dry-clean."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.pillowcase_care": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 60°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 80°C. Iron main fabric at maximum 200°C, avoiding fastenings. Do not bleach or dry-clean.",
+          "For the duvet cover and every pillowcase including attached fastenings: normal machine wash, maximum 40°C; fasten the duvet cover before washing. Line dry or tumble dry at maximum 60°C. Iron main fabric at maximum 110°C, avoiding fastenings. Do not bleach or dry-clean."
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.maximum_wash_temperature_c": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.maximum_tumble_temperature_c": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.maximum_main_fabric_iron_temperature_c": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.price_multiplier": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "duvet_fabric_composition": {
+      "id": "bedding.duvet_cover_sets.content.duvet_fabric_composition",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.duvet_fabric_composition"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "duvet_weave": {
+      "id": "bedding.duvet_cover_sets.content.duvet_weave",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.duvet_weave"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "pillowcase_fabric_composition": {
+      "id": "bedding.duvet_cover_sets.content.pillowcase_fabric_composition",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.pillowcase_fabric_composition"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "pillowcase_weave": {
+      "id": "bedding.duvet_cover_sets.content.pillowcase_weave",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.pillowcase_weave"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "nominal_cover_width_cm": {
+      "id": "bedding.duvet_cover_sets.content.nominal_cover_width_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_cover_width_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_cover_length_cm": {
+      "id": "bedding.duvet_cover_sets.content.nominal_cover_length_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_cover_length_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_pillowcase_width_cm": {
+      "id": "bedding.duvet_cover_sets.content.nominal_pillowcase_width_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_pillowcase_width_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_pillowcase_length_cm": {
+      "id": "bedding.duvet_cover_sets.content.nominal_pillowcase_length_cm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.nominal_pillowcase_length_cm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_cover_count": {
+      "id": "bedding.duvet_cover_sets.content.duvet_cover_count",
+      "display_group": "features",
+      "fields": [
+        "sku.duvet_cover_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "textile_piece_count": {
+      "id": "bedding.duvet_cover_sets.content.textile_piece_count",
+      "display_group": "features",
+      "fields": [
+        "sku.textile_piece_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_closure": {
+      "id": "bedding.duvet_cover_sets.content.duvet_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.duvet_closure"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "pillowcase_closure": {
+      "id": "bedding.duvet_cover_sets.content.pillowcase_closure",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.pillowcase_closure"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "duvet_buttons_count": {
+      "id": "bedding.duvet_cover_sets.content.duvet_buttons_count",
+      "display_group": "features",
+      "fields": [
+        "sku.duvet_buttons_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_buttonholes_count": {
+      "id": "bedding.duvet_cover_sets.content.duvet_buttonholes_count",
+      "display_group": "features",
+      "fields": [
+        "sku.duvet_buttonholes_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_zips_count": {
+      "id": "bedding.duvet_cover_sets.content.duvet_zips_count",
+      "display_group": "features",
+      "fields": [
+        "sku.duvet_zips_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_corner_ties_per_cover": {
+      "id": "bedding.duvet_cover_sets.content.duvet_corner_ties_per_cover",
+      "display_group": "features",
+      "fields": [
+        "sku.duvet_corner_ties_per_cover"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_top_hand_openings_per_cover": {
+      "id": "bedding.duvet_cover_sets.content.duvet_top_hand_openings_per_cover",
+      "display_group": "features",
+      "fields": [
+        "sku.duvet_top_hand_openings_per_cover"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_care": {
+      "id": "bedding.duvet_cover_sets.content.duvet_care",
+      "display_group": "care",
+      "fields": [
+        "sku.duvet_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pillowcase_care": {
+      "id": "bedding.duvet_cover_sets.content.pillowcase_care",
+      "display_group": "care",
+      "fields": [
+        "sku.pillowcase_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "maximum_wash_temperature_c": {
+      "id": "bedding.duvet_cover_sets.content.maximum_wash_temperature_c",
+      "display_group": "care",
+      "fields": [
+        "sku.maximum_wash_temperature_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "maximum_tumble_temperature_c": {
+      "id": "bedding.duvet_cover_sets.content.maximum_tumble_temperature_c",
+      "display_group": "care",
+      "fields": [
+        "sku.maximum_tumble_temperature_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "maximum_main_fabric_iron_temperature_c": {
+      "id": "bedding.duvet_cover_sets.content.maximum_main_fabric_iron_temperature_c",
+      "display_group": "care",
+      "fields": [
+        "sku.maximum_main_fabric_iron_temperature_c"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "duvet_insert_supplied": {
+      "id": "bedding.duvet_cover_sets.content.duvet_insert_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.duvet_insert_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pillow_inserts_supplied": {
+      "id": "bedding.duvet_cover_sets.content.pillow_inserts_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.pillow_inserts_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sheet_supplied": {
+      "id": "bedding.duvet_cover_sets.content.sheet_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.sheet_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "other_usable_extras_supplied": {
+      "id": "bedding.duvet_cover_sets.content.other_usable_extras_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.other_usable_extras_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_spare_fasteners_supplied": {
+      "id": "bedding.duvet_cover_sets.content.loose_spare_fasteners_supplied",
+      "display_group": "contents",
+      "fields": [
+        "sku.loose_spare_fasteners_supplied"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "retail_wrapping_counted_as_textile_piece": {
+      "id": "bedding.duvet_cover_sets.content.retail_wrapping_counted_as_textile_piece",
+      "display_group": "features",
+      "fields": [
+        "sku.retail_wrapping_counted_as_textile_piece"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pillowcase_separate_fastenings_present": {
+      "id": "bedding.duvet_cover_sets.content.pillowcase_separate_fastenings_present",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.pillowcase_separate_fastenings_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 65,
+    "roles": {
+      "identity": 3,
+      "descriptive": 15,
+      "omit_placeholder": 12,
+      "literal": 14,
+      "buying_choice": 4,
+      "commerce": 1,
+      "internal": 2,
+      "private_support": 14
+    },
+    "display_groups": 5,
+    "highlight_candidates": 6,
+    "unmapped_descriptive_fields": 7
+  }
+}

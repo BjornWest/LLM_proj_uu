@@ -55,6 +55,9 @@ def registry():
 
 def render_report(report,product):
     """Faithful compositional templates; opinions never follow from catalog facts."""
+    if report.get('template_version')==5:
+        from .profile_narratives import render_narrative
+        return render_narrative(report,product)[0]
     if report.get('template_version')==4:
         from .evidence_drinks import render_drink
         return render_drink(report,product)[0]
@@ -90,7 +93,15 @@ def render_report(report,product):
     return ' '.join((lead,spec,*statements,tail))
 
 
-def generate_evidence(world,*,seed=0,as_of='2026-09-26',reviews_per_sku=12,reviewed_variants_per_model=1):
+def generate_evidence(world,*,seed=0,as_of='2026-09-26',reviews_per_sku=12,reviewed_variants_per_model=1,profile_options=None,narrative_options=None):
+    if narrative_options is not None:
+        from .profile_narratives import generate_narrative_evidence
+        return generate_narrative_evidence(world,seed=seed,as_of=as_of,reviews_per_sku=reviews_per_sku,
+            reviewed_variants_per_model=reviewed_variants_per_model,profile_options=profile_options,narrative_options=narrative_options)
+    if profile_options is not None:
+        from .opinion_profiles import generate_profiled_evidence
+        return generate_profiled_evidence(world,seed=seed,as_of=as_of,reviews_per_sku=reviews_per_sku,
+            reviewed_variants_per_model=reviewed_variants_per_model,profile_options=profile_options)
     if type(seed) is not int:raise ValueError('Integer evidence seed required')
     for key,value,maximum in [('reviews_per_sku',reviews_per_sku,100),('reviewed_variants_per_model',reviewed_variants_per_model,6)]:
         if type(value) is not int or not 0<=value<=maximum:raise ValueError(f'{key} must be 0..{maximum}')
@@ -195,13 +206,22 @@ def validate_evidence(world,export):
         attrs=r['mentioned_attributes']
         if not isinstance(attrs,list) or len(attrs)!=len(set(attrs)) or any(k not in p['attributes'] for k in attrs):raise ValueError('Unknown mentioned attribute')
         if set(r['template_choices'])!={'intro','facts','stance','ending'} or any(type(v) is not int or not 0<=v<(4 if k=='ending' else 3) for k,v in r['template_choices'].items()):raise ValueError('Invalid prose template choice')
-        if type(r.get('template_version',1)) is not int or r.get('template_version',1) not in (1,2,3,4):raise ValueError('Unknown review template version')
-        if r.get('template_version') in (3,4):
-            if r['template_version']==4:
+        if type(r.get('template_version',1)) is not int or r.get('template_version',1) not in (1,2,3,4,5):raise ValueError('Unknown review template version')
+        if r.get('template_version')==5 and 'narrative_sampling' not in export['private_provenance']:raise ValueError('Narrative provenance required')
+        if r.get('template_version') in (3,4,5):
+            if r['template_version']==5:
+                from .profile_narratives import render_narrative as render_natural
+            elif r['template_version']==4:
                 from .evidence_drinks import render_drink as render_natural
             else:
                 from .evidence_prose import render_natural
             if not r['assessments'] or u['experience_kind']=='intention':raise ValueError('Natural reports need substantive claims')
             if render_natural(r,p)[1]!=attrs:raise ValueError('Mentioned attributes differ from prose slots')
         if r['body']!=render_report(r,p):raise ValueError('Review prose differs from structured claims')
+    if 'narrative_sampling' in export['private_provenance']:
+        from .profile_narratives import validate_narrative_binding
+        validate_narrative_binding(world,export)
+    elif 'profile_sampling' in export['private_provenance']:
+        from .opinion_profiles import validate_profile_binding
+        validate_profile_binding(world,export)
     return {'valid':True,'review_count':len(ids),'public_sha256':digest(public)}

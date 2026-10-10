@@ -1,0 +1,5500 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "monitors.creative_image_work_monitors",
+  "family_id": "monitors",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/monitors.creative_image_work_monitors.json": "50b94bba17ea2e2c335513c5e0203632eac54cebdc035b9095f0392371490222",
+    "environments/product_world/data/product_width/_monitors_base.json": "b5bc8de51f89b1843f31b0c2e1911a3f277a3f4f4a4cfe9399671577a9419c40",
+    "environments/product_world/data/product_public_content/monitors.creative_image_work_monitors.json": "700d27c14db373d41ed38ed8dba31489925668f311de0a2be65e5922ee6f4a12"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Resolution, refresh, colour and connections have declared bases; no untested colour accuracy or cable bandwidth claims.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.monitor_units": {
+      "semantic_id": "monitors.creative.product.facts.monitor_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "monitor_units"
+    },
+    "product.facts.construction": {
+      "semantic_id": "monitors.creative.product.facts.construction",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "external monitor",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "construction"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "monitors.creative.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "prepared photo/image work on own computer",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.touchscreen": {
+      "semantic_id": "monitors.creative.product.facts.touchscreen",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "touchscreen"
+    },
+    "product.facts.advertised_diagonal_in": {
+      "semantic_id": "monitors.creative.product.facts.advertised_diagonal_in",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "inch",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "advertised_diagonal_in"
+    },
+    "product.facts.panel_type": {
+      "semantic_id": "monitors.creative.product.facts.panel_type",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "IPS",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "panel_type"
+    },
+    "product.facts.screen_backlight": {
+      "semantic_id": "monitors.creative.product.facts.screen_backlight",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "screen_backlight"
+    },
+    "product.facts.screen_surface": {
+      "semantic_id": "monitors.creative.product.facts.screen_surface",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "anti-glare",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "screen_surface"
+    },
+    "product.facts.screen_width_px": {
+      "semantic_id": "monitors.creative.product.facts.screen_width_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_width_px"
+    },
+    "product.facts.screen_height_px": {
+      "semantic_id": "monitors.creative.product.facts.screen_height_px",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "px",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "screen_height_px"
+    },
+    "product.facts.aspect_ratio": {
+      "semantic_id": "monitors.creative.product.facts.aspect_ratio",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "aspect_ratio"
+    },
+    "product.facts.touch_capabilities": {
+      "semantic_id": "monitors.creative.product.facts.touch_capabilities",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.touchscreen",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.declared_srgb_pct": {
+      "semantic_id": "monitors.creative.product.facts.declared_srgb_pct",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "percent",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "declared_srgb_pct"
+    },
+    "product.facts.declared_adobe_rgb_pct": {
+      "semantic_id": "monitors.creative.product.facts.declared_adobe_rgb_pct",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "percent",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_adobe_rgb_pct"
+    },
+    "product.facts.declared_dci_p3_pct": {
+      "semantic_id": "monitors.creative.product.facts.declared_dci_p3_pct",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "percent",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_dci_p3_pct"
+    },
+    "product.facts.gamut_metric_declaration": {
+      "semantic_id": "monitors.creative.product.facts.gamut_metric_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.gamut_conditions_declaration": {
+      "semantic_id": "monitors.creative.product.facts.gamut_conditions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.calibration_validation_declaration": {
+      "semantic_id": "monitors.creative.product.facts.calibration_validation_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.declared_deltae_upper": {
+      "semantic_id": "monitors.creative.product.facts.declared_deltae_upper",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "DeltaE",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "declared_deltae_upper"
+    },
+    "product.facts.deltae_bound_strict": {
+      "semantic_id": "monitors.creative.product.facts.deltae_bound_strict",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "deltae_bound_strict"
+    },
+    "product.facts.deltae_formula_declaration": {
+      "semantic_id": "monitors.creative.product.facts.deltae_formula_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.deltae_conditions_declaration": {
+      "semantic_id": "monitors.creative.product.facts.deltae_conditions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.factory_process_declaration": {
+      "semantic_id": "monitors.creative.product.facts.factory_process_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_deltae_declaration": {
+      "semantic_id": "monitors.creative.product.facts.actual_deltae_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.report_values_declaration": {
+      "semantic_id": "monitors.creative.product.facts.report_values_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.brightness_typ_nit": {
+      "semantic_id": "monitors.creative.product.facts.brightness_typ_nit",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "nit",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "brightness_typ_nit"
+    },
+    "product.facts.brightness_conditions_declaration": {
+      "semantic_id": "monitors.creative.product.facts.brightness_conditions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.contrast_typ_label": {
+      "semantic_id": "monitors.creative.product.facts.contrast_typ_label",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "1000:1",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "contrast_typ_label"
+    },
+    "product.facts.declared_gtg_ms": {
+      "semantic_id": "monitors.creative.product.facts.declared_gtg_ms",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "ms",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "declared_gtg_ms"
+    },
+    "product.facts.response_conditions_declaration": {
+      "semantic_id": "monitors.creative.product.facts.response_conditions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.refresh_rate_hz": {
+      "semantic_id": "monitors.creative.product.facts.refresh_rate_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "refresh_rate_hz"
+    },
+    "product.facts.refresh_declaration_basis": {
+      "semantic_id": "monitors.creative.product.facts.refresh_declaration_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "declared maximum",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.vertical_min_hz": {
+      "semantic_id": "monitors.creative.product.facts.vertical_min_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "vertical_min_hz"
+    },
+    "product.facts.vertical_max_hz": {
+      "semantic_id": "monitors.creative.product.facts.vertical_max_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "vertical_max_hz"
+    },
+    "product.facts.hdr_declaration": {
+      "semantic_id": "monitors.creative.product.facts.hdr_declaration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hdr_declaration"
+    },
+    "product.facts.mode_table_declaration": {
+      "semantic_id": "monitors.creative.product.facts.mode_table_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_gamut_declaration": {
+      "semantic_id": "monitors.creative.product.facts.actual_gamut_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_brightness_declaration": {
+      "semantic_id": "monitors.creative.product.facts.actual_brightness_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.uniformity_declaration": {
+      "semantic_id": "monitors.creative.product.facts.uniformity_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.input_lag_declaration": {
+      "semantic_id": "monitors.creative.product.facts.input_lag_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.achieved_editor_rate_declaration": {
+      "semantic_id": "monitors.creative.product.facts.achieved_editor_rate_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.print_match_declaration": {
+      "semantic_id": "monitors.creative.product.facts.print_match_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.active_area_declaration": {
+      "semantic_id": "monitors.creative.product.facts.active_area_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hdmi_input_units": {
+      "semantic_id": "monitors.creative.product.facts.hdmi_input_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hdmi_input_units"
+    },
+    "product.facts.dp_input_units": {
+      "semantic_id": "monitors.creative.product.facts.dp_input_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_input_units"
+    },
+    "product.facts.dp_output_units": {
+      "semantic_id": "monitors.creative.product.facts.dp_output_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dp_output_units"
+    },
+    "product.facts.vga_input_units": {
+      "semantic_id": "monitors.creative.product.facts.vga_input_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "vga_input_units"
+    },
+    "product.facts.hdmi_interface_label": {
+      "semantic_id": "monitors.creative.product.facts.hdmi_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "hdmi_interface_label"
+    },
+    "product.facts.dp_interface_label": {
+      "semantic_id": "monitors.creative.product.facts.dp_interface_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dp_interface_label"
+    },
+    "product.facts.dp_output_mst": {
+      "semantic_id": "monitors.creative.product.facts.dp_output_mst",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.dp_output_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dp_output_mst"
+    },
+    "product.facts.extra_display_limits": {
+      "semantic_id": "monitors.creative.product.facts.extra_display_limits",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.dp_output_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.signal_compatibility_declaration": {
+      "semantic_id": "monitors.creative.product.facts.signal_compatibility_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usb_b_upstream_units": {
+      "semantic_id": "monitors.creative.product.facts.usb_b_upstream_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_upstream_units"
+    },
+    "product.facts.c1_upstream_units": {
+      "semantic_id": "monitors.creative.product.facts.c1_upstream_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_upstream_units"
+    },
+    "product.facts.c2_downstream_units": {
+      "semantic_id": "monitors.creative.product.facts.c2_downstream_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_downstream_units"
+    },
+    "product.facts.usb_a_downstream_units": {
+      "semantic_id": "monitors.creative.product.facts.usb_a_downstream_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_a_downstream_units"
+    },
+    "product.facts.usb_hub_present": {
+      "semantic_id": "monitors.creative.product.facts.usb_hub_present",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_hub_present"
+    },
+    "product.facts.usb_b_data_upstream": {
+      "semantic_id": "monitors.creative.product.facts.usb_b_data_upstream",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_data_upstream"
+    },
+    "product.facts.c1_video_input": {
+      "semantic_id": "monitors.creative.product.facts.c1_video_input",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_video_input"
+    },
+    "product.facts.c1_data_upstream": {
+      "semantic_id": "monitors.creative.product.facts.c1_data_upstream",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_data_upstream"
+    },
+    "product.facts.c1_source_power_delivery": {
+      "semantic_id": "monitors.creative.product.facts.c1_source_power_delivery",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_source_power_delivery"
+    },
+    "product.facts.c1_source_power_max_w": {
+      "semantic_id": "monitors.creative.product.facts.c1_source_power_max_w",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_source_power_max_w"
+    },
+    "product.facts.c2_data_downstream": {
+      "semantic_id": "monitors.creative.product.facts.c2_data_downstream",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.c2_downstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_data_downstream"
+    },
+    "product.facts.c2_video_input": {
+      "semantic_id": "monitors.creative.product.facts.c2_video_input",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.c2_downstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c2_video_input"
+    },
+    "product.facts.c2_power_role_declaration": {
+      "semantic_id": "monitors.creative.product.facts.c2_power_role_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.c2_downstream_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_interface_label": {
+      "semantic_id": "monitors.creative.product.facts.hub_interface_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "USB3.2 Gen1",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hub_interface_label"
+    },
+    "product.facts.hub_nominal_rate_gbps": {
+      "semantic_id": "monitors.creative.product.facts.hub_nominal_rate_gbps",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Gb/s",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hub_nominal_rate_gbps"
+    },
+    "product.facts.pd_profiles_declaration": {
+      "semantic_id": "monitors.creative.product.facts.pd_profiles_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.source_power_acceptance": {
+      "semantic_id": "monitors.creative.product.facts.source_power_acceptance",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_per_port_power_declaration": {
+      "semantic_id": "monitors.creative.product.facts.hub_per_port_power_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_shared_power_declaration": {
+      "semantic_id": "monitors.creative.product.facts.hub_shared_power_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_achieved_rate_declaration": {
+      "semantic_id": "monitors.creative.product.facts.hub_achieved_rate_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hub_compatibility_declaration": {
+      "semantic_id": "monitors.creative.product.facts.hub_compatibility_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_hub_present",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.speaker_units": {
+      "semantic_id": "monitors.creative.product.facts.speaker_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "speaker_units"
+    },
+    "product.facts.speaker_channel_power_w": {
+      "semantic_id": "monitors.creative.product.facts.speaker_channel_power_w",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "speaker_channel_power_w"
+    },
+    "product.facts.headphone_output_units": {
+      "semantic_id": "monitors.creative.product.facts.headphone_output_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "headphone_output_units"
+    },
+    "product.facts.pc_audio_input_units": {
+      "semantic_id": "monitors.creative.product.facts.pc_audio_input_units",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pc_audio_input_units"
+    },
+    "product.facts.pc_audio_properties": {
+      "semantic_id": "monitors.creative.product.facts.pc_audio_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.pc_audio_input_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.microphone_units": {
+      "semantic_id": "monitors.creative.product.facts.microphone_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "microphone_units"
+    },
+    "product.facts.camera_units": {
+      "semantic_id": "monitors.creative.product.facts.camera_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "camera_units"
+    },
+    "product.facts.microphone_properties": {
+      "semantic_id": "monitors.creative.product.facts.microphone_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.microphone_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.stand_set_units": {
+      "semantic_id": "monitors.creative.sku.stand_set_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_set_units"
+    },
+    "product.facts.stand_tilt": {
+      "semantic_id": "monitors.creative.product.facts.stand_tilt",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_tilt"
+    },
+    "product.facts.stand_height_adjustable": {
+      "semantic_id": "monitors.creative.product.facts.stand_height_adjustable",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_height_adjustable"
+    },
+    "product.facts.stand_swivel": {
+      "semantic_id": "monitors.creative.product.facts.stand_swivel",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_swivel"
+    },
+    "product.facts.stand_pivot": {
+      "semantic_id": "monitors.creative.product.facts.stand_pivot",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stand_pivot"
+    },
+    "product.facts.tilt_down_deg": {
+      "semantic_id": "monitors.creative.product.facts.tilt_down_deg",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tilt_down_deg"
+    },
+    "product.facts.tilt_up_deg": {
+      "semantic_id": "monitors.creative.product.facts.tilt_up_deg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "tilt_up_deg"
+    },
+    "product.facts.height_travel_mm": {
+      "semantic_id": "monitors.creative.product.facts.height_travel_mm",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 130,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "height_travel_mm"
+    },
+    "product.facts.swivel_each_side_deg": {
+      "semantic_id": "monitors.creative.product.facts.swivel_each_side_deg",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "swivel_each_side_deg"
+    },
+    "product.facts.pivot_each_side_deg": {
+      "semantic_id": "monitors.creative.product.facts.pivot_each_side_deg",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "degree",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 90,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "pivot_each_side_deg"
+    },
+    "product.facts.mount_x_mm": {
+      "semantic_id": "monitors.creative.product.facts.mount_x_mm",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mount_x_mm"
+    },
+    "product.facts.mount_y_mm": {
+      "semantic_id": "monitors.creative.product.facts.mount_y_mm",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mount_y_mm"
+    },
+    "product.facts.mount_hardware_requirements": {
+      "semantic_id": "monitors.creative.product.facts.mount_hardware_requirements",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.control_kind": {
+      "semantic_id": "monitors.creative.product.facts.control_kind",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "physical OSD buttons",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "control_kind"
+    },
+    "product.facts.control_location": {
+      "semantic_id": "monitors.creative.product.facts.control_location",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.control_permissions": {
+      "semantic_id": "monitors.creative.product.facts.control_permissions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reference_configuration": {
+      "semantic_id": "monitors.creative.product.facts.reference_configuration",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_configuration"
+    },
+    "product.facts.reference_head_basis_label": {
+      "semantic_id": "monitors.creative.product.facts.reference_head_basis_label",
+      "role": "literal",
+      "display_group": "qualifiers",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "bare head including panel/body/internal supply; stand, all leads, report and packaging excluded",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "reference_head_basis_label"
+    },
+    "product.facts.reference_head_width_mm": {
+      "semantic_id": "monitors.creative.product.facts.reference_head_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_width_mm"
+    },
+    "product.facts.reference_head_height_mm": {
+      "semantic_id": "monitors.creative.product.facts.reference_head_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_height_mm"
+    },
+    "product.facts.reference_head_depth_mm": {
+      "semantic_id": "monitors.creative.product.facts.reference_head_depth_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_depth_mm"
+    },
+    "product.facts.reference_head_mass_g": {
+      "semantic_id": "monitors.creative.product.facts.reference_head_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_mass_g"
+    },
+    "product.facts.reference_assembly_basis_label": {
+      "semantic_id": "monitors.creative.product.facts.reference_assembly_basis_label",
+      "role": "literal",
+      "display_group": "qualifiers",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "head with matching stand/foot in landscape at authored highest130mm travel position and zero tilt/swivel/pivot; all leads, report and packaging excluded",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "reference_assembly_basis_label"
+    },
+    "product.facts.reference_assembly_width_mm": {
+      "semantic_id": "monitors.creative.product.facts.reference_assembly_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_width_mm"
+    },
+    "product.facts.reference_assembly_height_mm": {
+      "semantic_id": "monitors.creative.product.facts.reference_assembly_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_height_mm"
+    },
+    "product.facts.reference_assembly_depth_mm": {
+      "semantic_id": "monitors.creative.product.facts.reference_assembly_depth_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_depth_mm"
+    },
+    "product.facts.reference_assembly_mass_g": {
+      "semantic_id": "monitors.creative.product.facts.reference_assembly_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembly_mass_g"
+    },
+    "sku.actual_head_mass_g": {
+      "semantic_id": "monitors.creative.sku.actual_head_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_assembly_mass_g": {
+      "semantic_id": "monitors.creative.sku.actual_assembly_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_stand_mass_g": {
+      "semantic_id": "monitors.creative.sku.actual_stand_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_kit_mass_g": {
+      "semantic_id": "monitors.creative.sku.actual_kit_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.actual_dimensions_declaration": {
+      "semantic_id": "monitors.creative.sku.actual_dimensions_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.power_input_scope": {
+      "semantic_id": "monitors.creative.product.facts.power_input_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "internal supply's AC input",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.ac_min_v": {
+      "semantic_id": "monitors.creative.product.facts.ac_min_v",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_min_v"
+    },
+    "product.facts.ac_max_v": {
+      "semantic_id": "monitors.creative.product.facts.ac_max_v",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 240,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_max_v"
+    },
+    "product.facts.ac_min_hz": {
+      "semantic_id": "monitors.creative.product.facts.ac_min_hz",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 50,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_min_hz"
+    },
+    "product.facts.ac_max_hz": {
+      "semantic_id": "monitors.creative.product.facts.ac_max_hz",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 60,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ac_max_hz"
+    },
+    "sku.external_adapter_units": {
+      "semantic_id": "monitors.creative.sku.external_adapter_units",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "external_adapter_units"
+    },
+    "product.facts.monitor_dc_input_units": {
+      "semantic_id": "monitors.creative.product.facts.monitor_dc_input_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "monitor_dc_input_units"
+    },
+    "product.facts.adapter_output_declaration": {
+      "semantic_id": "monitors.creative.product.facts.adapter_output_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.monitor_dc_properties": {
+      "semantic_id": "monitors.creative.product.facts.monitor_dc_properties",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.monitor_dc_input_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.operating_consumption_w": {
+      "semantic_id": "monitors.creative.product.facts.operating_consumption_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.consumption_conditions": {
+      "semantic_id": "monitors.creative.product.facts.consumption_conditions",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.power_cord_units": {
+      "semantic_id": "monitors.creative.sku.power_cord_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_cord_units"
+    },
+    "sku.hdmi_cable_units": {
+      "semantic_id": "monitors.creative.sku.hdmi_cable_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_units"
+    },
+    "sku.dp_cable_units": {
+      "semantic_id": "monitors.creative.sku.dp_cable_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_units"
+    },
+    "sku.usb_b_cable_units": {
+      "semantic_id": "monitors.creative.sku.usb_b_cable_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_cable_units"
+    },
+    "sku.usb_c_cable_units": {
+      "semantic_id": "monitors.creative.sku.usb_c_cable_units",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_c_cable_units"
+    },
+    "sku.report_units": {
+      "semantic_id": "monitors.creative.sku.report_units",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "report_units"
+    },
+    "sku.power_cord_length_m": {
+      "semantic_id": "monitors.creative.sku.power_cord_length_m",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_cord_length_m"
+    },
+    "sku.hdmi_cable_length_m": {
+      "semantic_id": "monitors.creative.sku.hdmi_cable_length_m",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_length_m"
+    },
+    "sku.dp_cable_length_m": {
+      "semantic_id": "monitors.creative.sku.dp_cable_length_m",
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "optional": true,
+        "constant": 1.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_length_m"
+    },
+    "sku.mains_plug_label": {
+      "semantic_id": "monitors.creative.sku.mains_plug_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "EU plug",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mains_plug_label"
+    },
+    "sku.power_cord_detachable": {
+      "semantic_id": "monitors.creative.sku.power_cord_detachable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "power_cord_detachable"
+    },
+    "sku.hdmi_cable_detachable": {
+      "semantic_id": "monitors.creative.sku.hdmi_cable_detachable",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_detachable"
+    },
+    "sku.dp_cable_detachable": {
+      "semantic_id": "monitors.creative.sku.dp_cable_detachable",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_detachable"
+    },
+    "sku.hdmi_cable_connector_label": {
+      "semantic_id": "monitors.creative.sku.hdmi_cable_connector_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "HDMI to HDMI",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "hdmi_cable_connector_label"
+    },
+    "sku.dp_cable_connector_label": {
+      "semantic_id": "monitors.creative.sku.dp_cable_connector_label",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "DisplayPort to DisplayPort",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "dp_cable_connector_label"
+    },
+    "product.facts.usb_b_cable_connector_label": {
+      "semantic_id": "monitors.creative.product.facts.usb_b_cable_connector_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_cable_connector_label"
+    },
+    "product.facts.usb_c_cable_connector_label": {
+      "semantic_id": "monitors.creative.product.facts.usb_c_cable_connector_label",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_c_cable_connector_label"
+    },
+    "product.facts.usb_b_cable_detachable": {
+      "semantic_id": "monitors.creative.product.facts.usb_b_cable_detachable",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_b_cable_detachable"
+    },
+    "product.facts.usb_c_cable_detachable": {
+      "semantic_id": "monitors.creative.product.facts.usb_c_cable_detachable",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_c_cable_detachable"
+    },
+    "sku.report_kind": {
+      "semantic_id": "monitors.creative.sku.report_kind",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "paper colour pre-calibration report",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "report_kind"
+    },
+    "sku.region_label": {
+      "semantic_id": "monitors.creative.sku.region_label",
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "EEA",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.power_cord_ratings_declaration": {
+      "semantic_id": "monitors.creative.product.facts.power_cord_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.hdmi_cable_ratings_declaration": {
+      "semantic_id": "monitors.creative.product.facts.hdmi_cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.dp_cable_ratings_declaration": {
+      "semantic_id": "monitors.creative.product.facts.dp_cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usb_b_cable_ratings_declaration": {
+      "semantic_id": "monitors.creative.product.facts.usb_b_cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.usb_b_upstream_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usb_c_cable_ratings_declaration": {
+      "semantic_id": "monitors.creative.product.facts.usb_c_cable_ratings_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.c1_upstream_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.computer_units": {
+      "semantic_id": "monitors.creative.sku.computer_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "computer_units"
+    },
+    "sku.extra_display_units": {
+      "semantic_id": "monitors.creative.sku.extra_display_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "extra_display_units"
+    },
+    "sku.keyboard_units": {
+      "semantic_id": "monitors.creative.sku.keyboard_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "keyboard_units"
+    },
+    "sku.mouse_units": {
+      "semantic_id": "monitors.creative.sku.mouse_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mouse_units"
+    },
+    "sku.mount_arm_units": {
+      "semantic_id": "monitors.creative.sku.mount_arm_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "mount_arm_units"
+    },
+    "sku.wall_screw_units": {
+      "semantic_id": "monitors.creative.sku.wall_screw_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wall_screw_units"
+    },
+    "sku.external_calibrator_units": {
+      "semantic_id": "monitors.creative.sku.external_calibrator_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "external_calibrator_units"
+    },
+    "sku.vga_cable_units": {
+      "semantic_id": "monitors.creative.sku.vga_cable_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "vga_cable_units"
+    },
+    "sku.audio_cable_units": {
+      "semantic_id": "monitors.creative.sku.audio_cable_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "audio_cable_units"
+    },
+    "sku.editor_software_entitlement_included": {
+      "semantic_id": "monitors.creative.sku.editor_software_entitlement_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "editor_software_entitlement_included"
+    },
+    "sku.photo_content_entitlement_included": {
+      "semantic_id": "monitors.creative.sku.photo_content_entitlement_included",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "photo_content_entitlement_included"
+    },
+    "product.facts.care_declaration": {
+      "semantic_id": "monitors.creative.product.facts.care_declaration",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ip_rating": {
+      "semantic_id": "monitors.creative.product.facts.ip_rating",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_units": {
+      "semantic_id": "monitors.creative.product.facts.battery_units",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_units"
+    },
+    "product.facts.battery_chemistry": {
+      "semantic_id": "monitors.creative.product.facts.battery_chemistry",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "applicable_when": "product.facts.battery_units > 0",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_energy_wh": {
+      "semantic_id": "monitors.creative.product.facts.battery_energy_wh",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "applicable_when": "product.facts.battery_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_runtime_h": {
+      "semantic_id": "monitors.creative.product.facts.battery_runtime_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "hour",
+        "applicable_when": "product.facts.battery_units > 0",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.colour": {
+      "semantic_id": "monitors.creative.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "black",
+          "gray",
+          "white"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ],
+          "policy_key": "colour"
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.logical_usb_b_cable_length_m": {
+      "semantic_id": "monitors.creative.sku.usb_b_cable_length_m",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "applicable_when": "sku.usb_b_cable_length_m_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_usb_b_cable_length_m"
+    },
+    "sku.logical_usb_c_cable_length_m": {
+      "semantic_id": "monitors.creative.sku.usb_c_cable_length_m",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "applicable_when": "sku.usb_c_cable_length_m_status != 'not_applicable'",
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "logical_usb_c_cable_length_m"
+    },
+    "product.facts.srgb_preset_available": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.model": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "srgb_wuxga_24",
+          "wide_gamut_4k_27"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.model_price_factor": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": 1,
+        "max": 2.2
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.gamut_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.hdr_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.signal_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.usb_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.audio_input_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.usb_box_details_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    }
+  },
+  "disclosure_groups": {
+    "monitor_units": {
+      "id": "monitors.creative_image_work_monitors.content.monitor_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.monitor_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "construction": {
+      "id": "monitors.creative_image_work_monitors.content.construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.construction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "touchscreen": {
+      "id": "monitors.creative_image_work_monitors.content.touchscreen",
+      "display_group": "features",
+      "fields": [
+        "product.facts.touchscreen"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "advertised_diagonal_in": {
+      "id": "monitors.creative_image_work_monitors.content.advertised_diagonal_in",
+      "display_group": "features",
+      "fields": [
+        "product.facts.advertised_diagonal_in"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "panel_type": {
+      "id": "monitors.creative_image_work_monitors.content.panel_type",
+      "display_group": "features",
+      "fields": [
+        "product.facts.panel_type"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_backlight": {
+      "id": "monitors.creative_image_work_monitors.content.screen_backlight",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_backlight"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_surface": {
+      "id": "monitors.creative_image_work_monitors.content.screen_surface",
+      "display_group": "features",
+      "fields": [
+        "product.facts.screen_surface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "screen_width_px": {
+      "id": "monitors.creative_image_work_monitors.content.screen_width_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_width_px"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "screen_height_px": {
+      "id": "monitors.creative_image_work_monitors.content.screen_height_px",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.screen_height_px"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "aspect_ratio": {
+      "id": "monitors.creative_image_work_monitors.content.aspect_ratio",
+      "display_group": "features",
+      "fields": [
+        "product.facts.aspect_ratio"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_srgb_pct": {
+      "id": "monitors.creative_image_work_monitors.content.declared_srgb_pct",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_srgb_pct"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "declared_adobe_rgb_pct": {
+      "id": "monitors.creative_image_work_monitors.content.declared_adobe_rgb_pct",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_adobe_rgb_pct"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_dci_p3_pct": {
+      "id": "monitors.creative_image_work_monitors.content.declared_dci_p3_pct",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_dci_p3_pct"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_deltae_upper": {
+      "id": "monitors.creative_image_work_monitors.content.declared_deltae_upper",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_deltae_upper"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "deltae_bound_strict": {
+      "id": "monitors.creative_image_work_monitors.content.deltae_bound_strict",
+      "display_group": "features",
+      "fields": [
+        "product.facts.deltae_bound_strict"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "brightness_typ_nit": {
+      "id": "monitors.creative_image_work_monitors.content.brightness_typ_nit",
+      "display_group": "features",
+      "fields": [
+        "product.facts.brightness_typ_nit"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "contrast_typ_label": {
+      "id": "monitors.creative_image_work_monitors.content.contrast_typ_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.contrast_typ_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_gtg_ms": {
+      "id": "monitors.creative_image_work_monitors.content.declared_gtg_ms",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_gtg_ms"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "refresh_rate_hz": {
+      "id": "monitors.creative_image_work_monitors.content.refresh_rate_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.refresh_rate_hz"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "vertical_min_hz": {
+      "id": "monitors.creative_image_work_monitors.content.vertical_min_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.vertical_min_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "vertical_max_hz": {
+      "id": "monitors.creative_image_work_monitors.content.vertical_max_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.vertical_max_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdr_declaration": {
+      "id": "monitors.creative_image_work_monitors.content.hdr_declaration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hdr_declaration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_input_units": {
+      "id": "monitors.creative_image_work_monitors.content.hdmi_input_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hdmi_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_input_units": {
+      "id": "monitors.creative_image_work_monitors.content.dp_input_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dp_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_output_units": {
+      "id": "monitors.creative_image_work_monitors.content.dp_output_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dp_output_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "vga_input_units": {
+      "id": "monitors.creative_image_work_monitors.content.vga_input_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.vga_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_interface_label": {
+      "id": "monitors.creative_image_work_monitors.content.hdmi_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hdmi_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_interface_label": {
+      "id": "monitors.creative_image_work_monitors.content.dp_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.dp_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_output_mst": {
+      "id": "monitors.creative_image_work_monitors.content.dp_output_mst",
+      "display_group": "features",
+      "fields": [
+        "product.facts.dp_output_mst"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_upstream_units": {
+      "id": "monitors.creative_image_work_monitors.content.usb_b_upstream_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_b_upstream_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_upstream_units": {
+      "id": "monitors.creative_image_work_monitors.content.c1_upstream_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_upstream_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_downstream_units": {
+      "id": "monitors.creative_image_work_monitors.content.c2_downstream_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_downstream_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_a_downstream_units": {
+      "id": "monitors.creative_image_work_monitors.content.usb_a_downstream_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_a_downstream_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_hub_present": {
+      "id": "monitors.creative_image_work_monitors.content.usb_hub_present",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_hub_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_data_upstream": {
+      "id": "monitors.creative_image_work_monitors.content.usb_b_data_upstream",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_b_data_upstream"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_video_input": {
+      "id": "monitors.creative_image_work_monitors.content.c1_video_input",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_video_input"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_data_upstream": {
+      "id": "monitors.creative_image_work_monitors.content.c1_data_upstream",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_data_upstream"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_source_power_delivery": {
+      "id": "monitors.creative_image_work_monitors.content.c1_source_power_delivery",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_source_power_delivery"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_source_power_max_w": {
+      "id": "monitors.creative_image_work_monitors.content.c1_source_power_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_source_power_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_data_downstream": {
+      "id": "monitors.creative_image_work_monitors.content.c2_data_downstream",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_data_downstream"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_video_input": {
+      "id": "monitors.creative_image_work_monitors.content.c2_video_input",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_video_input"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hub_interface_label": {
+      "id": "monitors.creative_image_work_monitors.content.hub_interface_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.hub_interface_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hub_nominal_rate_gbps": {
+      "id": "monitors.creative_image_work_monitors.content.hub_nominal_rate_gbps",
+      "display_group": "features",
+      "fields": [
+        "product.facts.hub_nominal_rate_gbps"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "speaker_units": {
+      "id": "monitors.creative_image_work_monitors.content.speaker_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.speaker_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "speaker_channel_power_w": {
+      "id": "monitors.creative_image_work_monitors.content.speaker_channel_power_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.speaker_channel_power_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "headphone_output_units": {
+      "id": "monitors.creative_image_work_monitors.content.headphone_output_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.headphone_output_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pc_audio_input_units": {
+      "id": "monitors.creative_image_work_monitors.content.pc_audio_input_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pc_audio_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "microphone_units": {
+      "id": "monitors.creative_image_work_monitors.content.microphone_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.microphone_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "camera_units": {
+      "id": "monitors.creative_image_work_monitors.content.camera_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.camera_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_set_units": {
+      "id": "monitors.creative_image_work_monitors.content.stand_set_units",
+      "display_group": "features",
+      "fields": [
+        "sku.stand_set_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_tilt": {
+      "id": "monitors.creative_image_work_monitors.content.stand_tilt",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stand_tilt"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_height_adjustable": {
+      "id": "monitors.creative_image_work_monitors.content.stand_height_adjustable",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.stand_height_adjustable"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "stand_swivel": {
+      "id": "monitors.creative_image_work_monitors.content.stand_swivel",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stand_swivel"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stand_pivot": {
+      "id": "monitors.creative_image_work_monitors.content.stand_pivot",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stand_pivot"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "tilt_down_deg": {
+      "id": "monitors.creative_image_work_monitors.content.tilt_down_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tilt_down_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tilt_up_deg": {
+      "id": "monitors.creative_image_work_monitors.content.tilt_up_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tilt_up_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "height_travel_mm": {
+      "id": "monitors.creative_image_work_monitors.content.height_travel_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.height_travel_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "swivel_each_side_deg": {
+      "id": "monitors.creative_image_work_monitors.content.swivel_each_side_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.swivel_each_side_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pivot_each_side_deg": {
+      "id": "monitors.creative_image_work_monitors.content.pivot_each_side_deg",
+      "display_group": "features",
+      "fields": [
+        "product.facts.pivot_each_side_deg"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mount_x_mm": {
+      "id": "monitors.creative_image_work_monitors.content.mount_x_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.mount_x_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mount_y_mm": {
+      "id": "monitors.creative_image_work_monitors.content.mount_y_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.mount_y_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "control_kind": {
+      "id": "monitors.creative_image_work_monitors.content.control_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.control_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_configuration": {
+      "id": "monitors.creative_image_work_monitors.content.reference_configuration",
+      "display_group": "features",
+      "fields": [
+        "product.facts.reference_configuration"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_basis_label": {
+      "id": "monitors.creative_image_work_monitors.content.reference_head_basis_label",
+      "display_group": "qualifiers",
+      "fields": [
+        "product.facts.reference_head_basis_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_width_mm": {
+      "id": "monitors.creative_image_work_monitors.content.reference_head_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_height_mm": {
+      "id": "monitors.creative_image_work_monitors.content.reference_head_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_depth_mm": {
+      "id": "monitors.creative_image_work_monitors.content.reference_head_depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_depth_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_mass_g": {
+      "id": "monitors.creative_image_work_monitors.content.reference_head_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_head_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_basis_label": {
+      "id": "monitors.creative_image_work_monitors.content.reference_assembly_basis_label",
+      "display_group": "qualifiers",
+      "fields": [
+        "product.facts.reference_assembly_basis_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_width_mm": {
+      "id": "monitors.creative_image_work_monitors.content.reference_assembly_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_height_mm": {
+      "id": "monitors.creative_image_work_monitors.content.reference_assembly_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_depth_mm": {
+      "id": "monitors.creative_image_work_monitors.content.reference_assembly_depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_depth_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembly_mass_g": {
+      "id": "monitors.creative_image_work_monitors.content.reference_assembly_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_assembly_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_min_v": {
+      "id": "monitors.creative_image_work_monitors.content.ac_min_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_max_v": {
+      "id": "monitors.creative_image_work_monitors.content.ac_max_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_min_hz": {
+      "id": "monitors.creative_image_work_monitors.content.ac_min_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_min_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ac_max_hz": {
+      "id": "monitors.creative_image_work_monitors.content.ac_max_hz",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ac_max_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "external_adapter_units": {
+      "id": "monitors.creative_image_work_monitors.content.external_adapter_units",
+      "display_group": "contents",
+      "fields": [
+        "sku.external_adapter_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "monitor_dc_input_units": {
+      "id": "monitors.creative_image_work_monitors.content.monitor_dc_input_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.monitor_dc_input_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_cord_units": {
+      "id": "monitors.creative_image_work_monitors.content.power_cord_units",
+      "display_group": "features",
+      "fields": [
+        "sku.power_cord_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_units": {
+      "id": "monitors.creative_image_work_monitors.content.hdmi_cable_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_units": {
+      "id": "monitors.creative_image_work_monitors.content.dp_cable_units",
+      "display_group": "features",
+      "fields": [
+        "sku.dp_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_cable_units": {
+      "id": "monitors.creative_image_work_monitors.content.usb_b_cable_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.usb_b_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_c_cable_units": {
+      "id": "monitors.creative_image_work_monitors.content.usb_c_cable_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.usb_c_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "report_units": {
+      "id": "monitors.creative_image_work_monitors.content.report_units",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.report_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_cord_length_m": {
+      "id": "monitors.creative_image_work_monitors.content.power_cord_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.power_cord_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_length_m": {
+      "id": "monitors.creative_image_work_monitors.content.hdmi_cable_length_m",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_length_m": {
+      "id": "monitors.creative_image_work_monitors.content.dp_cable_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.dp_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_plug_label": {
+      "id": "monitors.creative_image_work_monitors.content.mains_plug_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.mains_plug_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "power_cord_detachable": {
+      "id": "monitors.creative_image_work_monitors.content.power_cord_detachable",
+      "display_group": "features",
+      "fields": [
+        "sku.power_cord_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_detachable": {
+      "id": "monitors.creative_image_work_monitors.content.hdmi_cable_detachable",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_detachable": {
+      "id": "monitors.creative_image_work_monitors.content.dp_cable_detachable",
+      "display_group": "features",
+      "fields": [
+        "sku.dp_cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "hdmi_cable_connector_label": {
+      "id": "monitors.creative_image_work_monitors.content.hdmi_cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.hdmi_cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dp_cable_connector_label": {
+      "id": "monitors.creative_image_work_monitors.content.dp_cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.dp_cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_cable_connector_label": {
+      "id": "monitors.creative_image_work_monitors.content.usb_b_cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_b_cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_c_cable_connector_label": {
+      "id": "monitors.creative_image_work_monitors.content.usb_c_cable_connector_label",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_c_cable_connector_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_b_cable_detachable": {
+      "id": "monitors.creative_image_work_monitors.content.usb_b_cable_detachable",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_b_cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_c_cable_detachable": {
+      "id": "monitors.creative_image_work_monitors.content.usb_c_cable_detachable",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_c_cable_detachable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "report_kind": {
+      "id": "monitors.creative_image_work_monitors.content.report_kind",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.report_kind"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "computer_units": {
+      "id": "monitors.creative_image_work_monitors.content.computer_units",
+      "display_group": "features",
+      "fields": [
+        "sku.computer_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "extra_display_units": {
+      "id": "monitors.creative_image_work_monitors.content.extra_display_units",
+      "display_group": "features",
+      "fields": [
+        "sku.extra_display_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "keyboard_units": {
+      "id": "monitors.creative_image_work_monitors.content.keyboard_units",
+      "display_group": "features",
+      "fields": [
+        "sku.keyboard_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mouse_units": {
+      "id": "monitors.creative_image_work_monitors.content.mouse_units",
+      "display_group": "features",
+      "fields": [
+        "sku.mouse_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mount_arm_units": {
+      "id": "monitors.creative_image_work_monitors.content.mount_arm_units",
+      "display_group": "features",
+      "fields": [
+        "sku.mount_arm_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wall_screw_units": {
+      "id": "monitors.creative_image_work_monitors.content.wall_screw_units",
+      "display_group": "features",
+      "fields": [
+        "sku.wall_screw_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "external_calibrator_units": {
+      "id": "monitors.creative_image_work_monitors.content.external_calibrator_units",
+      "display_group": "features",
+      "fields": [
+        "sku.external_calibrator_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "vga_cable_units": {
+      "id": "monitors.creative_image_work_monitors.content.vga_cable_units",
+      "display_group": "features",
+      "fields": [
+        "sku.vga_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "audio_cable_units": {
+      "id": "monitors.creative_image_work_monitors.content.audio_cable_units",
+      "display_group": "features",
+      "fields": [
+        "sku.audio_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "editor_software_entitlement_included": {
+      "id": "monitors.creative_image_work_monitors.content.editor_software_entitlement_included",
+      "display_group": "contents",
+      "fields": [
+        "sku.editor_software_entitlement_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "photo_content_entitlement_included": {
+      "id": "monitors.creative_image_work_monitors.content.photo_content_entitlement_included",
+      "display_group": "contents",
+      "fields": [
+        "sku.photo_content_entitlement_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_units": {
+      "id": "monitors.creative_image_work_monitors.content.battery_units",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_usb_b_cable_length_m": {
+      "id": "monitors.creative_image_work_monitors.content.logical_usb_b_cable_length_m",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.logical_usb_b_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "logical_usb_c_cable_length_m": {
+      "id": "monitors.creative_image_work_monitors.content.logical_usb_c_cable_length_m",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.logical_usb_c_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "qualifiers": {
+      "label": "Qualifiers",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 179,
+    "roles": {
+      "literal": 66,
+      "identity": 1,
+      "descriptive": 47,
+      "omit_placeholder": 52,
+      "qualifier": 2,
+      "operational": 1,
+      "buying_choice": 1,
+      "private_support": 9
+    },
+    "display_groups": 6,
+    "highlight_candidates": 8,
+    "unmapped_descriptive_fields": 0
+  }
+}

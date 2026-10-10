@@ -1,0 +1,1074 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "headphones.in_ear_earbuds",
+  "family_id": "headphones",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/headphones.in_ear_earbuds.json": "ddbf1b56c87290ed7bf56583ec42951ea0612f05327ad85e0c97d60103c054d4",
+    "environments/product_world/data/product_width/_electronics_base.json": "9dcdfd5d5ce31c2610fec964b168002caf6e3deb098cfcf10734e62b36eca93a"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Preserve battery-test mode, case-assisted versus wearable runtime and headset microphone-route conditions.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.connection": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "passive analogue",
+          "true wireless"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "connection"
+    },
+    "product.facts.wireless": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wireless"
+    },
+    "product.facts.rechargeable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "rechargeable"
+    },
+    "product.facts.charging_case": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "charging_case"
+    },
+    "product.facts.acoustic_design": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "closed dynamic ear-canal",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "acoustic_design"
+    },
+    "product.facts.driver_diameter_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": 7,
+        "max": 11,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "driver_diameter_mm"
+    },
+    "product.facts.tip_material": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "silicone",
+          "foam"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "tip_material"
+    },
+    "product.facts.supplied_tip_sizes": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "set",
+        "items": {
+          "type": "enum",
+          "values": [
+            "S",
+            "M",
+            "L"
+          ]
+        },
+        "constant": [
+          "S",
+          "M",
+          "L"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "supplied_tip_sizes"
+    },
+    "product.facts.detachable_analogue_cable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "detachable_analogue_cable"
+    },
+    "product.facts.analogue_source_plug_mm": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": 3.5,
+        "max": 3.5,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 3.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "analogue_source_plug_mm"
+    },
+    "product.facts.bluetooth_version": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "5.2",
+          "5.3"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "bluetooth_version"
+    },
+    "product.facts.call_microphone": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "call_microphone"
+    },
+    "product.facts.playback_controls": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "buttons",
+          "touch"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "playback_controls"
+    },
+    "product.facts.anc": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "anc"
+    },
+    "product.facts.ambient_passthrough": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ambient_passthrough"
+    },
+    "product.facts.case_wireless_charging": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "case_wireless_charging"
+    },
+    "product.facts.bud_charging_interface": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "matching charging-case contacts",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bud_charging_interface"
+    },
+    "product.facts.case_charging_interface": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "USB-C charging, not USB audio",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "case_charging_interface"
+    },
+    "product.facts.usb_audio": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_audio"
+    },
+    "product.facts.declared_bud_music_anc_off_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 4,
+        "max": 8,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_bud_music_anc_off_h"
+    },
+    "product.facts.declared_bud_music_anc_on_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 3,
+        "max": 7,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_bud_music_anc_on_h"
+    },
+    "product.facts.declared_case_assisted_music_anc_off_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 16,
+        "max": 32,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_case_assisted_music_anc_off_h"
+    },
+    "product.facts.declared_bud_charge_in_case_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 1,
+        "max": 1.5,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_bud_charge_in_case_h"
+    },
+    "product.facts.declared_case_usb_charge_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 2,
+        "max": 3,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_case_usb_charge_h"
+    },
+    "product.facts.nominal_bud_energy": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.nominal_case_energy": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_test_protocol": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.call_runtime": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ip_protection": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_isolation_anc_latency": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.pair_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "min": 8,
+        "max": 14,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pair_mass_g"
+    },
+    "product.facts.pair_mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "pair including fitted M tips, excluding cable and case",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.case_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "min": 37,
+        "max": 58,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "case_mass_g"
+    },
+    "product.facts.case_mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "case excluding earbuds",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    }
+  },
+  "disclosure_groups": {
+    "connection": {
+      "id": "headphones.in_ear_earbuds.content.connection",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.connection"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "wireless": {
+      "id": "headphones.in_ear_earbuds.content.wireless",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wireless"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rechargeable": {
+      "id": "headphones.in_ear_earbuds.content.rechargeable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rechargeable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charging_case": {
+      "id": "headphones.in_ear_earbuds.content.charging_case",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.charging_case"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "acoustic_design": {
+      "id": "headphones.in_ear_earbuds.content.acoustic_design",
+      "display_group": "features",
+      "fields": [
+        "product.facts.acoustic_design"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "driver_diameter_mm": {
+      "id": "headphones.in_ear_earbuds.content.driver_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.driver_diameter_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tip_material": {
+      "id": "headphones.in_ear_earbuds.content.tip_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.tip_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "supplied_tip_sizes": {
+      "id": "headphones.in_ear_earbuds.content.supplied_tip_sizes",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_tip_sizes"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "detachable_analogue_cable": {
+      "id": "headphones.in_ear_earbuds.content.detachable_analogue_cable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.detachable_analogue_cable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "analogue_source_plug_mm": {
+      "id": "headphones.in_ear_earbuds.content.analogue_source_plug_mm",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.analogue_source_plug_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth_version": {
+      "id": "headphones.in_ear_earbuds.content.bluetooth_version",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bluetooth_version"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "call_microphone": {
+      "id": "headphones.in_ear_earbuds.content.call_microphone",
+      "display_group": "features",
+      "fields": [
+        "product.facts.call_microphone"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "playback_controls": {
+      "id": "headphones.in_ear_earbuds.content.playback_controls",
+      "display_group": "features",
+      "fields": [
+        "product.facts.playback_controls"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "anc": {
+      "id": "headphones.in_ear_earbuds.content.anc",
+      "display_group": "features",
+      "fields": [
+        "product.facts.anc"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "ambient_passthrough": {
+      "id": "headphones.in_ear_earbuds.content.ambient_passthrough",
+      "display_group": "features",
+      "fields": [
+        "product.facts.ambient_passthrough"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "case_wireless_charging": {
+      "id": "headphones.in_ear_earbuds.content.case_wireless_charging",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.case_wireless_charging"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bud_charging_interface": {
+      "id": "headphones.in_ear_earbuds.content.bud_charging_interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.bud_charging_interface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "case_charging_interface": {
+      "id": "headphones.in_ear_earbuds.content.case_charging_interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.case_charging_interface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_audio": {
+      "id": "headphones.in_ear_earbuds.content.usb_audio",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_audio"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_bud_music_anc_off_h": {
+      "id": "headphones.in_ear_earbuds.content.declared_bud_music_anc_off_h",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_bud_music_anc_off_h"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_bud_music_anc_on_h": {
+      "id": "headphones.in_ear_earbuds.content.declared_bud_music_anc_on_h",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_bud_music_anc_on_h"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_case_assisted_music_anc_off_h": {
+      "id": "headphones.in_ear_earbuds.content.declared_case_assisted_music_anc_off_h",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_case_assisted_music_anc_off_h"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_bud_charge_in_case_h": {
+      "id": "headphones.in_ear_earbuds.content.declared_bud_charge_in_case_h",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_bud_charge_in_case_h"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_case_usb_charge_h": {
+      "id": "headphones.in_ear_earbuds.content.declared_case_usb_charge_h",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.declared_case_usb_charge_h"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pair_mass_g": {
+      "id": "headphones.in_ear_earbuds.content.pair_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.pair_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "case_mass_g": {
+      "id": "headphones.in_ear_earbuds.content.case_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.case_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 34,
+    "roles": {
+      "descriptive": 20,
+      "literal": 6,
+      "omit_placeholder": 6,
+      "qualifier": 2
+    },
+    "display_groups": 5,
+    "highlight_candidates": 8,
+    "unmapped_descriptive_fields": 26
+  }
+}

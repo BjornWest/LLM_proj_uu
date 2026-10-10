@@ -1,0 +1,1290 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "jackets.rain_shells",
+  "random_namespace": "product-width-jackets.rain_shells-v1",
+  "extends": "_apparel_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.laminate": {
+      "type": "object",
+      "properties": {
+        "layers": {
+          "type": "string"
+        },
+        "face": {
+          "type": "string"
+        },
+        "membrane": {
+          "type": "string"
+        },
+        "inner": {
+          "type": "string"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "rain protection",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.laminate_layers": {
+      "type": "enum",
+      "values": [
+        "2-layer",
+        "2.5-layer",
+        "3-layer"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.face_fabric": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.membrane": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.inner_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.seam_treatment": {
+      "type": "string",
+      "constant": "all seams taped",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.insulating_fill": {
+      "type": "string",
+      "constant": "no dedicated insulating fill declared",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.dwr": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.front_closure": {
+      "type": "string",
+      "constant": "full front zip",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cut": {
+      "type": "enum",
+      "values": [
+        "regular",
+        "relaxed"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_style": {
+      "type": "enum",
+      "values": [
+        "absent",
+        "attached adjustable",
+        "detachable adjustable"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_present": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_adjustable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_detachable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.underarm_zip_vents": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.head_published": {
+      "type": "boolean"
+    },
+    "product.facts.mvtr_published": {
+      "type": "boolean"
+    },
+    "product.facts.declared_hydrostatic_head_mm": {
+      "type": "number",
+      "unit": "mm",
+      "optional": true,
+      "min": 10000,
+      "max": 20000,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_mvtr_g_m2_24h": {
+      "type": "number",
+      "unit": "g/m2/24h",
+      "optional": true,
+      "min": 10000,
+      "max": 20000,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.test_method": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.test_conditioning": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one garment, nominal size M reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 280,
+      "max": 480,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.hood_required": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.vents_required": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.min_head_mm": {
+      "type": "number",
+      "unit": "mm",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "laminate_bundle",
+      "target": "internal.laminate",
+      "sample": "weighted_choice",
+      "weights": {
+        "two": 2,
+        "two_half": 4,
+        "three": 3
+      },
+      "values": {
+        "two": {
+          "layers": "2-layer",
+          "face": "polyester",
+          "membrane": "PU membrane",
+          "inner": "separate mesh lining",
+          "mass_g": 350
+        },
+        "two_half": {
+          "layers": "2.5-layer",
+          "face": "nylon",
+          "membrane": "PU membrane",
+          "inner": "protective inner print",
+          "mass_g": 300
+        },
+        "three": {
+          "layers": "3-layer",
+          "face": "nylon",
+          "membrane": "PU membrane",
+          "inner": "tricot backing",
+          "mass_g": 420
+        }
+      }
+    },
+    {
+      "id": "layers",
+      "target": "product.facts.laminate_layers",
+      "derive": "internal.laminate.layers"
+    },
+    {
+      "id": "face",
+      "target": "product.facts.face_fabric",
+      "derive": "internal.laminate.face"
+    },
+    {
+      "id": "membrane",
+      "target": "product.facts.membrane",
+      "derive": "internal.laminate.membrane"
+    },
+    {
+      "id": "inner",
+      "target": "product.facts.inner_structure",
+      "derive": "internal.laminate.inner"
+    },
+    {
+      "id": "dwr",
+      "target": "product.facts.dwr",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 4,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "cut",
+      "target": "product.facts.cut",
+      "sample": "weighted_choice",
+      "weights": {
+        "regular": 3,
+        "relaxed": 1
+      }
+    },
+    {
+      "id": "hood",
+      "target": "product.facts.hood_style",
+      "sample": "weighted_choice",
+      "weights": {
+        "absent": 1,
+        "attached adjustable": 6,
+        "detachable adjustable": 2
+      }
+    },
+    {
+      "id": "hood_present",
+      "target": "product.facts.hood_present",
+      "derive": "product.facts.hood_style != 'absent'"
+    },
+    {
+      "id": "hood_adjustable",
+      "target": "product.facts.hood_adjustable",
+      "derive": "product.facts.hood_present"
+    },
+    {
+      "id": "hood_detachable",
+      "target": "product.facts.hood_detachable",
+      "derive": "product.facts.hood_style == 'detachable adjustable'"
+    },
+    {
+      "id": "vents",
+      "target": "product.facts.underarm_zip_vents",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 3,
+        "no": 2
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "head_publication",
+      "target": "product.facts.head_published",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 2,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "head_value",
+      "target": "product.facts.declared_hydrostatic_head_mm",
+      "sample": "weighted_choice",
+      "weights": {
+        "10000": 1,
+        "20000": 1
+      },
+      "when": "product.facts.head_published",
+      "values": {
+        "10000": 10000,
+        "20000": 20000
+      }
+    },
+    {
+      "id": "mvtr_publication",
+      "target": "product.facts.mvtr_published",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 1,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "mvtr_value",
+      "target": "product.facts.declared_mvtr_g_m2_24h",
+      "sample": "weighted_choice",
+      "weights": {
+        "10000": 1,
+        "20000": 1
+      },
+      "when": "product.facts.mvtr_published",
+      "values": {
+        "10000": 10000,
+        "20000": 20000
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -20,
+      "max": 20
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.laminate.mass_g + internal.mass_noise_g + (25 if product.facts.hood_present else 0) + (15 if product.facts.underarm_zip_vents else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.laminate",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.laminate_layers",
+          "product.facts.face_fabric",
+          "product.facts.membrane",
+          "product.facts.inner_structure",
+          "product.facts.seam_treatment",
+          "product.facts.insulating_fill"
+        ]
+      },
+      "slots": {
+        "layers": "product.facts.laminate_layers",
+        "face": "product.facts.face_fabric",
+        "membrane": "product.facts.membrane",
+        "inner": "product.facts.inner_structure"
+      },
+      "formulations": [
+        "Rain shell: {layers} laminate, {face} face, {membrane} and {inner}; all seams taped; no dedicated insulating fill declared.",
+        "A {layers} laminate uses {face}, {membrane}, and {inner}. All seams taped, without declared dedicated insulating fill."
+      ]
+    },
+    {
+      "id": "description.controls",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.front_closure",
+          "product.facts.cut",
+          "product.facts.hood_style",
+          "product.facts.hood_present",
+          "product.facts.hood_adjustable",
+          "product.facts.hood_detachable",
+          "product.facts.underarm_zip_vents",
+          "product.facts.dwr"
+        ]
+      },
+      "slots": {
+        "cut": "product.facts.cut",
+        "hood": "product.facts.hood_style",
+        "vents": "'present' if product.facts.underarm_zip_vents else 'absent'",
+        "dwr": "'present' if product.facts.dwr else 'absent'"
+      },
+      "formulations": [
+        "Full front zip; {cut} cut; hood: {hood}; underarm zip vents {vents}; DWR {dwr}.",
+        "A {cut}-cut full-zip shell with hood {hood}, underarm zip vents {vents}, and DWR {dwr}."
+      ]
+    },
+    {
+      "id": "description.head_known",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.head_published",
+          "product.facts.declared_hydrostatic_head_mm",
+          "product.facts.test_method",
+          "product.facts.test_conditioning"
+        ]
+      },
+      "slots": {
+        "head": "product.facts.declared_hydrostatic_head_mm"
+      },
+      "formulations": [
+        "Declared hydrostatic head: {head} mm; test method/conditioning unspecified.",
+        "Manufacturer-declared hydrostatic head {head} mm, with no specified test method or conditioning."
+      ],
+      "when": "product.facts.head_published"
+    },
+    {
+      "id": "description.head_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.head_published"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Hydrostatic-head result not published.",
+        "No hydrostatic-head value is published."
+      ],
+      "when": "not product.facts.head_published"
+    },
+    {
+      "id": "description.mvtr_known",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.mvtr_published",
+          "product.facts.declared_mvtr_g_m2_24h",
+          "product.facts.test_method",
+          "product.facts.test_conditioning"
+        ]
+      },
+      "slots": {
+        "mvtr": "product.facts.declared_mvtr_g_m2_24h"
+      },
+      "formulations": [
+        "Declared MVTR: {mvtr} g/m²/24h; test method/conditioning unspecified.",
+        "Manufacturer-declared MVTR {mvtr} g/m²/24h, with no specified test method or conditioning."
+      ],
+      "when": "product.facts.mvtr_published"
+    },
+    {
+      "id": "description.mvtr_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.mvtr_published"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "MVTR result not published.",
+        "No MVTR value is published."
+      ],
+      "when": "not product.facts.mvtr_published"
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One nominal sizeM reference garment weighs {mass} g.",
+        "Reference mass: {mass} g for one garment in nominal sizeM."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'jackets.rain_shells' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "hood",
+      "role": "filter",
+      "predicate": "product.facts.hood_present == request.hood_required",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "vents",
+      "role": "filter",
+      "predicate": "product.facts.underarm_zip_vents == request.vents_required",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "head",
+      "role": "task_requirement",
+      "predicate": "product.facts.declared_hydrostatic_head_mm >= request.min_head_mm",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "size_label": {
+                "type": "string"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "size_label": {
+              "type": "string"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "front_zip_operation",
+              "rain_walk_dryness",
+              "layering_room",
+              "hood_adjustment",
+              "vent_operation"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 400,
+          "max": 4000
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 400
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 4000
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_front_zip_operation": {
+          "type": "boolean"
+        },
+        "review.positive_rain_walk_dryness": {
+          "type": "boolean"
+        },
+        "review.positive_layering_room": {
+          "type": "boolean"
+        },
+        "review.positive_hood_adjustment": {
+          "type": "boolean"
+        },
+        "review.positive_vent_operation": {
+          "type": "boolean"
+        },
+        "product.facts.hood_adjustable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.underarm_zip_vents": {
+          "type": "boolean",
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "plain": 1,
+            "hood": 0,
+            "vents": 0,
+            "both": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.hood_adjustable and product.facts.underarm_zip_vents",
+              "weights": {
+                "plain": 0,
+                "hood": 0,
+                "vents": 0,
+                "both": 1
+              }
+            },
+            {
+              "when": "product.facts.hood_adjustable and not product.facts.underarm_zip_vents",
+              "weights": {
+                "plain": 0,
+                "hood": 1,
+                "vents": 0,
+                "both": 0
+              }
+            },
+            {
+              "when": "not product.facts.hood_adjustable and product.facts.underarm_zip_vents",
+              "weights": {
+                "plain": 0,
+                "hood": 0,
+                "vents": 1,
+                "both": 0
+              }
+            }
+          ],
+          "values": {
+            "plain": [
+              "value",
+              "front_zip_operation",
+              "rain_walk_dryness",
+              "layering_room"
+            ],
+            "hood": [
+              "value",
+              "front_zip_operation",
+              "rain_walk_dryness",
+              "layering_room",
+              "hood_adjustment"
+            ],
+            "vents": [
+              "value",
+              "front_zip_operation",
+              "rain_walk_dryness",
+              "layering_room",
+              "vent_operation"
+            ],
+            "both": [
+              "value",
+              "front_zip_operation",
+              "rain_walk_dryness",
+              "layering_room",
+              "hood_adjustment",
+              "vent_operation"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_front_zip_operation",
+          "target": "review.positive_front_zip_operation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_rain_walk_dryness",
+          "target": "review.positive_rain_walk_dryness",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_layering_room",
+          "target": "review.positive_layering_room",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_hood_adjustment",
+          "target": "review.positive_hood_adjustment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_vent_operation",
+          "target": "review.positive_vent_operation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "front_zip_operation.positive",
+          "when": "'front_zip_operation' in review.topics and review.positive_front_zip_operation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_zip_operation",
+            "polarity": "positive",
+            "context": "operating the front entry zip",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the front entry zip easy to operate.",
+            "Operating the front entry zip was easy for me."
+          ]
+        },
+        {
+          "id": "front_zip_operation.negative",
+          "when": "'front_zip_operation' in review.topics and not review.positive_front_zip_operation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_zip_operation",
+            "polarity": "negative",
+            "context": "operating the front entry zip",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the front entry zip difficult to operate.",
+            "Operating the front entry zip was difficult for me."
+          ]
+        },
+        {
+          "id": "rain_walk_dryness.positive",
+          "when": "'rain_walk_dryness' in review.topics and review.positive_rain_walk_dryness",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "rain_walk_dryness",
+            "polarity": "positive",
+            "context": {
+              "use": "short rainy walk",
+              "front": "closed",
+              "aspect": "perceived torso dryness"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My torso stayed dry on a short rainy walk with the front closed.",
+            "I had a dry torso during a short rainy walk with the front closed."
+          ]
+        },
+        {
+          "id": "rain_walk_dryness.negative",
+          "when": "'rain_walk_dryness' in review.topics and not review.positive_rain_walk_dryness",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "rain_walk_dryness",
+            "polarity": "negative",
+            "context": {
+              "use": "short rainy walk",
+              "front": "closed",
+              "aspect": "perceived torso dryness"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My torso felt damp on a short rainy walk with the front closed.",
+            "I had a damp torso during a short rainy walk with the front closed."
+          ]
+        },
+        {
+          "id": "layering_room.positive",
+          "when": "'layering_room' in review.topics and review.positive_layering_room",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "layering_room",
+            "polarity": "positive",
+            "context": {
+              "layer": "light midlayer",
+              "size": "tested size",
+              "aspect": "sufficient layering room"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The tested size had enough room over my light midlayer.",
+            "There was sufficient room over my light midlayer in the size I tried."
+          ]
+        },
+        {
+          "id": "layering_room.negative",
+          "when": "'layering_room' in review.topics and not review.positive_layering_room",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "layering_room",
+            "polarity": "negative",
+            "context": {
+              "layer": "light midlayer",
+              "size": "tested size",
+              "aspect": "sufficient layering room"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The tested size lacked room over my light midlayer.",
+            "There was insufficient room over my light midlayer in the size I tried."
+          ]
+        },
+        {
+          "id": "hood_adjustment.positive",
+          "when": "'hood_adjustment' in review.topics and review.positive_hood_adjustment and product.facts.hood_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "hood_adjustment",
+            "polarity": "positive",
+            "context": "adjusting the hood",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the hood easy to adjust.",
+            "Adjusting the hood was easy for me."
+          ]
+        },
+        {
+          "id": "hood_adjustment.negative",
+          "when": "'hood_adjustment' in review.topics and not review.positive_hood_adjustment and product.facts.hood_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "hood_adjustment",
+            "polarity": "negative",
+            "context": "adjusting the hood",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the hood difficult to adjust.",
+            "Adjusting the hood was difficult for me."
+          ]
+        },
+        {
+          "id": "vent_operation.positive",
+          "when": "'vent_operation' in review.topics and review.positive_vent_operation and product.facts.underarm_zip_vents",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "vent_operation",
+            "polarity": "positive",
+            "context": "operating the underarm zip vents",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the underarm zip vents easy to operate.",
+            "Operating the underarm zip vents was easy for me."
+          ]
+        },
+        {
+          "id": "vent_operation.negative",
+          "when": "'vent_operation' in review.topics and not review.positive_vent_operation and product.facts.underarm_zip_vents",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "vent_operation",
+            "polarity": "negative",
+            "context": "operating the underarm zip vents",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the underarm zip vents difficult to operate.",
+            "Operating the underarm zip vents was difficult for me."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 400,
+          "max_sek": 4000
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "jackets",
+    "spec_path": "docs/agents/product-width-specs/jackets.rain_shells.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "apparel",
+      "outdoors"
+    ],
+    "scope_exceptions": [
+      "Nominal adult labels only; no body/gender/cut conversion",
+      "Authored declarations, no comparable laboratory protocol or dry-wear guarantee",
+      "Laminate count distinct from separate lining; no dedicated insulation declared"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 400,
+      "max": 1000,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 900,
+          "max": 2000
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1800,
+          "max": 4000
+        }
+      ]
+    }
+  }
+}

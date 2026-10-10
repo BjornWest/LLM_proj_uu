@@ -1,0 +1,106 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "memory_cards",
+  "review_id": "F10",
+  "label": "Memory cards",
+  "section": "Electronics and computing",
+  "store_type_ids": [
+    "electronics"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Use the same speed units and distinguish advertised peak from sustained/tested speed. Device compatibility and capacity limits must be declared; a shape adapter does not establish full compatibility.",
+  "shared_dimension_ids": [
+    "storage_capacity",
+    "card_format",
+    "read_speed",
+    "write_speed",
+    "pack_count"
+  ],
+  "dimensions": [
+    {
+      "id": "storage_capacity",
+      "label": "Storage capacity",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "GB",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "card_format",
+      "label": "Card format",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "read_speed",
+      "label": "Read speed",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "MB/s",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "write_speed",
+      "label": "Write speed",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "MB/s",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "memory_cards.memory_cards",
+      "label": "Memory cards",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

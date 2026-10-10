@@ -1,0 +1,170 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "authoring.dog_treat_food_base",
+  "random_namespace": "product-width-dog-treat-packs-v1",
+  "status": "shared_authoring_module_not_counted_as_concept",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "internal.unadjusted_reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "unit_net_mass_g": {
+            "type": "integer",
+            "unit": "g",
+            "min": 60,
+            "max": 260
+          },
+          "unit_count": {
+            "type": "integer",
+            "min": 1,
+            "max": 6
+          },
+          "total_net_mass_g": {
+            "type": "integer",
+            "unit": "g",
+            "min": 60,
+            "max": 924
+          },
+          "price_multiplier": {
+            "type": "number",
+            "min": 0.09,
+            "max": 1.2474
+          },
+          "reference_price_sek": {
+            "type": "number",
+            "unit": "SEK",
+            "min": 13.5,
+            "max": 1872
+          },
+          "nominal_pieces_per_unit": {
+            "type": "integer",
+            "min": -1,
+            "max": 7,
+            "unknown_values": [
+              -1
+            ]
+          },
+          "nominal_piece_count": {
+            "type": "integer",
+            "min": -1,
+            "max": 42,
+            "unknown_values": [
+              -1
+            ]
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "sku.unit_net_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "unit_net_mass_g"
+      }
+    },
+    "sku.unit_count": {
+      "type": "integer",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "unit_count"
+      }
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.05,
+      "max": 0.95
+    },
+    {
+      "id": "price",
+      "target": "internal.unadjusted_reference_price_sek",
+      "sample": "uniform",
+      "min": 150,
+      "max": 300,
+      "round_to": 1,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 260,
+          "max": 600
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 500,
+          "max": 1000
+        }
+      ]
+    }
+  ],
+  "language": [],
+  "rules": [],
+  "bindings": [],
+  "metadata": {
+    "purpose": "Neutral dog treat profiles/price input/canonical pack schema; inheriting concept supplies all manufacture",
+    "heuristics": "Authored bands; unknown count sentinels are not zero or measured negative counts"
+  }
+}

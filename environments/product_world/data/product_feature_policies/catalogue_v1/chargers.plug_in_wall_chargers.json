@@ -1,0 +1,1807 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "chargers.plug_in_wall_chargers",
+  "family_id": "chargers",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/chargers.plug_in_wall_chargers.json": "bce32a3c3ed529f278846a6eb78be4f4766700f56f94a576ec4da63296b6d6f3",
+    "environments/product_world/data/product_width/_chargers_base.json": "56accc3b68110f8907469a414bd8c0c4a6508553e492d221d75421962f928b0d"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Group solo/simultaneous and PPS bounds coherently; combined output is not per-port output. Bundle cable choices remain controls.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "regular",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": true,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.assembly": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "single45",
+          "dual65"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "assembly"
+    },
+    "product.facts.usb_c_port_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 2,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "usb_c_port_count"
+    },
+    "product.facts.c1_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_label"
+    },
+    "product.facts.c2_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_label"
+    },
+    "product.facts.c1_solo_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_solo_max_w"
+    },
+    "product.facts.c2_solo_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_solo_max_w"
+    },
+    "product.facts.c1_simultaneous_max_w": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 45,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c1_simultaneous_max_w"
+    },
+    "product.facts.c2_simultaneous_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_simultaneous_max_w"
+    },
+    "product.facts.combined_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "combined_max_w"
+    },
+    "product.facts.input_min_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "input_min_v"
+    },
+    "product.facts.input_max_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "input_max_v"
+    },
+    "product.facts.c1_solo_pdo": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "voltage_v": {
+              "type": "number",
+              "unit": "V",
+              "min": 0
+            },
+            "current_max_a": {
+              "type": "number",
+              "unit": "A",
+              "min": 0
+            }
+          }
+        },
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_solo_pdo"
+    },
+    "product.facts.c1_solo_pdo_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_solo_pdo_label"
+    },
+    "product.facts.c1_solo_pps_min_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_solo_pps_min_v"
+    },
+    "product.facts.c1_solo_pps_max_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_solo_pps_max_v"
+    },
+    "product.facts.c1_solo_pps_max_a": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_solo_pps_max_a"
+    },
+    "product.facts.c1_solo_pps_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_solo_pps_max_w"
+    },
+    "product.facts.c2_solo_pdo": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "voltage_v": {
+              "type": "number",
+              "unit": "V",
+              "min": 0
+            },
+            "current_max_a": {
+              "type": "number",
+              "unit": "A",
+              "min": 0
+            }
+          }
+        },
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_solo_pdo"
+    },
+    "product.facts.c2_solo_pdo_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_solo_pdo_label"
+    },
+    "product.facts.c2_solo_pps_min_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_solo_pps_min_v"
+    },
+    "product.facts.c2_solo_pps_max_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_solo_pps_max_v"
+    },
+    "product.facts.c2_solo_pps_max_a": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_solo_pps_max_a"
+    },
+    "product.facts.c2_solo_pps_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_solo_pps_max_w"
+    },
+    "product.facts.c1_simultaneous_pdo": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "voltage_v": {
+              "type": "number",
+              "unit": "V",
+              "min": 0
+            },
+            "current_max_a": {
+              "type": "number",
+              "unit": "A",
+              "min": 0
+            }
+          }
+        },
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_simultaneous_pdo"
+    },
+    "product.facts.c1_simultaneous_pdo_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_simultaneous_pdo_label"
+    },
+    "product.facts.c1_simultaneous_pps_min_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_simultaneous_pps_min_v"
+    },
+    "product.facts.c1_simultaneous_pps_max_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_simultaneous_pps_max_v"
+    },
+    "product.facts.c1_simultaneous_pps_max_a": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c1_simultaneous_pps_max_a"
+    },
+    "product.facts.c1_simultaneous_pps_max_w": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 45,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "c1_simultaneous_pps_max_w"
+    },
+    "product.facts.c2_simultaneous_pdo": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "voltage_v": {
+              "type": "number",
+              "unit": "V",
+              "min": 0
+            },
+            "current_max_a": {
+              "type": "number",
+              "unit": "A",
+              "min": 0
+            }
+          }
+        },
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_simultaneous_pdo"
+    },
+    "product.facts.c2_simultaneous_pdo_label": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_simultaneous_pdo_label"
+    },
+    "product.facts.c2_simultaneous_pps_min_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_simultaneous_pps_min_v"
+    },
+    "product.facts.c2_simultaneous_pps_max_v": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_simultaneous_pps_max_v"
+    },
+    "product.facts.c2_simultaneous_pps_max_a": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_simultaneous_pps_max_a"
+    },
+    "product.facts.c2_simultaneous_pps_max_w": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": 0,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.usb_c_port_count == 2"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "c2_simultaneous_pps_max_w"
+    },
+    "product.facts.protocols": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "set",
+        "items": {
+          "type": "string"
+        },
+        "constant": [
+          "USB PD 3.0 fixed PDO",
+          "PPS"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "protocols"
+    },
+    "product.facts.adapter_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "adapter_units"
+    },
+    "product.facts.bundled_cable_units": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bundled_cable_units"
+    },
+    "product.facts.bundle_cable_length_m": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "m",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "'cable_bundle' in product.bundles",
+        "constant": 2,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bundle_cable_length_m"
+    },
+    "product.facts.bundle_cable_connector": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "'cable_bundle' in product.bundles",
+        "constant": "USB-C to USB-C",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bundle_cable_connector"
+    },
+    "product.facts.phone_included": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.mains_extension_included": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.travel_adapter_included": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed absence of an unrelated extra or ordinary garment part; avoid negative inventories."
+    },
+    "product.facts.wireless_pad_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "wireless_pad_included"
+    },
+    "product.facts.body_mass_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.input_frequency_hz": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Hz",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.input_current_a": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "A",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.body_width_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.body_height_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.body_depth_mm": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "constant": -1,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.folding_pins": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.plug_dimensions": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.efficiency": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.safety_certification": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.reallocation_interruptions": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.priority": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.achieved_output": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.charging_time": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "assembly": {
+      "id": "chargers.plug_in_wall_chargers.content.assembly",
+      "display_group": "features",
+      "fields": [
+        "product.facts.assembly"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_c_port_count": {
+      "id": "chargers.plug_in_wall_chargers.content.usb_c_port_count",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_c_port_count"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "c1_label": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_label": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_solo_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_solo_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_solo_max_w"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "c2_solo_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_solo_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_solo_max_w"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "c1_simultaneous_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_simultaneous_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_simultaneous_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_simultaneous_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_simultaneous_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_simultaneous_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "combined_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.combined_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.combined_max_w"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "input_min_v": {
+      "id": "chargers.plug_in_wall_chargers.content.input_min_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.input_min_v"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "input_max_v": {
+      "id": "chargers.plug_in_wall_chargers.content.input_max_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.input_max_v"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "c1_solo_pdo": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_solo_pdo",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_solo_pdo"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_solo_pdo_label": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_solo_pdo_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_solo_pdo_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_solo_pps_min_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_solo_pps_min_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_solo_pps_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_solo_pps_max_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_solo_pps_max_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_solo_pps_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_solo_pps_max_a": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_solo_pps_max_a",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_solo_pps_max_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_solo_pps_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_solo_pps_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_solo_pps_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_solo_pdo": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_solo_pdo",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_solo_pdo"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_solo_pdo_label": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_solo_pdo_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_solo_pdo_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_solo_pps_min_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_solo_pps_min_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_solo_pps_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_solo_pps_max_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_solo_pps_max_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_solo_pps_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_solo_pps_max_a": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_solo_pps_max_a",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_solo_pps_max_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_solo_pps_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_solo_pps_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_solo_pps_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_simultaneous_pdo": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_simultaneous_pdo",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_simultaneous_pdo"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_simultaneous_pdo_label": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_simultaneous_pdo_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_simultaneous_pdo_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_simultaneous_pps_min_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_simultaneous_pps_min_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_simultaneous_pps_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_simultaneous_pps_max_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_simultaneous_pps_max_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_simultaneous_pps_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_simultaneous_pps_max_a": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_simultaneous_pps_max_a",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_simultaneous_pps_max_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c1_simultaneous_pps_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c1_simultaneous_pps_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c1_simultaneous_pps_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_simultaneous_pdo": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_simultaneous_pdo",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_simultaneous_pdo"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_simultaneous_pdo_label": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_simultaneous_pdo_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_simultaneous_pdo_label"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_simultaneous_pps_min_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_simultaneous_pps_min_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_simultaneous_pps_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_simultaneous_pps_max_v": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_simultaneous_pps_max_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_simultaneous_pps_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_simultaneous_pps_max_a": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_simultaneous_pps_max_a",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_simultaneous_pps_max_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "c2_simultaneous_pps_max_w": {
+      "id": "chargers.plug_in_wall_chargers.content.c2_simultaneous_pps_max_w",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c2_simultaneous_pps_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "protocols": {
+      "id": "chargers.plug_in_wall_chargers.content.protocols",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.protocols"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "adapter_units": {
+      "id": "chargers.plug_in_wall_chargers.content.adapter_units",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.adapter_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bundled_cable_units": {
+      "id": "chargers.plug_in_wall_chargers.content.bundled_cable_units",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.bundled_cable_units"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bundle_cable_length_m": {
+      "id": "chargers.plug_in_wall_chargers.content.bundle_cable_length_m",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.bundle_cable_length_m"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bundle_cable_connector": {
+      "id": "chargers.plug_in_wall_chargers.content.bundle_cable_connector",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.bundle_cable_connector"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "wireless_pad_included": {
+      "id": "chargers.plug_in_wall_chargers.content.wireless_pad_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.wireless_pad_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 59,
+    "roles": {
+      "operational": 1,
+      "descriptive": 33,
+      "literal": 8,
+      "omit_fixed_detail": 3,
+      "omit_placeholder": 14
+    },
+    "display_groups": 4,
+    "highlight_candidates": 7,
+    "unmapped_descriptive_fields": 41
+  }
+}

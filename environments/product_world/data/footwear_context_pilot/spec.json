@@ -1,0 +1,507 @@
+{
+  "schema_version": "footwear-context-pilot-spec-v1",
+  "status": "authored_initial_weights_not_calibrated",
+  "concepts": {
+    "walking_shoes": {
+      "registry_id": "footwear.walking_shoes",
+      "label": "Walking shoes",
+      "fixed": {
+        "construction": "enclosed shoe",
+        "closed_heel": true,
+        "intended_use": "everyday walking"
+      },
+      "component": "upper",
+      "material_weights": {
+        "mesh and synthetic panels": 4,
+        "woven synthetic fabric": 3,
+        "leather": 3
+      },
+      "fastening_weights": {
+        "laces": 7,
+        "hook-and-loop straps": 2,
+        "slip-on opening": 1
+      },
+      "base_mass_g_per_shoe_eu40": {
+        "light": 240,
+        "balanced": 290,
+        "cushioned": 310,
+        "structured": 360
+      },
+      "price_ranges_sek": {
+        "budget": [
+          450,
+          950
+        ],
+        "mainstream": [
+          850,
+          1600
+        ],
+        "premium": [
+          1400,
+          2400
+        ]
+      },
+      "width_set_weights": {
+        "regular_only": 50,
+        "regular_wide": 20,
+        "regular_narrow": 10,
+        "regular_narrow_wide": 20
+      },
+      "colour_weights": {
+        "black": 5,
+        "navy": 3,
+        "brown": 2,
+        "olive": 2,
+        "stone": 3,
+        "white": 3,
+        "grey": 3,
+        "burgundy": 1,
+        "blue": 2,
+        "pink": 1
+      }
+    },
+    "walking_sandals": {
+      "registry_id": "footwear.walking_sandals",
+      "label": "Walking sandals",
+      "fixed": {
+        "construction": "open strapped sandal",
+        "heel_retention": true,
+        "intended_use": "everyday walking"
+      },
+      "component": "straps",
+      "material_weights": {
+        "woven synthetic fabric": 6,
+        "leather": 4
+      },
+      "fastening_weights": {
+        "hook-and-loop straps": 7,
+        "buckles": 3
+      },
+      "base_mass_g_per_shoe_eu40": {
+        "light": 190,
+        "balanced": 240,
+        "cushioned": 260,
+        "structured": 310
+      },
+      "price_ranges_sek": {
+        "budget": [
+          300,
+          750
+        ],
+        "mainstream": [
+          650,
+          1200
+        ],
+        "premium": [
+          1000,
+          1900
+        ]
+      },
+      "width_set_weights": {
+        "regular_only": 80,
+        "regular_wide": 8,
+        "regular_narrow": 4,
+        "regular_narrow_wide": 8
+      },
+      "colour_weights": {
+        "black": 5,
+        "navy": 2,
+        "brown": 4,
+        "olive": 2,
+        "stone": 3,
+        "white": 2,
+        "grey": 2,
+        "burgundy": 1,
+        "blue": 1,
+        "pink": 1
+      }
+    }
+  },
+  "construction_weights": {
+    "light": 2,
+    "balanced": 4,
+    "cushioned": 3,
+    "structured": 3
+  },
+  "construction_packages": {
+    "light": {
+      "cushioning": "light",
+      "footbed": "flat foam footbed",
+      "sole_structure": "flexible"
+    },
+    "balanced": {
+      "cushioning": "moderate",
+      "footbed": "gently contoured foam footbed",
+      "sole_structure": "moderately flexible"
+    },
+    "cushioned": {
+      "cushioning": "substantial",
+      "footbed": "thick foam footbed",
+      "sole_structure": "moderately flexible"
+    },
+    "structured": {
+      "cushioning": "moderate",
+      "footbed": "contoured foam footbed",
+      "sole_structure": "firm"
+    }
+  },
+  "emphasis_multipliers": {
+    "cushioning": {
+      "construction": {
+        "light": 0.4,
+        "balanced": 1,
+        "cushioned": 3,
+        "structured": 0.8
+      },
+      "tread": {
+        "shallow": 1.4,
+        "moderate": 1,
+        "pronounced": 0.6
+      }
+    },
+    "lightness": {
+      "construction": {
+        "light": 3,
+        "balanced": 1.2,
+        "cushioned": 0.6,
+        "structured": 0.4
+      },
+      "material": {
+        "mesh and synthetic panels": 1.8,
+        "woven synthetic fabric": 1.5,
+        "leather": 0.5
+      },
+      "tread": {
+        "shallow": 1.5,
+        "moderate": 1,
+        "pronounced": 0.5
+      }
+    },
+    "support": {
+      "construction": {
+        "light": 0.4,
+        "balanced": 1,
+        "cushioned": 0.8,
+        "structured": 3
+      },
+      "tread": {
+        "shallow": 0.6,
+        "moderate": 1.5,
+        "pronounced": 1.3
+      }
+    }
+  },
+  "positioning_multipliers": {
+    "budget": {
+      "material": {
+        "mesh and synthetic panels": 1,
+        "woven synthetic fabric": 1.6,
+        "leather": 0.6
+      }
+    },
+    "mainstream": {
+      "material": {
+        "mesh and synthetic panels": 1,
+        "woven synthetic fabric": 1,
+        "leather": 1
+      }
+    },
+    "premium": {
+      "material": {
+        "mesh and synthetic panels": 1.2,
+        "woven synthetic fabric": 0.9,
+        "leather": 1.6
+      }
+    }
+  },
+  "tread_weights": {
+    "shallow": 4,
+    "moderate": 4,
+    "pronounced": 2
+  },
+  "colours": [
+    "black",
+    "navy",
+    "brown",
+    "olive",
+    "stone",
+    "white",
+    "grey",
+    "burgundy",
+    "blue",
+    "pink"
+  ],
+  "sizes_eu": [
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44
+  ],
+  "retailer_carry_probability": 0.65,
+  "stockout_probability": 0.22,
+  "review_length_weights": {
+    "1": 4,
+    "2": 3,
+    "3": 2,
+    "4": 1
+  },
+  "execution_range": [
+    0.1,
+    0.9
+  ],
+  "reviewer_spread": 0.22,
+  "rating_concentration": 1.5,
+  "execution_to_review": {
+    "comfort_match_bonus": 0.08,
+    "value_price_penalty": 0.2
+  },
+  "notes": [
+    "Illustrative synthetic weights, not estimated market frequencies or claims about material quality.",
+    "Effective weights are base times applicable emphasis and positioning multipliers, normalised over valid options.",
+    "Hard concept eligibility is applied before weights. Named streams keep unrelated draws independent.",
+    "Leather bias is an editable first positioning example, not a general quality rule; synthetic premium products remain possible.",
+    "Packages express coherent construction combinations, not a new product hierarchy or guaranteed performance.",
+    "Size, colour and width are canonical SKU identity here; sandal widths get separate retailer pages.",
+    "Execution is independent of brand/positioning/emphasis and shared across a product's SKUs. Review fit and experience vary by person.",
+    "Reference prices are authored SEK ranges. Review value uses the recorded purchase price; no current cheapest-retailer claim is implied.",
+    "Manufactured widths are drawn as a joint set with regular (canonical standard) always present. Regular-only is most likely; wide and narrow availability are positively correlated.",
+    "Draw one to four colours, then weighted distinct colours without replacement. Palette weights depend on concept, not positioning, emphasis or material."
+  ],
+  "topic_selection": {
+    "base_weights": {
+      "walking_comfort": 1.3
+    }
+  },
+  "review_site": {},
+  "review_topic_rules": [
+    {
+      "id": "cushioning_long_walks",
+      "emphasis": "cushioning",
+      "when": {
+        "cushioning": [
+          "substantial"
+        ]
+      },
+      "multipliers": {
+        "walking_comfort": 1.3
+      }
+    },
+    {
+      "id": "light_flexible_walks",
+      "emphasis": "lightness",
+      "when": {
+        "sole_structure": [
+          "flexible"
+        ]
+      },
+      "multipliers": {
+        "walking_comfort": 1.2
+      }
+    },
+    {
+      "id": "structured_fit",
+      "emphasis": "support",
+      "when": {
+        "sole_structure": [
+          "firm"
+        ]
+      },
+      "multipliers": {
+        "forefoot_room": 1.25,
+        "heel_rubbing": 1.25
+      }
+    }
+  ],
+  "width_sets": {
+    "regular_only": [
+      "standard"
+    ],
+    "regular_wide": [
+      "standard",
+      "wide"
+    ],
+    "regular_narrow": [
+      "standard",
+      "narrow"
+    ],
+    "regular_narrow_wide": [
+      "standard",
+      "narrow",
+      "wide"
+    ]
+  },
+  "colour_count_weights": {
+    "1": 25,
+    "2": 40,
+    "3": 25,
+    "4": 10
+  },
+  "size_ranges": {
+    "38_42": [
+      38,
+      39,
+      40,
+      41,
+      42
+    ],
+    "39_44": [
+      39,
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "38_44": [
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44
+    ]
+  },
+  "size_range_weights": {
+    "38_42": 1,
+    "39_44": 1,
+    "38_44": 1
+  },
+  "extra_width_colour_weights": {
+    "all": 60,
+    "subset": 40
+  },
+  "variant_size_weights": {
+    "full": 75,
+    "subrange": 20,
+    "alternating": 5
+  },
+  "brand_fit_weights": {
+    "true_to_size": 70,
+    "runs_small": 15,
+    "runs_large": 15
+  },
+  "brand_fit_offsets_eu": {
+    "true_to_size": 0,
+    "runs_small": -0.5,
+    "runs_large": 0.5
+  },
+  "fit_notice_probability": 0.5,
+  "brand_sampling": {
+    "schema_version": "brand-scopes-v1",
+    "diversity_strength": 0.5,
+    "scopes": {
+      "footwear": {
+        "names": [
+          "Myrvik",
+          "Norrdal",
+          "Aspvik",
+          "Lindero",
+          "Sundmark",
+          "Vallheden",
+          "Granvik",
+          "Almheden",
+          "Linddal",
+          "Hedmark",
+          "Bergliden",
+          "Tallback"
+        ],
+        "concepts": [
+          "walking_shoes",
+          "walking_sandals"
+        ],
+        "positioning_weights": {
+          "budget_led": 1,
+          "mainstream_led": 1,
+          "premium_led": 1
+        },
+        "positioning_profiles": {
+          "budget_led": {
+            "budget": 7,
+            "mainstream": 3,
+            "premium": 1
+          },
+          "mainstream_led": {
+            "budget": 2,
+            "mainstream": 7,
+            "premium": 2
+          },
+          "premium_led": {
+            "budget": 1,
+            "mainstream": 3,
+            "premium": 7
+          }
+        },
+        "emphasis_weights": {
+          "broad": 3,
+          "cushioning_led": 2,
+          "lightness_led": 2,
+          "support_led": 2
+        },
+        "emphasis_profiles": {
+          "broad": {
+            "cushioning": 1,
+            "lightness": 1,
+            "support": 1
+          },
+          "cushioning_led": {
+            "cushioning": 6,
+            "lightness": 2,
+            "support": 2
+          },
+          "lightness_led": {
+            "cushioning": 2,
+            "lightness": 6,
+            "support": 2
+          },
+          "support_led": {
+            "cushioning": 2,
+            "lightness": 2,
+            "support": 6
+          }
+        }
+      }
+    }
+  },
+  "product_names": {
+    "schema_version": "neutral-product-names-v1",
+    "reuse_penalty": 1,
+    "names": [
+      "Vika",
+      "Lunden",
+      "Runda",
+      "Strand",
+      "Alva",
+      "Tova",
+      "Nela",
+      "Vela",
+      "Mira",
+      "Sola",
+      "Aven",
+      "Elva",
+      "Luma",
+      "Nora",
+      "Onda",
+      "Riva",
+      "Sira",
+      "Tera",
+      "Vara",
+      "Ylva",
+      "Alda",
+      "Eira",
+      "Ivalo",
+      "Kora",
+      "Liva",
+      "Mela",
+      "Niva",
+      "Orla",
+      "Rona",
+      "Sava",
+      "Tula",
+      "Vilo"
+    ]
+  }
+}

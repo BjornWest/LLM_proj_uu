@@ -1,0 +1,1231 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.walking_shoes",
+  "random_namespace": "footwear-context-pilot-v1",
+  "status": "ported_reference_not_live_runtime",
+  "fields": {
+    "brand.brand_id": {
+      "type": "string",
+      "input": true
+    },
+    "brand.positioning_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.emphasis_weights": {
+      "type": "object",
+      "input": true
+    },
+    "brand.eligible_concepts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "input": true
+    },
+    "product.product_id": {
+      "type": "string",
+      "input": true
+    },
+    "profile.positioning": {
+      "type": "enum",
+      "values": [
+        "budget",
+        "mainstream",
+        "premium"
+      ]
+    },
+    "profile.emphasis": {
+      "type": "enum",
+      "values": [
+        "cushioning",
+        "lightness",
+        "support"
+      ]
+    },
+    "profile.execution": {
+      "type": "number",
+      "min": 0,
+      "max": 1
+    },
+    "internal.construction": {
+      "type": "object",
+      "properties": {
+        "cushioning": {
+          "type": "string"
+        },
+        "footbed": {
+          "type": "string"
+        },
+        "sole_structure": {
+          "type": "string"
+        },
+        "base_mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.cushioning": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "cushioning"
+      }
+    },
+    "product.facts.footbed": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "footbed"
+      }
+    },
+    "product.facts.sole_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "sole_structure"
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "enclosed shoe",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "construction"
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "closed_heel"
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "everyday walking",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "intended_use"
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one item, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "mass_basis"
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "waterproof_rating"
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "enum",
+      "values": [
+        "mesh and synthetic panels",
+        "woven synthetic fabric",
+        "leather"
+      ]
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "string",
+      "constant": "rubber"
+    },
+    "product.facts.fastening": {
+      "type": "enum",
+      "values": [
+        "laces",
+        "hook-and-loop straps",
+        "slip-on opening"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "fastening"
+      }
+    },
+    "product.facts.sole_tread": {
+      "type": "enum",
+      "values": [
+        "shallow",
+        "moderate",
+        "pronounced"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "sole_tread"
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ],
+        "policy_key": "reference_mass_g"
+      }
+    },
+    "product.widths": {
+      "type": "array",
+      "items": {
+        "type": "enum",
+        "values": [
+          "standard",
+          "narrow",
+          "wide"
+        ]
+      },
+      "min_items": 1
+    },
+    "product.colours": {
+      "type": "set",
+      "items": {
+        "type": "enum",
+        "values": [
+          "black",
+          "navy",
+          "brown",
+          "olive",
+          "stone",
+          "white",
+          "grey",
+          "burgundy",
+          "blue",
+          "pink"
+        ]
+      },
+      "min_items": 1
+    },
+    "product.sizes_eu": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "min_items": 1
+    },
+    "group.width": {
+      "type": "enum",
+      "values": [
+        "standard",
+        "narrow",
+        "wide"
+      ]
+    },
+    "group.colour_mode": {
+      "type": "enum",
+      "values": [
+        "all",
+        "subset"
+      ]
+    },
+    "group.colour_count": {
+      "type": "integer"
+    },
+    "group.colours": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      }
+    },
+    "group.colour": {
+      "type": "string"
+    },
+    "group.size_mode": {
+      "type": "enum",
+      "values": [
+        "full",
+        "subrange",
+        "alternating"
+      ]
+    },
+    "group.sizes": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "min_items": 1
+    },
+    "group.size": {
+      "type": "integer"
+    },
+    "product.skus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sku_id": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "width": {
+            "type": "string"
+          },
+          "size_eu": {
+            "type": "integer"
+          }
+        }
+      },
+      "min_items": 1
+    },
+    "product.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "review.usual_size_eu": {
+      "type": "number",
+      "optional": true
+    },
+    "sku.size_eu": {
+      "type": "integer",
+      "retail_presentation": {
+        "allowed": [
+          "selector"
+        ],
+        "policy_key": "size_eu"
+      }
+    },
+    "sku.colour": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "colour"
+      }
+    },
+    "sku.width": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "selector",
+          "separate_page"
+        ],
+        "policy_key": "width"
+      }
+    },
+    "product.name": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "positioning",
+      "target": "profile.positioning",
+      "sample": "weighted_choice",
+      "weights_from": "brand.positioning_weights",
+      "stream": "product/walking_shoes/positioning"
+    },
+    {
+      "id": "emphasis",
+      "target": "profile.emphasis",
+      "sample": "weighted_choice",
+      "weights_from": "brand.emphasis_weights",
+      "stream": "product/walking_shoes/emphasis"
+    },
+    {
+      "id": "execution",
+      "target": "profile.execution",
+      "sample": "uniform",
+      "min": 0.1,
+      "max": 0.9,
+      "stream": "product/walking_shoes/execution"
+    },
+    {
+      "id": "construction",
+      "target": "internal.construction",
+      "sample": "weighted_choice",
+      "weights": {
+        "light": 2,
+        "balanced": 4,
+        "cushioned": 3,
+        "structured": 3
+      },
+      "values": {
+        "light": {
+          "cushioning": "light",
+          "footbed": "flat foam footbed",
+          "sole_structure": "flexible",
+          "base_mass_g": 240
+        },
+        "balanced": {
+          "cushioning": "moderate",
+          "footbed": "gently contoured foam footbed",
+          "sole_structure": "moderately flexible",
+          "base_mass_g": 290
+        },
+        "cushioned": {
+          "cushioning": "substantial",
+          "footbed": "thick foam footbed",
+          "sole_structure": "moderately flexible",
+          "base_mass_g": 310
+        },
+        "structured": {
+          "cushioning": "moderate",
+          "footbed": "contoured foam footbed",
+          "sole_structure": "firm",
+          "base_mass_g": 360
+        }
+      },
+      "adjustments": [
+        {
+          "when": "profile.emphasis == 'cushioning'",
+          "multiply": {
+            "light": 0.4,
+            "balanced": 1,
+            "cushioned": 3,
+            "structured": 0.8
+          }
+        },
+        {
+          "when": "profile.emphasis == 'lightness'",
+          "multiply": {
+            "light": 3,
+            "balanced": 1.2,
+            "cushioned": 0.6,
+            "structured": 0.4
+          }
+        },
+        {
+          "when": "profile.emphasis == 'support'",
+          "multiply": {
+            "light": 0.4,
+            "balanced": 1,
+            "cushioned": 0.8,
+            "structured": 3
+          }
+        }
+      ],
+      "stream": "product/walking_shoes/construction"
+    },
+    {
+      "id": "cushioning",
+      "target": "product.facts.cushioning",
+      "derive": "internal.construction.cushioning"
+    },
+    {
+      "id": "footbed",
+      "target": "product.facts.footbed",
+      "derive": "internal.construction.footbed"
+    },
+    {
+      "id": "sole_structure",
+      "target": "product.facts.sole_structure",
+      "derive": "internal.construction.sole_structure"
+    },
+    {
+      "id": "material",
+      "target": "product.facts.component_materials.upper",
+      "sample": "weighted_choice",
+      "weights": {
+        "mesh and synthetic panels": 4,
+        "woven synthetic fabric": 3,
+        "leather": 3
+      },
+      "adjustments": [
+        {
+          "when": "profile.emphasis == 'lightness'",
+          "multiply": {
+            "mesh and synthetic panels": 1.8,
+            "woven synthetic fabric": 1.5,
+            "leather": 0.5
+          }
+        },
+        {
+          "when": "profile.positioning == 'budget'",
+          "multiply": {
+            "mesh and synthetic panels": 1,
+            "woven synthetic fabric": 1.6,
+            "leather": 0.6
+          }
+        },
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "multiply": {
+            "mesh and synthetic panels": 1,
+            "woven synthetic fabric": 1,
+            "leather": 1
+          }
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "multiply": {
+            "mesh and synthetic panels": 1.2,
+            "woven synthetic fabric": 0.9,
+            "leather": 1.6
+          }
+        }
+      ],
+      "stream": "product/walking_shoes/material"
+    },
+    {
+      "id": "fastening",
+      "target": "product.facts.fastening",
+      "sample": "weighted_choice",
+      "weights": {
+        "laces": 7,
+        "hook-and-loop straps": 2,
+        "slip-on opening": 1
+      },
+      "adjustments": [],
+      "stream": "product/walking_shoes/fastening"
+    },
+    {
+      "id": "sole_tread",
+      "target": "product.facts.sole_tread",
+      "sample": "weighted_choice",
+      "weights": {
+        "shallow": 4,
+        "moderate": 4,
+        "pronounced": 2
+      },
+      "adjustments": [
+        {
+          "when": "profile.emphasis == 'cushioning'",
+          "multiply": {
+            "shallow": 1.4,
+            "moderate": 1,
+            "pronounced": 0.6
+          }
+        },
+        {
+          "when": "profile.emphasis == 'lightness'",
+          "multiply": {
+            "shallow": 1.5,
+            "moderate": 1,
+            "pronounced": 0.5
+          }
+        },
+        {
+          "when": "profile.emphasis == 'support'",
+          "multiply": {
+            "shallow": 0.6,
+            "moderate": 1.5,
+            "pronounced": 1.3
+          }
+        }
+      ],
+      "stream": "product/walking_shoes/tread"
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -15,
+      "max": 15,
+      "stream": "product/walking_shoes/mass"
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.construction.base_mass_g + internal.mass_noise_g"
+    },
+    {
+      "id": "width_set",
+      "target": "product.widths",
+      "sample": "weighted_choice",
+      "weights": {
+        "regular_only": 50,
+        "regular_wide": 20,
+        "regular_narrow": 10,
+        "regular_narrow_wide": 20
+      },
+      "values": {
+        "regular_only": [
+          "standard"
+        ],
+        "regular_wide": [
+          "standard",
+          "wide"
+        ],
+        "regular_narrow": [
+          "standard",
+          "narrow"
+        ],
+        "regular_narrow_wide": [
+          "standard",
+          "narrow",
+          "wide"
+        ]
+      },
+      "stream": "product/walking_shoes/width_set"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 5,
+        "navy": 3,
+        "brown": 2,
+        "olive": 2,
+        "stone": 3,
+        "white": 3,
+        "grey": 3,
+        "burgundy": 1,
+        "blue": 2,
+        "pink": 1
+      },
+      "count_weights": {
+        "1": 25,
+        "2": 40,
+        "3": 25,
+        "4": 10
+      },
+      "streams": {
+        "count": "product/walking_shoes/colour_count",
+        "item": "product/walking_shoes/colour_{index}"
+      }
+    },
+    {
+      "id": "size_range",
+      "target": "product.sizes_eu",
+      "sample": "weighted_choice",
+      "weights": {
+        "38_42": 1,
+        "39_44": 1,
+        "38_44": 1
+      },
+      "values": {
+        "38_42": [
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "39_44": [
+          39,
+          40,
+          41,
+          42,
+          43,
+          44
+        ],
+        "38_44": [
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44
+        ]
+      },
+      "stream": "product/walking_shoes/size_range"
+    },
+    {
+      "id": "width_groups",
+      "for_each": {
+        "binding": "group.width",
+        "from": "product.widths"
+      },
+      "steps": [
+        {
+          "id": "width_colour_mode",
+          "target": "group.colour_mode",
+          "sample": "weighted_choice",
+          "weights": {
+            "all": 1,
+            "subset": 0
+          },
+          "cases": [
+            {
+              "when": "group.width != 'standard'",
+              "weights": {
+                "all": 60,
+                "subset": 40
+              }
+            }
+          ],
+          "stream": "product/walking_shoes/colour_coverage/{width}"
+        },
+        {
+          "id": "width_colour_count",
+          "target": "group.colour_count",
+          "sample": "uniform_int",
+          "min": "len(product.colours)",
+          "max": "len(product.colours)",
+          "cases": [
+            {
+              "when": "group.colour_mode == 'subset' and len(product.colours) > 1",
+              "min": 1,
+              "max": "len(product.colours) - 1"
+            }
+          ],
+          "stream": "product/walking_shoes/colour_subset_count/{width}"
+        },
+        {
+          "id": "width_colours",
+          "target": "group.colours",
+          "sample": "weighted_subset",
+          "weights": {
+            "black": 5,
+            "navy": 3,
+            "brown": 2,
+            "olive": 2,
+            "stone": 3,
+            "white": 3,
+            "grey": 3,
+            "burgundy": 1,
+            "blue": 2,
+            "pink": 1
+          },
+          "eligible_from": "product.colours",
+          "count_from": "group.colour_count",
+          "streams": {
+            "item": "product/walking_shoes/colour_subset/{width}/{index}"
+          }
+        },
+        {
+          "id": "colour_groups",
+          "for_each": {
+            "binding": "group.colour",
+            "from": "group.colours"
+          },
+          "steps": [
+            {
+              "id": "size_mode",
+              "target": "group.size_mode",
+              "sample": "weighted_choice",
+              "weights": {
+                "full": 75,
+                "subrange": 20,
+                "alternating": 5
+              },
+              "stream": "product/walking_shoes/sizes/{colour}/{width}/mode"
+            },
+            {
+              "id": "size_coverage",
+              "target": "group.sizes",
+              "sample": "uniform_choice",
+              "values_from": "coverage_groups(product.sizes_eu, group.size_mode)",
+              "stream": "product/walking_shoes/sizes/{colour}/{width}/coverage"
+            },
+            {
+              "id": "sku_sizes",
+              "for_each": {
+                "binding": "group.size",
+                "from": "group.sizes"
+              },
+              "steps": [
+                {
+                  "id": "skus",
+                  "target": "product.skus",
+                  "emit": {
+                    "sku_id": "product.product_id + '-' + group.colour + '-' + group.width + '-' + str(group.size)",
+                    "product_id": "product.product_id",
+                    "colour": "group.colour",
+                    "width": "group.width",
+                    "size_eu": "group.size"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 450,
+      "max": 950,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 850,
+          "max": 1600
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1400,
+          "max": 2400
+        }
+      ],
+      "stream": "product/walking_shoes/price"
+    }
+  ],
+  "language": [
+    {
+      "id": "walking_comfort/positive",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "walking_comfort",
+        "polarity": "positive",
+        "stance": "positive",
+        "context": {
+          "activity": "walking around town",
+          "duration": "several hours",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "Walked around town all afternoon and my feet were still comfortable.",
+        "Several hours of sightseeing in these, with no aching feet afterwards.",
+        "Comfortable right through a long walk around town.",
+        "My feet felt fine after an afternoon spent walking from place to place."
+      ]
+    },
+    {
+      "id": "walking_comfort/negative",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "walking_comfort",
+        "polarity": "negative",
+        "stance": "negative",
+        "context": {
+          "activity": "walking around town",
+          "duration": "several hours",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "My feet were aching by the end of an afternoon walking around town.",
+        "A few hours of sightseeing was enough to make me want to take these off.",
+        "Not comfortable for me on a long walk around town.",
+        "I regretted wearing these for a whole afternoon of walking."
+      ]
+    },
+    {
+      "id": "heel_rubbing/positive",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "heel_rubbing",
+        "polarity": "positive",
+        "stance": "positive",
+        "context": {
+          "activity": "walking",
+          "contact": "heel",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {
+        "heel_contact": "'back of the shoe'"
+      },
+      "formulations": [
+        "The {heel_contact} didn't rub while I was walking.",
+        "No rubbing from the {heel_contact} on my walks.",
+        "I was pleased that the {heel_contact} left my heels alone when walking.",
+        "The {heel_contact} has been comfortable against my heels on walks."
+      ]
+    },
+    {
+      "id": "heel_rubbing/negative",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "heel_rubbing",
+        "polarity": "negative",
+        "stance": "negative",
+        "context": {
+          "activity": "walking",
+          "contact": "heel",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {
+        "heel_contact": "'back of the shoe'"
+      },
+      "formulations": [
+        "The {heel_contact} rubbed my heels when I walked.",
+        "I kept noticing the {heel_contact} rubbing against my heels on walks.",
+        "The {heel_contact} left my heels sore after walking.",
+        "Rubbing from the {heel_contact} is my main complaint when walking in these."
+      ]
+    },
+    {
+      "id": "forefoot_room/positive",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "forefoot_room",
+        "polarity": "positive",
+        "stance": "positive",
+        "context": {
+          "activity": "wearing",
+          "body_region": "forefoot",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "Plenty of room across the front of my feet.",
+        "My toes don't feel squeezed together in these.",
+        "The fit across my forefoot works well for me.",
+        "There is enough space for my toes to spread out."
+      ]
+    },
+    {
+      "id": "forefoot_room/negative",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "forefoot_room",
+        "polarity": "negative",
+        "stance": "negative",
+        "context": {
+          "activity": "wearing",
+          "body_region": "forefoot",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "Too tight across the front of my feet.",
+        "My toes feel squeezed together in these.",
+        "The fit is cramped across my forefoot.",
+        "I wish there were more room for my toes."
+      ]
+    },
+    {
+      "id": "finish/positive",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "finish",
+        "polarity": "positive",
+        "stance": "positive",
+        "context": {
+          "activity": "examining purchased item",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "The finish looks neat up close.",
+        "Nicely finished, including the less obvious edges.",
+        "I couldn't spot any untidy finishing when I unpacked them.",
+        "The finish on my pair is tidy."
+      ]
+    },
+    {
+      "id": "finish/negative",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "finish",
+        "polarity": "negative",
+        "stance": "negative",
+        "context": {
+          "activity": "examining purchased item",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "The finishing looks rough up close.",
+        "Some untidy edges spoil the finish.",
+        "I noticed sloppy finishing as soon as I unpacked them.",
+        "My pair looks carelessly finished."
+      ]
+    },
+    {
+      "id": "wet_paving_grip/positive",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "wet_paving_grip",
+        "polarity": "positive",
+        "stance": "positive",
+        "context": {
+          "activity": "walking",
+          "surface": "wet paving",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "Felt secure underfoot on the wet paving outside my office.",
+        "I didn't slip while walking over wet paving.",
+        "The soles felt reassuring on wet pavement.",
+        "Walking across rain-soaked paving felt secure."
+      ]
+    },
+    {
+      "id": "wet_paving_grip/negative",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "wet_paving_grip",
+        "polarity": "negative",
+        "stance": "negative",
+        "context": {
+          "activity": "walking",
+          "surface": "wet paving",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "Slipped on the wet paving outside my office.",
+        "I had to tread carefully because they slid on wet paving.",
+        "The soles felt slippery on wet pavement.",
+        "Walking across rain-soaked paving felt unsteady because the soles slipped."
+      ]
+    },
+    {
+      "id": "value/positive",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "value",
+        "polarity": "positive",
+        "stance": "positive",
+        "context": {
+          "basis": "recorded purchase price",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "Good for the price.",
+        "Worth what I paid.",
+        "I feel I got my money's worth.",
+        "A good buy at the price I paid.",
+        "No regrets about what I spent on these."
+      ]
+    },
+    {
+      "id": "value/negative",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "value",
+        "polarity": "negative",
+        "stance": "negative",
+        "context": {
+          "basis": "recorded purchase price",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {},
+      "formulations": [
+        "Not worth what I paid.",
+        "Overpriced for what I got.",
+        "I expected more for my money.",
+        "The price is hard to justify.",
+        "I regret spending this much on them."
+      ]
+    },
+    {
+      "id": "size_fit/fits",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "size_fit",
+        "polarity": "positive",
+        "stance": "fits",
+        "context": {
+          "activity": "trying on purchased footwear",
+          "body_region": "foot length",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {
+        "purchased_size": "sku.size_eu",
+        "usual_size": "review.usual_size_eu"
+      },
+      "formulations": [
+        "I usually wear EU {usual_size:g}; the EU {purchased_size:g} pair fits me well in length.",
+        "EU {purchased_size:g} feels right lengthwise. My usual size is EU {usual_size:g}."
+      ]
+    },
+    {
+      "id": "size_fit/too_short",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "size_fit",
+        "polarity": "negative",
+        "stance": "too_short",
+        "context": {
+          "activity": "trying on purchased footwear",
+          "body_region": "foot length",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {
+        "purchased_size": "sku.size_eu",
+        "usual_size": "review.usual_size_eu"
+      },
+      "formulations": [
+        "I usually wear EU {usual_size:g}, but EU {purchased_size:g} felt too short for my feet.",
+        "Not enough length for me in EU {purchased_size:g}. I normally wear EU {usual_size:g}."
+      ]
+    },
+    {
+      "id": "size_fit/too_long",
+      "meaning": {
+        "kind": "customer_experience",
+        "aspect": "size_fit",
+        "polarity": "negative",
+        "stance": "too_long",
+        "context": {
+          "activity": "trying on purchased footwear",
+          "body_region": "foot length",
+          "source": "first_hand"
+        },
+        "source": "first_hand"
+      },
+      "slots": {
+        "purchased_size": "sku.size_eu",
+        "usual_size": "review.usual_size_eu"
+      },
+      "formulations": [
+        "I usually wear EU {usual_size:g}, but EU {purchased_size:g} left too much space in front of my toes.",
+        "EU {purchased_size:g} was too long for my feet; my usual size is EU {usual_size:g}."
+      ]
+    },
+    {
+      "id": "description/introduction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "name"
+        ],
+        "predicate": "product.facts.construction == 'enclosed shoe' and product.facts.closed_heel == True and product.facts.intended_use == 'everyday walking'"
+      },
+      "slots": {
+        "name": "product.name"
+      },
+      "formulations": [
+        "{name} is an enclosed walking shoe for everyday walking.",
+        "Designed for everyday walking, {name} has an enclosed construction and a closed heel."
+      ]
+    },
+    {
+      "id": "description/materials",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "facts.component_materials.upper"
+        ]
+      },
+      "slots": {
+        "material": "product.facts.component_materials.upper"
+      },
+      "formulations": [
+        "The upper is made from {material}.",
+        "This model uses {material} for the upper."
+      ]
+    },
+    {
+      "id": "description/construction_details",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "facts.fastening",
+          "facts.footbed",
+          "facts.cushioning"
+        ]
+      },
+      "slots": {
+        "fastening": "product.facts.fastening",
+        "footbed": "product.facts.footbed",
+        "cushioning": "product.facts.cushioning"
+      },
+      "formulations": [
+        "The design combines {fastening}, a {footbed} and {cushioning} cushioning.",
+        "It has {fastening} and a {footbed}, with {cushioning} cushioning."
+      ]
+    },
+    {
+      "id": "description/outsole",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "facts.component_materials.outsole",
+          "facts.sole_tread",
+          "facts.sole_structure"
+        ]
+      },
+      "slots": {
+        "material": "product.facts.component_materials.outsole",
+        "tread": "product.facts.sole_tread",
+        "structure": "product.facts.sole_structure"
+      },
+      "formulations": [
+        "The {material} outsole has a {tread} tread and a {structure} structure.",
+        "Underfoot, the {material} outsole combines a {tread} tread with a {structure} construction."
+      ]
+    },
+    {
+      "id": "description/reference_mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "facts.reference_mass_g"
+        ],
+        "predicate": "product.facts.mass_basis == 'one item, EU 40 reference configuration'"
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "The EU 40 reference configuration weighs {mass} g per shoe.",
+        "Reference weight: {mass} g for one shoe in EU 40."
+      ]
+    }
+  ],
+  "bindings": [],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'walking_shoes' in brand.eligible_concepts"
+    }
+  ],
+  "metadata": {
+    "source_spec": "/home/bjorn/code/LLM_proj_uu/environments/product_world/data/footwear_context_pilot/spec.json",
+    "execution_contract": "Independent of positioning/emphasis; existing rating and review-topic modules consume it.",
+    "variant_contract": "Same manufactured distributions; canonical unordered colour serialization can change exact variant outcomes for the same seed."
+  }
+}

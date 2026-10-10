@@ -1,0 +1,168 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "tool_power",
+  "review_id": "F52",
+  "label": "Tool batteries and chargers",
+  "section": "Tools and garden",
+  "store_type_ids": [
+    "tools"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Capacity and stored energy belong to batteries; charging channels/current to chargers. Same brand or nominal voltage does not establish platform compatibility; charge time depends on the battery/charger pair.",
+  "shared_dimension_ids": [
+    "compatible_platform",
+    "dimensions"
+  ],
+  "dimensions": [
+    {
+      "id": "compatible_platform",
+      "label": "Compatible platform",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "dimensions",
+      "label": "Dimensions",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "battery_capacity",
+      "label": "Battery capacity",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "Wh",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "voltage",
+      "label": "Voltage",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "V",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "charge_current",
+      "label": "Charge current",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "A",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "charging_channels",
+      "label": "Charging channels",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "plug_type",
+      "label": "Plug type",
+      "module_id": "power",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "tool_power.replacement_tool_batteries",
+      "label": "Replacement tool batteries",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "battery_capacity",
+        "voltage",
+        "pack_count"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "tool_power.compatible_tool_chargers",
+      "label": "Compatible tool chargers",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "charge_current",
+        "charging_channels",
+        "plug_type"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

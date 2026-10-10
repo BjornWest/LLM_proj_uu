@@ -1,0 +1,2960 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "toothbrushes.electric_toothbrushes",
+  "family_id": "toothbrushes",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/toothbrushes.electric_toothbrushes.json": "d2a92cadd77fd69898e802743c8fcb09f5a26632a550832a3c6b938d1d064091",
+    "environments/product_world/data/product_width/_toothbrushes_base.json": "b4814d3d5690b61db02d49e97c107f7c8f12b338c8cb3c52ca56b8cc4f247682",
+    "environments/product_world/data/product_public_content/toothbrushes.electric_toothbrushes.json": "a88d3f018bb934eb552abdb911a288d796102e4270faca0cd68b73eec64b4438"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Manual and electric brushes differ. Brush/bundle controls and head-platform compatibility remain explicit; no cleaning or dental outcome inference.",
+  "concept_note": "Publish compatibility exclusions with their supported platform when needed; do not use excluded platforms as highlights.",
+  "fields": {
+    "product.name": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.head_geometry": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.head_geometry",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "round",
+          "oval"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "head_geometry"
+    },
+    "sku.powered_motion": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.powered_motion",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "oscillating and rotating motion",
+          "side-to-side sonic motion"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "powered_motion"
+    },
+    "sku.bristle_firmness_label": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.bristle_firmness_label",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "soft"
+        ],
+        "optional": true,
+        "constant": "soft",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bristle_firmness_label"
+    },
+    "sku.compatible_head_platform": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.compatible_head_platform",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Round-R",
+          "Sonic-S"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "compatible_head_platform"
+    },
+    "sku.head_interface": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.head_interface",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "push-on"
+        ],
+        "optional": true,
+        "constant": "push-on",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "head_interface"
+    },
+    "sku.incompatible_head_platforms": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.incompatible_head_platforms",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "array",
+        "items": {
+          "type": "enum",
+          "values": [
+            "Sonic-S",
+            "Round-R"
+          ]
+        },
+        "min_items": 1,
+        "max_items": 1,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "incompatible_head_platforms"
+    },
+    "sku.grip_construction": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.grip_construction",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ABS with a thermoplastic-elastomer grip insert",
+          "smooth ABS without a grip insert"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "grip_construction"
+    },
+    "sku.modes_text": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.modes_text",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Daily and Gentle",
+          "Daily"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "modes_text"
+    },
+    "sku.nominal_timer_s": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.nominal_timer_s",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "s",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.nominal_timer_s_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_timer_s"
+    },
+    "sku.nominal_interval_cue_s": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.nominal_interval_cue_s",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "s",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.nominal_interval_cue_s_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_interval_cue_s"
+    },
+    "sku.pressure_feedback_response": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.pressure_feedback_response",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable: no pressure feedback",
+          "pulsing sound and automatic vibration reduction"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pressure_feedback_response"
+    },
+    "sku.pressure_threshold_n": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.pressure_threshold_n",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "N",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.pressure_threshold_n_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.battery_capacity_wh": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.battery_capacity_wh",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "Wh",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.battery_capacity_wh_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.runtime_per_charge_min": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.runtime_per_charge_min",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "min",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.runtime_per_charge_min_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.full_charge_time_h": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.full_charge_time_h",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "h",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.full_charge_time_h_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.charging_method": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.charging_method",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "inductive base with permanently attached USB-A lead"
+        ],
+        "optional": true,
+        "constant": "inductive base with permanently attached USB-A lead",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charging_method"
+    },
+    "sku.charger_input_voltage_v": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.charger_input_voltage_v",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "V",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.charger_input_voltage_v_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "charger_input_voltage_v"
+    },
+    "sku.charger_input_current_max_a": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.charger_input_current_max_a",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "A",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.charger_input_current_max_a_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "charger_input_current_max_a"
+    },
+    "sku.charger_label_power_max_w": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.charger_label_power_max_w",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "W",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.charger_label_power_max_w_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "charger_label_power_max_w"
+    },
+    "sku.actual_charging_power_w": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.actual_charging_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "W",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.actual_charging_power_w_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.mains_adapter_count": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_supplied_adapter"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_count"
+    },
+    "sku.mains_adapter_plug": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_plug",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "EU two-round-pin",
+          "not applicable: no mains adapter supplied"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_plug"
+    },
+    "sku.mains_adapter_input_voltage_min_v": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_input_voltage_min_v",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "V",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.mains_adapter_input_voltage_min_v_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_input_voltage_min_v"
+    },
+    "sku.mains_adapter_input_voltage_max_v": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_input_voltage_max_v",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "V",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.mains_adapter_input_voltage_max_v_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_input_voltage_max_v"
+    },
+    "sku.mains_adapter_input_frequency_min_hz": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_input_frequency_min_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "Hz",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.mains_adapter_input_frequency_min_hz_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_input_frequency_min_hz"
+    },
+    "sku.mains_adapter_input_frequency_max_hz": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_input_frequency_max_hz",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "Hz",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.mains_adapter_input_frequency_max_hz_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_input_frequency_max_hz"
+    },
+    "sku.mains_adapter_output_voltage_v": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_output_voltage_v",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "V",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.mains_adapter_output_voltage_v_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_output_voltage_v"
+    },
+    "sku.mains_adapter_output_current_max_a": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.mains_adapter_output_current_max_a",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "A",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.mains_adapter_output_current_max_a_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_output_current_max_a"
+    },
+    "sku.required_supply_interface": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.required_supply_interface",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "USB-A"
+        ],
+        "optional": true,
+        "constant": "USB-A",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "required_supply_interface"
+    },
+    "sku.required_supply_output_voltage_v": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.required_supply_output_voltage_v",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "V",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.required_supply_output_voltage_v_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "required_supply_output_voltage_v"
+    },
+    "sku.required_supply_output_min_current_a": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.required_supply_output_min_current_a",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "A",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.required_supply_output_min_current_a_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "required_supply_output_min_current_a"
+    },
+    "sku.total_head_count": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.total_head_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "total_head_count"
+    },
+    "sku.spare_head_count": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.spare_head_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "spare_head_count"
+    },
+    "sku.travel_case_count": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.travel_case_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_case"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "travel_case_count"
+    },
+    "sku.travel_case_colour": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.travel_case_colour",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable: no travel case supplied",
+          "white"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "travel_case_colour"
+    },
+    "sku.travel_case_material": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.travel_case_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable: no travel case supplied",
+          "polypropylene"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "travel_case_material"
+    },
+    "sku.travel_case_handle_capacity": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.travel_case_handle_capacity",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.travel_case_handle_capacity_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "travel_case_handle_capacity"
+    },
+    "sku.travel_case_detached_head_capacity": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.travel_case_detached_head_capacity",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.travel_case_detached_head_capacity_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "travel_case_detached_head_capacity"
+    },
+    "sku.reference_assembled_brush_length_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_assembled_brush_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_assembled_brush_length_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembled_brush_length_mm"
+    },
+    "sku.reference_handle_max_width_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_handle_max_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_handle_max_width_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_handle_max_width_mm"
+    },
+    "sku.reference_head_body_diameter_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_head_body_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_head_body_diameter_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_body_diameter_mm"
+    },
+    "sku.reference_bristle_projection_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_bristle_projection_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_bristle_projection_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_bristle_projection_mm"
+    },
+    "sku.reference_head_body_length_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_head_body_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_head_body_length_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_body_length_mm"
+    },
+    "sku.reference_head_body_width_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_head_body_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_head_body_width_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_body_width_mm"
+    },
+    "sku.reference_assembled_brush_mass_g": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_assembled_brush_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_assembled_brush_mass_g_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_assembled_brush_mass_g"
+    },
+    "sku.reference_head_mass_g": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_head_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_head_mass_g_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_head_mass_g"
+    },
+    "sku.reference_charging_assembly_mass_g": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_charging_assembly_mass_g",
+      "role": "descriptive",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_charging_assembly_mass_g_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_charging_assembly_mass_g"
+    },
+    "sku.reference_supplied_set_mass_g": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_supplied_set_mass_g",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_supplied_set_mass_g_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_supplied_set_mass_g"
+    },
+    "sku.reference_attached_lead_length_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_attached_lead_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.reference_attached_lead_length_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_attached_lead_length_mm"
+    },
+    "sku.actual_assembled_brush_length_mm": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.actual_assembled_brush_length_mm",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "mm",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.actual_assembled_brush_length_mm_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.actual_assembled_brush_mass_g": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.actual_assembled_brush_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "min": -2,
+        "max": 3000,
+        "unit": "g",
+        "unknown_values": [
+          -1,
+          -2
+        ],
+        "not_applicable_values": [
+          -2
+        ],
+        "optional": true,
+        "applicable_when": "sku.actual_assembled_brush_mass_g_status != 'not_applicable'"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.head_after_use_care": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.head_after_use_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "After brushing, switch off, remove and rinse the head and bristles under running water; leave the head off to air-dry."
+        ],
+        "optional": true,
+        "constant": "After brushing, switch off, remove and rinse the head and bristles under running water; leave the head off to air-dry.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "head_after_use_care"
+    },
+    "sku.handle_after_use_care": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.handle_after_use_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Wipe the handle and shaft with a damp cloth, then dry them with the head off."
+        ],
+        "optional": true,
+        "constant": "Wipe the handle and shaft with a damp cloth, then dry them with the head off.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handle_after_use_care"
+    },
+    "sku.charging_equipment_care": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.charging_equipment_care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Disconnect charging equipment from power before wiping it with a damp cloth; let it dry. Never immerse or dishwasher it."
+        ],
+        "optional": true,
+        "constant": "Disconnect charging equipment from power before wiping it with a damp cloth; let it dry. Never immerse or dishwasher it.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charging_equipment_care"
+    },
+    "sku.care_limits": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.care_limits",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "Do not immerse or dishwasher the handle or accessories. Do not share, heat or modify the brush; stop using visibly damaged parts."
+        ],
+        "optional": true,
+        "constant": "Do not immerse or dishwasher the handle or accessories. Do not share, heat or modify the brush; stop using visibly damaged parts.",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "care_limits"
+    },
+    "sku.travel_case_care": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.travel_case_care",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "not applicable: no travel case supplied",
+          "Wipe with a damp cloth and air-dry; store only dry parts."
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "travel_case_care"
+    },
+    "sku.bundle_label": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.bundle_label",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "starter set",
+          "travel set"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.colour": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "blue",
+          "white",
+          "black"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.semantic.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 200,
+        "max": 1600,
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "review.subject.bundle_label": {
+      "semantic_id": "toothbrushes.electric_toothbrushes.owner_bundle_label",
+      "role": "review_only",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {},
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "source_inherited": true,
+      "reason": "Review-context meaning; separate independent-source publication."
+    },
+    "sku.intended_user": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "adults"
+        ],
+        "optional": true,
+        "constant": "adults",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.ordinary_adult_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "ordinary powered toothbrushing"
+        ],
+        "optional": true,
+        "constant": "ordinary powered toothbrushing",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.ordinary_adult_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "sku.powered": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.powered_rechargeable_replaceable"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "powered"
+    },
+    "sku.rechargeable": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.battery_construction",
+        "toothbrushes.electric_toothbrushes.predicate.powered_rechargeable_replaceable"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rechargeable"
+    },
+    "sku.head_replaceable": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.powered_rechargeable_replaceable"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "head_replaceable"
+    },
+    "sku.head_body_material": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polypropylene"
+        ],
+        "optional": true,
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.head_materials"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "head_body_material"
+    },
+    "sku.bristle_material": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "polyamide"
+        ],
+        "optional": true,
+        "constant": "polyamide",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.head_materials"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bristle_material"
+    },
+    "sku.app_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_app_bluetooth_display"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "app_present"
+    },
+    "sku.bluetooth_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_app_bluetooth_display"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bluetooth_present"
+    },
+    "sku.display_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_app_bluetooth_display"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "display_present"
+    },
+    "sku.end_cue_present": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.round_end_cue_continues"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "end_cue_present"
+    },
+    "sku.automatic_stop_at_cycle_end": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.round_end_cue_continues",
+        "toothbrushes.electric_toothbrushes.predicate.sonic_cycle_stop"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "automatic_stop_at_cycle_end"
+    },
+    "sku.pressure_feedback_present": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_pressure_feedback",
+        "toothbrushes.electric_toothbrushes.predicate.pressure_feedback"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "pressure_feedback_present"
+    },
+    "sku.battery_count_per_handle": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.battery_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_count_per_handle"
+    },
+    "sku.battery_chemistry": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "lithium-ion"
+        ],
+        "optional": true,
+        "constant": "lithium-ion",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.battery_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_chemistry"
+    },
+    "sku.battery_user_replaceable": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.battery_construction"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_user_replaceable"
+    },
+    "sku.charging_lead_attached_permanently": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.fixed_charger_lead"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charging_lead_attached_permanently"
+    },
+    "sku.mains_adapter_present": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_supplied_adapter"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mains_adapter_present"
+    },
+    "sku.handle_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.handle_base_installed_counts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handle_count"
+    },
+    "sku.installed_head_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.handle_base_installed_counts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "installed_head_count"
+    },
+    "sku.charging_base_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.handle_base_installed_counts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charging_base_count"
+    },
+    "sku.attached_lead_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.handle_base_installed_counts"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "attached_lead_count"
+    },
+    "sku.separate_cable_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_loose_cable_paste_floss"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "separate_cable_count"
+    },
+    "sku.toothpaste_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_loose_cable_paste_floss"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "toothpaste_count"
+    },
+    "sku.floss_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "min": -2,
+        "max": 3000,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_loose_cable_paste_floss"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "floss_count"
+    },
+    "sku.travel_case_charging": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.case_not_charging_sanitising"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "travel_case_charging"
+    },
+    "sku.travel_case_sanitising": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.case_not_charging_sanitising"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "travel_case_sanitising"
+    },
+    "sku.travel_case_present": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "toothbrushes.electric_toothbrushes.predicate.no_case"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "travel_case_present"
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "round_daily",
+          "sonic_daily"
+        ]
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "head_geometry": {
+      "id": "toothbrushes.electric_toothbrushes.content.head_geometry",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_geometry"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "powered_motion": {
+      "id": "toothbrushes.electric_toothbrushes.content.powered_motion",
+      "display_group": "features",
+      "fields": [
+        "sku.powered_motion"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "bristle_firmness_label": {
+      "id": "toothbrushes.electric_toothbrushes.content.bristle_firmness_label",
+      "display_group": "features",
+      "fields": [
+        "sku.bristle_firmness_label"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "compatible_head_platform": {
+      "id": "toothbrushes.electric_toothbrushes.content.compatible_head_platform",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.compatible_head_platform"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "head_interface": {
+      "id": "toothbrushes.electric_toothbrushes.content.head_interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.head_interface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "incompatible_head_platforms": {
+      "id": "toothbrushes.electric_toothbrushes.content.incompatible_head_platforms",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.incompatible_head_platforms"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "grip_construction": {
+      "id": "toothbrushes.electric_toothbrushes.content.grip_construction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.grip_construction"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "modes_text": {
+      "id": "toothbrushes.electric_toothbrushes.content.modes_text",
+      "display_group": "features",
+      "fields": [
+        "sku.modes_text"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "nominal_timer_s": {
+      "id": "toothbrushes.electric_toothbrushes.content.nominal_timer_s",
+      "display_group": "features",
+      "fields": [
+        "sku.nominal_timer_s"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_interval_cue_s": {
+      "id": "toothbrushes.electric_toothbrushes.content.nominal_interval_cue_s",
+      "display_group": "features",
+      "fields": [
+        "sku.nominal_interval_cue_s"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pressure_feedback_response": {
+      "id": "toothbrushes.electric_toothbrushes.content.pressure_feedback_response",
+      "display_group": "features",
+      "fields": [
+        "sku.pressure_feedback_response"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charging_method": {
+      "id": "toothbrushes.electric_toothbrushes.content.charging_method",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.charging_method"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charger_input_voltage_v": {
+      "id": "toothbrushes.electric_toothbrushes.content.charger_input_voltage_v",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.charger_input_voltage_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charger_input_current_max_a": {
+      "id": "toothbrushes.electric_toothbrushes.content.charger_input_current_max_a",
+      "display_group": "features",
+      "fields": [
+        "sku.charger_input_current_max_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charger_label_power_max_w": {
+      "id": "toothbrushes.electric_toothbrushes.content.charger_label_power_max_w",
+      "display_group": "features",
+      "fields": [
+        "sku.charger_label_power_max_w"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_count",
+      "display_group": "features",
+      "fields": [
+        "sku.mains_adapter_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_plug": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_plug",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.mains_adapter_plug"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_input_voltage_min_v": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_input_voltage_min_v",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.mains_adapter_input_voltage_min_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_input_voltage_max_v": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_input_voltage_max_v",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.mains_adapter_input_voltage_max_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_input_frequency_min_hz": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_input_frequency_min_hz",
+      "display_group": "features",
+      "fields": [
+        "sku.mains_adapter_input_frequency_min_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_input_frequency_max_hz": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_input_frequency_max_hz",
+      "display_group": "features",
+      "fields": [
+        "sku.mains_adapter_input_frequency_max_hz"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_output_voltage_v": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_output_voltage_v",
+      "display_group": "features",
+      "fields": [
+        "sku.mains_adapter_output_voltage_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_output_current_max_a": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_output_current_max_a",
+      "display_group": "features",
+      "fields": [
+        "sku.mains_adapter_output_current_max_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "required_supply_interface": {
+      "id": "toothbrushes.electric_toothbrushes.content.required_supply_interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.required_supply_interface"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "required_supply_output_voltage_v": {
+      "id": "toothbrushes.electric_toothbrushes.content.required_supply_output_voltage_v",
+      "display_group": "features",
+      "fields": [
+        "sku.required_supply_output_voltage_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "required_supply_output_min_current_a": {
+      "id": "toothbrushes.electric_toothbrushes.content.required_supply_output_min_current_a",
+      "display_group": "features",
+      "fields": [
+        "sku.required_supply_output_min_current_a"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "total_head_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.total_head_count",
+      "display_group": "features",
+      "fields": [
+        "sku.total_head_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "spare_head_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.spare_head_count",
+      "display_group": "features",
+      "fields": [
+        "sku.spare_head_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_count",
+      "display_group": "features",
+      "fields": [
+        "sku.travel_case_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_colour": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_colour",
+      "display_group": "features",
+      "fields": [
+        "sku.travel_case_colour"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_material": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.travel_case_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_handle_capacity": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_handle_capacity",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.travel_case_handle_capacity"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_detached_head_capacity": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_detached_head_capacity",
+      "display_group": "features",
+      "fields": [
+        "sku.travel_case_detached_head_capacity"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembled_brush_length_mm": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_assembled_brush_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_assembled_brush_length_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_handle_max_width_mm": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_handle_max_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_handle_max_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_body_diameter_mm": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_head_body_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_body_diameter_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_bristle_projection_mm": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_bristle_projection_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.reference_bristle_projection_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_body_length_mm": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_head_body_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_body_length_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_body_width_mm": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_head_body_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_body_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_assembled_brush_mass_g": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_assembled_brush_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_assembled_brush_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_head_mass_g": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_head_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_head_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_charging_assembly_mass_g": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_charging_assembly_mass_g",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.reference_charging_assembly_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_supplied_set_mass_g": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_supplied_set_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_supplied_set_mass_g"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reference_attached_lead_length_mm": {
+      "id": "toothbrushes.electric_toothbrushes.content.reference_attached_lead_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.reference_attached_lead_length_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "head_after_use_care": {
+      "id": "toothbrushes.electric_toothbrushes.content.head_after_use_care",
+      "display_group": "care",
+      "fields": [
+        "sku.head_after_use_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_after_use_care": {
+      "id": "toothbrushes.electric_toothbrushes.content.handle_after_use_care",
+      "display_group": "care",
+      "fields": [
+        "sku.handle_after_use_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charging_equipment_care": {
+      "id": "toothbrushes.electric_toothbrushes.content.charging_equipment_care",
+      "display_group": "care",
+      "fields": [
+        "sku.charging_equipment_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_limits": {
+      "id": "toothbrushes.electric_toothbrushes.content.care_limits",
+      "display_group": "care",
+      "fields": [
+        "sku.care_limits"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_care": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_care",
+      "display_group": "care",
+      "fields": [
+        "sku.travel_case_care"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "powered": {
+      "id": "toothbrushes.electric_toothbrushes.content.powered",
+      "display_group": "features",
+      "fields": [
+        "sku.powered"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rechargeable": {
+      "id": "toothbrushes.electric_toothbrushes.content.rechargeable",
+      "display_group": "features",
+      "fields": [
+        "sku.rechargeable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "head_replaceable": {
+      "id": "toothbrushes.electric_toothbrushes.content.head_replaceable",
+      "display_group": "features",
+      "fields": [
+        "sku.head_replaceable"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "head_body_material": {
+      "id": "toothbrushes.electric_toothbrushes.content.head_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.head_body_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bristle_material": {
+      "id": "toothbrushes.electric_toothbrushes.content.bristle_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.bristle_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "app_present": {
+      "id": "toothbrushes.electric_toothbrushes.content.app_present",
+      "display_group": "features",
+      "fields": [
+        "sku.app_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth_present": {
+      "id": "toothbrushes.electric_toothbrushes.content.bluetooth_present",
+      "display_group": "features",
+      "fields": [
+        "sku.bluetooth_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "display_present": {
+      "id": "toothbrushes.electric_toothbrushes.content.display_present",
+      "display_group": "features",
+      "fields": [
+        "sku.display_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "end_cue_present": {
+      "id": "toothbrushes.electric_toothbrushes.content.end_cue_present",
+      "display_group": "features",
+      "fields": [
+        "sku.end_cue_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "automatic_stop_at_cycle_end": {
+      "id": "toothbrushes.electric_toothbrushes.content.automatic_stop_at_cycle_end",
+      "display_group": "features",
+      "fields": [
+        "sku.automatic_stop_at_cycle_end"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "pressure_feedback_present": {
+      "id": "toothbrushes.electric_toothbrushes.content.pressure_feedback_present",
+      "display_group": "features",
+      "fields": [
+        "sku.pressure_feedback_present"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "battery_count_per_handle": {
+      "id": "toothbrushes.electric_toothbrushes.content.battery_count_per_handle",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.battery_count_per_handle"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_chemistry": {
+      "id": "toothbrushes.electric_toothbrushes.content.battery_chemistry",
+      "display_group": "features",
+      "fields": [
+        "sku.battery_chemistry"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_user_replaceable": {
+      "id": "toothbrushes.electric_toothbrushes.content.battery_user_replaceable",
+      "display_group": "features",
+      "fields": [
+        "sku.battery_user_replaceable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charging_lead_attached_permanently": {
+      "id": "toothbrushes.electric_toothbrushes.content.charging_lead_attached_permanently",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.charging_lead_attached_permanently"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "mains_adapter_present": {
+      "id": "toothbrushes.electric_toothbrushes.content.mains_adapter_present",
+      "display_group": "features",
+      "fields": [
+        "sku.mains_adapter_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.handle_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.handle_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "installed_head_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.installed_head_count",
+      "display_group": "features",
+      "fields": [
+        "sku.installed_head_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charging_base_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.charging_base_count",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.charging_base_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "attached_lead_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.attached_lead_count",
+      "display_group": "features",
+      "fields": [
+        "sku.attached_lead_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "separate_cable_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.separate_cable_count",
+      "display_group": "features",
+      "fields": [
+        "sku.separate_cable_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "toothpaste_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.toothpaste_count",
+      "display_group": "features",
+      "fields": [
+        "sku.toothpaste_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "floss_count": {
+      "id": "toothbrushes.electric_toothbrushes.content.floss_count",
+      "display_group": "features",
+      "fields": [
+        "sku.floss_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_charging": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_charging",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "sku.travel_case_charging"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_sanitising": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_sanitising",
+      "display_group": "features",
+      "fields": [
+        "sku.travel_case_sanitising"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "travel_case_present": {
+      "id": "toothbrushes.electric_toothbrushes.content.travel_case_present",
+      "display_group": "features",
+      "fields": [
+        "sku.travel_case_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 90,
+    "roles": {
+      "identity": 3,
+      "descriptive": 46,
+      "literal": 29,
+      "omit_placeholder": 7,
+      "buying_choice": 2,
+      "commerce": 1,
+      "review_only": 1,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 8,
+    "unmapped_descriptive_fields": 26
+  }
+}

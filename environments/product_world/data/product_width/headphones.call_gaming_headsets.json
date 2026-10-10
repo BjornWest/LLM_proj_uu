@@ -1,0 +1,2213 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "headphones.call_gaming_headsets",
+  "random_namespace": "product-width-headphones.call_gaming_headsets-v1",
+  "extends": "_electronics_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "route": {
+          "type": "enum",
+          "values": [
+            "3.5mm analogue",
+            "USB audio",
+            "matching wireless receiver"
+          ]
+        },
+        "geometry": {
+          "type": "enum",
+          "values": [
+            "on-ear",
+            "over-ear"
+          ]
+        },
+        "channels": {
+          "type": "integer",
+          "min": 1,
+          "max": 2
+        }
+      }
+    },
+    "product.facts.primary_audio_route": {
+      "type": "enum",
+      "values": [
+        "3.5mm analogue",
+        "USB audio",
+        "matching wireless receiver"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wearing_geometry": {
+      "type": "enum",
+      "values": [
+        "on-ear",
+        "over-ear"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.channel_count": {
+      "type": "integer",
+      "min": 1,
+      "max": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.driver_diameter_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 40,
+      "max": 50,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.acoustic_back": {
+      "type": "string",
+      "constant": "closed",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.driver_design": {
+      "type": "string",
+      "constant": "dynamic",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.power_supply": {
+      "type": "enum",
+      "values": [
+        "passive analogue",
+        "USB host",
+        "rechargeable storage"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.storage_battery": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.headset_host_powered": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.receiver_host_powered": {
+      "type": "boolean",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usb_audio": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analogue_audio": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_audio": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_version": {
+      "type": "enum",
+      "values": [
+        "5.2",
+        "5.3"
+      ],
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_connector": {
+      "type": "enum",
+      "values": [
+        "4-pole 3.5mm CTIA",
+        "USB-A",
+        "USB-C"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_connection_component": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.microphone_supported_route": {
+      "type": "enum",
+      "values": [
+        "3.5mm analogue",
+        "USB audio",
+        "matching wireless receiver"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_microphone_routing": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.boom_removable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.boom_adjustable": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.volume_control": {
+      "type": "string",
+      "constant": "buttons",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.volume_location": {
+      "type": "enum",
+      "values": [
+        "inline control",
+        "ear cup"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mute_method": {
+      "type": "enum",
+      "values": [
+        "button",
+        "boom-lift"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mute_location": {
+      "type": "enum",
+      "values": [
+        "inline control",
+        "ear cup",
+        "boom"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mute_default_behavior": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.anc": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.simultaneous_audio_mixing": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.headset_charging_connector": {
+      "type": "string",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_music_receiver_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 15,
+      "max": 50,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_empty_charge_h": {
+      "type": "number",
+      "unit": "h",
+      "min": 2,
+      "max": 3,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.nominal_battery_energy": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.usable_battery_energy": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.battery_protocol": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.bluetooth_runtime": {
+      "type": "string",
+      "optional": true,
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.host_app_integration": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.acoustic_ip_latency_protocols": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_centre_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "internal.attached_boom_increment_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 100,
+      "max": 348,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one headset excluding cables, receiver, charger and removable boom; includes any non-removable boom",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.primary_audio_route": {
+      "type": "string",
+      "optional": true
+    },
+    "request.channel_count": {
+      "type": "integer",
+      "optional": true
+    },
+    "request.boom_removable": {
+      "type": "boolean",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "assembly",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "analogue": 2,
+        "usb_mono": 2,
+        "usb_stereo": 2,
+        "wireless": 3
+      },
+      "values": {
+        "analogue": {
+          "route": "3.5mm analogue",
+          "geometry": "over-ear",
+          "channels": 2
+        },
+        "usb_mono": {
+          "route": "USB audio",
+          "geometry": "on-ear",
+          "channels": 1
+        },
+        "usb_stereo": {
+          "route": "USB audio",
+          "geometry": "on-ear",
+          "channels": 2
+        },
+        "wireless": {
+          "route": "matching wireless receiver",
+          "geometry": "over-ear",
+          "channels": 2
+        }
+      }
+    },
+    {
+      "id": "primary_audio_route",
+      "target": "product.facts.primary_audio_route",
+      "derive": "internal.assembly.route"
+    },
+    {
+      "id": "wearing_geometry",
+      "target": "product.facts.wearing_geometry",
+      "derive": "internal.assembly.geometry"
+    },
+    {
+      "id": "channel_count",
+      "target": "product.facts.channel_count",
+      "derive": "internal.assembly.channels"
+    },
+    {
+      "id": "driver_diameter",
+      "target": "product.facts.driver_diameter_mm",
+      "sample": "weighted_choice",
+      "weights": {
+        "40": 1,
+        "50": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.wearing_geometry == 'over-ear'",
+          "weights": {
+            "40": 0,
+            "50": 1
+          }
+        }
+      ],
+      "values": {
+        "40": 40,
+        "50": 50
+      }
+    },
+    {
+      "id": "power_supply",
+      "target": "product.facts.power_supply",
+      "derive": "'passive analogue' if product.facts.primary_audio_route == '3.5mm analogue' else ('USB host' if product.facts.primary_audio_route == 'USB audio' else 'rechargeable storage')"
+    },
+    {
+      "id": "battery",
+      "target": "product.facts.storage_battery",
+      "derive": "product.facts.primary_audio_route == 'matching wireless receiver'"
+    },
+    {
+      "id": "host_supply",
+      "target": "product.facts.headset_host_powered",
+      "derive": "product.facts.primary_audio_route == 'USB audio'"
+    },
+    {
+      "id": "receiver_supply",
+      "target": "product.facts.receiver_host_powered",
+      "derive": "True",
+      "when": "product.facts.storage_battery"
+    },
+    {
+      "id": "usb_audio",
+      "target": "product.facts.usb_audio",
+      "derive": "product.facts.primary_audio_route == 'USB audio'"
+    },
+    {
+      "id": "analogue_audio",
+      "target": "product.facts.analogue_audio",
+      "derive": "product.facts.primary_audio_route == '3.5mm analogue'"
+    },
+    {
+      "id": "bluetooth",
+      "target": "product.facts.bluetooth_audio",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 0,
+        "no": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.storage_battery",
+          "weights": {
+            "yes": 2,
+            "no": 1
+          }
+        }
+      ],
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "bt_version",
+      "target": "product.facts.bluetooth_version",
+      "sample": "weighted_choice",
+      "weights": {
+        "5.2": 1,
+        "5.3": 1
+      },
+      "when": "product.facts.bluetooth_audio"
+    },
+    {
+      "id": "host_connector",
+      "target": "product.facts.host_connector",
+      "sample": "weighted_choice",
+      "weights": {
+        "4-pole 3.5mm CTIA": 1,
+        "USB-A": 0,
+        "USB-C": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.primary_audio_route != '3.5mm analogue'",
+          "weights": {
+            "4-pole 3.5mm CTIA": 0,
+            "USB-A": 1,
+            "USB-C": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "host_component",
+      "target": "product.facts.host_connection_component",
+      "derive": "'headset analogue plug' if product.facts.primary_audio_route == '3.5mm analogue' else ('headset USB-audio plug' if product.facts.primary_audio_route == 'USB audio' else 'matching wireless receiver')"
+    },
+    {
+      "id": "primary_mic",
+      "target": "product.facts.microphone_supported_route",
+      "derive": "product.facts.primary_audio_route"
+    },
+    {
+      "id": "bt_mic_unknown",
+      "target": "product.facts.bluetooth_microphone_routing",
+      "derive": "'not specified'",
+      "when": "product.facts.bluetooth_audio"
+    },
+    {
+      "id": "mic_attachment",
+      "target": "product.facts.boom_removable",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 2,
+        "no": 1
+      },
+      "cases": [
+        {
+          "when": "product.facts.primary_audio_route == 'USB audio'",
+          "weights": {
+            "yes": 1,
+            "no": 2
+          }
+        },
+        {
+          "when": "product.facts.storage_battery",
+          "weights": {
+            "yes": 1,
+            "no": 1
+          }
+        }
+      ],
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "volume_location",
+      "target": "product.facts.volume_location",
+      "derive": "'inline control' if product.facts.primary_audio_route == '3.5mm analogue' else 'ear cup'"
+    },
+    {
+      "id": "mute_method",
+      "target": "product.facts.mute_method",
+      "sample": "weighted_choice",
+      "weights": {
+        "button": 1,
+        "boom-lift": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.primary_audio_route == 'USB audio' and not product.facts.boom_removable",
+          "weights": {
+            "button": 1,
+            "boom-lift": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "mute_location",
+      "target": "product.facts.mute_location",
+      "derive": "'boom' if product.facts.mute_method == 'boom-lift' else product.facts.volume_location"
+    },
+    {
+      "id": "mute_behavior",
+      "target": "product.facts.mute_default_behavior",
+      "derive": "'raise boom to mute; lower boom to unmute on primary route' if product.facts.mute_method == 'boom-lift' else 'button toggles microphone mute on primary route'"
+    },
+    {
+      "id": "charge_connector",
+      "target": "product.facts.headset_charging_connector",
+      "derive": "'USB-C charging only, not USB audio'",
+      "when": "product.facts.storage_battery"
+    },
+    {
+      "id": "music_runtime",
+      "target": "product.facts.declared_music_receiver_h",
+      "sample": "weighted_choice",
+      "weights": {
+        "15": 1,
+        "30": 1,
+        "50": 1
+      },
+      "when": "product.facts.storage_battery",
+      "values": {
+        "15": 15,
+        "30": 30,
+        "50": 50
+      }
+    },
+    {
+      "id": "charge_hours",
+      "target": "product.facts.declared_empty_charge_h",
+      "sample": "weighted_choice",
+      "weights": {
+        "2": 1,
+        "3": 1
+      },
+      "when": "product.facts.storage_battery",
+      "values": {
+        "2": 2,
+        "3": 3
+      }
+    },
+    {
+      "id": "unknown_nominal_battery_energy",
+      "target": "product.facts.nominal_battery_energy",
+      "derive": "'not specified'",
+      "when": "product.facts.storage_battery"
+    },
+    {
+      "id": "unknown_usable_battery_energy",
+      "target": "product.facts.usable_battery_energy",
+      "derive": "'not specified'",
+      "when": "product.facts.storage_battery"
+    },
+    {
+      "id": "unknown_battery_protocol",
+      "target": "product.facts.battery_protocol",
+      "derive": "'not specified'",
+      "when": "product.facts.storage_battery"
+    },
+    {
+      "id": "bt_runtime",
+      "target": "product.facts.bluetooth_runtime",
+      "derive": "'not specified'",
+      "when": "product.facts.bluetooth_audio"
+    },
+    {
+      "id": "mass_centre",
+      "target": "internal.mass_centre_g",
+      "sample": "weighted_choice",
+      "weights": {
+        "analogue": 1,
+        "usb_mono": 0,
+        "usb_stereo": 0,
+        "wireless": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.primary_audio_route == 'USB audio' and product.facts.channel_count == 1",
+          "weights": {
+            "analogue": 0,
+            "usb_mono": 1,
+            "usb_stereo": 0,
+            "wireless": 0
+          }
+        },
+        {
+          "when": "product.facts.primary_audio_route == 'USB audio' and product.facts.channel_count == 2",
+          "weights": {
+            "analogue": 0,
+            "usb_mono": 0,
+            "usb_stereo": 1,
+            "wireless": 0
+          }
+        },
+        {
+          "when": "product.facts.storage_battery",
+          "weights": {
+            "analogue": 0,
+            "usb_mono": 0,
+            "usb_stereo": 0,
+            "wireless": 1
+          }
+        }
+      ],
+      "values": {
+        "analogue": 300,
+        "usb_mono": 110,
+        "usb_stereo": 190,
+        "wireless": 330
+      }
+    },
+    {
+      "id": "boom_mass",
+      "target": "internal.attached_boom_increment_g",
+      "sample": "weighted_choice",
+      "weights": {
+        "0": 1,
+        "8": 0
+      },
+      "cases": [
+        {
+          "when": "not product.facts.boom_removable",
+          "weights": {
+            "0": 0,
+            "8": 1
+          }
+        }
+      ],
+      "values": {
+        "0": 0,
+        "8": 8
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -10,
+      "max": 10
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.mass_centre_g + internal.attached_boom_increment_g + internal.mass_noise_g"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wearing_geometry",
+          "product.facts.channel_count",
+          "product.facts.acoustic_back",
+          "product.facts.driver_design",
+          "product.facts.driver_diameter_mm"
+        ]
+      },
+      "slots": {
+        "geometry": "product.facts.wearing_geometry",
+        "channels": "product.facts.channel_count",
+        "driver": "product.facts.driver_diameter_mm"
+      },
+      "formulations": [
+        "{geometry} closed dynamic headset, {channels} audio channel(s), {driver} mm drivers.",
+        "Closed dynamic {geometry} headset with {channels} channel(s) and {driver} mm drivers."
+      ]
+    },
+    {
+      "id": "description.route",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.primary_audio_route",
+          "product.facts.power_supply",
+          "product.facts.host_connector",
+          "product.facts.host_connection_component",
+          "product.facts.microphone_supported_route",
+          "product.facts.usb_audio",
+          "product.facts.analogue_audio",
+          "product.facts.anc",
+          "product.facts.simultaneous_audio_mixing"
+        ]
+      },
+      "slots": {
+        "route": "product.facts.primary_audio_route",
+        "power": "product.facts.power_supply",
+        "connector": "product.facts.host_connector",
+        "component": "product.facts.host_connection_component"
+      },
+      "formulations": [
+        "Primary audio/microphone route: {route}, via {component} ({connector}); headset supply {power}. No wearer ANC or simultaneous mixing in this recipe.",
+        "Headset power {power}; primary audio and microphone via {route}: {component}, {connector}. Wearer ANC and simultaneous audio mixing unsupported."
+      ]
+    },
+    {
+      "id": "description.mic_controls",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.boom_removable",
+          "product.facts.boom_adjustable",
+          "product.facts.volume_control",
+          "product.facts.volume_location",
+          "product.facts.mute_method",
+          "product.facts.mute_location",
+          "product.facts.mute_default_behavior"
+        ]
+      },
+      "slots": {
+        "attachment": "'removable' if product.facts.boom_removable else 'non-removable'",
+        "volume": "product.facts.volume_location",
+        "method": "product.facts.mute_method",
+        "location": "product.facts.mute_location",
+        "behavior": "product.facts.mute_default_behavior"
+      },
+      "formulations": [
+        "Supplied adjustable {attachment} boom. Volume buttons at {volume}; mute method {method} at {location}: {behavior}. No app-wide mute guarantee.",
+        "Microphone boom is adjustable and {attachment}. {volume} volume buttons; {location} mute via {method}, default {behavior}; application-wide mute not established."
+      ]
+    },
+    {
+      "id": "description.usb_host",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.headset_host_powered",
+          "product.facts.usb_audio",
+          "product.facts.storage_battery"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "USB audio headset powered by its compatible host, no storage battery or charging requirement.",
+        "USB host supplies the headset during USB audio; this template has no rechargeable battery."
+      ],
+      "when": "product.facts.headset_host_powered"
+    },
+    {
+      "id": "description.analogue",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.power_supply",
+          "product.facts.storage_battery",
+          "product.facts.analogue_audio"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Passive analogue headset, no storage battery; compatible4-pole CTIA audio/mic host required.",
+        "Analogue template needs a compatible CTIA headset host connection; no storage battery or charging."
+      ],
+      "when": "product.facts.analogue_audio"
+    },
+    {
+      "id": "description.wireless_power",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.receiver_host_powered",
+          "product.facts.headset_charging_connector",
+          "product.facts.declared_music_receiver_h",
+          "product.facts.declared_empty_charge_h",
+          "product.facts.nominal_battery_energy",
+          "product.facts.usable_battery_energy",
+          "product.facts.battery_protocol",
+          "product.facts.usb_audio",
+          "product.facts.analogue_audio"
+        ]
+      },
+      "slots": {
+        "music": "product.facts.declared_music_receiver_h",
+        "charge": "product.facts.declared_empty_charge_h"
+      },
+      "formulations": [
+        "Matching receiver takes host power; headset has rechargeable storage. Headset USB-C charges only, no USB or analogue audio. Declared receiver music up to {music} h per charge, empty charging {charge} h. Nominal/usable battery energy and protocol unspecified.",
+        "Host powers matching receiver, not the headset directly. Headset USB-C charging, not USB/analogue audio; rechargeable storage, receiver music maximum {music} h and empty-charge declaration {charge} h. Cell/usable energy and protocol unknown."
+      ],
+      "when": "product.facts.storage_battery"
+    },
+    {
+      "id": "description.bluetooth",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bluetooth_audio",
+          "product.facts.bluetooth_version",
+          "product.facts.bluetooth_microphone_routing",
+          "product.facts.bluetooth_runtime"
+        ]
+      },
+      "slots": {
+        "version": "product.facts.bluetooth_version"
+      },
+      "formulations": [
+        "Additional Bluetooth {version} audio; Bluetooth microphone routing and runtime unspecified.",
+        "Bluetooth {version} listening also supported; no specified Bluetooth mic route or battery-runtime declaration."
+      ],
+      "when": "product.facts.bluetooth_audio"
+    },
+    {
+      "id": "description.no_bluetooth",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.bluetooth_audio"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Bluetooth audio absent in this template.",
+        "No Bluetooth audio in this recipe."
+      ],
+      "when": "not product.facts.bluetooth_audio"
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "g": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "Reference headset mass {g} g excluding cables, receiver, charger and removable boom; includes any non-removable boom.",
+        "One headset {g} g without cables/receiver/charger or removable boom, including a non-removable boom if present."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.host_app_integration",
+          "product.facts.acoustic_ip_latency_protocols"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Host/application integration, quantified acoustic/IP/latency protocols unspecified.",
+        "No specified host/app integration certification or quantified acoustic, IP-protection or latency protocols."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'headphones.call_gaming_headsets' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "route",
+      "role": "filter",
+      "predicate": "product.facts.primary_audio_route == request.primary_audio_route",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "channels",
+      "role": "filter",
+      "predicate": "product.facts.channel_count == request.channel_count",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "mic_attachment",
+      "role": "filter",
+      "predicate": "product.facts.boom_removable == request.boom_removable",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "mic_attachment",
+              "bt_pairing",
+              "charge_handling"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 250,
+          "max": 4500
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 250
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 4500
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_wearing_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_incoming_spoken_clarity": {
+          "type": "boolean"
+        },
+        "review.positive_recorded_voice_preference": {
+          "type": "boolean"
+        },
+        "review.positive_host_connection": {
+          "type": "boolean"
+        },
+        "review.positive_volume_controls": {
+          "type": "boolean"
+        },
+        "review.positive_mute_controls": {
+          "type": "boolean"
+        },
+        "review.positive_mic_attachment": {
+          "type": "boolean"
+        },
+        "review.positive_bt_pairing": {
+          "type": "boolean"
+        },
+        "review.positive_charge_handling": {
+          "type": "boolean"
+        },
+        "product.facts.boom_removable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.bluetooth_audio": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.storage_battery": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.primary_audio_route": {
+          "type": "enum",
+          "values": [
+            "3.5mm analogue",
+            "USB audio",
+            "matching wireless receiver"
+          ],
+          "input": true
+        },
+        "product.facts.host_connection_component": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.host_connector": {
+          "type": "enum",
+          "values": [
+            "4-pole 3.5mm CTIA",
+            "USB-A",
+            "USB-C"
+          ],
+          "input": true
+        },
+        "product.facts.volume_location": {
+          "type": "enum",
+          "values": [
+            "inline control",
+            "ear cup"
+          ],
+          "input": true
+        },
+        "product.facts.mute_method": {
+          "type": "enum",
+          "values": [
+            "button",
+            "boom-lift"
+          ],
+          "input": true
+        },
+        "product.facts.mute_location": {
+          "type": "enum",
+          "values": [
+            "inline control",
+            "ear cup",
+            "boom"
+          ],
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "000": 1,
+            "001": 0,
+            "010": 0,
+            "011": 0,
+            "100": 0,
+            "101": 0,
+            "110": 0,
+            "111": 0
+          },
+          "cases": [
+            {
+              "when": "not product.facts.boom_removable and not product.facts.bluetooth_audio and not product.facts.storage_battery",
+              "weights": {
+                "000": 1,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "not product.facts.boom_removable and not product.facts.bluetooth_audio and product.facts.storage_battery",
+              "weights": {
+                "000": 0,
+                "001": 1,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "not product.facts.boom_removable and product.facts.bluetooth_audio and not product.facts.storage_battery",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 1,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "not product.facts.boom_removable and product.facts.bluetooth_audio and product.facts.storage_battery",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 1,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.boom_removable and not product.facts.bluetooth_audio and not product.facts.storage_battery",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 1,
+                "101": 0,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.boom_removable and not product.facts.bluetooth_audio and product.facts.storage_battery",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 1,
+                "110": 0,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.boom_removable and product.facts.bluetooth_audio and not product.facts.storage_battery",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 1,
+                "111": 0
+              }
+            },
+            {
+              "when": "product.facts.boom_removable and product.facts.bluetooth_audio and product.facts.storage_battery",
+              "weights": {
+                "000": 0,
+                "001": 0,
+                "010": 0,
+                "011": 0,
+                "100": 0,
+                "101": 0,
+                "110": 0,
+                "111": 1
+              }
+            }
+          ],
+          "values": {
+            "000": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls"
+            ],
+            "001": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "charge_handling"
+            ],
+            "010": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "bt_pairing"
+            ],
+            "011": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "bt_pairing",
+              "charge_handling"
+            ],
+            "100": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "mic_attachment"
+            ],
+            "101": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "mic_attachment",
+              "charge_handling"
+            ],
+            "110": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "mic_attachment",
+              "bt_pairing"
+            ],
+            "111": [
+              "value",
+              "wearing_comfort",
+              "incoming_spoken_clarity",
+              "recorded_voice_preference",
+              "host_connection",
+              "volume_controls",
+              "mute_controls",
+              "mic_attachment",
+              "bt_pairing",
+              "charge_handling"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_wearing_comfort",
+          "target": "review.positive_wearing_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_incoming_spoken_clarity",
+          "target": "review.positive_incoming_spoken_clarity",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_recorded_voice_preference",
+          "target": "review.positive_recorded_voice_preference",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_host_connection",
+          "target": "review.positive_host_connection",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_volume_controls",
+          "target": "review.positive_volume_controls",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_mute_controls",
+          "target": "review.positive_mute_controls",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_mic_attachment",
+          "target": "review.positive_mic_attachment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_bt_pairing",
+          "target": "review.positive_bt_pairing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_charge_handling",
+          "target": "review.positive_charge_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "wearing_comfort.positive",
+          "when": "'wearing_comfort' in review.topics and review.positive_wearing_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "wearing_comfort",
+            "polarity": "positive",
+            "context": {
+              "duration": "30 minutes",
+              "use": "seated at a desk",
+              "aspect": "wearing comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Wearing the headset felt comfortable over thirty minutes seated at my desk.",
+            "It was comfortable to wear for thirty minutes seated at my desk."
+          ]
+        },
+        {
+          "id": "wearing_comfort.negative",
+          "when": "'wearing_comfort' in review.topics and not review.positive_wearing_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "wearing_comfort",
+            "polarity": "negative",
+            "context": {
+              "duration": "30 minutes",
+              "use": "seated at a desk",
+              "aspect": "wearing comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Wearing the headset felt uncomfortable over thirty minutes seated at my desk.",
+            "It was uncomfortable to wear for thirty minutes seated at my desk."
+          ]
+        },
+        {
+          "id": "incoming_spoken_clarity.positive",
+          "when": "'incoming_spoken_clarity' in review.topics and review.positive_incoming_spoken_clarity",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "incoming_spoken_clarity",
+            "polarity": "positive",
+            "context": {
+              "audio": "familiar spoken audio",
+              "level": "usual comfortable listening level",
+              "environment": "quiet room",
+              "aspect": "perceived incoming spoken clarity"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Familiar spoken audio sounded clear to me at my usual comfortable level in a quiet room.",
+            "I perceived clear familiar spoken audio at my usual comfortable level in a quiet room."
+          ]
+        },
+        {
+          "id": "incoming_spoken_clarity.negative",
+          "when": "'incoming_spoken_clarity' in review.topics and not review.positive_incoming_spoken_clarity",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "incoming_spoken_clarity",
+            "polarity": "negative",
+            "context": {
+              "audio": "familiar spoken audio",
+              "level": "usual comfortable listening level",
+              "environment": "quiet room",
+              "aspect": "perceived incoming spoken clarity"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Familiar spoken audio sounded unclear to me at my usual comfortable level in a quiet room.",
+            "I perceived unclear familiar spoken audio at my usual comfortable level in a quiet room."
+          ]
+        },
+        {
+          "id": "recorded_voice_preference.positive",
+          "when": "'recorded_voice_preference' in review.topics and review.positive_recorded_voice_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "recorded_voice_preference",
+            "polarity": "positive",
+            "context": {
+              "use": "record same short script through supplied boom on primary route to compatible computer, then replay",
+              "aspect": "preference for own recorded voice"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked my recorded voice after speaking the same short script through the supplied boom via {route} to my compatible computer and replaying it.",
+            "After recording the same short script through the supplied boom via {route} to my compatible computer, I liked my voice on playback."
+          ],
+          "slots": {
+            "route": "product.facts.primary_audio_route"
+          }
+        },
+        {
+          "id": "recorded_voice_preference.negative",
+          "when": "'recorded_voice_preference' in review.topics and not review.positive_recorded_voice_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "recorded_voice_preference",
+            "polarity": "negative",
+            "context": {
+              "use": "record same short script through supplied boom on primary route to compatible computer, then replay",
+              "aspect": "preference for own recorded voice"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked my recorded voice after speaking the same short script through the supplied boom via {route} to my compatible computer and replaying it.",
+            "After recording the same short script through the supplied boom via {route} to my compatible computer, I disliked my voice on playback."
+          ],
+          "slots": {
+            "route": "product.facts.primary_audio_route"
+          }
+        },
+        {
+          "id": "host_connection.positive",
+          "when": "'host_connection' in review.topics and review.positive_host_connection",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "host_connection",
+            "polarity": "positive",
+            "context": "connecting and disconnecting the represented host plug/receiver to a compatible computer",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the {component} ({connector}) to my compatible computer was easy for me.",
+            "I found the {component} ({connector}) easy to connect to and disconnect from my compatible computer."
+          ],
+          "slots": {
+            "component": "product.facts.host_connection_component",
+            "connector": "product.facts.host_connector"
+          }
+        },
+        {
+          "id": "host_connection.negative",
+          "when": "'host_connection' in review.topics and not review.positive_host_connection",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "host_connection",
+            "polarity": "negative",
+            "context": "connecting and disconnecting the represented host plug/receiver to a compatible computer",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the {component} ({connector}) to my compatible computer was difficult for me.",
+            "I found the {component} ({connector}) difficult to connect to and disconnect from my compatible computer."
+          ],
+          "slots": {
+            "component": "product.facts.host_connection_component",
+            "connector": "product.facts.host_connector"
+          }
+        },
+        {
+          "id": "volume_controls.positive",
+          "when": "'volume_controls' in review.topics and review.positive_volume_controls",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "volume_controls",
+            "polarity": "positive",
+            "context": "operating represented volume buttons at actual location",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The {location} volume buttons were easy for me to operate.",
+            "I found the {location} volume buttons easy to operate."
+          ],
+          "slots": {
+            "location": "product.facts.volume_location"
+          }
+        },
+        {
+          "id": "volume_controls.negative",
+          "when": "'volume_controls' in review.topics and not review.positive_volume_controls",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "volume_controls",
+            "polarity": "negative",
+            "context": "operating represented volume buttons at actual location",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The {location} volume buttons were difficult for me to operate.",
+            "I found the {location} volume buttons difficult to operate."
+          ],
+          "slots": {
+            "location": "product.facts.volume_location"
+          }
+        },
+        {
+          "id": "mute_controls.positive",
+          "when": "'mute_controls' in review.topics and review.positive_mute_controls",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "mute_controls",
+            "polarity": "positive",
+            "context": "performing the represented default microphone mute control operation",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found {action} easy.",
+            "For me, {action} was easy."
+          ],
+          "slots": {
+            "action": "'raising the boom to mute and lowering it to unmute' if product.facts.mute_method == 'boom-lift' else 'pressing the ' + product.facts.mute_location + ' mute button'"
+          }
+        },
+        {
+          "id": "mute_controls.negative",
+          "when": "'mute_controls' in review.topics and not review.positive_mute_controls",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "mute_controls",
+            "polarity": "negative",
+            "context": "performing the represented default microphone mute control operation",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found {action} difficult.",
+            "For me, {action} was difficult."
+          ],
+          "slots": {
+            "action": "'raising the boom to mute and lowering it to unmute' if product.facts.mute_method == 'boom-lift' else 'pressing the ' + product.facts.mute_location + ' mute button'"
+          }
+        },
+        {
+          "id": "mic_attachment.positive",
+          "when": "'mic_attachment' in review.topics and review.positive_mic_attachment and product.facts.boom_removable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "mic_attachment",
+            "polarity": "positive",
+            "context": "attaching and removing the supplied removable boom microphone",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Attaching and removing the supplied removable boom microphone was easy for me.",
+            "I found the removable boom microphone easy to attach and remove."
+          ]
+        },
+        {
+          "id": "mic_attachment.negative",
+          "when": "'mic_attachment' in review.topics and not review.positive_mic_attachment and product.facts.boom_removable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "mic_attachment",
+            "polarity": "negative",
+            "context": "attaching and removing the supplied removable boom microphone",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Attaching and removing the supplied removable boom microphone was difficult for me.",
+            "I found the removable boom microphone difficult to attach and remove."
+          ]
+        },
+        {
+          "id": "bt_pairing.positive",
+          "when": "'bt_pairing' in review.topics and review.positive_bt_pairing and product.facts.bluetooth_audio",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bt_pairing",
+            "polarity": "positive",
+            "context": "Bluetooth pairing with a compatible device",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pairing with my compatible device by Bluetooth was easy.",
+            "I found Bluetooth pairing with my compatible device easy."
+          ]
+        },
+        {
+          "id": "bt_pairing.negative",
+          "when": "'bt_pairing' in review.topics and not review.positive_bt_pairing and product.facts.bluetooth_audio",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "bt_pairing",
+            "polarity": "negative",
+            "context": "Bluetooth pairing with a compatible device",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pairing with my compatible device by Bluetooth was difficult.",
+            "I found Bluetooth pairing with my compatible device difficult."
+          ]
+        },
+        {
+          "id": "charge_handling.positive",
+          "when": "'charge_handling' in review.topics and review.positive_charge_handling and product.facts.storage_battery",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "charge_handling",
+            "polarity": "positive",
+            "context": "connecting and disconnecting the represented headset USB-C charging-only interface",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the headset USB-C charging cable was easy for me.",
+            "I found the headset USB-C charging connection easy to connect and disconnect."
+          ]
+        },
+        {
+          "id": "charge_handling.negative",
+          "when": "'charge_handling' in review.topics and not review.positive_charge_handling and product.facts.storage_battery",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "charge_handling",
+            "polarity": "negative",
+            "context": "connecting and disconnecting the represented headset USB-C charging-only interface",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Connecting and disconnecting the headset USB-C charging cable was difficult for me.",
+            "I found the headset USB-C charging connection difficult to connect and disconnect."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 250,
+          "max_sek": 4500
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "headphones",
+    "spec_path": "docs/agents/product-width-specs/headphones.call_gaming_headsets.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "electronics"
+    ],
+    "scope_exceptions": [
+      "Four primary-route templates; connector/channels/hardware configurations are separate models, not colour SKU axes",
+      "Compatible-computer primary microphone route known; Bluetooth mic route remains unknown",
+      "USB host audio and headset charging-only USB-C are distinct",
+      "Wearer ANC absent; microphone processing/physical IP/acoustic/latency protocols unknown"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 250,
+      "max": 900,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 800,
+          "max": 2000
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1800,
+          "max": 4500
+        }
+      ]
+    }
+  }
+}

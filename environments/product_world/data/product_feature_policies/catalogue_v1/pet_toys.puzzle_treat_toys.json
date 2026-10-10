@@ -1,0 +1,5066 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "pet_toys.puzzle_treat_toys",
+  "family_id": "pet_toys",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/pet_toys.puzzle_treat_toys.json": "995cf38ac27e6cbb8d93c7f16d970d50670f4fa43dc6f22c86f264f8a82b4e69",
+    "environments/product_world/data/product_width/_pet_toys_base.json": "e29f03458136d223052afad9efd88874fd961e3c38401771248c3baa6253b73b",
+    "environments/product_world/data/product_public_content/pet_toys.puzzle_treat_toys.json": "3a4974fe6c804d1d9e6c40d9f3d1638bc1f5a77a7c524d0920333fdf3c96230c"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Chew, tug, soft, puzzle and teaser functions differ. Keep supervision/inspection instructions as care/use details, without claiming durability or clinical effects.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "puzzle.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Lundvik Fynd"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.mechanism": {
+      "semantic_id": "puzzle.mechanism",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "sliding_board",
+          "rocking_dispenser"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.actual_component_methods_conditions",
+        "puzzle.care.construction_restrictions",
+        "puzzle.component.actual_absences",
+        "puzzle.component.installed_counts_roles",
+        "puzzle.component.materials",
+        "puzzle.component.owner_separation",
+        "puzzle.unknown.construction_quantities",
+        "puzzle.use.inspect_close"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mechanism"
+    },
+    "sku.size_key": {
+      "semantic_id": "puzzle.sku.size",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual size label, no individual suitability evidence"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_clear_opening",
+        "puzzle.geometry.actual_exterior",
+        "puzzle.geometry.board_depth_or_reservoir_mark"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.colour": {
+      "semantic_id": "puzzle.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "puzzle.pack.complete_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 2,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full exact selected colour/size pack complete-toy count"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "product.facts.empty_assembled_mass_g": {
+      "semantic_id": "puzzle.unknown.complete_mass",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one empty complete assembled toy; explicitly unspecified mass, not zero"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "puzzle.price.full_pack_reference",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 90,
+        "max": 1134,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full exact selected complete size/count pack reference SEK, not retail quote"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "sku.sku_id": {
+      "semantic_id": "puzzle.field.sku_id",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.product_id": {
+      "semantic_id": "puzzle.field.product_id",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "sku.mechanism": {
+      "semantic_id": "puzzle.field.mechanism",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "sliding_board",
+          "rocking_dispenser"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.capacity.actual_mark_or_explicit_board_unknown",
+        "puzzle.geometry.actual_clear_opening",
+        "puzzle.geometry.actual_exterior",
+        "puzzle.geometry.board_depth_or_reservoir_mark"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "mechanism"
+    },
+    "sku.body_material": {
+      "semantic_id": "puzzle.field.body_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_material"
+    },
+    "sku.board_count": {
+      "semantic_id": "puzzle.field.board_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "board_count"
+    },
+    "sku.well_count": {
+      "semantic_id": "puzzle.field.well_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "well_count"
+    },
+    "sku.slider_count": {
+      "semantic_id": "puzzle.field.slider_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "slider_count"
+    },
+    "sku.track_count": {
+      "semantic_id": "puzzle.field.track_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "track_count"
+    },
+    "sku.foot_count": {
+      "semantic_id": "puzzle.field.foot_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "foot_count"
+    },
+    "sku.upper_shell_count": {
+      "semantic_id": "puzzle.field.upper_shell_count",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "upper_shell_count"
+    },
+    "sku.lower_shell_count": {
+      "semantic_id": "puzzle.field.lower_shell_count",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lower_shell_count"
+    },
+    "sku.thread_joint_count": {
+      "semantic_id": "puzzle.field.thread_joint_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "thread_joint_count"
+    },
+    "sku.reservoir_count": {
+      "semantic_id": "puzzle.field.reservoir_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reservoir_count"
+    },
+    "sku.outlet_count": {
+      "semantic_id": "puzzle.field.outlet_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "outlet_count"
+    },
+    "sku.ballast_count": {
+      "semantic_id": "puzzle.field.ballast_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ballast_count"
+    },
+    "sku.lid_count": {
+      "semantic_id": "puzzle.field.lid_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_count"
+    },
+    "sku.removable_cover_count": {
+      "semantic_id": "puzzle.field.removable_cover_count",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "optional": true,
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "removable_cover_count"
+    },
+    "sku.owner_shell_separation_permitted": {
+      "semantic_id": "puzzle.field.owner_shell_separation_permitted",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "owner_shell_separation_permitted"
+    },
+    "sku.owner_slider_removal_permitted": {
+      "semantic_id": "puzzle.field.owner_slider_removal_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "owner_slider_removal_permitted"
+    },
+    "sku.ballast_access_permitted": {
+      "semantic_id": "puzzle.field.ballast_access_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ballast_access_permitted"
+    },
+    "sku.shells_toprack_dishwasher_permitted": {
+      "semantic_id": "puzzle.field.shells_toprack_dishwasher_permitted",
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "shells_toprack_dishwasher_permitted"
+    },
+    "sku.board_dishwasher_permitted": {
+      "semantic_id": "puzzle.field.board_dishwasher_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "board_dishwasher_permitted"
+    },
+    "sku.intended_species": {
+      "semantic_id": "puzzle.field.intended_species",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "dog",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.intended_species"
+    },
+    "sku.intended_life_stage": {
+      "semantic_id": "puzzle.field.intended_life_stage",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "adult",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.intended_life_stage"
+    },
+    "sku.intended_use": {
+      "semantic_id": "puzzle.field.intended_use",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "constant": "supervised indoor puzzle and treat use",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.intended_use"
+    },
+    "sku.supervision_required": {
+      "semantic_id": "puzzle.field.supervision_required",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supervision_required"
+    },
+    "sku.inspection_required": {
+      "semantic_id": "puzzle.field.inspection_required",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.inspection_required"
+    },
+    "sku.indoor_use_only": {
+      "semantic_id": "puzzle.field.indoor_use_only",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.indoor_use_only"
+    },
+    "sku.chewing_permitted": {
+      "semantic_id": "puzzle.field.chewing_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.chewing_permitted"
+    },
+    "sku.unsupervised_use_permitted": {
+      "semantic_id": "puzzle.field.unsupervised_use_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.unsupervised_use_permitted"
+    },
+    "sku.separated_parts_pet_play_permitted": {
+      "semantic_id": "puzzle.field.separated_parts_pet_play_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.separated_parts_pet_play_permitted"
+    },
+    "sku.remove_retail_packaging_tags_ties": {
+      "semantic_id": "puzzle.field.remove_retail_packaging_tags_ties",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.remove_retail_packaging_tags_ties"
+    },
+    "sku.retain_functional_parts": {
+      "semantic_id": "puzzle.field.retain_functional_parts",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.retain_functional_parts"
+    },
+    "sku.stop_remove_discard_on_damage": {
+      "semantic_id": "puzzle.field.stop_remove_discard_on_damage",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.stop_remove_discard_on_damage"
+    },
+    "sku.remaining_food_removal_required": {
+      "semantic_id": "puzzle.field.remaining_food_removal_required",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.remaining_food_removal_required"
+    },
+    "sku.clean_dry_storage_required": {
+      "semantic_id": "puzzle.field.clean_dry_storage_required",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.clean_dry_storage_required"
+    },
+    "sku.food_included": {
+      "semantic_id": "puzzle.field.food_included",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.food_included"
+    },
+    "sku.loose_spares_included": {
+      "semantic_id": "puzzle.field.loose_spares_included",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.loose_spares_included"
+    },
+    "sku.tools_included": {
+      "semantic_id": "puzzle.field.tools_included",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.tools_included"
+    },
+    "sku.brush_included": {
+      "semantic_id": "puzzle.field.brush_included",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.brush_included"
+    },
+    "sku.detergent_included": {
+      "semantic_id": "puzzle.field.detergent_included",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.detergent_included"
+    },
+    "sku.identical_toys_per_pack": {
+      "semantic_id": "puzzle.field.identical_toys_per_pack",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.identical_toys_per_pack"
+    },
+    "sku.all_parts_supplied_installed": {
+      "semantic_id": "puzzle.field.all_parts_supplied_installed",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.pack.installed"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.all_parts_supplied_installed"
+    },
+    "sku.squeaker_present": {
+      "semantic_id": "puzzle.field.squeaker_present",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.squeaker_present"
+    },
+    "sku.fabric_filling_present": {
+      "semantic_id": "puzzle.field.fabric_filling_present",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.fabric_filling_present"
+    },
+    "sku.rope_present": {
+      "semantic_id": "puzzle.field.rope_present",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.rope_present"
+    },
+    "sku.handle_present": {
+      "semantic_id": "puzzle.field.handle_present",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.handle_present"
+    },
+    "sku.motor_present": {
+      "semantic_id": "puzzle.field.motor_present",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.motor_present"
+    },
+    "sku.battery_present": {
+      "semantic_id": "puzzle.field.battery_present",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.battery_present"
+    },
+    "sku.electronics_present": {
+      "semantic_id": "puzzle.field.electronics_present",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.electronics_present"
+    },
+    "sku.boiling_permitted": {
+      "semantic_id": "puzzle.field.boiling_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.boiling_permitted"
+    },
+    "sku.microwave_permitted": {
+      "semantic_id": "puzzle.field.microwave_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.microwave_permitted"
+    },
+    "sku.bleach_permitted": {
+      "semantic_id": "puzzle.field.bleach_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.bleach_permitted"
+    },
+    "sku.solvent_permitted": {
+      "semantic_id": "puzzle.field.solvent_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.solvent_permitted"
+    },
+    "sku.heated_drying_permitted": {
+      "semantic_id": "puzzle.field.heated_drying_permitted",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.heated_drying_permitted"
+    },
+    "sku.board_length_mm": {
+      "semantic_id": "puzzle.field.board_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'sliding_board'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "per complete empty dry assembled toy; nominal board flat exterior bounding dimensions include feet/sliders, dispenser upright greatest exterior diameter/height"
+        },
+        "semantic_status": {
+          "expr": "sku.board_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_exterior"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "board_length_mm"
+    },
+    "sku.board_width_mm": {
+      "semantic_id": "puzzle.field.board_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'sliding_board'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "per complete empty dry assembled toy; nominal board flat exterior bounding dimensions include feet/sliders, dispenser upright greatest exterior diameter/height"
+        },
+        "semantic_status": {
+          "expr": "sku.board_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_exterior"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "board_width_mm"
+    },
+    "sku.height_mm": {
+      "semantic_id": "puzzle.field.height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "per complete empty dry assembled toy; nominal board flat exterior bounding dimensions include feet/sliders, dispenser upright greatest exterior diameter/height"
+        },
+        "semantic_status": {
+          "expr": "sku.height_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_exterior"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "height_mm"
+    },
+    "sku.dispenser_diameter_mm": {
+      "semantic_id": "puzzle.field.dispenser_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'rocking_dispenser'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "per complete empty dry assembled toy; nominal board flat exterior bounding dimensions include feet/sliders, dispenser upright greatest exterior diameter/height"
+        },
+        "semantic_status": {
+          "expr": "sku.dispenser_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_exterior"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "dispenser_diameter_mm"
+    },
+    "sku.well_width_mm": {
+      "semantic_id": "puzzle.field.well_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'sliding_board'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "each of four wells; nominal fully uncovered minimum clear width/length; depth from rim to floor, not exterior dimensions or holding volume"
+        },
+        "semantic_status": {
+          "expr": "sku.well_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_clear_opening"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "wells"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "well_width_mm"
+    },
+    "sku.well_length_mm": {
+      "semantic_id": "puzzle.field.well_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'sliding_board'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "each of four wells; nominal fully uncovered minimum clear width/length; depth from rim to floor, not exterior dimensions or holding volume"
+        },
+        "semantic_status": {
+          "expr": "sku.well_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_clear_opening"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "wells"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "well_length_mm"
+    },
+    "sku.well_depth_mm": {
+      "semantic_id": "puzzle.field.well_depth_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'sliding_board'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "each of four wells; nominal fully uncovered minimum clear width/length; depth from rim to floor, not exterior dimensions or holding volume"
+        },
+        "semantic_status": {
+          "expr": "sku.well_depth_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.board_depth_or_reservoir_mark"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "wells"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "well_depth_mm"
+    },
+    "sku.outlet_diameter_mm": {
+      "semantic_id": "puzzle.field.outlet_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'rocking_dispenser'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one outlet; nominal minimum clear inside diameter when correctly assembled"
+        },
+        "semantic_status": {
+          "expr": "sku.outlet_diameter_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.geometry.actual_clear_opening"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "outlet"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "outlet_diameter_mm"
+    },
+    "sku.reservoir_marked_fill_ml": {
+      "semantic_id": "puzzle.field.reservoir_marked_fill_ml",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'rocking_dispenser'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "assembled reservoir nominal maximum dry-food fill mark mL below top excluding sealed ballast; not brim or guaranteed usable/ejected volume"
+        },
+        "semantic_status": {
+          "expr": "sku.reservoir_marked_fill_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.capacity.actual_mark_or_explicit_board_unknown",
+        "puzzle.geometry.board_depth_or_reservoir_mark"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "reservoir"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reservoir_marked_fill_ml"
+    },
+    "sku.board_length_mm_status": {
+      "semantic_id": "puzzle.field.board_length_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.board_width_mm_status": {
+      "semantic_id": "puzzle.field.board_width_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.height_mm_status": {
+      "semantic_id": "puzzle.field.height_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "known",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.dispenser_diameter_mm_status": {
+      "semantic_id": "puzzle.field.dispenser_diameter_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.well_width_mm_status": {
+      "semantic_id": "puzzle.field.well_width_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.well_length_mm_status": {
+      "semantic_id": "puzzle.field.well_length_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.well_depth_mm_status": {
+      "semantic_id": "puzzle.field.well_depth_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.outlet_diameter_mm_status": {
+      "semantic_id": "puzzle.field.outlet_diameter_mm_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.reservoir_marked_fill_ml_status": {
+      "semantic_id": "puzzle.field.reservoir_marked_fill_ml_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.capacity.actual_mark_or_explicit_board_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.empty_assembled_mass_g": {
+      "semantic_id": "puzzle.field.empty_assembled_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.empty_assembled_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.total_well_food_ml": {
+      "semantic_id": "puzzle.field.total_well_food_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'sliding_board'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.total_well_food_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.capacity.actual_mark_or_explicit_board_unknown"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "wells"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.ballast_mass_g": {
+      "semantic_id": "puzzle.field.ballast_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'rocking_dispenser'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.ballast_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "sealed_ballast"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.effective_dispensing_volume_ml": {
+      "semantic_id": "puzzle.field.effective_dispensing_volume_ml",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.mechanism == 'rocking_dispenser'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.effective_dispensing_volume_ml_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "reservoir"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.battery_capacity_mah": {
+      "semantic_id": "puzzle.field.battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.battery_present",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.battery_capacity_mah_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.voltage_v": {
+      "semantic_id": "puzzle.field.voltage_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "optional": true,
+        "applicable_when": "sku.electronics_present",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.voltage_v_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.dimensional_tolerances": {
+      "semantic_id": "puzzle.field.dimensional_tolerances",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.dimensional_tolerances_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.food_contact_certification": {
+      "semantic_id": "puzzle.field.food_contact_certification",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.food_contact_certification_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.migration_testing": {
+      "semantic_id": "puzzle.field.migration_testing",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual quantity information explicitly unknown when applicable; absent component not_applicable, never zero or a guarantee"
+        },
+        "semantic_status": {
+          "expr": "sku.migration_testing_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "complete_toy"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.empty_assembled_mass_g_status": {
+      "semantic_id": "puzzle.field.empty_assembled_mass_g_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.total_well_food_ml_status": {
+      "semantic_id": "puzzle.field.total_well_food_ml_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.ballast_mass_g_status": {
+      "semantic_id": "puzzle.field.ballast_mass_g_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.effective_dispensing_volume_ml_status": {
+      "semantic_id": "puzzle.field.effective_dispensing_volume_ml_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.battery_capacity_mah_status": {
+      "semantic_id": "puzzle.field.battery_capacity_mah_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.voltage_v_status": {
+      "semantic_id": "puzzle.field.voltage_v_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "not_applicable",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.dimensional_tolerances_status": {
+      "semantic_id": "puzzle.field.dimensional_tolerances_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.food_contact_certification_status": {
+      "semantic_id": "puzzle.field.food_contact_certification_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.migration_testing_status": {
+      "semantic_id": "puzzle.field.migration_testing_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true,
+        "constant": "unknown",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual selected SKU; physical quantities per empty dry complete assembled toy, applicable unknown versus absent NA; nominal mm/mL as declared"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.slider_material": {
+      "semantic_id": "puzzle.field.slider_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.mechanism == 'sliding_board'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual installed component material in one complete toy; product recipe shared across sizes; absent component field is typed not_applicable"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.component.materials"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "captive_sliders"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "slider_material"
+    },
+    "product.facts.foot_material": {
+      "semantic_id": "puzzle.field.foot_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.mechanism == 'sliding_board'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual installed component material in one complete toy; product recipe shared across sizes; absent component field is typed not_applicable"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.component.materials"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "fixed_feet"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "foot_material"
+    },
+    "product.facts.ballast_material": {
+      "semantic_id": "puzzle.field.ballast_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.mechanism == 'rocking_dispenser'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual installed component material in one complete toy; product recipe shared across sizes; absent component field is typed not_applicable"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.component.materials"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "sealed_ballast"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ballast_material"
+    },
+    "product.facts.food_contact_certification": {
+      "semantic_id": "puzzle.field.food_contact_certification",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicitly unspecified information, not a safety/certification result"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.unknown.food_contact_evidence"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.migration_testing": {
+      "semantic_id": "puzzle.field.migration_testing",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicitly unspecified information, not a safety/certification result"
+        }
+      },
+      "supporting_assertion_ids": [
+        "puzzle.unknown.food_contact_evidence"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.intended_species": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "dog",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.declared_species_life_stage_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.intended_life_stage": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "adult",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.declared_species_life_stage_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "intended_life_stage"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": null,
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "supervised indoor puzzle and treat use",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.declared_species_life_stage_use"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.battery_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.power.absent"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "battery_present"
+    },
+    "product.facts.electronics_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.power.absent"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "electronics_present"
+    },
+    "product.facts.body_material": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "polypropylene",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.materials"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "body_material"
+    },
+    "product.facts.board_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "board_count"
+    },
+    "product.facts.well_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences",
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "well_count"
+    },
+    "product.facts.slider_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences",
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "slider_count"
+    },
+    "product.facts.track_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "track_count"
+    },
+    "product.facts.foot_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences",
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "foot_count"
+    },
+    "product.facts.upper_shell_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "upper_shell_count"
+    },
+    "product.facts.lower_shell_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "lower_shell_count"
+    },
+    "product.facts.thread_joint_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "thread_joint_count"
+    },
+    "product.facts.reservoir_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences",
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reservoir_count"
+    },
+    "product.facts.outlet_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences",
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "outlet_count"
+    },
+    "product.facts.ballast_count": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences",
+        "puzzle.component.installed_counts_roles"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "ballast_count"
+    },
+    "product.facts.owner_slider_removal_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.owner_separation"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "owner_slider_removal_permitted"
+    },
+    "product.facts.owner_shell_separation_permitted": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.owner_separation"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "owner_shell_separation_permitted"
+    },
+    "product.facts.ballast_access_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.construction_restrictions",
+        "puzzle.component.owner_separation"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "ballast_access_permitted"
+    },
+    "product.facts.lid_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "lid_count"
+    },
+    "product.facts.removable_cover_count": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 4,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 0,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.actual_absences"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "removable_cover_count"
+    },
+    "product.facts.food_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "food_included"
+    },
+    "product.facts.loose_spares_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "loose_spares_included"
+    },
+    "product.facts.tools_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "tools_included"
+    },
+    "product.facts.brush_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "brush_included"
+    },
+    "product.facts.detergent_included": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "detergent_included"
+    },
+    "product.facts.squeaker_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.other_absences"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "squeaker_present"
+    },
+    "product.facts.fabric_filling_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.other_absences"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "fabric_filling_present"
+    },
+    "product.facts.rope_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.other_absences"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "rope_present"
+    },
+    "product.facts.handle_present": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.component.other_absences"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "handle_present"
+    },
+    "product.facts.care_sentence": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.actual_component_methods_conditions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Formulation support/label, not an additional sampled feature."
+    },
+    "product.facts.boiling_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.general_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "boiling_permitted"
+    },
+    "product.facts.microwave_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.general_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "microwave_permitted"
+    },
+    "product.facts.bleach_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.general_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "bleach_permitted"
+    },
+    "product.facts.solvent_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.general_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "solvent_permitted"
+    },
+    "product.facts.heated_drying_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.general_exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "heated_drying_permitted"
+    },
+    "product.facts.board_dishwasher_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.construction_restrictions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "board_dishwasher_permitted"
+    },
+    "product.facts.care_restriction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.care.construction_restrictions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "care_restriction"
+    },
+    "product.facts.remove_retail_packaging_tags_ties": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.packaging_remove_functional_retain"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "remove_retail_packaging_tags_ties"
+    },
+    "product.facts.retain_functional_parts": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.packaging_remove_functional_retain"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "retain_functional_parts"
+    },
+    "product.facts.inspection_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.inspect_close"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "inspection_required"
+    },
+    "product.facts.closure_instruction": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.inspect_close"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "closure_instruction"
+    },
+    "product.facts.chewing_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.no_chew_or_separated_shell_play"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "chewing_permitted"
+    },
+    "product.facts.separated_parts_pet_play_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.no_chew_or_separated_shell_play"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "separated_parts_pet_play_permitted"
+    },
+    "product.facts.stop_remove_discard_on_damage": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.damage_stop_remove_discard"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "stop_remove_discard_on_damage"
+    },
+    "product.facts.remaining_food_removal_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.remaining_food_storage"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "remaining_food_removal_required"
+    },
+    "product.facts.clean_dry_storage_required": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.remaining_food_storage"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "clean_dry_storage_required"
+    },
+    "product.facts.unsupervised_use_permitted": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.use.supervision"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "unsupervised_use_permitted"
+    },
+    "product.facts.dimensional_tolerances": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.unknown.construction_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.total_well_food_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.mechanism == 'sliding_board'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.unknown.construction_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ballast_mass_g": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.mechanism == 'rocking_dispenser'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.unknown.construction_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.effective_dispensing_volume_ml": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mL",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.mechanism == 'rocking_dispenser'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "puzzle.unknown.construction_quantities"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.shells_toprack_dishwasher_permitted": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.mechanism_label": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.assembly_details": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.absence_details": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.construction_unknowns": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.owner_wash_operation": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.owner_dry_finish": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.supervision_required": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.indoor_use_only": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.identical_toys_per_pack": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.all_parts_supplied_installed": {
+      "semantic_id": null,
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.motor_present": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.battery_capacity_mah": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.battery_present",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.voltage_v": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "unknown_values": [
+          -1
+        ],
+        "min": -1,
+        "max": 2000,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.electronics_present",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    }
+  },
+  "disclosure_groups": {
+    "mechanism": {
+      "id": "pet_toys.puzzle_treat_toys.content.mechanism",
+      "display_group": "features",
+      "fields": [
+        "product.facts.mechanism",
+        "sku.mechanism"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "body_material": {
+      "id": "pet_toys.puzzle_treat_toys.content.body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.body_material",
+        "product.facts.body_material"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "board_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.board_count",
+      "display_group": "features",
+      "fields": [
+        "sku.board_count",
+        "product.facts.board_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "well_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.well_count",
+      "display_group": "features",
+      "fields": [
+        "sku.well_count",
+        "product.facts.well_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "slider_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.slider_count",
+      "display_group": "features",
+      "fields": [
+        "sku.slider_count",
+        "product.facts.slider_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "track_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.track_count",
+      "display_group": "features",
+      "fields": [
+        "sku.track_count",
+        "product.facts.track_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "foot_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.foot_count",
+      "display_group": "features",
+      "fields": [
+        "sku.foot_count",
+        "product.facts.foot_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "upper_shell_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.upper_shell_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.upper_shell_count",
+        "product.facts.upper_shell_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lower_shell_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.lower_shell_count",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.lower_shell_count",
+        "product.facts.lower_shell_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "thread_joint_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.thread_joint_count",
+      "display_group": "features",
+      "fields": [
+        "sku.thread_joint_count",
+        "product.facts.thread_joint_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reservoir_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.reservoir_count",
+      "display_group": "features",
+      "fields": [
+        "sku.reservoir_count",
+        "product.facts.reservoir_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "outlet_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.outlet_count",
+      "display_group": "features",
+      "fields": [
+        "sku.outlet_count",
+        "product.facts.outlet_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ballast_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.ballast_count",
+      "display_group": "features",
+      "fields": [
+        "sku.ballast_count",
+        "product.facts.ballast_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "lid_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.lid_count",
+      "display_group": "features",
+      "fields": [
+        "sku.lid_count",
+        "product.facts.lid_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "removable_cover_count": {
+      "id": "pet_toys.puzzle_treat_toys.content.removable_cover_count",
+      "display_group": "features",
+      "fields": [
+        "sku.removable_cover_count",
+        "product.facts.removable_cover_count"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "owner_shell_separation_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.owner_shell_separation_permitted",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "sku.owner_shell_separation_permitted",
+        "product.facts.owner_shell_separation_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "owner_slider_removal_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.owner_slider_removal_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.owner_slider_removal_permitted",
+        "product.facts.owner_slider_removal_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ballast_access_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.ballast_access_permitted",
+      "display_group": "features",
+      "fields": [
+        "sku.ballast_access_permitted",
+        "product.facts.ballast_access_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "shells_toprack_dishwasher_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.shells_toprack_dishwasher_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.shells_toprack_dishwasher_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "board_dishwasher_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.board_dishwasher_permitted",
+      "display_group": "care",
+      "fields": [
+        "sku.board_dishwasher_permitted",
+        "product.facts.board_dishwasher_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "board_length_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.board_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.board_length_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "board_width_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.board_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.board_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "height_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.height_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "dispenser_diameter_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.dispenser_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.dispenser_diameter_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "well_width_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.well_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.well_width_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "well_length_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.well_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.well_length_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "well_depth_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.well_depth_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.well_depth_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "outlet_diameter_mm": {
+      "id": "pet_toys.puzzle_treat_toys.content.outlet_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.outlet_diameter_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "reservoir_marked_fill_ml": {
+      "id": "pet_toys.puzzle_treat_toys.content.reservoir_marked_fill_ml",
+      "display_group": "features",
+      "fields": [
+        "sku.reservoir_marked_fill_ml"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "slider_material": {
+      "id": "pet_toys.puzzle_treat_toys.content.slider_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.slider_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "foot_material": {
+      "id": "pet_toys.puzzle_treat_toys.content.foot_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.foot_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "ballast_material": {
+      "id": "pet_toys.puzzle_treat_toys.content.ballast_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.ballast_material"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "intended_life_stage": {
+      "id": "pet_toys.puzzle_treat_toys.content.intended_life_stage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.intended_life_stage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "battery_present": {
+      "id": "pet_toys.puzzle_treat_toys.content.battery_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.battery_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "electronics_present": {
+      "id": "pet_toys.puzzle_treat_toys.content.electronics_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.electronics_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "food_included": {
+      "id": "pet_toys.puzzle_treat_toys.content.food_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.food_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "loose_spares_included": {
+      "id": "pet_toys.puzzle_treat_toys.content.loose_spares_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.loose_spares_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "tools_included": {
+      "id": "pet_toys.puzzle_treat_toys.content.tools_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.tools_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "brush_included": {
+      "id": "pet_toys.puzzle_treat_toys.content.brush_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.brush_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "detergent_included": {
+      "id": "pet_toys.puzzle_treat_toys.content.detergent_included",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.detergent_included"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "squeaker_present": {
+      "id": "pet_toys.puzzle_treat_toys.content.squeaker_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.squeaker_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "fabric_filling_present": {
+      "id": "pet_toys.puzzle_treat_toys.content.fabric_filling_present",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.fabric_filling_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rope_present": {
+      "id": "pet_toys.puzzle_treat_toys.content.rope_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rope_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "handle_present": {
+      "id": "pet_toys.puzzle_treat_toys.content.handle_present",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_present"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "boiling_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.boiling_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.boiling_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "microwave_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.microwave_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.microwave_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bleach_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.bleach_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.bleach_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "solvent_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.solvent_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.solvent_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "heated_drying_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.heated_drying_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.heated_drying_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "care_restriction": {
+      "id": "pet_toys.puzzle_treat_toys.content.care_restriction",
+      "display_group": "care",
+      "fields": [
+        "product.facts.care_restriction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "remove_retail_packaging_tags_ties": {
+      "id": "pet_toys.puzzle_treat_toys.content.remove_retail_packaging_tags_ties",
+      "display_group": "features",
+      "fields": [
+        "product.facts.remove_retail_packaging_tags_ties"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "retain_functional_parts": {
+      "id": "pet_toys.puzzle_treat_toys.content.retain_functional_parts",
+      "display_group": "features",
+      "fields": [
+        "product.facts.retain_functional_parts"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "inspection_required": {
+      "id": "pet_toys.puzzle_treat_toys.content.inspection_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.inspection_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "closure_instruction": {
+      "id": "pet_toys.puzzle_treat_toys.content.closure_instruction",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.closure_instruction"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "chewing_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.chewing_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.chewing_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "separated_parts_pet_play_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.separated_parts_pet_play_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.separated_parts_pet_play_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "stop_remove_discard_on_damage": {
+      "id": "pet_toys.puzzle_treat_toys.content.stop_remove_discard_on_damage",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stop_remove_discard_on_damage"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "remaining_food_removal_required": {
+      "id": "pet_toys.puzzle_treat_toys.content.remaining_food_removal_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.remaining_food_removal_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "clean_dry_storage_required": {
+      "id": "pet_toys.puzzle_treat_toys.content.clean_dry_storage_required",
+      "display_group": "care",
+      "fields": [
+        "product.facts.clean_dry_storage_required"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "unsupervised_use_permitted": {
+      "id": "pet_toys.puzzle_treat_toys.content.unsupervised_use_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.unsupervised_use_permitted"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 170,
+    "roles": {
+      "identity": 5,
+      "descriptive": 41,
+      "buying_choice": 3,
+      "omit_placeholder": 18,
+      "commerce": 1,
+      "literal": 38,
+      "alias": 33,
+      "internal": 19,
+      "private_support": 11,
+      "omit_fixed_detail": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 2,
+    "unmapped_descriptive_fields": 46
+  }
+}

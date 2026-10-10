@@ -1,0 +1,1039 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.trail_running_shoes",
+  "random_namespace": "product-width-footwear.trail_running_shoes-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "brand.running_target_weights": {
+      "type": "object",
+      "input": true
+    },
+    "profile.session_target": {
+      "type": "enum",
+      "values": [
+        "short_fast",
+        "daily_training",
+        "long_distance"
+      ]
+    },
+    "internal.construction": {
+      "type": "object",
+      "properties": {
+        "sole_structure": {
+          "type": "string"
+        },
+        "cushioning": {
+          "type": "string"
+        },
+        "lug_depth_mm": {
+          "type": "integer",
+          "unit": "mm"
+        },
+        "base_mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "enclosed trail-running shoe",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "unpaved-trail running",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one shoe, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "enum",
+      "values": [
+        "mesh with synthetic reinforcement",
+        "woven synthetic fabric"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "string",
+      "constant": "rubber",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "enum",
+      "values": [
+        "laces",
+        "quick-lace cord"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cushioning": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.sole_tread": {
+      "type": "string",
+      "constant": "pronounced trail lugs",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lug_depth_mm": {
+      "type": "integer",
+      "unit": "mm",
+      "min": 3,
+      "max": 5,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.heel_to_toe_drop_mm": {
+      "type": "integer",
+      "unit": "mm",
+      "min": 0,
+      "max": 10,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rock_plate": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.reinforced_toe": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_membrane": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 190,
+      "max": 430,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.minimum_lug_mm": {
+      "type": "integer",
+      "unit": "mm",
+      "optional": true
+    },
+    "request.membrane_required": {
+      "type": "boolean",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "session_target",
+      "target": "profile.session_target",
+      "sample": "weighted_choice",
+      "weights_from": "brand.running_target_weights"
+    },
+    {
+      "id": "trail_construction",
+      "target": "internal.construction",
+      "sample": "weighted_choice",
+      "weights": {
+        "light": 2,
+        "balanced": 5,
+        "cushioned": 3
+      },
+      "adjustments": [
+        {
+          "when": "profile.session_target == 'short_fast'",
+          "multiply": {
+            "light": 2
+          }
+        },
+        {
+          "when": "profile.session_target == 'daily_training'",
+          "multiply": {
+            "balanced": 1.5
+          }
+        },
+        {
+          "when": "profile.session_target == 'long_distance'",
+          "multiply": {
+            "cushioned": 2
+          }
+        }
+      ],
+      "values": {
+        "light": {
+          "sole_structure": "light foam midsole with lugged rubber outsole",
+          "cushioning": "moderate",
+          "lug_depth_mm": 3,
+          "base_mass_g": 240
+        },
+        "balanced": {
+          "sole_structure": "balanced foam midsole with lugged rubber outsole",
+          "cushioning": "moderate",
+          "lug_depth_mm": 4,
+          "base_mass_g": 290
+        },
+        "cushioned": {
+          "sole_structure": "deep foam midsole with lugged rubber outsole",
+          "cushioning": "substantial",
+          "lug_depth_mm": 5,
+          "base_mass_g": 335
+        }
+      }
+    },
+    {
+      "id": "sole",
+      "target": "product.facts.sole_structure",
+      "derive": "internal.construction.sole_structure"
+    },
+    {
+      "id": "cushion",
+      "target": "product.facts.cushioning",
+      "derive": "internal.construction.cushioning"
+    },
+    {
+      "id": "lug",
+      "target": "product.facts.lug_depth_mm",
+      "derive": "internal.construction.lug_depth_mm"
+    },
+    {
+      "id": "upper",
+      "target": "product.facts.component_materials.upper",
+      "sample": "weighted_choice",
+      "weights": {
+        "mesh with synthetic reinforcement": 4,
+        "woven synthetic fabric": 1
+      }
+    },
+    {
+      "id": "closure",
+      "target": "product.facts.fastening",
+      "sample": "weighted_choice",
+      "weights": {
+        "laces": 4,
+        "quick-lace cord": 1
+      }
+    },
+    {
+      "id": "drop",
+      "target": "product.facts.heel_to_toe_drop_mm",
+      "sample": "weighted_choice",
+      "weights": {
+        "0": 1,
+        "4": 2,
+        "6": 3,
+        "8": 3,
+        "10": 1
+      },
+      "values": {
+        "0": 0,
+        "4": 4,
+        "6": 6,
+        "8": 8,
+        "10": 10
+      }
+    },
+    {
+      "id": "rock_plate",
+      "target": "product.facts.rock_plate",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 2,
+        "no": 3
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "toe_protection",
+      "target": "product.facts.reinforced_toe",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 4,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "membrane",
+      "target": "product.facts.waterproof_membrane",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 1,
+        "no": 4
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -20,
+      "max": 20
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.construction.base_mass_g + internal.mass_noise_g + (20 if product.facts.waterproof_membrane else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.trail",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.intended_use",
+          "product.facts.component_materials.upper",
+          "product.facts.sole_structure",
+          "product.facts.lug_depth_mm"
+        ]
+      },
+      "slots": {
+        "upper": "product.facts.component_materials.upper",
+        "sole": "product.facts.sole_structure",
+        "lug": "product.facts.lug_depth_mm"
+      },
+      "formulations": [
+        "For unpaved-trail running: {upper}, {sole} and nominal {lug} mm lugs.",
+        "A trail-running design with {upper}, {sole}; lug depth is {lug} mm."
+      ]
+    },
+    {
+      "id": "description.drop_mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.heel_to_toe_drop_mm",
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "drop": "product.facts.heel_to_toe_drop_mm",
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "Nominal drop: {drop} mm. One EU 40 reference shoe weighs {mass} g.",
+        "EU 40 reference weight is {mass} g per shoe; heel-to-toe drop is {drop} mm."
+      ]
+    },
+    {
+      "id": "description.protection",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.rock_plate",
+          "product.facts.reinforced_toe",
+          "product.facts.waterproof_membrane"
+        ]
+      },
+      "slots": {
+        "plate": "'present' if product.facts.rock_plate else 'absent'",
+        "toe": "'present' if product.facts.reinforced_toe else 'absent'",
+        "membrane": "'present' if product.facts.waterproof_membrane else 'absent'"
+      },
+      "formulations": [
+        "Underfoot rock plate: {plate}; reinforced toe: {toe}; waterproof membrane: {membrane}.",
+        "Declared construction includes rock plate {plate}, toe reinforcement {toe}, and waterproof membrane {membrane}."
+      ]
+    },
+    {
+      "id": "description.closure",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.fastening"
+        ]
+      },
+      "slots": {
+        "closure": "product.facts.fastening"
+      },
+      "formulations": [
+        "Closure: {closure}.",
+        "Fastening uses {closure}."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.trail_running_shoes' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "minimum_lug",
+      "role": "task_requirement",
+      "predicate": "product.facts.lug_depth_mm >= request.minimum_lug_mm",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "membrane",
+      "role": "filter",
+      "predicate": "product.facts.waterproof_membrane == request.membrane_required",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "trail_comfort",
+            "forefoot_fit",
+            "loose_trail_traction",
+            "underfoot_stones"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "trail_comfort",
+              "forefoot_fit",
+              "loose_trail_traction",
+              "underfoot_stones"
+            ]
+          }
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_trail_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_forefoot_fit": {
+          "type": "boolean"
+        },
+        "review.positive_loose_trail_traction": {
+          "type": "boolean"
+        },
+        "review.positive_underfoot_stones": {
+          "type": "boolean"
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 650,
+          "max": 3000
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 650
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 3000
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_trail_comfort",
+          "target": "review.positive_trail_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_forefoot_fit",
+          "target": "review.positive_forefoot_fit",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_loose_trail_traction",
+          "target": "review.positive_loose_trail_traction",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_underfoot_stones",
+          "target": "review.positive_underfoot_stones",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "trail_comfort.positive",
+          "when": "'trail_comfort' in review.topics and review.positive_trail_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "trail_comfort",
+            "polarity": "positive",
+            "context": "ordinary unpaved-trail running",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt comfortable during my ordinary trail runs.",
+            "Comfort was good on the trails I ran."
+          ]
+        },
+        {
+          "id": "trail_comfort.negative",
+          "when": "'trail_comfort' in review.topics and not review.positive_trail_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "trail_comfort",
+            "polarity": "negative",
+            "context": "ordinary unpaved-trail running",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt uncomfortable during my ordinary trail runs.",
+            "My feet were uncomfortable on the trails I ran."
+          ]
+        },
+        {
+          "id": "forefoot_fit.positive",
+          "when": "'forefoot_fit' in review.topics and review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "positive",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The front left enough room for my forefoot in the size I tried.",
+            "My forefoot did not feel squeezed in the tested size."
+          ]
+        },
+        {
+          "id": "forefoot_fit.negative",
+          "when": "'forefoot_fit' in review.topics and not review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "negative",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The front squeezed my forefoot in the size I tried.",
+            "The tested size felt too narrow across my forefoot."
+          ]
+        },
+        {
+          "id": "loose_trail_traction.positive",
+          "when": "'loose_trail_traction' in review.topics and review.positive_loose_trail_traction",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "loose_trail_traction",
+            "polarity": "positive",
+            "context": {
+              "surface": "dry loose paths",
+              "use": "trail running"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I had dependable traction while running on dry loose paths.",
+            "They gripped well on the dry loose paths I ran."
+          ]
+        },
+        {
+          "id": "loose_trail_traction.negative",
+          "when": "'loose_trail_traction' in review.topics and not review.positive_loose_trail_traction",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "loose_trail_traction",
+            "polarity": "negative",
+            "context": {
+              "surface": "dry loose paths",
+              "use": "trail running"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Traction felt poor while I ran on dry loose paths.",
+            "Traction was poor on the dry loose paths I ran."
+          ]
+        },
+        {
+          "id": "underfoot_stones.positive",
+          "when": "'underfoot_stones' in review.topics and review.positive_underfoot_stones",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "underfoot_stones",
+            "polarity": "positive",
+            "context": {
+              "surface": "small stony paths",
+              "use": "trail running",
+              "aspect": "pressure underfoot"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Small stones did not press painfully into my feet on stony trail runs.",
+            "Pressure from small stones stayed comfortable during my stony trail runs."
+          ]
+        },
+        {
+          "id": "underfoot_stones.negative",
+          "when": "'underfoot_stones' in review.topics and not review.positive_underfoot_stones",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "underfoot_stones",
+            "polarity": "negative",
+            "context": {
+              "surface": "small stony paths",
+              "use": "trail running",
+              "aspect": "pressure underfoot"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Small stones pressed painfully into my feet during stony trail runs.",
+            "The pressure from small stones was uncomfortable on my stony trail runs."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent, concentration1.5, protected mention frequency; value score reuses pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote or checkout record",
+        "relative_price_basis": {
+          "min_sek": 650,
+          "max_sek": 3000
+        },
+        "value_not_quality": "Price changes only value sentiment; not star draw, execution or every topic"
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.trail_running_shoes.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "store_type_ids": [
+      "footwear",
+      "outdoors"
+    ],
+    "preview_input_defaults": {
+      "brand": {
+        "running_target_weights": {
+          "short_fast": 2,
+          "daily_training": 5,
+          "long_distance": 3
+        }
+      }
+    },
+    "scope_exceptions": [
+      "No wet-rock/ice traction guarantee or numerical waterproof certification",
+      "Lug depth/cushion coupling is a bounded recipe, not a universal law"
+    ],
+    "review_policy_revision": "width-review-policy-v2"
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 650,
+      "max": 1200,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 1100,
+          "max": 1900
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1700,
+          "max": 3000
+        }
+      ]
+    }
+  }
+}

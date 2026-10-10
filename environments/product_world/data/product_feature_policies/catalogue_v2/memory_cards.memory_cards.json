@@ -1,0 +1,5447 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "memory_cards.memory_cards",
+  "family_id": "memory_cards",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/memory_cards.memory_cards.json": "529551d2d11e6445ecfd664a3565f0b2843d5e5b01fffdc4bfb4e76ec81a0569",
+    "environments/product_world/data/product_width/_memory_cards_base.json": "06aa2ee31ffe23eec4c740678f1932a5eeff49cb630fce4ffedb7883fa570c75",
+    "environments/product_world/data/product_public_content/memory_cards.memory_cards.json": "e6d8b5aaaa771418286490206969fe28f7a542ad1c4b93bdd825a886a20e87ad"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Class minimum write speed and advertised maxima are separate statements. An adapter does not upgrade bus or capacity support.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "memory.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Norvik Archive"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual product name"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.card_format_label": {
+      "semantic_id": "memory.format",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual card physical format plus SDXC capacity family"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_card_format_label"
+    },
+    "sku.capacity_gb": {
+      "semantic_id": "memory.label.capacity",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "GB",
+        "min": 64,
+        "max": 256,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "decimal GB label per card; 1 GB = 1,000,000,000 bytes; not usable GB"
+        },
+        "unit_basis": {
+          "literal": "decimal GB per card; no usable/combined filesystem inference"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "product.facts.usable_capacity_gb": {
+      "semantic_id": "memory.capacity.usable_unknown",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 2048,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit unknown formatted/usable GB per card"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.advertised_read_max_mb_s": {
+      "semantic_id": "memory.speed.advertised_read_max",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": 0,
+        "max": 104,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 100,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "advertised maximum decimal MB/s, not achieved/sustained"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_advertised_read_max_mb_s"
+    },
+    "product.facts.advertised_write_max_mb_s": {
+      "semantic_id": "memory.speed.advertised_write_max",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "advertised maximum decimal MB/s or explicit unknown; no inference from read/class"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_advertised_write_max_mb_s"
+    },
+    "sku.pack_count": {
+      "semantic_id": "memory.pack.card_count",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 1,
+        "max": 2,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "complete memory cards in the entire selected pack, excluding adapter/packaging"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.adapter_count": {
+      "semantic_id": "memory.pack.adapter_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 1,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "one enclosed adapter per micro pack, none per full-size pack"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.adapter_count"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "memory.price.full_pack",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "min": 80,
+        "max": 1296,
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "full exact selected capacity/count pack reference SEK, actual adapter included; not per-card/current offer"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "supplied_set"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.assembly": {
+      "semantic_id": "memory.field.assembly",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "full_size_sdxc",
+          "microsdxc_with_adapter"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction",
+        "memory.card.construction",
+        "memory.compat.passive_limits",
+        "memory.compat.physical_route",
+        "memory.slider.scope",
+        "memory.speed.class_semantics",
+        "memory.speed.classes",
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_assembly"
+    },
+    "product.facts.card_format": {
+      "semantic_id": "memory.field.card_format",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "SD",
+          "microSD"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_card_format"
+    },
+    "product.facts.capacity_family": {
+      "semantic_id": "memory.field.capacity_family",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "SDXC"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "SDXC",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.interface_filesystem_supply"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_capacity_family"
+    },
+    "product.facts.body_material": {
+      "semantic_id": "memory.field.body_material",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "polymer",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_body_material"
+    },
+    "product.facts.body_colour": {
+      "semantic_id": "memory.field.body_colour",
+      "role": "literal",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "black",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_body_colour"
+    },
+    "product.facts.label_colour": {
+      "semantic_id": "memory.field.label_colour",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.contact_rows": {
+      "semantic_id": "memory.field.contact_rows",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.card_flash_storage_present": {
+      "semantic_id": "memory.field.card_flash_storage_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.card_controller_present": {
+      "semantic_id": "memory.field.card_controller_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.card_slider_present": {
+      "semantic_id": "memory.field.card_slider_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.construction",
+        "memory.slider.scope"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_card_slider_present"
+    },
+    "product.facts.adapter_count": {
+      "semantic_id": "memory.field.adapter_count",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "min": 0,
+        "max": 1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_count"
+    },
+    "product.facts.adapter_present": {
+      "semantic_id": "memory.field.adapter_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction",
+        "memory.compat.passive_limits"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_present"
+    },
+    "product.facts.adapter_material": {
+      "semantic_id": "memory.field.adapter_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_material"
+    },
+    "product.facts.adapter_body_colour": {
+      "semantic_id": "memory.field.adapter_body_colour",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_contacts_present": {
+      "semantic_id": "memory.field.adapter_contacts_present",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_micro_opening_present": {
+      "semantic_id": "memory.field.adapter_micro_opening_present",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_slider_present": {
+      "semantic_id": "memory.field.adapter_slider_present",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction",
+        "memory.slider.scope"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_slider_present"
+    },
+    "product.facts.adapter_supplied_separate": {
+      "semantic_id": "memory.field.adapter_supplied_separate",
+      "role": "descriptive",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_supplied_separate"
+    },
+    "product.facts.card_length_mm": {
+      "semantic_id": "memory.field.card_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_card_length_mm"
+    },
+    "product.facts.card_width_mm": {
+      "semantic_id": "memory.field.card_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_card_width_mm"
+    },
+    "product.facts.card_thickness_mm": {
+      "semantic_id": "memory.field.card_thickness_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_card_thickness_mm"
+    },
+    "product.facts.adapter_length_mm": {
+      "semantic_id": "memory.field.adapter_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_length_mm"
+    },
+    "product.facts.adapter_width_mm": {
+      "semantic_id": "memory.field.adapter_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_width_mm"
+    },
+    "product.facts.adapter_thickness_mm": {
+      "semantic_id": "memory.field.adapter_thickness_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_adapter_thickness_mm"
+    },
+    "product.facts.write_max_status": {
+      "semantic_id": "memory.field.write_max_status",
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "product.facts.c_class": {
+      "semantic_id": "memory.field.c_class",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "C10"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "C10",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.speed.classes"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_c_class"
+    },
+    "product.facts.u_class": {
+      "semantic_id": "memory.field.u_class",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "U1",
+          "U3"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.speed.classes"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_u_class"
+    },
+    "product.facts.v_class": {
+      "semantic_id": "memory.field.v_class",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "V10",
+          "V30"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.speed.classes"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_v_class"
+    },
+    "product.facts.c_min_mb_s": {
+      "semantic_id": "memory.field.c_min_mb_s",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.speed.class_semantics"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_c_min_mb_s"
+    },
+    "product.facts.u_min_mb_s": {
+      "semantic_id": "memory.field.u_min_mb_s",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.speed.class_semantics"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_u_min_mb_s"
+    },
+    "product.facts.v_min_mb_s": {
+      "semantic_id": "memory.field.v_min_mb_s",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.speed.class_semantics"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_v_min_mb_s"
+    },
+    "product.facts.bus_interface": {
+      "semantic_id": "memory.field.bus_interface",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "UHS-I",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.interface_filesystem_supply"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_bus_interface"
+    },
+    "product.facts.supplied_filesystem": {
+      "semantic_id": "memory.field.supplied_filesystem",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "exFAT",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.interface_filesystem_supply"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_supplied_filesystem"
+    },
+    "product.facts.nominal_card_voltage_v": {
+      "semantic_id": "memory.field.nominal_card_voltage_v",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 0,
+        "max": 10,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 3.3,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.interface_filesystem_supply"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_nominal_card_voltage_v"
+    },
+    "product.facts.label_gb_basis": {
+      "semantic_id": "memory.field.label_gb_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "decimal per card; 1 GB = 1,000,000,000 bytes",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.rate_mb_basis": {
+      "semantic_id": "memory.field.rate_mb_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "decimal maximum; 1 MB = 1,000,000 bytes; not measured or sustained",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.dimensions_basis": {
+      "semantic_id": "memory.field.dimensions_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "nominal exterior length x width x thickness, dry component excluding packaging",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.adapter_dimensions_basis": {
+      "semantic_id": "memory.field.adapter_dimensions_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "one empty adapter including slider, excluding packaging, not added to card",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.class_minimum_basis": {
+      "semantic_id": "memory.field.class_minimum_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "each C/U/V family sequential-write standard conditions with supporting host/card state",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.speed.class_semantics"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.complete_cards_supplied": {
+      "semantic_id": "memory.field.complete_cards_supplied",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.identical_cards_per_pack": {
+      "semantic_id": "memory.field.identical_cards_per_pack",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.packaging_in_component_count": {
+      "semantic_id": "memory.field.packaging_in_component_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Fixed ordinary anatomy/bookkeeping; preserve source truth but remove it from the prospective feature list."
+    },
+    "product.facts.card_battery_present": {
+      "semantic_id": "memory.field.card_battery_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.interface_filesystem_supply"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.adapter_storage_present": {
+      "semantic_id": "memory.field.adapter_storage_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction",
+        "memory.compat.passive_limits"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_controller_present": {
+      "semantic_id": "memory.field.adapter_controller_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_usb_interface_present": {
+      "semantic_id": "memory.field.adapter_usb_interface_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_active_reader_present": {
+      "semantic_id": "memory.field.adapter_active_reader_present",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.construction",
+        "memory.compat.passive_limits"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_bus_upgrade": {
+      "semantic_id": "memory.field.adapter_bus_upgrade",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.compat.passive_limits"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.adapter_sdhc_conversion": {
+      "semantic_id": "memory.field.adapter_sdhc_conversion",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.compat.passive_limits"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.active_reader_included": {
+      "semantic_id": "memory.field.active_reader_included",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.active_reader_not_supplied",
+        "memory.compat.passive_limits"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.usb_cable_included": {
+      "semantic_id": "memory.field.usb_cable_included",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.storage_case_included": {
+      "semantic_id": "memory.field.storage_case_included",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.extra_adapter_included": {
+      "semantic_id": "memory.field.extra_adapter_included",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Absent ordinary part or unrelated capability; avoid an inventory of things this product is not."
+    },
+    "product.facts.keep_dry_required": {
+      "semantic_id": "memory.field.keep_dry_required",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.dry_handling"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_drying"
+    },
+    "product.facts.housing_handling_required": {
+      "semantic_id": "memory.field.housing_handling_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.dry_handling"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_housing_handling_required"
+    },
+    "product.facts.touch_contacts_permitted": {
+      "semantic_id": "memory.field.touch_contacts_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.dry_handling"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_touch_contacts_permitted"
+    },
+    "product.facts.immersion_permitted": {
+      "semantic_id": "memory.field.immersion_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.dry_handling"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_immersion_permitted"
+    },
+    "product.facts.wet_cleaning_permitted": {
+      "semantic_id": "memory.field.wet_cleaning_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.dry_handling"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_wet_cleaning_permitted"
+    },
+    "product.facts.machine_wash_permitted": {
+      "semantic_id": "memory.field.machine_wash_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.dry_handling"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.dishwasher_permitted": {
+      "semantic_id": "memory.field.dishwasher_permitted",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.dry_handling"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.safe_ejection_before_removal_required": {
+      "semantic_id": "memory.field.safe_ejection_before_removal_required",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.ejection_storage"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_safe_ejection_before_removal_required"
+    },
+    "product.facts.removal_during_transfer_permitted": {
+      "semantic_id": "memory.field.removal_during_transfer_permitted",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.ejection_storage"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_removal_during_transfer_permitted"
+    },
+    "product.facts.owner_rigid_case_storage_required": {
+      "semantic_id": "memory.field.owner_rigid_case_storage_required",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.ejection_storage"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_owner_rigid_case_storage_required"
+    },
+    "product.facts.stop_further_use_on_opening_problem": {
+      "semantic_id": "memory.field.stop_further_use_on_opening_problem",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.care.ejection_storage"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_stop_further_use_on_opening_problem"
+    },
+    "product.facts.host_sdxc_required": {
+      "semantic_id": "memory.field.host_sdxc_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_host_sdxc_required"
+    },
+    "product.facts.host_uhs_i_required": {
+      "semantic_id": "memory.field.host_uhs_i_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_host_uhs_i_required"
+    },
+    "product.facts.host_exfat_read_write_required": {
+      "semantic_id": "memory.field.host_exfat_read_write_required",
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_host_exfat_read_write_required"
+    },
+    "product.facts.physical_fit_is_sufficient": {
+      "semantic_id": "memory.field.physical_fit_is_sufficient",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_physical_fit_is_sufficient"
+    },
+    "product.facts.slider_is_encryption": {
+      "semantic_id": "memory.field.slider_is_encryption",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.slider.scope"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_slider_is_encryption"
+    },
+    "product.facts.write_block_test_claimed": {
+      "semantic_id": "memory.field.write_block_test_claimed",
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "actual declared card/component fact; no compatibility/performance/health guarantee"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.slider.scope"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_write_block_test_claimed"
+    },
+    "product.facts.card_mass_g": {
+      "semantic_id": "memory.field.card_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_mass_g": {
+      "semantic_id": "memory.field.adapter_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.initial_free_space_gb": {
+      "semantic_id": "memory.field.initial_free_space_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 2048,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.card_current_ma": {
+      "semantic_id": "memory.field.card_current_ma",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mA",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.card_power_w": {
+      "semantic_id": "memory.field.card_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_read_rate_mb_s": {
+      "semantic_id": "memory.field.measured_read_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.measured_rates_time"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.measured_write_rate_mb_s": {
+      "semantic_id": "memory.field.measured_write_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.measured_rates_time"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.elapsed_transfer_seconds": {
+      "semantic_id": "memory.field.elapsed_transfer_seconds",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.measured_rates_time"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_storage_gb": {
+      "semantic_id": "memory.field.adapter_storage_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_read_rate_mb_s": {
+      "semantic_id": "memory.field.adapter_read_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_write_rate_mb_s": {
+      "semantic_id": "memory.field.adapter_write_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_voltage_v": {
+      "semantic_id": "memory.field.adapter_voltage_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_power_w": {
+      "semantic_id": "memory.field.adapter_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_battery_capacity_mah": {
+      "semantic_id": "memory.field.adapter_battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.card_battery_capacity_mah": {
+      "semantic_id": "memory.field.card_battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.card_dimensional_tolerances": {
+      "semantic_id": "memory.field.card_dimensional_tolerances",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_dimensional_tolerances": {
+      "semantic_id": "memory.field.adapter_dimensional_tolerances",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'",
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.contact_plating": {
+      "semantic_id": "memory.field.contact_plating",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.controller_model": {
+      "semantic_id": "memory.field.controller_model",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.flash_cell_technology": {
+      "semantic_id": "memory.field.flash_cell_technology",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.write_endurance": {
+      "semantic_id": "memory.field.write_endurance",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.environmental_ratings": {
+      "semantic_id": "memory.field.environmental_ratings",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.adapter_replacement_compatibility": {
+      "semantic_id": "memory.field.adapter_replacement_compatibility",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "applicable_when": "product.facts.assembly == 'microsdxc_with_adapter'",
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or absent/passive numeric NA, never zero or inferred measurement"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.unknowns.physical_and_technology"
+      ],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "sku.card_length_mm": {
+      "semantic_id": "memory.field.sku_card_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal dry exterior component L/W/T excluding packaging; empty adapter includes slider"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_card_length_mm"
+    },
+    "sku.card_width_mm": {
+      "semantic_id": "memory.field.sku_card_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal dry exterior component L/W/T excluding packaging; empty adapter includes slider"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_card_width_mm"
+    },
+    "sku.card_thickness_mm": {
+      "semantic_id": "memory.field.sku_card_thickness_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal dry exterior component L/W/T excluding packaging; empty adapter includes slider"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.card.geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_card_thickness_mm"
+    },
+    "sku.adapter_length_mm": {
+      "semantic_id": "memory.field.sku_adapter_length_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "sku.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal dry exterior component L/W/T excluding packaging; empty adapter includes slider"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_length_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_adapter_length_mm"
+    },
+    "sku.adapter_width_mm": {
+      "semantic_id": "memory.field.sku_adapter_width_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "sku.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal dry exterior component L/W/T excluding packaging; empty adapter includes slider"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_width_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_adapter_width_mm"
+    },
+    "sku.adapter_thickness_mm": {
+      "semantic_id": "memory.field.sku_adapter_thickness_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "sku.assembly == 'microsdxc_with_adapter'"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "nominal dry exterior component L/W/T excluding packaging; empty adapter includes slider"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_thickness_mm_status"
+        }
+      },
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry"
+      ],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "sku_adapter_thickness_mm"
+    },
+    "sku.card_mass_g": {
+      "semantic_id": "memory.field.sku_card_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.card_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_mass_g": {
+      "semantic_id": "memory.field.sku_adapter_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "sku.assembly == 'microsdxc_with_adapter'",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_mass_g_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.usable_capacity_gb": {
+      "semantic_id": "memory.field.sku_usable_capacity_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 2048,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.usable_capacity_gb_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.initial_free_space_gb": {
+      "semantic_id": "memory.field.sku_initial_free_space_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 2048,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.initial_free_space_gb_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.card_current_ma": {
+      "semantic_id": "memory.field.sku_card_current_ma",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mA",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.card_current_ma_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.card_power_w": {
+      "semantic_id": "memory.field.sku_card_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.card_power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_read_rate_mb_s": {
+      "semantic_id": "memory.field.sku_measured_read_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.measured_read_rate_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.measured_write_rate_mb_s": {
+      "semantic_id": "memory.field.sku_measured_write_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.measured_write_rate_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.elapsed_transfer_seconds": {
+      "semantic_id": "memory.field.sku_elapsed_transfer_seconds",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.elapsed_transfer_seconds_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_storage_gb": {
+      "semantic_id": "memory.field.sku_adapter_storage_gb",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "GB",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_storage_gb_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_read_rate_mb_s": {
+      "semantic_id": "memory.field.sku_adapter_read_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_read_rate_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_write_rate_mb_s": {
+      "semantic_id": "memory.field.sku_adapter_write_rate_mb_s",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "MB/s",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_write_rate_mb_s_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_voltage_v": {
+      "semantic_id": "memory.field.sku_adapter_voltage_v",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_voltage_v_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_power_w": {
+      "semantic_id": "memory.field.sku_adapter_power_w",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "W",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_power_w_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_battery_capacity_mah": {
+      "semantic_id": "memory.field.sku_adapter_battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_battery_capacity_mah_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.card_battery_capacity_mah": {
+      "semantic_id": "memory.field.sku_card_battery_capacity_mah",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": -1,
+        "max": 1000,
+        "unknown_values": [
+          -1
+        ],
+        "optional": true,
+        "applicable_when": "False",
+        "constant": -1,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.card_battery_capacity_mah_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.card_dimensional_tolerances": {
+      "semantic_id": "memory.field.sku_card_dimensional_tolerances",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.card_dimensional_tolerances_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_dimensional_tolerances": {
+      "semantic_id": "memory.field.sku_adapter_dimensional_tolerances",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "applicable_when": "sku.assembly == 'microsdxc_with_adapter'",
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_dimensional_tolerances_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.contact_plating": {
+      "semantic_id": "memory.field.sku_contact_plating",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.contact_plating_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.controller_model": {
+      "semantic_id": "memory.field.sku_controller_model",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.controller_model_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.flash_cell_technology": {
+      "semantic_id": "memory.field.sku_flash_cell_technology",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.flash_cell_technology_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.write_endurance": {
+      "semantic_id": "memory.field.sku_write_endurance",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.write_endurance_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.environmental_ratings": {
+      "semantic_id": "memory.field.sku_environmental_ratings",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.environmental_ratings_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "card"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.adapter_replacement_compatibility": {
+      "semantic_id": "memory.field.sku_adapter_replacement_compatibility",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "optional": true,
+        "applicable_when": "sku.assembly == 'microsdxc_with_adapter'",
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {
+        "basis": {
+          "literal": "explicit applicable unknown or passive/absent NA, not zero"
+        },
+        "semantic_status": {
+          "expr": "sku.adapter_replacement_compatibility_status"
+        }
+      },
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id",
+        "component": "passive_adapter"
+      },
+      "source_inherited": false,
+      "reason": "Every declared finite source status is unknown/not-applicable; retain privately without automatic shopper rows."
+    },
+    "sku.assembly": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "full_size_sdxc",
+          "microsdxc_with_adapter"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry",
+        "memory.card.geometry"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.assembly"
+    },
+    "sku.adapter_length_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.adapter_width_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.adapter_thickness_mm_status": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "known",
+          "unknown",
+          "not_applicable"
+        ],
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.adapter.geometry"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    },
+    "sku.complete_cards_supplied": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.supplied_condition"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.complete_cards_supplied"
+    },
+    "sku.adapter_supplied_separate": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.supplied_condition"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.adapter_supplied_separate"
+    },
+    "sku.adapter_present": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.supplied_condition"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.adapter_present"
+    },
+    "sku.active_reader_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.active_reader_included"
+    },
+    "sku.usb_cable_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.usb_cable_included"
+    },
+    "sku.storage_case_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.storage_case_included"
+    },
+    "sku.extra_adapter_included": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.extra_adapter_included"
+    },
+    "sku.packaging_in_component_count": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.pack.exclusions"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.packaging_in_component_count"
+    },
+    "sku.host_sdxc_required": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.compat.capacity_bus_filesystem"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.host_sdxc_required"
+    },
+    "sku.host_uhs_i_required": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.compat.capacity_bus_filesystem"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.host_uhs_i_required"
+    },
+    "sku.host_exfat_read_write_required": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": true,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.compat.capacity_bus_filesystem"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.host_exfat_read_write_required"
+    },
+    "sku.physical_fit_is_sufficient": {
+      "semantic_id": null,
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "optional": true,
+        "constant": false,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.compat.capacity_bus_filesystem"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.physical_fit_is_sufficient"
+    },
+    "product.facts.physical_route": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.compat.physical_route"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_physical_route"
+    },
+    "product.facts.slider_location": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [
+        "memory.slider.scope"
+      ],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_slider_location"
+    },
+    "product.facts.card_construction": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.adapter_construction": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.adapter_geometry": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.maximum_rate_sentence": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Formulation support/label, not an additional sampled feature."
+    },
+    "product.facts.class_sentence": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Formulation support/label, not an additional sampled feature."
+    },
+    "product.facts.pack_adapter_sentence": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Formulation support/label, not an additional sampled feature."
+    },
+    "product.facts.passive_limits": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    },
+    "product.facts.physical_unknowns": {
+      "semantic_id": null,
+      "role": "private_support",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Manufacturing/context support without a published semantic mapping; not an extra retail fact or highlight."
+    }
+  },
+  "disclosure_groups": {
+    "product_card_format_label": {
+      "id": "memory_cards.memory_cards.content.product_card_format_label",
+      "display_group": "features",
+      "fields": [
+        "product.facts.card_format_label"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_advertised_read_max_mb_s": {
+      "id": "memory_cards.memory_cards.content.product_advertised_read_max_mb_s",
+      "display_group": "features",
+      "fields": [
+        "product.facts.advertised_read_max_mb_s"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_advertised_write_max_mb_s": {
+      "id": "memory_cards.memory_cards.content.product_advertised_write_max_mb_s",
+      "display_group": "features",
+      "fields": [
+        "product.facts.advertised_write_max_mb_s"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_assembly": {
+      "id": "memory_cards.memory_cards.content.product_assembly",
+      "display_group": "features",
+      "fields": [
+        "product.facts.assembly"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_card_format": {
+      "id": "memory_cards.memory_cards.content.product_card_format",
+      "display_group": "features",
+      "fields": [
+        "product.facts.card_format"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_capacity_family": {
+      "id": "memory_cards.memory_cards.content.product_capacity_family",
+      "display_group": "features",
+      "fields": [
+        "product.facts.capacity_family"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_body_material": {
+      "id": "memory_cards.memory_cards.content.product_body_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_body_colour": {
+      "id": "memory_cards.memory_cards.content.product_body_colour",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.body_colour"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_card_slider_present": {
+      "id": "memory_cards.memory_cards.content.product_card_slider_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.card_slider_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_adapter_count": {
+      "id": "memory_cards.memory_cards.content.product_adapter_count",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adapter_count"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_adapter_present": {
+      "id": "memory_cards.memory_cards.content.product_adapter_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adapter_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_adapter_material": {
+      "id": "memory_cards.memory_cards.content.product_adapter_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.adapter_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_adapter_slider_present": {
+      "id": "memory_cards.memory_cards.content.product_adapter_slider_present",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adapter_slider_present"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_adapter_supplied_separate": {
+      "id": "memory_cards.memory_cards.content.product_adapter_supplied_separate",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.adapter_supplied_separate"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_card_length_mm": {
+      "id": "memory_cards.memory_cards.content.product_card_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.card_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_card_width_mm": {
+      "id": "memory_cards.memory_cards.content.product_card_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.card_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_card_thickness_mm": {
+      "id": "memory_cards.memory_cards.content.product_card_thickness_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.card_thickness_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_adapter_length_mm": {
+      "id": "memory_cards.memory_cards.content.product_adapter_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.adapter_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_adapter_width_mm": {
+      "id": "memory_cards.memory_cards.content.product_adapter_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.adapter_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_adapter_thickness_mm": {
+      "id": "memory_cards.memory_cards.content.product_adapter_thickness_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.adapter_thickness_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_c_class": {
+      "id": "memory_cards.memory_cards.content.product_c_class",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c_class"
+      ],
+      "atomic": false,
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "product_u_class": {
+      "id": "memory_cards.memory_cards.content.product_u_class",
+      "display_group": "features",
+      "fields": [
+        "product.facts.u_class"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_v_class": {
+      "id": "memory_cards.memory_cards.content.product_v_class",
+      "display_group": "features",
+      "fields": [
+        "product.facts.v_class"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_c_min_mb_s": {
+      "id": "memory_cards.memory_cards.content.product_c_min_mb_s",
+      "display_group": "features",
+      "fields": [
+        "product.facts.c_min_mb_s"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_u_min_mb_s": {
+      "id": "memory_cards.memory_cards.content.product_u_min_mb_s",
+      "display_group": "features",
+      "fields": [
+        "product.facts.u_min_mb_s"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_v_min_mb_s": {
+      "id": "memory_cards.memory_cards.content.product_v_min_mb_s",
+      "display_group": "features",
+      "fields": [
+        "product.facts.v_min_mb_s"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_bus_interface": {
+      "id": "memory_cards.memory_cards.content.product_bus_interface",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.bus_interface"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_supplied_filesystem": {
+      "id": "memory_cards.memory_cards.content.product_supplied_filesystem",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_filesystem"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_nominal_card_voltage_v": {
+      "id": "memory_cards.memory_cards.content.product_nominal_card_voltage_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.nominal_card_voltage_v"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_drying": {
+      "id": "memory_cards.memory_cards.content.product_product_drying",
+      "display_group": "care",
+      "fields": [
+        "product.facts.keep_dry_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_housing_handling_required": {
+      "id": "memory_cards.memory_cards.content.product_housing_handling_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.housing_handling_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_touch_contacts_permitted": {
+      "id": "memory_cards.memory_cards.content.product_product_touch_contacts_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.touch_contacts_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_immersion_permitted": {
+      "id": "memory_cards.memory_cards.content.product_product_immersion_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.immersion_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_wet_cleaning_permitted": {
+      "id": "memory_cards.memory_cards.content.product_product_wet_cleaning_permitted",
+      "display_group": "care",
+      "fields": [
+        "product.facts.wet_cleaning_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_washing": {
+      "id": "memory_cards.memory_cards.content.product_product_washing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.machine_wash_permitted",
+        "product.facts.dishwasher_permitted"
+      ],
+      "atomic": true,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_safe_ejection_before_removal_required": {
+      "id": "memory_cards.memory_cards.content.product_product_safe_ejection_before_removal_required",
+      "display_group": "care",
+      "fields": [
+        "product.facts.safe_ejection_before_removal_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_removal_during_transfer_permitted": {
+      "id": "memory_cards.memory_cards.content.product_removal_during_transfer_permitted",
+      "display_group": "features",
+      "fields": [
+        "product.facts.removal_during_transfer_permitted"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_owner_rigid_case_storage_required": {
+      "id": "memory_cards.memory_cards.content.product_owner_rigid_case_storage_required",
+      "display_group": "features",
+      "fields": [
+        "product.facts.owner_rigid_case_storage_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_stop_further_use_on_opening_problem": {
+      "id": "memory_cards.memory_cards.content.product_stop_further_use_on_opening_problem",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stop_further_use_on_opening_problem"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_host_sdxc_required": {
+      "id": "memory_cards.memory_cards.content.product_host_sdxc_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.host_sdxc_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_host_uhs_i_required": {
+      "id": "memory_cards.memory_cards.content.product_host_uhs_i_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.host_uhs_i_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_host_exfat_read_write_required": {
+      "id": "memory_cards.memory_cards.content.product_host_exfat_read_write_required",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.host_exfat_read_write_required"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_physical_fit_is_sufficient": {
+      "id": "memory_cards.memory_cards.content.product_physical_fit_is_sufficient",
+      "display_group": "features",
+      "fields": [
+        "product.facts.physical_fit_is_sufficient"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_slider_is_encryption": {
+      "id": "memory_cards.memory_cards.content.product_slider_is_encryption",
+      "display_group": "features",
+      "fields": [
+        "product.facts.slider_is_encryption"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_write_block_test_claimed": {
+      "id": "memory_cards.memory_cards.content.product_write_block_test_claimed",
+      "display_group": "features",
+      "fields": [
+        "product.facts.write_block_test_claimed"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_card_length_mm": {
+      "id": "memory_cards.memory_cards.content.sku_card_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.card_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_card_width_mm": {
+      "id": "memory_cards.memory_cards.content.sku_card_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.card_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_card_thickness_mm": {
+      "id": "memory_cards.memory_cards.content.sku_card_thickness_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.card_thickness_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_adapter_length_mm": {
+      "id": "memory_cards.memory_cards.content.sku_adapter_length_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.adapter_length_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_adapter_width_mm": {
+      "id": "memory_cards.memory_cards.content.sku_adapter_width_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "sku.adapter_width_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "sku_adapter_thickness_mm": {
+      "id": "memory_cards.memory_cards.content.sku_adapter_thickness_mm",
+      "display_group": "features",
+      "fields": [
+        "sku.adapter_thickness_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_physical_route": {
+      "id": "memory_cards.memory_cards.content.product_physical_route",
+      "display_group": "features",
+      "fields": [
+        "product.facts.physical_route"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_slider_location": {
+      "id": "memory_cards.memory_cards.content.product_slider_location",
+      "display_group": "features",
+      "fields": [
+        "product.facts.slider_location"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 158,
+    "roles": {
+      "identity": 1,
+      "descriptive": 29,
+      "buying_choice": 2,
+      "omit_placeholder": 48,
+      "literal": 25,
+      "alias": 14,
+      "commerce": 1,
+      "omit_low_value_detail": 4,
+      "omit_fixed_detail": 17,
+      "internal": 7,
+      "qualifier": 5,
+      "private_support": 5
+    },
+    "display_groups": 6,
+    "highlight_candidates": 9,
+    "unmapped_descriptive_fields": 2
+  },
+  "semantic_review_note": "Capacity, format/bus and speed-class requirements matter. Group peak transfer claims separately from minimum class rates. Passive adapters change fit, not bus speed; suppress cosmetic component inventory and missing unrelated accessories."
+}

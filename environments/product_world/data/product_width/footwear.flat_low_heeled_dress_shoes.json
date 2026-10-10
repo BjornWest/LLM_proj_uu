@@ -1,0 +1,1035 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.flat_low_heeled_dress_shoes",
+  "random_namespace": "product-width-footwear.flat_low_heeled_dress_shoes-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.style": {
+      "type": "object",
+      "properties": {
+        "style": {
+          "type": "string"
+        },
+        "closure": {
+          "type": "string"
+        },
+        "heel_geometry": {
+          "type": "string"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "internal.outsole": {
+      "type": "object",
+      "properties": {
+        "structure": {
+          "type": "string"
+        },
+        "material": {
+          "type": "string"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "closed flat or low-heeled dress shoe",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_toe": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "occasion wear",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.style": {
+      "type": "enum",
+      "values": [
+        "loafer",
+        "Oxford",
+        "ballet-style flat"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "enum",
+      "values": [
+        "slip-on",
+        "closed lacing"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.heel_geometry": {
+      "type": "enum",
+      "values": [
+        "low block",
+        "flat"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.heel_height_mm": {
+      "type": "number",
+      "unit": "mm",
+      "min": 5,
+      "max": 30,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "enum",
+      "values": [
+        "smooth leather",
+        "suede leather",
+        "synthetic"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "enum",
+      "values": [
+        "rubber",
+        "leather",
+        "leather and rubber"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.outsole_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cushioning": {
+      "type": "enum",
+      "values": [
+        "minimal",
+        "modest"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one shoe, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 150,
+      "max": 450,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.maximum_heel_mm": {
+      "type": "number",
+      "unit": "mm",
+      "optional": true
+    },
+    "request.closure": {
+      "type": "string",
+      "optional": true
+    },
+    "request.upper_material": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "style_bundle",
+      "target": "internal.style",
+      "sample": "weighted_choice",
+      "weights": {
+        "loafer": 3,
+        "Oxford": 3,
+        "ballet": 2
+      },
+      "values": {
+        "loafer": {
+          "style": "loafer",
+          "closure": "slip-on",
+          "heel_geometry": "low block",
+          "mass_g": 300
+        },
+        "Oxford": {
+          "style": "Oxford",
+          "closure": "closed lacing",
+          "heel_geometry": "low block",
+          "mass_g": 420
+        },
+        "ballet": {
+          "style": "ballet-style flat",
+          "closure": "slip-on",
+          "heel_geometry": "flat",
+          "mass_g": 180
+        }
+      }
+    },
+    {
+      "id": "style",
+      "target": "product.facts.style",
+      "derive": "internal.style.style"
+    },
+    {
+      "id": "closure",
+      "target": "product.facts.fastening",
+      "derive": "internal.style.closure"
+    },
+    {
+      "id": "heel_geometry",
+      "target": "product.facts.heel_geometry",
+      "derive": "internal.style.heel_geometry"
+    },
+    {
+      "id": "heel_height",
+      "target": "product.facts.heel_height_mm",
+      "sample": "weighted_choice",
+      "weights": {
+        "5": 0,
+        "10": 1,
+        "12.7": 2,
+        "15": 0,
+        "20": 3,
+        "25": 1,
+        "30": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.style == 'Oxford'",
+          "weights": {
+            "5": 0,
+            "10": 0,
+            "12.7": 0,
+            "15": 1,
+            "20": 3,
+            "25": 2,
+            "30": 1
+          }
+        },
+        {
+          "when": "product.facts.style == 'ballet-style flat'",
+          "weights": {
+            "5": 1,
+            "10": 4,
+            "12.7": 0,
+            "15": 1,
+            "20": 0,
+            "25": 0,
+            "30": 0
+          }
+        }
+      ],
+      "values": {
+        "5": 5,
+        "10": 10,
+        "12.7": 12.7,
+        "15": 15,
+        "20": 20,
+        "25": 25,
+        "30": 30
+      }
+    },
+    {
+      "id": "upper",
+      "target": "product.facts.component_materials.upper",
+      "sample": "weighted_choice",
+      "weights": {
+        "smooth leather": 4,
+        "suede leather": 2,
+        "synthetic": 3
+      },
+      "cases": [
+        {
+          "when": "profile.positioning == 'premium'",
+          "weights": {
+            "smooth leather": 6,
+            "suede leather": 3,
+            "synthetic": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "outsole",
+      "target": "internal.outsole",
+      "sample": "weighted_choice",
+      "weights": {
+        "rubber": 3,
+        "leather": 2,
+        "mixed": 2
+      },
+      "values": {
+        "rubber": {
+          "structure": "rubber outsole",
+          "material": "rubber"
+        },
+        "leather": {
+          "structure": "leather outsole",
+          "material": "leather"
+        },
+        "mixed": {
+          "structure": "leather outsole with rubber wear patches",
+          "material": "leather and rubber"
+        }
+      }
+    },
+    {
+      "id": "outsole_structure",
+      "target": "product.facts.outsole_structure",
+      "derive": "internal.outsole.structure"
+    },
+    {
+      "id": "outsole_material",
+      "target": "product.facts.component_materials.outsole",
+      "derive": "internal.outsole.material"
+    },
+    {
+      "id": "cushion",
+      "target": "product.facts.cushioning",
+      "sample": "weighted_choice",
+      "weights": {
+        "minimal": 3,
+        "modest": 2
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -20,
+      "max": 20
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.style.mass_g + internal.mass_noise_g"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.style",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.style",
+          "product.facts.fastening",
+          "product.facts.closed_heel",
+          "product.facts.closed_toe",
+          "product.facts.intended_use"
+        ]
+      },
+      "slots": {
+        "style": "product.facts.style",
+        "closure": "product.facts.fastening"
+      },
+      "formulations": [
+        "Closed-toe, closed-heel {style} for occasion wear; fastening: {closure}.",
+        "An occasion-wear {style} with {closure}, enclosed toe and heel."
+      ]
+    },
+    {
+      "id": "description.materials",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.component_materials.upper",
+          "product.facts.component_materials.outsole",
+          "product.facts.outsole_structure",
+          "product.facts.cushioning"
+        ]
+      },
+      "slots": {
+        "upper": "product.facts.component_materials.upper",
+        "sole": "product.facts.outsole_structure",
+        "material": "product.facts.component_materials.outsole",
+        "cushion": "product.facts.cushioning"
+      },
+      "formulations": [
+        "Upper: {upper}. Construction: {sole} ({material}); {cushion} cushioning.",
+        "Uses {upper} above a {sole}, made from {material}; cushioning is {cushion}."
+      ]
+    },
+    {
+      "id": "description.heel_mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.heel_height_mm",
+          "product.facts.heel_geometry",
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "height": "product.facts.heel_height_mm",
+        "geometry": "product.facts.heel_geometry",
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "Heel style: {geometry}; nominal height: {height} mm. One EU40 reference shoe weighs {mass} g.",
+        "A {geometry} heel with nominal height {height} mm; reference mass is {mass} g for one EU40 shoe."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.flat_low_heeled_dress_shoes' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "heel_ceiling",
+      "role": "task_requirement",
+      "predicate": "product.facts.heel_height_mm <= request.maximum_heel_mm",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "closure",
+      "role": "filter",
+      "predicate": "product.facts.fastening == request.closure",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "upper",
+      "role": "filter",
+      "predicate": "product.facts.component_materials.upper == request.upper_material",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "occasion_comfort",
+            "forefoot_fit",
+            "heel_rubbing",
+            "outsole_abrasion"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "occasion_comfort",
+              "forefoot_fit",
+              "heel_rubbing",
+              "outsole_abrasion"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 350,
+          "max": 3000
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 350
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 3000
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_occasion_comfort": {
+          "type": "boolean"
+        },
+        "review.positive_forefoot_fit": {
+          "type": "boolean"
+        },
+        "review.positive_heel_rubbing": {
+          "type": "boolean"
+        },
+        "review.positive_outsole_abrasion": {
+          "type": "boolean"
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_occasion_comfort",
+          "target": "review.positive_occasion_comfort",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_forefoot_fit",
+          "target": "review.positive_forefoot_fit",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_heel_rubbing",
+          "target": "review.positive_heel_rubbing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_outsole_abrasion",
+          "target": "review.positive_outsole_abrasion",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "occasion_comfort.positive",
+          "when": "'occasion_comfort' in review.topics and review.positive_occasion_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "occasion_comfort",
+            "polarity": "positive",
+            "context": "an evening occasion",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt comfortable throughout an evening occasion.",
+            "Comfort was good throughout the evening occasion I wore them for."
+          ]
+        },
+        {
+          "id": "occasion_comfort.negative",
+          "when": "'occasion_comfort' in review.topics and not review.positive_occasion_comfort",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "occasion_comfort",
+            "polarity": "negative",
+            "context": "an evening occasion",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "They felt uncomfortable throughout an evening occasion.",
+            "Comfort was poor throughout the evening occasion I wore them for."
+          ]
+        },
+        {
+          "id": "forefoot_fit.positive",
+          "when": "'forefoot_fit' in review.topics and review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "positive",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot had enough room in the size I tried.",
+            "The tested size did not squeeze my forefoot."
+          ]
+        },
+        {
+          "id": "forefoot_fit.negative",
+          "when": "'forefoot_fit' in review.topics and not review.positive_forefoot_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "forefoot_fit",
+            "polarity": "negative",
+            "context": "fit across forefoot",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot was squeezed in the size I tried.",
+            "The tested size squeezed my forefoot."
+          ]
+        },
+        {
+          "id": "heel_rubbing.positive",
+          "when": "'heel_rubbing' in review.topics and review.positive_heel_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "heel_rubbing",
+            "polarity": "positive",
+            "context": {
+              "use": "an evening occasion",
+              "aspect": "uncomfortable heel rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I had no uncomfortable heel rubbing during an evening occasion.",
+            "My heels were not uncomfortably rubbed at the evening occasion."
+          ]
+        },
+        {
+          "id": "heel_rubbing.negative",
+          "when": "'heel_rubbing' in review.topics and not review.positive_heel_rubbing",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "heel_rubbing",
+            "polarity": "negative",
+            "context": {
+              "use": "an evening occasion",
+              "aspect": "uncomfortable heel rubbing"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I had uncomfortable heel rubbing during an evening occasion.",
+            "My heels were uncomfortably rubbed at the evening occasion."
+          ]
+        },
+        {
+          "id": "outsole_abrasion.positive",
+          "when": "'outsole_abrasion' in review.topics and review.positive_outsole_abrasion",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "outsole_abrasion",
+            "polarity": "positive",
+            "context": {
+              "use": "regular occasion wear",
+              "duration": "several months",
+              "aspect": "abrasion"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The outsole showed little abrasion after several months of regular occasion wear.",
+            "After several months of regular occasion wear, outsole abrasion was slight."
+          ]
+        },
+        {
+          "id": "outsole_abrasion.negative",
+          "when": "'outsole_abrasion' in review.topics and not review.positive_outsole_abrasion",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "outsole_abrasion",
+            "polarity": "negative",
+            "context": {
+              "use": "regular occasion wear",
+              "duration": "several months",
+              "aspect": "abrasion"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "The outsole showed substantial abrasion after several months of regular occasion wear.",
+            "After several months of regular occasion wear, outsole abrasion was substantial."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 350,
+          "max_sek": 3000
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.flat_low_heeled_dress_shoes.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "footwear",
+      "apparel"
+    ],
+    "scope_exceptions": [
+      "Initial closed loafer/Oxford/ballet scope only; mules/slingbacks/open toes deferred",
+      "Nominal heel<=30mm is provisional recipe scope, not universal taxonomy",
+      "Rubber heel cap, lining, insole and sole-joining method not inferred from aggregate outsole"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 350,
+      "max": 900,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 800,
+          "max": 1700
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1500,
+          "max": 3000
+        }
+      ]
+    }
+  }
+}

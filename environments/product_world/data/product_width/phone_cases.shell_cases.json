@@ -1,0 +1,1835 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "phone_cases.shell_cases",
+  "random_namespace": "product-width-phone_cases.shell_cases-v1",
+  "extends": "_phone_cases_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.assembly": {
+      "type": "object",
+      "properties": {
+        "assembly": {
+          "type": "enum",
+          "values": [
+            "flexible",
+            "hybrid",
+            "rugged"
+          ]
+        },
+        "component_materials": {
+          "type": "array",
+          "items": {
+            "type": "enum",
+            "values": [
+              "TPU",
+              "PC",
+              "TPE"
+            ]
+          },
+          "min_items": 1
+        },
+        "component_allocation": {
+          "type": "string"
+        },
+        "surface": {
+          "type": "enum",
+          "values": [
+            "textured",
+            "smooth"
+          ]
+        },
+        "built_in_magnets": {
+          "type": "boolean"
+        },
+        "stand_configuration": {
+          "type": "enum",
+          "values": [
+            "none",
+            "flush folding",
+            "not specified"
+          ]
+        },
+        "stand_use": {
+          "type": "string"
+        },
+        "port_cover": {
+          "type": "boolean"
+        },
+        "strap_anchors": {
+          "type": "boolean"
+        },
+        "wireless_route": {
+          "type": "string"
+        },
+        "wireless_condition": {
+          "type": "string"
+        }
+      }
+    },
+    "internal.device": {
+      "type": "object",
+      "properties": {
+        "supported_device_id": {
+          "type": "string"
+        },
+        "supported_device_label": {
+          "type": "string"
+        },
+        "device_controls": {
+          "type": "string"
+        }
+      }
+    },
+    "product.facts.assembly": {
+      "type": "enum",
+      "values": [
+        "flexible",
+        "hybrid",
+        "rugged"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials": {
+      "type": "array",
+      "items": {
+        "type": "enum",
+        "values": [
+          "TPU",
+          "PC",
+          "TPE"
+        ]
+      },
+      "min_items": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_allocation": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.surface": {
+      "type": "enum",
+      "values": [
+        "textured",
+        "smooth"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.built_in_magnets": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.stand_configuration": {
+      "type": "enum",
+      "values": [
+        "none",
+        "flush folding",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.stand_use": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.port_cover": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.strap_anchors": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wireless_route": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.wireless_condition": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.supported_device_id": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.supported_device_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_controls": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.covered_side_buttons": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.raised_screen_edge": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.raised_camera_edge": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charge_port": {
+      "type": "string",
+      "constant": "USB-C",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_units": {
+      "type": "integer",
+      "unit": "count",
+      "constant": 1,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_included": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.charger_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.holster_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.strap_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.screen_protector_included": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.case_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.packaging_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "constant": -1,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.supported_device_id": {
+      "type": "string",
+      "optional": true
+    },
+    "request.component_material": {
+      "type": "string",
+      "optional": true
+    },
+    "request.built_in_magnets": {
+      "type": "boolean",
+      "optional": true
+    },
+    "request.integrated_stand": {
+      "type": "boolean",
+      "optional": true
+    },
+    "product.facts.material_proportions": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lip_dimensions": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.impact_protocol": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.drop_survival": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.magnetic_retention_strength": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ip_label": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.accessory_clearance": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.achieved_charging": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.device_fit_tolerances": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.screen_protector_fit": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    }
+  },
+  "steps": [
+    {
+      "id": "supported_device_joint",
+      "target": "internal.device",
+      "sample": "weighted_choice",
+      "weights": {
+        "compact": 3,
+        "mid": 2
+      },
+      "values": {
+        "compact": {
+          "supported_device_id": "case-fixture-compact-uk-v1",
+          "supported_device_label": "Compact UK fixture",
+          "device_controls": "right-side power and volume buttons; bottom USB-C port; upper-left rear-camera area"
+        },
+        "mid": {
+          "supported_device_id": "case-fixture-mid-uk-v1",
+          "supported_device_label": "Mid UK fixture",
+          "device_controls": "right-side power and left-side volume buttons; bottom USB-C port; upper-centre rear-camera area"
+        }
+      }
+    },
+    {
+      "id": "device_supported_device_id",
+      "target": "product.facts.supported_device_id",
+      "derive": "internal.device.supported_device_id"
+    },
+    {
+      "id": "device_supported_device_label",
+      "target": "product.facts.supported_device_label",
+      "derive": "internal.device.supported_device_label"
+    },
+    {
+      "id": "device_device_controls",
+      "target": "product.facts.device_controls",
+      "derive": "internal.device.device_controls"
+    },
+    {
+      "id": "assembly_joint",
+      "target": "internal.assembly",
+      "sample": "weighted_choice",
+      "weights": {
+        "flexible": 6,
+        "hybrid": 3,
+        "rugged": 2
+      },
+      "cases": [
+        {
+          "when": "profile.positioning == 'budget'",
+          "weights": {
+            "flexible": 8,
+            "hybrid": 2,
+            "rugged": 1
+          }
+        },
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "weights": {
+            "flexible": 5,
+            "hybrid": 4,
+            "rugged": 2
+          }
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "weights": {
+            "flexible": 2,
+            "hybrid": 4,
+            "rugged": 5
+          }
+        }
+      ],
+      "values": {
+        "flexible": {
+          "assembly": "flexible",
+          "component_materials": [
+            "TPU"
+          ],
+          "component_allocation": "TPU wraparound shell",
+          "surface": "textured",
+          "built_in_magnets": false,
+          "stand_configuration": "none",
+          "stand_use": "not specified",
+          "port_cover": false,
+          "strap_anchors": false,
+          "wireless_route": "compatible wireless route declared",
+          "wireless_condition": "requires a phone and charger supporting that route; accessory clearance unassessed"
+        },
+        "hybrid": {
+          "assembly": "hybrid",
+          "component_materials": [
+            "PC",
+            "TPU"
+          ],
+          "component_allocation": "PC back with TPU bumper",
+          "surface": "smooth",
+          "built_in_magnets": true,
+          "stand_configuration": "flush folding",
+          "stand_use": "landscape on a flat desk",
+          "port_cover": false,
+          "strap_anchors": false,
+          "wireless_route": "compatible magnetic/wireless route declared",
+          "wireless_condition": "requires a phone and charger supporting that route and stand fully folded; accessory clearance unassessed"
+        },
+        "rugged": {
+          "assembly": "rugged",
+          "component_materials": [
+            "PC",
+            "TPE"
+          ],
+          "component_allocation": "PC inner shell with TPE exterior",
+          "surface": "textured",
+          "built_in_magnets": true,
+          "stand_configuration": "not specified",
+          "stand_use": "not specified",
+          "port_cover": true,
+          "strap_anchors": true,
+          "wireless_route": "compatible magnetic/wireless route declared",
+          "wireless_condition": "requires a phone and charger supporting that route; cover/charger clearance unassessed"
+        }
+      }
+    },
+    {
+      "id": "assembly_assembly",
+      "target": "product.facts.assembly",
+      "derive": "internal.assembly.assembly"
+    },
+    {
+      "id": "assembly_component_materials",
+      "target": "product.facts.component_materials",
+      "derive": "internal.assembly.component_materials"
+    },
+    {
+      "id": "assembly_component_allocation",
+      "target": "product.facts.component_allocation",
+      "derive": "internal.assembly.component_allocation"
+    },
+    {
+      "id": "assembly_surface",
+      "target": "product.facts.surface",
+      "derive": "internal.assembly.surface"
+    },
+    {
+      "id": "assembly_built_in_magnets",
+      "target": "product.facts.built_in_magnets",
+      "derive": "internal.assembly.built_in_magnets"
+    },
+    {
+      "id": "assembly_stand_configuration",
+      "target": "product.facts.stand_configuration",
+      "derive": "internal.assembly.stand_configuration"
+    },
+    {
+      "id": "assembly_stand_use",
+      "target": "product.facts.stand_use",
+      "derive": "internal.assembly.stand_use"
+    },
+    {
+      "id": "assembly_port_cover",
+      "target": "product.facts.port_cover",
+      "derive": "internal.assembly.port_cover"
+    },
+    {
+      "id": "assembly_strap_anchors",
+      "target": "product.facts.strap_anchors",
+      "derive": "internal.assembly.strap_anchors"
+    },
+    {
+      "id": "assembly_wireless_route",
+      "target": "product.facts.wireless_route",
+      "derive": "internal.assembly.wireless_route"
+    },
+    {
+      "id": "assembly_wireless_condition",
+      "target": "product.facts.wireless_condition",
+      "derive": "internal.assembly.wireless_condition"
+    },
+    {
+      "id": "colours",
+      "target": "product.colours",
+      "sample": "weighted_subset",
+      "weights": {
+        "black": 5,
+        "blue": 3,
+        "clear": 2
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 4,
+        "3": 2
+      },
+      "cases": [
+        {
+          "when": "product.facts.assembly == 'rugged'",
+          "weights": {
+            "black": 5,
+            "blue": 3,
+            "clear": 0
+          },
+          "count_weights": {
+            "1": 3,
+            "2": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "colour_groups",
+      "for_each": {
+        "binding": "group.colour",
+        "from": "product.colours"
+      },
+      "steps": [
+        {
+          "id": "skus",
+          "target": "product.skus",
+          "emit": {
+            "sku_id": "product.product_id + '-' + product.facts.supported_device_id + '-' + group.colour",
+            "product_id": "product.product_id",
+            "colour": "group.colour",
+            "supported_device_id": "product.facts.supported_device_id",
+            "reference_price_sek": "product.reference_price_sek"
+          }
+        }
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "description.fit",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.supported_device_id",
+          "product.facts.supported_device_label",
+          "product.facts.device_controls",
+          "product.facts.device_fit_tolerances"
+        ]
+      },
+      "slots": {
+        "id": "product.facts.supported_device_id",
+        "device": "product.facts.supported_device_label",
+        "controls": "product.facts.device_controls"
+      },
+      "formulations": [
+        "Declared exact fit: {device} ({id}), with {controls}. This is an authoring fixture, not a real vendor phone; numerical fit tolerances unspecified.",
+        "For {device}, exact fixture ID {id}; represented device layout: {controls}. Compatibility is by declared ID, not similar screen size; fit tolerances unspecified."
+      ]
+    },
+    {
+      "id": "description.construction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.component_materials",
+          "product.facts.component_allocation",
+          "product.facts.surface"
+        ]
+      },
+      "slots": {
+        "material": "product.facts.component_allocation",
+        "surface": "product.facts.surface"
+      },
+      "formulations": [
+        "Construction: {material}; {surface} exterior. Layer proportions unspecified.",
+        "{material}, with a {surface} surface; no component-ratio declaration."
+      ]
+    },
+    {
+      "id": "description.edges_buttons",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.raised_screen_edge",
+          "product.facts.raised_camera_edge",
+          "product.facts.covered_side_buttons",
+          "product.facts.lip_dimensions"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Raised screen and camera edges; covered side power/volume buttons. Lip dimensions and protection performance unspecified.",
+        "Side power/volume controls have case covers; screen/camera edges are raised. No numerical lip-height or measured protection claim."
+      ]
+    },
+    {
+      "id": "description.open_port",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.charge_port",
+          "product.facts.port_cover"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "USB-C port access is open; no port cover.",
+        "Uncovered opening for the USB-C plug."
+      ],
+      "when": "not product.facts.port_cover"
+    },
+    {
+      "id": "description.port_cover",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.charge_port",
+          "product.facts.port_cover",
+          "product.facts.strap_anchors",
+          "product.facts.strap_included",
+          "product.facts.ip_label"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Hinged USB-C port cover and strap anchors; strap excluded. Port cover does not establish an IP rating.",
+        "Open the hinged cover to reach USB-C; anchors are provided, not a strap. No IP/waterproof claim."
+      ],
+      "when": "product.facts.port_cover"
+    },
+    {
+      "id": "description.magnets",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.built_in_magnets"
+        ]
+      },
+      "slots": {
+        "state": "'present' if product.facts.built_in_magnets else 'absent'"
+      },
+      "formulations": [
+        "Built-in magnets {state}; this is not a charging-performance certification.",
+        "Magnetic hardware: {state}. No certified or achieved charging result implied."
+      ]
+    },
+    {
+      "id": "description.stand_none",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.stand_configuration"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "No integrated case stand, as an explicit fixture declaration.",
+        "This authored shell has no built-in stand."
+      ],
+      "when": "known(product.facts.stand_configuration) and product.facts.stand_configuration == 'none'"
+    },
+    {
+      "id": "description.stand",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.stand_configuration",
+          "product.facts.stand_use",
+          "product.facts.wireless_condition"
+        ]
+      },
+      "slots": {
+        "use": "product.facts.stand_use"
+      },
+      "formulations": [
+        "Integrated flush-folding stand for {use}; fold it fully before the declared charging route.",
+        "Built-in flush-folding stand supports {use}. Charging-route declaration requires it fully folded."
+      ],
+      "when": "known(product.facts.stand_configuration) and product.facts.stand_configuration != 'none'"
+    },
+    {
+      "id": "description.stand_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.stand_configuration",
+          "product.facts.stand_use",
+          "product.facts.holster_included"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Case-body stand configuration unspecified; a separate holster is not included and is not this case stand.",
+        "Integrated-stand declaration unavailable, not declared absent; excluded accessory holster does not supply a case-body stand."
+      ],
+      "when": "not known(product.facts.stand_configuration)"
+    },
+    {
+      "id": "description.wireless",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.wireless_route",
+          "product.facts.wireless_condition",
+          "product.facts.achieved_charging",
+          "product.facts.accessory_clearance"
+        ]
+      },
+      "slots": {
+        "route": "product.facts.wireless_route",
+        "condition": "product.facts.wireless_condition"
+      },
+      "formulations": [
+        "{route}; {condition}. Achieved charging and accessory clearance unspecified; the case does not create phone wireless capability.",
+        "Route declaration: {route}, conditional on {condition}. Actual charging and accessory clearance remain unknown; no phone capability upgrade."
+      ]
+    },
+    {
+      "id": "description.box",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.case_units",
+          "product.facts.case_included",
+          "product.facts.charger_included",
+          "product.facts.holster_included",
+          "product.facts.strap_included",
+          "product.facts.screen_protector_included"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Authored package: one shell only; charger, holster, strap and screen protector excluded.",
+        "One case unit included. This recipe does not include a charger, separate holster, strap or screen protector."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.case_mass_g",
+          "product.facts.packaging_mass_g",
+          "product.facts.material_proportions",
+          "product.facts.impact_protocol",
+          "product.facts.drop_survival",
+          "product.facts.magnetic_retention_strength",
+          "product.facts.ip_label",
+          "product.facts.screen_protector_fit"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Case and packaging mass, material proportions, impact-test protocol, actual drop survival, magnetic strength, IP label and screen-protector fit unspecified.",
+        "No supplied case/package masses, material ratios, drop protocol/outcome, magnet-retention measurement, IP rating or screen-protector-fit declaration."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'phone_cases.shell_cases' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "device",
+      "role": "filter",
+      "predicate": "product.facts.supported_device_id == request.supported_device_id",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "material",
+      "role": "filter",
+      "predicate": "request.component_material in product.facts.component_materials",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "magnets",
+      "role": "filter",
+      "predicate": "product.facts.built_in_magnets == request.built_in_magnets",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "stand",
+      "role": "filter",
+      "predicate": "known(product.facts.stand_configuration) and (product.facts.stand_configuration != 'none') == request.integrated_stand",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "supported_device_id": {
+                "type": "string"
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 70,
+                "max": 900
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "supported_device_id": {
+              "type": "string"
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 70,
+              "max": 900
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "case_attachment",
+              "dry_hand_grip",
+              "usual_pocket",
+              "covered_power_button",
+              "usb_plug_attachment",
+              "integrated_stand",
+              "port_cover_handling"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 70,
+          "max": 900
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 70
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 900
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_case_attachment": {
+          "type": "boolean"
+        },
+        "review.positive_dry_hand_grip": {
+          "type": "boolean"
+        },
+        "review.positive_usual_pocket": {
+          "type": "boolean"
+        },
+        "review.positive_covered_power_button": {
+          "type": "boolean"
+        },
+        "review.positive_usb_plug_attachment": {
+          "type": "boolean"
+        },
+        "review.positive_integrated_stand": {
+          "type": "boolean"
+        },
+        "review.positive_port_cover_handling": {
+          "type": "boolean"
+        },
+        "product.facts.supported_device_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.supported_device_label": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.stand_configuration": {
+          "type": "enum",
+          "values": [
+            "none",
+            "flush folding",
+            "not specified"
+          ],
+          "unknown_values": [
+            "not specified"
+          ],
+          "input": true
+        },
+        "product.facts.port_cover": {
+          "type": "boolean",
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "flexible": 1,
+            "hybrid": 0,
+            "rugged": 0
+          },
+          "cases": [
+            {
+              "when": "known(product.facts.stand_configuration) and product.facts.stand_configuration != 'none'",
+              "weights": {
+                "flexible": 0,
+                "hybrid": 1,
+                "rugged": 0
+              }
+            },
+            {
+              "when": "product.facts.port_cover",
+              "weights": {
+                "flexible": 0,
+                "hybrid": 0,
+                "rugged": 1
+              }
+            }
+          ],
+          "values": {
+            "flexible": [
+              "value",
+              "case_attachment",
+              "dry_hand_grip",
+              "usual_pocket",
+              "covered_power_button",
+              "usb_plug_attachment"
+            ],
+            "hybrid": [
+              "value",
+              "case_attachment",
+              "dry_hand_grip",
+              "usual_pocket",
+              "covered_power_button",
+              "usb_plug_attachment",
+              "integrated_stand"
+            ],
+            "rugged": [
+              "value",
+              "case_attachment",
+              "dry_hand_grip",
+              "usual_pocket",
+              "covered_power_button",
+              "usb_plug_attachment",
+              "port_cover_handling"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_case_attachment",
+          "target": "review.positive_case_attachment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_dry_hand_grip",
+          "target": "review.positive_dry_hand_grip",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_usual_pocket",
+          "target": "review.positive_usual_pocket",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_covered_power_button",
+          "target": "review.positive_covered_power_button",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_usb_plug_attachment",
+          "target": "review.positive_usb_plug_attachment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_integrated_stand",
+          "target": "review.positive_integrated_stand",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_port_cover_handling",
+          "target": "review.positive_port_cover_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        },
+        {
+          "id": "tested_device",
+          "require": "review.subject.supported_device_id == product.facts.supported_device_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "case_attachment.positive",
+          "when": "'case_attachment' in review.topics and review.positive_case_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "case_attachment",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "seating/removing case on its declared device; subjective handling"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Seating and removing this case on my {device} felt straightforward.",
+            "I found putting this case on and taking it off my {device} easy."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "case_attachment.negative",
+          "when": "'case_attachment' in review.topics and not review.positive_case_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "case_attachment",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "seating/removing case on its declared device; subjective handling"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Seating and removing this case on my {device} felt awkward.",
+            "I found putting this case on and taking it off my {device} difficult."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "dry_hand_grip.positive",
+          "when": "'dry_hand_grip' in review.topics and review.positive_dry_hand_grip",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "dry_hand_grip",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "ordinary use with dry hands; owner preference not universal grip"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked gripping my cased {device} with dry hands during ordinary use.",
+            "During ordinary use, the case felt comfortable in my dry hands around my {device}."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "dry_hand_grip.negative",
+          "when": "'dry_hand_grip' in review.topics and not review.positive_dry_hand_grip",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "dry_hand_grip",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "ordinary use with dry hands; owner preference not universal grip"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked gripping my cased {device} with dry hands during ordinary use.",
+            "During ordinary use, the case felt uncomfortable in my dry hands around my {device}."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "usual_pocket.positive",
+          "when": "'usual_pocket' in review.topics and review.positive_usual_pocket",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usual_pocket",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "inserting/removing cased device from owner usual pocket"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Putting my cased {device} into and taking it out of my usual pocket felt easy.",
+            "With this case, moving my {device} into and out of my usual pocket was straightforward."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "usual_pocket.negative",
+          "when": "'usual_pocket' in review.topics and not review.positive_usual_pocket",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usual_pocket",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "inserting/removing cased device from owner usual pocket"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Putting my cased {device} into and taking it out of my usual pocket felt awkward.",
+            "With this case, moving my {device} into and out of my usual pocket was difficult."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "covered_power_button.positive",
+          "when": "'covered_power_button' in review.topics and review.positive_covered_power_button",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "covered_power_button",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "pressing actually covered side power button on declared device"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pressing the covered side power button on my {device} felt easy through this case.",
+            "Through the case, I found my {device} covered side power button easy to press."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "covered_power_button.negative",
+          "when": "'covered_power_button' in review.topics and not review.positive_covered_power_button",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "covered_power_button",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "pressing actually covered side power button on declared device"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Pressing the covered side power button on my {device} felt awkward through this case.",
+            "Through the case, I found my {device} covered side power button difficult to press."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "usb_plug_attachment.positive",
+          "when": "'usb_plug_attachment' in review.topics and review.positive_usb_plug_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usb_plug_attachment",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "attaching owner usual USB-C plug with actual cover open if present; not charging success"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Attaching my usual USB-C plug to my cased {device} felt easy {port_context}.",
+            "I found my usual USB-C plug easy to attach to my {device} {port_context}."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label",
+            "port_context": "'with the port cover open' if product.facts.port_cover else 'through the open port access'"
+          }
+        },
+        {
+          "id": "usb_plug_attachment.negative",
+          "when": "'usb_plug_attachment' in review.topics and not review.positive_usb_plug_attachment",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "usb_plug_attachment",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "attaching owner usual USB-C plug with actual cover open if present; not charging success"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Attaching my usual USB-C plug to my cased {device} felt awkward {port_context}.",
+            "I found my usual USB-C plug difficult to attach to my {device} {port_context}."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label",
+            "port_context": "'with the port cover open' if product.facts.port_cover else 'through the open port access'"
+          }
+        },
+        {
+          "id": "integrated_stand.positive",
+          "when": "'integrated_stand' in review.topics and review.positive_integrated_stand and known(product.facts.stand_configuration) and product.facts.stand_configuration != 'none'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "integrated_stand",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "unfold/fold actual integrated stand; cased device in landscape on flat desk"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Unfolding and folding the integrated stand felt easy with my {device} in landscape on a flat desk.",
+            "On a flat desk with my {device} in landscape, I found the built-in stand easy to unfold and fold."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "integrated_stand.negative",
+          "when": "'integrated_stand' in review.topics and not review.positive_integrated_stand and known(product.facts.stand_configuration) and product.facts.stand_configuration != 'none'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "integrated_stand",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "unfold/fold actual integrated stand; cased device in landscape on flat desk"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Unfolding and folding the integrated stand felt awkward with my {device} in landscape on a flat desk.",
+            "On a flat desk with my {device} in landscape, I found the built-in stand difficult to unfold and fold."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "port_cover_handling.positive",
+          "when": "'port_cover_handling' in review.topics and review.positive_port_cover_handling and product.facts.port_cover",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "port_cover_handling",
+            "polarity": "positive",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "opening/closing actual hinged USB-C port cover on declared device"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and closing the hinged USB-C port cover on my {device} felt easy.",
+            "On my {device}, I found the hinged USB-C port cover easy to open and close."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        },
+        {
+          "id": "port_cover_handling.negative",
+          "when": "'port_cover_handling' in review.topics and not review.positive_port_cover_handling and product.facts.port_cover",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "port_cover_handling",
+            "polarity": "negative",
+            "context": {
+              "device": "exact declared supported fixture device, bound to tested SKU",
+              "aspect": "opening/closing actual hinged USB-C port cover on declared device"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Opening and closing the hinged USB-C port cover on my {device} felt awkward.",
+            "On my {device}, I found the hinged USB-C port cover difficult to open and close."
+          ],
+          "slots": {
+            "device": "product.facts.supported_device_label"
+          }
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Selected exact manufactured device/colour SKU price; no quantity or colour surcharge",
+        "relative_price_basis": {
+          "min_sek": 70,
+          "max_sek": 900
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "phone_cases",
+    "spec_path": "docs/agents/product-width-specs/phone_cases.shell_cases.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "No colour surcharge; selected exact device/colour canonical SKU reference price",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "electronics"
+    ],
+    "source_notes": ".local/product-width/research/shell_phone_cases.md",
+    "authored_exceptions": [
+      "Separate named device fixtures, not real phones or generated smartphone IDs; all covered-control/fit declarations are authored",
+      "Material allocation, no magnets/stand in flexible, all box exclusions and rugged colour menu are explicit recipe choices",
+      "No quantitative protection/charging/fit, source omission never proves absent stand; no accessory holster as stand"
+    ]
+  }
+}

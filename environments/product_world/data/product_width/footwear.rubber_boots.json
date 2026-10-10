@@ -1,0 +1,1021 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "footwear.rubber_boots",
+  "random_namespace": "product-width-footwear.rubber_boots-v1",
+  "extends": "_footwear_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.lining_bundle": {
+      "type": "object",
+      "properties": {
+        "lining": {
+          "type": "string"
+        },
+        "insulation": {
+          "type": "string"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.construction": {
+      "type": "string",
+      "constant": "rubber-upper wet-weather boot",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "wet-weather wear",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_heel": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.closed_toe": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.upper": {
+      "type": "string",
+      "constant": "rubber",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.outsole": {
+      "type": "string",
+      "constant": "rubber",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.rubber_formulation": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.component_materials.lining": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.insulation_kind": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.removable_inner_boot": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.footbed_material": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.removable_footbed": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shaft_height": {
+      "type": "enum",
+      "values": [
+        "mid",
+        "tall"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fastening": {
+      "type": "string",
+      "constant": "pull-on",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.calf_adjuster": {
+      "type": "enum",
+      "values": [
+        "none",
+        "shaft buckle strap",
+        "gusset adjuster (hardware unspecified)"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_declared": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.temperature_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one boot, EU 40 reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 670,
+      "max": 1040,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.calf_adjuster": {
+      "type": "string",
+      "optional": true
+    },
+    "request.lining": {
+      "type": "string",
+      "optional": true
+    },
+    "request.waterproof_declared": {
+      "type": "boolean",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "lining_bundle",
+      "target": "internal.lining_bundle",
+      "sample": "weighted_choice",
+      "weights": {
+        "textile": 4,
+        "neoprene": 1
+      },
+      "values": {
+        "textile": {
+          "lining": "textile",
+          "insulation": "no dedicated insulation declared",
+          "mass_g": 700
+        },
+        "neoprene": {
+          "lining": "neoprene",
+          "insulation": "neoprene insulation",
+          "mass_g": 950
+        }
+      }
+    },
+    {
+      "id": "lining",
+      "target": "product.facts.component_materials.lining",
+      "derive": "internal.lining_bundle.lining"
+    },
+    {
+      "id": "insulation",
+      "target": "product.facts.insulation_kind",
+      "derive": "internal.lining_bundle.insulation"
+    },
+    {
+      "id": "shaft",
+      "target": "product.facts.shaft_height",
+      "sample": "weighted_choice",
+      "weights": {
+        "mid": 2,
+        "tall": 3
+      }
+    },
+    {
+      "id": "calf_adjuster",
+      "target": "product.facts.calf_adjuster",
+      "sample": "weighted_choice",
+      "weights": {
+        "none": 3,
+        "shaft buckle strap": 2,
+        "gusset adjuster (hardware unspecified)": 1
+      }
+    },
+    {
+      "id": "waterproof_declaration",
+      "target": "product.facts.waterproof_declared",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 5,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -30,
+      "max": 30
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.lining_bundle.mass_g + internal.mass_noise_g + (60 if product.facts.shaft_height == 'tall' else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.construction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.intended_use",
+          "product.facts.closed_toe",
+          "product.facts.closed_heel",
+          "product.facts.component_materials.upper",
+          "product.facts.component_materials.outsole",
+          "product.facts.component_materials.lining",
+          "product.facts.insulation_kind",
+          "product.facts.removable_inner_boot",
+          "product.facts.rubber_formulation"
+        ]
+      },
+      "slots": {
+        "lining": "product.facts.component_materials.lining",
+        "insulation": "product.facts.insulation_kind"
+      },
+      "formulations": [
+        "Closed-toe and closed-heel wet-weather boot: rubber upper/outsole, {lining} lining and {insulation}; no removable inner boot. Rubber formulation unspecified.",
+        "Rubber upper and outsole enclose toe and upper heel. Lining: {lining}; insulation: {insulation}; no removable inner boot. Exact rubber formulation not specified."
+      ]
+    },
+    {
+      "id": "description.entry",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.fastening",
+          "product.facts.shaft_height",
+          "product.facts.calf_adjuster"
+        ]
+      },
+      "slots": {
+        "shaft": "product.facts.shaft_height",
+        "adjuster": "product.facts.calf_adjuster"
+      },
+      "formulations": [
+        "Pull-on entry; {shaft} shaft; calf adjuster: {adjuster}.",
+        "A {shaft} shaft with pull-on entry. Calf adjustment mechanism: {adjuster}."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.footbed_material",
+          "product.facts.removable_footbed",
+          "product.facts.waterproof_declared",
+          "product.facts.waterproof_rating",
+          "product.facts.temperature_rating"
+        ]
+      },
+      "slots": {
+        "declaration": "'present' if product.facts.waterproof_declared else 'absent'"
+      },
+      "formulations": [
+        "Waterproof declaration: {declaration}; numeric waterproof/temperature ratings unspecified. Footbed material and removability are not specified.",
+        "Manufacturer waterproof declaration {declaration}; quantitative waterproof and temperature ratings unknown, as are footbed material and removability."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One EU40 reference boot weighs {mass} g.",
+        "Reference mass: {mass} g for one boot in EU40."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'footwear.rubber_boots' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "adjuster",
+      "role": "filter",
+      "predicate": "product.facts.calf_adjuster == request.calf_adjuster",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "lining",
+      "role": "filter",
+      "predicate": "product.facts.component_materials.lining == request.lining",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "waterproof_declaration",
+      "role": "filter",
+      "predicate": "product.facts.waterproof_declared == request.waterproof_declared",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "width": {
+                "type": "string"
+              },
+              "size_eu": {
+                "type": "integer"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "width": {
+              "type": "string"
+            },
+            "size_eu": {
+              "type": "integer"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "rain_walk_dryness",
+              "sock_fit",
+              "boot_entry",
+              "calf_adjustment"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 350,
+          "max": 2400
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 350
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 2400
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_rain_walk_dryness": {
+          "type": "boolean"
+        },
+        "review.positive_sock_fit": {
+          "type": "boolean"
+        },
+        "review.positive_boot_entry": {
+          "type": "boolean"
+        },
+        "review.positive_calf_adjustment": {
+          "type": "boolean"
+        },
+        "product.facts.calf_adjuster": {
+          "type": "enum",
+          "values": [
+            "none",
+            "shaft buckle strap",
+            "gusset adjuster (hardware unspecified)"
+          ],
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "plain": 1,
+            "adjustable": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.calf_adjuster != 'none'",
+              "weights": {
+                "plain": 0,
+                "adjustable": 1
+              }
+            }
+          ],
+          "values": {
+            "plain": [
+              "value",
+              "rain_walk_dryness",
+              "sock_fit",
+              "boot_entry"
+            ],
+            "adjustable": [
+              "value",
+              "rain_walk_dryness",
+              "sock_fit",
+              "boot_entry",
+              "calf_adjustment"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_rain_walk_dryness",
+          "target": "review.positive_rain_walk_dryness",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_sock_fit",
+          "target": "review.positive_sock_fit",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_boot_entry",
+          "target": "review.positive_boot_entry",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_calf_adjustment",
+          "target": "review.positive_calf_adjustment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "rain_walk_dryness.positive",
+          "when": "'rain_walk_dryness' in review.topics and review.positive_rain_walk_dryness",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "rain_walk_dryness",
+            "polarity": "positive",
+            "context": {
+              "use": "short rainy walk",
+              "water": "below shaft",
+              "aspect": "perceived foot dryness"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My feet stayed dry during a short rainy walk with water below the shaft.",
+            "I had dry feet on a short rainy walk while water stayed below the shaft."
+          ]
+        },
+        {
+          "id": "rain_walk_dryness.negative",
+          "when": "'rain_walk_dryness' in review.topics and not review.positive_rain_walk_dryness",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "rain_walk_dryness",
+            "polarity": "negative",
+            "context": {
+              "use": "short rainy walk",
+              "water": "below shaft",
+              "aspect": "perceived foot dryness"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My feet were wet during a short rainy walk with water below the shaft.",
+            "I had wet feet on a short rainy walk while water stayed below the shaft."
+          ]
+        },
+        {
+          "id": "sock_fit.positive",
+          "when": "'sock_fit' in review.topics and review.positive_sock_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "sock_fit",
+            "polarity": "positive",
+            "context": {
+              "aspect": "forefoot room",
+              "socks": "ordinary socks",
+              "size": "tested size"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot had enough room with ordinary socks in the size I tried.",
+            "The tested size left enough forefoot room for my ordinary socks."
+          ]
+        },
+        {
+          "id": "sock_fit.negative",
+          "when": "'sock_fit' in review.topics and not review.positive_sock_fit",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "sock_fit",
+            "polarity": "negative",
+            "context": {
+              "aspect": "forefoot room",
+              "socks": "ordinary socks",
+              "size": "tested size"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "My forefoot lacked room with ordinary socks in the size I tried.",
+            "The tested size left too little forefoot room for my ordinary socks."
+          ]
+        },
+        {
+          "id": "boot_entry.positive",
+          "when": "'boot_entry' in review.topics and review.positive_boot_entry",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "boot_entry",
+            "polarity": "positive",
+            "context": "putting on the boots",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the boots easy to put on.",
+            "Putting on the boots was easy for me."
+          ]
+        },
+        {
+          "id": "boot_entry.negative",
+          "when": "'boot_entry' in review.topics and not review.positive_boot_entry",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "boot_entry",
+            "polarity": "negative",
+            "context": "putting on the boots",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the boots difficult to put on.",
+            "Putting on the boots was difficult for me."
+          ]
+        },
+        {
+          "id": "calf_adjustment.positive",
+          "when": "'calf_adjustment' in review.topics and review.positive_calf_adjustment and product.facts.calf_adjuster != 'none'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "calf_adjustment",
+            "polarity": "positive",
+            "context": "adjusting the represented calf adjuster",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the calf adjuster easy to adjust.",
+            "Adjusting the calf adjuster was easy for me."
+          ]
+        },
+        {
+          "id": "calf_adjustment.negative",
+          "when": "'calf_adjustment' in review.topics and not review.positive_calf_adjustment and product.facts.calf_adjuster != 'none'",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "calf_adjustment",
+            "polarity": "negative",
+            "context": "adjusting the represented calf adjuster",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the calf adjuster difficult to adjust.",
+            "Adjusting the calf adjuster was difficult for me."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 350,
+          "max_sek": 2400
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "footwear",
+    "spec_path": "docs/agents/product-width-specs/footwear.rubber_boots.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "footwear",
+      "apparel",
+      "outdoors"
+    ],
+    "scope_exceptions": [
+      "Pull-on entry distinct from calf adjuster",
+      "Waterproof declaration not equivalent to dry-foot outcome; quantitative test unknown",
+      "Footbed details unknown; neoprene lining not removable inner boot",
+      "No chemical, occupational or slip-resistance certification"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 350,
+      "max": 800,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 700,
+          "max": 1400
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1200,
+          "max": 2400
+        }
+      ]
+    }
+  }
+}

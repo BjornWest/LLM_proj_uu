@@ -1,0 +1,1028 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "jackets.fleece_jackets",
+  "random_namespace": "product-width-jackets.fleece_jackets-v1",
+  "extends": "_apparel_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.body": {
+      "type": "object",
+      "properties": {
+        "structure": {
+          "type": "string"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "internal.pockets": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "closure": {
+          "type": "string"
+        }
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "fleece layering",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_fibre": {
+      "type": "string",
+      "constant": "polyester",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.knit_structure": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.body_fabric_mass_g_m2": {
+      "type": "number",
+      "unit": "g/m2",
+      "min": 170,
+      "max": 360,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.membrane_present": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.separate_body_lining": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.dedicated_fill": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.front_closure": {
+      "type": "string",
+      "constant": "full front zip",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.collar": {
+      "type": "string",
+      "constant": "stand collar",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_present": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cut": {
+      "type": "enum",
+      "values": [
+        "slim",
+        "regular",
+        "relaxed"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hand_pocket_count": {
+      "type": "integer",
+      "min": 0,
+      "max": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hand_pocket_closure": {
+      "type": "enum",
+      "values": [
+        "none",
+        "open",
+        "zip"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.anti_pilling_treatment": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.pilling_grade": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.thermal_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one garment, nominal size M reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 275,
+      "max": 640,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.max_fabric_mass_g_m2": {
+      "type": "number",
+      "unit": "g/m2",
+      "optional": true
+    },
+    "request.structure": {
+      "type": "string",
+      "optional": true
+    },
+    "request.hand_pockets": {
+      "type": "integer",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "body_bundle",
+      "target": "internal.body",
+      "sample": "weighted_choice",
+      "weights": {
+        "grid": 3,
+        "sweater": 2
+      },
+      "values": {
+        "grid": {
+          "structure": "open-grid fleece backer",
+          "mass_g": 300
+        },
+        "sweater": {
+          "structure": "sweater-knit face with fleece back",
+          "mass_g": 600
+        }
+      }
+    },
+    {
+      "id": "structure",
+      "target": "product.facts.knit_structure",
+      "derive": "internal.body.structure"
+    },
+    {
+      "id": "fabric_mass",
+      "target": "product.facts.body_fabric_mass_g_m2",
+      "sample": "weighted_choice",
+      "weights": {
+        "170": 1,
+        "180": 1,
+        "190": 1,
+        "320": 0,
+        "340": 0,
+        "360": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.knit_structure == 'sweater-knit face with fleece back'",
+          "weights": {
+            "170": 0,
+            "180": 0,
+            "190": 0,
+            "320": 1,
+            "340": 1,
+            "360": 1
+          }
+        }
+      ],
+      "values": {
+        "170": 170,
+        "180": 180,
+        "190": 190,
+        "320": 320,
+        "340": 340,
+        "360": 360
+      }
+    },
+    {
+      "id": "cut",
+      "target": "product.facts.cut",
+      "sample": "weighted_choice",
+      "weights": {
+        "slim": 2,
+        "regular": 5,
+        "relaxed": 2
+      }
+    },
+    {
+      "id": "pocket_bundle",
+      "target": "internal.pockets",
+      "sample": "weighted_choice",
+      "weights": {
+        "none": 1,
+        "open": 2,
+        "zipped": 5
+      },
+      "values": {
+        "none": {
+          "count": 0,
+          "closure": "none"
+        },
+        "open": {
+          "count": 2,
+          "closure": "open"
+        },
+        "zipped": {
+          "count": 2,
+          "closure": "zip"
+        }
+      }
+    },
+    {
+      "id": "pocket_count",
+      "target": "product.facts.hand_pocket_count",
+      "derive": "internal.pockets.count"
+    },
+    {
+      "id": "pocket_closure",
+      "target": "product.facts.hand_pocket_closure",
+      "derive": "internal.pockets.closure"
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -25,
+      "max": 25
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.body.mass_g + internal.mass_noise_g + (15 if product.facts.hand_pocket_count > 0 else 0)"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.body_fibre",
+          "product.facts.knit_structure",
+          "product.facts.body_fabric_mass_g_m2",
+          "product.facts.membrane_present",
+          "product.facts.separate_body_lining",
+          "product.facts.dedicated_fill"
+        ]
+      },
+      "slots": {
+        "structure": "product.facts.knit_structure",
+        "fabric": "product.facts.body_fabric_mass_g_m2"
+      },
+      "formulations": [
+        "Polyester knitted fleece: {structure}, body fabric {fabric} g/m²; no membrane, separate body lining or dedicated fill.",
+        "A polyester {structure} body at {fabric} g/m² without membrane, separate body lining or dedicated fill."
+      ]
+    },
+    {
+      "id": "description.controls",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.front_closure",
+          "product.facts.collar",
+          "product.facts.hood_present",
+          "product.facts.cut",
+          "product.facts.hand_pocket_count",
+          "product.facts.hand_pocket_closure"
+        ]
+      },
+      "slots": {
+        "cut": "product.facts.cut",
+        "count": "product.facts.hand_pocket_count",
+        "closure": "product.facts.hand_pocket_closure"
+      },
+      "formulations": [
+        "Full front zip, stand collar, no hood, {cut} cut. Hand-pocket count: {count}; pocket closure designation: {closure}.",
+        "A {cut}-cut full-zip stand-collar jacket without hood; {count} hand pockets, closure designation {closure}."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.anti_pilling_treatment",
+          "product.facts.pilling_grade",
+          "product.facts.thermal_rating",
+          "product.facts.waterproof_rating"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Anti-pilling treatment, numerical pilling grade, thermal rating and quantitative waterproof rating are not specified.",
+        "No specified anti-pilling treatment or numerical pilling, thermal or waterproof rating."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One nominal sizeM reference garment weighs {mass} g.",
+        "Reference mass: {mass} g for one garment in nominal sizeM."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'jackets.fleece_jackets' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "fabric_mass",
+      "role": "filter",
+      "predicate": "product.facts.body_fabric_mass_g_m2 <= request.max_fabric_mass_g_m2",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "structure",
+      "role": "filter",
+      "predicate": "product.facts.knit_structure == request.structure",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "pockets",
+      "role": "filter",
+      "predicate": "product.facts.hand_pocket_count == request.hand_pockets",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "size_label": {
+                "type": "string"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "size_label": {
+              "type": "string"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "cool_walk_warmth",
+            "arm_movement",
+            "front_zip_operation",
+            "surface_pilling"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "cool_walk_warmth",
+              "arm_movement",
+              "front_zip_operation",
+              "surface_pilling"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 300,
+          "max": 2400
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 300
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 2400
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_cool_walk_warmth": {
+          "type": "boolean"
+        },
+        "review.positive_arm_movement": {
+          "type": "boolean"
+        },
+        "review.positive_front_zip_operation": {
+          "type": "boolean"
+        },
+        "review.positive_surface_pilling": {
+          "type": "boolean"
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_cool_walk_warmth",
+          "target": "review.positive_cool_walk_warmth",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_arm_movement",
+          "target": "review.positive_arm_movement",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_front_zip_operation",
+          "target": "review.positive_front_zip_operation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_surface_pilling",
+          "target": "review.positive_surface_pilling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "cool_walk_warmth.positive",
+          "when": "'cool_walk_warmth' in review.topics and review.positive_cool_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cool_walk_warmth",
+            "polarity": "positive",
+            "context": {
+              "use": "short cool dry walk",
+              "layer": "light layer",
+              "front": "closed",
+              "aspect": "perceived sufficient warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I felt warm enough on a short cool dry walk over a light layer with the front closed.",
+            "Warmth was sufficient for me on a short cool dry walk over a light layer with the front closed."
+          ]
+        },
+        {
+          "id": "cool_walk_warmth.negative",
+          "when": "'cool_walk_warmth' in review.topics and not review.positive_cool_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cool_walk_warmth",
+            "polarity": "negative",
+            "context": {
+              "use": "short cool dry walk",
+              "layer": "light layer",
+              "front": "closed",
+              "aspect": "perceived sufficient warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I did not feel warm enough on a short cool dry walk over a light layer with the front closed.",
+            "Warmth was insufficient for me on a short cool dry walk over a light layer with the front closed."
+          ]
+        },
+        {
+          "id": "arm_movement.positive",
+          "when": "'arm_movement' in review.topics and review.positive_arm_movement",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "arm_movement",
+            "polarity": "positive",
+            "context": {
+              "layer": "light layer",
+              "size": "tested size",
+              "aspect": "arm movement comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving my arms was comfortable in the tested size over a light layer.",
+            "My arm movements felt comfortable in the size I tried over a light layer."
+          ]
+        },
+        {
+          "id": "arm_movement.negative",
+          "when": "'arm_movement' in review.topics and not review.positive_arm_movement",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "arm_movement",
+            "polarity": "negative",
+            "context": {
+              "layer": "light layer",
+              "size": "tested size",
+              "aspect": "arm movement comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving my arms was uncomfortable in the tested size over a light layer.",
+            "My arm movements felt uncomfortable in the size I tried over a light layer."
+          ]
+        },
+        {
+          "id": "front_zip_operation.positive",
+          "when": "'front_zip_operation' in review.topics and review.positive_front_zip_operation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_zip_operation",
+            "polarity": "positive",
+            "context": "operating the front entry zip",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the front entry zip easy to operate.",
+            "Operating the front entry zip was easy for me."
+          ]
+        },
+        {
+          "id": "front_zip_operation.negative",
+          "when": "'front_zip_operation' in review.topics and not review.positive_front_zip_operation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_zip_operation",
+            "polarity": "negative",
+            "context": "operating the front entry zip",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the front entry zip difficult to operate.",
+            "Operating the front entry zip was difficult for me."
+          ]
+        },
+        {
+          "id": "surface_pilling.positive",
+          "when": "'surface_pilling' in review.topics and review.positive_surface_pilling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "surface_pilling",
+            "polarity": "positive",
+            "context": {
+              "event": "after 10 washes",
+              "surface": "body fabric",
+              "aspect": "noticeable pilling"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "There was no noticeable body-fabric surface pilling after ten washes.",
+            "After ten washes, I saw no noticeable pilling on the body-fabric surface."
+          ]
+        },
+        {
+          "id": "surface_pilling.negative",
+          "when": "'surface_pilling' in review.topics and not review.positive_surface_pilling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "surface_pilling",
+            "polarity": "negative",
+            "context": {
+              "event": "after 10 washes",
+              "surface": "body fabric",
+              "aspect": "noticeable pilling"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "There was noticeable body-fabric surface pilling after ten washes.",
+            "After ten washes, I saw noticeable pilling on the body-fabric surface."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 300,
+          "max_sek": 2400
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "jackets",
+    "spec_path": "docs/agents/product-width-specs/jackets.fleece_jackets.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "apparel",
+      "outdoors"
+    ],
+    "scope_exceptions": [
+      "No membrane/body lining/fill only in this authored scope, not universal fleece rule",
+      "Areal fabric mass is not whole garment mass or insulation fill",
+      "No hood, anti-pill or numeric thermal guarantee; blend/hood/half-zip variants deferred"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 300,
+      "max": 800,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 700,
+          "max": 1400
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 1200,
+          "max": 2400
+        }
+      ]
+    }
+  }
+}

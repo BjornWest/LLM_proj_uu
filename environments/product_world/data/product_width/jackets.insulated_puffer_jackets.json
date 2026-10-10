@@ -1,0 +1,1416 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "jackets.insulated_puffer_jackets",
+  "random_namespace": "product-width-jackets.insulated_puffer_jackets-v1",
+  "extends": "_apparel_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "internal.insulation": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "material": {
+          "type": "string"
+        },
+        "distribution": {
+          "type": "string"
+        },
+        "mass_g": {
+          "type": "integer",
+          "unit": "g"
+        }
+      }
+    },
+    "product.facts.intended_use": {
+      "type": "string",
+      "constant": "hip-length insulated outerwear",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.insulation_kind": {
+      "type": "enum",
+      "values": [
+        "down",
+        "synthetic"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.insulation_material": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.insulation_distribution": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shell_fibre": {
+      "type": "enum",
+      "values": [
+        "nylon",
+        "polyester"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.lining_fibre": {
+      "type": "string",
+      "constant": "polyester",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.dedicated_fill": {
+      "type": "boolean",
+      "constant": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.membrane_present": {
+      "type": "boolean",
+      "constant": false,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_down_fill_power": {
+      "type": "number",
+      "unit": "cu in/oz",
+      "min": 700,
+      "max": 800,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_down_fill_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "min": 100,
+      "max": 200,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hydrophobic_down_treatment": {
+      "type": "boolean",
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_synthetic_insulation_g_m2": {
+      "type": "number",
+      "unit": "g/m2",
+      "min": 60,
+      "max": 100,
+      "optional": true,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.synthetic_total_fill_mass": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "optional": true
+    },
+    "product.facts.fill_reference_basis": {
+      "type": "string",
+      "constant": "one garment, nominal size M reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fill_power_test_method": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "optional": true
+    },
+    "product.facts.fill_power_conditioning": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "optional": true
+    },
+    "product.facts.down_species_and_blend": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      },
+      "optional": true
+    },
+    "product.facts.seam_treatment": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.waterproof_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.thermal_rating": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.pack_volume": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.front_closure": {
+      "type": "string",
+      "constant": "full front zip",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hand_pocket_count": {
+      "type": "integer",
+      "constant": 2,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hand_pocket_closure": {
+      "type": "string",
+      "constant": "zip",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_style": {
+      "type": "enum",
+      "values": [
+        "absent",
+        "fixed",
+        "adjustable"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_present": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.hood_adjustable": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.internal_pocket_storage": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.shell_dwr": {
+      "type": "boolean",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.cut": {
+      "type": "enum",
+      "values": [
+        "slim",
+        "regular",
+        "relaxed"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.mass_basis": {
+      "type": "string",
+      "constant": "one garment, nominal size M reference configuration",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.mass_noise_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "product.facts.reference_mass_g": {
+      "type": "integer",
+      "unit": "g",
+      "min": 295,
+      "max": 445,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "request.insulation_kind": {
+      "type": "string",
+      "optional": true
+    },
+    "request.minimum_down_fill_power": {
+      "type": "number",
+      "unit": "cu in/oz",
+      "optional": true
+    },
+    "request.max_mass_g": {
+      "type": "number",
+      "unit": "g",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "insulation_bundle",
+      "target": "internal.insulation",
+      "sample": "weighted_choice",
+      "weights": {
+        "down": 3,
+        "synthetic": 3
+      },
+      "values": {
+        "down": {
+          "kind": "down",
+          "material": "down",
+          "distribution": "sewn baffles",
+          "mass_g": 380
+        },
+        "synthetic": {
+          "kind": "synthetic",
+          "material": "polyester synthetic insulation",
+          "distribution": "quilting",
+          "mass_g": 320
+        }
+      }
+    },
+    {
+      "id": "kind",
+      "target": "product.facts.insulation_kind",
+      "derive": "internal.insulation.kind"
+    },
+    {
+      "id": "material",
+      "target": "product.facts.insulation_material",
+      "derive": "internal.insulation.material"
+    },
+    {
+      "id": "distribution",
+      "target": "product.facts.insulation_distribution",
+      "derive": "internal.insulation.distribution"
+    },
+    {
+      "id": "shell",
+      "target": "product.facts.shell_fibre",
+      "sample": "weighted_choice",
+      "weights": {
+        "nylon": 2,
+        "polyester": 1
+      }
+    },
+    {
+      "id": "fill_power",
+      "target": "product.facts.declared_down_fill_power",
+      "sample": "weighted_choice",
+      "weights": {
+        "700": 1,
+        "800": 1
+      },
+      "when": "product.facts.insulation_kind == 'down'",
+      "values": {
+        "700": 700,
+        "800": 800
+      }
+    },
+    {
+      "id": "fill_mass",
+      "target": "product.facts.declared_down_fill_mass_g",
+      "sample": "weighted_choice",
+      "weights": {
+        "100": 1,
+        "150": 1,
+        "200": 1
+      },
+      "when": "product.facts.insulation_kind == 'down'",
+      "values": {
+        "100": 100,
+        "150": 150,
+        "200": 200
+      }
+    },
+    {
+      "id": "down_treatment",
+      "target": "product.facts.hydrophobic_down_treatment",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 3,
+        "no": 2
+      },
+      "when": "product.facts.insulation_kind == 'down'",
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "synthetic_areal_mass",
+      "target": "product.facts.declared_synthetic_insulation_g_m2",
+      "sample": "weighted_choice",
+      "weights": {
+        "60": 1,
+        "100": 1
+      },
+      "when": "product.facts.insulation_kind == 'synthetic'",
+      "values": {
+        "60": 60,
+        "100": 100
+      }
+    },
+    {
+      "id": "hood",
+      "target": "product.facts.hood_style",
+      "sample": "weighted_choice",
+      "weights": {
+        "absent": 1,
+        "fixed": 2,
+        "adjustable": 3
+      }
+    },
+    {
+      "id": "hood_present",
+      "target": "product.facts.hood_present",
+      "derive": "product.facts.hood_style != 'absent'"
+    },
+    {
+      "id": "hood_adjustable",
+      "target": "product.facts.hood_adjustable",
+      "derive": "product.facts.hood_style == 'adjustable'"
+    },
+    {
+      "id": "storage",
+      "target": "product.facts.internal_pocket_storage",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 2,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "dwr",
+      "target": "product.facts.shell_dwr",
+      "sample": "weighted_choice",
+      "weights": {
+        "yes": 3,
+        "no": 1
+      },
+      "values": {
+        "yes": true,
+        "no": false
+      }
+    },
+    {
+      "id": "cut",
+      "target": "product.facts.cut",
+      "sample": "weighted_choice",
+      "weights": {
+        "slim": 1,
+        "regular": 5,
+        "relaxed": 2
+      }
+    },
+    {
+      "id": "mass_noise",
+      "target": "internal.mass_noise_g",
+      "sample": "uniform_int",
+      "min": -25,
+      "max": 25
+    },
+    {
+      "id": "mass",
+      "target": "product.facts.reference_mass_g",
+      "derive": "internal.insulation.mass_g + internal.mass_noise_g + (30 if product.facts.hood_present else 0) + (10 if product.facts.internal_pocket_storage else 0)"
+    },
+    {
+      "id": "synthetic_total_fill_mass_status",
+      "target": "product.facts.synthetic_total_fill_mass",
+      "derive": "'not specified'",
+      "when": "product.facts.insulation_kind == 'synthetic'"
+    },
+    {
+      "id": "fill_power_test_method_status",
+      "target": "product.facts.fill_power_test_method",
+      "derive": "'not specified'",
+      "when": "product.facts.insulation_kind == 'down'"
+    },
+    {
+      "id": "fill_power_conditioning_status",
+      "target": "product.facts.fill_power_conditioning",
+      "derive": "'not specified'",
+      "when": "product.facts.insulation_kind == 'down'"
+    },
+    {
+      "id": "down_species_and_blend_status",
+      "target": "product.facts.down_species_and_blend",
+      "derive": "'not specified'",
+      "when": "product.facts.insulation_kind == 'down'"
+    }
+  ],
+  "language": [
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.shell_fibre",
+          "product.facts.lining_fibre",
+          "product.facts.insulation_material",
+          "product.facts.insulation_distribution",
+          "product.facts.dedicated_fill",
+          "product.facts.membrane_present"
+        ]
+      },
+      "slots": {
+        "shell": "product.facts.shell_fibre",
+        "fill": "product.facts.insulation_material",
+        "distribution": "product.facts.insulation_distribution"
+      },
+      "formulations": [
+        "{shell} shell and polyester lining, dedicated {fill} retained by {distribution}; no membrane in this assembly.",
+        "Dedicated {fill} with {distribution}, a {shell} shell and polyester lining; membrane absent."
+      ]
+    },
+    {
+      "id": "description.down",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.declared_down_fill_power",
+          "product.facts.declared_down_fill_mass_g",
+          "product.facts.hydrophobic_down_treatment",
+          "product.facts.fill_reference_basis",
+          "product.facts.fill_power_test_method",
+          "product.facts.fill_power_conditioning"
+        ]
+      },
+      "slots": {
+        "power": "product.facts.declared_down_fill_power",
+        "fill": "product.facts.declared_down_fill_mass_g",
+        "treated": "'present' if product.facts.hydrophobic_down_treatment else 'absent'"
+      },
+      "formulations": [
+        "Declared down fill power {power} cuin/oz, method/conditioning unspecified; total down fill {fill} g for one nominal sizeM reference garment. Hydrophobic-down treatment {treated}.",
+        "One nominal sizeM reference jacket: {fill} g total down fill; declared fill power {power} cuin/oz without specified protocol/conditioning; hydrophobic-down treatment {treated}."
+      ],
+      "when": "product.facts.insulation_kind == 'down'"
+    },
+    {
+      "id": "description.synthetic",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.declared_synthetic_insulation_g_m2",
+          "product.facts.synthetic_total_fill_mass"
+        ]
+      },
+      "slots": {
+        "areal": "product.facts.declared_synthetic_insulation_g_m2"
+      },
+      "formulations": [
+        "Declared synthetic insulation areal mass {areal} g/m²; total synthetic fill grams unspecified.",
+        "Synthetic insulation: {areal} g/m², not a total fill mass; no specified total fill grams."
+      ],
+      "when": "product.facts.insulation_kind == 'synthetic'"
+    },
+    {
+      "id": "description.controls",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.front_closure",
+          "product.facts.hood_style",
+          "product.facts.hood_adjustable",
+          "product.facts.internal_pocket_storage",
+          "product.facts.hand_pocket_count",
+          "product.facts.hand_pocket_closure",
+          "product.facts.shell_dwr",
+          "product.facts.cut"
+        ]
+      },
+      "slots": {
+        "hood": "product.facts.hood_style",
+        "storage": "'present' if product.facts.internal_pocket_storage else 'absent'",
+        "dwr": "'present' if product.facts.shell_dwr else 'absent'",
+        "cut": "product.facts.cut"
+      },
+      "formulations": [
+        "Full front zip, {cut} cut, hood {hood}, two zipped hand pockets; internal storage pocket {storage}; shell DWR {dwr}.",
+        "A {cut}-cut jacket with full front zip and two zip hand pockets; hood: {hood}; internal pocket storage {storage}; shell DWR {dwr}."
+      ]
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.down_species_and_blend",
+          "product.facts.seam_treatment",
+          "product.facts.waterproof_rating",
+          "product.facts.thermal_rating",
+          "product.facts.pack_volume"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Down species/blend where applicable, seam treatment, quantitative waterproof/thermal ratings and numerical packed volume unspecified.",
+        "No specified down species/blend where applicable, seam treatment, numeric waterproof/thermal results or packed volume."
+      ]
+    },
+    {
+      "id": "description.mass",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_mass_g",
+          "product.facts.mass_basis"
+        ]
+      },
+      "slots": {
+        "mass": "product.facts.reference_mass_g"
+      },
+      "formulations": [
+        "One nominal sizeM reference garment weighs {mass} g.",
+        "Reference mass: {mass} g for one garment in nominal sizeM."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'jackets.insulated_puffer_jackets' in brand.eligible_concepts"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "insulation",
+      "role": "filter",
+      "predicate": "product.facts.insulation_kind == request.insulation_kind",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "down_power",
+      "role": "filter",
+      "predicate": "applicable(product.facts.declared_down_fill_power) and product.facts.insulation_kind == 'down' and product.facts.declared_down_fill_power >= request.minimum_down_fill_power",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "mass",
+      "role": "filter",
+      "predicate": "product.facts.reference_mass_g <= request.max_mass_g",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "colour": {
+                "type": "string"
+              },
+              "size_label": {
+                "type": "string"
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "colour": {
+              "type": "string"
+            },
+            "size_label": {
+              "type": "string"
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "cold_walk_warmth",
+              "arm_movement",
+              "front_zip_operation",
+              "hood_adjustment",
+              "pocket_packing"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 700,
+          "max": 5000
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 700
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 5000
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_cold_walk_warmth": {
+          "type": "boolean"
+        },
+        "review.positive_arm_movement": {
+          "type": "boolean"
+        },
+        "review.positive_front_zip_operation": {
+          "type": "boolean"
+        },
+        "review.positive_hood_adjustment": {
+          "type": "boolean"
+        },
+        "review.positive_pocket_packing": {
+          "type": "boolean"
+        },
+        "product.facts.hood_adjustable": {
+          "type": "boolean",
+          "input": true
+        },
+        "product.facts.internal_pocket_storage": {
+          "type": "boolean",
+          "input": true
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topic_applicability",
+          "target": "review.eligible",
+          "sample": "weighted_choice",
+          "weights": {
+            "plain": 1,
+            "hood": 0,
+            "storage": 0,
+            "both": 0
+          },
+          "cases": [
+            {
+              "when": "product.facts.hood_adjustable and product.facts.internal_pocket_storage",
+              "weights": {
+                "plain": 0,
+                "hood": 0,
+                "storage": 0,
+                "both": 1
+              }
+            },
+            {
+              "when": "product.facts.hood_adjustable and not product.facts.internal_pocket_storage",
+              "weights": {
+                "plain": 0,
+                "hood": 1,
+                "storage": 0,
+                "both": 0
+              }
+            },
+            {
+              "when": "not product.facts.hood_adjustable and product.facts.internal_pocket_storage",
+              "weights": {
+                "plain": 0,
+                "hood": 0,
+                "storage": 1,
+                "both": 0
+              }
+            }
+          ],
+          "values": {
+            "plain": [
+              "value",
+              "cold_walk_warmth",
+              "arm_movement",
+              "front_zip_operation"
+            ],
+            "hood": [
+              "value",
+              "cold_walk_warmth",
+              "arm_movement",
+              "front_zip_operation",
+              "hood_adjustment"
+            ],
+            "storage": [
+              "value",
+              "cold_walk_warmth",
+              "arm_movement",
+              "front_zip_operation",
+              "pocket_packing"
+            ],
+            "both": [
+              "value",
+              "cold_walk_warmth",
+              "arm_movement",
+              "front_zip_operation",
+              "hood_adjustment",
+              "pocket_packing"
+            ]
+          }
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "product.reference_price_sek"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_cold_walk_warmth",
+          "target": "review.positive_cold_walk_warmth",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_arm_movement",
+          "target": "review.positive_arm_movement",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_front_zip_operation",
+          "target": "review.positive_front_zip_operation",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_hood_adjustment",
+          "target": "review.positive_hood_adjustment",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_pocket_packing",
+          "target": "review.positive_pocket_packing",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "cold_walk_warmth.positive",
+          "when": "'cold_walk_warmth' in review.topics and review.positive_cold_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cold_walk_warmth",
+            "polarity": "positive",
+            "context": {
+              "use": "short cold dry walk",
+              "layer": "light midlayer",
+              "front": "closed",
+              "aspect": "perceived sufficient warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I felt warm enough on a short cold dry walk over a light midlayer with the front closed.",
+            "Warmth was sufficient for me on a short cold dry walk over a light midlayer with the front closed."
+          ]
+        },
+        {
+          "id": "cold_walk_warmth.negative",
+          "when": "'cold_walk_warmth' in review.topics and not review.positive_cold_walk_warmth",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "cold_walk_warmth",
+            "polarity": "negative",
+            "context": {
+              "use": "short cold dry walk",
+              "layer": "light midlayer",
+              "front": "closed",
+              "aspect": "perceived sufficient warmth"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I did not feel warm enough on a short cold dry walk over a light midlayer with the front closed.",
+            "Warmth was insufficient for me on a short cold dry walk over a light midlayer with the front closed."
+          ]
+        },
+        {
+          "id": "arm_movement.positive",
+          "when": "'arm_movement' in review.topics and review.positive_arm_movement",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "arm_movement",
+            "polarity": "positive",
+            "context": {
+              "layer": "light midlayer",
+              "size": "tested size",
+              "aspect": "arm movement comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving my arms was comfortable in the tested size over a light midlayer.",
+            "My arm movements felt comfortable in the size I tried over a light midlayer."
+          ]
+        },
+        {
+          "id": "arm_movement.negative",
+          "when": "'arm_movement' in review.topics and not review.positive_arm_movement",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "arm_movement",
+            "polarity": "negative",
+            "context": {
+              "layer": "light midlayer",
+              "size": "tested size",
+              "aspect": "arm movement comfort"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Moving my arms was uncomfortable in the tested size over a light midlayer.",
+            "My arm movements felt uncomfortable in the size I tried over a light midlayer."
+          ]
+        },
+        {
+          "id": "front_zip_operation.positive",
+          "when": "'front_zip_operation' in review.topics and review.positive_front_zip_operation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_zip_operation",
+            "polarity": "positive",
+            "context": "operating the front entry zip",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the front entry zip easy to operate.",
+            "Operating the front entry zip was easy for me."
+          ]
+        },
+        {
+          "id": "front_zip_operation.negative",
+          "when": "'front_zip_operation' in review.topics and not review.positive_front_zip_operation",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "front_zip_operation",
+            "polarity": "negative",
+            "context": "operating the front entry zip",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the front entry zip difficult to operate.",
+            "Operating the front entry zip was difficult for me."
+          ]
+        },
+        {
+          "id": "hood_adjustment.positive",
+          "when": "'hood_adjustment' in review.topics and review.positive_hood_adjustment and product.facts.hood_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "hood_adjustment",
+            "polarity": "positive",
+            "context": "adjusting the hood",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the hood easy to adjust.",
+            "Adjusting the hood was easy for me."
+          ]
+        },
+        {
+          "id": "hood_adjustment.negative",
+          "when": "'hood_adjustment' in review.topics and not review.positive_hood_adjustment and product.facts.hood_adjustable",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "hood_adjustment",
+            "polarity": "negative",
+            "context": "adjusting the hood",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found the hood difficult to adjust.",
+            "Adjusting the hood was difficult for me."
+          ]
+        },
+        {
+          "id": "pocket_packing.positive",
+          "when": "'pocket_packing' in review.topics and review.positive_pocket_packing and product.facts.internal_pocket_storage",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "pocket_packing",
+            "polarity": "positive",
+            "context": "packing this jacket into its internal storage pocket",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found it easy to pack this jacket into its internal storage pocket.",
+            "Packing the jacket into its internal storage pocket was easy for me."
+          ]
+        },
+        {
+          "id": "pocket_packing.negative",
+          "when": "'pocket_packing' in review.topics and not review.positive_pocket_packing and product.facts.internal_pocket_storage",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "pocket_packing",
+            "polarity": "negative",
+            "context": "packing this jacket into its internal storage pocket",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I found it difficult to pack this jacket into its internal storage pocket.",
+            "Packing the jacket into its internal storage pocket was difficult for me."
+          ]
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Synthetic authored purchase price initialized to model reference; not a current retailer quote",
+        "relative_price_basis": {
+          "min_sek": 700,
+          "max_sek": 5000
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "jackets",
+    "spec_path": "docs/agents/product-width-specs/jackets.insulated_puffer_jackets.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Model reference bands only; SKU surcharges deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "apparel",
+      "outdoors"
+    ],
+    "scope_exceptions": [
+      "No waterproof/temperature guarantee from fill or DWR",
+      "Reference garment/fill g, synthetic insulation g/m2 and fill power cuin/oz are separate",
+      "Source weighed-size basis not silently normalized"
+    ]
+  },
+  "replace_steps": {
+    "price": {
+      "id": "price",
+      "target": "product.reference_price_sek",
+      "sample": "uniform",
+      "min": 700,
+      "max": 1500,
+      "round_to": 10,
+      "cases": [
+        {
+          "when": "profile.positioning == 'mainstream'",
+          "min": 1400,
+          "max": 2800
+        },
+        {
+          "when": "profile.positioning == 'premium'",
+          "min": 2500,
+          "max": 5000
+        }
+      ]
+    }
+  }
+}

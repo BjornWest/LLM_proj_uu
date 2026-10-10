@@ -1,0 +1,48 @@
+{
+  "schema_version": "footwear-world-pilot-config-v1",
+  "concept_ids": ["footwear.walking_shoes", "footwear.walking_sandals"],
+  "quote_as_of": "2026-09-30",
+  "stock": {
+    "tendency_weights": {"low": 0.2, "typical": 0.6, "high": 0.2},
+    "condition_weights": {"well_stocked": 0.5, "patchy": 0.35, "mostly_depleted": 0.15},
+    "alignment_multiplier": 1.5,
+    "zero_probability": {"well_stocked": 0.1, "patchy": 0.45, "mostly_depleted": 0.85},
+    "quantity_ranges": {
+      "small": {"well_stocked": [1, 8], "patchy": [1, 4], "mostly_depleted": [1, 2]},
+      "medium": {"well_stocked": [1, 20], "patchy": [1, 10], "mostly_depleted": [1, 3]},
+      "large": {"well_stocked": [1, 50], "patchy": [1, 25], "mostly_depleted": [1, 5]}
+    }
+  },
+  "supplier": {
+    "retailer_enabled_probability": 0.5,
+    "sku_eligible_probability": 0.2,
+    "policy_only_disclosure_probability": 0.5,
+    "outlier_probability": 0.1,
+    "normal_wait_days": [21, 28],
+    "outlier_wait_days": [35, 56]
+  },
+  "retailer_price": {
+    "reference_match_probability": 0.4,
+    "offset_standard_deviation": 0.1,
+    "offset_min": -0.3,
+    "offset_max": 0.3,
+    "rounding_bands_sek": [[100, 1], [500, 5], [2000, 10], [10000, 50], [null, 100]]
+  },
+  "authoring_defaults": {
+    "standard_colour_probability": 0.6,
+    "round_reference_probability": 0.5,
+    "branch_count_ranges": {"small": [0, 2], "medium": [2, 5], "large": [6, 10]},
+    "product_ratings": 40,
+    "carrier_histories_per_carrier": 32
+  },
+  "task_objectives": ["cheapest_delivered", "closest_in_stock", "widest_assortment"],
+  "limitations": [
+    "Only walking shoes and walking sandals are authored; broader retailer templates have only their footwear slice here.",
+    "Authoring preview, not connected shopping sites, a production generator, or a new grader.",
+    "Single-item quotes in SEK throughout; foreign retailer prices are synthetic SEK-normalized scenario prices, not real FX conversion.",
+    "Regular parcel delivery only; no bulky footwear, cart splits, dynamic checkout, appointment booking or stock reservations.",
+    "Product reference-price ranges come from the existing positioning-based pilot; additional feature-cost adjustments remain authoring work.",
+    "No accounts/coupons, merchant reviews, ads, comparison coverage, hidden clarification tasks or solver-enforced world requirements in this bounded example.",
+    "No rejection, seed search or forced task success. Empty catalog/store draws and all ties are retained."
+  ]
+}

@@ -1,0 +1,1127 @@
+{
+  "schema": "product-feature-policy-v2",
+  "concept_id": "kitchen_utensils.strainers_colanders",
+  "family_id": "kitchen_utensils",
+  "status": "reviewed_prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/kitchen_utensils.strainers_colanders.json": "736e5741748cbf751158ccf56313dbc3b2f7b287249fe9f17b54cc06a8bd4526",
+    "environments/product_world/data/product_width/_kitchen_utensils_base.json": "0d3b6bb90cb1061d33594e34a163cd84614b28216c00ce13a6de6a7e39e2d43f",
+    "environments/product_world/data/product_public_content/kitchen_utensils.strainers_colanders.json": "621036bba3bbd1d3ed2dbff6c27858886a2fba6b11230796826ccc12c7ed3b8f"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Function/material/contact surface first. Component-specific heat and cleaning are scoped groups, not whole-tool guarantees.",
+  "concept_note": null,
+  "fields": {
+    "product.name": {
+      "semantic_id": "utensils.strainers_colanders.product.name",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "input": true
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": true,
+      "reason": "Preserve actual product/SKU identity."
+    },
+    "product.facts.pack_count": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.pack_count",
+      "role": "omit_fixed_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "basis": "one assembled complete tool; attached handles/rest/base are not separate pieces",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Ordinary installed anatomy or component bookkeeping; retain manufacturing truth privately."
+    },
+    "product.facts.supplied_contents": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.supplied_contents",
+      "role": "literal",
+      "display_group": "contents",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one complete non-powered strainer or colander; no bowl, lid, pot, brush or separate utensil",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_supplied_contents"
+    },
+    "product.facts.fastening_method": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.fastening_method",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "unknown_values": [
+          "not specified"
+        ],
+        "constant": "not specified",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.care": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.care",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "Dishwasher-safe; handwashing also permitted.",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_care"
+    },
+    "product.facts.dishwasher_safe": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.dishwasher_safe",
+      "role": "literal",
+      "display_group": "care",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "explicit whole supplied-tool care declaration, not a reviewer trial",
+        "constant": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "product_product_washing"
+    },
+    "product.facts.heat_limit_c": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.heat_limit_c",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "C",
+        "basis": "declared numeric use-temperature maximum for the whole supplied tool",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.actual_mass_g": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.actual_mass_g",
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "g",
+        "basis": "actual supplied whole tool excluding packaging",
+        "unknown_values": [
+          -1
+        ],
+        "constant": -1,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.tool_form": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.tool_form",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "handled mesh strainer",
+          "perforated bowl colander"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_tool_form"
+    },
+    "product.facts.intended_use": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.intended_use",
+      "role": "identity",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "rinsing rice",
+          "draining cooked pasta"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep meaningful type/use/recipient context; no standalone filler row."
+    },
+    "product.facts.drain_surface_material": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.drain_surface_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "stainless steel",
+          "polypropylene"
+        ],
+        "component": "food-contact draining mesh or bowl",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_drain_surface_material"
+    },
+    "product.facts.rim_material": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.rim_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "stainless steel",
+          "polypropylene"
+        ],
+        "component": "bowl rim",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_rim_material"
+    },
+    "product.facts.grip_surface_material": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.grip_surface_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "stainless steel",
+          "polypropylene"
+        ],
+        "component": "hand-contact handle surfaces",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_grip_surface_material"
+    },
+    "product.facts.opening_kind": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.opening_kind",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "qualitatively fine woven mesh",
+          "circular perforations",
+          "elongated slots"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_opening_kind"
+    },
+    "product.facts.opening_measure_basis": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.opening_measure_basis",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "numeric clear mesh aperture unspecified",
+          "nominal clear diameter of one circular hole",
+          "nominal clear width and length of one slot"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.opening_short_span_mm": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.opening_short_span_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "basis": "nominal circular-hole diameter or slot width; mesh numeric aperture unspecified",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_opening_short_span_mm"
+    },
+    "product.facts.opening_long_span_mm": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.opening_long_span_mm",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "basis": "nominal circular-hole diameter or slot length; mesh numeric aperture unspecified",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_opening_long_span_mm"
+    },
+    "product.facts.handle_count": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.handle_count",
+      "role": "omit_low_value_detail",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "basis": "attached hand-contact handles, not supplied-piece count",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Construction bookkeeping or minor hardware detail; variation alone does not make a useful retail feature."
+    },
+    "product.facts.handle_layout": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.handle_layout",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "one long handle",
+          "two side handles"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_handle_layout"
+    },
+    "product.facts.base_support": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.base_support",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "fixed raised foot ring",
+          "four fixed feet"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_base_support"
+    },
+    "product.facts.base_material": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.base_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "stainless steel",
+          "polypropylene"
+        ],
+        "component": "standing base support, none means absent",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_base_material"
+    },
+    "product.facts.vessel_rim_rest": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.vessel_rim_rest",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "one fixed opposing rest",
+          "none"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_vessel_rim_rest"
+    },
+    "product.facts.rest_material": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.rest_material",
+      "role": "descriptive",
+      "display_group": "materials_and_construction",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "stainless steel",
+          "none"
+        ],
+        "component": "opposing vessel-rim rest, none means absent",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_rest_material"
+    },
+    "product.facts.stands_on_base": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.stands_on_base",
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "basis": "known presence or absence of a standing base, not observed stability or universal sink fit",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_stands_on_base"
+    },
+    "product.facts.colour_scope": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.colour_scope",
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "exposed steel finish",
+          "bowl, rim, handles and feet together"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.rim_diameter_mm": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.rim_diameter_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "basis": "nominal outside circular bowl rim excluding handles/rest",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_rim_diameter_mm"
+    },
+    "product.facts.body_height_mm": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.body_height_mm",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "basis": "nominal rim-to-bottom draining-bowl height excluding feet/foot ring",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_body_height_mm"
+    },
+    "product.facts.nominal_capacity_l": {
+      "semantic_id": "utensils.strainers_colanders.product.facts.nominal_capacity_l",
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "L",
+        "basis": "declared nominal bowl capacity; not watertight storage, safe-fill mark or food load",
+        "unknown_values": [
+          -1
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "product_nominal_capacity_l"
+    },
+    "sku.colour": {
+      "semantic_id": "utensils.strainers_colanders.sku.colour",
+      "role": "buying_choice",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "blue",
+          "grey",
+          "silver",
+          "white"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "selector",
+            "separate_page"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Retain the actual variant/page/menu contract; do not randomly hide listed choices."
+    },
+    "sku.pack_count": {
+      "semantic_id": "utensils.strainers_colanders.sku.pack_count",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "integer",
+        "unit": "count",
+        "constant": 1,
+        "basis": "one assembled complete tool; attached handles/rest/base are not separate pieces"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.pack_count"
+    },
+    "sku.supplied_contents": {
+      "semantic_id": "utensils.strainers_colanders.sku.supplied_contents",
+      "role": "alias",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one complete non-powered strainer or colander; no bowl, lid, pot, brush or separate utensil"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Every emit uses the same direct model-to-SKU copy; publish one semantic fact, not duplicate rows.",
+      "alias_of": "product.facts.supplied_contents"
+    },
+    "sku.reference_price_sek": {
+      "semantic_id": "utensils.strainers_colanders.sku.reference_price_sek",
+      "role": "commerce",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "SEK",
+        "basis": "whole supplied-tool reference, not offer, delivery total or actual payment",
+        "min": 25,
+        "max": 315
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "source_inherited": false,
+      "reason": "Keep the existing monetary contract; exclude from descriptive highlights."
+    },
+    "product.facts.shipping_class": {
+      "semantic_id": null,
+      "role": "operational",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Keep fulfilment, region or size-label contract outside optional descriptive selection."
+    },
+    "product.facts.recipe_id": {
+      "semantic_id": null,
+      "role": "internal",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "steel_mesh",
+          "steel_bowl",
+          "plastic_bowl"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Recipe/component identity, status or price mechanics; not a shopper fact."
+    }
+  },
+  "disclosure_groups": {
+    "product_supplied_contents": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_supplied_contents",
+      "display_group": "contents",
+      "fields": [
+        "product.facts.supplied_contents"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_care": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_product_care",
+      "display_group": "care",
+      "fields": [
+        "product.facts.care"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_product_washing": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_product_washing",
+      "display_group": "care",
+      "fields": [
+        "product.facts.dishwasher_safe"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_tool_form": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_tool_form",
+      "display_group": "features",
+      "fields": [
+        "product.facts.tool_form"
+      ],
+      "atomic": false,
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "product_drain_surface_material": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_drain_surface_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.drain_surface_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_rim_material": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_rim_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.rim_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_grip_surface_material": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_grip_surface_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.grip_surface_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_opening_kind": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_opening_kind",
+      "display_group": "features",
+      "fields": [
+        "product.facts.opening_kind"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_opening_short_span_mm": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_opening_short_span_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.opening_short_span_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_opening_long_span_mm": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_opening_long_span_mm",
+      "display_group": "features",
+      "fields": [
+        "product.facts.opening_long_span_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_handle_layout": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_handle_layout",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.handle_layout"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_base_support": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_base_support",
+      "display_group": "features",
+      "fields": [
+        "product.facts.base_support"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_base_material": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_base_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.base_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_vessel_rim_rest": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_vessel_rim_rest",
+      "display_group": "features",
+      "fields": [
+        "product.facts.vessel_rim_rest"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_rest_material": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_rest_material",
+      "display_group": "materials_and_construction",
+      "fields": [
+        "product.facts.rest_material"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_stands_on_base": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_stands_on_base",
+      "display_group": "features",
+      "fields": [
+        "product.facts.stands_on_base"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_rim_diameter_mm": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_rim_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.rim_diameter_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_body_height_mm": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_body_height_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.body_height_mm"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "product_nominal_capacity_l": {
+      "id": "kitchen_utensils.strainers_colanders.content.product_nominal_capacity_l",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.nominal_capacity_l"
+      ],
+      "atomic": false,
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    }
+  },
+  "display_groups": {
+    "care": {
+      "label": "Care instructions",
+      "omit_when_empty": true,
+      "preferred_representation": "prose"
+    },
+    "contents": {
+      "label": "Contents",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "materials_and_construction": {
+      "label": "Materials and construction",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 34,
+    "roles": {
+      "identity": 2,
+      "omit_fixed_detail": 1,
+      "literal": 3,
+      "omit_placeholder": 3,
+      "descriptive": 16,
+      "qualifier": 2,
+      "omit_low_value_detail": 1,
+      "buying_choice": 1,
+      "alias": 2,
+      "commerce": 1,
+      "operational": 1,
+      "internal": 1
+    },
+    "display_groups": 5,
+    "highlight_candidates": 1,
+    "unmapped_descriptive_fields": 0
+  },
+  "semantic_review_note": "Keep function, contact material, size and real heat/nonstick/cleaning limits. Capacity applies to a ladle, not every utensil. Counts of feet/grips/holes are subordinate to construction. Geometry is not cutting performance."
+}

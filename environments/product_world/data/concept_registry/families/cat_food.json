@@ -1,0 +1,204 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "cat_food",
+  "review_id": "F16",
+  "label": "Cat food",
+  "section": "Pet supplies",
+  "store_type_ids": [
+    "pets"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Share food structures with dog food but retain species-specific targets and feeding data. Wet-food texture is conditional; no inferred urinary/medical benefit from ingredients.",
+  "shared_dimension_ids": [
+    "recipe",
+    "life_stage",
+    "target_animal_size",
+    "nutrition_profile",
+    "dietary_role",
+    "net_weight",
+    "pack_count"
+  ],
+  "dimensions": [
+    {
+      "id": "recipe",
+      "label": "Recipe",
+      "module_id": "formula",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "life_stage",
+      "label": "Life stage",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "target_animal_size",
+      "label": "Target animal size",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "nutrition_profile",
+      "label": "Nutrition profile",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "dietary_role",
+      "label": "Dietary role",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "net_weight",
+      "label": "Net weight",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "number",
+      "unit": "kg",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "food_texture",
+      "label": "Food texture",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "treat_shape",
+      "label": "Treat shape",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "cat_food.dry_food",
+      "label": "Dry food",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "cat_food.wet_food",
+      "label": "Wet food",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "food_texture"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "cat_food.treats_snacks",
+      "label": "Treats/snacks",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "treat_shape"
+      ],
+      "excluded_dimension_ids": [
+        "dietary_role"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "dietary_role": "complementary_treat"
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

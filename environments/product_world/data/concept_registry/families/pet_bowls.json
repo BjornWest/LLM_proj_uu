@@ -1,0 +1,249 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "pet_bowls",
+  "review_id": "F43",
+  "label": "Feeding bowls and waterers",
+  "section": "Pet supplies",
+  "store_type_ids": [
+    "pets"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Slow-feeder geometry, raised-stand height and fountain power/filter/pump details belong only to those concepts. A plain bowl has no motor or replacement-filter platform.",
+  "shared_dimension_ids": [
+    "component_materials",
+    "bowl_capacity",
+    "opening_geometry",
+    "anti_slip_base",
+    "colour",
+    "care_method"
+  ],
+  "dimensions": [
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "bowl_capacity",
+      "label": "Bowl capacity",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "number",
+      "unit": "ml",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "opening_geometry",
+      "label": "Opening geometry",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "anti_slip_base",
+      "label": "Anti slip base",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "boolean",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "care_method",
+      "label": "Care method",
+      "module_id": "materials",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "feeding_obstacle_geometry",
+      "label": "Feeding obstacle geometry",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "stand_height",
+      "label": "Stand height",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "number",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "power_source",
+      "label": "Power source",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "filter_platform",
+      "label": "Filter platform",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pump_design",
+      "label": "Pump design",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "pet_bowls.standard_bowls",
+      "label": "Standard bowls",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "pet_bowls.slow_feed_bowls",
+      "label": "Slow-feed bowls",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "feeding_obstacle_geometry"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "pet_bowls.raised_feeding_stations",
+      "label": "Raised feeding stations",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "stand_height"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "pet_bowls.drinking_fountains",
+      "label": "Drinking fountains",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "power_source",
+        "filter_platform",
+        "pump_design"
+      ],
+      "excluded_dimension_ids": [
+        "anti_slip_base"
+      ],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

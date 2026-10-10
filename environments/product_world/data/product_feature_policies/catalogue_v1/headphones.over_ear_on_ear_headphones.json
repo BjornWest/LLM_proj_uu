@@ -1,0 +1,986 @@
+{
+  "schema": "product-feature-policy-v1",
+  "concept_id": "headphones.over_ear_on_ear_headphones",
+  "family_id": "headphones",
+  "status": "prospective_publication_policy_not_DSL_migration",
+  "source_sha256": {
+    "environments/product_world/data/product_width/headphones.over_ear_on_ear_headphones.json": "a1101fa5771231b26660255e0c012e0d6b56c698a628a3476a81a1ad8c95c00c",
+    "environments/product_world/data/product_width/_electronics_base.json": "9dcdfd5d5ce31c2610fec964b168002caf6e3deb098cfcf10734e62b36eca93a"
+  },
+  "family_rules_sha256": "b71968d9269ac8458aeb7ac9694d8976041701800a71aca9b88ea06f86d3c387",
+  "concept_exceptions_sha256": "269f1c097e39eea3011d723a27b5fd01d2cb04e897129461d2fec58dc56e5a3e",
+  "family_note": "Preserve battery-test mode, case-assisted versus wearable runtime and headset microphone-route conditions.",
+  "concept_note": null,
+  "fields": {
+    "product.facts.wearing_geometry": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "over-ear",
+          "on-ear"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "wearing_geometry"
+    },
+    "product.facts.acoustic_back": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "closed",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "acoustic_back"
+    },
+    "product.facts.driver_design": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "dynamic",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "driver_design"
+    },
+    "product.facts.driver_diameter_mm": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": 30,
+        "max": 45,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "driver_diameter_mm"
+    },
+    "product.facts.bluetooth_audio": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "bluetooth_audio"
+    },
+    "product.facts.analogue_audio": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "analogue_audio"
+    },
+    "product.facts.passive_analogue_listening": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "passive_analogue_listening"
+    },
+    "product.facts.detachable_analogue_cable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "detachable_analogue_cable"
+    },
+    "product.facts.powered": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "powered"
+    },
+    "product.facts.rechargeable": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "rechargeable"
+    },
+    "product.facts.usb_audio": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "boolean",
+        "constant": false,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "usb_audio"
+    },
+    "product.facts.analogue_plug_mm": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mm",
+        "min": 3.5,
+        "max": 3.5,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 3.5,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "analogue_plug_mm"
+    },
+    "product.facts.bluetooth_version": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "5.2",
+          "5.3"
+        ],
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "bluetooth_version"
+    },
+    "product.facts.charging_connector": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "compatibility_and_connections",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "USB-C",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "charging_connector"
+    },
+    "product.facts.declared_cell_voltage_v": {
+      "semantic_id": null,
+      "role": "literal",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "V",
+        "min": 3.7,
+        "max": 3.7,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": 3.7,
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Useful fixed declaration; content rather than an independent variation dimension.",
+      "disclosure_group": "declared_cell_voltage_v"
+    },
+    "product.facts.declared_cell_capacity_mah": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "mAh",
+        "min": 300,
+        "max": 600,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_cell_capacity_mah"
+    },
+    "product.facts.nominal_battery_energy_wh": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "Wh",
+        "min": 1.11,
+        "max": 2.22,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "nominal_battery_energy_wh"
+    },
+    "product.facts.declared_music_max_anc_off_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 30,
+        "max": 60,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_music_max_anc_off_h"
+    },
+    "product.facts.declared_music_max_anc_on_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 20,
+        "max": 50,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_music_max_anc_on_h"
+    },
+    "product.facts.declared_empty_charge_h": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "number",
+        "unit": "h",
+        "min": 2,
+        "max": 3.5,
+        "optional": true,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "declared_empty_charge_h"
+    },
+    "product.facts.anc": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 3,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "anc"
+    },
+    "product.facts.volume_controls": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 0,
+      "definition": {
+        "type": "enum",
+        "values": [
+          "none",
+          "buttons",
+          "touch"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "volume_controls"
+    },
+    "product.facts.bluetooth_call_microphone": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "features",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "boolean",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "bluetooth_call_microphone"
+    },
+    "product.facts.ambient_passthrough": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.ip_rating": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.passive_isolation_measurement": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.anc_attenuation": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.usable_battery_energy": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.battery_test_method": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "optional": true,
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        },
+        "constant": "not specified",
+        "fixed_evidence": "complete_literal_choice_and_copy_domain"
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.impedance_sensitivity_latency": {
+      "semantic_id": null,
+      "role": "omit_placeholder",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "not specified",
+        "unknown_values": [
+          "not specified"
+        ],
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Permanently unknown/not-applicable declaration: omit automatic content without inventing its value."
+    },
+    "product.facts.mass_basis": {
+      "semantic_id": null,
+      "role": "qualifier",
+      "display_group": null,
+      "highlight_priority": 0,
+      "definition": {
+        "type": "string",
+        "constant": "one headphone excluding detachable cable, charger and case",
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Attach the original declaration scope to its fact group, not a separate feature row."
+    },
+    "product.facts.reference_mass_g": {
+      "semantic_id": null,
+      "role": "descriptive",
+      "display_group": "dimensions",
+      "highlight_priority": 2,
+      "definition": {
+        "type": "integer",
+        "unit": "g",
+        "min": 135,
+        "max": 285,
+        "retail_presentation": {
+          "allowed": [
+            "description"
+          ]
+        }
+      },
+      "required_qualifiers": {},
+      "supporting_assertion_ids": [],
+      "subject": null,
+      "source_inherited": false,
+      "reason": "Retain existing meaningful sampling/status domain; optional descriptive content.",
+      "disclosure_group": "reference_mass_g"
+    }
+  },
+  "disclosure_groups": {
+    "wearing_geometry": {
+      "id": "headphones.over_ear_on_ear_headphones.content.wearing_geometry",
+      "display_group": "features",
+      "fields": [
+        "product.facts.wearing_geometry"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "acoustic_back": {
+      "id": "headphones.over_ear_on_ear_headphones.content.acoustic_back",
+      "display_group": "features",
+      "fields": [
+        "product.facts.acoustic_back"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "driver_design": {
+      "id": "headphones.over_ear_on_ear_headphones.content.driver_design",
+      "display_group": "features",
+      "fields": [
+        "product.facts.driver_design"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "driver_diameter_mm": {
+      "id": "headphones.over_ear_on_ear_headphones.content.driver_diameter_mm",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.driver_diameter_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth_audio": {
+      "id": "headphones.over_ear_on_ear_headphones.content.bluetooth_audio",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bluetooth_audio"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "analogue_audio": {
+      "id": "headphones.over_ear_on_ear_headphones.content.analogue_audio",
+      "display_group": "features",
+      "fields": [
+        "product.facts.analogue_audio"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "passive_analogue_listening": {
+      "id": "headphones.over_ear_on_ear_headphones.content.passive_analogue_listening",
+      "display_group": "features",
+      "fields": [
+        "product.facts.passive_analogue_listening"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "detachable_analogue_cable": {
+      "id": "headphones.over_ear_on_ear_headphones.content.detachable_analogue_cable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.detachable_analogue_cable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "powered": {
+      "id": "headphones.over_ear_on_ear_headphones.content.powered",
+      "display_group": "features",
+      "fields": [
+        "product.facts.powered"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "rechargeable": {
+      "id": "headphones.over_ear_on_ear_headphones.content.rechargeable",
+      "display_group": "features",
+      "fields": [
+        "product.facts.rechargeable"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "usb_audio": {
+      "id": "headphones.over_ear_on_ear_headphones.content.usb_audio",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.usb_audio"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "analogue_plug_mm": {
+      "id": "headphones.over_ear_on_ear_headphones.content.analogue_plug_mm",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.analogue_plug_mm"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth_version": {
+      "id": "headphones.over_ear_on_ear_headphones.content.bluetooth_version",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bluetooth_version"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "charging_connector": {
+      "id": "headphones.over_ear_on_ear_headphones.content.charging_connector",
+      "display_group": "compatibility_and_connections",
+      "fields": [
+        "product.facts.charging_connector"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_cell_voltage_v": {
+      "id": "headphones.over_ear_on_ear_headphones.content.declared_cell_voltage_v",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_cell_voltage_v"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_cell_capacity_mah": {
+      "id": "headphones.over_ear_on_ear_headphones.content.declared_cell_capacity_mah",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_cell_capacity_mah"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "nominal_battery_energy_wh": {
+      "id": "headphones.over_ear_on_ear_headphones.content.nominal_battery_energy_wh",
+      "display_group": "features",
+      "fields": [
+        "product.facts.nominal_battery_energy_wh"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "declared_music_max_anc_off_h": {
+      "id": "headphones.over_ear_on_ear_headphones.content.declared_music_max_anc_off_h",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_music_max_anc_off_h"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_music_max_anc_on_h": {
+      "id": "headphones.over_ear_on_ear_headphones.content.declared_music_max_anc_on_h",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_music_max_anc_on_h"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "declared_empty_charge_h": {
+      "id": "headphones.over_ear_on_ear_headphones.content.declared_empty_charge_h",
+      "display_group": "features",
+      "fields": [
+        "product.facts.declared_empty_charge_h"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "anc": {
+      "id": "headphones.over_ear_on_ear_headphones.content.anc",
+      "display_group": "features",
+      "fields": [
+        "product.facts.anc"
+      ],
+      "highlight_priority": 3,
+      "highlight_candidate": true
+    },
+    "volume_controls": {
+      "id": "headphones.over_ear_on_ear_headphones.content.volume_controls",
+      "display_group": "features",
+      "fields": [
+        "product.facts.volume_controls"
+      ],
+      "highlight_priority": 0,
+      "highlight_candidate": false
+    },
+    "bluetooth_call_microphone": {
+      "id": "headphones.over_ear_on_ear_headphones.content.bluetooth_call_microphone",
+      "display_group": "features",
+      "fields": [
+        "product.facts.bluetooth_call_microphone"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    },
+    "reference_mass_g": {
+      "id": "headphones.over_ear_on_ear_headphones.content.reference_mass_g",
+      "display_group": "dimensions",
+      "fields": [
+        "product.facts.reference_mass_g"
+      ],
+      "highlight_priority": 2,
+      "highlight_candidate": true
+    }
+  },
+  "display_groups": {
+    "compatibility_and_connections": {
+      "label": "Compatibility and connections",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "dimensions": {
+      "label": "Dimensions",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    },
+    "features": {
+      "label": "Features",
+      "omit_when_empty": true,
+      "preferred_representation": "renderer_choice"
+    }
+  },
+  "summary": {
+    "fields_accounted": 32,
+    "roles": {
+      "descriptive": 18,
+      "literal": 6,
+      "omit_placeholder": 7,
+      "qualifier": 1
+    },
+    "display_groups": 3,
+    "highlight_candidates": 6,
+    "unmapped_descriptive_fields": 24
+  }
+}

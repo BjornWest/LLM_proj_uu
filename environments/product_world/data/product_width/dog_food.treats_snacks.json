@@ -1,0 +1,1937 @@
+{
+  "schema_version": "product-package-v1",
+  "concept_id": "dog_food.treats_snacks",
+  "random_namespace": "product-width-dog_food.treats_snacks-v1",
+  "extends": "_dog_treat_food_base.json",
+  "status": "domain_accepted_not_production_integrated",
+  "fields": {
+    "product.facts.species": {
+      "type": "string",
+      "constant": "dog",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.dietary_role": {
+      "type": "string",
+      "constant": "complementary_treat",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.format": {
+      "type": "enum",
+      "values": [
+        "chewy_cubes",
+        "dental_plant",
+        "air_dried"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "internal.format": {
+      "type": "object",
+      "properties": {
+        "texture": {
+          "type": "string"
+        },
+        "container": {
+          "type": "string"
+        },
+        "opening": {
+          "type": "string"
+        },
+        "opening_action": {
+          "type": "string"
+        },
+        "handling": {
+          "type": "string"
+        },
+        "stage": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "owner_target": {
+          "type": "string"
+        },
+        "composition": {
+          "type": "string"
+        },
+        "composition_scope": {
+          "type": "string"
+        },
+        "energy_label": {
+          "type": "string"
+        },
+        "normalization": {
+          "type": "string"
+        },
+        "protein": {
+          "type": "number",
+          "unit": "%"
+        },
+        "fat": {
+          "type": "number",
+          "unit": "%"
+        },
+        "fibre": {
+          "type": "number",
+          "unit": "%"
+        },
+        "ash": {
+          "type": "number",
+          "unit": "%"
+        },
+        "moisture": {
+          "type": "number",
+          "unit": "%"
+        },
+        "carbohydrate": {
+          "type": "number",
+          "unit": "%"
+        },
+        "minimum_age": {
+          "type": "integer",
+          "unit": "months"
+        },
+        "energy": {
+          "type": "number",
+          "unit": "kcal/100g"
+        },
+        "pieces_per_unit": {
+          "type": "integer"
+        },
+        "price_factor": {
+          "type": "number"
+        }
+      }
+    },
+    "product.facts.texture": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.container": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.opening_method": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.opening_action": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.handling_action": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.owner_target": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.composition": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.composition_scope": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.energy_source_label": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.energy_normalization": {
+      "type": "string",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.life_stage": {
+      "type": "enum",
+      "values": [
+        "adult",
+        "not specified"
+      ],
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.minimum_age_months": {
+      "type": "integer",
+      "unit": "months",
+      "min": -1,
+      "max": 6,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.declared_body_weight": {
+      "type": "string",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.protein_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": -1,
+      "max": 100,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fat_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": -1,
+      "max": 100,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.fibre_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": -1,
+      "max": 100,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.ash_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": -1,
+      "max": 100,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.moisture_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": -1,
+      "max": 100,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.carbohydrate_pct": {
+      "type": "number",
+      "unit": "%",
+      "min": -1,
+      "max": 100,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analytical_basis": {
+      "type": "string",
+      "constant": "label percent of food as sold",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.energy_kcal_per_100g": {
+      "type": "number",
+      "unit": "kcal/100g",
+      "min": 255,
+      "max": 333,
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.nominal_pieces_per_unit": {
+      "type": "integer",
+      "min": -1,
+      "max": 7,
+      "unknown_values": [
+        -1
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.individual_piece_mass": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.individual_piece_calories": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.piece_geometry": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.analysis_protocol": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.calorie_method": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.additive_quantities": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.total_micronutrient_assays": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.individual_dietary_suitability": {
+      "type": "string",
+      "constant": "not specified",
+      "unknown_values": [
+        "not specified"
+      ],
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.facts.reference_price_basis": {
+      "type": "string",
+      "constant": "synthetic one-kilogram formula anchor; exact pack prices are separate SKU facts",
+      "retail_presentation": {
+        "allowed": [
+          "description"
+        ]
+      }
+    },
+    "product.pack_keys": {
+      "type": "set",
+      "items": {
+        "type": "string"
+      },
+      "min_items": 1
+    },
+    "group.pack_key": {
+      "type": "string"
+    },
+    "group.pack": {
+      "type": "object",
+      "properties": {
+        "mass": {
+          "type": "integer",
+          "unit": "g"
+        },
+        "count": {
+          "type": "integer"
+        },
+        "coefficient": {
+          "type": "number"
+        }
+      }
+    },
+    "group.unit_net_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "group.unit_count": {
+      "type": "integer"
+    },
+    "group.total_net_mass_g": {
+      "type": "integer",
+      "unit": "g"
+    },
+    "group.nominal_pieces_per_unit": {
+      "type": "integer",
+      "min": -1,
+      "max": 7
+    },
+    "group.nominal_piece_count": {
+      "type": "integer",
+      "min": -1,
+      "max": 42
+    },
+    "group.price_multiplier": {
+      "type": "number"
+    },
+    "group.reference_price_sek": {
+      "type": "number",
+      "unit": "SEK"
+    },
+    "request.format": {
+      "type": "string",
+      "optional": true
+    },
+    "request.life_stage": {
+      "type": "string",
+      "optional": true
+    }
+  },
+  "steps": [
+    {
+      "id": "format",
+      "target": "product.facts.format",
+      "sample": "weighted_choice",
+      "weights": {
+        "chewy_cubes": 3,
+        "dental_plant": 2,
+        "air_dried": 2
+      }
+    },
+    {
+      "id": "format_bundle",
+      "target": "internal.format",
+      "sample": "weighted_choice",
+      "weights": {
+        "chewy_cubes": 1,
+        "dental_plant": 0,
+        "air_dried": 0
+      },
+      "cases": [
+        {
+          "when": "product.facts.format == 'dental_plant'",
+          "weights": {
+            "chewy_cubes": 0,
+            "dental_plant": 1,
+            "air_dried": 0
+          }
+        },
+        {
+          "when": "product.facts.format == 'air_dried'",
+          "weights": {
+            "chewy_cubes": 0,
+            "dental_plant": 0,
+            "air_dried": 1
+          }
+        }
+      ],
+      "values": {
+        "chewy_cubes": {
+          "texture": "chewy cubes",
+          "container": "resealable bag",
+          "opening": "bag zipper",
+          "opening_action": "opening and reclosing the bag zipper",
+          "handling": "taking a cube from the bag",
+          "stage": "adult",
+          "minimum_age": -1,
+          "body": "not specified",
+          "owner_target": "adult dog",
+          "composition": "cereals, meat and animal derivatives including chicken 4% and duck 1%, vegetable derivatives, oils and fats, minerals and seeds",
+          "composition_scope": "partial unordered ingredient declaration",
+          "protein": 21,
+          "fat": 11,
+          "fibre": 3,
+          "ash": 9,
+          "moisture": 15,
+          "carbohydrate": -1,
+          "energy": 333,
+          "energy_label": "333 kcal/100g",
+          "normalization": "original kcal per 100g label",
+          "pieces_per_unit": -1,
+          "price_factor": 1
+        },
+        "dental_plant": {
+          "texture": "chewy plant-based dental pieces",
+          "container": "non-reclosable bag",
+          "opening": "bag tear-notch",
+          "opening_action": "tearing the bag notch",
+          "handling": "taking a chew from the bag",
+          "stage": "adult",
+          "minimum_age": 6,
+          "body": "small dogs 6-10 kg",
+          "owner_target": "small adult dog",
+          "composition": "potato and tapioca flours, glycerine, cellulose, algae 2.2%, yeast 1%, fennel 0.3%, coconut 0.3% and parsley 0.1%",
+          "composition_scope": "partial unordered ingredient declaration",
+          "protein": 8,
+          "fat": 1,
+          "fibre": 9.5,
+          "ash": 4,
+          "moisture": 15,
+          "carbohydrate": -1,
+          "energy": 255,
+          "energy_label": "255 kcal/100g",
+          "normalization": "original kcal per 100g label",
+          "pieces_per_unit": 7,
+          "price_factor": 1
+        },
+        "air_dried": {
+          "texture": "air-dried chicken pieces",
+          "container": "rigid outer tube of loose edible pieces",
+          "opening": "outer tube cap",
+          "opening_action": "opening and closing the outer tube cap",
+          "handling": "taking a chicken piece from the outer tube",
+          "stage": "not specified",
+          "minimum_age": -1,
+          "body": "not specified",
+          "owner_target": "dog",
+          "composition": "100% chicken breast",
+          "composition_scope": "complete ingredient declaration, not complete dietary nutrition",
+          "protein": 60,
+          "fat": 2,
+          "fibre": 1,
+          "ash": 5.5,
+          "moisture": 18,
+          "carbohydrate": 13.5,
+          "energy": 274,
+          "energy_label": "274 nutrition Calories/100g",
+          "normalization": "nutrition Calorie convention: one nutrition Calorie is one kcal",
+          "pieces_per_unit": -1,
+          "price_factor": 1.5
+        }
+      }
+    },
+    {
+      "id": "fact_texture",
+      "target": "product.facts.texture",
+      "derive": "internal.format.texture"
+    },
+    {
+      "id": "fact_container",
+      "target": "product.facts.container",
+      "derive": "internal.format.container"
+    },
+    {
+      "id": "fact_opening_method",
+      "target": "product.facts.opening_method",
+      "derive": "internal.format.opening"
+    },
+    {
+      "id": "fact_opening_action",
+      "target": "product.facts.opening_action",
+      "derive": "internal.format.opening_action"
+    },
+    {
+      "id": "fact_handling_action",
+      "target": "product.facts.handling_action",
+      "derive": "internal.format.handling"
+    },
+    {
+      "id": "fact_life_stage",
+      "target": "product.facts.life_stage",
+      "derive": "internal.format.stage"
+    },
+    {
+      "id": "fact_minimum_age_months",
+      "target": "product.facts.minimum_age_months",
+      "derive": "internal.format.minimum_age"
+    },
+    {
+      "id": "fact_declared_body_weight",
+      "target": "product.facts.declared_body_weight",
+      "derive": "internal.format.body"
+    },
+    {
+      "id": "fact_owner_target",
+      "target": "product.facts.owner_target",
+      "derive": "internal.format.owner_target"
+    },
+    {
+      "id": "fact_composition",
+      "target": "product.facts.composition",
+      "derive": "internal.format.composition"
+    },
+    {
+      "id": "fact_composition_scope",
+      "target": "product.facts.composition_scope",
+      "derive": "internal.format.composition_scope"
+    },
+    {
+      "id": "fact_energy_kcal_per_100g",
+      "target": "product.facts.energy_kcal_per_100g",
+      "derive": "internal.format.energy"
+    },
+    {
+      "id": "fact_energy_source_label",
+      "target": "product.facts.energy_source_label",
+      "derive": "internal.format.energy_label"
+    },
+    {
+      "id": "fact_energy_normalization",
+      "target": "product.facts.energy_normalization",
+      "derive": "internal.format.normalization"
+    },
+    {
+      "id": "fact_nominal_pieces_per_unit",
+      "target": "product.facts.nominal_pieces_per_unit",
+      "derive": "internal.format.pieces_per_unit"
+    },
+    {
+      "id": "fact_protein_pct",
+      "target": "product.facts.protein_pct",
+      "derive": "internal.format.protein"
+    },
+    {
+      "id": "fact_fat_pct",
+      "target": "product.facts.fat_pct",
+      "derive": "internal.format.fat"
+    },
+    {
+      "id": "fact_fibre_pct",
+      "target": "product.facts.fibre_pct",
+      "derive": "internal.format.fibre"
+    },
+    {
+      "id": "fact_ash_pct",
+      "target": "product.facts.ash_pct",
+      "derive": "internal.format.ash"
+    },
+    {
+      "id": "fact_moisture_pct",
+      "target": "product.facts.moisture_pct",
+      "derive": "internal.format.moisture"
+    },
+    {
+      "id": "fact_carbohydrate_pct",
+      "target": "product.facts.carbohydrate_pct",
+      "derive": "internal.format.carbohydrate"
+    },
+    {
+      "id": "format_price",
+      "target": "product.reference_price_sek",
+      "derive": "internal.unadjusted_reference_price_sek * internal.format.price_factor"
+    },
+    {
+      "id": "pack_menu",
+      "target": "product.pack_keys",
+      "sample": "weighted_subset",
+      "weights": {
+        "bag130g": 1,
+        "bag260g": 1,
+        "1x154g": 0,
+        "6x154g": 0,
+        "outer60g": 0,
+        "outer120g": 0
+      },
+      "count_weights": {
+        "1": 3,
+        "2": 2
+      },
+      "cases": [
+        {
+          "when": "product.facts.format == 'dental_plant'",
+          "weights": {
+            "bag130g": 0,
+            "bag260g": 0,
+            "1x154g": 1,
+            "6x154g": 1,
+            "outer60g": 0,
+            "outer120g": 0
+          }
+        },
+        {
+          "when": "product.facts.format == 'air_dried'",
+          "weights": {
+            "bag130g": 0,
+            "bag260g": 0,
+            "1x154g": 0,
+            "6x154g": 0,
+            "outer60g": 1,
+            "outer120g": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "pack_skus",
+      "for_each": {
+        "binding": "group.pack_key",
+        "from": "product.pack_keys"
+      },
+      "steps": [
+        {
+          "id": "pack_bundle",
+          "target": "group.pack",
+          "sample": "weighted_choice",
+          "weights": {
+            "bag130g": 1,
+            "bag260g": 0,
+            "1x154g": 0,
+            "6x154g": 0,
+            "outer60g": 0,
+            "outer120g": 0
+          },
+          "cases": [
+            {
+              "when": "group.pack_key == 'bag260g'",
+              "weights": {
+                "bag130g": 0,
+                "bag260g": 1,
+                "1x154g": 0,
+                "6x154g": 0,
+                "outer60g": 0,
+                "outer120g": 0
+              }
+            },
+            {
+              "when": "group.pack_key == '1x154g'",
+              "weights": {
+                "bag130g": 0,
+                "bag260g": 0,
+                "1x154g": 1,
+                "6x154g": 0,
+                "outer60g": 0,
+                "outer120g": 0
+              }
+            },
+            {
+              "when": "group.pack_key == '6x154g'",
+              "weights": {
+                "bag130g": 0,
+                "bag260g": 0,
+                "1x154g": 0,
+                "6x154g": 1,
+                "outer60g": 0,
+                "outer120g": 0
+              }
+            },
+            {
+              "when": "group.pack_key == 'outer60g'",
+              "weights": {
+                "bag130g": 0,
+                "bag260g": 0,
+                "1x154g": 0,
+                "6x154g": 0,
+                "outer60g": 1,
+                "outer120g": 0
+              }
+            },
+            {
+              "when": "group.pack_key == 'outer120g'",
+              "weights": {
+                "bag130g": 0,
+                "bag260g": 0,
+                "1x154g": 0,
+                "6x154g": 0,
+                "outer60g": 0,
+                "outer120g": 1
+              }
+            }
+          ],
+          "values": {
+            "bag130g": {
+              "mass": 130,
+              "count": 1,
+              "coefficient": 0.195
+            },
+            "bag260g": {
+              "mass": 260,
+              "count": 1,
+              "coefficient": 0.351
+            },
+            "1x154g": {
+              "mass": 154,
+              "count": 1,
+              "coefficient": 0.231
+            },
+            "6x154g": {
+              "mass": 154,
+              "count": 6,
+              "coefficient": 1.2474
+            },
+            "outer60g": {
+              "mass": 60,
+              "count": 1,
+              "coefficient": 0.09
+            },
+            "outer120g": {
+              "mass": 120,
+              "count": 1,
+              "coefficient": 0.162
+            }
+          }
+        },
+        {
+          "id": "unit_mass",
+          "target": "group.unit_net_mass_g",
+          "derive": "group.pack.mass"
+        },
+        {
+          "id": "outer_count",
+          "target": "group.unit_count",
+          "derive": "group.pack.count"
+        },
+        {
+          "id": "total_mass",
+          "target": "group.total_net_mass_g",
+          "derive": "group.unit_net_mass_g * group.unit_count"
+        },
+        {
+          "id": "nominal_unit_pieces",
+          "target": "group.nominal_pieces_per_unit",
+          "derive": "product.facts.nominal_pieces_per_unit if known(product.facts.nominal_pieces_per_unit) else -1"
+        },
+        {
+          "id": "nominal_total_pieces",
+          "target": "group.nominal_piece_count",
+          "derive": "group.nominal_pieces_per_unit * group.unit_count if group.nominal_pieces_per_unit >= 0 else -1"
+        },
+        {
+          "id": "coefficient",
+          "target": "group.price_multiplier",
+          "derive": "group.pack.coefficient"
+        },
+        {
+          "id": "pack_price",
+          "target": "group.reference_price_sek",
+          "derive": "product.reference_price_sek * group.price_multiplier"
+        },
+        {
+          "id": "skus",
+          "target": "product.skus",
+          "emit": {
+            "sku_id": "product.product_id+'-'+group.pack_key",
+            "product_id": "product.product_id",
+            "unit_net_mass_g": "group.unit_net_mass_g",
+            "unit_count": "group.unit_count",
+            "total_net_mass_g": "group.total_net_mass_g",
+            "nominal_pieces_per_unit": "group.nominal_pieces_per_unit",
+            "nominal_piece_count": "group.nominal_piece_count",
+            "price_multiplier": "group.price_multiplier",
+            "reference_price_sek": "group.reference_price_sek"
+          }
+        }
+      ]
+    }
+  ],
+  "language": [
+    {
+      "id": "description.purpose",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.species",
+          "product.facts.dietary_role"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Authored complementary dog-treat label; occasional rewards/snacks alongside usual complete food, not a full-diet replacement.",
+        "Declared complementary dog treats for occasional snacks beside usual complete meals; no individual feeding or adequacy assessment."
+      ]
+    },
+    {
+      "id": "description.stage",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.life_stage"
+        ]
+      },
+      "slots": {
+        "stage": "product.facts.life_stage"
+      },
+      "formulations": [
+        "Declared life-stage category: {stage}; this is not a universal age cutoff or individual suitability assessment.",
+        "Life-stage label {stage}; no universal numerical age boundary is inferred."
+      ],
+      "when": "known(product.facts.life_stage)"
+    },
+    {
+      "id": "description.stage_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.life_stage"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Dog life-stage label unspecified.",
+        "No declared puppy/adult stage for this dog treat."
+      ],
+      "when": "not known(product.facts.life_stage)"
+    },
+    {
+      "id": "description.age",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.minimum_age_months"
+        ]
+      },
+      "slots": {
+        "age": "product.facts.minimum_age_months"
+      },
+      "formulations": [
+        "Declared minimum age {age} months; a recipe label, not clinical or universal dog-age advice.",
+        "Age label: from {age} months, without individualized suitability assurance."
+      ],
+      "when": "known(product.facts.minimum_age_months)"
+    },
+    {
+      "id": "description.age_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.minimum_age_months"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Numerical minimum age unspecified.",
+        "No numerical age floor is declared."
+      ],
+      "when": "not known(product.facts.minimum_age_months)"
+    },
+    {
+      "id": "description.body",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.declared_body_weight"
+        ]
+      },
+      "slots": {
+        "body": "product.facts.declared_body_weight"
+      },
+      "formulations": [
+        "Declared target {body}; animal weight is distinct from food net mass and daily feeding counts.",
+        "Body-weight label: {body}, not a pack mass or daily ration."
+      ],
+      "when": "known(product.facts.declared_body_weight)"
+    },
+    {
+      "id": "description.body_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.declared_body_weight"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Numerical animal body-weight target unspecified.",
+        "No numerical dog-weight target is declared."
+      ],
+      "when": "not known(product.facts.declared_body_weight)"
+    },
+    {
+      "id": "description.construction",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.texture",
+          "product.facts.container",
+          "product.facts.opening_method",
+          "product.facts.handling_action"
+        ]
+      },
+      "slots": {
+        "texture": "product.facts.texture",
+        "container": "product.facts.container",
+        "opening_method": "product.facts.opening_method",
+        "handling_action": "product.facts.handling_action"
+      },
+      "formulations": [
+        "{texture}, supplied in a {container}. Opening: {opening_method}; handling: {handling_action}; no freshness guarantee.",
+        "Food construction: {texture}. Package {container}, accessed by {opening_method}, with {handling_action}; no dental/training efficacy claim."
+      ]
+    },
+    {
+      "id": "description.composition",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.composition",
+          "product.facts.composition_scope"
+        ]
+      },
+      "slots": {
+        "composition": "product.facts.composition",
+        "scope": "product.facts.composition_scope"
+      },
+      "formulations": [
+        "Composition {composition}; {scope}. Ingredient percentage is distinct from analytical protein and dietary completeness.",
+        "{scope}: {composition}; no allergy/quality guarantee or nutrient-adequacy conclusion."
+      ]
+    },
+    {
+      "id": "description.analysis",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.protein_pct",
+          "product.facts.fat_pct",
+          "product.facts.fibre_pct",
+          "product.facts.ash_pct",
+          "product.facts.moisture_pct",
+          "product.facts.analytical_basis",
+          "product.facts.analysis_protocol"
+        ]
+      },
+      "slots": {
+        "protein": "product.facts.protein_pct",
+        "fat": "product.facts.fat_pct",
+        "fibre": "product.facts.fibre_pct",
+        "ash": "product.facts.ash_pct",
+        "moisture": "product.facts.moisture_pct"
+      },
+      "formulations": [
+        "Analytical label, percent of food as sold: protein {protein:g}%, fat {fat:g}%, fibre {fibre:g}%, ash {ash:g}%, moisture {moisture:g}%; method unspecified.",
+        "As-sold percentages: protein {protein:g}, fat {fat:g}, fibre {fibre:g}, ash {ash:g}, moisture {moisture:g}; no analysis protocol or nutrient validation."
+      ]
+    },
+    {
+      "id": "description.carbohydrate",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.carbohydrate_pct"
+        ]
+      },
+      "slots": {
+        "pct": "product.facts.carbohydrate_pct"
+      },
+      "formulations": [
+        "Separately declared carbohydrate {pct:g}% of food, not an inferred residual.",
+        "Carbohydrate label {pct:g}%, independently supplied rather than calculated from the other percentages."
+      ],
+      "when": "known(product.facts.carbohydrate_pct)"
+    },
+    {
+      "id": "description.carbohydrate_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.carbohydrate_pct"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Carbohydrate percentage unspecified; do not infer a residual.",
+        "No carbohydrate declaration; partial analytical totals do not supply it."
+      ],
+      "when": "not known(product.facts.carbohydrate_pct)"
+    },
+    {
+      "id": "description.energy",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.energy_kcal_per_100g",
+          "product.facts.energy_source_label",
+          "product.facts.energy_normalization",
+          "product.facts.calorie_method"
+        ]
+      },
+      "slots": {
+        "energy": "product.facts.energy_kcal_per_100g",
+        "source": "product.facts.energy_source_label",
+        "basis": "product.facts.energy_normalization"
+      },
+      "formulations": [
+        "Energy {energy:g} kcal/100g; source label {source}; basis {basis}. Method and individual-piece calories unspecified.",
+        "Per100g energy {energy:g} kcal from {source}, using {basis}; no calorie method or individual-piece energy declaration."
+      ]
+    },
+    {
+      "id": "description.pieces",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.nominal_pieces_per_unit",
+          "product.facts.individual_piece_mass",
+          "product.facts.individual_piece_calories"
+        ]
+      },
+      "slots": {
+        "pieces": "product.facts.nominal_pieces_per_unit"
+      },
+      "formulations": [
+        "Declared {pieces} nominal chews per food bag; outer-bag count determines total nominal pieces. Individual chew mass/calories unspecified.",
+        "Each food bag carries {pieces} nominal pieces; canonical packs retain separate bag and total-piece counts. No guaranteed individual mass or calories."
+      ],
+      "when": "known(product.facts.nominal_pieces_per_unit)"
+    },
+    {
+      "id": "description.pieces_unknown",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.nominal_pieces_per_unit",
+          "product.facts.individual_piece_mass",
+          "product.facts.individual_piece_calories"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Edible-piece count, individual mass and calories unspecified; outer food mass and daily guidance do not establish them.",
+        "No nominal edible-piece count, individual piece mass or per-piece calories are specified."
+      ],
+      "when": "not known(product.facts.nominal_pieces_per_unit)"
+    },
+    {
+      "id": "description.unknowns",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.piece_geometry",
+          "product.facts.analysis_protocol",
+          "product.facts.calorie_method",
+          "product.facts.additive_quantities",
+          "product.facts.total_micronutrient_assays",
+          "product.facts.individual_dietary_suitability"
+        ]
+      },
+      "slots": {},
+      "formulations": [
+        "Piece geometry, additive doses, total micronutrient assays, methods and individual suitability unspecified.",
+        "No specified piece dimensions, quantitative additive/total-micronutrient panel, methods or individual suitability assessment."
+      ]
+    },
+    {
+      "id": "description.price",
+      "meaning": {
+        "kind": "catalog_fact",
+        "fact_paths": [
+          "product.facts.reference_price_basis"
+        ]
+      },
+      "slots": {
+        "anchor": "product.reference_price_sek"
+      },
+      "formulations": [
+        "Synthetic one-kilogram formula anchor {anchor} SEK; exact units/counts and reference prices are canonical SKU facts, not retail quotes.",
+        "One-kilogram reference anchor {anchor} SEK. Canonical same-formula packs retain food mass/count and their own reference price; no current offer."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "brand_scope",
+      "require": "'dog_food.treats_snacks' in brand.eligible_concepts"
+    },
+    {
+      "id": "partial_analysis_mass",
+      "require": "product.facts.protein_pct + product.facts.fat_pct + product.facts.fibre_pct + product.facts.ash_pct + product.facts.moisture_pct <= 100"
+    },
+    {
+      "id": "partial_analysis_with_carbohydrate",
+      "when": "known(product.facts.carbohydrate_pct)",
+      "require": "product.facts.protein_pct + product.facts.fat_pct + product.facts.fibre_pct + product.facts.ash_pct + product.facts.moisture_pct + product.facts.carbohydrate_pct <= 100"
+    }
+  ],
+  "bindings": [
+    {
+      "id": "format",
+      "role": "filter",
+      "predicate": "product.facts.format == request.format",
+      "support": "proposal_not_registered"
+    },
+    {
+      "id": "life_stage",
+      "role": "filter",
+      "predicate": "known(product.facts.life_stage) and product.facts.life_stage == request.life_stage",
+      "support": "proposal_not_registered"
+    }
+  ],
+  "programs": {
+    "review": {
+      "fields": {
+        "profile.positioning": {
+          "type": "enum",
+          "values": [
+            "budget",
+            "mainstream",
+            "premium"
+          ],
+          "input": true
+        },
+        "profile.execution": {
+          "type": "number",
+          "input": true,
+          "min": 0,
+          "max": 1
+        },
+        "product.product_id": {
+          "type": "string",
+          "input": true
+        },
+        "product.skus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sku_id": {
+                "type": "string"
+              },
+              "product_id": {
+                "type": "string"
+              },
+              "unit_net_mass_g": {
+                "type": "integer",
+                "unit": "g",
+                "min": 60,
+                "max": 260
+              },
+              "unit_count": {
+                "type": "integer",
+                "min": 1,
+                "max": 6
+              },
+              "total_net_mass_g": {
+                "type": "integer",
+                "unit": "g",
+                "min": 60,
+                "max": 924
+              },
+              "price_multiplier": {
+                "type": "number",
+                "min": 0.09,
+                "max": 1.2474
+              },
+              "reference_price_sek": {
+                "type": "number",
+                "unit": "SEK",
+                "min": 13.5,
+                "max": 1872
+              },
+              "nominal_pieces_per_unit": {
+                "type": "integer",
+                "min": -1,
+                "max": 7,
+                "unknown_values": [
+                  -1
+                ]
+              },
+              "nominal_piece_count": {
+                "type": "integer",
+                "min": -1,
+                "max": 42,
+                "unknown_values": [
+                  -1
+                ]
+              }
+            }
+          },
+          "input": true,
+          "min_items": 1
+        },
+        "review.subject": {
+          "type": "object",
+          "properties": {
+            "sku_id": {
+              "type": "string"
+            },
+            "product_id": {
+              "type": "string"
+            },
+            "unit_net_mass_g": {
+              "type": "integer",
+              "unit": "g",
+              "min": 60,
+              "max": 260
+            },
+            "unit_count": {
+              "type": "integer",
+              "min": 1,
+              "max": 6
+            },
+            "total_net_mass_g": {
+              "type": "integer",
+              "unit": "g",
+              "min": 60,
+              "max": 924
+            },
+            "price_multiplier": {
+              "type": "number",
+              "min": 0.09,
+              "max": 1.2474
+            },
+            "reference_price_sek": {
+              "type": "number",
+              "unit": "SEK",
+              "min": 13.5,
+              "max": 1872
+            },
+            "nominal_pieces_per_unit": {
+              "type": "integer",
+              "min": -1,
+              "max": 7,
+              "unknown_values": [
+                -1
+              ]
+            },
+            "nominal_piece_count": {
+              "type": "integer",
+              "min": -1,
+              "max": 42,
+              "unknown_values": [
+                -1
+              ]
+            }
+          }
+        },
+        "sku.sku_id": {
+          "type": "string"
+        },
+        "sku.product_id": {
+          "type": "string"
+        },
+        "review.rating": {
+          "type": "integer",
+          "min": 1,
+          "max": 5
+        },
+        "review.eligible": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "constant": [
+            "value",
+            "reward_acceptance",
+            "piece_handling",
+            "smell_preference",
+            "opening"
+          ]
+        },
+        "review.topics": {
+          "type": "set",
+          "items": {
+            "type": "enum",
+            "values": [
+              "value",
+              "reward_acceptance",
+              "piece_handling",
+              "smell_preference",
+              "opening"
+            ]
+          }
+        },
+        "product.reference_price_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "input": true,
+          "min": 150,
+          "max": 1500
+        },
+        "review.purchase_price_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_min_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.price_max_sek": {
+          "type": "number",
+          "unit": "SEK"
+        },
+        "review.value_price_position": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.value_favourability": {
+          "type": "number",
+          "min": 0,
+          "max": 1
+        },
+        "review.positive_value": {
+          "type": "boolean"
+        },
+        "review.positive_reward_acceptance": {
+          "type": "boolean"
+        },
+        "review.positive_piece_handling": {
+          "type": "boolean"
+        },
+        "review.positive_smell_preference": {
+          "type": "boolean"
+        },
+        "review.positive_opening": {
+          "type": "boolean"
+        },
+        "product.facts.owner_target": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.handling_action": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.opening_action": {
+          "type": "string",
+          "input": true
+        },
+        "product.facts.container": {
+          "type": "string",
+          "input": true
+        },
+        "review.reference_bound_min_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 150
+        },
+        "review.reference_bound_max_sek": {
+          "type": "number",
+          "unit": "SEK",
+          "constant": 1500
+        }
+      },
+      "steps": [
+        {
+          "id": "tested_sku",
+          "target": "review.subject",
+          "sample": "uniform_choice",
+          "values_from": "product.skus"
+        },
+        {
+          "id": "tested_id",
+          "target": "sku.sku_id",
+          "derive": "review.subject.sku_id"
+        },
+        {
+          "id": "tested_product",
+          "target": "sku.product_id",
+          "derive": "review.subject.product_id"
+        },
+        {
+          "id": "rating",
+          "target": "review.rating",
+          "sample": "rating",
+          "execution": "profile.execution",
+          "concentration": 1.5
+        },
+        {
+          "id": "topics",
+          "target": "review.topics",
+          "sample": "review_topics",
+          "execution": "profile.execution",
+          "positioning_from": "profile.positioning",
+          "eligible_from": "review.eligible",
+          "length_weights": {
+            "0": 24,
+            "1": 4,
+            "2": 3,
+            "3": 1
+          }
+        },
+        {
+          "id": "synthetic_purchase_price",
+          "target": "review.purchase_price_sek",
+          "derive": "review.subject.reference_price_sek"
+        },
+        {
+          "id": "pack_lower_price_bound",
+          "target": "review.price_min_sek",
+          "derive": "review.reference_bound_min_sek * review.subject.price_multiplier"
+        },
+        {
+          "id": "pack_upper_price_bound",
+          "target": "review.price_max_sek",
+          "derive": "review.reference_bound_max_sek * review.subject.price_multiplier"
+        },
+        {
+          "id": "relative_purchase_price",
+          "target": "review.value_price_position",
+          "derive": "(review.purchase_price_sek - review.price_min_sek) / (review.price_max_sek - review.price_min_sek)"
+        },
+        {
+          "id": "value_favourability",
+          "target": "review.value_favourability",
+          "sample": "normal",
+          "mean": "(review.rating - 1) / 4 - 0.2 * (review.value_price_position - 0.5)",
+          "sd": 0.22,
+          "min": 0,
+          "max": 1,
+          "bounds_mode": "clip",
+          "round_to": 1e-06
+        },
+        {
+          "id": "sentiment_value",
+          "target": "review.positive_value",
+          "derive": "review.value_favourability >= 0.5"
+        },
+        {
+          "id": "sentiment_reward_acceptance",
+          "target": "review.positive_reward_acceptance",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_piece_handling",
+          "target": "review.positive_piece_handling",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_smell_preference",
+          "target": "review.positive_smell_preference",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        },
+        {
+          "id": "sentiment_opening",
+          "target": "review.positive_opening",
+          "sample": "weighted_choice",
+          "weights": {
+            "positive": 1,
+            "negative": 1
+          },
+          "cases": [
+            {
+              "when": "review.rating >= 4",
+              "weights": {
+                "positive": 4,
+                "negative": 1
+              }
+            },
+            {
+              "when": "review.rating <= 2",
+              "weights": {
+                "positive": 1,
+                "negative": 4
+              }
+            }
+          ],
+          "values": {
+            "positive": true,
+            "negative": false
+          }
+        }
+      ],
+      "rules": [
+        {
+          "id": "tested_parent",
+          "require": "sku.product_id == product.product_id"
+        }
+      ],
+      "language": [
+        {
+          "id": "value.positive",
+          "when": "'value' in review.topics and review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "positive",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "Good value for what I paid.",
+            "It met my expectations at this price."
+          ]
+        },
+        {
+          "id": "value.negative",
+          "when": "'value' in review.topics and not review.positive_value",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "value",
+            "polarity": "negative",
+            "context": "purchase",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I expected more for the price.",
+            "I would not pay this much again."
+          ]
+        },
+        {
+          "id": "reward_acceptance.positive",
+          "when": "'reward_acceptance' in review.topics and review.positive_reward_acceptance",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "reward_acceptance",
+            "polarity": "positive",
+            "context": {
+              "observer": "owner",
+              "animal": "represented-target dog",
+              "use": "occasional reward alongside usual complete food",
+              "aspect": "observed acceptance/rejection"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I observed my {target} accept an occasional reward alongside its usual complete food.",
+            "Alongside its usual complete food, I saw my {target} accept an occasional reward."
+          ],
+          "slots": {
+            "target": "product.facts.owner_target"
+          }
+        },
+        {
+          "id": "reward_acceptance.negative",
+          "when": "'reward_acceptance' in review.topics and not review.positive_reward_acceptance",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "reward_acceptance",
+            "polarity": "negative",
+            "context": {
+              "observer": "owner",
+              "animal": "represented-target dog",
+              "use": "occasional reward alongside usual complete food",
+              "aspect": "observed acceptance/rejection"
+            },
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I observed my {target} leave an occasional reward alongside its usual complete food.",
+            "Alongside its usual complete food, I saw my {target} leave an occasional reward."
+          ],
+          "slots": {
+            "target": "product.facts.owner_target"
+          }
+        },
+        {
+          "id": "piece_handling.positive",
+          "when": "'piece_handling' in review.topics and review.positive_piece_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "piece_handling",
+            "polarity": "positive",
+            "context": "owner taking represented piece from actual outer food container",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "For me, {action} was easy.",
+            "I found {action} easy."
+          ],
+          "slots": {
+            "action": "product.facts.handling_action"
+          }
+        },
+        {
+          "id": "piece_handling.negative",
+          "when": "'piece_handling' in review.topics and not review.positive_piece_handling",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "piece_handling",
+            "polarity": "negative",
+            "context": "owner taking represented piece from actual outer food container",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "For me, {action} was difficult.",
+            "I found {action} difficult."
+          ],
+          "slots": {
+            "action": "product.facts.handling_action"
+          }
+        },
+        {
+          "id": "smell_preference.positive",
+          "when": "'smell_preference' in review.topics and review.positive_smell_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "smell_preference",
+            "polarity": "positive",
+            "context": "owner smell preference opening actual container in usual feeding area",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I liked the smell on opening the {container} in the usual feeding area.",
+            "On opening the {container} in the usual feeding area, I liked its smell."
+          ],
+          "slots": {
+            "container": "product.facts.container"
+          }
+        },
+        {
+          "id": "smell_preference.negative",
+          "when": "'smell_preference' in review.topics and not review.positive_smell_preference",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "smell_preference",
+            "polarity": "negative",
+            "context": "owner smell preference opening actual container in usual feeding area",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "I disliked the smell on opening the {container} in the usual feeding area.",
+            "On opening the {container} in the usual feeding area, I disliked its smell."
+          ],
+          "slots": {
+            "container": "product.facts.container"
+          }
+        },
+        {
+          "id": "opening.positive",
+          "when": "'opening' in review.topics and review.positive_opening",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "opening",
+            "polarity": "positive",
+            "context": "owner operating represented bag zipper/notch/outer cap",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "For me, {opening} was easy.",
+            "I found {opening} easy."
+          ],
+          "slots": {
+            "opening": "product.facts.opening_action"
+          }
+        },
+        {
+          "id": "opening.negative",
+          "when": "'opening' in review.topics and not review.positive_opening",
+          "meaning": {
+            "kind": "customer_experience",
+            "aspect": "opening",
+            "polarity": "negative",
+            "context": "owner operating represented bag zipper/notch/outer cap",
+            "source": "first_hand"
+          },
+          "formulations": [
+            "For me, {opening} was difficult.",
+            "I found {opening} difficult."
+          ],
+          "slots": {
+            "opening": "product.facts.opening_action"
+          }
+        }
+      ],
+      "bindings": [],
+      "metadata": {
+        "review_policy": "75% silent; shared concentration1.5 and anchored value frequency; pilot price penalty0.2 and reviewer spread0.22",
+        "purchase_price_basis": "Selected canonical food-pack reference; synthetic fixture, not seller transaction",
+        "relative_price_basis": {
+          "anchor_min_sek": 150,
+          "anchor_max_sek": 1500,
+          "bounds_scaled_by": "review.subject.price_multiplier"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "family_id": "dog_food",
+    "spec_path": "docs/agents/product-width-specs/dog_food.treats_snacks.md",
+    "task_adoption": "exported proposals only; not automatically registered",
+    "site_adoption": "isolated authoring preview only",
+    "price_effects": "Air-dried soft factor1.5; exact food-pack reference coefficients, seller quotes deferred",
+    "heuristic_status": "Tunable authored recipe; not empirical probabilities",
+    "review_policy_revision": "width-review-policy-v2",
+    "store_type_ids": [
+      "pets"
+    ],
+    "scope_exceptions": [
+      "Authored complementary-treat role; source gaps not inferred",
+      "Three bounded joint constructions and target declarations",
+      "Known nominal dental counts do not establish individual piece mass/calories"
+    ]
+  }
+}

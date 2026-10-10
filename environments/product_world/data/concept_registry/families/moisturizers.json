@@ -1,0 +1,170 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "moisturizers",
+  "review_id": "F20",
+  "label": "Moisturizers",
+  "section": "Beauty and personal care",
+  "store_type_ids": [
+    "beauty"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "SPF only for a declared SPF product with applicable label evidence. Sensitive-skin suitability is a claim; ingredient presence alone does not prove effectiveness or tolerance.",
+  "shared_dimension_ids": [
+    "ingredient_formula",
+    "target_skin_type",
+    "fragrance_variant",
+    "texture",
+    "net_volume",
+    "pack_count",
+    "packaging"
+  ],
+  "dimensions": [
+    {
+      "id": "ingredient_formula",
+      "label": "Ingredient formula",
+      "module_id": "formula",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "target_skin_type",
+      "label": "Target skin type",
+      "module_id": "formula",
+      "identity_level": "model",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "fragrance_variant",
+      "label": "Fragrance variant",
+      "module_id": "sensory",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "texture",
+      "label": "Texture",
+      "module_id": "sensory",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "net_volume",
+      "label": "Net volume",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "number",
+      "unit": "ml",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "packaging",
+      "label": "Packaging",
+      "module_id": "quantity",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "moisturizers.light_facial_moisturizers",
+      "label": "Light facial moisturizers",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "moisturizers.rich_facial_creams",
+      "label": "Rich facial creams",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "moisturizers.body_moisturizers",
+      "label": "Body moisturizers",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

@@ -1,0 +1,266 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "backpacks",
+  "review_id": "F39",
+  "label": "Backpacks",
+  "section": "Outdoor equipment and family travel",
+  "store_type_ids": [
+    "outdoors",
+    "strollers"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Laptop sleeve fit, hydration compatibility and hip belts depend on concept. A running vest needs different pocket/access contexts from a travel bag; cabin fit depends on stated dimensions and carrier rules.",
+  "shared_dimension_ids": [
+    "bag_capacity",
+    "torso_size",
+    "weight",
+    "component_materials",
+    "exposure_protection",
+    "compartment_layout",
+    "carrying_system",
+    "colour"
+  ],
+  "dimensions": [
+    {
+      "id": "bag_capacity",
+      "label": "Bag capacity",
+      "module_id": "geometry",
+      "identity_level": "model_or_sku",
+      "value_kind": "number",
+      "unit": "litre",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "torso_size",
+      "label": "Torso size",
+      "module_id": "fit",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "weight",
+      "label": "Weight",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "g",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "component_materials",
+      "label": "Component materials",
+      "module_id": "materials",
+      "identity_level": "model_or_sku",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "exposure_protection",
+      "label": "Exposure protection",
+      "module_id": "exposure",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "compartment_layout",
+      "label": "Compartment layout",
+      "module_id": "geometry",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "carrying_system",
+      "label": "Carrying system",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "colour",
+      "label": "Colour",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "rated_load",
+      "label": "Rated load",
+      "module_id": "fit",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "kg",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "laptop_sleeve_dimensions",
+      "label": "Laptop sleeve dimensions",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "structured",
+      "unit": "mm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "hydration_platform",
+      "label": "Hydration platform",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "backpacks.everyday_daypacks",
+      "label": "Everyday daypacks",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "backpacks.hiking_trekking_packs",
+      "label": "Hiking/trekking packs",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "rated_load"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "backpacks.commuter_laptop_packs",
+      "label": "Commuter/laptop packs",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "laptop_sleeve_dimensions"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "backpacks.travel_packs",
+      "label": "Travel packs",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "backpacks.running_hydration_packs",
+      "label": "Running/hydration packs",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "hydration_platform"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "printer_ink",
+  "review_id": "F28",
+  "label": "Printer ink",
+  "section": "Electronics and computing",
+  "store_type_ids": [
+    "electronics"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Ink volume and page yield are not interchangeable. Compatible third-party status is distinct from manufacturer-original; do not introduce toner into the ink schema without explicit scope expansion.",
+  "shared_dimension_ids": [
+    "compatible_platform",
+    "ink_colour_set",
+    "yield_version",
+    "pack_count",
+    "manufacturer_original"
+  ],
+  "dimensions": [
+    {
+      "id": "compatible_platform",
+      "label": "Compatible platform",
+      "module_id": "compatibility",
+      "identity_level": "model_or_sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "ink_colour_set",
+      "label": "Ink colour set",
+      "module_id": "appearance",
+      "identity_level": "sku",
+      "value_kind": "set",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "yield_version",
+      "label": "Yield version",
+      "module_id": "quantity",
+      "identity_level": "model_or_sku",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "pack_count",
+      "label": "Pack count",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "count",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "manufacturer_original",
+      "label": "Manufacturer original",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "boolean",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "printer_ink.ink_cartridges_and_cartridge_sets",
+      "label": "Ink cartridges and cartridge sets",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {},
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

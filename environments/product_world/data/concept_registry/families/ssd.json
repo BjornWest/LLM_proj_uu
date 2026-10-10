@@ -1,0 +1,163 @@
+{
+  "schema_version": "product-concept-family-v1",
+  "id": "ssd",
+  "review_id": "F11",
+  "label": "Storage drives",
+  "section": "Electronics and computing",
+  "store_type_ids": [
+    "electronics"
+  ],
+  "status": "proposed_not_runtime",
+  "source_notes": "Keep shallow. Protocol, connector and form factor are separate facts. Mechanical/spin characteristics apply only to HDDs. External enclosure details and power source apply only to external products; expanding legacy ssd is a future migration.",
+  "shared_dimension_ids": [
+    "storage_capacity",
+    "read_speed",
+    "write_speed",
+    "form_factor",
+    "placement"
+  ],
+  "dimensions": [
+    {
+      "id": "storage_capacity",
+      "label": "Storage capacity",
+      "module_id": "quantity",
+      "identity_level": "sku",
+      "value_kind": "integer",
+      "unit": "GB",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "read_speed",
+      "label": "Read speed",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "MB/s",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "write_speed",
+      "label": "Write speed",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "number",
+      "unit": "MB/s",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "form_factor",
+      "label": "Form factor",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "placement",
+      "label": "Placement",
+      "module_id": "compatibility",
+      "identity_level": "model",
+      "value_kind": "categorical",
+      "unit": null,
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    },
+    {
+      "id": "rotation_speed",
+      "label": "Rotation speed",
+      "module_id": "power",
+      "identity_level": "model",
+      "value_kind": "integer",
+      "unit": "rpm",
+      "status": "proposed",
+      "value_domain": null,
+      "sampling": null,
+      "dependencies": [],
+      "runtime_binding": null
+    }
+  ],
+  "concepts": [
+    {
+      "id": "ssd.nvme_ssds",
+      "label": "NVMe SSDs",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "storage_technology": "nvme_ssd"
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "ssd.sata_ssds",
+      "label": "SATA SSDs",
+      "status": "proposed",
+      "additional_dimension_ids": [],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "storage_technology": "sata_ssd"
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    },
+    {
+      "id": "ssd.hard_disk_drives_hdds",
+      "label": "Hard disk drives (HDDs)",
+      "status": "proposed",
+      "additional_dimension_ids": [
+        "rotation_speed"
+      ],
+      "excluded_dimension_ids": [],
+      "conditional_dimensions": {},
+      "fixed_traits": {
+        "storage_technology": "hdd"
+      },
+      "context_module_ids": [],
+      "specification_status": {
+        "domains": "pending",
+        "dependencies": "pending",
+        "sampling": "pending",
+        "retail_bindings": "pending",
+        "review_bindings": "pending"
+      },
+      "notes": []
+    }
+  ]
+}

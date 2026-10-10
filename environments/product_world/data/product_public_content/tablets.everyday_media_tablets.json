@@ -1,0 +1,2889 @@
+{
+  "schema": "product-public-content-v1",
+  "concept_id": "tablets.everyday_media_tablets",
+  "fields": {
+    "product.facts.tablet_units": {
+      "id": "tablets.media.product.facts.tablet_units",
+      "label": "tablet units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.construction": {
+      "id": "tablets.media.product.facts.construction",
+      "label": "construction",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.intended_use": {
+      "id": "tablets.media.product.facts.intended_use",
+      "label": "intended use",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.processor_label": {
+      "id": "tablets.media.product.facts.processor_label",
+      "label": "processor label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.os_label": {
+      "id": "tablets.media.product.facts.os_label",
+      "label": "os label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.os_release": {
+      "id": "tablets.media.product.facts.os_release",
+      "label": "os release",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.application_inventory": {
+      "id": "tablets.media.product.facts.application_inventory",
+      "label": "application inventory",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.application_setup": {
+      "id": "tablets.media.product.facts.application_setup",
+      "label": "application setup",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.support_duration_years": {
+      "id": "tablets.media.product.facts.support_duration_years",
+      "label": "support duration years",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.configuration": {
+      "id": "tablets.media.sku.configuration",
+      "label": "configuration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.ram_gb": {
+      "id": "tablets.media.sku.ram_gb",
+      "label": "ram gb",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Marketed installed system memory; unknown remains unknown, no GiB/usable-memory claim."
+        }
+      ]
+    },
+    "sku.ram_attachment": {
+      "id": "tablets.media.sku.ram_attachment",
+      "label": "ram attachment",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.storage_label": {
+      "id": "tablets.media.sku.storage_label",
+      "label": "storage label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.storage_kind": {
+      "id": "tablets.media.sku.storage_kind",
+      "label": "storage kind",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.storage_gb": {
+      "id": "tablets.media.sku.storage_gb",
+      "label": "storage gb",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Original marketed label with decimal GB comparator, not formatted usable capacity or GiB."
+        }
+      ]
+    },
+    "sku.storage_attachment": {
+      "id": "tablets.media.sku.storage_attachment",
+      "label": "storage attachment",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "product.facts.ram_socket_units": {
+      "id": "tablets.media.product.facts.ram_socket_units",
+      "label": "ram socket units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.storage_module_position_units": {
+      "id": "tablets.media.product.facts.storage_module_position_units",
+      "label": "storage module position units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.free_ram_gb": {
+      "id": "tablets.media.product.facts.free_ram_gb",
+      "label": "free ram gb",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.formatted_storage_gb": {
+      "id": "tablets.media.sku.formatted_storage_gb",
+      "label": "formatted storage gb",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "product.facts.service_access_declaration": {
+      "id": "tablets.media.product.facts.service_access_declaration",
+      "label": "service access declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.graphics_label": {
+      "id": "tablets.media.product.facts.graphics_label",
+      "label": "graphics label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "integrated_gpu"
+      }
+    },
+    "product.facts.graphics_shared_memory": {
+      "id": "tablets.media.product.facts.graphics_shared_memory",
+      "label": "graphics shared memory",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "integrated_gpu"
+      }
+    },
+    "product.facts.discrete_gpu": {
+      "id": "tablets.media.product.facts.discrete_gpu",
+      "label": "discrete gpu",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.dedicated_vram_gb": {
+      "id": "tablets.media.product.facts.dedicated_vram_gb",
+      "label": "dedicated vram gb",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "discrete_gpu"
+      }
+    },
+    "product.facts.graphics_routing": {
+      "id": "tablets.media.product.facts.graphics_routing",
+      "label": "graphics routing",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.performance_declaration": {
+      "id": "tablets.media.product.facts.performance_declaration",
+      "label": "performance declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_size_label": {
+      "id": "tablets.media.product.facts.screen_size_label",
+      "label": "screen size label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_rectangle_diagonal_in": {
+      "id": "tablets.media.product.facts.screen_rectangle_diagonal_in",
+      "label": "screen rectangle diagonal in",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Enclosing display rectangle, separate from advertised size and smaller clipped viewable area."
+        }
+      ]
+    },
+    "product.facts.screen_width_px": {
+      "id": "tablets.media.product.facts.screen_width_px",
+      "label": "screen width px",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_height_px": {
+      "id": "tablets.media.product.facts.screen_height_px",
+      "label": "screen height px",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_technology": {
+      "id": "tablets.media.product.facts.screen_technology",
+      "label": "screen technology",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_surface": {
+      "id": "tablets.media.product.facts.screen_surface",
+      "label": "screen surface",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.touchscreen": {
+      "id": "tablets.media.product.facts.touchscreen",
+      "label": "touchscreen",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.viewable_area_declaration": {
+      "id": "tablets.media.product.facts.viewable_area_declaration",
+      "label": "viewable area declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.touch_capabilities": {
+      "id": "tablets.media.product.facts.touch_capabilities",
+      "label": "touch capabilities",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_brightness_nit": {
+      "id": "tablets.media.product.facts.screen_brightness_nit",
+      "label": "screen brightness nit",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_gamut": {
+      "id": "tablets.media.product.facts.screen_gamut",
+      "label": "screen gamut",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.colour_calibration_error": {
+      "id": "tablets.media.product.facts.colour_calibration_error",
+      "label": "colour calibration error",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.screen_backlight": {
+      "id": "tablets.media.product.facts.screen_backlight",
+      "label": "screen backlight",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.lcd_backlight_properties": {
+      "id": "tablets.media.product.facts.lcd_backlight_properties",
+      "label": "lcd backlight properties",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.refresh_rate_hz": {
+      "id": "tablets.media.product.facts.refresh_rate_hz",
+      "label": "refresh rate hz",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Nominal panel refresh declaration if known; not achieved frame rate."
+        }
+      ]
+    },
+    "product.facts.achieved_frame_rate_hz": {
+      "id": "tablets.media.product.facts.achieved_frame_rate_hz",
+      "label": "achieved frame rate hz",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.reference_configuration": {
+      "id": "tablets.media.product.facts.reference_configuration",
+      "label": "reference configuration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.reference_width_mm": {
+      "id": "tablets.media.product.facts.reference_width_mm",
+      "label": "reference width mm",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Authored nominal first-full-menu bare tablet with installed RAM/storage/operating battery, excluding cable/adapter/pen/keyboard/case/packaging. Not measured actual selected-SKU or kit quantity."
+        },
+        {
+          "expr": "product.facts.reference_configuration"
+        }
+      ]
+    },
+    "product.facts.reference_height_mm": {
+      "id": "tablets.media.product.facts.reference_height_mm",
+      "label": "reference height mm",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Authored nominal first-full-menu bare tablet with installed RAM/storage/operating battery, excluding cable/adapter/pen/keyboard/case/packaging. Not measured actual selected-SKU or kit quantity."
+        },
+        {
+          "expr": "product.facts.reference_configuration"
+        }
+      ]
+    },
+    "product.facts.reference_max_thickness_mm": {
+      "id": "tablets.media.product.facts.reference_max_thickness_mm",
+      "label": "reference max thickness mm",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Authored nominal first-full-menu bare tablet with installed RAM/storage/operating battery, excluding cable/adapter/pen/keyboard/case/packaging. Not measured actual selected-SKU or kit quantity."
+        },
+        {
+          "expr": "product.facts.reference_configuration"
+        }
+      ]
+    },
+    "product.facts.reference_mass_g": {
+      "id": "tablets.media.product.facts.reference_mass_g",
+      "label": "reference mass g",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "qualifiers": [
+        {
+          "literal": "Authored nominal first-full-menu bare tablet with installed RAM/storage/operating battery, excluding cable/adapter/pen/keyboard/case/packaging. Not measured actual selected-SKU or kit quantity."
+        },
+        {
+          "expr": "product.facts.reference_configuration"
+        }
+      ]
+    },
+    "sku.actual_mass_g": {
+      "id": "tablets.media.sku.actual_mass_g",
+      "label": "actual mass g",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.actual_dimensions_declaration": {
+      "id": "tablets.media.sku.actual_dimensions_declaration",
+      "label": "actual dimensions declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "product.facts.carried_kit_mass_declaration": {
+      "id": "tablets.media.product.facts.carried_kit_mass_declaration",
+      "label": "carried kit mass declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.colour": {
+      "id": "tablets.media.sku.colour",
+      "label": "colour",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "product.facts.back_material": {
+      "id": "tablets.media.product.facts.back_material",
+      "label": "back material",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "back"
+      }
+    },
+    "product.facts.touch_surface_material": {
+      "id": "tablets.media.product.facts.touch_surface_material",
+      "label": "touch surface material",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "front"
+      }
+    },
+    "product.facts.finish_durability": {
+      "id": "tablets.media.product.facts.finish_durability",
+      "label": "finish durability",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.battery_included": {
+      "id": "tablets.media.product.facts.battery_included",
+      "label": "battery included",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      }
+    },
+    "product.facts.battery_location": {
+      "id": "tablets.media.product.facts.battery_location",
+      "label": "battery location",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      }
+    },
+    "product.facts.battery_rechargeable": {
+      "id": "tablets.media.product.facts.battery_rechargeable",
+      "label": "battery rechargeable",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      }
+    },
+    "product.facts.battery_chemistry": {
+      "id": "tablets.media.product.facts.battery_chemistry",
+      "label": "battery chemistry",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      }
+    },
+    "product.facts.battery_charge_mah": {
+      "id": "tablets.media.product.facts.battery_charge_mah",
+      "label": "battery charge mah",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      },
+      "qualifiers": [
+        {
+          "literal": "Authored typical installed-pack charge label if known; not energy/runtime, no inferred voltage."
+        }
+      ]
+    },
+    "product.facts.battery_energy_wh": {
+      "id": "tablets.media.product.facts.battery_energy_wh",
+      "label": "battery energy wh",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      },
+      "qualifiers": [
+        {
+          "literal": "Authored nominal installed-pack energy if known, not measured endurance."
+        }
+      ]
+    },
+    "product.facts.battery_service": {
+      "id": "tablets.media.product.facts.battery_service",
+      "label": "battery service",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      }
+    },
+    "product.facts.battery_voltage_v": {
+      "id": "tablets.media.product.facts.battery_voltage_v",
+      "label": "battery voltage v",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "component": {
+        "id": "installed_battery"
+      }
+    },
+    "product.facts.battery_runtime_h": {
+      "id": "tablets.media.product.facts.battery_runtime_h",
+      "label": "battery runtime h",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.charge_time_h": {
+      "id": "tablets.media.product.facts.charge_time_h",
+      "label": "charge time h",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.device_input_ceiling_w": {
+      "id": "tablets.media.product.facts.device_input_ceiling_w",
+      "label": "device input ceiling w",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.usb_c_units": {
+      "id": "tablets.media.product.facts.usb_c_units",
+      "label": "usb c units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.c1_interface_label": {
+      "id": "tablets.media.product.facts.c1_interface_label",
+      "label": "c1 interface label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.c1_data": {
+      "id": "tablets.media.product.facts.c1_data",
+      "label": "c1 data",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.c1_tablet_input_charging": {
+      "id": "tablets.media.product.facts.c1_tablet_input_charging",
+      "label": "c1 tablet input charging",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.c1_video_declaration": {
+      "id": "tablets.media.product.facts.c1_video_declaration",
+      "label": "c1 video declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.c1_video_conditions": {
+      "id": "tablets.media.product.facts.c1_video_conditions",
+      "label": "c1 video conditions",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.audio_combo_units": {
+      "id": "tablets.media.product.facts.audio_combo_units",
+      "label": "audio combo units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.port_power_profiles": {
+      "id": "tablets.media.product.facts.port_power_profiles",
+      "label": "port power profiles",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.c1_output_charging_declaration": {
+      "id": "tablets.media.product.facts.c1_output_charging_declaration",
+      "label": "c1 output charging declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.wireless_charging_declaration": {
+      "id": "tablets.media.product.facts.wireless_charging_declaration",
+      "label": "wireless charging declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.achieved_link_rate_declaration": {
+      "id": "tablets.media.product.facts.achieved_link_rate_declaration",
+      "label": "achieved link rate declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.external_display_limits": {
+      "id": "tablets.media.product.facts.external_display_limits",
+      "label": "external display limits",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.wifi_label": {
+      "id": "tablets.media.product.facts.wifi_label",
+      "label": "wifi label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.bluetooth_label": {
+      "id": "tablets.media.product.facts.bluetooth_label",
+      "label": "bluetooth label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.region_label": {
+      "id": "tablets.media.sku.region_label",
+      "label": "region label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.cellular_configuration": {
+      "id": "tablets.media.sku.cellular_configuration",
+      "label": "cellular configuration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.cellular_present": {
+      "id": "tablets.media.sku.cellular_present",
+      "label": "cellular present",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.physical_sim_tray_units": {
+      "id": "tablets.media.sku.physical_sim_tray_units",
+      "label": "physical sim tray units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "product.facts.memory_card_reader_units": {
+      "id": "tablets.media.product.facts.memory_card_reader_units",
+      "label": "memory card reader units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.maximum_card_capacity_gb": {
+      "id": "tablets.media.product.facts.maximum_card_capacity_gb",
+      "label": "maximum card capacity gb",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.memory_card_units": {
+      "id": "tablets.media.sku.memory_card_units",
+      "label": "memory card units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "product.facts.stylus_platform_label": {
+      "id": "tablets.media.product.facts.stylus_platform_label",
+      "label": "stylus platform label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.stylus_compatibility_declaration": {
+      "id": "tablets.media.product.facts.stylus_compatibility_declaration",
+      "label": "stylus compatibility declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.keyboard_compatibility_declaration": {
+      "id": "tablets.media.product.facts.keyboard_compatibility_declaration",
+      "label": "keyboard compatibility declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.pen_units": {
+      "id": "tablets.media.sku.pen_units",
+      "label": "pen units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.keyboard_units": {
+      "id": "tablets.media.sku.keyboard_units",
+      "label": "keyboard units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.cable_units": {
+      "id": "tablets.media.sku.cable_units",
+      "label": "cable units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_cable"
+      }
+    },
+    "sku.cable_connector_label": {
+      "id": "tablets.media.sku.cable_connector_label",
+      "label": "cable connector label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_cable"
+      }
+    },
+    "sku.cable_detachable": {
+      "id": "tablets.media.sku.cable_detachable",
+      "label": "cable detachable",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_cable"
+      }
+    },
+    "sku.cable_length_m": {
+      "id": "tablets.media.sku.cable_length_m",
+      "label": "cable length m",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_cable"
+      },
+      "qualifiers": [
+        {
+          "literal": "Authored nominal supplied detachable C-to-C cable length; not reference-body or whole-kit measurement."
+        }
+      ]
+    },
+    "sku.adapter_units": {
+      "id": "tablets.media.sku.adapter_units",
+      "label": "adapter units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_adapter"
+      }
+    },
+    "sku.cable_ratings_declaration": {
+      "id": "tablets.media.sku.cable_ratings_declaration",
+      "label": "cable ratings declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_cable"
+      }
+    },
+    "product.facts.own_charger_requirement": {
+      "id": "tablets.media.product.facts.own_charger_requirement",
+      "label": "own charger requirement",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.case_units": {
+      "id": "tablets.media.sku.case_units",
+      "label": "case units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.sim_units": {
+      "id": "tablets.media.sku.sim_units",
+      "label": "sim units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "sku.content_subscription_included": {
+      "id": "tablets.media.sku.content_subscription_included",
+      "label": "content subscription included",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      }
+    },
+    "product.facts.care_declaration": {
+      "id": "tablets.media.product.facts.care_declaration",
+      "label": "care declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.cleaning_permissions": {
+      "id": "tablets.media.product.facts.cleaning_permissions",
+      "label": "cleaning permissions",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "product.facts.ip_rating": {
+      "id": "tablets.media.product.facts.ip_rating",
+      "label": "ip rating",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      }
+    },
+    "sku.logical_adapter_input_declaration": {
+      "id": "tablets.media.sku.adapter_input_declaration",
+      "label": "adapter input declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_adapter"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.adapter_input_declaration_status"
+        }
+      ]
+    },
+    "sku.logical_adapter_output_a": {
+      "id": "tablets.media.sku.adapter_output_a",
+      "label": "adapter output a",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_adapter"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.adapter_output_a_status"
+        }
+      ]
+    },
+    "sku.logical_adapter_output_v": {
+      "id": "tablets.media.sku.adapter_output_v",
+      "label": "adapter output v",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_adapter"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.adapter_output_v_status"
+        }
+      ]
+    },
+    "sku.logical_adapter_output_w": {
+      "id": "tablets.media.sku.adapter_output_w",
+      "label": "adapter output w",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "component": {
+        "id": "supplied_adapter"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.adapter_output_w_status"
+        }
+      ]
+    },
+    "sku.logical_cellular_service_declaration": {
+      "id": "tablets.media.sku.cellular_service_declaration",
+      "label": "cellular service declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.cellular_service_declaration_status"
+        }
+      ]
+    },
+    "sku.logical_esim_declaration": {
+      "id": "tablets.media.sku.esim_declaration",
+      "label": "esim declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.esim_declaration_status"
+        }
+      ]
+    },
+    "sku.logical_modem_family": {
+      "id": "tablets.media.sku.modem_family",
+      "label": "modem family",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.modem_family_status"
+        }
+      ]
+    },
+    "sku.logical_regional_bands_declaration": {
+      "id": "tablets.media.sku.regional_bands_declaration",
+      "label": "regional bands declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "qualifiers": [
+        {
+          "expr": "sku.regional_bands_declaration_status"
+        }
+      ]
+    }
+  },
+  "assertions": {
+    "tablets.media.product.facts.tablet_units": {
+      "kind": "field_value",
+      "field": "product.facts.tablet_units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.construction": {
+      "kind": "field_value",
+      "field": "product.facts.construction",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.intended_use": {
+      "kind": "field_value",
+      "field": "product.facts.intended_use",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.processor_label": {
+      "kind": "field_value",
+      "field": "product.facts.processor_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.os_label": {
+      "kind": "field_value",
+      "field": "product.facts.os_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.os_release": {
+      "kind": "field_value",
+      "field": "product.facts.os_release",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.application_inventory": {
+      "kind": "field_value",
+      "field": "product.facts.application_inventory",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.application_setup": {
+      "kind": "field_value",
+      "field": "product.facts.application_setup",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.support_duration_years": {
+      "kind": "field_value",
+      "field": "product.facts.support_duration_years",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.configuration": {
+      "kind": "field_value",
+      "field": "sku.configuration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.ram_gb": {
+      "kind": "field_value",
+      "field": "sku.ram_gb",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.ram_attachment": {
+      "kind": "field_value",
+      "field": "sku.ram_attachment",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.storage_label": {
+      "kind": "field_value",
+      "field": "sku.storage_label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.storage_kind": {
+      "kind": "field_value",
+      "field": "sku.storage_kind",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.storage_gb": {
+      "kind": "field_value",
+      "field": "sku.storage_gb",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.storage_attachment": {
+      "kind": "field_value",
+      "field": "sku.storage_attachment",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.ram_socket_units": {
+      "kind": "field_value",
+      "field": "product.facts.ram_socket_units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.storage_module_position_units": {
+      "kind": "field_value",
+      "field": "product.facts.storage_module_position_units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.free_ram_gb": {
+      "kind": "field_value",
+      "field": "product.facts.free_ram_gb",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.formatted_storage_gb": {
+      "kind": "field_value",
+      "field": "sku.formatted_storage_gb",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.service_access_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.service_access_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.graphics_label": {
+      "kind": "field_value",
+      "field": "product.facts.graphics_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.graphics_shared_memory": {
+      "kind": "field_value",
+      "field": "product.facts.graphics_shared_memory",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.discrete_gpu": {
+      "kind": "field_value",
+      "field": "product.facts.discrete_gpu",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.dedicated_vram_gb": {
+      "kind": "field_value",
+      "field": "product.facts.dedicated_vram_gb",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.graphics_routing": {
+      "kind": "field_value",
+      "field": "product.facts.graphics_routing",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.performance_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.performance_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_size_label": {
+      "kind": "field_value",
+      "field": "product.facts.screen_size_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_rectangle_diagonal_in": {
+      "kind": "field_value",
+      "field": "product.facts.screen_rectangle_diagonal_in",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_width_px": {
+      "kind": "field_value",
+      "field": "product.facts.screen_width_px",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_height_px": {
+      "kind": "field_value",
+      "field": "product.facts.screen_height_px",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_technology": {
+      "kind": "field_value",
+      "field": "product.facts.screen_technology",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_surface": {
+      "kind": "field_value",
+      "field": "product.facts.screen_surface",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.touchscreen": {
+      "kind": "field_value",
+      "field": "product.facts.touchscreen",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.viewable_area_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.viewable_area_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.touch_capabilities": {
+      "kind": "field_value",
+      "field": "product.facts.touch_capabilities",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_brightness_nit": {
+      "kind": "field_value",
+      "field": "product.facts.screen_brightness_nit",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_gamut": {
+      "kind": "field_value",
+      "field": "product.facts.screen_gamut",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.colour_calibration_error": {
+      "kind": "field_value",
+      "field": "product.facts.colour_calibration_error",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.screen_backlight": {
+      "kind": "field_value",
+      "field": "product.facts.screen_backlight",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.lcd_backlight_properties": {
+      "kind": "field_value",
+      "field": "product.facts.lcd_backlight_properties",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.refresh_rate_hz": {
+      "kind": "field_value",
+      "field": "product.facts.refresh_rate_hz",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.achieved_frame_rate_hz": {
+      "kind": "field_value",
+      "field": "product.facts.achieved_frame_rate_hz",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.reference_configuration": {
+      "kind": "field_value",
+      "field": "product.facts.reference_configuration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.reference_width_mm": {
+      "kind": "field_value",
+      "field": "product.facts.reference_width_mm",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.reference_height_mm": {
+      "kind": "field_value",
+      "field": "product.facts.reference_height_mm",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.reference_max_thickness_mm": {
+      "kind": "field_value",
+      "field": "product.facts.reference_max_thickness_mm",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.reference_mass_g": {
+      "kind": "field_value",
+      "field": "product.facts.reference_mass_g",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.actual_mass_g": {
+      "kind": "field_value",
+      "field": "sku.actual_mass_g",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.actual_dimensions_declaration": {
+      "kind": "field_value",
+      "field": "sku.actual_dimensions_declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.carried_kit_mass_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.carried_kit_mass_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.colour": {
+      "kind": "field_value",
+      "field": "sku.colour",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.back_material": {
+      "kind": "field_value",
+      "field": "product.facts.back_material",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.touch_surface_material": {
+      "kind": "field_value",
+      "field": "product.facts.touch_surface_material",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.finish_durability": {
+      "kind": "field_value",
+      "field": "product.facts.finish_durability",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_included": {
+      "kind": "field_value",
+      "field": "product.facts.battery_included",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_location": {
+      "kind": "field_value",
+      "field": "product.facts.battery_location",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_rechargeable": {
+      "kind": "field_value",
+      "field": "product.facts.battery_rechargeable",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_chemistry": {
+      "kind": "field_value",
+      "field": "product.facts.battery_chemistry",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_charge_mah": {
+      "kind": "field_value",
+      "field": "product.facts.battery_charge_mah",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_energy_wh": {
+      "kind": "field_value",
+      "field": "product.facts.battery_energy_wh",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_service": {
+      "kind": "field_value",
+      "field": "product.facts.battery_service",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_voltage_v": {
+      "kind": "field_value",
+      "field": "product.facts.battery_voltage_v",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.battery_runtime_h": {
+      "kind": "field_value",
+      "field": "product.facts.battery_runtime_h",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.charge_time_h": {
+      "kind": "field_value",
+      "field": "product.facts.charge_time_h",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.device_input_ceiling_w": {
+      "kind": "field_value",
+      "field": "product.facts.device_input_ceiling_w",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.usb_c_units": {
+      "kind": "field_value",
+      "field": "product.facts.usb_c_units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.c1_interface_label": {
+      "kind": "field_value",
+      "field": "product.facts.c1_interface_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.c1_data": {
+      "kind": "field_value",
+      "field": "product.facts.c1_data",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.c1_tablet_input_charging": {
+      "kind": "field_value",
+      "field": "product.facts.c1_tablet_input_charging",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.c1_video_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.c1_video_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.c1_video_conditions": {
+      "kind": "field_value",
+      "field": "product.facts.c1_video_conditions",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.audio_combo_units": {
+      "kind": "field_value",
+      "field": "product.facts.audio_combo_units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.port_power_profiles": {
+      "kind": "field_value",
+      "field": "product.facts.port_power_profiles",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.c1_output_charging_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.c1_output_charging_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.wireless_charging_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.wireless_charging_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.achieved_link_rate_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.achieved_link_rate_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.external_display_limits": {
+      "kind": "field_value",
+      "field": "product.facts.external_display_limits",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.wifi_label": {
+      "kind": "field_value",
+      "field": "product.facts.wifi_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.bluetooth_label": {
+      "kind": "field_value",
+      "field": "product.facts.bluetooth_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.region_label": {
+      "kind": "field_value",
+      "field": "sku.region_label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cellular_configuration": {
+      "kind": "field_value",
+      "field": "sku.cellular_configuration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cellular_present": {
+      "kind": "field_value",
+      "field": "sku.cellular_present",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.modem_family": {
+      "kind": "field_value",
+      "field": "sku.logical_modem_family",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.physical_sim_tray_units": {
+      "kind": "field_value",
+      "field": "sku.physical_sim_tray_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.esim_declaration": {
+      "kind": "field_value",
+      "field": "sku.logical_esim_declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.regional_bands_declaration": {
+      "kind": "field_value",
+      "field": "sku.logical_regional_bands_declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cellular_service_declaration": {
+      "kind": "field_value",
+      "field": "sku.logical_cellular_service_declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.memory_card_reader_units": {
+      "kind": "field_value",
+      "field": "product.facts.memory_card_reader_units",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.maximum_card_capacity_gb": {
+      "kind": "field_value",
+      "field": "product.facts.maximum_card_capacity_gb",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.memory_card_units": {
+      "kind": "field_value",
+      "field": "sku.memory_card_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.stylus_platform_label": {
+      "kind": "field_value",
+      "field": "product.facts.stylus_platform_label",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.stylus_compatibility_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.stylus_compatibility_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.keyboard_compatibility_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.keyboard_compatibility_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.pen_units": {
+      "kind": "field_value",
+      "field": "sku.pen_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.keyboard_units": {
+      "kind": "field_value",
+      "field": "sku.keyboard_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cable_units": {
+      "kind": "field_value",
+      "field": "sku.cable_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cable_connector_label": {
+      "kind": "field_value",
+      "field": "sku.cable_connector_label",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cable_detachable": {
+      "kind": "field_value",
+      "field": "sku.cable_detachable",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cable_length_m": {
+      "kind": "field_value",
+      "field": "sku.cable_length_m",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.adapter_units": {
+      "kind": "field_value",
+      "field": "sku.adapter_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.adapter_output_w": {
+      "kind": "field_value",
+      "field": "sku.logical_adapter_output_w",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.adapter_output_v": {
+      "kind": "field_value",
+      "field": "sku.logical_adapter_output_v",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.adapter_output_a": {
+      "kind": "field_value",
+      "field": "sku.logical_adapter_output_a",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.adapter_input_declaration": {
+      "kind": "field_value",
+      "field": "sku.logical_adapter_input_declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.cable_ratings_declaration": {
+      "kind": "field_value",
+      "field": "sku.cable_ratings_declaration",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.own_charger_requirement": {
+      "kind": "field_value",
+      "field": "product.facts.own_charger_requirement",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.case_units": {
+      "kind": "field_value",
+      "field": "sku.case_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.sim_units": {
+      "kind": "field_value",
+      "field": "sku.sim_units",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.sku.content_subscription_included": {
+      "kind": "field_value",
+      "field": "sku.content_subscription_included",
+      "subject": {
+        "kind": "sku",
+        "id_expr": "sku.sku_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.care_declaration": {
+      "kind": "field_value",
+      "field": "product.facts.care_declaration",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.cleaning_permissions": {
+      "kind": "field_value",
+      "field": "product.facts.cleaning_permissions",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.product.facts.ip_rating": {
+      "kind": "field_value",
+      "field": "product.facts.ip_rating",
+      "subject": {
+        "kind": "product",
+        "id_expr": "product.product_id"
+      },
+      "authority": "catalog_fact"
+    },
+    "tablets.media.experience.value.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "value",
+        "polarity": "positive",
+        "context": {
+          "operation": "Assess value at actual price paid for exact tested canonical SKU; no numeric retailer quote is communicated",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        }
+      ]
+    },
+    "tablets.media.experience.value.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "value",
+        "polarity": "negative",
+        "context": {
+          "operation": "Assess value at actual price paid for exact tested canonical SKU; no numeric retailer quote is communicated",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        }
+      ]
+    },
+    "tablets.media.experience.touch_navigation.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "touch_navigation",
+        "polarity": "positive",
+        "context": {
+          "operation": "Five touch swipes through own prepared local browser article in landscape at half brightness",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "article_binding": "review.article_setup_label",
+          "screen_binding": "review.screen_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.article_setup_label"
+        },
+        {
+          "expr": "review.screen_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.touch_navigation.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "touch_navigation",
+        "polarity": "negative",
+        "context": {
+          "operation": "Five touch swipes through own prepared local browser article in landscape at half brightness",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "article_binding": "review.article_setup_label",
+          "screen_binding": "review.screen_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.article_setup_label"
+        },
+        {
+          "expr": "review.screen_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.reading.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "reading",
+        "polarity": "positive",
+        "context": {
+          "operation": "Read one paragraph of prepared local article in landscape,half brightness,font/zoom100%,own ordinary desk lamp",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "article_binding": "review.article_setup_label",
+          "screen_binding": "review.screen_setup_label",
+          "reading_binding": "review.reading_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.article_setup_label"
+        },
+        {
+          "expr": "review.screen_setup_label"
+        },
+        {
+          "expr": "review.reading_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.reading.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "reading",
+        "polarity": "negative",
+        "context": {
+          "operation": "Read one paragraph of prepared local article in landscape,half brightness,font/zoom100%,own ordinary desk lamp",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "article_binding": "review.article_setup_label",
+          "screen_binding": "review.screen_setup_label",
+          "reading_binding": "review.reading_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.article_setup_label"
+        },
+        {
+          "expr": "review.screen_setup_label"
+        },
+        {
+          "expr": "review.reading_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.offline_video.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "offline_video",
+        "polarity": "positive",
+        "context": {
+          "operation": "Watch own already-playing offline clip on battery for ten minutes on own sofa,in landscape at half brightness",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "media_binding": "review.media_setup_label",
+          "screen_binding": "review.screen_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.media_setup_label"
+        },
+        {
+          "expr": "review.screen_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.offline_video.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "offline_video",
+        "polarity": "negative",
+        "context": {
+          "operation": "Watch own already-playing offline clip on battery for ten minutes on own sofa,in landscape at half brightness",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "media_binding": "review.media_setup_label",
+          "screen_binding": "review.screen_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.media_setup_label"
+        },
+        {
+          "expr": "review.screen_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.couch_hold.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "couch_hold",
+        "polarity": "positive",
+        "context": {
+          "operation": "Hold actual bare tablet in hands for twenty minutes on own sofa; no mass or ergonomic measurement",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        }
+      ]
+    },
+    "tablets.media.experience.couch_hold.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "couch_hold",
+        "polarity": "negative",
+        "context": {
+          "operation": "Hold actual bare tablet in hands for twenty minutes on own sofa; no mass or ergonomic measurement",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        }
+      ]
+    },
+    "tablets.media.experience.carrying.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "carrying",
+        "polarity": "positive",
+        "context": {
+          "operation": "After session put bare tablet alone into own usual bag; no whole-kit mass claim",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        }
+      ]
+    },
+    "tablets.media.experience.carrying.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "carrying",
+        "polarity": "negative",
+        "context": {
+          "operation": "After session put bare tablet alone into own usual bag; no whole-kit mass claim",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        }
+      ]
+    },
+    "tablets.media.experience.charge_handling.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "charge_handling",
+        "polarity": "positive",
+        "context": {
+          "operation": "After session handle supplied nominal 1m C-to-C cable with already-compatible own USB-C adapter at wall socket; no achieved charging rate/time",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "charge_binding": "review.charge_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.charge_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.charge_handling.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "charge_handling",
+        "polarity": "negative",
+        "context": {
+          "operation": "After session handle supplied nominal 1m C-to-C cable with already-compatible own USB-C adapter at wall socket; no achieved charging rate/time",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "charge_binding": "review.charge_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.charge_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.pen_marks.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "pen_marks",
+        "polarity": "positive",
+        "context": {
+          "operation": "Make twenty short marks with own already-charged platform pen in own prepared note app",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "pen_binding": "review.pen_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.pen_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.pen_marks.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "pen_marks",
+        "polarity": "negative",
+        "context": {
+          "operation": "Make twenty short marks with own already-charged platform pen in own prepared note app",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "pen_binding": "review.pen_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.pen_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.keyboard_entry.positive": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "keyboard_entry",
+        "polarity": "positive",
+        "context": {
+          "operation": "Type one short note with own already-paired Bluetooth keyboard on actual OS,US English active map matching own legends",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "keyboard_binding": "review.keyboard_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.keyboard_setup_label"
+        }
+      ]
+    },
+    "tablets.media.experience.keyboard_entry.negative": {
+      "kind": "customer_experience",
+      "experience": {
+        "aspect": "keyboard_entry",
+        "polarity": "negative",
+        "context": {
+          "operation": "Type one short note with own already-paired Bluetooth keyboard on actual OS,US English active map matching own legends",
+          "subject": "actual tested existing canonical tablet SKU",
+          "limit": "Attributed subjective occurrence only; no benchmark/runtime/charging rate/streaming entitlement/carrier/app/productivity/ergonomic or health guarantee",
+          "keyboard_binding": "review.keyboard_setup_label"
+        },
+        "source": "first_hand"
+      },
+      "subject": {
+        "kind": "sku",
+        "id_expr": "review.subject.sku_id"
+      },
+      "authority": "attributed_experience",
+      "qualifiers": [
+        {
+          "literal": "Actual review/reviewer occurrence and full tested canonical SKU; subjective experience is not catalog performance."
+        },
+        {
+          "expr": "review.keyboard_setup_label"
+        }
+      ]
+    }
+  },
+  "language": {
+    "description.body": {
+      "common_assertions": [
+        "tablets.media.product.facts.tablet_units",
+        "tablets.media.product.facts.construction",
+        "tablets.media.product.facts.intended_use"
+      ]
+    },
+    "description.platform": {
+      "common_assertions": [
+        "tablets.media.product.facts.processor_label",
+        "tablets.media.product.facts.os_label",
+        "tablets.media.product.facts.os_release",
+        "tablets.media.product.facts.application_inventory",
+        "tablets.media.product.facts.application_setup",
+        "tablets.media.product.facts.support_duration_years"
+      ]
+    },
+    "description.configuration": {
+      "common_assertions": [
+        "tablets.media.sku.configuration",
+        "tablets.media.sku.ram_gb",
+        "tablets.media.sku.ram_attachment",
+        "tablets.media.sku.storage_label",
+        "tablets.media.sku.storage_kind",
+        "tablets.media.sku.storage_gb",
+        "tablets.media.sku.storage_attachment",
+        "tablets.media.product.facts.ram_socket_units",
+        "tablets.media.product.facts.storage_module_position_units",
+        "tablets.media.product.facts.free_ram_gb",
+        "tablets.media.sku.formatted_storage_gb",
+        "tablets.media.product.facts.service_access_declaration"
+      ]
+    },
+    "description.graphics": {
+      "common_assertions": [
+        "tablets.media.product.facts.graphics_label",
+        "tablets.media.product.facts.graphics_shared_memory",
+        "tablets.media.product.facts.discrete_gpu",
+        "tablets.media.product.facts.dedicated_vram_gb",
+        "tablets.media.product.facts.graphics_routing",
+        "tablets.media.product.facts.performance_declaration"
+      ]
+    },
+    "description.screen": {
+      "common_assertions": [
+        "tablets.media.product.facts.screen_size_label",
+        "tablets.media.product.facts.screen_rectangle_diagonal_in",
+        "tablets.media.product.facts.screen_width_px",
+        "tablets.media.product.facts.screen_height_px",
+        "tablets.media.product.facts.screen_technology",
+        "tablets.media.product.facts.screen_surface",
+        "tablets.media.product.facts.touchscreen",
+        "tablets.media.product.facts.viewable_area_declaration",
+        "tablets.media.product.facts.touch_capabilities",
+        "tablets.media.product.facts.screen_brightness_nit",
+        "tablets.media.product.facts.screen_gamut",
+        "tablets.media.product.facts.colour_calibration_error",
+        "tablets.media.product.facts.screen_backlight",
+        "tablets.media.product.facts.lcd_backlight_properties"
+      ]
+    },
+    "description.refresh": {
+      "common_assertions": [
+        "tablets.media.product.facts.refresh_rate_hz",
+        "tablets.media.product.facts.achieved_frame_rate_hz"
+      ]
+    },
+    "description.body_reference": {
+      "common_assertions": [
+        "tablets.media.product.facts.reference_configuration",
+        "tablets.media.product.facts.reference_width_mm",
+        "tablets.media.product.facts.reference_height_mm",
+        "tablets.media.product.facts.reference_max_thickness_mm",
+        "tablets.media.product.facts.reference_mass_g",
+        "tablets.media.sku.actual_mass_g",
+        "tablets.media.sku.actual_dimensions_declaration",
+        "tablets.media.product.facts.carried_kit_mass_declaration"
+      ]
+    },
+    "description.appearance": {
+      "common_assertions": [
+        "tablets.media.sku.colour",
+        "tablets.media.product.facts.back_material",
+        "tablets.media.product.facts.touch_surface_material",
+        "tablets.media.product.facts.finish_durability"
+      ]
+    },
+    "description.battery": {
+      "common_assertions": [
+        "tablets.media.product.facts.battery_included",
+        "tablets.media.product.facts.battery_location",
+        "tablets.media.product.facts.battery_rechargeable",
+        "tablets.media.product.facts.battery_chemistry",
+        "tablets.media.product.facts.battery_charge_mah",
+        "tablets.media.product.facts.battery_energy_wh",
+        "tablets.media.product.facts.battery_service"
+      ]
+    },
+    "description.battery_unknowns": {
+      "common_assertions": [
+        "tablets.media.product.facts.battery_voltage_v",
+        "tablets.media.product.facts.battery_runtime_h",
+        "tablets.media.product.facts.charge_time_h",
+        "tablets.media.product.facts.device_input_ceiling_w"
+      ]
+    },
+    "description.ports": {
+      "common_assertions": [
+        "tablets.media.product.facts.usb_c_units",
+        "tablets.media.product.facts.c1_interface_label",
+        "tablets.media.product.facts.c1_data",
+        "tablets.media.product.facts.c1_tablet_input_charging",
+        "tablets.media.product.facts.c1_video_declaration",
+        "tablets.media.product.facts.c1_video_conditions",
+        "tablets.media.product.facts.audio_combo_units",
+        "tablets.media.product.facts.port_power_profiles",
+        "tablets.media.product.facts.c1_output_charging_declaration",
+        "tablets.media.product.facts.wireless_charging_declaration",
+        "tablets.media.product.facts.achieved_link_rate_declaration",
+        "tablets.media.product.facts.external_display_limits"
+      ]
+    },
+    "description.wireless": {
+      "common_assertions": [
+        "tablets.media.product.facts.wifi_label",
+        "tablets.media.product.facts.bluetooth_label",
+        "tablets.media.sku.region_label"
+      ]
+    },
+    "description.cellular": {
+      "common_assertions": [
+        "tablets.media.sku.cellular_configuration",
+        "tablets.media.sku.cellular_present",
+        "tablets.media.sku.modem_family",
+        "tablets.media.sku.physical_sim_tray_units",
+        "tablets.media.sku.esim_declaration",
+        "tablets.media.sku.regional_bands_declaration",
+        "tablets.media.sku.cellular_service_declaration"
+      ]
+    },
+    "description.memory_card": {
+      "common_assertions": [
+        "tablets.media.product.facts.memory_card_reader_units",
+        "tablets.media.product.facts.maximum_card_capacity_gb",
+        "tablets.media.sku.memory_card_units"
+      ]
+    },
+    "description.compatibility": {
+      "common_assertions": [
+        "tablets.media.product.facts.stylus_platform_label",
+        "tablets.media.product.facts.stylus_compatibility_declaration",
+        "tablets.media.product.facts.keyboard_compatibility_declaration",
+        "tablets.media.sku.pen_units",
+        "tablets.media.sku.keyboard_units"
+      ]
+    },
+    "description.charge": {
+      "common_assertions": [
+        "tablets.media.sku.cable_units",
+        "tablets.media.sku.cable_connector_label",
+        "tablets.media.sku.cable_detachable",
+        "tablets.media.sku.cable_length_m",
+        "tablets.media.sku.adapter_units",
+        "tablets.media.sku.adapter_output_w",
+        "tablets.media.sku.adapter_output_v",
+        "tablets.media.sku.adapter_output_a",
+        "tablets.media.sku.adapter_input_declaration",
+        "tablets.media.sku.cable_ratings_declaration",
+        "tablets.media.product.facts.own_charger_requirement"
+      ]
+    },
+    "description.box": {
+      "common_assertions": [
+        "tablets.media.product.facts.tablet_units",
+        "tablets.media.product.facts.battery_included",
+        "tablets.media.sku.cable_units",
+        "tablets.media.sku.pen_units",
+        "tablets.media.sku.keyboard_units",
+        "tablets.media.sku.case_units",
+        "tablets.media.sku.sim_units",
+        "tablets.media.sku.memory_card_units",
+        "tablets.media.sku.content_subscription_included"
+      ]
+    },
+    "description.care": {
+      "common_assertions": [
+        "tablets.media.product.facts.care_declaration",
+        "tablets.media.product.facts.cleaning_permissions",
+        "tablets.media.product.facts.ip_rating"
+      ]
+    },
+    "value.positive": {
+      "common_assertions": [
+        "tablets.media.experience.value.positive"
+      ]
+    },
+    "value.negative": {
+      "common_assertions": [
+        "tablets.media.experience.value.negative"
+      ]
+    },
+    "touch_navigation.positive": {
+      "common_assertions": [
+        "tablets.media.experience.touch_navigation.positive"
+      ]
+    },
+    "touch_navigation.negative": {
+      "common_assertions": [
+        "tablets.media.experience.touch_navigation.negative"
+      ]
+    },
+    "reading.positive": {
+      "common_assertions": [
+        "tablets.media.experience.reading.positive"
+      ]
+    },
+    "reading.negative": {
+      "common_assertions": [
+        "tablets.media.experience.reading.negative"
+      ]
+    },
+    "offline_video.positive": {
+      "common_assertions": [
+        "tablets.media.experience.offline_video.positive"
+      ]
+    },
+    "offline_video.negative": {
+      "common_assertions": [
+        "tablets.media.experience.offline_video.negative"
+      ]
+    },
+    "couch_hold.positive": {
+      "common_assertions": [
+        "tablets.media.experience.couch_hold.positive"
+      ]
+    },
+    "couch_hold.negative": {
+      "common_assertions": [
+        "tablets.media.experience.couch_hold.negative"
+      ]
+    },
+    "carrying.positive": {
+      "common_assertions": [
+        "tablets.media.experience.carrying.positive"
+      ]
+    },
+    "carrying.negative": {
+      "common_assertions": [
+        "tablets.media.experience.carrying.negative"
+      ]
+    },
+    "charge_handling.positive": {
+      "common_assertions": [
+        "tablets.media.experience.charge_handling.positive"
+      ]
+    },
+    "charge_handling.negative": {
+      "common_assertions": [
+        "tablets.media.experience.charge_handling.negative"
+      ]
+    },
+    "pen_marks.positive": {
+      "common_assertions": [
+        "tablets.media.experience.pen_marks.positive"
+      ]
+    },
+    "pen_marks.negative": {
+      "common_assertions": [
+        "tablets.media.experience.pen_marks.negative"
+      ]
+    },
+    "keyboard_entry.positive": {
+      "common_assertions": [
+        "tablets.media.experience.keyboard_entry.positive"
+      ]
+    },
+    "keyboard_entry.negative": {
+      "common_assertions": [
+        "tablets.media.experience.keyboard_entry.negative"
+      ]
+    }
+  },
+  "source_files": {
+    "environments/product_world/data/product_width/tablets.everyday_media_tablets.json": "c81f534e88b054f10062a24df7d705fd03046608b84b46f0005d7fe83387f432",
+    "environments/product_world/data/product_width/_tablets_base.json": "356e92422c148f5f0dca52baadb94235b4882b52ede1e2d93447d84f73279871",
+    "docs/agents/product-width-specs/tablets.everyday_media_tablets.md": "848c9b33f8cd8bd07afd17dd3b0a093fe746fb1690411a69abf38621c3eef2c3",
+    "docs/agents/product-width-specs/_tablets-base.md": "809ffece0d7b8711d8976cef108658f1c3148d9576b948c66369e19a8e519ac3",
+    "docs/agents/product-public-assertions.md": "580e6421699b5c9430a018e2be786ce60337f65b00fafa8a484b4a171e74c8c3"
+  }
+}

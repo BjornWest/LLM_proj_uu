@@ -1,0 +1,30 @@
+{
+  "schema": "retailer-disclosure-profile-v1",
+  "modes": ["sparse", "typical", "detailed"],
+  "base_weights_by_scale": {
+    "small": {"sparse": 35, "typical": 50, "detailed": 15},
+    "medium": {"sparse": 25, "typical": 50, "detailed": 25},
+    "large": {"sparse": 15, "typical": 50, "detailed": 35}
+  },
+  "specificity_multipliers": {
+    "balanced": {"sparse": 1, "typical": 1, "detailed": 1},
+    "focused": {"sparse": 0.95, "typical": 1, "detailed": 1.2}
+  },
+  "price_preference_multipliers": {
+    "budget": {"sparse": 1.1, "typical": 1, "detailed": 0.95},
+    "mainstream": {"sparse": 1, "typical": 1, "detailed": 1},
+    "premium": {"sparse": 0.95, "typical": 1, "detailed": 1.1}
+  },
+  "template_groups": {
+    "technical": ["electronics", "creator_equipment", "gaming_setup", "tools", "appliances"],
+    "broad": ["marketplace", "department_store"]
+  },
+  "template_multipliers": {
+    "technical": {"sparse": 0.9, "typical": 1, "detailed": 1.25},
+    "broad": {"sparse": 1.25, "typical": 1, "detailed": 0.9},
+    "other": {"sparse": 1, "typical": 1, "detailed": 1}
+  },
+  "count_family": "binomial",
+  "count_fraction_by_mode": {"sparse": 0.25, "typical": 0.55, "detailed": 0.85},
+  "basis": "Untuned soft heuristics over existing retailer profiles, not empirical claims. Scale supplies the base; focus and technical scope modestly favour detailed disclosure. Price preference has only a weak effect. Every valid profile can draw every tendency; every tendency can draw zero or full content. No link to product truth, task relevance, layout, stock, execution or service quality."
+}
