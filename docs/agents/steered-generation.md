@@ -146,15 +146,17 @@ How it is checked:
 - **Unit tests run the real commerce producer.** Only product manufacture is
   replaced by a stand-in, which leaves a pass at about a second. The model's
   probability equals a full enumeration of the draws written straight from
-  the configuration, 4,000 plans per requirement follow the enumerated
-  conditional distribution, and steered worlds satisfy the native oracle.
+  the configuration for nine requirements, 4,000 plans for each of four of
+  them follow the enumerated conditional distribution, and steered worlds
+  satisfy the native oracle.
 - **A reading of the producer's stock lines, checked draw for draw.**
   `stock.natural_draws` repeats the producer's stock lines for one offer with
   the producer's own stream and weighted-choice functions. A plan entry
   `streams.Reseeded` opens a stream under another seed, so the real producer
-  can redraw the block naturally; `stock.redraw` requires the producer's
-  recorded result to equal the reading exactly. The reading is then cheap
-  enough for millions of redraws, which is what a 1-in-100,000 scenario needs.
+  can redraw the block naturally. `stock.redraw` returns the producer's
+  recorded result and the reading side by side, and the runner and the tests
+  require them to be equal. The reading is then cheap enough for millions of
+  redraws, which is what a 1-in-100,000 scenario needs.
 
 ## Evidence on seed 73
 
@@ -308,11 +310,13 @@ Coordination with Product, who own the producer:
 A measurement for Product, independent of steering: a pass through the
 commerce producer with manufacture already done spends most of its time
 re-reading the sampling defaults and the concept registry. `population.load()`
-runs 77 times per seed-73 pass (once per `list_skus` call, among others). In a
-side measurement with stand-in products a pass took 2.5 s as is and 0.4 s with
-one shared `load()` result, and produced the identical world. Caching it in
-the producer would make every pass, steered or not, about six times cheaper.
-This experiment does not patch it.
+runs once per retailer/product entry (in `list_skus`), once per retailer and
+twice more: 82 times for the saved seed-73 world. In a side measurement with
+the seed-73 inputs and stand-in products (77 loads) a pass took 2.5 s as is
+and 0.4 s with one shared `load()` result, and produced the identical world.
+Caching it in the producer would make passes that reuse manufacture, which is
+every steered pass, about six times cheaper. It does little for a first pass,
+which manufacture dominates. This experiment does not patch it.
 
 ## Reproduction
 
