@@ -45,7 +45,7 @@ def load_native(root, commit):
     return SimpleNamespace(**modules)
 
 
-def verify_sources(root):
+def verify_sources(root, constructor_paths):
     pins = {}
     for module in tuple(sys.modules.values()):
         name = getattr(module, "__file__", None)
@@ -55,7 +55,8 @@ def verify_sources(root):
         if (getattr(module, "__name__", "").split(".")[0] in
                 {"environments", "experiments", "intent_browser", "training", "scripts"}
                 and not path.is_relative_to(root)):
-            raise ValueError("Project dependency escaped the accepted root: " + str(path))
+            if constructor_paths.get(str(path)) != byte_digest(path.read_bytes()):
+                raise ValueError("Project dependency escaped the accepted root: " + str(path))
         if path.is_relative_to(root) and path.suffix == ".py":
             relative = path.relative_to(root).as_posix()
             expected = subprocess.check_output(["git", "-C", str(root), "show", "HEAD:" + relative])
@@ -86,14 +87,17 @@ def main():
     started = time.monotonic()
     root = args.native_root.resolve()
     api = load_native(root, args.native_commit)
-    source_pins = verify_sources(root)
+    constructor_commit = subprocess.check_output(["git", "-C", str(root), "rev-parse", "--verify", args.constructor_commit + "^{commit}"], text=True).strip()
     constructor_pins = {}
-    for name in ("model.py", "run.py"):
+    constructor_paths = {}
+    for name in ("__init__.py", "model.py", "run.py"):
         relative = "experiments/world_requirement_construction/" + name
-        expected = subprocess.check_output(["git", "-C", str(root), "show", args.constructor_commit + ":" + relative])
+        expected = subprocess.check_output(["git", "-C", str(root), "show", constructor_commit + ":" + relative])
         if Path(__file__).with_name(name).read_bytes() != expected:
             raise ValueError("Constructor source differs from its declared commit: " + name)
         constructor_pins[name] = byte_digest(expected)
+        constructor_paths[str(Path(__file__).with_name(name).resolve())] = byte_digest(expected)
+    source_pins = verify_sources(root, constructor_paths)
     manifest_raw = (args.recipe / "manifest.json").read_bytes()
     if byte_digest(manifest_raw) != args.expected_parent_manifest_sha256:
         raise ValueError("Parent manifest differs from its externally declared pin")
@@ -173,7 +177,7 @@ def main():
         by_id[oid]["price_minor"] in price_domain(by_id[oid], world["config"]["retailer_price"], api.native.rounded_price) for oid in targets)
     ensure(all(controls.values()), "An acceptance control failed")
     # No source or original artifact drift is accepted during construction.
-    ensure(source_pins.items() <= verify_sources(root).items(), "Consumed native sources changed")
+    ensure(source_pins.items() <= verify_sources(root, constructor_paths).items(), "Consumed native sources changed")
     ensure(all((args.recipe / n).read_bytes() == raw for n, raw in originals.items()), "Original input artifact changed")
     ensure((args.recipe / "manifest.json").read_bytes() == manifest_raw, "Parent manifest changed")
     ensure(args.requirement.read_bytes() == requirement_raw, "Requirement changed")
@@ -191,8 +195,8 @@ def main():
         (output / name).write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
     receipt = {"schema": VERSION, "status": "passed_construction_native_only",
                "native_commit": args.native_commit, "native_root": str(root),
-               "constructor_commit": args.constructor_commit, "constructor_source_sha256": constructor_pins,
-               "native_source_sha256": verify_sources(root),
+               "constructor_commit": constructor_commit, "constructor_source_sha256": constructor_pins,
+               "native_source_sha256": verify_sources(root, constructor_paths),
                "parent_recipe": str(args.recipe.resolve()), "parent_manifest_sha256": byte_digest(manifest_raw),
                "original_artifacts": {n: byte_digest(raw) for n, raw in originals.items()},
                "requirement_sha256": byte_digest(requirement_raw),

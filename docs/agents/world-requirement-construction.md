@@ -18,7 +18,8 @@ satisfied parents are declined without mutation; authored parent chains are
 explicitly outside this first operator's scope.
 Both new prices must belong to the native rounded output grid inside the existing
 clamped offset support. It chooses the highest common feasible price below the
-unchanged competitors. Failure means this particular operator cannot construct
+unchanged competitors. It does not minimize the number or magnitude of edits:
+an existing sole winner can also be raised toward that floor. Failure means this particular operator cannot construct
 the request; it does not prove that no possible world satisfies it.
 
 The example uses the accepted `e3fbfadd84d3b16a26895d62abb66f61df433697` source
@@ -60,8 +61,10 @@ ordinary sampler validation, or shared source change occurs. Native construction
 readiness does not imply that this world can be handed to a browser episode yet.
 
 Evidence is under `.local/coordination/world-requirement-construction-20261010/`.
-`native-v2/receipt.json` records the successful native run; its bounded process
-completed in about3.75 seconds inside the operator and acceptance checks.
+`native-final-v5/receipt.json` and `native-final-v5-optimized/receipt.json`
+record the current constructor's successful normal and optimized native checks.
+Earlier `native-v2` and `native-final-v4` results remain historical evidence; the
+final handoff pins the exact constructor commit and current checks.
 `native-v1-bounded/` preserves an initial experiment error: the runner selected
 the legacy checkout-domain API instead of the accepted-catalog API. The parent
 was not edited; choosing the correct released API fixed the runner. This is a
@@ -156,6 +159,10 @@ summary reconstruction. Setting stock to zero does not create menu absence.
   construction method and its search budget belong to a separate authoring plan.
   UNSAT for a bounded edit block must not be reported as global impossibility;
   solver timeouts and incomplete enumeration must remain unknown.
+- The direct callable's sampled-parent marker check is a scope guard, not a
+  proof against deliberately stripped provenance. The runner binds its original
+  recipe to an externally declared manifest digest; editing that parent requires
+  a different approved binding. Authored chains are outside this pilot's scope.
 
 ## Reproduction
 

@@ -52,6 +52,15 @@ class RequirementTests(unittest.TestCase):
         self.assertEqual(min(support), rounding(5500 * (1 + cfg["offset_min"]), 5500, cfg))
         self.assertEqual(min(support), 3800)
 
+    def test_reference_match_draw_exists_outside_offset_interval(self):
+        def rounding(raw, reference, config):
+            return max(1000, reference + round((raw - reference) / 1000) * 1000)
+        cfg = {"offset_min": .05, "offset_max": .3,
+               "reference_match_probability": .4, "rounding_bands_sek": [[None, 10]]}
+        offer = {"price_trace": {"reference_minor": 51000}}
+        self.assertIn(51000, price_domain(offer, cfg, rounding))
+        self.assertNotIn(51000, price_domain(offer, {**cfg, "reference_match_probability": 0}, rounding))
+
 
 if __name__ == "__main__":
     unittest.main()

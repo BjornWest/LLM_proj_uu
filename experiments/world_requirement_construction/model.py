@@ -66,7 +66,10 @@ def price_domain(offer, config, native_round):
     # Do not continue a range from that endpoint: it would invent impossible
     # prices whenever the reference has a commercial ending unlike step.
     first = low if low > step else reference + ((step - reference) // step + 1) * step
-    return {low} | set(range(first, high + 1, step))
+    support = {low} | set(range(first, high + 1, step))
+    if config.get("reference_match_probability", 0) > 0:
+        support.add(native_round(reference, reference, config))
+    return support
 
 
 def _reference(world, requirement, api):
@@ -144,7 +147,7 @@ def construct(parent, requirement, api, *, parent_bytes_sha256):
     # Keep the parent's exact limitation strings in the immutable parent, not as
     # fresh unqualified derivative claims such as "no winner or seed repair".
     world["limitations"] = ["Parent declaration: " + note for note in parent["limitations"]]
-    world["limitations"].append("Authored two-price derivative. Parent surrounding, rendering, task, runtime and execution sidecars are unusable here; only rebuilt native artifacts are released.")
+    world["limitations"].append("Authored two-price derivative. Parent surrounding, rendering, task, runtime and execution sidecars are unusable here; only rebuilt native artifacts are emitted.")
     world.pop("world_id")
     world["world_id"] = api.native.digest(world)
     task, reference = check(world, requirement, api)
