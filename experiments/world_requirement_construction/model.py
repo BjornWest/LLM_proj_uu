@@ -55,8 +55,11 @@ def price_domain(offer, config, native_round):
         raise ValueError("Unsupported native offset bounds")
     step = next(step for upper, step in config["rounding_bands_sek"]
                 if upper is None or reference < upper * 100) * 100
-    low = native_round(float(reference * (1 + lo)), reference, config)
-    high = native_round(float(reference * (1 + hi)), reference, config)
+    # Match the existing producer's exact float expression. Decimal arithmetic
+    # can move a binary-float half-step and alter round-to-even at a clamped
+    # endpoint, changing native support even though the interval is identical.
+    low = native_round(reference * (1 + config["offset_min"]), reference, config)
+    high = native_round(reference * (1 + config["offset_max"]), reference, config)
     if type(step) is not int or step <= 0 or (high - low) // step > 10000:
         raise ValueError("Native price grid exceeds bounded operator support")
     # max(step, rounded) can add a clamped endpoint off the reference grid.
@@ -129,6 +132,9 @@ def construct(parent, requirement, api, *, parent_bytes_sha256):
                   "trace_semantics": "Original price traces describe the parent draw; these explicit overrides describe the derivative."}
     world["provenance"]["authored_derivative"] = provenance
     world["status"] = "authored_derivative_construction_only"
+    # Keep the parent's exact limitation strings in the immutable parent, not as
+    # fresh unqualified derivative claims such as "no winner or seed repair".
+    world["limitations"] = ["Parent declaration: " + note for note in parent["limitations"]]
     world["limitations"].append("Authored two-price derivative. Parent surrounding, rendering, task, runtime and execution sidecars are unusable here; only rebuilt native artifacts are released.")
     world.pop("world_id")
     world["world_id"] = api.native.digest(world)

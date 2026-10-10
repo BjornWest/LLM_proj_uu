@@ -40,6 +40,15 @@ class RequirementTests(unittest.TestCase):
         self.assertEqual(support, {100, 190, 290, 390, 490, 590})
         self.assertNotIn(200, support)
 
+    def test_existing_float_endpoint_keeps_its_half_step(self):
+        def rounding(raw, reference, config):
+            return max(100, reference + round((raw - reference) / 100) * 100)
+        cfg = {"offset_min": -.3, "offset_max": .3, "rounding_bands_sek": [[None, 1]]}
+        # float(5500*(1-.3)) falls just below3850; native round gives3800.
+        support = price_domain({"price_trace": {"reference_minor": 5500}}, cfg, rounding)
+        self.assertEqual(min(support), rounding(5500 * (1 + cfg["offset_min"]), 5500, cfg))
+        self.assertEqual(min(support), 3800)
+
 
 if __name__ == "__main__":
     unittest.main()
