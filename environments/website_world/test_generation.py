@@ -236,3 +236,34 @@ def test_native_fresh_generation_replays_and_runtime_consumes_pinned_plans(tmp_p
     (output/'presentation.json').write_text('{}')
     with pytest.raises(ValueError, match='artifact changed'):
         pipeline.load(output)
+
+
+@pytest.mark.parametrize('explicit_basket', [False, True])
+def test_native_composition_uses_default_or_explicit_basket_policy(monkeypatch, explicit_basket):
+    world = fake_world()
+    world['schema_version'] = pipeline.producer.VERSION
+    policies = {'retailer_policies': [{'retailer_id': 'r0', 'optional_split': False,
+                                     'qualification_scope': 'checkout'}]}
+    calls = []
+    def make_plan(actual):
+        assert actual is world
+        calls.append(actual)
+        return deepcopy(policies)
+    monkeypatch.setattr(pipeline.basket_quote, 'make_plan', make_plan)
+    spec = request(basket_shipping={'enabled': explicit_basket})
+    result = pipeline.generate(spec, world_factory=lambda *_args, **_kwargs: world)
+    retailer = world['retailers'][0]
+    expected = pipeline.site_plan(world, retailer, result['presentation'],
+        basket_policy=pipeline.basket_quote.public_policy(policies, 'r0'))
+    assert result['compositions']['r0'] == expected
+    assert result['compositions']['r0'] != pipeline.site_plan(world, retailer, result['presentation'])
+    assert len(calls) == 1
+    assert result['order_set_task'] is None and result['checkout_domain'] is None
+    assert result['world'] is world and 'basket_plan' not in result
+
+
+def test_synthetic_noncommerce_factory_does_not_create_native_basket(monkeypatch):
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError('Synthetic finite sampling fixture has no native commerce envelope')
+    monkeypatch.setattr(pipeline.basket_quote, 'make_plan', forbidden)
+    assert pipeline.generate(request(), world_factory=lambda *_args, **_kwargs: fake_world())['compositions']

@@ -286,8 +286,15 @@ def generate(request, *, world_factory=None):
             if not native_reference['result']['complete']:
                 audit.update(status='order_set_search_exhausted',feasibility='unknown',order_set_reference=native_reference)
                 raise SamplingBudgetExceeded(audit)
+        # Runtime supplies the native default basket even when the historical
+        # request does not publish an explicit basket fixture. Bind page plans
+        # to that same producer policy, without changing task/reference scope.
+        composition_basket_plan = basket_plan
+        if composition_basket_plan is None and world.get('schema_version') == producer.VERSION:
+            composition_basket_plan = basket_quote.make_plan(world)
         plans = {r['retailer_id']: site_plan(world, r, presentation,
-                 basket_policy=oracle.public_policy(basket_plan,r['retailer_id']) if basket_plan else None)
+                 basket_policy=oracle.public_policy(composition_basket_plan,r['retailer_id'])
+                 if composition_basket_plan else None)
                  for r in world['retailers']}
         audit.update(status='accepted', selected_seed=seed, resolved=completion['resolved'],
                      elapsed_seconds=monotonic()-started)
