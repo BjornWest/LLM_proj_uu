@@ -86,6 +86,8 @@ class Design:
         self.stores={rid:{'name':name} for rid,name in retailer_names.items()}
         self.filter_config=self.profile['filters']
         self.discovery=None
+        self.catalog_search=self.profile.get('catalog_search',True)
+        if type(self.catalog_search) is not bool:raise ValueError('Catalog search must be a site-wide boolean')
 
     def offers(self,item):return item['listings']
     def price(self,item):return min((r['advertised_price_minor'] for r in self.offers(item)),default=None)
@@ -108,6 +110,7 @@ class Design:
         if self.profile['navigation']=='disclosure':nav='<details><summary>Browse departments and services</summary><nav>'+nav+'</nav></details>'
         else:nav='<nav aria-label="Main navigation">'+nav+'</nav>'
         search='<form action="/search"><label>Search products<input type="search" name="q" placeholder="Product or model name"></label><button>Search</button></form>'
+        if not self.catalog_search:search=''
         top=search+nav if self.profile['navigation']=='search-first' else nav+search
         foot='<footer><h2>Explore '+e(self.name)+'</h2><nav aria-label="Footer departments">'+self.categories()+'</nav><p>Item prices exclude delivery; the retailer confirms the selected option and final charges.</p><nav>'+link('/about','Sources and coverage')+self.discovery_link('More shopping websites')+'</nav></footer>'
         return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+e(title)+' — '+e(self.name)+'</title>'+STYLE+'</head><body><header>'+link('/',self.name)+top+'</header><main id="main">'+body+'</main>'+foot+'</body></html>'
@@ -144,7 +147,8 @@ class Design:
         if self.family and q.get('category',self.family)!=self.family:raise ValueError('Outside specialist scope')
         facets=self.facet_options(category) if category else {}
         known={f'f_{k}_{i}':(k,v) for k,values in facets.items() for i,v in enumerate(values)}
-        allowed={'q','category','page'}|set(known)
+        allowed={'category','page'}|set(known)
+        if self.catalog_search:allowed.add('q')
         if self.filter_config is None or self.filter_config['price_ceiling']:allowed.add('max_price')
         if self.filter_config is None or self.filter_config['sorting']:allowed.add('sort')
         if set(q)-allowed:raise ValueError('Unknown or unavailable filter')
@@ -167,7 +171,8 @@ class Design:
         return items,category,facets
 
     def filters(self,q,category,facets):
-        body='<form id="filters" action="/search"><h2>Refine products</h2><label>Product name<input name="q" value="'+e(q.get('q',''))+'"></label>'
+        body='<form id="filters" action="/search"><h2>Refine products</h2>'
+        if self.catalog_search:body+='<label>Product name<input name="q" value="'+e(q.get('q',''))+'"></label>'
         body+='<input type="hidden" name="category" value="'+e(category)+'"><p>Category: '+e(self.labels.get(category,'All categories'))+'</p>'
         if self.filter_config is None or self.filter_config['price_ceiling']:body+='<label>Maximum advertised price (SEK)<input type="number" min="0" step="0.01" name="max_price" value="'+e(q.get('max_price',''))+'"></label>'
         body+='<div class="refinements">'
@@ -302,7 +307,9 @@ class Ledger(Design):
 
 class Finder(Design):
     def home(self):
-        body='<h1>'+e(self.labels[self.family])+' discovery guide</h1><form action="/search"><label>Search products<input type="search" name="q"></label><button>Search</button></form><div class="collections">'
+        body='<h1>'+e(self.labels[self.family])+' discovery guide</h1>'
+        if self.catalog_search:body+='<form action="/search"><label>Search products<input type="search" name="q"></label><button>Search</button></form>'
+        body+='<div class="collections">'
         for family in self.families:
             body+='<section><h2>'+link('/search?'+urlencode({'category':family}),self.labels[family])+'</h2>'
             for field,values in self.facet_options(family).items():

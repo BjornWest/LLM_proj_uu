@@ -12,7 +12,7 @@ def options(value=None):
     raw = {} if value is None else deepcopy(value)
     if type(raw) is not dict:
         raise ValueError('Rich review options must be an object')
-    allowed = {*rich_ecosystem.DEFAULTS, 'coverage_seed', 'family_weights', 'review_assignment', 'review_page_size'}
+    allowed = {*rich_ecosystem.DEFAULTS, 'coverage_seed', 'family_weights', 'review_assignment', 'review_page_size', 'comparison_search_probability'}
     if set(raw) - allowed:raise ValueError('Unknown rich review option')
     weights = rich_ecosystem.weights(raw.get('review_layout_weights', dict.fromkeys(LAYOUTS, 1)), dict.fromkeys(LAYOUTS, 1), 'review layouts')
     legacy = {k: v for k, v in raw.items() if k not in ('review_layout_weights', 'review_assignment', 'review_page_size')}

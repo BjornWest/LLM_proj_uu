@@ -41,7 +41,7 @@ class AtomicConsumerTests(unittest.TestCase):
 
     def test_price_normalizes_only_answer_money_and_currency(self):
         grader = read_grader('read_listed_price')
-        claims = {'interpretation': 'extracted', 'issues': [],
+        claims = {'interpretation': 'extracted', 'issues': [], 'source_urls': [],
                   'total': {'amount': '125.00', 'currency': 'SEK', 'evidence': '125 SEK'}}
         report = grader.grade(claims, 'The listed price is 125 SEK.')
         self.assertTrue(report['structured_claims_correct'])
@@ -51,7 +51,7 @@ class AtomicConsumerTests(unittest.TestCase):
 
     def test_missing_price_stays_missing(self):
         grader = read_grader('read_listed_price')
-        report = grader.grade({'interpretation': 'extracted', 'issues': []}, 'I could not find it.')
+        report = grader.grade({'interpretation': 'extracted', 'issues': [], 'total': None, 'source_urls': []}, 'I could not find it.')
         self.assertIsNone(report['claims']['total'])
         self.assertIsNone(report['structured_claims_correct'])
 
@@ -109,7 +109,7 @@ class AtomicConsumerTests(unittest.TestCase):
 
     def test_actual_shared_extractor_accepts_read_contract_without_provider(self):
         grader = read_grader('read_listed_price')
-        claims = {'interpretation': 'extracted', 'issues': [],
+        claims = {'interpretation': 'extracted', 'issues': [], 'source_urls': [],
                   'total': {'amount': '125.00', 'currency': 'SEK', 'evidence': '125 SEK'}}
         class Backend:
             calls = 0
@@ -152,42 +152,14 @@ class AtomicConsumerTests(unittest.TestCase):
                 with patch.object(consumer.shared, 'load', side_effect=AssertionError('Should reject before load')):
                     with self.assertRaises(ValueError): consumer.run(Path(directory)/'recipe', Path(directory)/'run', **{**base, **changed})
 
-    def test_native_action_grade_once_after_close_and_projection_required(self):
-        for projected in (True, False):
-            with tempfile.TemporaryDirectory() as directory:
-                root = Path(directory); recipe = root/'recipe'; recipe.mkdir()
-                (recipe/'execution.private.json').write_text(json.dumps({'answer_grading': {'mode': 'off'}}))
-                (recipe/'atomic-product-task.private.json').write_text(json.dumps({'kind': 'add_exact_quantity'}))
-                events = []
-                class FakeEpisode:
-                    def __init__(self, *args, **kw):
-                        self.task = SimpleNamespace(files={}, make_env=lambda: None)
-                        self.profile = object();self.capture = object();self.catalog = {};self.domain = {}
-                        self.runtime = SimpleNamespace(world={}, bindings={})
-                        self.native_task = {'kind': 'add_exact_quantity'};self.reference = {}
-                        self.automatic_grading = {'native_saved_return': consumer.native_execution.grade_saved_return}
-                    def __enter__(self): return self
-                    def __exit__(self, *args): pass
-                @contextmanager
-                def session(**kw):
-                    events.append('open')
-                    try: yield object()
-                    finally: events.append('close')
-                def runner(*args, output, **kw):
-                    trace = Path(output)/'actual-return';trace.mkdir(parents=True)
-                    events.append('return');return trace, {}
-                def grade(*args, **kw): events.append('grade');return {'verdict': 'pass'}
-                def viewer(**kw): events.append('viewer');return {'status': 'verified' if projected else 'missing'}
-                with patch.object(consumer.shared, 'load', return_value={}), \
-                        patch.object(consumer, 'AtomicProductEpisode', FakeEpisode), \
-                        patch.object(consumer.native_execution, 'grade_saved_return', side_effect=grade):
-                    result = consumer.run(recipe, root/'run', policy_session=session, viewer_projection=viewer,
-                        authority_approval={'path': 'synthetic-only', 'sha256': 'synthetic-only'}, metadata={},
-                        runner_options={'max_steps': 1, 'max_input_tokens': 1}, runner=runner,
-                        quota_guard=lambda: events.append('quota'))
-                self.assertEqual(events, ['quota', 'open', 'return', 'close', 'grade', 'viewer'])
-                self.assertEqual(result['status'], 'graded_and_projected' if projected else 'system_failure')
-                self.assertIs(result['task_completed'], True if projected else None)
+    def test_dispatch_cannot_replace_attached_grader_or_allow_ungraded(self):
+        with patch.object(consumer.shared, 'load') as loader:
+            for key in ('automatic_grading','allow_ungraded','agent_runtime','episode_task'):
+                with self.subTest(key=key), self.assertRaises(ValueError):
+                    consumer.run('unused','unused',policy_session=lambda:None,
+                        viewer_projection=lambda **_:None, metadata={'tags':['scripted']},
+                        runner_options={'max_steps':1,'max_input_tokens':1,key:True})
+            loader.assert_not_called()
 
 
 if __name__ == '__main__': unittest.main()

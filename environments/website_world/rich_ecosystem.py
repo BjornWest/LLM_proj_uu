@@ -28,7 +28,7 @@ def weights(value,defaults,name):
 
 def options(value=None):
     value={} if value is None else value
-    if type(value) is not dict or set(value)-{*DEFAULTS,'coverage_seed','family_weights'}:
+    if type(value) is not dict or set(value)-{*DEFAULTS,'coverage_seed','family_weights','comparison_search_probability'}:
         raise ValueError('Unknown rich surrounding-site control')
     result={**deepcopy(DEFAULTS),**deepcopy(value)}
     legacy={k:result[k] for k in base.DEFAULTS if k!='comparison_layout_weights'}
@@ -39,7 +39,8 @@ def options(value=None):
     if type(result['module_weights']) is not dict or set(result['module_weights'])!=set(DEFAULTS['module_weights']):
         raise ValueError('Declare all comparator page roles')
     result['module_weights']={r:weights(result['module_weights'][r],DEFAULTS['module_weights'][r],r) for r in DEFAULTS['module_weights']}
-    for key in ('price_ceiling_probability','sorting_probability'):
+    for key in ('price_ceiling_probability','sorting_probability',
+                *(['comparison_search_probability'] if 'comparison_search_probability' in result else [])):
         p=result[key]
         if type(p) not in (int,float) or not isfinite(p) or not 0<=p<=1:raise ValueError('Invalid '+key)
     if 'family_weights' in result:
@@ -86,12 +87,16 @@ def presentation(world,site,controls,families):
         if type(v) in (str,bool,int,float) and p.get('fact_status',{}).get(k,'known')=='known' and v not in ('not specified','unknown')}) for f in chosen}
     limit=int(choice(seed,sid,'results/'+modules['results']+'/facet-limit',controls['facet_limit_weights']))
     fields={f:sorted(keys,key=lambda k:base.draw(seed,VERSION,sid,'results',modules['results'],'facet',f,k))[:limit] for f,keys in known.items()}
-    return chosen,{'scope':scope,'modules':modules,
+    profile = {'scope':scope,'modules':modules,
         'navigation':choice(seed,sid,'navigation',controls['navigation_weights']),
         'filters':{'attributes':fields,
             'price_ceiling':base.draw(seed,VERSION,sid,'results',modules['results'],'price-ceiling')<controls['price_ceiling_probability'],
             'sorting':base.draw(seed,VERSION,sid,'results',modules['results'],'sorting')<controls['sorting_probability']},
         'permutations':permutations}
+    # An omitted control preserves literal legacy profiles and all prior draws.
+    if 'comparison_search_probability' in controls:
+        profile['catalog_search'] = base.draw(seed,VERSION,sid,'catalog-search') < controls['comparison_search_probability']
+    return chosen, profile
 
 
 def generate(world,controls=None):
