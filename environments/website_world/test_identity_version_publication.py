@@ -142,3 +142,67 @@ def test_publish_does_not_tag_unrelated_grades(fixed, tmp_path):
     report.pop('identity_grading_version')
     report['response_contract'].pop('identity_grading_version')
     assert 'identity_grading_version' not in published(tmp_path, report)
+
+
+@pytest.fixture
+def shortlist_with_rows(fixed, monkeypatch):
+    world, base, ref, bindings, identity, ft, fr, feature = fixed
+    task = {**base, 'grain': 'model', 'tie_policy': 'all', 'limit': 1,
+            'feature_task': ft}
+    expected = {'feature_reference': fr, 'status': 'match',
+                'selected_models': [{'product_id': 'p', 'price_minor': 74000,
+                                     'winners': deepcopy(fr['winners'])}]}
+    monkeypatch.setattr(catalog_shortlist_grading.native, 'reference',
+                        lambda *a, **k: deepcopy(expected))
+    monkeypatch.setattr(catalog_shortlist_grading, 'FeatureOfferGrader',
+                        lambda *a, **k: feature)
+    # Enforce the identity schema before legacy normalization can supply omitted
+    # fields. This is the boundary exercised by the current composed runtime.
+    from jsonschema import Draft202012Validator
+    original_validate = feature.validate_claims
+    def validate_identity(value, text):
+        Draft202012Validator(feature.schema).validate(value)
+        return original_validate(value, text)
+    monkeypatch.setattr(feature, 'validate_claims', validate_identity)
+    return catalog_shortlist_grading.CatalogShortlistGrader(
+        world, task, expected, bindings, inventory=object())
+
+
+def shortlist_claims(price='740'):
+    text, single = answer(price=price)
+    row = {k: single[k] for k in ('product_name', 'retailer_name', 'offer_url',
+                                 'sku_id', 'variant', 'total')}
+    return text, {'interpretation': 'extracted', 'issues': [],
+                  'status': {'value': 'shortlist', 'evidence': text},
+                  'rows': [row], 'source_urls': []}
+
+
+@pytest.mark.parametrize('price,correct', [('740', True), ('700', False)])
+def test_nonempty_shortlist_uses_real_identity_schema_and_grades(
+        shortlist_with_rows, tmp_path, price, correct):
+    text, claims = shortlist_claims(price)
+    report = shortlist_with_rows.grade(claims, text)
+    assert report['structured_claims_correct'] is correct
+    assert report['oracle_grade']['requirements']['row_0'] is correct
+    assert report['claims'] == claims
+    assert published(tmp_path, report)['structured_claims_correct'] is correct
+
+
+def test_shortlist_identity_delegation_preserves_issues(shortlist_with_rows):
+    text, claims = shortlist_claims()
+    claims['issues'] = ['Retained formatter diagnostic']
+    from unittest.mock import patch
+    identity = shortlist_with_rows.identity
+    with patch.object(identity, 'validate_claims',
+                      wraps=identity.validate_claims) as delegated:
+        assert shortlist_with_rows.validate_claims(claims, text) == claims
+    assert delegated.call_args.args[0]['issues'] == claims['issues']
+
+
+def test_shortlist_identity_delegation_keeps_variant_grounding(shortlist_with_rows):
+    text, claims = shortlist_claims()
+    # Generic quote validation accepts the exact quote, but the real identity
+    # validator must reject a variant value absent from that quote.
+    claims['rows'][0]['variant']['size_eu']['value'] = '99'
+    with pytest.raises(ValueError, match='Variant value absent'):
+        shortlist_with_rows.grade(claims, text)

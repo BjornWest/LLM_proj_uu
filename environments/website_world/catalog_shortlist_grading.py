@@ -49,6 +49,7 @@ class CatalogShortlistGrader:
             # Reuse existing literal/variant grounding without interpreting this
             # row as a global cheapest-one recommendation.
             self.identity.validate_claims({**row, 'interpretation': 'extracted',
+                'issues': value['issues'],
                 'status': {'value': 'selection', 'evidence': answer}, 'source_urls': []}, answer)
         return value
 
