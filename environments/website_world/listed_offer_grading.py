@@ -14,7 +14,7 @@ from experiments.answer_grading.extraction import (
 from . import basic_offer_task
 from .adapter import digest
 
-VERSION = 'website-listed-offer-grading-v1'
+VERSION = 'website-listed-offer-grading-v2'
 
 
 def _text(value):
@@ -77,6 +77,26 @@ class ListedOfferGrader:
         for oid, offer in self.offers.items():
             if any(self.links[oid][k] != offer[k] for k in ('product_id', 'sku_id', 'retailer_id')):
                 raise ValueError('Public offer identity binding changed')
+        # Bind the renderer's exact page title to this offer's native catalogue
+        # page. Never strip arbitrary suffixes or use a price/winner to repair
+        # identity. Both public adapters use this page ID and title formula.
+        self.product_names = {oid: {_text(self.products[o['product_id']]['name'])}
+                              for oid, o in self.offers.items()}
+        offer_by_sku = {(o['retailer_id'], o['sku_id']): oid
+                        for oid, o in self.offers.items()}
+        for retailer in world['retailers']:
+            rid = retailer['retailer_id']
+            for entry in retailer.get('catalog', []):
+                product = self.products[entry['product_id']]
+                for page in entry['pages']:
+                    page_id = 'page-' + digest([product['product_id'], page['page_key']])[:24]
+                    suffix = ', '.join(str(v) for v in page['page_key'].values())
+                    title = product['name'] + (f' — {suffix}' if suffix else '')
+                    for listing in page['listings']:
+                        oid = offer_by_sku.get((rid, listing['sku_id']))
+                        if (oid is not None and self.offers[oid]['product_id'] == product['product_id']
+                                and _url(self.links[oid]['url'])[0][3] == '/product/' + page_id):
+                            self.product_names[oid].add(_text(title))
         # Reuse the canonical availability/ranking implementation, never a second formula.
         native = basic_offer_task._reference_bound(world, task)
         if task['kind'] == 'cheapest_available_exact_sku':
@@ -101,7 +121,7 @@ class ListedOfferGrader:
         # Field names/types only cross the extractor boundary, never expected values.
         fields = sorted({field for pid, p in self.products.items()
                          if p['concept_id'] == task['concept_id'] for field in self.dimensions[pid]})
-        self.contract = {'version': VERSION, 'operation': task['kind'], 'variant_fields': fields,
+        self.contract = {'version': VERSION, 'identity_grading_version': VERSION, 'operation': task['kind'], 'variant_fields': fields,
                          'price_basis': 'listed price for one sale unit, excluding shipping/coupons/cart deals',
                          'statuses': ['selection', 'no_match', 'uncertain']}
         self.schema = obj({
@@ -152,7 +172,7 @@ class ListedOfferGrader:
             offer = self.offers[oid]
             sku, product = self.skus[offer['sku_id']], self.products[offer['product_id']]
             # A present wrong value must exclude the candidate even if its price is right.
-            if claims['product_name']['value'] is not None and _text(claims['product_name']['value']) != _text(product['name']):
+            if claims['product_name']['value'] is not None and _text(claims['product_name']['value']) not in self.product_names[oid]:
                 continue
             if claims['retailer_name']['value'] is not None and _text(claims['retailer_name']['value']) != _text(offer['retailer_name']):
                 continue
@@ -197,7 +217,7 @@ class ListedOfferGrader:
                             'supplied': supplied,
                             'explanation': ('Public identity is resolved before eligibility/ranking; ambiguity is not repaired from task requirements or prices. ' + reason),
                             'answer_quote': c['total']['evidence'] if key.startswith('reported_') and money else c['status']['evidence']}
-        return {'grading_version': VERSION, 'response_contract': deepcopy(self.contract),
+        return {'grading_version': VERSION, 'identity_grading_version': VERSION, 'response_contract': deepcopy(self.contract),
                 'structured_claims_correct': correct, 'oracle_grade': {'requirements': check},
                 'additional_checks': {}, 'oracle_answer': supplied, 'claims': c,
                 'selected_candidate_assessment': {'offer_id': selected['offer_id'], 'sku_id': selected['sku_id']} if selected else None,

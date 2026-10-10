@@ -167,3 +167,181 @@ def test_contract_does_not_include_expectations_and_does_not_change_for_executio
     grader.grade(c, text)
     assert grader.schema == before
     assert all(v not in json.dumps(grader.schema) for v in ('Sundmark', 'Veska', '74000', 'p-olive'))
+
+
+def page_title_fixture():
+    world, _, _, bindings = fixture()
+    for retailer in world['retailers']:
+        pages = []
+        for colour in ('olive', 'brown'):
+            key = {'colour': colour}
+            page_id = 'page-' + digest(['p', key])[:24]
+            listings = [{'sku_id': o['sku_id']} for o in retailer['offers']
+                        if '-' + colour + '-' in o['sku_id']]
+            pages.append({'page_key': key, 'listings': listings})
+            for listing in listings:
+                oid = retailer['retailer_id'] + '/' + listing['sku_id']
+                bindings['retailer_offers'][oid]['url'] = (
+                    f'https://{retailer["retailer_id"]}.test/#/product/{page_id}')
+        retailer['catalog'] = [{'product_id': 'p', 'pages': pages}]
+    task = _make_bound(world, {'kind': 'cheapest_available',
+                               'concept_id': 'footwear.walking_shoes'}, digest(world))
+    return world, task, _reference_bound(world, task), bindings
+
+
+@pytest.mark.parametrize('name', ['Sundmark Sira', 'Sundmark Sira — olive'])
+def test_exact_bound_public_page_title_and_canonical_model_name_pass(name):
+    inputs = page_title_fixture()
+    url = inputs[3]['retailer_offers']['a/p-olive-42']['url']
+    text, claims = answer(url=url)
+    text = text.replace('Sundmark Sira', name)
+    # Keep all claim quotes grounded in the actual rewritten final answer.
+    for field in ('status', 'product_name', 'retailer_name', 'offer_url'):
+        claims[field]['evidence'] = text
+    for field in claims['variant'].values():
+        field['evidence'] = text
+    claims['total']['evidence'] = text
+    claims['product_name']['value'] = name
+    assert ListedOfferGrader(*inputs).grade(claims, text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('name', ['Sundmark Sira — brown', 'Sundmark Sira — sale', 'Wrong — olive'])
+def test_wrong_page_or_unregistered_suffix_cannot_repair_identity(name):
+    inputs = page_title_fixture()
+    url = inputs[3]['retailer_offers']['a/p-olive-42']['url']
+    text, claims = answer(url=url)
+    claims['product_name']['value'] = name
+    assert ListedOfferGrader(*inputs).resolve(claims)[0] == []
+
+
+def test_page_title_does_not_fill_variant_or_use_matching_price():
+    inputs = page_title_fixture()
+    url = inputs[3]['retailer_offers']['a/p-olive-42']['url']
+    _, claims = answer(url=url)
+    claims['product_name']['value'] = 'Sundmark Sira — olive'
+    claims['variant']['size_eu'] = {'value': None, 'evidence': None}
+    assert len(ListedOfferGrader(*inputs).resolve(claims)[0]) == 2
+    claims['variant']['size_eu'] = {'value': '99', 'evidence': '99'}
+    assert ListedOfferGrader(*inputs).resolve(claims)[0] == []
+
+
+def rebuild_page_task(world, bindings):
+    task = _make_bound(world, {'kind': 'cheapest_available',
+                               'concept_id': 'footwear.walking_shoes'}, digest(world))
+    return world, task, _reference_bound(world, task), bindings
+
+
+def test_public_title_requires_actual_url_page_identity():
+    world, _, _, bindings = page_title_fixture()
+    # Claimed offer identity remains p/olive42, but the supplied binding routes
+    # to the sibling brown catalogue page. That page cannot certify olive title.
+    brown_url = bindings['retailer_offers']['a/p-brown-42']['url']
+    bindings['retailer_offers']['a/p-olive-42']['url'] = brown_url
+    grader = ListedOfferGrader(*rebuild_page_task(world, bindings))
+    assert 'sundmark sira — olive' not in grader.product_names['a/p-olive-42']
+
+
+def test_public_title_is_retailer_bound_and_preserves_page_key_order():
+    world, _, _, bindings = page_title_fixture()
+    retailer = world['retailers'][1]
+    for page in retailer['catalog'][0]['pages']:
+        # A different retailer groups both colour and width in the page title.
+        page['page_key']['width'] = 'standard'
+        page_id = 'page-' + digest(['p', page['page_key']])[:24]
+        for listing in page['listings']:
+            oid = retailer['retailer_id'] + '/' + listing['sku_id']
+            bindings['retailer_offers'][oid]['url'] = 'https://b.test/#/product/' + page_id
+    grader = ListedOfferGrader(*rebuild_page_task(world, bindings))
+    assert 'sundmark sira — olive, standard' in grader.product_names['b/p-olive-42']
+    assert 'sundmark sira — standard, olive' not in grader.product_names['b/p-olive-42']
+    assert 'sundmark sira — olive, standard' not in grader.product_names['a/p-olive-42']
+
+
+def test_public_page_identity_includes_product_not_only_page_key():
+    world, _, _, bindings = page_title_fixture()
+    item = deepcopy(world['products'][0])
+    item['public'].update(product_id='q', name='Other Model')
+    for sku in item['public']['skus']:
+        sku.update(product_id='q', sku_id=sku['sku_id'].replace('p-', 'q-'))
+    world['products'].append(item)
+    retailer = world['retailers'][0]
+    entry = deepcopy(retailer['catalog'][0]);entry['product_id'] = 'q'
+    for page in entry['pages']:
+        page_id = 'page-' + digest(['q', page['page_key']])[:24]
+        for listing in page['listings']:
+            old_sku = listing['sku_id'];listing['sku_id'] = old_sku.replace('p-', 'q-')
+            oid = 'a/' + listing['sku_id']
+            offer = deepcopy(next(o for o in retailer['offers'] if o['sku_id'] == old_sku))
+            offer.update(offer_id=oid, product_id='q', sku_id=listing['sku_id'], price_minor=99900)
+            retailer['offers'].append(offer)
+            link = deepcopy(bindings['retailer_offers']['a/' + old_sku])
+            link.update(offer_id=oid, product_id='q', sku_id=listing['sku_id'],
+                        url='https://a.test/#/product/' + page_id)
+            bindings['retailer_offers'][oid] = link
+    retailer['catalog'].append(entry)
+    grader = ListedOfferGrader(*rebuild_page_task(world, bindings))
+    assert 'sundmark sira — olive' in grader.product_names['a/p-olive-42']
+    assert 'other model — olive' in grader.product_names['a/q-olive-42']
+    assert 'other model — olive' not in grader.product_names['a/p-olive-42']
+    assert 'sundmark sira — olive' not in grader.product_names['a/q-olive-42']
+
+
+def test_inherited_offer_grade_reports_changed_identity_version():
+    grader = ListedOfferGrader(*fixture())
+    text, claims = answer()
+    result = grader.grade(claims, text)
+    assert result['grading_version'] == 'website-listed-offer-grading-v2'
+    assert result['identity_grading_version'] == 'website-listed-offer-grading-v2'
+    assert grader.contract['identity_grading_version'] == 'website-listed-offer-grading-v2'
+
+
+@pytest.mark.parametrize("adapter_name", ["adapter", "catalog_adapter"])
+def test_aliases_match_actual_adapter_page_titles_with_integer_keys(adapter_name):
+    from unittest.mock import patch
+    from environments.website_world import adapter, catalog_adapter
+    module = adapter if adapter_name == "adapter" else catalog_adapter
+    world, _, _, bindings = page_title_fixture()
+    world['quote_as_of'] = '2026-10-10'
+    address = dict(recipient='Customer', street='Example Street', house_number='1',
+                   unit='', postcode='12345', city='Uppsala', country='SE')
+    world['address_context'] = {'addresses': [{'address': address}]}
+    for item in world['products']:
+        item['public'].update(concept='walking_shoes', brand_id='brand', facts={},
+                              family_id='footwear', reference_price_sek=900)
+        item.update(catalog_status={}, sku_status={}, descriptions=[])
+        item['retail_content'] = {'fields': [], 'description': {
+            'text': 'Walking shoes.', 'sentences': [{'text': 'Walking shoes.'}]}}
+    for retailer in world['retailers']:
+        retailer.update(geography={'branches': [], 'fulfilment_policy': {
+            'delivery_countries': ['SE'], 'warehouse_transfer_enabled': False}},
+            free_shipping_threshold_minor=100000, contracts=[],
+            initial_form={'address': address, 'instructions': ''})
+        retailer['source_locations'][0].update(kind='warehouse', location={'city': 'Uppsala'})
+        pages = []
+        for sku in world['products'][0]['public']['skus']:
+            key = {'colour': sku['colour'], 'size_eu': sku['size_eu']}
+            page_id = 'page-' + digest(['p', key])[:24]
+            pages.append({'page_key': key, 'selectors': {'width': ['standard']},
+                          'listings': [{'sku_id': sku['sku_id']}]})
+            oid = retailer['retailer_id'] + '/' + sku['sku_id']
+            bindings['retailer_offers'][oid]['url'] = (
+                f'https://{retailer["retailer_id"]}.test/#/product/{page_id}')
+        retailer['catalog'] = [{'product_id': 'p', 'pages': pages}]
+    grader = ListedOfferGrader(*rebuild_page_task(world, bindings))
+    # Invoke the production catalogue/title builder. Unrelated fulfilment is
+    # stubbed only for this title-unit test; no commerce/browser claim is made.
+    builder = module.PublicAdapter.__new__(module.PublicAdapter)
+    builder.world = world
+    builder.retailers = {r['retailer_id']: r for r in world['retailers']}
+    builder.products = {p['public']['product_id']: p for p in world['products']}
+    builder.brands = {'brand': 'Example Brand'}
+    builder.fields = [];builder.initial_address = {}
+    builder.lazy = False;builder.selected_content = False
+    builder.fulfilment = lambda *a, **k: {'optionsBySku': {}}
+    with patch.object(adapter.model, 'pickup_options', return_value=[]):
+        for rid in builder.retailers:
+            catalog = builder.catalog(rid, {})
+            for page in catalog['products']:
+                for variant in page['variants']:
+                    assert page['name'].casefold() in grader.product_names[variant['offerId']]
+                    assert '#/product/' + page['id'] in bindings['retailer_offers'][variant['offerId']]['url']

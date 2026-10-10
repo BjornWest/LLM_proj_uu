@@ -57,7 +57,9 @@ class CatalogComparisonGrader:
         self.identity = ListedOfferGrader(world, base,
             basic_offer_task._reference_bound(world, base), bindings)
         self.task, self.reference = deepcopy(task), deepcopy(expected)
-        self.contract = {'version': VERSION, 'operation': native.KIND,
+        self.contract = {'version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'operation': native.KIND,
             'grain': 'manufactured_product_model',
             'fields': list(task['fields']), 'field_declarations': deepcopy(task['field_declarations']),
             'measurement_scopes': deepcopy(task['measurement_scopes']),
@@ -133,7 +135,9 @@ class CatalogComparisonGrader:
                 'native_facts': deepcopy(native_row['facts']) if native_row else None})
         checks['complete_distinct_model_set'] = (len(identities) == len(expected)
             and len(set(identities)) == len(identities) and set(identities) == set(expected))
-        return {'grading_version': VERSION, 'structured_claims_correct': all(checks.values()),
+        return {'grading_version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'structured_claims_correct': all(checks.values()),
             'claims': c, 'response_contract': deepcopy(self.contract),
             'native_reference': deepcopy(self.reference), 'oracle_answer': deepcopy(self.reference),
             'oracle_grade': {'requirements': checks}, 'additional_checks': {},

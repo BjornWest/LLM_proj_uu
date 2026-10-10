@@ -56,7 +56,9 @@ class ShippingClaimGrader:
         extras.update({key: claim(enum=values+[None]) for key, values in ENUMS.items()})
         extras['policy_url'] = claim()
         self.schema['properties'].update(extras); self.schema['required'].extend(extras)
-        self.contract = {'version': VERSION, 'operation': task['kind'],
+        self.contract = {'version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'operation': task['kind'],
             'quantity_basis': 'retail_sale_units', 'variant_fields': self.identity.contract['variant_fields'],
             'delivery_types': task['delivery_types'], 'price_basis': 'one exact SKU basket, no extras/coupons/new memberships',
             'threshold_basis': 'merchandise subtotal; actual option fee is independent',
@@ -123,7 +125,9 @@ class ShippingClaimGrader:
         policy = urlsplit(c['policy_url']['value'] or ''); actual = urlsplit(link)
         checks['actual_policy_or_checkout_link'] = (policy.scheme, policy.netloc, policy.path) == (
             actual.scheme, actual.netloc, actual.path) and policy.fragment in ('/info/shipping', '/checkout') and not policy.query
-        return {'grading_version': VERSION, 'response_contract': deepcopy(self.contract),
+        return {'grading_version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'response_contract': deepcopy(self.contract),
             'structured_claims_correct': all(checks.values()), 'oracle_grade': {'requirements': checks},
             'claims': c, 'additional_checks': {}, 'identity_resolution': {'offer_ids': ids, 'reason': reason},
             'oracle_answer': {k: deepcopy(ref[k]) for k in ('subject', 'quantity', 'subtotal_test', 'assessment', 'option_count', 'free_option_count')},

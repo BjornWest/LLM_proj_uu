@@ -36,7 +36,9 @@ class CatalogShortlistGrader:
             'rows': {'type': 'array', 'items': self.row_schema},
             'source_urls': deepcopy(self.identity.schema['properties']['source_urls'])})
         self.task, self.reference = deepcopy(task), deepcopy(expected)
-        self.contract = {'version': VERSION, 'operation': task['kind'], 'grain': task['grain'],
+        self.contract = {'version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'operation': task['kind'], 'grain': task['grain'],
             'tie_policy': task['tie_policy'], 'limit': task['limit'],
             'price_basis': 'each_model_minimum_eligible_matching_listed_SEK_price'}
         self.extraction_instructions = INSTRUCTIONS
@@ -76,7 +78,9 @@ class CatalogShortlistGrader:
             checks['complete_selected_population'] = set(pids) == set(expected)
             prices = [r['price_minor'] for r in rows]
             checks['increasing_price_order'] = all(p is not None for p in prices) and prices == sorted(prices)
-        return {'grading_version': VERSION, 'structured_claims_correct': all(checks.values()),
+        return {'grading_version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'structured_claims_correct': all(checks.values()),
             'claims': c, 'response_contract': deepcopy(self.contract),
             'oracle_answer': {'status': self.reference['status'], 'selected_models': deepcopy(self.reference['selected_models'])},
             'native_reference': deepcopy(self.reference), 'derivations': rows,

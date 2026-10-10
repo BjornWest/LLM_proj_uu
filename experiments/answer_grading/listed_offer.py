@@ -120,6 +120,8 @@ def publish(trace, output, grade, *, mode, source_hashes):
              ['Derived after the episode; original evaluation and recordings remain unchanged.'],
              'source_directory': str(output), 'source_artifact_sha256': artifacts,
              'episode_artifact_sha256': {name: sha(trace/name) for name in BOUND_FILES}, 'extraction_mode': mode}
+    if 'identity_grading_version' in grade:
+        value['identity_grading_version'] = grade['identity_grading_version']
     _exclusive_atomic(trace/FILENAME, value)
     details = {'schema': 'browser-answer-check-details-v1', 'episode_id': trace.name,
                'grade_sidecar_sha256': sha(trace/FILENAME), 'checks': grade['check_details'],

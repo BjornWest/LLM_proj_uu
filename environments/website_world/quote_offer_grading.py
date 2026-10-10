@@ -130,7 +130,9 @@ class QuoteOfferGrader:
             checks['no_contradictory_selection'] = (all(c[k]['value'] is None for k in
                 ('offer_url', 'sku_id', 'product_name', 'retailer_name', *SERVICE_FIELDS)) and
                 all(v['value'] is None for v in c['variant'].values()) and c['total'] is None)
-        return {'grading_version': VERSION, 'response_contract': deepcopy(self.contract),
+        return {'grading_version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'response_contract': deepcopy(self.contract),
             'structured_claims_correct': all(checks.values()), 'oracle_grade': {'requirements': checks},
             'additional_checks': {}, 'claims': c,
             'oracle_answer': {'offer_id': offer['offer_id'] if offer else None,

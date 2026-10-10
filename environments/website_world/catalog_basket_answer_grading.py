@@ -78,7 +78,9 @@ class CatalogBasketAnswerGrader:
         self.plan, self.domain, self.admission, self.bindings = deepcopy(plan), deepcopy(checkout_domain), deepcopy(admission_plan), deepcopy(bindings)
         self.quotes = prepare(world, plan=plan, admission_plan=admission_plan)
         self.points = {p['point_id']: p['name'] for p in world['address_context']['collection_points']}
-        self.contract = {'version': VERSION, 'operation': task['kind'], 'quantity_basis': 'retail_sale_units',
+        self.contract = {'version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'operation': task['kind'], 'quantity_basis': 'retail_sale_units',
             'variant_fields': self.variant_fields, 'price_basis': 'combined_payable_including_shipping',
             'account_coupons': 'unsupported', 'identity': 'public_links_and_explicit_variant_service_claims',
             'effects': 'recommendation_only_no_purchase'}
@@ -204,7 +206,9 @@ class CatalogBasketAnswerGrader:
             report = structured.grade(self.world, self.task, response, reference=self.reference,
                 plan=self.plan, domain=self.domain, url_bindings=self.bindings, admission_plan=self.admission)
         checks['native_complete_payable_plan'] = report is not None and report['verdict'] == 'pass'
-        return {'grading_version': VERSION, 'structured_claims_correct': all(checks.values()), 'claims': c,
+        return {'grading_version': VERSION,
+            'identity_grading_version': self.identity.contract['identity_grading_version'],
+            'structured_claims_correct': all(checks.values()), 'claims': c,
             'response_contract': deepcopy(self.contract), 'oracle_answer': {
                 'task_id': self.task['task_id'], 'status': self.reference['result']['status'],
                 'minimum_payable_minor': self.reference['result']['total_minor'], 'currency': 'SEK'},

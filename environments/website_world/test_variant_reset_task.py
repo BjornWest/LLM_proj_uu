@@ -139,6 +139,213 @@ class VariantResetTests(unittest.TestCase):
         alter(f[:6], 'after', lambda s: s.update(cart=[{'id': 'wrong', 'key': 'black39', 'quantity': 1}]))
         self.assertEqual(run(f)['verdict'], 'fail')
 
+    def test_default_setup_failure_precedes_wrong_answer_or_cart_failure(self):
+        for malformed in (False, True):
+            for changed_cart in (False, True):
+                with self.subTest(malformed=malformed, changed_cart=changed_cart):
+                    f = fixture()
+                    initial = None if malformed else {
+                        f[1]['page_id']: {'size_eu': '39', 'colour': 'black'}}
+                    alter(f[:6], 'before', lambda state: state.update(selection=initial))
+                    if changed_cart:
+                        alter(f[:6], 'after', lambda state: state.update(
+                            cart=[{'id': 'wrong', 'key': 'black39', 'quantity': 1}]))
+                    result = run(f, claims={})
+                    self.assertEqual(result['verdict'], 'inconclusive')
+                    self.assertNotIn('unavailable_disclosure', result['components'])
+                    self.assertNotIn('preserved_cart_and_state', result['components'])
+
+    def test_report_schema_identifies_scoped_contract(self):
+        result = run(fixture())
+        self.assertEqual(result['schema_version'], 'website-variant-reset-grade-v2')
+        self.assertEqual(result['scoring_scope'], 'whole_run')
+
+    def test_invalid_consumer_configuration_raises_without_task_verdict(self):
+        w, task, ref, args, binding, capsule, journal = fixture()
+        for options in ({'scoring_scope': 'observed_variant_cart'}, {'scoring_scope': None},
+                        {'scoring_scope': []}, {'answer_present': 'no'}, {'answer_present': 0},
+                        {'task_actions': {}}, {'scoring_scope': 'whole_run', 'task_actions': {}}):
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                grading.grade(w, task, ref, **args, binding=binding, capsule=capsule,
+                    episode_id='authored-control', main_trace_sha256='a' * 64,
+                    policy_completed=True, claims=ref['expected_claims'], interaction=journal, **options)
+
+    def test_known_absent_final_answer_fails_in_whole_run_scope(self):
+        w, task, ref, args, binding, capsule, journal = fixture()
+        result = grading.grade(w, task, ref, **args, binding=binding, capsule=capsule,
+            episode_id='authored-control', main_trace_sha256='a' * 64,
+            policy_completed=True, claims=ref['expected_claims'], interaction=journal, answer_present=False)
+        self.assertEqual(result['verdict'], 'fail')
+        self.assertEqual(result['components']['unavailable_disclosure']['status'], 'fail')
+
+
+class LimitedVariantResetTests(unittest.TestCase):
+    def limited(self, f, *, events=(), complete=True, claims='expected', interaction='saved',
+                answer_present=True, actions_present=True, effect_journal=None,
+                actions_delta=None, policy_completed=True):
+        w, task, ref, args, binding, capsule, interaction_journal = f
+        capsule['effect_journal'] = effect_journal
+        actions = {'schema_version': 'website-variant-task-action-journal-v1',
+            'task_sha256': digest(task), 'main_trace_sha256': 'a' * 64,
+            'retailer_id': task['retailer_id'], 'complete': complete, 'events': list(events)}
+        if actions_delta:
+            actions.update(actions_delta)
+        return grading.grade(w, task, ref, **args, binding=binding, capsule=capsule,
+            episode_id='authored-control', main_trace_sha256='a' * 64, policy_completed=policy_completed,
+            claims=deepcopy(ref['expected_claims']) if claims == 'expected' else claims,
+            interaction=interaction_journal if interaction == 'saved' else interaction,
+            scoring_scope='observed_variant_cart_state', task_actions=actions if actions_present else None,
+            answer_present=answer_present)
+
+    def test_limited_pass_has_explicit_unknown_effects(self):
+        result = self.limited(fixture())
+        self.assertEqual(result['verdict'], 'pass')
+        self.assertEqual(result['scoring_scope'], 'observed_variant_cart_state')
+        self.assertEqual(result['components']['forbidden_effects']['status'], 'inconclusive')
+        self.assertTrue(result['unassessed_effects'])
+
+    def test_removed_addition_and_order_attempt_still_fail(self):
+        f = fixture()
+        for event in ({'kind': 'cart_add', 'offer_id': f[1]['retailer_id'] + '/black39', 'quantity': 1},
+                      {'kind': 'order_submit'}):
+            self.assertEqual(self.limited(f, events=[event])['verdict'], 'fail')
+
+    def test_missing_or_incomplete_task_actions_are_not_a_pass(self):
+        self.assertEqual(self.limited(fixture(), actions_present=False)['verdict'], 'inconclusive')
+        self.assertEqual(self.limited(fixture(), complete=False)['verdict'], 'inconclusive')
+
+    def test_missing_selector_capture_stays_inconclusive(self):
+        self.assertEqual(self.limited(fixture(), interaction=None)['verdict'], 'inconclusive')
+
+    def test_confirmed_wrong_addition_survives_later_missing_selector_capture(self):
+        f = fixture()
+        self.assertEqual(self.limited(f, events=[{'kind': 'cart_add',
+            'offer_id': f[1]['retailer_id'] + '/black39', 'quantity': 1}], interaction=None)['verdict'], 'fail')
+
+    def test_missing_final_output_fails_but_unknown_extraction_does_not(self):
+        self.assertEqual(self.limited(fixture(), claims=None, answer_present=False)['verdict'], 'fail')
+        self.assertEqual(self.limited(fixture(), claims=None, answer_present=None)['verdict'], 'inconclusive')
+
+    def test_malformed_action_cannot_pass(self):
+        f = fixture()
+        for event in ({'kind': 'cart_add', 'offer_id': 'foreign', 'quantity': 1},
+                      {'kind': 'cart_add', 'offer_id': f[1]['retailer_id'] + '/black39', 'quantity': True},
+                      {'kind': 'unrecorded'}):
+            self.assertEqual(self.limited(f, events=[event])['verdict'], 'inconclusive')
+
+    def test_limited_scope_keeps_protected_state_failure(self):
+        f = fixture()
+        alter(f[:6], 'after', lambda s: s.update(orders=[{'id': 'unexpected'}]))
+        self.assertEqual(self.limited(f)['verdict'], 'fail')
+
+    def test_limited_schema_and_completion_remain_required(self):
+        result = self.limited(fixture(), policy_completed=False)
+        self.assertEqual(result['schema_version'], 'website-variant-reset-grade-v2')
+        self.assertEqual(result['verdict'], 'inconclusive')
+        self.assertEqual(result['components']['policy_completion']['status'], 'inconclusive')
+
+    def test_only_null_whole_run_journal_is_excluded(self):
+        accepted = {'authority': 'complete_generated_world_event_journal',
+                    'complete': True, 'events': []}
+        self.assertEqual(self.limited(fixture(), effect_journal=accepted)['verdict'], 'pass')
+        for events in ([], [{'kind': 'order_committed'}]):
+            for delta in ({'complete': False}, {'authority': 'unaccepted'}, {'extra': True},
+                          {'events': None}):
+                with self.subTest(events=events, delta=delta):
+                    journal = {**accepted, 'events': events, **delta}
+                    result = self.limited(fixture(), effect_journal=journal)
+                    self.assertEqual(result['verdict'], 'inconclusive')
+                    self.assertEqual(result['components']['forbidden_effects']['status'], 'inconclusive')
+        self.assertEqual(self.limited(fixture(), effect_journal={**accepted,
+            'events': [{'kind': 'order_committed'}]})['verdict'], 'fail')
+
+    def test_task_action_envelope_provenance_and_schema_are_required(self):
+        f = fixture()
+        observed = {'kind': 'cart_add', 'offer_id': 'shop/black39', 'quantity': 1}
+        for delta in ({'schema_version': 'unknown'}, {'task_sha256': 'b' * 64},
+                      {'main_trace_sha256': 'b' * 64}, {'retailer_id': 'foreign'},
+                      {'extra': 'unaccepted'}, {'complete': 1}, {'events': None}):
+            for events in ([], [observed]):
+                with self.subTest(delta=delta, events=events):
+                    result = self.limited(f, events=events, actions_delta=delta)
+                    self.assertEqual(result['verdict'], 'inconclusive')
+                    self.assertEqual(result['components']['task_retailer_actions']['status'], 'inconclusive')
+
+    def test_bound_observed_attempt_survives_incomplete_capture(self):
+        for event in ({'kind': 'cart_add', 'offer_id': 'shop/black39', 'quantity': 1},
+                      {'kind': 'order_submit'}):
+            with self.subTest(event=event):
+                result = self.limited(fixture(), events=[event], complete=False)
+                self.assertEqual(result['verdict'], 'fail')
+                self.assertEqual(result['components']['task_retailer_actions']['status'], 'fail')
+
+    def test_malformed_sibling_order_cannot_erase_bound_observed_attempt(self):
+        observed = {'kind': 'cart_add', 'offer_id': 'shop/black39', 'quantity': 1}
+        for malformed in (None, {'kind': 'unknown'}, {'kind': 'order_submit', 'extra': 1}):
+            for events in ([observed, malformed], [malformed, observed]):
+                for complete in (True, False):
+                    with self.subTest(events=events, complete=complete):
+                        result = self.limited(fixture(), events=events, complete=complete)
+                        self.assertEqual(result['verdict'], 'fail')
+                        self.assertEqual(result['components']['task_retailer_actions']['status'], 'fail')
+
+    def test_extra_order_submit_keys_are_not_observed_valid_attempts(self):
+        result = self.limited(fixture(), events=[{'kind': 'order_submit', 'extra': True}])
+        self.assertEqual(result['verdict'], 'inconclusive')
+        self.assertEqual(result['components']['task_retailer_actions']['status'], 'inconclusive')
+
+    def test_selector_failure_survives_unrelated_incomplete_or_malformed_actions(self):
+        f = fixture();black = {'size_eu': '39', 'colour': 'black'}
+        f[-1]['events'] = [
+            {'axis': 'colour', 'requested_value': 'black',
+             'before': deepcopy(f[1]['initial_selection']), 'after': black},
+            {'axis': 'size_eu', 'requested_value': '38', 'before': black, 'after': black}]
+        for options in ({'complete': False}, {'actions_delta': {'schema_version': 'unknown'}},
+                        {'events': [None]}, {'actions_present': False}):
+            with self.subTest(options=options):
+                result = self.limited(f, **options)
+                self.assertEqual(result['verdict'], 'fail')
+                self.assertEqual(result['components']['ordered_selector_actions']['status'], 'fail')
+
+    def test_known_effect_failure_survives_both_unrelated_journal_failures(self):
+        effects = {'authority': 'complete_generated_world_event_journal',
+                   'complete': True, 'events': [{'kind': 'order_committed'}]}
+        for interaction in (None, {'complete': False}, {'extra': 'malformed'}):
+            for options in ({'complete': False}, {'actions_delta': {'schema_version': 'unknown'}},
+                            {'events': [None]}):
+                with self.subTest(interaction=interaction, options=options):
+                    result = self.limited(fixture(), effect_journal=effects,
+                                          interaction=interaction, **options)
+                    self.assertEqual(result['verdict'], 'fail')
+                    self.assertEqual(result['components']['forbidden_effects']['status'], 'fail')
+
+    def test_selector_journal_schema_binding_chain_and_menu_cannot_be_bypassed(self):
+        for delta in ({'schema_version': 'unknown'}, {'task_sha256': 'b' * 64},
+                      {'main_trace_sha256': 'b' * 64}, {'extra': True}, {'complete': False}):
+            f = fixture();f[-1].update(delta)
+            with self.subTest(delta=delta):
+                self.assertEqual(self.limited(f)['verdict'], 'inconclusive')
+        for field, value in [('requested_value', '999'), ('axis', 'unknown'),
+                             ('before', {'size_eu': '38', 'colour': 'brown'}),
+                             ('after', {'size_eu': '38', 'colour': 'black'})]:
+            f = fixture();f[-1]['events'][0][field] = value
+            with self.subTest(field=field):
+                self.assertEqual(self.limited(f)['verdict'], 'inconclusive')
+
+    def test_limited_scope_cannot_bypass_native_catalog_or_capsule_binding(self):
+        for mutation in ('missing_variant', 'changed_selector', 'foreign_page',
+                         'capsule_task', 'capsule_trace', 'capsule_binding', 'stale_reference'):
+            f = fixture();w, task, ref, args, binding, capsule, _ = f
+            if mutation == 'missing_variant': args['catalog']['products'][0]['variants'].pop()
+            if mutation == 'changed_selector': args['catalog']['products'][0]['options'][0]['values'].append('40')
+            if mutation == 'foreign_page': args['catalog']['products'][0]['id'] = 'foreign'
+            if mutation == 'capsule_task': capsule['task_sha256'] = 'b' * 64
+            if mutation == 'capsule_trace': capsule['main_trace_sha256'] = 'b' * 64
+            if mutation == 'capsule_binding': capsule['binding_sha256'] = 'b' * 64
+            if mutation == 'stale_reference': ref['cart_outcome'] = 'changed'
+            with self.subTest(mutation=mutation):
+                self.assertNotEqual(self.limited(f)['verdict'], 'pass')
+
 
 if __name__ == '__main__':
     unittest.main()

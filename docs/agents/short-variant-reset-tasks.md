@@ -102,7 +102,76 @@ native grading before provider dispatch, then publish the accepted viewer grade.
 python3 -m unittest environments.website_world.test_variant_reset_task -q
 ```
 
-Nine finite controls cover reported absence, fallback purchase attempts, wrong
+Finite native controls cover reported absence, fallback purchase attempts, wrong
 requested options, incomplete menus, present-but-zero-stock tuples, missing or
 misordered action evidence, incorrect tuple chains/setup, baseline rejection and
-missing effect authority. They launch no Runtime/browser/provider/world draw.
+missing effect authority. Scoped controls additionally cover journal provenance,
+malformed/incomplete evidence, retained observed failures and caller configuration.
+They launch no Runtime/browser/provider/world draw.
+
+## Explicit limited outcome scope
+
+`variant_reset_grading.grade` retains `scoring_scope="whole_run"` as its default.
+A prospective consumer may instead bind `scoring_scope="observed_variant_cart_state"`
+in its accepted run configuration. This grades the ordered selector actions,
+actual unavailable-combination answer, preserved captured cart/protected state
+and relevant task-retailer attempts. Reports use
+`schema_version="website-variant-reset-grade-v2"` and carry `scoring_scope`;
+consumers must preserve both in their grade projection. The default retains the
+legacy validation order: a missing or mismatched initial tuple is a setup/capture
+failure before answer or cart failure components are assessed.
+
+Limited scoring reports `unassessed_effects` and excludes `forbidden_effects`
+from its verdict only when the original capsule has `effect_journal: null`. A
+non-null but incomplete, malformed or unaccepted effect journal remains
+inconclusive and prevents a pass. An accepted journal containing effects fails.
+Policy completion remains required in both scopes. A limited pass does not
+establish absence of transient or uncaptured effects.
+
+Limited scoring additionally requires a complete, actually captured `task_actions`
+object, independently accepted with the consumer source and trace:
+
+```json
+{
+  "schema_version": "website-variant-task-action-journal-v1",
+  "task_sha256": "digest of native task",
+  "main_trace_sha256": "actual returned trace digest",
+  "retailer_id": "native task retailer",
+  "complete": true,
+  "events": []
+}
+```
+
+Each actual attempted addition is `{"kind":"cart_add","offer_id":"actual native
+retailer offer","quantity":1}`; each actual order-submit attempt is
+`{"kind":"order_submit"}`. Any such attempt fails this unavailable-combination
+contract, including an addition subsequently removed. Empty events must come
+from complete actual capture, never from terminal-state equality or the expected
+answer. A missing journal or invalid task/trace/retailer binding remains
+inconclusive: it cannot establish provenance for its events. For a valid bound
+envelope, valid observed cart additions or order-submit attempts fail even when
+`complete` is false or another event is malformed. An incomplete journal with no
+valid observed attempt remains inconclusive. Malformed events alone do not
+establish a valid attempt. Event ordering cannot erase an independently observed
+attempt. Limited scoring evaluates independent selector, attempt, whole-run
+effect and completion components without allowing missing sibling evidence to
+erase a confirmed task failure. Native task, capsule and initial setup binding
+must still be validated first.
+
+Ordinary cart navigation is permitted. Capture may span it without imposing a
+hidden no-navigation rule; a reload/new tab remains inconclusive if continuity
+cannot be established. Website owns this actual capture implementation and its
+acceptance. Native authored controls alone cannot approve a consumer journal.
+
+`answer_present=False` records actual absence of a final answer as task failure.
+`answer_present=None` preserves the distinction between missing answer-extraction
+evidence and known absent output; missing claims alone remain inconclusive.
+The consumer must bind this flag to actual returned policy output. Neither scope
+changes existing tasks, saved answers, grades or model-run authorization.
+
+Caller configuration is validated before a task report is created. Unknown
+`scoring_scope`, non-boolean known `answer_present`, or any non-null `task_actions`
+under the default `whole_run` scope raises `ValueError`. Supplying `task_actions`
+requires explicitly selecting `observed_variant_cart_state`; it cannot silently
+fall back to the default and discard observed attempts. This scope remains
+prospective until actual Website capture and Evaluation projection acceptance.
