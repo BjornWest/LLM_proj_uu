@@ -348,7 +348,7 @@ def main():
                 if enable_data:
                     from .harness import with_data_tools
                     from .data_tools import DataConfig
-                    harness_profile=with_data_tools(harness_profile,DataConfig(image=os.getenv('HARNESS_PYTHON_IMAGE','intent-browser-python:stdlib-v1')))
+                    harness_profile=with_data_tools(harness_profile,DataConfig(image=os.getenv('HARNESS_PYTHON_IMAGE','intent-browser-python:stdlib-v1'), script_workspace=adaptive_ax))
                 if adaptive_ax:
                     from .standard_profile import with_adaptive_ax
                     harness_profile=with_adaptive_ax(harness_profile)

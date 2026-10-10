@@ -63,3 +63,45 @@ class BatchTests(unittest.TestCase):
         changed['axtree_object']['nodes'][0]['name']['value']='2 PM'
         self.assertNotEqual(before,target_signature(changed,'5'))
         self.assertIsNone(target_signature(obs,'missing'))
+
+    def option_observation(self):
+        return {'axtree_object':{'nodes':[
+            {'nodeId':'popup','role':{'value':'MenuListPopup'},'childIds':['option']},
+            {'nodeId':'option','browsergym_id':'42','backendDOMNodeId':12,
+             'role':{'value':'option'},'name':{'value':'42'}}]}}
+
+    def test_identical_ax_records_preserve_signature_without_mutation(self):
+        obs=self.option_observation()
+        expected=target_signature(obs,'42')
+        obs['axtree_object']['nodes'] += deepcopy(obs['axtree_object']['nodes'])
+        original=deepcopy(obs)
+        self.assertIsNotNone(expected)
+        self.assertEqual(target_signature(obs,'42'),expected)
+        self.assertEqual(obs,original)
+
+    def test_distinct_ax_nodes_with_same_bid_remain_ambiguous(self):
+        obs=self.option_observation()
+        other=deepcopy(obs['axtree_object']['nodes'][1])
+        other['nodeId']='another-option'
+        obs['axtree_object']['nodes'].append(other)
+        self.assertIsNone(target_signature(obs,'42'))
+
+    def test_conflicting_ax_target_records_are_rejected_in_either_order(self):
+        for field,value in [('name',{'value':'43'}),('backendDOMNodeId',13),
+                            ('browsergym_id','43'),('ignored',True),
+                            ('properties',[{'name':'selected','value':{'value':True}}])]:
+            with self.subTest(field=field):
+                obs=self.option_observation()
+                other=deepcopy(obs['axtree_object']['nodes'][1])
+                other[field]=value
+                obs['axtree_object']['nodes'].append(other)
+                self.assertIsNone(target_signature(obs,'42'))
+                obs['axtree_object']['nodes'].reverse()
+                self.assertIsNone(target_signature(obs,'42'))
+
+    def test_conflicting_ax_ancestor_records_are_rejected(self):
+        obs=self.option_observation()
+        other=deepcopy(obs['axtree_object']['nodes'][0])
+        other['name']={'value':'Another popup'}
+        obs['axtree_object']['nodes'].append(other)
+        self.assertIsNone(target_signature(obs,'42'))

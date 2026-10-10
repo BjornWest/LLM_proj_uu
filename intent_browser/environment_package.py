@@ -111,6 +111,7 @@ def export(output, *, fixtures, chaos, miniwob, resources=None, source=ROOT):
     output.mkdir(parents=True, exist_ok=False)
     runtime = output/'runtime'
     copy_tree(source/'intent_browser', runtime/'intent_browser', python_only=True)
+    copy_tree(source/'intent_browser/assets/chat', runtime/'intent_browser/assets/chat')
     copy_tree(source/'environments/demo', runtime/'environments/demo')
     copy_tree(source/'environments/susbench_ikea', runtime/'environments/susbench_ikea')
     # Include the fixture/verifier runtime's exact private inputs, not .env/runs.
