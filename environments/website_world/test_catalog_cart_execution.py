@@ -64,7 +64,9 @@ def test_initialize_uses_existing_tab_and_restores_start():
     visits=[]
     class Page:
         url='https://start.test/'
-        def goto(self,url): self.url=url;visits.append(url)
+        def goto(self,url, *, timeout):
+            assert timeout == 30000
+            self.url=url;visits.append(url)
         def wait_for_selector(self,selector): assert selector=='#app main'
         def wait_for_function(self,expression,*,arg): assert arg=='state-v2'
     page=Page()
@@ -99,3 +101,26 @@ def test_storage_capture_recovers_only_the_original_task_page(tmp_path,wrong_rec
         result=capture.snapshot_environment(env,trace,'before','before_policy')
         assert base.page is page
         assert json.loads(Path(result['path']).read_text())['storage_state']==raw
+
+
+@pytest.mark.parametrize('failed_url', ['https://one.test/#/home', 'https://start.test/'])
+def test_setup_navigation_timeout_propagates_without_retry(failed_url):
+    visits = []
+    class Page:
+        url = 'https://start.test/'
+        def goto(self, url, *, timeout):
+            assert timeout == 30000
+            visits.append(url)
+            if url == failed_url:
+                raise TimeoutError('retained setup navigation failure')
+            self.url = url
+        def wait_for_selector(self, selector): assert selector == '#app main'
+        def wait_for_function(self, expression, *, arg): assert arg == 'state-v2'
+    page = Page(); page.context = SimpleNamespace(pages=[page])
+    capture = object.__new__(execution.CartCapture)
+    capture.installed = True; capture.initialized = False; capture.setup_requests = []
+    capture.binding = {'retailers': {'one': {'origin': 'https://one.test', 'storage_key': 'state-v2'}}}
+    with pytest.raises(TimeoutError, match='retained setup'):
+        capture.initialize(page)
+    assert visits.count(failed_url) == 1 and not capture.initialized
+    assert page.context.pages == [page]

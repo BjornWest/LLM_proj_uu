@@ -8,7 +8,10 @@ The default helper and legacy plan shape stay unchanged when it is omitted.
 For separate specification groups, also pass `product_details_heading` as the
 exact native public fact heading. Publication checks it against
 `task.public_fact.heading`; setup checks it against the bound selected SKU's
-public details. The helper finds exactly one existing product-facts disclosure
+public details. For any panel setup, the plan binds the intended offer/SKU/tuple
+and checks both the live selected tuple and buying-form SKU before and after
+the panel interaction. When native setup leaves selection omitted, a different
+renderer default fails without selecting the target implicitly. The helper finds exactly one existing product-facts disclosure
 with that direct summary text. Without a heading, it requires one outer facts
 disclosure, as in the story layout or `detailsPresentation=disclosure`.
 

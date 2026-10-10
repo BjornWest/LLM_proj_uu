@@ -87,7 +87,12 @@ class Page:
     def __init__(self):
         self.context = SimpleNamespace(pages=[self]);self.url = 'about:blank';self.visits = []
         self.state = {'version': 2, 'cart': [], 'editing': None, 'address': {'postcode': 'old'},
-                      'remembered': {'postcode': 'oracle'}, 'instructions': 'original', 'coupon': '', 'orders': []}
+                      'remembered': {'postcode': 'oracle'}, 'instructions': 'original', 'coupon': '', 'orders': [],
+                      'selection': {'page': {'colour': 'black', 'size_eu': '42'}}}
+        self.actual_key = 'sku'
+    def form(self, selector):
+        return SimpleNamespace(count=lambda: int(selector ==
+            f'form[data-form="add"][data-key={setup._attribute(self.actual_key)}]'))
     def goto(self, url): self.url = url;self.visits.append(url)
     def wait_for_selector(self, value): assert value == '#app main'
     def evaluate(self, expression, key):
@@ -201,7 +206,7 @@ def test_ordinary_panel_setup_changes_only_disclosure(before, after, clicks):
     panel = Panel(page, before)
     page.state['disclosures'] = {'product:page:details': before}
     original = deepcopy(page.state)
-    page.locator = lambda selector: panel if selector == setup.DETAILS_PANEL else None
+    page.locator = lambda selector: page.form(selector) if selector.startswith('form') else panel
     result = setup.apply(page, plan(product_details_open=after), runtime=runtime())
     assert panel.clicks == clicks and panel.opened is after
     assert result['actions'][-1]['before_open'] is before
@@ -214,7 +219,7 @@ def test_ordinary_panel_setup_changes_only_disclosure(before, after, clicks):
 @pytest.mark.parametrize('count', [0, 2])
 def test_missing_or_ambiguous_panel_is_not_rewritten(count):
     page = Page(); panel = Panel(page, count=count)
-    page.locator = lambda selector: panel
+    page.locator = lambda selector: page.form(selector) if selector.startswith('form') else panel
     with pytest.raises(ValueError, match='one existing'):
         setup.apply(page, plan(product_details_open=True), runtime=runtime())
     assert panel.clicks == 0
@@ -234,7 +239,7 @@ def test_exact_native_heading_selects_only_one_existing_group():
     requested = plan(rt, product_details_open=True, product_details_heading='Specifications')
     setup.validate_plan(rt, requested)
     page = Page(); target = Panel(page, label='Specifications'); other = Panel(page, label='Care instructions')
-    page.locator = lambda selector: Panels([other, target])
+    page.locator = lambda selector: page.form(selector) if selector.startswith('form') else Panels([other, target])
     result = setup.apply(page, requested, runtime=rt)
     assert target.clicks == 1 and other.clicks == 0
     assert result['actions'][-1]['summary'] == 'Specifications'
@@ -276,3 +281,53 @@ def test_publication_refuses_non_native_heading_before_creating_output(tmp_path,
             expected_world_sha256=sha256(payload).hexdigest(),
             product_details_open=True, product_details_heading='Specifications')
     assert not output.exists()
+
+
+@pytest.mark.parametrize('actual_target', [True, False])
+def test_omitted_selection_panel_binds_target_in_multi_sku_page(actual_target):
+    rt = runtime()
+    product = rt.public_catalogs['shop']['products'][0]
+    target = product['variants'][0]
+    target['details'] = [{'heading': 'Specifications', 'facts': [{'label': 'Size', 'value': '42'}]}]
+    other = deepcopy(target)
+    other.update(offerId='shop/other', skuId='other', key='other',
+                 selection={'colour': 'black', 'size_eu': '41'},
+                 details=[{'heading': 'Specifications', 'facts': [{'label': 'Size', 'value': '41'}]}])
+    product['variants'].insert(0, other)
+    rt.bindings['retailer_offers']['shop/other'] = {
+        'retailer_id': 'shop', 'sku_id': 'other', 'selection': deepcopy(other['selection'])}
+    requested = plan(rt, product_details_open=True, product_details_heading='Specifications')
+    assert requested['selected_offer'] is None
+    assert requested['request']['selected_offer_id'] is None
+    assert requested['product_details_offer']['sku_id'] == 'sku'
+    page = Page(); panel = Panel(page, label='Specifications')
+    page.actual_key = 'sku' if actual_target else 'other'
+    page.state['selection']['page'] = deepcopy((target if actual_target else other)['selection'])
+    page.locator = lambda selector: page.form(selector) if selector.startswith('form') else Panels([panel])
+    before = deepcopy(page.state)
+    if actual_target:
+        result = setup.apply(page, requested, runtime=rt)
+        assert [action['operation'] for action in result['actions']] == ['product_details_via_ui']
+        assert panel.clicks == 1
+    else:
+        with pytest.raises(ValueError, match='selected SKU differs'):
+            setup.apply(page, requested, runtime=rt)
+        assert panel.clicks == 0 and page.state == before
+    changed = deepcopy(requested); changed['product_details_offer']['sku_id'] = 'other'
+    with pytest.raises(ValueError, match='runtime binding'):
+        setup.validate_plan(rt, changed)
+
+
+def test_read_fact_native_null_selection_is_not_replaced_by_panel_setup():
+    from environments.website_world.test_atomic_product_tasks import fixture
+    from environments.website_world import atomic_product_publication as publication
+    world, task, _, args, _, _ = fixture('read_public_fact')
+    packet = publication.compile_packet(world, task['spec'], **args)
+    assert packet['task']['setup']['selected_offer_id'] is None
+    rt = runtime()
+    rt.public_catalogs['shop']['products'][0]['variants'][0]['details'] = [
+        {'heading': packet['task']['public_fact']['heading'], 'facts': []}]
+    requested = plan(rt, selected_offer_id=packet['task']['setup']['selected_offer_id'],
+        product_details_open=False, product_details_heading=packet['task']['public_fact']['heading'])
+    assert requested['selected_offer'] is None and requested['request']['selected_offer_id'] is None
+    assert requested['product_details_offer']['offer_id'] == 'shop/sku'

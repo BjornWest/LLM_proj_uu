@@ -92,13 +92,13 @@ class CartCapture:
         self.phase = 'ordinary_baseline_initialization'
         for rid, row in self.binding['retailers'].items():
             url = row['origin']+'/#/home'
-            page.goto(url);page.wait_for_selector('#app main')
+            page.goto(url, timeout=30000);page.wait_for_selector('#app main')
             # The ordinary renderer calls save() from render(). Read only.
             page.wait_for_function('(key)=>localStorage.getItem(key)!==null', arg=row['storage_key'])
             self.setup_requests.append({'retailer_id': rid, 'url': url,
                 'actual_url': page.url, 'purpose': 'ordinary home render persists its own version2 baseline',
                 'browser_storage_writes_by_capture': False})
-        page.goto(start_url)
+        page.goto(start_url, timeout=30000)
         if page.url != start_url or list(context.pages) != original_pages:
             raise ValueError('Baseline setup changed initial page or retained tabs')
         self.initialized = True

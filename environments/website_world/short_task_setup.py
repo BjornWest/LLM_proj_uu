@@ -112,6 +112,7 @@ def make_plan(runtime, *, retailer_id, start, prepared_cart=None, selected_offer
     if product_details_open is not None:
         plan['request']['product_details_open'] = product_details_open
         plan['product_details_open'] = product_details_open
+        plan['product_details_offer'] = action(selected_offer_id or start['offer_id'])
     return plan
 
 
@@ -215,6 +216,16 @@ def _details_panel(page, opened, storage_key, heading=None):
             'disclosure_id': disclosure, 'before_open': before, 'after_open': opened}
 
 
+def _verify_panel_selection(page, plan):
+    # A product route identifies a page, not a SKU. Do not silently select the
+    # task target when the native setup deliberately leaves selection omitted.
+    item = plan['product_details_offer']
+    selected = _state(page, plan['storage_key']).get('selection', {}).get(item['page_id'])
+    form = page.locator(f'form[data-form="add"][data-key={_attribute(item["key"])}]')
+    if selected != item['selection'] or form.count() != 1:
+        raise ValueError('Actual selected SKU differs from product details setup target')
+
+
 def apply(page, plan, *, runtime):
     """Ordinary UI setup in the existing tab; never write browser storage.
 
@@ -247,8 +258,10 @@ def apply(page, plan, *, runtime):
         _select(page, plan['selected_offer'])
         actions.append({'operation': 'select_via_ui', **deepcopy(plan['selected_offer'])})
     if 'product_details_open' in plan:
+        _verify_panel_selection(page, plan)
         actions.append(_details_panel(page, plan['product_details_open'], plan['storage_key'],
                                       plan.get('product_details_heading')))
+        _verify_panel_selection(page, plan)
     after = _state(page, plan['storage_key'])
     actual = sorted((line['key'], line['quantity']) for line in after['cart'])
     expected = sorted((line['key'], line['quantity']) for line in plan['prepared_cart'])
