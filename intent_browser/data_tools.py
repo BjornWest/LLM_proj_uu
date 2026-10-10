@@ -16,7 +16,7 @@ import tempfile
 import time
 from uuid import uuid4
 
-TOOLS = ('extract_page', 'run_python')
+TOOLS = ('extract_page', 'run_python', 'script_file')
 
 
 @dataclass(frozen=True)
@@ -29,16 +29,22 @@ class DataConfig:
     total_dataset_bytes: int = 16 * 1024 * 1024
     max_datasets: int = 64
     feedback_tokens: int = 1500
+    script_workspace: bool = False
+    script_bytes: int = 65536
+    total_script_bytes: int = 1024 * 1024
+    max_scripts: int = 32
 
     def __post_init__(self):
         if not isinstance(self.image, str) or not self.image or self.image.startswith('-'):
             raise ValueError('Python image must be a trusted local Docker image reference')
         for key, value in asdict(self).items():
-            if key != 'image' and (type(value) is not int or value <= 0):
+            if key == 'script_workspace':
+                if type(value) is not bool: raise ValueError('script_workspace must be boolean')
+            elif key != 'image' and (type(value) is not int or value <= 0):
                 raise ValueError(f'{key} must be a positive integer')
 
     def describe(self):
-        return {'version': 'public-data-python-v1', **asdict(self),
+        return {'version': 'public-data-python-v2-scripts' if self.script_workspace else 'public-data-python-v1', **asdict(self),
                 'runtime': 'Docker; no automatic pulls or host-execution fallback',
                 'isolation': 'no network, no host mounts, unprivileged, read-only root, ephemeral tmpfs',
                 'data_scope': 'full public semantic AX subtree from current capture; no implicit pagination',
@@ -202,13 +208,27 @@ class DataSession:
         self.config, self.directory, self.explorer = config, Path(directory), explorer
         self.datasets = {}; self.bytes = 0
         self.executor = DockerPython(config)
+        from .script_workspace import ScriptWorkspace
+        self.scripts = ScriptWorkspace(directory, max_bytes=config.script_bytes,
+            total_bytes=config.total_script_bytes, max_files=config.max_scripts) if config.script_workspace else None
+
+    def checkpoint_state(self):
+        return {'datasets': deepcopy(self.datasets), 'bytes': self.bytes,
+                'scripts': self.scripts.checkpoint_state() if self.scripts is not None else None}
+
+    def restore_state(self, state, prefix='inherited/'):
+        self.datasets = deepcopy(state['datasets']); self.bytes = state['bytes']
+        for binding in self.datasets.values(): binding['path'] = prefix + binding['path']
+        if state.get('scripts') is not None:
+            if self.scripts is None: raise ValueError('Checkpoint requires script workspace support')
+            self.scripts.restore_state(state['scripts'], prefix)
 
     def bounded_feedback(self, value):
         result = deepcopy(value)
         tokens = self.explorer.tokenizer
         def count(): return len(tokens.encode(json.dumps(result, ensure_ascii=False), add_special_tokens=False).ids)
         # Only presentation previews/output are shortened; artifact data stays exact.
-        for field in ('preview', 'stdout', 'stderr'):
+        for field in ('preview', 'stdout', 'stderr', 'content', 'old_string', 'new_string'):
             if count() <= self.config.feedback_tokens: break
             if field not in result: continue
             text = result[field] if isinstance(result[field], str) else json.dumps(result[field], ensure_ascii=False)
@@ -217,6 +237,9 @@ class DataSession:
                 ids = ids[:len(ids)//2]
                 result[field] = tokens.decode(ids, skip_special_tokens=False)
                 result['feedback_truncated'] = True
+                if field == 'content':
+                    result['next_line'] = None
+                    result['view_note'] = 'View was shortened for feedback; reread this start_line with a smaller limit. Exact file is retained.'
         if count() > self.config.feedback_tokens:
             return {'error': 'Feedback metadata exceeds token budget; inspect a smaller extraction.', 'artifact': result.get('artifact')}
         return result
@@ -255,13 +278,30 @@ class DataSession:
                     if hashlib.sha256(data).hexdigest() != binding['sha256']:
                         raise ValueError('Dataset artifact changed; execution refused')
                     selected[key] = json.loads(data)
-                code = arguments['code']
-                script = f'python-{index:03d}.py'; (self.directory/script).write_text(code, encoding='utf-8')
+                has_code, has_file = 'code' in arguments, 'file_path' in arguments
+                if has_code == has_file: raise ValueError('Supply exactly one of code or file_path.')
+                binding = None
+                if has_file:
+                    if self.scripts is None: raise ValueError('Script workspace is disabled in this profile.')
+                    if 'expected_revision' not in arguments: raise ValueError('Saved script execution requires expected_revision from create/view/edit.')
+                    code, binding = self.scripts.read(arguments['file_path'], arguments['expected_revision'])
+                else:
+                    if 'expected_revision' in arguments: raise ValueError('expected_revision requires file_path.')
+                    code = arguments['code']
+                script = f'python-{index:03d}.py'
+                with (self.directory/script).open('x', encoding='utf-8') as output: output.write(code)
                 result = {'tool': name, **self.executor.run(code, selected), 'script': script,
                     'datasets': {key: self.datasets[key] for key in selected}, 'artifact': artifact,
                     'scope': 'Script output is an agent calculation, not independently verified task success.'}
+                if binding is not None: result['saved_script'] = binding
+            elif name == 'script_file':
+                if self.scripts is None: raise ValueError('Script workspace is disabled in this profile.')
+                result = {'tool': name, 'execution': 'completed', **self.scripts.execute(**arguments), 'artifact': artifact}
             else: raise ValueError('Unknown data tool')
         except (ValueError, KeyError) as exc:
             result = {'tool': name, 'execution': 'failed', 'error': str(exc), 'artifact': artifact}
+        except OSError:
+            result = {'tool': name, 'execution': 'failed',
+                'error': 'Script/data artifact unavailable or write conflict; no automatic execution retry.', 'artifact': artifact}
         write_json(self.directory/artifact, result)
         return self.bounded_feedback(result), artifact

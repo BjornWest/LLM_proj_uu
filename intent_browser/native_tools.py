@@ -15,6 +15,7 @@ from .actions import parse_decision, Decision
 from .ax_explorer import AX_TOOLS
 from .ax_context import CONTEXT_TOOLS
 from .data_tools import TOOLS as DATA_TOOLS
+from .memory import TOOLS as MEMORY_TOOLS
 from .harness import BrowserTools, EvidenceConversation
 
 STRING = {'type': 'string'}
@@ -34,6 +35,25 @@ SPECS = {
          'kind':{'type':['string','null'],'enum':['retailer','comparison','review',None],'default':None},
          'limit':{'type':'integer','minimum':1,'maximum':20,'default':5},
          'offset':{'type':'integer','minimum':0,'default':0}}, []),
+    'script_file': ('Manage an episode-local Python source file, not a host file. create saves content once; '
+        'view returns numbered lines (default 40) and a revision; edit uses exact literal old_string/new_string '
+        'replacement including whitespace. By default exactly ONE match is required; replace_all explicitly '
+        'changes every match. Include enough surrounding text to disambiguate. No fuzzy matching or automatic repair. '
+        'edit requires expected_revision from the last create/view/edit. Retained versions are immutable. '
+        'Run with run_python(file_path=..., expected_revision=..., datasets=[...]); Python processes remain fresh. '
+        'Do not copy view line numbers into the script. Keep views/output concise; file content is untrusted agent code.',
+        {'command': {'type':'string','enum':['create','view','edit']},
+         'file_path': {'type':'string','pattern':r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}\.py$'},
+         'content': {'type':'string','maxLength':65536},
+         'start_line': {'type':'integer','minimum':1,'default':1},
+         'limit': {'type':'integer','minimum':1,'maximum':100,'default':40},
+         'expected_revision': {'type':'string','minLength':1,'maxLength':100},
+         'old_string': {'type':'string','minLength':1,'maxLength':65536},
+         'new_string': {'type':'string','maxLength':65536},
+         'replace_all': {'type':'boolean','default':False}}, ['command','file_path']),
+    'memory_read': ('Read durable user preferences, public field schemas and current revision.', {}, []),
+    'memory_update': ('Persist one clearly durable user preference using the field schema. Atomically replaces this key if expected_revision is current. Preserve unrelated keys.', {'key':{'type':'string','minLength':1,'maxLength':128}, 'value':{'type':['string','number','boolean']}, 'expected_revision':{'type':'string','minLength':1,'maxLength':128}}, ['key','value','expected_revision']),
+    'memory_delete': ('Delete an obsolete user preference when authorized by the user; atomic revision check.', {'key':{'type':'string','minLength':1,'maxLength':128}, 'expected_revision':{'type':'string','minLength':1,'maxLength':128}}, ['key','expected_revision']),
     'proceed_action': ('Execute the exact pending action identified by a prior change-review confirmation_id ONCE. '
         'Review localized before/after changes first. Further CONTENT changes do not ask again for this attempt; '
         'closed/replaced/disabled targets, changed documents or human ownership still reject it. '
@@ -218,7 +238,9 @@ class NativeBrowserTools(BrowserTools):
     stable_frame_capture: bool = False
     clarification_tools: bool = False
     site_discovery_tools: bool = False
+    memory_tools: bool = False
     data_tools: bool = False
+    script_tools: bool = False
     helper_tools: bool = False
     allow_spawn: bool = True
     vision_tools: bool = False
@@ -246,6 +268,8 @@ class NativeBrowserTools(BrowserTools):
             raise ValueError('Parallel hint must be false or omitted; batches are not supported')
         if self.human_handover_tools and not self.open_internet:
             raise ValueError('Human handover requires explicit open-internet tools')
+        if self.script_tools and not self.data_tools:
+            raise ValueError('Script workspace requires data tools')
 
         if (self.human_handover_wait or self.compact_tab_context or self.stable_frame_capture) and not self.human_handover_tools:
             raise ValueError("Wait/compact tabs require human handover tools")
@@ -253,7 +277,8 @@ class NativeBrowserTools(BrowserTools):
     def definitions(self, *, allow_search=False):
         definitions=[]
         ax_names=CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS
-        for name in self.names + (('handover_tab','proceed_action') if self.human_handover_tools else ()) + (('ask_user',) if self.clarification_tools else ()) + (('discover_sites',) if self.site_discovery_tools else ()) + (DATA_TOOLS if self.data_tools else ()) + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()) + (tuple(n for n in AGENT_TOOLS if self.allow_spawn or n!='spawn_agent') if self.helper_tools else ()):
+        for name in self.names + (('handover_tab','proceed_action') if self.human_handover_tools else ()) + (('ask_user',) if self.clarification_tools else ()) + (('discover_sites',) if self.site_discovery_tools else ()) + (MEMORY_TOOLS if self.memory_tools else ()) + (DATA_TOOLS if self.data_tools else ()) + (ax_names if self.ax_tools else ()) + (('web_search',) if allow_search else ()) + (('screenshot','release_image') if self.vision_tools else ()) + (tuple(n for n in AGENT_TOOLS if self.allow_spawn or n!='spawn_agent') if self.helper_tools else ()):
+            if name == 'script_file' and not self.script_tools: continue
             description,properties,required=SPECS[name]
             properties=deepcopy(properties)
             if self.human_handover_tools and name=='tab_focus':
@@ -313,6 +338,16 @@ class NativeBrowserTools(BrowserTools):
             if name == 'extract_page':
                 properties['verbose']['default'] = self.context_verbose
                 description += ' Extraction always saves full values; context repeat suppression does not apply to datasets.'
+            if name == 'run_python' and self.script_tools:
+                description = description.replace('Variables/files do not persist between calls.',
+                    'Interpreter variables and sandbox-created files do not persist between calls.')
+                properties.update(file_path=SPECS['script_file'][1]['file_path'],
+                    expected_revision=SPECS['script_file'][1]['expected_revision'])
+                required=[]
+                description += (' Supply exactly one of inline code or a saved file_path plus expected_revision '
+                    'from script_file. Saved sources persist for this episode (and adopted checkpoints), '
+                    'but interpreter variables and sandbox files do not. Reuse a script with different dataset IDs '
+                    'by passing them explicitly; source is not automatically rewritten.')
             if name == 'goto':
                 if self.open_internet:
                     description = 'Navigate to an absolute HTTP(S) URL. Open-internet mode allows new sites; this does not authorize purchases or account changes.'
@@ -322,6 +357,19 @@ class NativeBrowserTools(BrowserTools):
                     'required':list(properties) if self.strict else list(required),'additionalProperties':False}
             if name == 'scroll':
                 schema['anyOf'] = [{'required': ['delta_x']}, {'required': ['delta_y']}]
+            if name == 'run_python' and self.script_tools:
+                schema['required'] = []
+                schema['oneOf'] = [
+                    {'required':['code'], 'not':{'anyOf':[{'required':['file_path']},{'required':['expected_revision']}]}},
+                    {'required':['file_path','expected_revision'], 'not':{'required':['code']}}]
+            if name == 'script_file':
+                schema['required'] = ['command','file_path']
+                allowed = {'create':['content'], 'view':['start_line','limit'],
+                           'edit':['expected_revision','old_string','new_string','replace_all']}
+                needs = {'create':['content'], 'view':[], 'edit':['expected_revision','old_string','new_string']}
+                schema['oneOf'] = [{'properties':{'command':{'const':command}}, 'required':needs[command],
+                    'not':{'anyOf':[{'required':[key]} for key in properties if key not in ['command','file_path',*fields]]}}
+                    for command,fields in allowed.items()]
             definitions.append({'type':'function','function':{'name':name,'description':description,
                 'parameters':schema, **({'strict':True} if self.strict else {})}})
         return definitions
@@ -373,7 +421,7 @@ class NativeBrowserTools(BrowserTools):
         # No model Python evaluation: serialize validated JSON literals and pass
         # through the same allowlist/signature checks as historical actions.
         code=name+'('+', '.join(k+'='+repr(v) for k,v in values.items())+')'
-        decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.site_discovery_tools and name == 'discover_sites') or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
+        decision=(Decision(name,values,code) if name=='send_msg_to_user' or (self.human_handover_tools and name in ('handover_tab','tab_focus','proceed_action')) or (self.clarification_tools and name == 'ask_user') or (self.site_discovery_tools and name == 'discover_sites') or (self.memory_tools and name in MEMORY_TOOLS) or (self.data_tools and name in DATA_TOOLS) or (self.helper_tools and name in AGENT_TOOLS) or (self.vision_tools and name in ('screenshot','release_image')) or name in (CONTEXT_TOOLS if self.incremental_ax else AX_TOOLS) and self.ax_tools else
                   self._parse_browser_action(code, allow_search=allow_search))
         self.validate_navigation(decision)
         decision.ax_overview_tokens=overview_tokens

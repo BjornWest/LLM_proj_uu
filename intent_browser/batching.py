@@ -76,12 +76,21 @@ def document_signature(env, *, active_only=False):
 
 def target_signature(observation, bid):
     nodes = observation['axtree_object'].get('nodes', [])
-    by_id = {n['nodeId']: n for n in nodes}
-    parents = {child: n['nodeId'] for n in nodes for child in n.get('childIds', [])}
-    matches = [n for n in nodes if n.get('browsergym_id') == bid and not n.get('ignored')]
+    # Chrome can repeat identical native-option records in a flat AX capture.
+    # Only collapse copies of the same AX node; conflicting records remain unsafe.
+    by_id, conflicts = {}, set()
+    for node in nodes:
+        node_id = node['nodeId']
+        if node_id in by_id and by_id[node_id] != node:
+            conflicts.add(node_id)
+        else:
+            by_id[node_id] = node
+    parents = {child: n['nodeId'] for n in by_id.values() for child in n.get('childIds', [])}
+    matches = {n['nodeId'] for n in nodes if n.get('browsergym_id') == bid and not n.get('ignored')}
     if len(matches) != 1: return None
-    n = matches[0]; chain = []; visited = set()
+    n = by_id[next(iter(matches))]; chain = []; visited = set()
     while n['nodeId'] not in visited:
+        if n['nodeId'] in conflicts: return None
         visited.add(n['nodeId'])
         chain.append((n.get('backendDOMNodeId'), n.get('frameId'),
                       n.get('role', {}).get('value'), n.get('name', {}).get('value')))

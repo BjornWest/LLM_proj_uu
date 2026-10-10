@@ -83,6 +83,7 @@ $p=Start-Process -FilePath $exe -ArgumentList $args -PassThru
         original=module._get_global_playwright
         original_chat = module.Chat
         def chat_factory(*args, **kwargs):
+            from .chat_ui import create_chat
             # WSLg activates even background-created windows. Native Windows chat
             # uses its own isolated profile/browser and respects background=True.
             if self.windows_chat and not kwargs.get("headless", False):
@@ -106,11 +107,11 @@ $p=Start-Process -FilePath $exe -ArgumentList $args -PassThru
                     return SimpleNamespace(chromium=SimpleNamespace(launch=launch))
                 chat_module._get_global_playwright = chat_playwright
                 try:
-                    chat = original_chat(*args, **kwargs)
+                    chat = create_chat(original_chat, *args, **kwargs)
                 finally:
                     chat_module._get_global_playwright = original_chat_factory
             else:
-                chat = original_chat(*args, **kwargs)
+                chat = create_chat(original_chat, *args, **kwargs)
             if not kwargs.get("headless", False):
                 self._place(chat.page, "chat")
             return chat

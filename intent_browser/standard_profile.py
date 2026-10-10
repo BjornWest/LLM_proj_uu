@@ -31,7 +31,7 @@ def standard_profile(*, navigation_origins=(), helpers=True, tokenizer=None, dat
     profile=with_subagents(profile) if helpers else profile
     if data_tools:
         from .data_tools import DataConfig
-        profile=with_data_tools(profile, data_config or DataConfig(image=os.environ.get('HARNESS_PYTHON_IMAGE', 'intent-browser-python:stdlib-v1')))
+        profile=with_data_tools(profile, data_config or DataConfig(image=os.environ.get('HARNESS_PYTHON_IMAGE', 'intent-browser-python:stdlib-v1'), script_workspace=True))
     return with_adaptive_ax(profile)
 
 
