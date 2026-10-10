@@ -19,6 +19,8 @@ AUTHORED_STATUS = "authored_derivative_construction_only"
 DRAW_FIELDS = ("matched_reference_draw", "offset_draw")
 META_FIELDS = ("provenance", "status", "limitations", "world_id")
 SEARCH_LIMIT = 10000
+# In rounding steps: closer than this to a half step counts as a rounding tie.
+KNIFE_EDGE = 1e-9
 
 
 class CannotConstruct(ValueError):
@@ -70,8 +72,9 @@ def _producible(draw, config):
     """Whether the producer's `_offer_price` can record this draw, type included.
 
     JSON keeps 0 and 0.0 apart, and so does the producer: a matched draw is the
-    integer 0, an unmatched one a float unless it was clamped to an
-    integer-typed bound.
+    integer 0; an unmatched one is `max(lo, min(hi, gauss))`, which returns the
+    lower bound itself whenever the value equals it, else the upper bound
+    itself when the value equals that, else the drawn float.
     """
     match, offset = draw
     if type(match) is not bool or type(offset) not in (int, float):
@@ -86,9 +89,8 @@ def _producible(draw, config):
     if config["offset_standard_deviation"] == 0:
         clamped = max(lo, min(hi, 0.0))
         return type(offset) is type(clamped) and offset == clamped
-    if type(offset) is int:
-        return any(type(bound) is int and bound == offset for bound in (lo, hi))
-    return lo <= offset <= hi
+    expected = type(lo) if offset == lo else type(hi) if offset == hi else float
+    return lo <= offset <= hi and type(offset) is expected
 
 
 def price_rule_violations(world, native_round):
@@ -129,20 +131,32 @@ def check_price_rule(world, native_round):
         raise CannotConstruct("price_rule", "World breaks the producer's pricing rule: " + "; ".join(problems[:3]))
 
 
+def knife_edge(references, offset, config):
+    """Whether some SKU's rounding input is within KNIFE_EDGE of a half step."""
+    for reference in set(references):
+        steps = (reference * (1 + offset) - reference) / _step(reference, config)
+        if abs(steps - floor(steps) - .5) < KNIFE_EDGE:
+            return True
+    return False
+
+
 def candidate_draws(references, config):
-    """One representative draw for every price combination of positive probability.
+    """The finite set of draws this operator considers for one retailer/product.
 
     A SKU's rounded price flips where reference*offset/step crosses a half
     step. Between two neighbouring flips of any SKU, every SKU's price is
-    constant, so one offset per interval covers the joint outcomes; bin centres
+    constant, so the candidates are the matched draw, both clamp endpoints
+    and the midpoint of each interval between neighbouring flips; bin centres
     of single references would miss combinations of differently rounded SKUs.
-    Clamped draws land exactly on the endpoints, with positive probability.
 
-    Offsets exactly on a flip are deliberately not candidates. Ties-to-even can
-    give a few floats there a price combination of their own, but the producer
-    draws them with probability zero, and an authored world should not sit on
-    a rounding knife-edge. The choice among prices is therefore optimal over
-    positive-probability draws only.
+    This is a representative policy, not the producer's complete support. In
+    floating point a flip is a plateau some 1e-16 wide on which ties-to-even
+    can give a price combination of its own; the producer can draw it, with
+    negligible probability. Such knife-edges are not candidates: an interval
+    midpoint that leaves any SKU within KNIFE_EDGE of a half step is skipped,
+    so an authored price never depends on how a tie was rounded. The clamp
+    endpoints are kept whatever they round to; a clamped draw lands exactly
+    there with real probability.
     """
     lo, hi = config["offset_min"], config["offset_max"]
     if not -1 < lo <= hi:
@@ -162,11 +176,14 @@ def candidate_draws(references, config):
             raise CannotConstruct("operator_limit", "Native price grid exceeds this operator's bounded search")
         flips.update((k + .5) * step / reference for k in range(first, last + 1))
     edges = [lo] + sorted(flip for flip in flips if lo < flip < hi) + [hi]
-    draws += [(False, lo), (False, hi)]
+    # Coincident bounds always record the lower bound object.
+    draws += [(False, lo)] if lo == hi else [(False, lo), (False, hi)]
     for left, right in zip(edges, edges[1:]):
+        middle = (left + right) / 2
         # The matched draw already gives the prices of the interval around zero.
-        if not (probability > 0 and left < 0 < right):
-            draws.append((False, (left + right) / 2))
+        if (left < right and not (probability > 0 and left < 0 < right)
+                and not knife_edge(references, middle, config)):
+            draws.append((False, middle))
     return draws
 
 

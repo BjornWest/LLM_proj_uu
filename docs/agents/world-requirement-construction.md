@@ -25,20 +25,27 @@ The producer prices a product **once per retailer**: one recorded draw
 (`matched_reference_draw`, `offset_draw`), applied to every listed SKU through
 `rounded_price`. The operator therefore edits that draw, never a single SKU's
 price. It replaces the draw for a designated retailer/product pair and
-recomputes every SKU of the pair with the producer's own rounding. It only uses
-draws the producer can emit: the matched reference draw, the clamp endpoints,
-and one offset from each interval between neighbouring rounding flips of any
-SKU in the pair. The intervals matter when SKUs have their own reference
-prices and round in different steps; per-SKU bin centres would miss some of
-their joint prices. Offsets exactly on a rounding flip are deliberately
-excluded: the producer draws them with probability zero, and an authored world
-should not sit on a rounding knife-edge.
+recomputes every SKU of the pair with the producer's own rounding. It considers
+a finite set of draws the producer can emit: the matched reference draw, the
+clamp endpoints, and the midpoint of each interval between neighbouring
+rounding flips of any SKU in the pair. The intervals matter when SKUs have
+their own reference prices and round in different steps; per-SKU bin centres
+would miss some of their joint prices.
+
+This candidate set is a representative policy, not the producer's complete
+support. In floating point each rounding flip is a plateau about 1e-16 wide
+where ties-to-even can give a price combination of its own. The producer can
+draw it, with negligible probability; the operator never uses it, and skips
+any interval midpoint within a billionth of a step of a half step, so an
+authored price never depends on how a tie was rounded. Clamp endpoints are
+kept whatever they round to, because a clamped draw lands exactly there.
 
 Among the prices all designated retailers can reach below the unchanged
 competitors, it picks the one that reprices the fewest retailers, then has the
 smallest total movement over every repriced SKU price (unavailable siblings
 included), then is lowest. The choice is optimal over the candidate draws
-above, so a knife-edge draw could occasionally move prices less. This is a
+above plus each retailer's current draw, not over the producer's complete
+support: a knife-edge draw can occasionally move prices less. This is a
 deterministic choice, not a random feasible one. Declining means this operator cannot construct the request; it
 does not prove that no world satisfies it. Each decline carries a reason code
 (`price_rule`, `unavailable`, `already_holds`, `no_common_price`,
@@ -48,7 +55,7 @@ does not prove that no world satisfies it. Each decline carries a reason code
 price follows from its recorded draw and a positive manufacturer reference, the
 draw is one the producer's matched or unmatched branch can record under the
 world's own price config (including whether the offset is written as an
-integer or a float), and all SKUs of a product at a retailer share it. The
+integer or a float, which follows the producer's clamp expression), and all SKUs of a product at a retailer share it. The
 operator requires this of the parent and of the result. The native commerce
 validator does not check it.
 
@@ -93,10 +100,10 @@ a separate declared requirement if a scenario needs it.
 ## Evidence and cost
 
 Evidence is under `.local/coordination/world-requirement-construction-20261010/`:
-`native-v8/receipt.json` (with negative controls) and
-`native-v8-construct-only/receipt.json`. The requirement is `requirement-v2.json`.
-`native-v6*` and `native-v7*` are the same case on earlier commits, before Codex
-review fixes; the emitted world is the same in all three.
+`native-v9/receipt.json` (with negative controls) and
+`native-v9-construct-only/receipt.json`. The requirement is `requirement-v2.json`.
+`native-v6*` to `native-v8*` are the same case on earlier commits, before Codex
+review fixes; the emitted world is the same in all of them.
 
 The edit itself is cheap: about 0.2 s for `construct` on this world, most of it
 the native oracle hashing the 6.4 MB world. A whole runner invocation is

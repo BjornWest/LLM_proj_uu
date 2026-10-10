@@ -227,6 +227,19 @@ class PriceRuleTests(unittest.TestCase):
         self.assertEqual(self.violations((False, 0), offset_min=0), [])
         self.assertEqual(len(self.violations((False, 0), offset_standard_deviation=0)), 3)
 
+    def test_recorded_type_at_a_clamp_bound_is_the_bound_object(self):
+        # max(lo, min(hi, g)) returns lo itself when the value equals lo, else
+        # hi itself when it equals hi.
+        self.assertEqual(len(self.violations((False, 0.0), offset_min=0)), 3)
+        self.assertEqual(self.violations((False, 1), offset_max=1), [])
+        self.assertEqual(len(self.violations((False, 1.0), offset_max=1)), 3)
+        self.assertEqual(self.violations((False, 0.0), offset_min=0.0, offset_max=0), [])
+        self.assertEqual(len(self.violations((False, 0), offset_min=0.0, offset_max=0)), 3)
+        self.assertEqual(self.violations((False, 0), offset_min=0, offset_max=0), [])
+        self.assertEqual(len(self.violations((False, 0.0), offset_min=0, offset_max=0)), 3)
+        self.assertEqual(self.violations((False, 0.3)), [])
+        self.assertEqual(self.violations((False, -0.3)), [])
+
     def test_matched_draw_is_valid_outside_the_unmatched_clamp(self):
         self.assertEqual(self.violations(MATCH, offset_min=0.1), [])
         self.assertEqual(len(self.violations((False, 0.0), offset_min=0.1)), 3)
@@ -263,16 +276,35 @@ class DrawTests(unittest.TestCase):
                 self.assertIn(tuple(native.rounded_price(r * (1 + offset), r, PRICE) for r in references), joint)
 
     def test_rounding_knife_edges_are_not_candidates(self):
-        # At offset 1/102 both SKUs sit exactly on a flip and ties-to-even gives
-        # 510/1550 SEK, which neither neighbouring interval produces. The
-        # producer draws that offset with probability zero.
+        # At offset 1/102 both SKUs sit on a flip and ties-to-even gives
+        # 510/1550 SEK, which neither neighbouring interval produces. The float
+        # plateau around it is about 1e-16 wide; the operator does not use it.
         references = (51000, 153000)
         edge = tuple(native.rounded_price(r * (1 + 1 / 102), r, PRICE) for r in references)
         self.assertEqual(edge, (51000, 155000))
+        self.assertTrue(model.knife_edge(references, 1 / 102, PRICE))
+        self.assertFalse(model.knife_edge(references, 1 / 102 + 1e-6, PRICE))
         joint = {tuple(native.rounded_price(r * (1 + draw[1]), r, PRICE) for r in references)
                  for draw in model.candidate_draws(references, PRICE)}
         self.assertNotIn(edge, joint)
         self.assertTrue({(51000, 154000), (52000, 155000)} <= joint)
+
+    def test_midpoint_inside_a_tie_plateau_is_skipped_but_endpoints_stay(self):
+        # A clamp this narrow puts the only interior midpoint on the plateau.
+        narrow = {**PRICE, "reference_match_probability": 0,
+                  "offset_min": 0.00980392156862719, "offset_max": 0.009803921568627711}
+        draws = model.candidate_draws((51000, 153000), narrow)
+        self.assertEqual(draws, [(False, narrow["offset_min"]), (False, narrow["offset_max"])])
+        for config in (PRICE, {**PRICE, "offset_min": 0.05}):
+            for draw in model.candidate_draws((49900, 50000, 51000, 153000), config):
+                if draw[0] or draw[1] in (config["offset_min"], config["offset_max"]):
+                    continue
+                self.assertFalse(model.knife_edge((49900, 50000, 51000, 153000), draw[1], config))
+
+    def test_coincident_clamp_bounds_give_one_endpoint_candidate(self):
+        pinned = {**PRICE, "reference_match_probability": 0, "offset_min": 0.0, "offset_max": 0}
+        self.assertEqual(model.candidate_draws((51000,), pinned), [(False, 0.0)])
+        self.assertTrue(model._producible((False, 0.0), pinned))
 
     def test_search_limit_is_a_coded_decline(self):
         with self.assertRaises(model.CannotConstruct) as caught:
