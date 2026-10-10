@@ -59,10 +59,26 @@ class CapabilityControls(unittest.TestCase):
             pin={'path':str(current),'sha256':sha256(current.read_bytes()).hexdigest()}
             path, checked=cap.check_manifest(pin)
             archive=root/'archive'
-            publication.archive_evidence(path,checked,archive)
+            publication.archive_evidence(path,checked,archive,expected_manifest_sha256=pin['sha256'])
             self.assertEqual((archive/'manifest.json').read_bytes(),first)
             self.assertEqual((archive/'manifest-v2.json').read_bytes(),current.read_bytes())
             cap.check_manifest({'path':str(archive/'manifest-v2.json'),'sha256':pin['sha256']})
+
+    def test_archive_rejects_internally_consistent_unapproved_envelope_drift(self):
+        with TemporaryDirectory() as folder:
+            root=Path(folder);source=root/'packet';source.mkdir()
+            _, _, _, _, approval, _=packet(source)
+            accepted=json.loads(Path(approval['path']).read_bytes())
+            pin=accepted['evidence_manifest'];path,checked=cap.check_manifest(pin)
+            world=source/'world.private.json';world.write_text('{"world_id":"unapproved"}')
+            changed=deepcopy(checked);changed['files']['world.private.json']=sha256(world.read_bytes()).hexdigest()
+            path.write_text(json.dumps(changed))
+            # The changed packet remains self-consistent, but its envelope was
+            # never approved by Product. Retain the originally approved hash.
+            cap.check_manifest({'path':str(path),'sha256':sha256(path.read_bytes()).hexdigest()})
+            with self.assertRaisesRegex(ValueError,'Pinned capability evidence changed'):
+                publication.archive_evidence(path,checked,root/'archive',
+                    expected_manifest_sha256=pin['sha256'])
 
     def test_complete_synthetic_packet_can_compile_but_inputs_stay_unchanged(self):
         with TemporaryDirectory() as folder:
