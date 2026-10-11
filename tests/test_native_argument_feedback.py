@@ -155,7 +155,7 @@ def exercise(tmp_path, sequence, *, batch_size=8, max_steps=None, repeat_ids=Fal
     def transport(request):
         requests.append(json.loads(request.content));raw=deepcopy(sequence[len(requests)-1])
         if not repeat_ids:
-            for call in raw['choices'][0]['message'].get('tool_calls',[]):
+            for call in raw['choices'][0]['message'].get('tool_calls') or []:
                 call['id']=str(len(requests))+'-'+call['id']
         responses.append(deepcopy(raw));return httpx.Response(200,json=raw)
     backend=ChatCompletionsBackend('https://fixture.invalid/v1','mock');backend.client.close()

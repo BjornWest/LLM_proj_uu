@@ -185,6 +185,10 @@ class NativeArgumentError(ValueError):
         self.force_controller = force_controller
 
 
+class MissingNativeToolCall(ValueError):
+    """Completed assistant reply has no calls; controller feedback, never an action."""
+
+
 def _object(pairs):
     result={}
     for key,value in pairs:
@@ -443,6 +447,7 @@ class NativeBrowserTools(BrowserTools):
                            has_call_id=lambda _: False):
         """Return bounded argument errors only after validating the whole envelope.
 
+        Completed replies without calls receive a separate controller correction.
         Strict parsers stay unchanged for validators/offline callers. A rejected
         batch runs no member. Malformed identities, unsupported tools, navigation
         policy errors on schema-valid calls and incomplete generations remain hard failures.
@@ -450,6 +455,21 @@ class NativeBrowserTools(BrowserTools):
         from .completion_diagnostics import completion_diagnostic
         from .backend import Completion
         from .retry_policy import argument_diagnostic
+        raw = completion.raw
+        choices = raw.get('choices') if isinstance(raw,dict) else None
+        if isinstance(choices,list) and len(choices)==1 and isinstance(choices[0],dict):
+            choice=choices[0];message=choice.get('message')
+            if isinstance(message,dict):
+                calls=message.get('tool_calls')
+                no_calls=calls is None or (isinstance(calls,list) and not calls)
+                diagnostic=completion_diagnostic(raw,completion.request)
+                if (no_calls and choice.get('finish_reason') in ('stop','tool_calls')
+                        and message.get('role')=='assistant' and not message.get('refusal')
+                        and (message.get('content') is None or isinstance(message.get('content'),str))
+                        and not (diagnostic and diagnostic['retry_unchanged'] is False)):
+                    if self.reasoning_replay=='preserve':
+                        reasoning_for_replay(message)  # Malformed reasoning remains an envelope error.
+                    raise MissingNativeToolCall('No native tool call returned; nothing executed')
         try:
             parsed, assistant = (self.parse_batch if batching else self.parse_completion)(
                 completion, allow_search=allow_search)

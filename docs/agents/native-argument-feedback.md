@@ -40,3 +40,14 @@ only a successfully validated decision does. It also does not consume an additio
 retry allowance. Rejected display strings are explicitly inert proposals, not
 serialized executable browser calls. Overlong JSON integer literals return bounded
 argument feedback without weakening Python's integer-conversion protection.
+
+
+Completed assistant replies with no native calls now receive controller feedback
+(version `native-no-call-feedback-v1`), even with `retry_policy=None`. The original
+text and configured reasoning are retained in append-only history. No call ID,
+matched tool result, browser action or task completion is inferred from prose.
+The model can issue a valid call on its next ordinary turn, using the unchanged
+schemas; terminal answers must use `send_msg_to_user`. Repeated no-call replies
+consume normal decisions and remain subject to the existing context/turn bounds.
+Malformed/refused envelopes and provider-reported truncated output retain their
+existing failure/retry behavior. Strict offline parsers still reject no-call replies.

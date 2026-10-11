@@ -360,6 +360,9 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             profile_metadata['decision_retry_policy']['counts_toward_max_steps'] = False
     if native_tools:
         profile_metadata['native_tool_request_options'] = native_options
+        profile_metadata['native_reply_feedback'] = {
+            'version':'native-no-call-feedback-v1', 'scope':'completed replies without native calls',
+            'recovery':'next ordinary decision, controller notice; no automatic action or generation replay'}
         profile_metadata['invalid_argument_feedback'] = {
             'version':'native-argument-rejection-v1','whole_batch_rejected':True,
             'browser_action_replay':False,'argument_clamping':False,
@@ -1071,9 +1074,28 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     event['completion_diagnostic']=diagnostic
                     trace.event('completion_classified',step=index,diagnostic=diagnostic)
                 if native_tools:
-                    decisions, assistant, argument_results, argument_channel = harness_profile.tools.parse_for_dispatch(
-                        completion, batching=batching, allow_search=search_backend is not None,
-                        has_call_id=conversation.has_call_id)
+                    from .native_tools import MissingNativeToolCall
+                    try:
+                        decisions, assistant, argument_results, argument_channel = harness_profile.tools.parse_for_dispatch(
+                            completion, batching=batching, allow_search=search_backend is not None,
+                            has_call_id=conversation.has_call_id)
+                    except MissingNativeToolCall:
+                        value={'execution':'not_executed','reason':'missing_native_tool_call',
+                            'feedback':'No native tool call was returned. Use the provided native tool schema for your next decision. '
+                                       'To finish, call send_msg_to_user with your answer; ordinary assistant text does not finish the task.',
+                            'scope':'Controller protocol feedback; no action or tool result was invented.'}
+                        notice=json.dumps(value,ensure_ascii=False,sort_keys=True)
+                        source=delivery.register('batch_result',notice,step=index,
+                            provenance={'scope':'Completed reply without calls; no action dispatched'}) if delivery else None
+                        conversation.recover(completion.raw,notice,
+                            preserve_reasoning=harness_profile.tools.reasoning_replay=='preserve',notice_source=source)
+                        event.update(kind='native_protocol_rejection',policy_feedback=value,actions=[],
+                            browser_stepped=False,action_dispatch_started=False,not_executed=True,
+                            native_feedback_channel='controller',native_feedback_reason='missing_native_tool_call',
+                            next_observation=final_ref)
+                        trace.event('native_reply_rejected',step=index,reason='missing_native_tool_call',
+                            not_executed=True,tool_call_count=0)
+                        continue  # Ordinary next turn; retry_policy=None remains supported.
                     event['assistant_tool_message'] = assistant
                     event['tool_call_id'] = assistant['tool_calls'][0]['id']
                     if argument_results is not None:
