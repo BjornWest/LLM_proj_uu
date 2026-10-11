@@ -367,7 +367,9 @@ class BlockTests(TwoConcepts):
             again = [shared.generate()[0] for _ in range(2)]
         self.assertEqual((world, opened), (self.frozen, self.opened))
         self.assertEqual(again, [self.frozen] * 2)
-        self.assertGreater(separate, 20)
+        # The native producer now loads once per world; session sharing still
+        # reuses that snapshot across worlds without changing their records.
+        self.assertEqual(separate, 1)
         self.assertEqual(len(calls), separate + 1)
         self.assertIs(self.api.population.load, real)
         # A pass that altered the shared configuration is an error, not a silent change to later worlds.

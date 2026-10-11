@@ -518,6 +518,16 @@ cheaper, and does little for a first pass, which manufacture dominates. This
 experiment works around it inside its own session and does not patch the
 producer.
 
+## Producer defaults integration (2026-10-11)
+
+The central commerce producer now loads one validated defaults/registry snapshot
+per world and passes it explicitly to population sampling, retailer home-location
+weighting, SKU listing and provenance hashing. A fresh independent generation
+reads fresh defaults; there is no process-global producer cache. The repeated-read
+cost figures above describe the original producer and remain historical evidence.
+`streams.Defaults` still shares the initial snapshot across an experimental
+session's repeated worlds; its module swap and thread-safety limitation remain.
+
 ## Reproduction
 
 ```bash

@@ -121,7 +121,7 @@ def task_prose(task, city):
     return {'user_message': message, 'memories': memories}
 
 
-def choose_home(seed, rid, user, international, method, geo):
+def choose_home(seed, rid, user, international, method, geo, *, population_config=None):
     known = cities()
     domestic = sorted(c['city_id'] for c in known.values() if c['country'] == user['country'] and c['city_id'] != user['city_id'])
     adjacent = neighbour_countries(user['country'])
@@ -133,7 +133,8 @@ def choose_home(seed, rid, user, international, method, geo):
     weights = dict(geo['base_home_location_weights'])
     if not domestic:
         weights['same_user_city'] += weights['other_city_in_user_country']; weights['other_city_in_user_country'] = 0
-    weights['foreign_country'] *= population.foreign_placement_multiplier(user['city_id'], foreign, method, international)
+    weights['foreign_country'] *= population.foreign_placement_multiplier(user['city_id'], foreign, method, international,
+                                                                        config=population_config)
     category = draw(seed, rid+'/home-category', weights)
     return user['city_id'] if category == 'same_user_city' else rng(seed, rid+'/home-domestic').choice(domestic) if category == 'other_city_in_user_country' else foreign
 

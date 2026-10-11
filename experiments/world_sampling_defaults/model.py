@@ -144,15 +144,17 @@ def department_budgets(weights, counts, expected):
 
 
 def sample(seed=0, tasks=('footwear.walking_shoes',), controls=None, *, concept_ids=None,
-           brand_factory=None, product_factory=None):
+           brand_factory=None, product_factory=None, _loaded_defaults=None):
     """Draw metadata, optionally materializing a bounded authored concept slice.
 
     Factories execute before allocation so stores consume the actual positioning
     and brand metadata, rather than a separately drawn surrogate. They must retain
     identities/scope. No stock or price result is inspected by population logic.
-    Default calls preserve the original metadata-only draw.
+    Default calls preserve the original metadata-only draw. `_loaded_defaults`
+    is the validated (configuration, registry) pair returned by `load()`, for
+    producer-internal reuse within one world; it is not a cross-world cache.
     """
-    config, registry = load()
+    config, registry = load() if _loaded_defaults is None else _loaded_defaults
     knobs = {**config['controls'], **(controls or {})}
     if set(knobs) != set(config['controls']):
         raise ValueError('Unknown population control')
@@ -368,12 +370,12 @@ def grouping_policy(seed, retailer_id, allowed):
     return result
 
 
-def foreign_placement_multiplier(user_city_id, candidate_city_id, method='delivery', international=False):
+def foreign_placement_multiplier(user_city_id, candidate_city_id, method='delivery', international=False, *, config=None):
     """Candidate-city placement weight; independent of inventory and winners."""
     from environments.product_world.geography import cities, route
     if method not in {'delivery', 'pickup', 'inspection'}:
         raise ValueError('Unknown fulfilment method')
-    config, _ = load()
+    config = load()[0] if config is None else config
     rule = config['shipping_selection']['nearby_foreign_pickup']
     known = cities()
     if user_city_id not in known or candidate_city_id not in known:

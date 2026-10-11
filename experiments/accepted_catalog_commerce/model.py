@@ -120,14 +120,16 @@ def generate(seed=0, *, concept_ids=package_export.CONCEPTS,
         item['sample_seed']=seed_for(seed,base['product_id']);item['stock_tendency']=draw(seed,base['product_id']+'/stock-tendency',cfg['stock']['tendency_weights'])
         item['axes']=_axes(seed,item['public'],item['variant_fields']);rich.append(item)
         return {**base,'positioning':item['private']['profiles']['positioning'],'name':item['public']['name']}
-    metadata=population.sample(seed,tasks=tasks,controls=controls,concept_ids=concept_ids,brand_factory=brand_factory,product_factory=product_factory)
+    population_defaults=population.load()
+    metadata=population.sample(seed,tasks=tasks,controls=controls,concept_ids=concept_ids,brand_factory=brand_factory,product_factory=product_factory,
+                               _loaded_defaults=population_defaults)
     address=addresses.generate(seed,city_id);user=address['addresses'][0]['location'];profiles={};homes={}
     for r in metadata['retailers']:
         rid=r['retailer_id'];kind={'small':'local_shop','medium':'regional_chain','large':'major_retailer'}[r['scale']]
         international=rng(seed,rid+'/international').random()<geo['international_shipping_probability_by_profile'][kind]
         profiles[rid]={'profile_id':kind,'international_probability':int(international),
                       'branch_count':rng(seed,rid+'/branches').randint(*cfg['authoring_defaults']['branch_count_ranges'][r['scale']])}
-        homes[rid]=native.choose_home(seed,rid,user,international,'delivery',geo)
+        homes[rid]=native.choose_home(seed,rid,user,international,'delivery',geo,population_config=population_defaults[0])
     network=plan_locations(seed,user,profiles,config={'transfer_probability':geo['stock_transfers']['enabled_probability']},
         merchant_home_cities=homes,branch_shipping={'enabled_probability':geo['branch_shipping']['enabled_probability']})
     headquarters={m['retailer_id']:m['headquarters'] for m in network['merchants']}
@@ -156,7 +158,7 @@ def generate(seed=0, *, concept_ids=package_export.CONCEPTS,
                 'home_delta_minor':int(draw(seed,rid+'/'+cid+'/home-fee',shipping['home_delivery_relative_to_collection_minor_probabilities']))})
         r['catalog']=[];r['offers']=[];r['conditions']=[]
         for pid in r['product_ids']:
-            p=products[pid];public=p['public'];listing=population.list_skus(seed,rid+'/'+pid,public['skus'],p['axes'])
+            p=products[pid];public=p['public'];listing=population.list_skus(seed,rid+'/'+pid,public['skus'],p['axes'],config=population_defaults[0])
             listed={s['sku_id']:s for s in public['skus'] if s['sku_id'] in listing['sku_ids']};amounts={sid:{} for sid in listed}
             probabilities=native.stock_distribution(tendency,p['stock_tendency'],cfg['stock'])
             for source in r['source_locations']:
@@ -183,7 +185,7 @@ def generate(seed=0, *, concept_ids=package_export.CONCEPTS,
         'carrier_evidence':carrier_reviews(seed,city_id,{'shipments_per_carrier':cfg['authoring_defaults']['carrier_histories_per_carrier']}),
         'config':cfg,'diagnostics':metadata['diagnostics'],
         'provenance':{'accepted_package_gates':gates,'retailer_naming_version':retailer_naming.VERSION,'native_commerce_config_sha256':native.digest(cfg),
-                      'population_defaults_sha256':native.digest(population.load()[0]),'plan_sha256':native.digest(plan)},
+                      'population_defaults_sha256':native.digest(population_defaults[0]),'plan_sha256':native.digest(plan)},
         'limitations':(['Closed five-concept/three-family slice; not all accepted authoring packages.'] if set(concept_ids)<=set(package_export.CONCEPTS) else ['Explicit registered ordinary-parcel slice; not all accepted authoring packages.'])+[
             'Explicit ordinary-parcel commerce classification; manufacturer facts remain unchanged.',
             'Prose mapping remains unmapped unless independently accepted by an explicit later export.',

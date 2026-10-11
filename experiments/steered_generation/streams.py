@@ -169,8 +169,10 @@ class Manufacture:
 class Defaults:
     """Reads the sampling defaults once for all of a session's passes.
 
-    The producer calls `population.load()` for every retailer/product entry,
-    and each call re-reads and re-validates the same files. With manufacture
+    The experiment's original producer called `population.load()` for every
+    retailer/product entry, re-reading and re-validating the same files. The
+    current central producer reads once per world; this session still shares
+    its first defaults snapshot across repeated worlds. With manufacture
     cached that is most of a pass, and it grows with the world. Passes here
     get the first call's result instead. The pinned producer only reads it.
     As a check on that, a pass that completes with the configuration changed
