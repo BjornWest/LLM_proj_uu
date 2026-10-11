@@ -269,12 +269,14 @@ ever be cheapest. Receipts and worlds are under
 | `run-v5-cheapest/` | `832238a6` | who is cheapest combined with other concepts; 30,000 redraws |
 | `run-v5-regression/` | `832238a6` | every `run-v4` requirement again |
 | `run-v6-all/` | `390247b` | every requirement again with the sampling defaults read once; 20,000 redraws |
+| `run-v7-all/` | `ac1eacc` | every requirement again after coupling was moved ahead of probabilities; 20,000 redraws |
 
 Requirement files are in `steering/`, `steering/stock/`, `steering/price/` and
 `steering/combined/`. Commit `832238a6` moved the single-requirement paths
-onto `blocks.replay`, and `390247b` added the shared sampling defaults; both
-reruns reproduce every earlier steered world with the identical world
-identity (27 of 27, then 48 of 48), with the same probabilities.
+onto `blocks.replay`, `390247b` added the shared sampling defaults and
+`ac1eacc` changed the order of the coupling check; each rerun reproduces
+every earlier steered world with the identical world identity (27 of 27,
+then 48 of 48 twice), with the same probabilities and refusals.
 `run-v3` is the same price evidence at the earlier reviewed
 commit, with identical probabilities and hit counts. `run-v1` and `run-v2`
 used the removed keep-if-it-fits rule; their worlds satisfy their
