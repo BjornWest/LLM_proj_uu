@@ -74,6 +74,8 @@ def settings_from_prepared(prepared, *, native=None):
             if setup['mandatory_fees'] else []
         return {'quote_id': result['quote_id'], 'total_minor': result['total_minor'],
                 'currency': result['currency'], 'native_option_id': selected['native_option_id'],
+                'shipping_summary': {key: selected[key] for key in
+                    ('shipping_minor', 'merchandise_minor', 'free_shipping_threshold_minor', 'threshold_met')},
                 'promotion_codes': list(result['promotion_codes']), 'promotion_feedback': feedback,
                 'lines': breakdown, 'options': [{key: option[key] for key in
                     ('native_option_id', 'shipping_minor', 'total_minor')} for option in result['options']]}

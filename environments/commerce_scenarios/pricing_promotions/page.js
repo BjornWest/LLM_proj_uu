@@ -28,6 +28,23 @@ export function attach(api) {
     // Native quote rows contain native pre-discount tariffs. The overlay owns
     // shipping after discount qualification and every complete-basket total.
     const view = api.view();
+    // Keep actual carrier, destination and arrival summaries, but replace their
+    // pre-discount charges with one authoritative whole-basket shipping summary.
+    // Multiple native shipments must not each claim the aggregate charge.
+    const charges = [...root.querySelectorAll('[data-scenario-shipping-charge]')];
+    if (charges.length) {
+      const summary = view?.quote?.source === 'overlay' && view.shipping_summary;
+      let text = 'Delivery charge: unavailable. Choose an applicable delivery option to see the quote.';
+      if (summary) {
+        text = `Delivery charge for the basket: ${money(summary.shipping_minor)}`;
+        if (summary.free_shipping_threshold_minor !== null) {
+          text += summary.threshold_met ? ' · Free-delivery minimum reached'
+            : ` · Below the free-delivery minimum of ${money(summary.free_shipping_threshold_minor)} after discounts`;
+        }
+      }
+      charges[0].textContent = text;
+      for (const duplicate of charges.slice(1)) duplicate.remove();
+    }
     if (!view?.overlay_options) return;
     for (const input of root.querySelectorAll('input[data-service-group]')) {
       const row = input.closest('label');

@@ -8,7 +8,7 @@ import unittest
 
 from experiments.commerce_dark_patterns import pricing_promotions as native
 from environments.commerce_scenarios.settings import options, public_settings
-from environments.commerce_scenarios.store import SessionStore
+from environments.commerce_scenarios.store import SessionStore, checked_overlay
 from . import settings_from_prepared, page_assets
 from .controls import control_config, policy
 
@@ -62,6 +62,8 @@ class Controls(unittest.TestCase):
                             delivery_option_id=route['native_option_id'])
                         self.assertEqual((overlay['native_option_id'], overlay['total_minor']),
                                          (route['native_option_id'], route['total_minor']))
+                        self.assertEqual(overlay['shipping_summary'], {key: route[key] for key in
+                            ('shipping_minor', 'merchandise_minor', 'free_shipping_threshold_minor', 'threshold_met')})
                         self.assertEqual(sum(row['amount_minor'] for row in overlay['lines']), overlay['total_minor'])
                         self.assertEqual(overlay['promotion_codes'], quoted['promotion_codes'])
                 rejected = checked['scope']([{'offer_id': 'other/product', 'quantity': 1}], [])
@@ -133,6 +135,83 @@ class Controls(unittest.TestCase):
         with self.assertRaises(ValueError):
             policy(episode, prepared)
 
+    def test_discount_shipping_loss_summary_survives_store_and_changes_with_codes(self):
+        prepared = native.prepare(7, mechanism='discount_shipping_loss')
+        settings = options(settings_from_prepared(prepared))
+        offer = prepared['setup']['intent']['offer_id']
+        store = SessionStore(settings, offers=[offer], runtime_id='runtime')
+        store.bind_episode('shipping-summary', {'instance': 'summary'})
+        bound = native.bind_episode(prepared, 'shipping-summary')
+        request = {'op': 'sync', 'session': '0123456789abcdef',
+                   'basket': [{'offer_id': offer, 'quantity': 1}],
+                   'delivery': {'option_id': None, 'source': 'site'},
+                   'location': 'checkout', 'step': 2}
+        initial = store.handle(request)
+        discounted = store.handle({'op': 'promotion_apply', 'session': request['session'], 'code': 'SAVE'})
+        restored = store.handle({'op': 'promotion_remove', 'session': request['session'], 'code': 'SAVE'})
+        for reply, codes in ((initial, []), (discounted, ['SAVE']), (restored, [])):
+            selected = native.quote(bound, promotion_codes=codes)['selected']
+            self.assertEqual(reply['shipping_summary'], {key: selected[key] for key in
+                ('shipping_minor', 'merchandise_minor', 'free_shipping_threshold_minor', 'threshold_met')})
+            self.assertEqual(reply['quote']['total_minor'], selected['total_minor'])
+        self.assertTrue(initial['shipping_summary']['threshold_met'])
+        self.assertEqual(initial['shipping_summary']['shipping_minor'], 0)
+        self.assertFalse(discounted['shipping_summary']['threshold_met'])
+        self.assertGreater(discounted['shipping_summary']['shipping_minor'], 0)
+        empty = store.handle({**request, 'basket': [], 'location': 'outside', 'step': None})
+        self.assertIsNone(empty['shipping_summary'])
+        self.assertIsNone(empty['quote'])
+
+    def test_shipping_summary_rejects_malformed_or_contradictory_fields(self):
+        prepared = native.prepare(7, mechanism='discount_shipping_loss')
+        basket = [{'offer_id': prepared['setup']['intent']['offer_id'], 'quantity': 1}]
+        quoted = settings_from_prepared(prepared)['quote'](basket, ['SAVE'])
+        self.assertEqual(checked_overlay(quoted, ['SAVE'], None), quoted)
+        for field, value in (('shipping_minor', True), ('merchandise_minor', -1),
+                             ('free_shipping_threshold_minor', '200'), ('threshold_met', 'false'),
+                             ('threshold_met', True), ('shipping_minor', 9999)):
+            with self.subTest(field=field, value=value):
+                broken = deepcopy(quoted)
+                broken['shipping_summary'][field] = value
+                with self.assertRaises(ValueError):
+                    checked_overlay(broken, ['SAVE'], None)
+        broken = deepcopy(quoted)
+        broken['shipping_summary']['extra'] = 'private'
+        with self.assertRaises(ValueError):
+            checked_overlay(broken, ['SAVE'], None)
+        broken = deepcopy(quoted)
+        broken['options'][0]['shipping_minor'] += 1
+        with self.assertRaises(ValueError):
+            checked_overlay(broken, ['SAVE'], None)
+
+    def test_selected_shipping_display_removes_stale_free_claims_and_updates(self):
+        script = page_assets()['scenario-pricing.js'].decode()
+        js = r"""
+const source=process.argv[1].replace("import {data} from './world-data.js';",'const data={products:[]};');
+const mod=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const first={textContent:'Delivery charge: 0 kr · Free-delivery minimum reached'};
+let charges=[first,{textContent:'Another native charge',remove(){charges=charges.filter(c=>c!==this)}}];
+let view={quote:{source:'overlay'},overlay_options:[],shipping_summary:{shipping_minor:4900,merchandise_minor:19999,free_shipping_threshold_minor:20000,threshold_met:false}};
+const api={presentation:{pricing:{product_id:'p'}},money:v=>(v/100).toFixed(2)+' SEK',decorators:[],view:()=>view};
+const root={querySelector:()=>null,querySelectorAll:s=>s==='[data-scenario-shipping-charge]'?charges:[]};
+mod.attach(api);api.decorators[0](root);const discounted={text:first.textContent,count:charges.length};
+view.shipping_summary={shipping_minor:0,merchandise_minor:20000,free_shipping_threshold_minor:20000,threshold_met:true};
+api.decorators[0](root);const restored=first.textContent;
+view.shipping_summary={shipping_minor:2900,merchandise_minor:20000,free_shipping_threshold_minor:null,threshold_met:false};
+api.decorators[0](root);const noThreshold=first.textContent;
+view={quote:null,overlay_options:[]};api.decorators[0](root);
+console.log(JSON.stringify({discounted,restored,noThreshold,unavailable:first.textContent}));
+"""
+        result = json.loads(subprocess.check_output(['node', '--input-type=module', '-e', js, script], text=True))
+        self.assertEqual(result['discounted']['count'], 1)
+        self.assertIn('49.00 SEK', result['discounted']['text'])
+        self.assertIn('Below the free-delivery minimum of 200.00 SEK after discounts', result['discounted']['text'])
+        self.assertNotIn('minimum reached', result['discounted']['text'])
+        self.assertIn('0.00 SEK · Free-delivery minimum reached', result['restored'])
+        self.assertEqual(result['noThreshold'], 'Delivery charge for the basket: 29.00 SEK')
+        self.assertIn('unavailable', result['unavailable'])
+        self.assertNotIn('minimum reached', result['unavailable'])
+
     def test_page_discloses_terms_and_replaces_native_row_money_without_losing_routes(self):
         script = page_assets()['scenario-pricing.js'].decode()
         # Minimal DOM at the owned projection seam; this is source validation,
@@ -149,7 +228,7 @@ globalThis.document={createElement(){return {dataset:{},setAttribute(){},innerHT
 let overlay={overlay_options:[{native_option_id:'route',shipping_minor:2400,total_minor:12000}]};
 const api={presentation:{pricing:{product_id:'p',advertised_claim:{kind:'from_price',price_minor:7999},promotions:[{code:'<SAVE>',saving_minor:1500,conditions:['active membership required'],offer_ids:['o']}],membership_active:false,quote_as_of:'2026-09-30'}},
  escape:v=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'),money:v=>(v/100).toFixed(2)+' SEK',page:{byVariant:()=>({product:{canonicalProductId:'p'}})},decorators:[],view:()=>overlay};
-const root={querySelector:s=>s.startsWith('form')?form:null,querySelectorAll:()=>[input]};
+const root={querySelector:s=>s.startsWith('form')?form:null,querySelectorAll:s=>s==='input[data-service-group]'?[input]:[]};
 mod.attach(api);api.decorators[0](root);
 const initial=rowSpan.target.innerHTML;overlay={overlay_options:[]};api.decorators[0](root);
 console.log(JSON.stringify({terms:inserted.innerHTML,route:rowSpan.innerHTML,initial,unavailable:rowSpan.target.innerHTML}));

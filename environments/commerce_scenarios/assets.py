@@ -19,6 +19,7 @@ CHOSEN = 'if(worldBinding.selectDelivery(state,input.value))revise("Delivery ser
 REVIEW = '<section aria-label="Checkout review"><h2>Review before payment</h2>'
 TOTALS_START = '<dl><dt>Products</dt><dd>${money(result.subtotal)}</dd>'
 TOTALS_END = '<dd><strong>${money(result.total)}</strong></dd></dl>'
+SHIPPING = "<p>Delivery charge: ${money(s.fee)}${s.qualified?' · Free-delivery minimum reached':''}</p>"
 COUPON = 'function couponForm() {if(worldBinding)return'
 ORDER = 'if(worldBinding?.simulatedOrders){await completeSimulatedOrder('
 RENDERED = '  save();\n  if(focusId)document.querySelector('
@@ -36,6 +37,8 @@ HOOKS = {
     CHOSEN: 'if(worldBinding.selectDelivery(state,input.value)){__scenario.chose(state);'
             'revise("Delivery service selected. Totals recalculated.");}return;}',
     REVIEW: REVIEW + '${__scenario.checkoutControls()}',
+    # Family decorators can replace native shipment charges from a host quote.
+    SHIPPING: SHIPPING.replace('<p>', '<p data-scenario-shipping-charge>'),
     # Every total of this retailer comes from the session quote.
     TOTALS_START: '${__scenario.totals(result)??`' + TOTALS_START,
     TOTALS_END: TOTALS_END + '`}',

@@ -92,6 +92,23 @@ def checked_overlay(value, codes, delivery_option_id):
     if options and not any(row['native_option_id'] == selected
                            and row['total_minor'] == value['total_minor'] for row in options):
         raise ValueError('Overlay selected amount contradicts its route amounts')
+    if 'shipping_summary' in value:
+        summary = value['shipping_summary']
+        if (type(summary) is not dict or set(summary) != {
+                'shipping_minor', 'merchandise_minor', 'free_shipping_threshold_minor', 'threshold_met'}
+                or not amount(summary.get('shipping_minor')) or not amount(summary.get('merchandise_minor'))
+                or summary.get('free_shipping_threshold_minor') is not None
+                and not amount(summary['free_shipping_threshold_minor'])
+                or type(summary.get('threshold_met')) is not bool):
+            raise ValueError('Malformed overlay shipping summary')
+        threshold = summary['free_shipping_threshold_minor']
+        if summary['threshold_met'] != (threshold is not None and summary['merchandise_minor'] >= threshold):
+            raise ValueError('Overlay shipping qualification contradicts its threshold')
+        delivery = [row['amount_minor'] for row in lines if row['label'] == 'Delivery']
+        if delivery != [summary['shipping_minor']]:
+            raise ValueError('Overlay shipping summary contradicts its breakdown')
+        if options and next(row for row in options if row['native_option_id'] == selected)['shipping_minor'] != summary['shipping_minor']:
+            raise ValueError('Overlay shipping summary contradicts its selected route')
     return deepcopy(value)
 
 
@@ -133,6 +150,7 @@ class SessionStore:
         self._feedback = None
         self._quote_reason, self._quote_lines = 'The basket is empty.', []
         self._overlay_options = []
+        self._shipping_summary = None
         self._overlay_errors = []
         self._scope_reason = None
         self._order_ids = set()
@@ -368,6 +386,7 @@ class SessionStore:
         basket, codes = state['basket'], state['promotion_codes']
         state['quote'], self._quote_lines = None, []
         self._overlay_options = []
+        self._shipping_summary = None
         if not basket:
             self._quote_reason = 'The basket is empty.'
             return
@@ -382,6 +401,7 @@ class SessionStore:
             self._overlay_options = [{key: row[key] for key in
                 ('native_option_id', 'shipping_minor', 'total_minor')}
                 for row in overlay.get('options') or []]
+            self._shipping_summary = deepcopy(overlay.get('shipping_summary'))
             self._quote_reason = None
             return
         if self._settings['outside_scope_behavior'] == 'reject_quote':
@@ -433,6 +453,7 @@ class SessionStore:
                 'quote': deepcopy(state['quote']), 'quote_reason': self._quote_reason,
                 'quote_lines': deepcopy(self._quote_lines), 'charges': charges,
                 'overlay_options': deepcopy(self._overlay_options),
+                'shipping_summary': deepcopy(self._shipping_summary),
                 'grand_total_minor': None if charges is None else sum(row['amount_minor'] for row in charges),
                 'checkout': deepcopy(state['checkout']), 'order': self._arm_reply,
                 'directives': {'reset_delivery': self._reset_directive}}
