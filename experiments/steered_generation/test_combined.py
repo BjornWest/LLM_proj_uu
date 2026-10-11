@@ -12,6 +12,7 @@ from math import prod
 from random import Random
 from types import SimpleNamespace
 import unittest
+from unittest import mock
 
 from experiments.accepted_catalog_commerce import model as commerce
 from experiments.world_requirement_construction import model as edits
@@ -296,6 +297,30 @@ class BlockTests(TwoConcepts):
             self.assertFalse(same(world, {("stock", PLAIN, pair[1]), ("price", BOTH, "another-product")}))
             self.assertFalse(same(world, set()))
         self.assertTrue(same(deepcopy(self.natural), set()))
+
+    def test_sharing_the_sampling_defaults_changes_no_world(self):
+        calls = []
+        real = self.api.population.load
+
+        def counted():
+            calls.append(1)
+            return real()
+
+        with mock.patch.object(self.api.population, "load", counted):
+            apart = streams.Session(self.api, self.inputs, share_defaults=False)
+            world, opened = apart.generate()
+            separate = len(calls)
+            shared = streams.Session(self.api, self.inputs)
+            again = [shared.generate()[0] for _ in range(2)]
+        self.assertEqual((world, opened), (self.frozen, self.opened))
+        self.assertEqual(again, [self.frozen] * 2)
+        self.assertGreater(separate, 20)
+        self.assertEqual(len(calls), separate + 1)
+        self.assertIs(self.api.population.load, real)
+        # A pass that altered the shared configuration is an error, not a silent change to later worlds.
+        shared.defaults.loaded[0]["controls"]["world_size"] += 1
+        with self.assertRaises(AssertionError):
+            shared.generate()
 
     def test_independence_is_read_from_what_blocks_declare(self):
         block = lambda writes, reads=(): SimpleNamespace(writes=set(writes), reads=set(reads))

@@ -4,11 +4,12 @@ The commerce producer gives every decision its own named stream
 (`population.stream(seed, key)`), so replacing one stream leaves every other
 draw exactly as the seed makes it. A plan maps stream keys to the results the
 producer's calls on that stream should return. Nothing in the producer is
-copied or edited; two module attributes are swapped for the duration of a
+copied or edited; three module attributes are swapped for the duration of a
 call. That is an experiment seam, not thread-safe and not a released API.
 """
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from hashlib import sha256
+import json
 from math import isfinite
 import pickle
 
@@ -165,11 +166,47 @@ class Manufacture:
             package_export.sample = real
 
 
+class Defaults:
+    """Reads the sampling defaults once for all of a session's passes.
+
+    The producer calls `population.load()` for every retailer/product entry,
+    and each call re-reads and re-validates the same files. With manufacture
+    cached that is most of a pass, and it grows with the world. Passes here
+    get the first call's result instead. The producer only reads it; a pass
+    that changed the configuration would fail.
+    """
+
+    def __init__(self):
+        self.loaded = self.text = None
+
+    def _text(self):
+        return json.dumps(self.loaded[0], sort_keys=True, ensure_ascii=False)
+
+    @contextmanager
+    def shared(self, population):
+        real = population.load
+
+        def load():
+            if self.loaded is None:
+                self.loaded = real()
+                self.text = self._text()
+            return self.loaded
+
+        population.load = load
+        try:
+            yield
+        finally:
+            population.load = real
+        if self.loaded is not None and self._text() != self.text:
+            raise AssertionError("A pass changed the shared sampling defaults")
+
+
 class Session:
     """One set of generation inputs; repeated passes through the real producer."""
 
-    def __init__(self, native, inputs):
+    def __init__(self, native, inputs, share_defaults=True):
         self.native, self.manufacture = native, Manufacture()
+        self.defaults = Defaults() if share_defaults else None
         self.inputs = {"seed": inputs["seed"], "concept_ids": inputs["concept_ids"],
                        "tasks": tuple(inputs["tasks"]), "controls": inputs["controls"],
                        "city_id": inputs["city_id"], "review_count": inputs["review_count"]}
@@ -178,7 +215,10 @@ class Session:
         """Returns the world and the stream keys the producer opened."""
         options = {k: v for k, v in self.inputs.items() if k != "seed"}
         opened = []
-        with self.manufacture.reused(self.native.package_export):
-            with steered(self.native.population, plan or {}, opened):
-                world = self.native.commerce.generate(self.inputs["seed"], **options)
+        with ExitStack() as stack:
+            stack.enter_context(self.manufacture.reused(self.native.package_export))
+            if self.defaults:
+                stack.enter_context(self.defaults.shared(self.native.population))
+            stack.enter_context(steered(self.native.population, plan or {}, opened))
+            world = self.native.commerce.generate(self.inputs["seed"], **options)
         return world, opened

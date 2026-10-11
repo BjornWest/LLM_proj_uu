@@ -296,6 +296,7 @@ def main():
                "natural_world_id": natural["world_id"], "summary": natural["summary"],
                "streams_opened_per_pass": len(opened), "distinct_streams": len(set(opened)),
                "natural_pass_seconds": natural_seconds, "unsteered_replay_seconds": replay_seconds,
+               "sampling_defaults_read_once": session.defaults is not None,
                "cases": cases, "browser_runtime_ready": False, "provider_calls": 0,
                "elapsed_seconds": time.monotonic() - started}
     (output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
