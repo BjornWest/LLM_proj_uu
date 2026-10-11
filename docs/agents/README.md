@@ -169,3 +169,5 @@ maintained copies as part of this transition.
 - [Required automatic episode grading](automatic-grading.md): prospective dispatch contract, explicit diagnostics and post-close native grading.
 
 - [Opt-in AX fact provenance](ax-fact-provenance.md): unchanged policy requests, exact private source/output spans, retained delivery and synthetic-only adoption scope.
+
+- [Optional suite inspection recording](inspection-suite-recording.md): pinned provider hook, task adapters and partial prefix coverage.

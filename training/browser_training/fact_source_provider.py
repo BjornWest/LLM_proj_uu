@@ -34,7 +34,9 @@ class FactSourceProvider:
             self.page.evaluate('()=>location.href')
         if self.latest is None:raise ValueError('No committed render export')
         expected=self.latest
-        actual=read_attestation(self.page,expected)
+        attestation = getattr(self, 'attestation_function', None)
+        actual=read_attestation(self.page,expected, **(
+            {'attestation_function':attestation} if attestation is not None else {}))
         # evaluate() also dispatches pending private binding callbacks. Validate
         # the captured live state against the export available AFTER that pump,
         # rather than a previously read export from the preceding page/action.
@@ -64,7 +66,9 @@ class FactSourceProvider:
             after=self._attest()
             if object_digest(before)!=object_digest(after):raise ValueError('Render changed during observation')
             result=capture(self.page,self.cdp,before,snapshot_id=f'render-{before["revision"]}',
-                           raw_ax=observation['axtree_object']['nodes'])
+                           raw_ax=observation['axtree_object']['nodes'], **(
+                               {'attestation_function':getattr(self,'attestation_function')}
+                               if getattr(self,'attestation_function',None) is not None else {}))
             if object_digest(before)!=object_digest(self._attest()):raise ValueError('Render changed during DOM binding')
             raw_hash=object_digest(observation['axtree_object'])
             self.pairs[id(observation)]=(observation,raw_hash,result)

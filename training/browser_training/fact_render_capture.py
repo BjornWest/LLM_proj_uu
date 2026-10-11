@@ -23,17 +23,19 @@ def _render_attestation_function():
     return 'function renderAttestation(root) {'+function
 
 
-def read_attestation(page, commit):
+def read_attestation(page, commit, *, attestation_function=None):
     """Read one live snapshot; callers validate its exact corresponding export."""
     expected=commit['meta']
     selector=expected.get('root_selector','#app')
     state_kind=expected.get('state_kind','local_storage')
-    if selector not in ('#app','#main') or state_kind not in ('local_storage','static_review'):
+    if selector not in ('#app','#main','main','body') or state_kind not in ('local_storage','static_review'):
         raise ValueError('Unqualified render root or state kind')
+    if selector == 'main' and page.locator('main').count() != 1:
+        raise ValueError('Expected exactly one native main root')
     if 'render_state' in expected:
         if expected['render_state'].get('schema')!='fact-render-state-browsergym-v1':
             raise ValueError('Unqualified render attestation schema')
-        script='(config)=>{'+_render_attestation_function()+'''
+        script='(config)=>{'+(attestation_function or _render_attestation_function())+'''
           return {url:location.href,render_state:renderAttestation(document.querySelector(config.selector)),
             draft:config.static?null:JSON.parse(localStorage.getItem(config.key))};}'''
     else:
@@ -51,9 +53,10 @@ def validate_attestation(actual, commit):
         raise ValueError('Render content, URL or effective state is stale')
 
 
-def attest(page, commit):
+def attest(page, commit, *, attestation_function=None):
     """Check live render/state against its export; legacy exports stay strict."""
-    actual=read_attestation(page,commit)
+    actual=read_attestation(page,commit, **(
+        {'attestation_function':attestation_function} if attestation_function is not None else {}))
     validate_attestation(actual,commit)
     return actual
 
@@ -113,9 +116,10 @@ def normalize(commit, app_node, *, snapshot_id, document_id, frame_id, control_v
         'delivery_evidence':False,'inventory_complete':False}
 
 
-def capture(page, cdp, commit, *, snapshot_id, raw_ax=None):
+def capture(page, cdp, commit, *, snapshot_id, raw_ax=None, attestation_function=None):
     """Capture unchanged DOM/AX and normalize exact-path registrations."""
-    before = attest(page,commit)
+    before = attest(page,commit, **(
+        {'attestation_function':attestation_function} if attestation_function is not None else {}))
     doc = cdp.send('DOM.getDocument', {'depth':-1})['root']
     app_id = cdp.send('DOM.querySelector', {'nodeId':doc['nodeId'],
         'selector':commit['meta'].get('root_selector','#app')})['nodeId']
@@ -123,7 +127,8 @@ def capture(page, cdp, commit, *, snapshot_id, raw_ax=None):
     frame = cdp.send('Page.getFrameTree')['frameTree']['frame']['id']
     ax = raw_ax if raw_ax is not None else cdp.send('Accessibility.getFullAXTree')['nodes']
     snapshot = cdp.send('DOMSnapshot.captureSnapshot', {'computedStyles':[]})
-    after = attest(page,commit)
+    after = attest(page,commit, **(
+        {'attestation_function':attestation_function} if attestation_function is not None else {}))
     if before != after:
         raise ValueError('DOM, URL or effective state changed during capture')
     controls={}
