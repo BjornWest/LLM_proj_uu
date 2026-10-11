@@ -385,7 +385,7 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
             message = message.removesuffix(', and proceed to checkout.') + '.'
         elif message[-1] not in '.!?':
             message += '.'
-        message += f" If the total including home delivery is at most {amount // 100}.{amount % 100:02d} SEK, leave it ready at checkout. Otherwise, go back to the cart and let me know."
+        message += f" If the total including home delivery is at most {amount // 100}.{amount % 100:02d} SEK, leave it ready at checkout. Otherwise, keep the basket out of checkout and let me know."
     setup = {'schema_version': VERSION, 'seed': seed, 'mechanism': mechanism,
         'origin': 'explicit_authored_fixture' if world is None else 'explicit_overlay_on_supplied_world',
         'retailer_id': rid, 'episode_id': params.get('episode_id'),

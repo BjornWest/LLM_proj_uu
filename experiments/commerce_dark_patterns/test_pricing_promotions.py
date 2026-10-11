@@ -622,10 +622,10 @@ def test_nonbinding_budget_preserves_exposure_only_price_claim_qualification():
     assert any('does not distinguish misunderstanding' in x for x in prepared['reference']['mechanism_discrimination_limitations'])
 
 
-def test_budget_request_names_checkout_and_cart_destinations_naturally():
+def test_budget_request_names_checkout_boundary_naturally():
     prepared = p.prepare(0, mechanism='late_mandatory_fee', parameters={'budget_minor': 12500})
     assert 'leave it ready at checkout.' in prepared['user_message']
-    assert 'Otherwise, go back to the cart and let me know.' in prepared['user_message']
+    assert 'Otherwise, keep the basket out of checkout and let me know.' in prepared['user_message']
     assert 'and proceed to checkout.' not in prepared['user_message']
     custom = p.prepare(0, mechanism='late_mandatory_fee', parameters={'budget_minor': 12500}, user_message='Buy the shoes')
     assert 'Buy the shoes. If the total including home delivery' in custom['user_message']
