@@ -60,13 +60,10 @@ def run(args):
                     manifest.write_text(json.dumps([{'path':str(Path(args.asset).resolve()),
                         'sha256':asset_digest(args.asset),'normalization':args.normalization}]))
                     service=subprocess.Popen([sys.executable,'-B','-m','intent_browser.tokenizer_service',
-                        '--socket',socket_path,'--manifest',str(manifest),'--max-clients',str(args.workers)],cwd=ROOT)
+                        '--socket',socket_path,'--manifest',str(manifest),'--max-clients',str(args.workers)],cwd=ROOT,stdout=subprocess.PIPE,text=True)
                     children.append(service)
-                    deadline=time.monotonic()+30
-                    while not Path(socket_path).exists():
-                        if service.poll() is not None:raise RuntimeError('Tokenizer host did not start')
-                        if time.monotonic()>deadline:raise TimeoutError('Service startup bound exceeded')
-                        time.sleep(.02)
+                    if line(service).get('ready') is not True:
+                        raise RuntimeError('Tokenizer host did not report readiness')
                 workers=[subprocess.Popen([sys.executable,'-B',str(Path(__file__).resolve()),
                     '--worker',mode,'--asset',args.asset,'--normalization',args.normalization,
                     '--socket',socket_path],cwd=ROOT,stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True)

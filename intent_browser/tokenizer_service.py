@@ -20,6 +20,12 @@ from .shared_tokenizer import (PROTOCOL, VERSION, MAX_FRAME_BYTES, _hash,
                                receive_frame, send_frame)
 
 
+class RequestRejected(ValueError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
 class TokenizerService:
     def __init__(self, socket_path, assets, *, max_assets=4, max_clients=4,
                  request_seconds=30, max_text_bytes=4*1024*1024,
@@ -92,17 +98,17 @@ class TokenizerService:
         key = (request['asset'], request['normalization'])
         tokenizer = self.assets.get(key)
         if tokenizer is None:
-            raise ValueError('Tokenizer asset not qualified')
+            raise RequestRejected('asset')
         if operation in ('encode_batch', 'count_batch'):
             texts = request['texts']
             if (not isinstance(texts, list) or len(texts) > 256 or
                     any(not isinstance(t, str) for t in texts) or
                     sum(len(t.encode('utf-8')) for t in texts) > self.max_text_bytes or
                     type(request['add_special_tokens']) is not bool):
-                raise ValueError('Tokenizer batch text/flag bound')
+                raise RequestRejected('bound')
             encodings = tokenizer.encode_batch(texts, add_special_tokens=request['add_special_tokens'])
-            if sum(len(e.ids) for e in encodings) > self.max_ids:
-                raise ValueError('Tokenizer batch output ID bound')
+            if operation == 'encode_batch' and sum(len(e.ids) for e in encodings) > self.max_ids:
+                raise RequestRejected('bound')
             result = [len(e.ids) for e in encodings] if operation == 'count_batch' else [e.ids for e in encodings]
         elif operation == 'decode_batch':
             sequences = request['sequences']
@@ -111,56 +117,60 @@ class TokenizerService:
                     sum(len(ids) for ids in sequences) > self.max_ids or
                     type(request['skip_special_tokens']) is not bool or
                     any(type(i) is not int or not 0 <= i <= 0xffffffff for ids in sequences for i in ids)):
-                raise ValueError('Tokenizer batch ID/flag bound')
+                raise RequestRejected('bound')
             result = tokenizer.decode_batch(sequences, skip_special_tokens=request['skip_special_tokens'])
             if sum(len(t.encode('utf-8')) for t in result) > self.max_text_bytes:
-                raise ValueError('Tokenizer batch decoded text bound')
+                raise RequestRejected('bound')
         elif operation in ('count', 'encode'):
             text = request['text']
             if (not isinstance(text, str) or len(text.encode('utf-8')) > self.max_text_bytes or
                     type(request['add_special_tokens']) is not bool):
-                raise ValueError('Tokenizer text/flag bound')
+                raise RequestRejected('bound')
             ids = tokenizer.encode(text, add_special_tokens=request['add_special_tokens']).ids
-            if len(ids) > self.max_ids:
-                raise ValueError('Tokenizer output ID bound')
+            if operation == 'encode' and len(ids) > self.max_ids:
+                raise RequestRejected('bound')
             result = len(ids) if operation == 'count' else ids
         elif operation == 'decode':
             ids = request['ids']
             if (not isinstance(ids, list) or len(ids) > self.max_ids or
                     type(request['skip_special_tokens']) is not bool or
                     any(type(i) is not int or not 0 <= i <= 0xffffffff for i in ids)):
-                raise ValueError('Tokenizer ID/flag bound')
+                raise RequestRejected('bound')
             result = tokenizer.decode(ids, skip_special_tokens=request['skip_special_tokens'])
             if len(result.encode('utf-8')) > self.max_text_bytes:
-                raise ValueError('Tokenizer decoded text bound')
+                raise RequestRejected('bound')
         else:
             result = {'immutable_assets': len(self.assets), 'loads': self.load_count,
                       'request_cache_entries': 0}
         return {'ok': True, 'identity': {k: request[k] for k in ('protocol', 'version', 'asset', 'normalization')},
                 'instance': self.instance, 'result': result}
 
-    def _handle(self, connection):
-        deadline = time.monotonic() + self.request_seconds
+    def _handle(self, connection, deadline):
         try:
-            with connection:
-                peer = struct.unpack('3i', connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
-                if peer[1] != os.getuid():
-                    return
-                try:
-                    request = receive_frame(connection, self.max_frame_bytes, deadline)
-                    response = self.dispatch(request)
-                except Exception:
-                    # No exception bodies, asset paths, IDs, or request text logged.
-                    response = {'ok': False, 'error': 'tokenizer_request_rejected'}
-                send_frame(connection, response, self.max_frame_bytes, deadline)
+            peer = struct.unpack('3i', connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
+            if peer[1] != os.getuid():
+                return
+            try:
+                request = receive_frame(connection, self.max_frame_bytes, deadline)
+                response = self.dispatch(request)
+            except RequestRejected as error:
+                response = {'ok': False, 'error': error.code}
+            except TimeoutError:
+                response = {'ok': False, 'error': 'timeout'}
+            except (ValueError, TypeError, KeyError):
+                response = {'ok': False, 'error': 'protocol'}
+            except Exception:
+                response = {'ok': False, 'error': 'internal'}
+            send_frame(connection, response, self.max_frame_bytes, deadline)
         except Exception:
             pass  # Closed/timed-out clients do not stop the service or trigger retry.
         finally:
             with self._lock:
                 self._threads.discard(threading.current_thread())
             self._slots.release()
+            connection.close()
 
-    def serve(self, ready=None):
+    def serve(self, ready=None, on_ready=None):
         try:
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as listener:
                 listener.bind(str(self.path))
@@ -171,18 +181,37 @@ class TokenizerService:
                 self._listener = listener
                 if ready is not None:
                     ready.set()
+                if on_ready is not None:
+                    on_ready()
                 while not self._stop.is_set():
                     try:
                         connection, _ = listener.accept()
                     except socket.timeout:
                         continue
-                    if not self._slots.acquire(blocking=False):
-                        connection.close()  # Bounded admission; client gets explicit failure.
+                    # One accepted waiter plus the finite kernel backlog. Admission
+                    # consumes the SAME request deadline as handling; no unbounded
+                    # handler/queue growth and no spurious instant capacity rejection.
+                    deadline = time.monotonic() + self.request_seconds
+                    if not self._slots.acquire(timeout=max(0, deadline-time.monotonic())):
+                        try:
+                            send_frame(connection, {'ok': False, 'error': 'saturated'},
+                                       self.max_frame_bytes, deadline)
+                        except Exception:
+                            pass
+                        finally:
+                            connection.close()
                         continue
-                    worker = threading.Thread(target=self._handle, args=(connection,), daemon=True)
+                    worker = threading.Thread(target=self._handle, args=(connection, deadline), daemon=True)
                     with self._lock:
                         self._threads.add(worker)
-                    worker.start()
+                    try:
+                        worker.start()
+                    except Exception:
+                        with self._lock:
+                            self._threads.discard(worker)
+                        self._slots.release()
+                        connection.close()
+                        raise
         finally:
             self._listener = None
             if self._socket_inode is not None:
@@ -210,7 +239,8 @@ def main():
     import signal
     signal.signal(signal.SIGTERM, lambda *_: service.stop())
     signal.signal(signal.SIGINT, lambda *_: service.stop())
-    service.serve()
+    service.serve(on_ready=lambda: print(json.dumps({'ready': True, 'protocol': PROTOCOL,
+                                                    'instance': service.instance}), flush=True))
 
 
 if __name__ == '__main__':

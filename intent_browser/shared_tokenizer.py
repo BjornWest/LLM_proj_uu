@@ -22,7 +22,11 @@ MAX_FRAME_BYTES = 16 * 1024 * 1024
 
 
 class SharedTokenizerError(RuntimeError):
-    """Unavailable, mismatched or rejected service; never silently load locally."""
+    """Safe cause code without request contents; never silently load locally."""
+
+    def __init__(self, message, *, code='protocol'):
+        super().__init__(message)
+        self.code = code
 
 
 def asset_digest(path):
@@ -47,6 +51,8 @@ class SharedTokenizerConfig:
     def __post_init__(self):
         if not isinstance(self.socket_path, str) or not Path(self.socket_path).is_absolute():
             raise ValueError('Shared tokenizer requires an absolute Unix socket path')
+        if '\x00' in self.socket_path or len(os.fsencode(self.socket_path)) > 107:
+            raise ValueError('Unix socket path must be at most 107 bytes and contain no NUL')
         if (type(self.timeout_seconds) not in (int, float) or
                 not math.isfinite(self.timeout_seconds) or not 0 < self.timeout_seconds <= 120):
             raise ValueError('Shared tokenizer timeout must be finite and at most 120 seconds')
@@ -72,7 +78,7 @@ def _receive(connection, count, deadline):
         connection.settimeout(remaining)
         part = connection.recv(count - len(chunks))
         if not part:
-            raise SharedTokenizerError('Tokenizer connection closed')
+            raise SharedTokenizerError('Tokenizer connection closed', code='connection_closed')
         chunks.extend(part)
     return bytes(chunks)
 
@@ -80,14 +86,14 @@ def _receive(connection, count, deadline):
 def receive_frame(connection, bound, deadline):
     length = struct.unpack('!I', _receive(connection, 4, deadline))[0]
     if not 0 < length <= bound:
-        raise SharedTokenizerError('Tokenizer frame exceeds configured bound')
+        raise SharedTokenizerError('Tokenizer frame exceeds configured bound', code='bound')
     return json.loads(_receive(connection, length, deadline))
 
 
 def send_frame(connection, value, bound, deadline):
     data = _wire(value)
     if len(data) > bound:
-        raise SharedTokenizerError('Tokenizer frame exceeds configured bound')
+        raise SharedTokenizerError('Tokenizer frame exceeds configured bound', code='bound')
     remaining = deadline - time.monotonic()
     if remaining <= 0:
         raise TimeoutError('Tokenizer deadline exceeded')
@@ -136,8 +142,19 @@ class SharedTokenizer:
                     raise SharedTokenizerError('Tokenizer peer owner mismatch')
                 send_frame(connection, request, self.config.max_frame_bytes, deadline)
                 response = receive_frame(connection, self.config.max_frame_bytes, deadline)
-        except (OSError, ValueError, SharedTokenizerError, TimeoutError):
-            raise SharedTokenizerError('Shared tokenizer request unavailable or rejected; no fallback') from None
+        except SharedTokenizerError:
+            raise
+        except (TimeoutError, socket.timeout):
+            raise SharedTokenizerError('Shared tokenizer request deadline exceeded; no fallback', code='timeout') from None
+        except OSError:
+            raise SharedTokenizerError('Shared tokenizer connection unavailable; no fallback', code='unavailable') from None
+        except (ValueError, UnicodeError):
+            raise SharedTokenizerError('Shared tokenizer invalid wire payload; no fallback', code='protocol') from None
+        if isinstance(response, dict) and response.get('ok') is False:
+            code = response.get('error')
+            if code not in ('bound', 'asset', 'protocol', 'saturated', 'timeout', 'internal'):
+                code = 'protocol'
+            raise SharedTokenizerError('Shared tokenizer request rejected: '+code, code=code)
         identity = {'protocol': PROTOCOL, 'version': VERSION,
                     'asset': self.digest, 'normalization': self.normalization}
         if (not isinstance(response, dict) or response.get('ok') is not True or

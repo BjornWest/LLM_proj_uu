@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import statistics
+import select
 import subprocess
 import sys
 import tempfile
@@ -36,13 +37,11 @@ def main():
         manifest.write_text(json.dumps([{'path':str(Path(args.tokenizer).resolve()),
             'sha256':asset_digest(args.tokenizer),'normalization':'raw'}]))
         service=subprocess.Popen([sys.executable,'-B','-m','intent_browser.tokenizer_service',
-            '--socket',socket,'--manifest',str(manifest)],cwd=ROOT)
+            '--socket',socket,'--manifest',str(manifest)],cwd=ROOT,stdout=subprocess.PIPE,text=True)
         try:
-            deadline=time.monotonic()+30
-            while not Path(socket).exists():
-                if service.poll() is not None:raise RuntimeError('Service startup failed')
-                if time.monotonic()>deadline:raise TimeoutError('Service readiness deadline')
-                time.sleep(.02)
+            readable,_,_=select.select([service.stdout],[],[],30)
+            if not readable or json.loads(service.stdout.readline()).get('ready') is not True:
+                raise RuntimeError('Service startup did not report readiness')
             for mode in ('local','shared'):
                 samples=[]
                 for _ in range(3):

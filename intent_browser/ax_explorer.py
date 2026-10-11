@@ -10,6 +10,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from .shared_tokenizer import SharedTokenizerError
 
 AX_TOOLS = ('ax_search', 'ax_read')
 
@@ -142,7 +143,18 @@ class AXExplorer:
                 scratch = {**scratch, 'items': scratch['items']+[item],
                            'next_offset': offset+len(scratch['items'])+1}
                 candidates.append(scratch)
-            counts = self._batch_candidate_counts([encoded(c) for c in candidates])
+            try:
+                counts = self._batch_candidate_counts([encoded(c) for c in candidates])
+            except SharedTokenizerError as error:
+                if error.code != 'bound' or len(candidates) == 1:
+                    raise
+                # Speculation must not reject a locally valid truncated prefix.
+                # Count individually, lazily: callers stop before later oversized
+                # candidates. This is a pure tokenizer operation, never action retry.
+                for candidate in candidates:
+                    yield candidate, self.tokens(encoded(candidate))
+                    result = candidate
+                continue
             for candidate, count in zip(candidates, counts):
                 yield candidate, count
                 result = candidate

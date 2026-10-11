@@ -63,9 +63,12 @@ def exercise(tmp_path, *, model='z-ai/glm-5.3-flash', limit=100000,
     backend = ChatCompletionsBackend('https://openrouter.ai/api/v1', model)
     backend.client.close()
     backend.client = httpx.Client(transport=httpx.MockTransport(transport))
-    profile = replace(native_tools_profile(), feedback_factory=SemanticFeedback, ax_config=ax_config)
+    if ax_config is None:
+        assert native_tools_profile().ax_config is None  # AX cannot select policy tokenizer.
+    profile = replace(native_tools_profile(ax_config=ax_config), feedback_factory=SemanticFeedback)
     try:
-        with patch('intent_browser.runner.observation_text', return_value='Inspect'), \
+        with patch('intent_browser.runner.refresh_observation', side_effect=lambda env: env.obs()), \
+                patch('intent_browser.runner.observation_text', return_value='Inspect'), \
                 patch('intent_browser.harness.flatten_axtree_to_str', return_value='Inspect'):
             options = dict(harness_profile=profile, max_steps=2,
                            max_input_tokens=limit, input_counter=counter)
@@ -179,3 +182,39 @@ def test_default_factory_passes_opt_in_shared_config_before_environment_setup(tm
         exercise(tmp_path, factory=factory, ax_config=config)
     factory.assert_called_once()
     assert factory.call_args.kwargs == {'ax_tokenizer_path': str(tokenizer), 'shared_tokenizer': service}
+
+
+@pytest.mark.parametrize('model',['qwen/qwen3.8-27b','z-ai/glm-5.3-flash'])
+def test_real_runner_shared_ax_and_official_counter(tmp_path,model):
+    import threading
+    from intent_browser.ax_explorer import AXConfig
+    from intent_browser.shared_tokenizer import SharedTokenizer,SharedTokenizerConfig,asset_digest
+    from intent_browser.tokenizer_service import TokenizerService
+    root=REGISTRY.parent.parent/'.local/model-tokenizers'
+    entries=json.loads(REGISTRY.read_text())['models']
+    qwen=root/entries['qwen/qwen3.8-27b']['bundle']/'tokenizer.json'
+    policy=root/entries[model]['bundle']/'tokenizer.json'
+    if not qwen.exists() or not policy.exists():
+        pytest.skip('Existing official assets required; no download')
+    mode='ascii-json' if model.startswith('z-ai/') else 'raw'
+    socket=tmp_path/'runner.sock'
+    tmp_path.chmod(0o700)
+    service=TokenizerService(socket,[{'path':str(qwen),'sha256':asset_digest(qwen),'normalization':'raw'},
+        {'path':str(policy),'sha256':asset_digest(policy),'normalization':mode}])
+    ready=threading.Event();thread=threading.Thread(target=service.serve,args=(ready,),daemon=True)
+    thread.start();assert ready.wait(5)
+    seen=[];rpc=SharedTokenizer._rpc
+    def observe(client,operation,**values):
+        seen.append((client.digest,client.normalization,operation))
+        return rpc(client,operation,**values)
+    try:
+        config=AXConfig(str(qwen),incremental=True,shared_tokenizer=SharedTokenizerConfig(str(socket)))
+        with patch.object(SharedTokenizer,'_rpc',observe):
+            summary,rows,activity,_=exercise(tmp_path,model=model,ax_config=config)
+        assert summary['error'] is None and summary['stop_reason']=='agent_finished'
+        assert len(activity['requests'])==1  # MockTransport only, zero external sends.
+        assert rows[0]['input_budget']['tokenizer_service']['normalization']==mode
+        assert (asset_digest(qwen),'raw','encode_batch') in seen
+        assert (asset_digest(policy),mode,'count') in seen
+    finally:
+        service.stop();thread.join(5);assert not thread.is_alive()

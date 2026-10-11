@@ -150,9 +150,72 @@ class ServiceFixture(unittest.TestCase):
         until = time.monotonic()+1
         while not service._threads and time.monotonic()<until: time.sleep(.005)
         self.assertTrue(service._threads)
-        with self.assertRaises(SharedTokenizerError):self.client(config)
-        self.services[-1][1].join(.3)
+        short=replace(config,timeout_seconds=.05)
+        with self.assertRaises(SharedTokenizerError) as failure:self.client(short)
+        self.assertEqual(failure.exception.code,'timeout')
+        time.sleep(.25)
         self.assertEqual(self.client(config).count('hello'), 1)
+
+    def test_in_capacity_sequential_clients_are_never_spuriously_rejected(self):
+        for capacity in (1,4):
+            config,_=self.start(max_clients=capacity)
+            def run(_):
+                client=self.client(config)
+                for i in range(1500):
+                    self.assertEqual(client.count('hello world'),2)
+                return True
+            with ThreadPoolExecutor(max_workers=capacity) as pool:
+                self.assertEqual(list(pool.map(run,range(capacity))),[True]*capacity)
+
+    def test_count_only_not_limited_by_transferred_id_limit(self):
+        config,_=self.start(max_ids=1)
+        client=self.client(config)
+        self.assertEqual(client.count('hello world'),2)
+        self.assertEqual(client.count_batch(['hello world','hello']),[2,1])
+        with self.assertRaises(SharedTokenizerError) as failure:client.encode('hello world')
+        self.assertEqual(failure.exception.code,'bound')
+
+    def test_cause_classes_and_path_validation(self):
+        with self.assertRaisesRegex(ValueError,'107 bytes'):
+            SharedTokenizerConfig('/'+('x'*108))
+        with self.assertRaisesRegex(ValueError,'107 bytes'):
+            TokenizerService(self.root/('x'*108),[self.asset])
+        for config,code in [(replace(self.config,socket_path=str(self.root/'missing.sock')),'unavailable')]:
+            with self.assertRaises(SharedTokenizerError) as failure:self.client(config)
+            self.assertEqual(failure.exception.code,code)
+        with self.assertRaises(SharedTokenizerError) as failure:
+            SharedTokenizer(self.config,'0'*64)
+        self.assertEqual(failure.exception.code,'asset')
+
+    def test_speculative_batch_bound_stops_at_valid_prefix(self):
+        from itertools import islice
+        # Each cumulative candidate fits, but the speculative batch exceeds the
+        # service text bound. A consumer must be able to stop after item one.
+        config,_=self.start(max_text_bytes=250)
+        local=AXExplorer(AXConfig(str(self.path)))
+        remote=AXExplorer(AXConfig(str(self.path),shared_tokenizer=config))
+        envelope={'items':[],'next_offset':0}
+        items=[{'label':'hello world'*3} for _ in range(16)]
+        expected=list(islice(local._packed_candidates(envelope,items,0),1))
+        actual=list(islice(remote._packed_candidates(envelope,items,0),1))
+        self.assertEqual(actual,expected)
+
+    def test_cli_readiness_after_listen(self):
+        import select
+        manifest=self.root/'manifest.json'
+        manifest.write_text(json.dumps([self.asset]))
+        sock=str(self.root/'cli.sock')
+        process=subprocess.Popen([sys.executable,'-B','-m','intent_browser.tokenizer_service',
+            '--socket',sock,'--manifest',str(manifest)],stdout=subprocess.PIPE,text=True)
+        try:
+            readable,_,_=select.select([process.stdout],[],[],5)
+            self.assertTrue(readable)
+            self.assertTrue(json.loads(process.stdout.readline())['ready'])
+            self.assertEqual(self.client(SharedTokenizerConfig(sock)).count('hello'),1)
+        finally:
+            process.terminate()
+            try:process.wait(timeout=5)
+            except subprocess.TimeoutExpired:process.kill();process.wait(timeout=5)
 
     def test_bad_frames_are_rejected_and_text_not_reflected(self):
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
@@ -162,7 +225,7 @@ class ServiceFixture(unittest.TestCase):
                      'add_special_tokens':False,'surprise':'also-secret'}
             send_frame(connection,payload,16384,time.monotonic()+2)
             result=receive_frame(connection,16384,time.monotonic()+2)
-            self.assertEqual(result,{'ok':False,'error':'tokenizer_request_rejected'})
+            self.assertEqual(result,{'ok':False,'error':'protocol'})
         self.assertEqual(self.client().count('hello'),1)
 
     def test_pin_validation_socket_permissions_and_existing_path(self):

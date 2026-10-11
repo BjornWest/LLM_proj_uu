@@ -31,7 +31,10 @@ python3 scripts/run_bounded_job.py --memory-mib 2048 --tasks 128 -- \
   --manifest .local/tokenizer-host/assets.json --max-clients 4
 ```
 
-Keep this foreground owner alive while rollouts use it. Restarting the service
+The CLI emits one JSON line with `ready: true` only after socket permissions and
+`listen` are complete. Supervisors must wait for that line (with a finite startup
+deadline); socket-path existence alone is not readiness. Socket paths are limited
+to 107 encoded bytes. Keep this foreground owner alive while rollouts use it. Restarting the service
 invalidates existing clients; requalify/recreate them before another model
 request. A stale existing socket is rejected rather than automatically removed.
 After an unclean process death, confirm its owner is gone before removing that
@@ -43,6 +46,10 @@ keys include the file SHA-256, normalization, protocol and exact tokenizers
 `ascii-json`, retaining its qualified JSON-reserialization workaround. Assets
 are loaded from verified bytes once per key, not re-read on requests. Unknown
 keys, different normalization/version and corrupt or missing assets fail.
+The manifest must admit both the AX and policy tokenizer keys: an AX tokenizer
+always uses `raw`, even when GLM full-request counting uses `ascii-json`. These
+may be two keys for one file, or separate files. Missing either key fails before
+model dispatch; do not assume the policy asset alone covers AX operations.
 
 ## Attach to AX and full-request sizing
 
@@ -87,11 +94,13 @@ network API. Requests/responses never include prompt text in diagnostic errors.
 
 Defaults are four simultaneous request handlers, four allowlisted asset entries,
 30-second request deadline, 16 MiB frames, 4 MiB aggregate UTF-8 input text,
-one million aggregate output/input IDs and 256 batch entries. Asset files are
+one million aggregate transferred output/input IDs (count-only results are
+not limited by token-ID count) and 256 batch entries. Asset files are
 limited to 64 MiB each. Configure finite handler capacity for your workload
-before acceptance (`--max-clients`, maximum 128); saturation explicitly rejects
-a request, with no implicit retry or local fallback. Handler threads and the
-socket backlog are bounded. Native tokenizer computation is bounded by admitted
+before acceptance (`--max-clients`, maximum 128). An accepted connection waits
+for a handler within the same finite request deadline; one accepted waiter and
+the 16-entry kernel backlog bound pending admission. No implicit retry or local
+fallback occurs. Handler threads and the socket backlog are bounded. Native tokenizer computation is bounded by admitted
 input/output sizes and job resources; the I/O/completion deadline does not
 preempt an in-progress Rust operation. The outer finite supervisor timeout owns
 whole-service termination.
@@ -104,7 +113,12 @@ and delivery acknowledgments must match the local path. Full-request counts
 always contact the service, even when AX previews are cached.
 
 Unavailable/mismatched service, oversized requests and transport deadlines are
-explicit infrastructure errors. Do not automatically downgrade the tokenizer,
+explicit infrastructure errors, with safe cause codes (`bound`, `asset`,
+`protocol`, `timeout`, `unavailable`, `connection_closed`, `internal`). Oversized
+UTF-8 text or escaped wire payloads can fail before an over-context count is
+available; this is a service-bound failure, not a model task verdict. AX
+speculative count batches exceeding a bound are counted individually and lazily
+so that a valid truncated prefix can still return. Do not automatically downgrade the tokenizer,
 replay committed browser actions, or call models again to recover. Frozen
 recipes and existing runs never opt in merely because a service starts.
 
