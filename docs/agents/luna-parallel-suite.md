@@ -76,3 +76,8 @@ source requires independent Claude review before dispatch; checks themselves mak
 no provider calls. Source readiness does not authorize more than this exact suite.
 The review receipt also binds the entire launch configuration, excluding only its
 own proof pointers, so adding review evidence cannot create a circular hash.
+
+The supervisor unit tests need the separately pinned Events helper. Set
+`LUNA_EVENTS_HELPER` to its accepted file when `scripts/episode_events.py` is absent
+from the checkout; otherwise those tests explicitly skip. The three-file caller
+release does not include that helper or the separately pinned episode runtimes.

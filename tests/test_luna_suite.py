@@ -367,6 +367,7 @@ class ParallelSupervisor(unittest.TestCase):
                 'cases': [{'id': c, 'recipe_manifest': {}} for c in suite.CASE_IDS]}
             suite.save(spec['spec_path'], spec)
             barrier = threading.Barrier(34, timeout=10)
+            interruption_delivered = threading.Event()
             starts = []
             handlers={}
             class Child:
@@ -382,6 +383,12 @@ class ParallelSupervisor(unittest.TestCase):
                     barrier.wait()
                     if stops and self.case=='B01':
                         handlers[suite.signal.SIGTERM](suite.signal.SIGTERM,None)
+                        interruption_delivered.set()
+                    elif stops:
+                        # The barrier proves concurrent starts, not terminal order.
+                        # Wait for B01's handler before testing interrupted exits.
+                        if not interruption_delivered.wait(timeout=10):
+                            raise AssertionError('Synthetic interrupt was not delivered')
                     if stops and self.case=='B02':
                         suite.save(output/self.case/'watchdog-stop.json',{'reason':'supervisor_lost'})
                         self.returncode=137;return 137
