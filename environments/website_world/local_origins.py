@@ -6,9 +6,15 @@ the machine's DNS/hosts configuration and ordinary localhost previews are untouc
 from copy import deepcopy
 from collections import Counter
 from hashlib import sha256
+from contextlib import contextmanager
 import ipaddress
 import base64
+import json
+import os
+from pathlib import Path
 import re
+from threading import Lock
+from time import monotonic_ns
 import unicodedata
 from types import SimpleNamespace
 from urllib.parse import urljoin, urlsplit
@@ -18,6 +24,8 @@ from intent_browser.checkpoint_browser import LogicalOrigins
 from intent_browser.navigation import origin
 
 VERSION = 'website-local-origins-v1'
+PHASE_SCHEMA = 'website-local-origin-phases-v1'
+_PHASE_PATHS = frozenset(('/', '/api/session', '/api/basket-quote', '/api/order'))
 
 
 def _origin(url):
@@ -112,7 +120,18 @@ class LocalOriginBridge(LogicalOrigins):
     Browser storage, rather than httpx's shared localhost cookie jar, owns cookies.
     Each browser context receives its own bridge; no cookie crosses a site or context.
     """
-    def __init__(self, identity):
+    def __init__(self, identity, *, diagnostics_path=None):
+        """Optionally append flushed/fsynced NDJSON around existing waits.
+
+        Disabled by default; Runtime does not opt in automatically. Only declared
+        origins and root/commerce API paths are emitted; other paths are redacted.
+        Bodies, query strings, fragments, headers and exception messages are never
+        recorded. Recording failures disable this sink, preserving routing behavior;
+        `diagnostics_error` then gives only the exception class to the caller.
+        """
+        self.diagnostics_path = None if diagnostics_path is None else Path(diagnostics_path)
+        self.diagnostics_error = None
+        self._diagnostics_lock = Lock()
         self.identity = identity
         rows = identity.descriptor['sites']
         super().__init__({r['site_id']: r['logical_origin'] for r in rows},
@@ -120,6 +139,48 @@ class LocalOriginBridge(LogicalOrigins):
         self.closed = False
         self.sessions = []
         self.pages = set()
+
+    def _record_phase(self, phase, request, **fields):
+        if self.diagnostics_path is None or self.diagnostics_error is not None:
+            return
+        try:
+            declared = _origin(request.url)
+            logical = declared if declared in self.mapping else None
+            path = urlsplit(request.url).path or '/'
+        except (ValueError, TypeError):
+            logical, path = None, None
+        method = request.method
+        row = {'schema': PHASE_SCHEMA, 'monotonic_ns': monotonic_ns(), 'phase': phase,
+               'request_id': getattr(request, '_phase_request_id', None),
+               'network_id': getattr(request, '_phase_network_id', None),
+               'method': method if re.fullmatch(r'[A-Z]{1,16}', method) else None,
+               'origin': logical, 'path': path if path in _PHASE_PATHS else '<redacted>', **fields}
+        try:
+            with self._diagnostics_lock:
+                self.diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
+                with self.diagnostics_path.open('a', encoding='utf-8') as stream:
+                    stream.write(json.dumps(row, ensure_ascii=True, allow_nan=False) + '\n')
+                    stream.flush()
+                    os.fsync(stream.fileno())
+        except (OSError, ValueError, TypeError) as error:
+            self.diagnostics_error = type(error).__name__
+
+    @contextmanager
+    def _phase(self, name, request, **fields):
+        self._record_phase(name + '_enter', request, **fields)
+        failed = False
+        try:
+            yield
+        except BaseException as error:
+            failed = True
+            self._record_phase(name + '_error', request, error_type=type(error).__name__, **fields)
+            raise
+        finally:
+            self._record_phase(name + '_exit', request, failed=failed, **fields)
+
+    def _send_cdp(self, session, method, parameters, request):
+        with self._phase('cdp', request, rpc_method=method):
+            return session.send(method, parameters)
 
     def replace(self, text):
         return self.identity.rewrite(text)
@@ -156,6 +217,14 @@ class LocalOriginBridge(LogicalOrigins):
 
     def _paused(self, session, event):
         data = event['request']
+        request = SimpleNamespace(url=data['url'], method=data['method'],
+                                  _phase_request_id=event['requestId'],
+                                  _phase_network_id=event.get('networkId'))
+        with self._phase('callback', request):
+            self._forward_paused(session, event, request)
+
+    def _forward_paused(self, session, event, request):
+        data = event['request']
         headers = {k.lower(): v for k, v in data['headers'].items()}
         body = None
         if data.get('postDataEntries'):
@@ -164,12 +233,15 @@ class LocalOriginBridge(LogicalOrigins):
             body = data['postData'].encode('utf-8')
         elif data.get('hasPostData'):
             # Current native checkout sends bounded UTF-8 JSON, never file uploads.
-            body = session.send('Network.getRequestPostData', {'requestId': event['networkId']})['postData'].encode('utf-8')
-        request = SimpleNamespace(url=data['url'], method=data['method'],
-                                  all_headers=lambda: headers, post_data_buffer=body)
+            body = self._send_cdp(session, 'Network.getRequestPostData',
+                                 {'requestId': event['networkId']}, request)['postData'].encode('utf-8')
+        request.all_headers = lambda: headers
+        request.post_data_buffer = body
+        bridge = self
         class Response:
             def abort(self, reason):
-                session.send('Fetch.failRequest', {'requestId': event['requestId'], 'errorReason': 'BlockedByClient'})
+                bridge._send_cdp(session, 'Fetch.failRequest',
+                                 {'requestId': event['requestId'], 'errorReason': 'BlockedByClient'}, request)
 
             def fulfill(self, *, status, body, headers=None):
                 values = []
@@ -177,8 +249,9 @@ class LocalOriginBridge(LogicalOrigins):
                     for part in value.split('\n') if key.lower() == 'set-cookie' else [value]:
                         values.append({'name': key, 'value': part})
                 payload = body.encode('utf-8') if isinstance(body, str) else body
-                session.send('Fetch.fulfillRequest', {'requestId': event['requestId'], 'responseCode': status,
-                              'responseHeaders': values, 'body': base64.b64encode(payload).decode('ascii')})
+                bridge._send_cdp(session, 'Fetch.fulfillRequest',
+                                 {'requestId': event['requestId'], 'responseCode': status,
+                                  'responseHeaders': values, 'body': base64.b64encode(payload).decode('ascii')}, request)
         self.route(Response(), request)
 
     def close(self):
@@ -214,8 +287,9 @@ class LocalOriginBridge(LogicalOrigins):
         try:
             # Standalone Request deliberately bypasses Client.build_request's
             # cookie merging across localhost ports. Only Chromium's cookie is sent.
-            response = self.client.send(httpx.Request(request.method, target, headers=headers,
-                                       content=request.post_data_buffer), follow_redirects=False)
+            with self._phase('http', request):
+                response = self.client.send(httpx.Request(request.method, target, headers=headers,
+                                           content=request.post_data_buffer), follow_redirects=False)
             self.client.cookies.clear()
         except httpx.HTTPError:
             route.fulfill(status=502, body='Local site transport unavailable')
