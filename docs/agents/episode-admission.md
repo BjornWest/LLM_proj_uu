@@ -14,6 +14,11 @@ refresh succeeds. It does not reset again, execute tools or call a provider whil
 parked. Fresh capture preserves the exact task goal and rechecks grading pins
 before opening the model session. Root delegation forwards the hook once;
 helpers do not inherit it. The default `None` preserves the original lifecycle.
+Restoring an inherited checkpoint request is rejected before environment setup
+when admission is enabled: replaying that immutable request would substitute old
+page state for the fresh activation observation. Fresh episodes may still use
+ordinary checkpoint recording; resumed episodes keep their existing nonqueued
+lifecycle until a separate continuation/admission contract is qualified.
 
 Raise `EpisodeAdmissionCancelled(reason)` to stop a parked episode. The runner
 records `admission_cancelled`, closes its environment through normal cleanup and

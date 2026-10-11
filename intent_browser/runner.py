@@ -95,6 +95,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             raise ValueError('Site discovery checkpoints require a versioned directory restoration contract')
         from .checkpoints import CheckpointControl
         if not isinstance(checkpoint_control,CheckpointControl):raise ValueError('Expected CheckpointControl')
+        if environment_admission is not None and checkpoint_control.restore_id is not None:
+            raise ValueError('Environment admission does not support checkpoint restoration')
         checkpoint_control.validate(harness_profile,observation_pipeline,
             search=search_backend is not None, memory=memory_adapter is not None,
             clarification=clarification_callback is not None, retry=retry_policy is not None,

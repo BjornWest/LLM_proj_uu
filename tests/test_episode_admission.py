@@ -169,6 +169,14 @@ class AdmissionTests(unittest.TestCase):
         ready=EpisodeReady('id',Path('/tmp/fixture'),0.0)
         with self.assertRaises(AttributeError):ready.episode_id='changed'
 
+    def test_checkpoint_restoration_rejected_before_setup_or_lease(self):
+        from intent_browser.checkpoints import CheckpointControl
+        control=object.__new__(CheckpointControl);control.restore_id='inherited-request'
+        with self.assertRaisesRegex(ValueError,'does not support checkpoint restoration'):
+            run_episode(lambda _:self.fail('No environment'),SimpleNamespace(),{},
+                environment_admission=lambda _:None,checkpoint_control=control,
+                allow_ungraded=True,ungraded_reason='Explicit restoration compatibility test')
+
     def test_invalid_cancellation_reason_rejected(self):
         for reason in ('',None,42):
             with self.assertRaises(ValueError):EpisodeAdmissionCancelled(reason)
