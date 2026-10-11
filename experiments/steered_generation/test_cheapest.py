@@ -21,17 +21,25 @@ from unittest import mock
 from experiments.accepted_catalog_commerce import model as commerce
 from experiments.world_requirement_construction import model as edits
 
-from experiments.steered_generation import blocks, cheapest, combined, prices, run, stock, streams
+from environments.website_world import comparison_sku_task, native_review_ecosystem
+
+from experiments.steered_generation import blocks, cheapest, combined, listed, prices, run, stock, streams
 from experiments.steered_generation.test_combined import BOTH, PLAIN, SHIRTS, SHOES, SMALL, TwoConcepts
 from experiments.steered_generation.test_stock import stand_in
 
-LARGE = "department_store-04"  # eleven locations, no supplier orders
+LARGE = "department_store-04"  # eleven locations, no supplier orders, no branch in Uppsala
 EMPTY = "footwear-06"          # lists nothing
+SIZE_40 = [{"field": "sku.size_eu", "operator": "eq", "value": 40}]
+# The native tasks' three readings of "available", each with a size requirement.
+READINGS = ({"predicates": SIZE_40}, {"predicates": SIZE_40, "availability": cheapest.PHYSICAL},
+            {"predicates": SIZE_40, "availability": cheapest.BRANCH, "city": "Uppsala"})
 
 
 def two_prices(seed, concept_id, brand, product_id, *, earlier, review_count):
     product = stand_in(seed, concept_id, brand, product_id, earlier=earlier, review_count=review_count)
     product["public"]["skus"][-1]["reference_price_sek"] = product["public"]["reference_price_sek"] + 40
+    # The surrounding-site generator reads published facts; the stand-in has none.
+    product["public"]["facts"] = {}
     return product
 
 
@@ -223,6 +231,67 @@ class ModelTests(Cheapest):
         self.assertGreater(usual.probability, 0)
         self.assertAlmostEqual(log(usual.probability), usual.log_probability, places=9)
 
+    def sized(self, rid, index=0):
+        """The size-40 offer of the natural winners' shoe at a retailer."""
+        return next(sku for sku in (self.size(rid, i) for i in range(4)) if sku.endswith("-40"))
+
+    def test_predicates_and_availability_match_other_seeds(self):
+        """Each native reading of who competes and what is available, against the redraws read by that rule."""
+        for reading in READINGS:
+            sold_out = {**self.need(self.second, below=[(self.first, self.sized(self.first))]), **reading}
+            for world, trials, requirement, least in (
+                    (self.natural, 2500, {**self.need(self.first), **reading}, 400),
+                    (self.scarce, 4000, {**self.need(self.first), **reading}, 400), (self.scarce, 4000, sold_out, 100)):
+                with self.subTest(requirement=requirement, scarce=world is self.scarce):
+                    block = cheapest.model(world, requirement, self.api)
+                    seen = Counter(cheapest.judged(found, requirement, block.scope)
+                                   for found in self.redraws(world, trials))
+                    del seen[None]
+                    hits, chance = sum(seen.values()), block.probability
+                    self.assertLess(abs(hits / trials - chance), 4 * (chance * (1 - chance) / trials) ** .5)
+                    self.assertGreater(hits, least)
+                    distance = sum(abs(block.shares.get(price, 0) - seen.get(price, 0) / hits)
+                                   for price in set(block.shares) | set(seen)) / 2
+                    self.assertLess(distance, .03 + .6 * (len(block.shares) / hits) ** .5)
+        # The readings differ: the same redraws give other verdicts.
+        blocks_by_reading = [cheapest.model(self.scarce, {**self.need(self.first), **reading}, self.api)
+                             for reading in ({},) + READINGS]
+        chances = [block.probability for block in blocks_by_reading]
+        self.assertEqual(len({round(chance, 6) for chance in chances}), 4)
+
+    def test_samples_under_a_branch_reading_match_rejection_sampling(self):
+        requirement = {**self.need(self.second, below=[(self.first, self.sized(self.first))]), **READINGS[2]}
+        block = cheapest.model(self.scarce, requirement, self.api)
+        rejection = [found for found in self.redraws(self.scarce, 4000)
+                     if cheapest.judged(found, requirement, block.scope) is not None]
+        steered = [cheapest.planned(block, cheapest.sample(block, Random(index))[1]) for index in range(1500)]
+        self.assertGreater(len(rejection), 100)
+        for found in steered[:100]:
+            self.assertIsNotNone(cheapest.judged(found, requirement, block.scope))
+        counting = block.scope.sources
+
+        def compare(statistic):
+            ours, theirs = [statistic(found) for found in steered], [statistic(found) for found in rejection]
+            mean = lambda values: sum(values) / len(values)
+            spread = (sum((value - mean(theirs)) ** 2 for value in theirs) / len(theirs)) ** .5
+            self.assertLessEqual(abs(mean(ours) - mean(theirs)),
+                                 4 * spread * (1 / len(ours) + 1 / len(theirs)) ** .5)
+
+        rows = lambda found: found["offers"].values()
+        compare(lambda found: cheapest.judged(found, requirement, block.scope))
+        # Stock where it counts and where it does not, for offers that compete and offers that do not.
+        for competes in (True, False):
+            for counts in (True, False):
+                compare(lambda found: sum(
+                    quantity for row in rows(found) if (row["sku_id"] in block.scope.skus) == competes
+                    for name, quantity in row["stock_by_source"].items()
+                    if (name in counting[row["retailer_id"]]) == counts))
+        compare(lambda found: sum(row["supplier_order"] for row in rows(found)))
+        compare(lambda found: sum(value == "mostly_depleted" for value in found["conditions"].values()))
+        compare(lambda found: sum(value == "mostly_depleted" for key, value in found["conditions"].items()
+                                  if key.rsplit("/", 1)[1] in counting[key.split("/", 1)[0]]))
+        compare(lambda found: sum(row["price_minor"] for row in rows(found)) / len(found["offers"]))
+
     def test_every_option_with_a_positive_weight_can_be_picked(self):
         self.assertEqual(blocks.pick(Top(), "ab", [1.0, 1e-300]), "b")
         self.assertEqual(blocks.pick(Top(), "abc", [1.0, 1e-300, 0.0]), "b")
@@ -389,6 +458,184 @@ class ProducerTests(Cheapest):
         self.assertGreater(chances[0], .1)
         self.assertLess(max(chances[2:]), .001)
         self.assertEqual(self.natural, self.frozen)
+
+    def test_steered_worlds_satisfy_each_native_reading_through_the_producer(self):
+        for index, reading in enumerate(READINGS):
+            for below in ((), [(self.first, next(sku for sku in (self.size(self.first, i) for i in range(2))
+                                                 if sku.endswith("-40")))]):
+                requirement = {**self.need(self.second, below=below), **reading}
+                with self.subTest(requirement=requirement):
+                    world, found, record = cheapest.steer(self.session, self.natural, self.opened, requirement,
+                                                          self.api, Random(index))
+                    reference, scope = found["reference"], cheapest.scope(self.natural, requirement, self.api)
+                    self.assertEqual({(w["retailer_id"], w["product_id"]) for w in reference["winners"]},
+                                     {(self.second, self.shoe)})
+                    self.assertTrue(all(w["sku_id"].endswith("-40") for w in reference["candidates"]))
+                    self.assertEqual(found["task"]["availability"], reading.get("availability", cheapest.PURCHASABLE))
+                    self.assertEqual(cheapest.judged(cheapest.recorded(world, SHOES), requirement, scope),
+                                     record["winning_price_minor"])
+                    self.assertEqual(reference["minimum_price_minor"], record["winning_price_minor"])
+                    self.assertEqual(len(found["listed_below"]), len(below))
+                    for row in found["listed_below"]:
+                        self.assertNotIn(row["offer_id"], {c["offer_id"] for c in reference["candidates"]})
+                        self.assertLess(row["price_minor"], reference["minimum_price_minor"])
+                    self.assertTrue(cheapest.satisfied(world, requirement, self.api))
+                    self.assertTrue(commerce.validate({**world, "world_id": world["world_id"]})["valid"])
+                    writes = cheapest.footprint(self.natural, requirement, self.api).writes
+                    self.assertEqual(blocks.background(world, writes), blocks.background(self.natural, writes))
+                    if reading.get("availability") == cheapest.BRANCH:
+                        winner = next(w for w in reference["branch_winners"])
+                        self.assertEqual((winner["city"], winner["pickup_enabled"]), ("Uppsala", True))
+                        self.assertGreater(winner["physical_stock"], 0)
+        self.assertEqual(self.natural, self.frozen)
+
+    def test_a_comparison_site_confines_who_competes(self):
+        site = {"comparison_site_id": "comparison-00"}
+        every = cheapest.scope(self.natural, self.need(self.first), self.api)
+        scope = cheapest.scope(self.natural, {**self.need(self.first), **site}, self.api)
+        listed = cheapest.competing(self.natural, None, scope)
+        shoes = cheapest.competing(self.natural, None, every)
+        self.assertTrue(listed < shoes and len(listed) > 4)
+        # A listed pair that is not the natural winner, with every listed pair of the natural winners below it or not.
+        winner = sorted(listed - {(self.first, self.shoe), (self.second, self.shoe)})[0]
+        requirement = {**self.need(winner[0], product=winner[1]), **site}
+        block = cheapest.model(self.natural, requirement, self.api)
+        self.assertEqual(set(block.places), listed)
+        confined, free = block.probability, cheapest.model(
+            self.natural, self.need(winner[0], product=winner[1]), self.api).probability
+        self.assertGreater(confined, free)
+        reading = cheapest.trial(self.natural, requirement, self.api)
+        world, found, record = cheapest.steer(self.session, self.natural, self.opened, requirement, self.api, Random(1))
+        reference = found["reference"]
+        self.assertEqual({(w["retailer_id"], w["product_id"]) for w in reference["winners"]}, {winner})
+        self.assertEqual({tuple(pair[::-1]) for pair in found["task"]["comparison_scope"]["product_retailer_pairs"]
+                          if pair[0].split("/")[1] == SHOES}, listed)
+        self.assertEqual(cheapest.judged(cheapest.recorded(world, SHOES), requirement, scope),
+                         record["winning_price_minor"])
+        self.assertTrue(reading.satisfied(world))
+        writes = cheapest.footprint(self.natural, requirement, self.api).writes
+        self.assertEqual({tuple(pair) for _, *pair in writes}, set(listed))
+        self.assertEqual(blocks.background(world, writes), blocks.background(self.natural, writes))
+        # The same site with a size requirement and physical stock only.
+        sized = {**self.need(self.second, below=[(self.first, next(
+            sku for sku in (self.size(self.first, i) for i in range(2)) if sku.endswith("-40")))]),
+            **site, **READINGS[1]}
+        if {(self.first, self.shoe), (self.second, self.shoe)} <= listed:
+            world, found, record = cheapest.steer(self.session, self.natural, self.opened, sized, self.api, Random(2))
+            self.assertEqual(found["task"]["comparison_site_id"], "comparison-00")
+            self.assertEqual(found["reference"]["minimum_price_minor"], record["winning_price_minor"])
+        trials = 1500
+        seen = sum(reading.holds(seed) for seed in range(10 ** 6, 10 ** 6 + trials))
+        self.assertLess(abs(seen / trials - confined), 4 * (confined * (1 - confined) / trials) ** .5)
+        unlisted = sorted(shoes - listed)[0]
+        with self.assertRaises(prices.ZeroMass) as caught:
+            cheapest.model(self.natural, {**self.need(unlisted[0], product=unlisted[1]), **site}, self.api)
+        self.assertEqual(caught.exception.reason, "not_listed")
+        for extra in ({"comparison_site_id": "comparison-99"}, {"comparison_site_id": ""},
+                      {"surrounding": {}}, {**site, "surrounding": {"no_such_control": 1}}, {**site, "surrounding": 3},
+                      {**site, "listed_below": [{"retailer_id": unlisted[0], "sku_id": next(
+                          o["sku_id"] for o in self.retailer(unlisted[0])["offers"] if o["product_id"] == unlisted[1])}]}):
+            with self.subTest(extra=extra), self.assertRaises(ValueError) as caught:
+                cheapest.model(self.natural, {**self.need(winner[0], product=winner[1]), **extra}, self.api)
+            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+
+    def test_the_retailer_advertised_cheapest_has_the_variant_only_on_supplier_order(self):
+        """The comparison-stock task's hard case: who the site shows cheapest, and that offer's stock there."""
+        site = {"comparison_site_id": "comparison-00"}
+        pairs = cheapest.scope(self.natural, {**self.need(self.first), **site}, self.api).pairs
+        # A listed pair at a retailer that takes supplier orders, for a product several listed retailers sell.
+        rid, product = next(pair for pair in sorted(pairs) if self.retailer(pair[0])["supplier_enabled"] and
+                            sum(other[1] == pair[1] for other in pairs) > 2)
+        cheapest_listed = {"schema": listed.VERSION, "product_id": product, "retailer_ids": [rid], **site}
+        block = listed.model(self.natural, cheapest_listed, self.api)
+        self.assertEqual(set(block.groups), {pair for pair in pairs if pair[1] == product})
+        trials = 3000
+        seen = listed.empirical(self.natural, cheapest_listed, self.api, trials, 10 ** 6)
+        hits, chance = sum(seen.values()), block.probability
+        self.assertLess(abs(hits / trials - chance), 4 * (chance * (1 - chance) / trials) ** .5)
+        self.assertGreater(hits, 100)
+        distance = sum(abs(block.shares.get(p, 0) - seen.get(p, 0) / hits) for p in set(block.shares) | set(seen)) / 2
+        self.assertLess(distance, .03 + .6 * (len(block.shares) / hits) ** .5)
+        found = blocks.redraw(self.session, self.natural, [listed.trial(self.natural, cheapest_listed, self.api)], 901)
+        self.assertEqual((found.identical, found.agreed), ([True], [True]))
+
+        variant = self.size(rid, 0, product)
+        # The comparison-stock task counts stock at any location as in stock, so "only on supplier order"
+        # is a supplier order with nothing held anywhere.
+        on_order = {"schema": stock.VERSION, "retailer_id": rid, "sku_id": variant, "availability": "backorder",
+                    "stock": {source: {"max": 0} for source in self.sources(rid)}}
+        requirement = self.together(cheapest_listed, on_order)
+        world, read, record = combined.steer(self.session, self.natural, self.opened, requirement, self.api, Random(4))
+        self.assertAlmostEqual(record["log_probability_given_upstream"],
+                               block.log_probability + log(self.alone(on_order)), places=12)
+        self.assertEqual(read[0]["retailer_ids"], [rid])
+        # The native comparison-stock oracle on the steered world and its own surrounding sidecar.
+        surrounding = native_review_ecosystem.generate(world)
+        task = comparison_sku_task.make(world, surrounding, comparison_site_id="comparison-00", sku_id=variant)
+        winners = comparison_sku_task.reference(world, surrounding, task)["winners"]
+        self.assertEqual([(w["retailer_id"], w["availability"], w["in_stock"]) for w in winners],
+                         [(rid, "backorder", False)])
+        self.assertEqual(winners[0]["advertised_price_minor"], read[0]["minimum_listed_price_minor"])
+        natural = comparison_sku_task.reference(self.natural, native_review_ecosystem.generate(self.natural),
+                                                comparison_sku_task.make(
+                                                    self.natural, native_review_ecosystem.generate(self.natural),
+                                                    comparison_site_id="comparison-00", sku_id=variant))["winners"]
+        self.assertNotEqual([(w["retailer_id"], w["availability"]) for w in natural], [(rid, "backorder")])
+        # A who-is-cheapest-available requirement on the same concept redraws the same prices: coupled.
+        with self.assertRaises(blocks.Coupled):
+            combined.prepare(self.natural, self.together(cheapest_listed, {
+                **self.need(rid, product=product), "concept_id": product.split("/")[1]}), self.api, Random(0))
+        for bad in ({**cheapest_listed, "retailer_ids": ["nobody"]}, {**cheapest_listed, "product_id": "nothing"},
+                    {**cheapest_listed, "comparison_site_id": "comparison-99"}, {**cheapest_listed, "concept_id": SHOES},
+                    {"schema": listed.VERSION, "product_id": product, "retailer_ids": []}):
+            with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
+                listed.model(self.natural, bad, self.api)
+            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        with self.assertRaises(prices.ZeroMass):
+            listed.model(self.natural, {**cheapest_listed, "retailer_ids": [EMPTY]}, self.api)
+
+    def test_only_pairs_with_a_competing_offer_are_in_the_block(self):
+        largest = [{"field": "sku.size_eu", "operator": "eq", "value": 41}]
+        requirement = {**self.need(LARGE, product=next(o["product_id"] for o in self.retailer(LARGE)["offers"])),
+                       "predicates": largest}
+        every = cheapest.footprint(self.natural, self.need(self.first), self.api).writes
+        some = cheapest.footprint(self.natural, requirement, self.api).writes
+        self.assertTrue(some < every)
+        # The natural winner lists no size 41 at its first retailer, so that pair keeps the seed's own draws.
+        self.assertNotIn(("price", self.first, self.shoe), some)
+        world, found, record = cheapest.steer(self.session, self.natural, self.opened, requirement, self.api, Random(0))
+        self.assertEqual(blocks.background(world, some), blocks.background(self.natural, some))
+        self.assertEqual({row["retailer_id"] + "/" + row["product_id"] for row in record["restocked"]},
+                         {"/".join(pair) for _, *pair in some})
+        self.assertTrue(all(w["sku_id"].endswith("-41") for w in found["reference"]["winners"]))
+
+    def test_readings_of_scope_are_validated_and_impossible_ones_named(self):
+        good = self.need(self.first)
+        for extra in ({"predicates": []}, {"predicates": "size"}, {"availability": cheapest.PHYSICAL},
+                      {"availability": "soon", "predicates": SIZE_40}, {"city": "Uppsala", "predicates": SIZE_40},
+                      {"availability": cheapest.BRANCH, "predicates": SIZE_40},
+                      {"availability": cheapest.PHYSICAL, "predicates": SIZE_40, "country": "SE"},
+                      {"availability": cheapest.BRANCH, "predicates": SIZE_40, "city": ""},
+                      {"predicates": [{"field": "sku.no_such_field", "operator": "eq", "value": 1}]},
+                      {"predicates": [{"field": "sku.size_eu", "operator": "about", "value": 40}]},
+                      # An offer listed below the winner must itself compete.
+                      {"predicates": SIZE_40, "listed_below": [{"retailer_id": self.second,
+                                                                "sku_id": self.size(self.second, 0)}]}):
+            for call in (cheapest.model, cheapest.footprint, cheapest.trial):
+                with self.subTest(extra=extra, call=call), self.assertRaises(ValueError) as caught:
+                    call(self.natural, {**good, **extra}, self.api)
+                self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        self.assertFalse(self.size(self.second, 0).endswith("-40"))
+        for requirement, reason in (
+                # No branch of this retailer is in the city.
+                ({**self.need(LARGE, product=next(o["product_id"] for o in self.retailer(LARGE)["offers"])),
+                  **READINGS[2]}, "no_outcome"),
+                ({**good, **READINGS[2], "city": "Kiruna"}, "no_outcome"),
+                # No shoe comes in this size.
+                ({**good, "predicates": [{"field": "sku.size_eu", "operator": "eq", "value": 47}]}, "not_listed")):
+            with self.subTest(requirement=requirement), self.assertRaises(prices.ZeroMass) as caught:
+                cheapest.model(self.natural, requirement, self.api)
+            self.assertEqual(caught.exception.reason, reason)
 
     def test_repeated_samples_differ(self):
         requirement = self.requirements()[2]

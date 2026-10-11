@@ -4,9 +4,9 @@ Run as a module from the repository root:
     python -m experiments.steered_generation.run ...
 One natural pass through the real producer, then one cheap steered pass per
 requested sample. A requirement file is a who-is-cheapest requirement (on
-prices alone, or on stock and prices together with offers listed below the
-winner), a one-offer stock or price requirement, or several of those to hold
-together.
+prices alone, on stock and prices together with offers listed below the
+winner, or on a product's listed prices), a one-offer stock or price
+requirement, or several of those to hold together.
 No browser, provider or sidecar publication.
 """
 import argparse
@@ -22,11 +22,11 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import blocks, cheapest, combined, price_bounds, prices, stock, streams
+from . import blocks, cheapest, combined, listed, price_bounds, prices, stock, streams
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
-              "combined.py", "run.py"),
+              "listed.py", "combined.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -226,14 +226,18 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
         seconds = time.monotonic() - clock
         # The saved leaves themselves, read without the block model or the native oracle.
         leaves = cheapest.recorded(world, concept)
-        minimum, scanned = pinned.direct_scan(world, requirement)
-        designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
-        below = [next(row for row in leaves["offers"].values()
-                      if (row["retailer_id"], row["sku_id"]) == (named["retailer_id"], named["sku_id"]))
-                 for named in requirement.get("listed_below", [])]
-        pinned.ensure(scanned == designated and minimum == record["winning_price_minor"] and
-                      all(row["price_minor"] < minimum and not held(row) for row in below),
-                      "Direct full-population scan disagrees with the steered result")
+        minimum = cheapest.judged(leaves, requirement, block.scope)
+        pinned.ensure(minimum is not None and minimum == record["winning_price_minor"],
+                      "Direct reading of the saved leaves disagrees with the steered result")
+        if not {"predicates", "comparison_site_id"} & set(requirement):
+            # Every offer competes: the full-population scan that knows nothing of this block applies too.
+            designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
+            below = [next(row for row in leaves["offers"].values()
+                          if (row["retailer_id"], row["sku_id"]) == (named["retailer_id"], named["sku_id"]))
+                     for named in requirement.get("listed_below", [])]
+            pinned.ensure(pinned.direct_scan(world, requirement) == (minimum, designated) and
+                          all(row["price_minor"] < minimum and not held(row) for row in below),
+                          "Direct full-population scan disagrees with the steered result")
         files = write(folder(index), {"world.private.json": world, "task.private.json": found["task"],
                                       "reference.private.json": found["reference"], "steering.json": record})
         case["samples"].append({
@@ -260,6 +264,48 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
         validation.update(winning_price_total_variation=distance)
         pinned.ensure(hits < 1000 or distance < 0.1,
                       "Conditional winning-price distribution disagrees with the producer's draws")
+
+
+def listed_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        block = listed.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    pairs = set(block.groups)
+    case.update(status="sampled", probability_given_upstream=block.probability or None,
+                log_probability_given_upstream=block.log_probability, compared_retailer_products=len(pairs),
+                winning_prices_modelled=len(block.shares), natural_lowest_listed=min(listed.lowest(natural, pairs).values()))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        world, found, record = listed.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        seconds = time.monotonic() - clock
+        # The saved price leaves themselves, read without the block model.
+        lowest = listed.lowest(world, pairs)
+        minimum = min(lowest.values())
+        pinned.ensure({pair for pair, price in lowest.items() if price == minimum} == block.designated and
+                      minimum == record["winning_price_minor"] and
+                      not edits.price_rule_violations(world, api.native.rounded_price),
+                      "Direct reading of the saved leaves disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        case["samples"].append({
+            "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+            "winning_price_minor": minimum, "comparison_rows": found.get("comparison_rows"),
+            "changed_price_leaves": sum(o["natural"] != o["steered"] for r in record["repriced"] for o in r["offers"]),
+            "streams_steered": record["streams_steered"], "files": files})
+    reading = listed.trial(natural, requirement, api)
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [reading], case)
+    if args.validate_trials and block.probability:
+        winning = Counter(reading.winning(seed) for seed in range(10 ** 6, 10 ** 6 + args.validate_trials))
+        del winning[None]
+        hits = sum(winning.values())
+        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        distance = sum(abs(block.shares.get(p, 0) - winning.get(p, 0) / hits)
+                       for p in set(block.shares) | set(winning)) / 2 if hits else None
+        validation.update(winning_price_total_variation=distance)
+        pinned.ensure(hits < 1000 or distance < 0.1,
+                      "Conditional winning-price distribution disagrees with the real pricing function")
 
 
 def held(row):
@@ -305,6 +351,7 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
 
 CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_case),
          price_bounds.VERSION: ("price", bound_case), cheapest.VERSION: ("stock_and_prices", cheapest_case),
+         listed.VERSION: ("listed_prices", listed_case),
          combined.VERSION: ("combined", combined_case)}
 
 

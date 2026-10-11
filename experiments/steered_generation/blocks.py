@@ -61,7 +61,11 @@ ORDINARY = 2.0 ** -500
 
 
 def pick(rng, options, weights):
-    """One option, with probability proportional to its weight, whatever the weights' range.
+    """One option, with probability proportional to its weight, over a very wide range of weights.
+
+    Pick from finite, nonnegative weights; for all-float inputs whose smallest
+    positive weight is at least 2**-500, the total must fit in a finite float,
+    as it does for the fourth block's probability weights.
 
     `rng.choices` draws one 53-bit uniform number, so an option whose share of
     the total is far below 1e-16 may be unreachable or badly quantized, and

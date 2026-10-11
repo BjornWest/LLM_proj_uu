@@ -276,9 +276,12 @@ thing: the price of its cheapest available SKU, or that it has none.
     are taken as exact rationals with a uniform draw of enough bits that
     every positive weight keeps its interval. The winning price is picked
     from the logarithms (`cheapest.pick_log`), and the weights of the
-    backward stock sampling are exact products of the stored values, so
-    sampling does not meet a numerical limit the model did not. `shares`,
-    the winning price's distribution as floats, is for comparisons only.
+    backward stock sampling are exact products of the stored values. Exact
+    backward products avoid additional float-product underflow during
+    sampling; `pick_log` can still raise `NumericalLimit` at sampling time
+    when logarithm gaps exceed the supported Decimal exponent range.
+    `shares`, the winning price's distribution as floats, is for comparisons
+    only.
 
   This is a numerical implementation of the conditional model, not exact
   arithmetic. Conditioning uses float masses and logarithms, and Decimal
@@ -330,10 +333,87 @@ Checks, besides the ones every block gets:
   sampler three ways (always the first witness, conditions from their prior,
   equality allowed at the ceiling) and each was caught by these tests.
 
+### Who competes and what is available
+
+The native tasks do not all read "the cheapest available offer" alike, and
+the requirement can state the reading with optional fields. Each reading is
+checked with the native oracle of the task that uses it.
+
+```json
+{"schema": "steered-cheapest-available-v1",
+ "concept_id": "footwear.walking_shoes",
+ "product_id": "...", "retailer_ids": ["..."],
+ "predicates": [{"field": "sku.size_eu", "operator": "eq", "value": 42}],
+ "availability": "positive_pickup_branch_stock", "city": "Uppsala",
+ "comparison_site_id": "comparison-01"}
+```
+
+| Field | Meaning | Native oracle |
+| --- | --- | --- |
+| `predicates` | only SKUs that meet them compete (size, product facts), evaluated with the native `PredicateSet` | `feature_offer_task.reference` |
+| `availability: purchasable` (default) | stock at any location or a supplier order | `basic_offer_task`, `feature_offer_task` |
+| `availability: positive_stock` | physical stock at any location; a supplier order does not count | `feature_offer_task` |
+| `availability: positive_pickup_branch_stock` with `city`, `country` | physical stock at a pickup-enabled branch in the city | `catalog_branch_task.reference` |
+| `comparison_site_id`, `surrounding` | only retailer/product pairs the comparison site lists compete | the comparison-scoped `basic_offer_task` and `feature_offer_task` |
+
+The two stricter availabilities need at least one predicate, as their native
+tasks do.
+
+In the block these are three static facts (`cheapest.scope`): the SKUs that
+compete, the pairs that compete, and per retailer the stock locations that
+count, with whether a supplier order counts. The model is unchanged in form.
+A pair's levels are taken over its competing SKUs only; "unavailable" is
+"held at no location that counts", and where a supplier order counts, "and
+left without one". SKUs that do not compete, locations that do not count and
+a supplier order that does not count are drawn as the producer draws them
+under the sampled conditions. Pairs without a competing offer are outside the
+block and keep the seed's own draws.
+
+The comparison scope is static because of how the surrounding sites are
+generated: which products and pairs a site lists is decided by draws keyed by
+the world's seed, the site, the product and the retailer over the listed
+pairs (`ecosystem.py`, `rich_ecosystem.py`), independent of stock and prices.
+The natural world and every steered one therefore have the same listings.
+The check generates the sidecar for the steered world
+(`native_review_ecosystem.generate`) and hands it to the native oracle. On
+saved seed 73 the scope computed this way for `comparison-01` equals the 36
+pairs stored in the suite's own comparison-scoped task on that world (B01,
+H09; `steering/readings/explore.log`).
+
+## The fifth block: who lists a product cheapest
+
+Requirement (`steered-cheapest-listed-v1`): a product and the retailers that
+must be exactly the ones listing it at the lowest price, optionally among the
+pairs one comparison site lists.
+
+```json
+{"schema": "steered-cheapest-listed-v1",
+ "product_id": "footwear-brand-21/footwear.walking_shoes/00",
+ "retailer_ids": ["department_store-01"],
+ "comparison_site_id": "comparison-01"}
+```
+
+A retailer's price for the product is its lowest listed price over all its
+SKUs, in or out of stock. That is the price a comparison row shows
+(`ecosystem.py`, `minimum_listed_native_offer_snapshot`). The block
+(`listed.py`) is the price draw of every compared pair, and it depends on no
+stock, so it combines with a one-offer stock requirement on the advertised
+retailer as independent blocks. That combination is the comparison-stock
+task's hard case, "the retailer advertised cheapest has the variant only on
+supplier order", and a unit test checks it with the native
+`comparison_sku_task.reference`. That task counts stock at any location as in
+stock, so "only on supplier order" is the stock requirement `backorder` with
+a maximum of zero at every location.
+
+The model is `prices.model` with every listed SKU counted, products over
+pairs kept as logarithms and choices made through `blocks.pick`, as in the
+fourth block. It is checked against the real `_offer_price` under other seeds
+and against the comparison site's own rows for the steered world.
+
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the four kinds above, that must all hold.
+of the five kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -349,7 +429,8 @@ price of one retailer/product:
 | One offer's stock | stock of its retailer/product (all SKUs: the conditions are shared) | nothing |
 | One offer's price | price of its retailer/product | nothing |
 | Who is cheapest, on prices | price of every pair of the concept with an available offer | stock of every pair of the concept, which decides who competes |
-| Who is cheapest, on stock and prices | stock and price of every listed pair of the concept | nothing |
+| Who is cheapest, on stock and prices | stock and price of every listed pair of the concept with an offer that competes | nothing |
+| Who lists a product cheapest | price of every compared pair of the product | nothing |
 
 `blocks.independent` accepts a list of blocks when no block decides a
 resource that another decides or depends on. The producer draws separate
@@ -418,6 +499,8 @@ ever be cheapest. Receipts and worlds are under
 | `medium/run-v9-shoes/`, `medium/run-v9-others/` | `7dd4727` | a medium world from dev's producer; see "A medium world" |
 | `run-v10-sold-out/`, `run-v10-shoe/`, `run-v10-regression/`, `medium/run-v10-shoes/`, `medium/run-v10-others/` | `50a3a79` | all five again after the seventh review's fixes; fewer redraws on the medium world (3,000 and 40,000) |
 | `run-v11-sold-out/`, `run-v11-shoe/`, `run-v11-regression/`, `medium/run-v11-shoes/`, `medium/run-v11-others/` | `311e8ff` (code `d9973a9`) | all five again after the eighth review's fix, with shorter redraw counts (50,000, 10,000, 20,000; 1,000 and 10,000 on the medium world) |
+| `readings/run-v1/` | `9cb2610` | the native tasks' readings of who competes and what is available, and who lists a product cheapest; 20,000 redraws |
+| `readings/run-v2/` | `cf07fdb` | the same after the rebase onto the approved candidate; 4,000 redraws |
 
 Requirement files are in `steering/`, `steering/stock/`, `steering/price/`,
 `steering/cheapest/` and `steering/combined/`. Commit `832238a6` moved the
@@ -431,7 +514,7 @@ of 27, then 48 of 48 six times), with the same probabilities and refusals.
 `d9973a9` changes which weights `blocks.pick` hands to the float choice; the
 `run-v11` runs reproduce every `run-v10` sample of the fourth block as well,
 with the identical world identity (15, 6, 15 and 12 samples) and identical
-probabilities, as they must when no weight is near the subnormal range.
+probabilities; these are observed identities for the tested configurations.
 `74ad475` is a commit of the branch based on `e3fbfadd`
 (`dev/world-steered-generation-20261010-r1`); `7dd4727` is on the branch based
 on dev (`dev/world-steered-generation-20261011-r2`), where the same change is
@@ -654,6 +737,38 @@ hit, with 0.5 expected. The sandal requirement with a stock requirement on a
 sandal offer (`combined/refused-sold-out-sandal-and-stock`) is refused with
 `coupled_requirements`.
 
+### The native tasks' readings, and who lists a product cheapest
+
+`readings/run-v1/` at `9cb2610` (the work branch before its rebase onto the
+approved fourth-block candidate; kept reachable as tag
+`steering-evidence-readings-run-v1`), on saved seed 73, which is the world of
+the suite's comparison-scoped tasks B01 and H09; three samples each, 20,000
+redraws, 10 producer redraws each (all equal to the reading).
+`readings/run-v2/` repeats it at `cf07fdb`, the rebased code, with 4,000
+redraws: all 30 samples with the identical world identity and identical
+probabilities. Requirement files were chosen by `readings/explore.py` from
+the block models' own probabilities.
+
+| Requirement on walking shoes | Reading | Competing pairs | Probability given upstream | Sample | Hits | Expected |
+| --- | --- | --- | --- | --- | --- | --- |
+| A retailer alone is cheapest available among the pairs `comparison-01` lists (`site-winner`) | comparison site | 27 | 0.393 | 0.75 to 0.80 s | 7,883 | 7,868 ± 69 |
+| The same with another listed retailer's offer below it (`site-sold-out`) | comparison site | 27 | 4.3e-11 | 0.78 to 0.83 s | 0 | 0 |
+| A retailer alone is cheapest in EU 42 with physical stock (`size42-winner`) | size, physical stock | 35 | 0.108 | 0.60 to 0.63 s | 2,150 | 2,165 ± 44 |
+| The same with another retailer's size 42 listed below it (`size42-sold-out`) | size, physical stock | 35 | 0.00172 (1 in 581) | 0.61 to 0.62 s | 27 | 34.4 ± 5.9 |
+| EU 42, moderate cushioning, at most 340 g, physical stock: the B05 predicates (`features-winner`) | size and two facts, physical stock | 4 | 0.201 | 0.54 to 0.65 s | 4,106 | 4,012 ± 57 |
+| The same with another matching offer listed below it (`features-sold-out`) | size and two facts, physical stock | 4 | 0.00319 (1 in 314) | 0.59 to 0.72 s | 75 | 63.7 ± 8.0 |
+| Cheapest EU 42 held at a pickup branch in Uppsala: the B20 reading (`branch-winner`) | size, branch stock | 35 | 0.142 | 0.66 to 0.70 s | 2,821 | 2,847 ± 49 |
+| The same with another retailer's size 42 listed below it (`branch-sold-out`) | size, branch stock | 35 | 0.0158 (1 in 63) | 0.63 to 0.64 s | 314 | 316 ± 18 |
+| A retailer lists a shoe cheapest among those `comparison-01` shows (`advertised-cheapest`) | fifth block | 3 | 0.252 | 0.52 to 1.69 s | 4,995 | 5,040 ± 61 |
+| The same, with one size there only on supplier order: the B04 case (`advertised-cheapest-on-supplier-order`) | fifth block with a stock requirement | | 8.0e-6 (1 in 125,083) | 0.57 to 0.63 s | 0 joint; parts 4,995 and 0 | parts 5,040 ± 61 and 0.6 |
+
+Every sample passed the native oracle of its reading (`feature_offer_task`,
+`catalog_branch_task`, the comparison-scoped `basic_offer_task`) and the
+direct reading of the saved leaves by the same rule. The combination was
+checked by its two parts' own checks; the native comparison-stock oracle is
+applied to that combination in the unit tests, not in the pinned runner. The
+medium world has not been run with these readings.
+
 ### A medium world
 
 The world sizes asked for (Bjorn, 2026-10-11): a medium world has 4 to 8
@@ -792,9 +907,13 @@ carries review and description text that the checks also digest.
   are refused with a reason code, not repaired.
 - **The earlier Z3 pilot** (`experiments/constrained_world_pilot/`) is not
   connected.
-- **Only retail stock and prices.** Reviews, review sites and comparison-site
-  content are not steered; a task about them gets its world from the ordinary
-  generation.
+- **Only retail stock and prices.** Reviews and review sites are not steered,
+  and neither is which products a comparison site lists (that is the seed's,
+  and the requirement can only confine the comparison to it). Delivery fees,
+  free-shipping thresholds and delivery options are not modelled. Ranking
+  beyond the single winner (the three cheapest with a tie at the cutoff, the
+  cheapest per kilogram, nothing matching until a requirement is relaxed) is
+  not built.
 - **No publication.** Steered worlds are native worlds only:
   `browser_runtime_ready` is false. `unified_generation.generate` accepts a
   `world_factory`, which is where a steered world would enter so that
