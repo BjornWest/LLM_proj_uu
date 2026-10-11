@@ -28,6 +28,11 @@ def resolve(requirement):
     return json.loads(json.dumps(requirement))
 
 
+def footprint(world, requirement, api):
+    """What the block decides: the one price draw, so the price of every SKU of the product here."""
+    return SimpleNamespace(writes={blocks.offer_resource("price", world, resolve(requirement))}, reads=set())
+
+
 def site(world, requirement, api):
     """Where the offer's price draw sits in a world."""
     requirement = resolve(requirement)
@@ -103,7 +108,7 @@ def prepare(natural, requirement, api, rng):
                                       "across seeds."}
 
     return Step(script={place.key: prices.script(draw, place.config)}, probability=block.probability,
-                writes={("price", *place.pair)}, reads=set(), record=record,
+                **vars(footprint(natural, requirement, api)), record=record,
                 check=lambda world: check(world, requirement, api))
 
 
@@ -120,7 +125,7 @@ def trial(natural, requirement, api):
     price = lambda seed, sku_id: api.commerce._offer_price(
         seed, place.pair[0], products[place.pair[1]], skus[sku_id], place.config)[0]
     return SimpleNamespace(
-        keys={place.key}, writes={("price", *place.pair)}, reads=set(),
+        keys={place.key}, **vars(footprint(natural, requirement, api)),
         price=lambda seed: price(seed, place.sku_id),
         holds=lambda seed: within(place.requirement["price_minor"], price(seed, place.sku_id)),
         reading=lambda seed: {o["offer_id"]: price(seed, o["sku_id"]) for o in place.group},

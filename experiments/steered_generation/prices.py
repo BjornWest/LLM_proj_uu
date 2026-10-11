@@ -225,6 +225,19 @@ def competing(world, concept_id):
             if concepts[o["product_id"]] == concept_id}
 
 
+def footprint(world, requirement, api):
+    """What the block decides and what its probability also depends on.
+
+    It redraws the price of every pair with an available offer. Which offers
+    compete is decided by the stock of every listed pair of the concept,
+    including pairs with nothing available now. Needs no probability: it
+    exists when the requirement has none on this world's stock.
+    """
+    requirement = edits.resolve(requirement)
+    return SimpleNamespace(writes={("price", *pair) for pair in block(world, requirement, api)},
+                           reads={("stock", *pair) for pair in competing(world, requirement["concept_id"])})
+
+
 def prepare(natural, requirement, api, rng):
     """Sample the block on the natural world; the step replays it and reads the result."""
     draws, probability, winning = plan(natural, requirement, api, rng)
@@ -247,11 +260,8 @@ def prepare(natural, requirement, api, rng):
         task, reference = edits.check(world, requirement, api)
         return {"task": task, "reference": reference}
 
-    # Which offers compete is decided by the stock of every pair of the concept.
     return blocks.Step(script={keys[pair]: script(draw, config) for pair, draw in draws.items()},
-                       probability=probability,
-                       writes={("price", *pair) for pair in draws},
-                       reads={("stock", *pair) for pair in competing(natural, requirement["concept_id"])},
+                       probability=probability, **vars(footprint(natural, requirement, api)),
                        record=record, check=check)
 
 
@@ -287,8 +297,7 @@ def trial(natural, requirement, api):
                 if (r["retailer_id"], o["product_id"]) in pairs}
 
     return SimpleNamespace(
-        keys=set(stream_keys(pairs, api).values()), writes={("price", *pair) for pair in pairs},
-        reads={("stock", *pair) for pair in competing(natural, requirement["concept_id"])}, winning=winning,
+        keys=set(stream_keys(pairs, api).values()), **vars(footprint(natural, requirement, api)), winning=winning,
         holds=lambda seed: winning(seed) is not None, recorded=recorded,
         satisfied=lambda world: satisfied(world, requirement, api),
         reading=lambda seed: {o["offer_id"]: price(seed, pair, o) for pair, entry in pairs.items() for o in entry["group"]})

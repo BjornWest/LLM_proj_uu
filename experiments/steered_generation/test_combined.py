@@ -17,7 +17,7 @@ from unittest import mock
 from experiments.accepted_catalog_commerce import model as commerce
 from experiments.world_requirement_construction import model as edits
 
-from experiments.steered_generation import blocks, combined, price_bounds, prices, stock, streams
+from experiments.steered_generation import blocks, combined, price_bounds, prices, run, stock, streams
 from experiments.steered_generation.test_stock import INPUTS, RealProducer
 
 SHOES, SHIRTS = "footwear.walking_shoes", "tops.t_shirts"
@@ -25,6 +25,7 @@ SMALL = "travel-03"    # shoes only; three locations, supplier orders
 BOTH = "apparel-01"    # shirts and shoes; supplier orders
 PLAIN = "apparel-02"   # shirts and shoes; no supplier orders
 EMPTY = "footwear-06"  # lists nothing
+FEW = "apparel-05"     # one shoe in two sizes; no supplier orders
 
 
 class TwoConcepts(RealProducer):
@@ -212,6 +213,58 @@ class CombinedTests(TwoConcepts):
                     with self.assertRaises(blocks.Coupled) as caught:
                         attempt()
                     self.assertEqual(caught.exception.reason, "coupled_requirements")
+
+    def test_coupling_is_settled_before_any_part_is_called_impossible(self):
+        # A producer world in which FEW has no size of its shoe at any location.
+        product = self.offer(FEW, SHOES)["product_id"]
+        sizes = [o["sku_id"] for o in self.retailer(FEW)["offers"] if o["product_id"] == product]
+        self.assertFalse(self.retailer(FEW)["supplier_enabled"])
+        world, _ = self.session.generate({
+            f"{commerce.VERSION}/{FEW}/{sku}/{source}/zero": [("random", 0.0)]
+            for sku in sizes for source in self.sources(FEW)})
+        winner = {"schema": edits.VERSION, "kind": edits.KIND, "concept_id": SHOES, "product_id": product,
+                  "retailer_ids": [FEW]}
+        restocked = {"schema": stock.VERSION, "retailer_id": FEW, "sku_id": sizes[0], "availability": "in_stock"}
+        # By itself, on this stock, the shop cannot be cheapest; its own price is then not redrawn.
+        with self.assertRaises(prices.ZeroMass) as caught:
+            prices.prepare(world, winner, self.api, Random(0))
+        self.assertEqual(caught.exception.reason, "unavailable")
+        declared = prices.footprint(world, winner, self.api)
+        self.assertNotIn(("price", FEW, product), declared.writes)
+        self.assertIn(("stock", FEW, product), declared.reads)
+        once = SimpleNamespace(samples=1, producer_redraws=0, validate_trials=0)
+        # Together with a requirement that restocks it, that is no verdict on the pair of them.
+        for parts in ([winner, restocked], [restocked, winner]):
+            requirement = self.together(*parts)
+            for attempt in (lambda: combined.prepare(world, requirement, self.api, Random(0)),
+                            lambda: combined.trial(world, requirement, self.api)):
+                with self.assertRaises(blocks.Coupled):
+                    attempt()
+            case = {"requirement_sha256": "fixture", "samples": []}
+            run.combined_case(once, self.session, world, self.opened, self.api, requirement, case, None)
+            self.assertEqual((case["status"], case["reason"]), ("refused", "coupled_requirements"))
+        # With no part redrawing that stock, zero is the answer, and it names the part.
+        requirement = self.together(self.priced(BOTH, SHIRTS, min=0), winner)
+        case = {"requirement_sha256": "fixture", "samples": []}
+        run.combined_case(once, self.session, world, self.opened, self.api, requirement, case, None)
+        self.assertEqual((case["status"], case["reason"], case["part"]),
+                         ("zero_probability_given_upstream", "unavailable", 1))
+
+    def test_a_block_is_declared_for_an_offer_the_retailer_does_not_list(self):
+        sku = self.offer(BOTH, SHIRTS)["sku_id"]
+        product = self.offer(BOTH, SHIRTS)["product_id"]
+        unlisted = {"schema": stock.VERSION, "retailer_id": EMPTY, "sku_id": sku, "availability": "in_stock"}
+        self.assertEqual(stock.footprint(self.natural, unlisted, self.api).writes, {("stock", EMPTY, product)})
+        unpriced = {"schema": price_bounds.VERSION, "retailer_id": EMPTY, "sku_id": sku, "price_minor": {"min": 0}}
+        self.assertEqual(price_bounds.footprint(self.natural, unpriced, self.api).writes, {("price", EMPTY, product)})
+        with self.assertRaises(prices.ZeroMass) as caught:
+            combined.prepare(self.natural, self.together(self.priced(BOTH, SHIRTS, min=0), unlisted),
+                             self.api, Random(0))
+        self.assertEqual((caught.exception.reason, caught.exception.part), ("not_listed", 1))
+        for module, requirement in ((stock, unlisted), (price_bounds, unpriced)):
+            for unknown in ({"sku_id": "no-such-sku"}, {"retailer_id": "no-such-shop"}):
+                with self.assertRaisesRegex(ValueError, "Unknown retailer or SKU"):
+                    module.footprint(self.natural, {**requirement, **unknown}, self.api)
 
     def test_a_part_with_probability_zero_is_named(self):
         requirement = self.together(self.held(SMALL, SHOES, availability="in_stock"),

@@ -27,16 +27,28 @@ def resolve(requirement):
     return json.loads(json.dumps(requirement))
 
 
+def parts(natural, requirement, api):
+    """The parts of a requirement, once their blocks are known to be independent.
+
+    Coupling is settled first, from what each block declares, before any part
+    is asked for a probability. A part's probability treats everything outside
+    its block as fixed, so "zero given upstream" for one part says nothing
+    about the whole requirement when another part redraws that upstream.
+    """
+    found = resolve(requirement)["all"]
+    blocks.independent([KINDS[part["schema"]].footprint(natural, part, api) for part in found])
+    return found
+
+
 def prepare(natural, requirement, api, rng):
     """Sample every part on the natural world. A part with probability zero is named by its index."""
     steps = []
-    for index, part in enumerate(resolve(requirement)["all"]):
+    for index, part in enumerate(parts(natural, requirement, api)):
         try:
             steps.append(KINDS[part["schema"]].prepare(natural, part, api, rng))
         except prices.ZeroMass as error:
             error.part = index
             raise
-    blocks.independent(steps)
     return steps
 
 
@@ -61,9 +73,7 @@ def steer(session, natural, natural_opened, requirement, api, rng):
 
 def trial(natural, requirement, api):
     """Every part's reading of its block under another seed; refused for coupled parts like `prepare`."""
-    readings = [KINDS[part["schema"]].trial(natural, part, api) for part in resolve(requirement)["all"]]
-    blocks.independent(readings)
-    return readings
+    return [KINDS[part["schema"]].trial(natural, part, api) for part in parts(natural, requirement, api)]
 
 
 def empirical(natural, requirement, api, trials, first_seed):

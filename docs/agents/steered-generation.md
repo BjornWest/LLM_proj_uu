@@ -41,8 +41,10 @@ producer. And the result carries a probability.
    for every retailer/product entry, and each call re-reads and re-validates
    the same files. `streams.Defaults` gives every pass of a session the first
    call's result, which takes a seed-73 pass from about 2 s to about 0.4 s and
-   matters more as the world grows (see "Cost against world size"). A pass
-   that changed the shared configuration would fail.
+   matters more as the world grows (see "Cost against world size"). The
+   pinned producer only reads that result. As a check, a pass that completes
+   with the configuration changed fails; the registry object is not checked,
+   and a session does not see later edits to the files.
 5. **Solve on a model, materialize with the producer, check with the oracle.**
    A block sampler decides the planned draws from a model of the affected
    draws. The real producer then generates the world with that plan, and the
@@ -235,6 +237,17 @@ stock or price requirements on other concepts.
 A refusal says the parts cannot be sampled separately. It says nothing about
 probability; a joint block could still sample them.
 
+Coupling is settled first, from each module's `footprint`, which needs no
+probability. Only then is each part asked for one. The order matters: a part's
+probability treats everything outside its block as fixed, so "zero given
+upstream" for one part is no verdict on the whole requirement when another
+part redraws that upstream. A shop with nothing in stock cannot be cheapest by
+itself, but can together with a requirement that restocks it; that pair is
+reported as coupled, not as impossible. (The first version of this code asked
+for probabilities first and reported it as impossible; the fourth Codex
+review caught it.) When no part redraws what a zero-probability part depends
+on, the requirement is reported as zero with that part's index and reason.
+
 `blocks.replay` is now the one place where plans meet the producer, for single
 requirements too: it runs the pass, has each block confirm that the producer
 recorded its plan, and compares the natural and the steered world with every
@@ -396,10 +409,12 @@ All parts are requirements from the tables above unless described.
 
 A joint hit is a seed under which every part's reading holds at once. Where
 there are enough of them (the first two rows) the joint frequency is the
-product of the parts', which is the independence the method relies on. In the
-other two rows no number of redraws would show a joint hit; there the evidence
-is each part's own frequency, which was recounted in the same redraws and
-agrees with its computed probability in every case, and the declared
+product of the parts', which is the independence the method relies on. The
+trial counts of the other two rows give no useful joint-frequency check: the
+last row would need about half a million redraws per expected hit, and the
+eight-part one cannot practically be checked that way at all. There the
+evidence is each part's own frequency, which was recounted in the same redraws
+and agrees with its computed probability in every case, and the declared
 independence of the blocks. In the last row the three parts were hit 89, 220
 and 2,828 times in 30,000 (expected 85 ± 9, 226 ± 15, 2,867 ± 51).
 

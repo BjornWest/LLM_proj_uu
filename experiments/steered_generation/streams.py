@@ -172,8 +172,9 @@ class Defaults:
     The producer calls `population.load()` for every retailer/product entry,
     and each call re-reads and re-validates the same files. With manufacture
     cached that is most of a pass, and it grows with the world. Passes here
-    get the first call's result instead. The producer only reads it; a pass
-    that changed the configuration would fail.
+    get the first call's result instead. The pinned producer only reads it.
+    As a check on that, a pass that completes with the configuration changed
+    fails; the registry object and a failing pass are not checked.
     """
 
     def __init__(self):

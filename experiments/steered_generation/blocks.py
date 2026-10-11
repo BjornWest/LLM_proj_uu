@@ -60,10 +60,25 @@ def within(limits, value):
     return limits.get("min", 0) <= value <= limits.get("max", value)
 
 
+def offer_resource(kind, world, requirement):
+    """The stock or price resource of the retailer and SKU a one-offer requirement names.
+
+    Read from the product the SKU belongs to, so it exists whether or not the
+    retailer lists the SKU.
+    """
+    products = {s["sku_id"]: p["public"]["product_id"] for p in world["products"] for s in p["public"]["skus"]}
+    if (requirement["sku_id"] not in products or
+            not any(r["retailer_id"] == requirement["retailer_id"] for r in world["retailers"])):
+        raise ValueError("Unknown retailer or SKU")
+    return kind, requirement["retailer_id"], products[requirement["sku_id"]]
+
+
 def independent(steps):
     """Fail unless no block decides a leaf another block decides or is judged on.
 
-    Takes anything that declares `writes` and `reads`.
+    Takes anything that declares `writes` and `reads`: sampled steps, or the
+    modules' `footprint`, which needs no probability and so also exists for a
+    requirement that has none on this world.
     """
     for index, step in enumerate(steps):
         for other_index, other in enumerate(steps):

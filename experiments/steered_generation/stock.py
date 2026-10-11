@@ -77,6 +77,11 @@ def amount(atom):
     return atom[2] or 0
 
 
+def footprint(world, requirement, api):
+    """What the block decides: the conditions are shared, so the stock of every SKU of the product here."""
+    return SimpleNamespace(writes={blocks.offer_resource("stock", world, resolve(requirement))}, reads=set())
+
+
 def site(world, requirement, api):
     """Where the offer's stock draws sit in a world, and everything upstream of them."""
     requirement = resolve(requirement)
@@ -257,9 +262,8 @@ def prepare(natural, requirement, api, rng):
                                       "are not reweighted; use probability_given_upstream as the importance weight "
                                       "across seeds."}
 
-    # The conditions are shared, so the block decides the stock of every SKU of the product here.
     return Step(script=scripts(place, draws), probability=block.probability,
-                writes={("stock", place.retailer_id, place.product_id)}, reads=set(), record=record,
+                **vars(footprint(natural, requirement, api)), record=record,
                 check=lambda world: {**check(world, requirement, api), "offer_id": place.offer_id})
 
 
@@ -331,8 +335,7 @@ def block_keys(place):
 def trial(natural, requirement, api):
     """This module's reading of the block under another seed, and the same leaves read off a world."""
     place = site(natural, requirement, api)
-    return SimpleNamespace(keys=block_keys(place), writes={("stock", place.retailer_id, place.product_id)},
-                           reads=set(),
+    return SimpleNamespace(keys=block_keys(place), **vars(footprint(natural, requirement, api)),
                            reading=lambda seed: natural_draws(place, api, seed),
                            holds=lambda seed: holds(place, natural_draws(place, api, seed)),
                            recorded=lambda world: recorded(world, place),
