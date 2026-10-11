@@ -209,7 +209,7 @@ class PlanTests(unittest.TestCase):
             self.assertEqual({(w["retailer_id"], w["product_id"]) for w in reference["winners"]},
                              {("north", "shoe"), ("south", "shoe")})
             self.assertEqual(edits.price_rule_violations(world, native.rounded_price), [])
-            self.assertEqual(world["status"], prices.STATUS)
+            self.assertEqual(world["status"], streams.STATUS)
             self.assertEqual(record["winning_price_minor"], reference["minimum_price_minor"])
             self.assertNotEqual(world["world_id"], self.natural["world_id"])
             self.assertEqual(record["streams_steered"], 5)

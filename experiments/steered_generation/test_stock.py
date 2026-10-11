@@ -20,7 +20,7 @@ from experiments.accepted_catalog_commerce import model as commerce, package_exp
 from experiments.footwear_world_pilot import model as native
 from experiments.world_sampling_defaults import model as population
 
-from experiments.steered_generation import stock, streams
+from experiments.steered_generation import blocks, stock, streams
 from experiments.steered_generation.prices import ZeroMass
 
 CONCEPT = "footwear.walking_shoes"
@@ -48,6 +48,8 @@ def need(retailer_id, sku_id, **stated):
 
 
 class RealProducer(unittest.TestCase):
+    inputs = INPUTS
+
     @classmethod
     def setUpClass(cls):
         patch = mock.patch.object(package_export, "sample", stand_in)
@@ -55,7 +57,7 @@ class RealProducer(unittest.TestCase):
         cls.addClassCleanup(patch.stop)
         cls.api = SimpleNamespace(basic=basic_offer_task, native=native, population=population,
                                   commerce=commerce, package_export=package_export)
-        cls.session = streams.Session(cls.api, INPUTS)
+        cls.session = streams.Session(cls.api, cls.inputs)
         cls.natural, cls.opened = cls.session.generate()
         cls.frozen = deepcopy(cls.natural)
 
@@ -254,9 +256,9 @@ class ProducerTests(RealProducer):
         for rid, wanted in ((SMALL, "backorder"), (PLAIN, "unavailable"), (WIDE, "in_stock")):
             requirement = need(rid, self.sku(rid, 1), availability=wanted)
             for seed in range(900, 905):
-                found = stock.redraw(self.session, self.natural, requirement, self.api, seed)
-                self.assertEqual(found.recorded, found.reading)
-                self.assertEqual(found.satisfied, found.reading_satisfied)
+                found = blocks.redraw(self.session, self.natural,
+                                      [stock.trial(self.natural, requirement, self.api)], seed)
+                self.assertEqual((found.identical, found.agreed), ([True], [True]))
                 hits += found.satisfied
         self.assertTrue(0 < hits < 15)
         self.assertEqual(self.session.generate()[0], self.frozen)

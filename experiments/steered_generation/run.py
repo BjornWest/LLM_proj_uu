@@ -3,15 +3,15 @@
 Run as a module from the repository root:
     python -m experiments.steered_generation.run ...
 One natural pass through the real producer, then one cheap steered pass per
-requested sample. Each requirement file is either a who-is-cheapest price
-requirement or a one-offer stock requirement. No browser, provider or sidecar
-publication.
+requested sample. A requirement file is a who-is-cheapest price requirement, a
+one-offer stock or price requirement, or several of those to hold together.
+No browser, provider or sidecar publication.
 """
 import argparse
 from hashlib import sha256
 import importlib
 import json
-from math import sqrt
+from math import fsum, sqrt
 from pathlib import Path
 from random import Random
 import subprocess
@@ -19,10 +19,11 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import prices, stock, streams
+from . import blocks, combined, price_bounds, prices, stock, streams
 
 HERE = Path(__file__).resolve().parent
-OWN = {HERE: ("__init__.py", "streams.py", "prices.py", "stock.py", "run.py"),
+OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "combined.py",
+              "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -103,6 +104,18 @@ def price_case(args, session, natural, opened, api, requirement, case, folder):
                       "Conditional winning-price distribution disagrees with the real pricing function")
 
 
+def producer_redraws(args, session, natural, readings, case):
+    """The real producer redraws the blocks under other seeds; each block's reading must agree with it."""
+    hits = 0
+    for seed in range(2 * 10 ** 6, 2 * 10 ** 6 + args.producer_redraws):
+        found = blocks.redraw(session, natural, readings, seed)
+        pinned.ensure(all(found.identical) and all(found.agreed),
+                      "Reading of the producer's draws disagrees with the producer")
+        hits += found.satisfied
+    case["producer_redraws"] = {"passes": args.producer_redraws, "identical_to_reading": args.producer_redraws,
+                                "requirement_held": hits}
+
+
 def stock_case(args, session, natural, opened, api, requirement, case, folder):
     try:
         block = stock.model(natural, requirement, api)
@@ -127,16 +140,7 @@ def stock_case(args, session, natural, opened, api, requirement, case, folder):
             "streams_opened_only_naturally": record["streams_opened_only_naturally"],
             "rebuilt_by_the_producer": record["rebuilt_by_the_producer"], "files": files})
     if args.producer_redraws:
-        # The real producer redraws the block under other seeds; this module's
-        # reading of the stock lines must agree with it draw for draw.
-        hits = 0
-        for seed in range(2 * 10 ** 6, 2 * 10 ** 6 + args.producer_redraws):
-            found = stock.redraw(session, natural, requirement, api, seed)
-            pinned.ensure(found.recorded == found.reading and found.satisfied == found.reading_satisfied,
-                          "Reading of the producer's stock lines disagrees with the producer")
-            hits += found.satisfied
-        case["producer_redraws"] = {"passes": args.producer_redraws, "identical_to_reading": args.producer_redraws,
-                                    "requirement_held": hits}
+        producer_redraws(args, session, natural, [stock.trial(natural, requirement, api)], case)
     if args.validate_trials:
         ends = stock.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
         hits = sum(ends.values())
@@ -149,7 +153,81 @@ def stock_case(args, session, natural, opened, api, requirement, case, folder):
                       "Conditional distribution of the block's ending disagrees with the producer's draws")
 
 
-CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_case)}
+def bound_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        block = price_bounds.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    place, limits = block.site, requirement["price_minor"]
+    listed = lambda world: next(o["price_minor"] for r in world["retailers"] for o in r["offers"]
+                                if o["offer_id"] == place.offer_id)
+    case.update(status="sampled", probability_given_upstream=block.probability, offer_id=place.offer_id,
+                natural_price_minor=listed(natural), prices_modelled=len(block.by_price))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        world, found, record = price_bounds.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        seconds = time.monotonic() - clock
+        # The saved leaf itself, read without the block model.
+        pinned.ensure(limits.get("min", 0) <= listed(world) <= limits.get("max", listed(world)) and
+                      not edits.price_rule_violations(world, api.native.rounded_price),
+                      "Direct reading disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        offers = record["repriced"][0]["offers"]
+        case["samples"].append({
+            "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+            "price_minor": found["price_minor"], "offers_of_the_product": len(offers),
+            "changed_price_leaves": sum(o["natural"] != o["steered"] for o in offers), "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [price_bounds.trial(natural, requirement, api)], case)
+    if args.validate_trials:
+        seen = price_bounds.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        hits = sum(seen.values())
+        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        # The offer's price given the requirement: model against the real pricing function.
+        distance = sum(abs(fsum(a[0] for a in block.by_price.get(p, ())) / block.probability - seen.get(p, 0) / hits)
+                       for p in set(block.by_price) | set(seen)) / 2 if hits else None
+        validation.update(price_total_variation=distance)
+        pinned.ensure(hits < 1000 or distance < 0.1,
+                      "Conditional price distribution disagrees with the real pricing function")
+
+
+def combined_case(args, session, natural, opened, api, requirement, case, folder):
+    for index in range(args.samples):
+        clock = time.monotonic()
+        try:
+            world, found, record = combined.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        except prices.ZeroMass as error:
+            case.update(status="zero_probability_given_upstream", reason=error.reason, part=error.part)
+            return
+        except blocks.Coupled as error:
+            case.update(status="refused", reason=error.reason, detail=str(error))
+            return
+        seconds = time.monotonic() - clock
+        parts = [part["probability_given_upstream"] for part in record["blocks"]]
+        files = write(folder(index), {"world.private.json": world, "observed.json": found, "steering.json": record})
+        case.update(status="sampled", probability_given_upstream=record["probability_given_upstream"],
+                    part_probabilities=parts, methods=[part["method"] for part in record["blocks"]])
+        case["samples"].append({
+            "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+            "streams_steered": record["streams_steered"],
+            "streams_opened_only_when_steered": record["streams_opened_only_when_steered"],
+            "streams_opened_only_naturally": record["streams_opened_only_naturally"], "files": files})
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, combined.trial(natural, requirement, api), case)
+    if args.validate_trials:
+        alone, together = combined.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
+        validation = frequency_check(case, case["probability_given_upstream"], together, args.validate_trials)
+        validation["parts"] = []
+        for probability, hits in zip(case["part_probabilities"], alone):
+            error = sqrt(probability * (1 - probability) / args.validate_trials)
+            validation["parts"].append({"hits": hits, "computed": probability, "standard_error": error})
+            pinned.ensure(abs(hits / args.validate_trials - probability) <= 4 * error,
+                          "A part's computed probability disagrees with the producer's draws")
+
+
+CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_case),
+         price_bounds.VERSION: ("price", bound_case), combined.VERSION: ("combined", combined_case)}
 
 
 def main():
@@ -166,8 +244,9 @@ def main():
                         help="redraw the block this many times under other seeds, outside the producer's "
                              "world loop, and compare the frequency with the computed probability")
     parser.add_argument("--producer-redraws", type=int, default=0,
-                        help="stock requirements: run the real producer this many times with the block's "
-                             "streams opened under other seeds and compare it with this module's reading")
+                        help="run the real producer this many times with the block's streams opened under "
+                             "other seeds and compare it with the block module's reading (not for a "
+                             "who-is-cheapest requirement by itself)")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     started = time.monotonic()
@@ -210,7 +289,7 @@ def main():
                   "Steering source changed")
     pinned.ensure(session.generate()[0]["world_id"] == natural["world_id"],
                   "An unsteered pass after the steered ones must still reproduce the natural world")
-    receipt = {"schema": "steered-generation-v2", "status": "passed_native_only",
+    receipt = {"schema": "steered-generation-v3", "status": "passed_native_only",
                "native_commit": args.native_commit, "native_root": str(root),
                "steering_commit": commit, "steering_source_sha256": own_pins, "native_source_sha256": final_pins,
                "generation_input_sha256": edits.byte_digest(inputs_raw),

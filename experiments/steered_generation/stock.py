@@ -21,16 +21,14 @@ from types import SimpleNamespace
 from experiments.world_requirement_construction import model as edits
 
 from . import streams
+from . import blocks
+from .blocks import Step, Unmet, bound, within
 from .prices import UNMATCHED, ZeroMass
 
 VERSION = "steered-offer-stock-v1"
 AVAILABILITY = ("in_stock", "backorder", "unavailable")
 # What the locations seen so far hold of the SKU.
 NOWHERE, NOT_SHIPPABLE, DISPATCH = 0, 1, 2
-
-
-class Unmet(ValueError):
-    """A world does not satisfy the requirement."""
 
 
 def resolve(requirement):
@@ -45,16 +43,9 @@ def resolve(requirement):
         bounds = requirement["stock"]
         if type(bounds) is not dict or not bounds or any(type(source) is not str for source in bounds):
             raise ValueError("Stock bounds are given per source location")
-        for bound in bounds.values():
-            if (type(bound) is not dict or not bound or set(bound) - {"min", "max"} or
-                    any(type(v) is not int or v < 0 for v in bound.values()) or
-                    bound.get("min", 0) > bound.get("max", bound.get("min", 0))):
-                raise ValueError("A stock bound is a non-negative min, max or both")
+        if not all(map(bound, bounds.values())):
+            raise ValueError("A stock bound is a non-negative min, max or both")
     return json.loads(json.dumps(requirement))
-
-
-def within(bound, held):
-    return bound.get("min", 0) <= held <= bound.get("max", held)
 
 
 def availability(state, supplier):
@@ -215,8 +206,8 @@ def check(world, requirement, api):
     """Read the requirement off a world: recorded quantities and the native oracle's availability."""
     place = site(world, requirement, api)
     found = recorded(world, place)
-    for source, bound in place.requirement.get("stock", {}).items():
-        if not within(bound, found["stock_by_source"][source]):
+    for source, limits in place.requirement.get("stock", {}).items():
+        if not within(limits, found["stock_by_source"][source]):
             raise Unmet(f"{source} holds {found['stock_by_source'][source]}")
     _, reference = edits._reference(world, {"concept_id": place.concept_id}, api)
     judged = next((row["availability"] for row in reference["candidates"] if row["offer_id"] == place.offer_id),
@@ -226,26 +217,6 @@ def check(world, requirement, api):
     if place.requirement.get("availability", judged) != judged:
         raise Unmet("The native oracle judges the offer " + judged)
     return {**found, "availability": judged}
-
-
-def _background(world, place):
-    """Canonical JSON of everything but identity and the leaves stock draws of this retailer/product decide."""
-    def retailer(value):
-        if value["retailer_id"] != place.retailer_id:
-            return value
-        own = lambda row: row["product_id"] == place.product_id
-        return {**value,
-                "conditions": [{k: v for k, v in row.items() if k != "condition"} if own(row) else row
-                               for row in value["conditions"]],
-                "offers": [{k: v for k, v in o.items() if k not in ("stock_by_source", "supplier_order")}
-                           if own(o) else o for o in value["offers"]],
-                "catalog": [{**entry, "pages": [
-                    {**{k: v for k, v in page.items() if k != "warehouse_sold_out"},
-                     "listings": [{k: v for k, v in row.items() if k != "stock"} for row in page["listings"]]}
-                    for page in entry["pages"]]} if own(entry) else entry for entry in value["catalog"]]}
-    view = {k: v for k, v in world.items() if k not in edits.META_FIELDS}
-    view["retailers"] = [retailer(r) for r in world["retailers"]]
-    return json.dumps(view, sort_keys=True, ensure_ascii=False, allow_nan=False)
 
 
 def dependants(natural, world, place):
@@ -265,39 +236,42 @@ def dependants(natural, world, place):
             "catalog_pages_changed": sum(a != b for a, b in zip(pages_before, pages_now))}
 
 
-def steer(session, natural, natural_opened, requirement, api, rng):
-    """Plan on the natural world, regenerate through the real producer, verify."""
+def prepare(natural, requirement, api, rng):
+    """Sample the block on the natural world; the step replays it and reads the result."""
     draws, block = plan(natural, requirement, api, rng)
     place = block.site
-    script = scripts(place, draws)
-    world, opened = session.generate(script)
-    if recorded(world, place) != planned(draws):
-        raise streams.PlanMismatch(f"{place.offer_id}: producer recorded {recorded(world, place)}, "
-                                   f"plan was {planned(draws)}")
-    if _background(natural, place) != _background(world, place):
-        raise AssertionError("Steering the stock draws changed something they do not decide")
-    record = {"method": "exact_conditional_stock_block", "requirement": place.requirement,
-              "natural_world_id": natural["world_id"], "probability_given_upstream": block.probability,
-              "offer_id": place.offer_id, "natural": recorded(natural, place), "steered": planned(draws),
-              "streams_opened": len(opened), "streams_steered": len(script),
-              "streams_opened_only_when_steered": len(set(opened) - set(natural_opened)),
-              "streams_opened_only_naturally": len(set(natural_opened) - set(opened)),
-              "rebuilt_by_the_producer": dependants(natural, world, place),
-              "distribution_claim": "This offer's stock draws (a condition and a quantity per location, and supplier "
-                                    "eligibility) are sampled from their distribution given the requirement and "
-                                    "all upstream draws, under the model in stock.atoms and stock.model. Every "
-                                    "other draw is the seed's own; the product's other SKUs at this retailer are "
-                                    "re-evaluated by the producer under the sampled conditions. Upstream draws "
-                                    "are not reweighted; use probability_given_upstream as the importance weight "
-                                    "across seeds."}
-    streams.relabel(world, record, api)
-    return world, {**check(world, requirement, api), "offer_id": place.offer_id}, record
+
+    def record(world):
+        if recorded(world, place) != planned(draws):
+            raise streams.PlanMismatch(f"{place.offer_id}: producer recorded {recorded(world, place)}, "
+                                       f"plan was {planned(draws)}")
+        return {"method": "exact_conditional_stock_block", "requirement": place.requirement,
+                "natural_world_id": natural["world_id"], "probability_given_upstream": block.probability,
+                "offer_id": place.offer_id, "natural": recorded(natural, place), "steered": planned(draws),
+                "rebuilt_by_the_producer": dependants(natural, world, place),
+                "distribution_claim": "This offer's stock draws (a condition and a quantity per location, and supplier "
+                                      "eligibility) are sampled from their distribution given the requirement and "
+                                      "all upstream draws, under the model in stock.atoms and stock.model. Every "
+                                      "other draw is the seed's own; the product's other SKUs at this retailer are "
+                                      "re-evaluated by the producer under the sampled conditions. Upstream draws "
+                                      "are not reweighted; use probability_given_upstream as the importance weight "
+                                      "across seeds."}
+
+    # The conditions are shared, so the block decides the stock of every SKU of the product here.
+    return Step(script=scripts(place, draws), probability=block.probability,
+                writes={("stock", place.retailer_id, place.product_id)}, reads=set(), record=record,
+                check=lambda world: {**check(world, requirement, api), "offer_id": place.offer_id})
+
+
+def steer(session, natural, natural_opened, requirement, api, rng):
+    """Plan on the natural world, regenerate through the real producer, verify."""
+    return blocks.steer(session, natural, natural_opened, prepare(natural, requirement, api, rng), api)
 
 
 def natural_draws(place, api, seed):
     """This module's reading of the producer's stock lines, drawn under another seed.
 
-    Uses the producer's own stream and weighted-choice functions. `redraw`
+    Uses the producer's own stream and weighted-choice functions. `blocks.redraw`
     checks it against the real producer draw for draw; it is then cheap enough
     to estimate frequencies from.
     """
@@ -334,8 +308,8 @@ def judged(place, found):
 
 def holds(place, found):
     """Whether recorded draws satisfy the requirement, without the block model's atoms."""
-    return (all(within(bound, found["stock_by_source"][name])
-                for name, bound in place.requirement.get("stock", {}).items()) and
+    return (all(within(limits, found["stock_by_source"][name])
+                for name, limits in place.requirement.get("stock", {}).items()) and
             place.requirement.get("availability") in (None, judged(place, found)))
 
 
@@ -350,22 +324,23 @@ def empirical(natural, requirement, api, trials, first_seed):
     return ends
 
 
-def redraw(session, natural, requirement, api, seed):
-    """One pass of the real producer with this offer's stock streams opened under another seed.
+def block_keys(place):
+    return {key for source in place.sources for key in source.keys.values()} | {place.supplier_key}
 
-    Returns what the producer recorded for the offer, the native oracle's
-    judgement of it, and this module's reading of the same draws. Everything
-    the stock draws do not decide must still equal the natural world.
-    """
+
+def trial(natural, requirement, api):
+    """This module's reading of the block under another seed, and the same leaves read off a world."""
     place = site(natural, requirement, api)
-    block = {key for source in place.sources for key in source.keys.values()} | {place.supplier_key}
-    world, _ = session.generate({key: streams.Reseeded(seed) for key in block})
-    if _background(natural, place) != _background(world, place):
-        raise AssertionError("Redrawing the stock streams changed something they do not decide")
+    return SimpleNamespace(keys=block_keys(place), writes={("stock", place.retailer_id, place.product_id)},
+                           reads=set(),
+                           reading=lambda seed: natural_draws(place, api, seed),
+                           holds=lambda seed: holds(place, natural_draws(place, api, seed)),
+                           recorded=lambda world: recorded(world, place),
+                           satisfied=lambda world: satisfied(world, requirement, api))
+
+
+def satisfied(world, requirement, api):
     try:
-        satisfied = bool(check(world, requirement, api))
+        return bool(check(world, requirement, api))
     except Unmet:
-        satisfied = False
-    reading = natural_draws(place, api, seed)
-    return SimpleNamespace(recorded=recorded(world, place), satisfied=satisfied,
-                           reading=reading, reading_satisfied=holds(place, reading))
+        return False

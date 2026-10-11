@@ -15,7 +15,8 @@ from types import SimpleNamespace
 
 from experiments.world_requirement_construction import model as edits
 
-from .streams import STATUS, PlanMismatch, relabel
+from . import blocks
+from .streams import PlanMismatch
 
 # A `random()` result that is never below a match probability smaller than 1.
 UNMATCHED = 1 - 2 ** -53
@@ -193,23 +194,15 @@ def plan(world, requirement, api, rng):
     return draws, block_model.probability, winning
 
 
-def steer(session, natural, requirement, api, rng):
-    """Plan on the natural world, regenerate through the real producer, verify."""
-    draws, probability, winning = plan(natural, requirement, api, rng)
-    config = natural["config"]["retailer_price"]
-    keys = {pair: api.commerce.VERSION + "/" + pair[0] + "/" + pair[1] + "/price" for pair in draws}
-    world, opened = session.generate({keys[pair]: script(draw, config) for pair, draw in draws.items()})
-    changed, repriced = set(), []
+def replayed(natural, world, draws, keys):
+    """Check that the producer recorded the planned price draws; describe what they repriced."""
     for retailer in world["retailers"]:
         for offer in retailer["offers"]:
             pair = (retailer["retailer_id"], offer["product_id"])
-            if pair in draws:
-                if edits._draw(offer) != draws[pair]:
-                    raise PlanMismatch(f"{offer['offer_id']}: producer recorded {edits._draw(offer)}, plan was {draws[pair]}")
-                changed.add(offer["offer_id"])
-    if not edits._only_declared_changes(natural, world, changed):
-        raise AssertionError("Steering the price draws changed something other than the block's prices")
+            if pair in draws and edits._draw(offer) != draws[pair]:
+                raise PlanMismatch(f"{offer['offer_id']}: producer recorded {edits._draw(offer)}, plan was {draws[pair]}")
     by_id = {o["offer_id"]: o for r in natural["retailers"] for o in r["offers"]}
+    repriced = []
     for pair in sorted(draws):
         group = [o for r in world["retailers"] if r["retailer_id"] == pair[0]
                  for o in r["offers"] if o["product_id"] == pair[1]]
@@ -218,27 +211,63 @@ def steer(session, natural, requirement, api, rng):
                          "steered_draw": dict(zip(edits.DRAW_FIELDS, draws[pair])),
                          "offers": [{"offer_id": o["offer_id"], "natural": by_id[o["offer_id"]]["price_minor"],
                                      "steered": o["price_minor"]} for o in group]})
-    record = {"method": "exact_conditional_price_block", "requirement": edits.resolve(requirement),
-              "natural_world_id": natural["world_id"],
-              "probability_given_upstream": probability, "winning_price_minor": winning,
-              "streams_opened": len(opened), "streams_steered": len(draws), "repriced": repriced,
-              "distribution_claim": "The price draw of every retailer/product pair of the concept with an "
-                                    "available offer is sampled from its distribution given the requirement and "
-                                    "all upstream draws, under the price model in prices.atoms. Pairs with no "
-                                    "available offer keep the seed's own draw. "
-                                    "Upstream draws are not reweighted; use probability_given_upstream as the "
-                                    "importance weight across seeds."}
-    relabel(world, record, api)
-    task, reference = edits.check(world, requirement, api)
-    return world, task, reference, record
+    return repriced
 
 
-def empirical(natural, requirement, api, trials, first_seed):
-    """Redraw the price block with the real `_offer_price` under other seeds.
+def stream_keys(pairs, api):
+    return {pair: api.commerce.VERSION + "/" + pair[0] + "/" + pair[1] + "/price" for pair in pairs}
 
-    Returns how often the requirement held and the winning prices when it did.
+
+def competing(world, concept_id):
+    """Every listed retailer/product pair of the concept: the oracle judges all of their stock."""
+    concepts = {p["public"]["product_id"]: p["public"]["concept_id"] for p in world["products"]}
+    return {(r["retailer_id"], o["product_id"]) for r in world["retailers"] for o in r["offers"]
+            if concepts[o["product_id"]] == concept_id}
+
+
+def prepare(natural, requirement, api, rng):
+    """Sample the block on the natural world; the step replays it and reads the result."""
+    draws, probability, winning = plan(natural, requirement, api, rng)
+    config = natural["config"]["retailer_price"]
+    keys = stream_keys(draws, api)
+
+    def record(world):
+        return {"method": "exact_conditional_price_block", "requirement": edits.resolve(requirement),
+                "natural_world_id": natural["world_id"],
+                "probability_given_upstream": probability, "winning_price_minor": winning,
+                "repriced": replayed(natural, world, draws, keys),
+                "distribution_claim": "The price draw of every retailer/product pair of the concept with an "
+                                      "available offer is sampled from its distribution given the requirement and "
+                                      "all upstream draws, under the price model in prices.atoms. Pairs with no "
+                                      "available offer keep the seed's own draw. "
+                                      "Upstream draws are not reweighted; use probability_given_upstream as the "
+                                      "importance weight across seeds."}
+
+    def check(world):
+        task, reference = edits.check(world, requirement, api)
+        return {"task": task, "reference": reference}
+
+    # Which offers compete is decided by the stock of every pair of the concept.
+    return blocks.Step(script={keys[pair]: script(draw, config) for pair, draw in draws.items()},
+                       probability=probability,
+                       writes={("price", *pair) for pair in draws},
+                       reads={("stock", *pair) for pair in competing(natural, requirement["concept_id"])},
+                       record=record, check=check)
+
+
+def steer(session, natural, requirement, api, rng):
+    """Plan on the natural world, regenerate through the real producer, verify."""
+    world, found, record = blocks.steer(session, natural, None, prepare(natural, requirement, api, rng), api)
+    return world, found["task"], found["reference"], record
+
+
+def trial(natural, requirement, api):
+    """The block redrawn with the real `_offer_price` under another seed.
+
     Independent of `atoms`: the producer's own pricing function, on this
-    world's products, assortment and stock.
+    world's products, assortment and stock. `reading(seed)` is every block
+    offer's price under that seed, `winning(seed)` the winning price when the
+    requirement holds and None otherwise.
     """
     requirement = edits.resolve(requirement)
     config = natural["config"]["retailer_price"]
@@ -246,11 +275,36 @@ def empirical(natural, requirement, api, trials, first_seed):
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
     products = {p["public"]["product_id"]: p["public"] for p in natural["products"]}
     skus = {s["sku_id"]: s for p in products.values() for s in p["skus"]}
-    winning = Counter()
-    for seed in range(first_seed, first_seed + trials):
-        low = {pair: min(api.commerce._offer_price(seed, pair[0], products[pair[1]], skus[o["sku_id"]], config)[0]
-                         for o in entry["buyable"]) for pair, entry in pairs.items()}
+    price = lambda seed, pair, o: api.commerce._offer_price(seed, pair[0], products[pair[1]], skus[o["sku_id"]], config)[0]
+
+    def winning(seed):
+        low = {pair: min(price(seed, pair, o) for o in entry["buyable"]) for pair, entry in pairs.items()}
         floor_price = min(low.values())
-        if {pair for pair, price in low.items() if price == floor_price} == designated:
-            winning[floor_price] += 1
-    return winning
+        return floor_price if {pair for pair, found in low.items() if found == floor_price} == designated else None
+
+    def recorded(world):
+        return {o["offer_id"]: o["price_minor"] for r in world["retailers"] for o in r["offers"]
+                if (r["retailer_id"], o["product_id"]) in pairs}
+
+    return SimpleNamespace(
+        keys=set(stream_keys(pairs, api).values()), writes={("price", *pair) for pair in pairs},
+        reads={("stock", *pair) for pair in competing(natural, requirement["concept_id"])}, winning=winning,
+        holds=lambda seed: winning(seed) is not None, recorded=recorded,
+        satisfied=lambda world: satisfied(world, requirement, api),
+        reading=lambda seed: {o["offer_id"]: price(seed, pair, o) for pair, entry in pairs.items() for o in entry["group"]})
+
+
+def satisfied(world, requirement, api):
+    try:
+        return bool(edits.check(world, requirement, api))
+    except edits.CannotConstruct as error:
+        if error.reason != "winners":
+            raise
+        return False
+
+
+def empirical(natural, requirement, api, trials, first_seed):
+    """How often the requirement holds under other seeds, by winning price."""
+    winning = trial(natural, requirement, api).winning
+    found = (winning(seed) for seed in range(first_seed, first_seed + trials))
+    return Counter(price for price in found if price is not None)
