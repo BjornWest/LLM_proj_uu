@@ -198,7 +198,9 @@ def test_real_installed_dispatch_no_reply_is_send_not_pending_wait(tmp_path):
                 ignored_id = messages[-1]['id']
                 connection.dispatch({'id': ignored_id, 'result': {}})
                 assert ignored_id not in connection._callbacks and not ignored.future.done()
-                assert ignored.future._callbacks is None  # No diagnostic completion observer.
+                assert len(ignored.future._callbacks) == 1
+                assert ignored.future._callbacks[0][0].__qualname__.startswith('ProtocolCallback.')
+                # Retain the native completion callback, with no diagnostic observer.
                 ordinary = connection._send_message_to_server(channel, 'click', {})
                 connection.dispatch({'id': messages[-1]['id'], 'result': {}})
                 await asyncio.sleep(0)
