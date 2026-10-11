@@ -1,4 +1,5 @@
 """Actual runner default selection and pre-dispatch failures, zero providers."""
+from contextlib import ExitStack
 from copy import deepcopy
 from dataclasses import replace
 import json
@@ -67,9 +68,11 @@ def exercise(tmp_path, *, model='z-ai/glm-5.3-flash', limit=100000,
         assert native_tools_profile().ax_config is None  # AX cannot select policy tokenizer.
     profile = replace(native_tools_profile(ax_config=ax_config), feedback_factory=SemanticFeedback)
     try:
-        with patch('intent_browser.runner.refresh_observation', side_effect=lambda env: env.obs()), \
-                patch('intent_browser.runner.observation_text', return_value='Inspect'), \
-                patch('intent_browser.harness.flatten_axtree_to_str', return_value='Inspect'):
+        with ExitStack() as mocks:
+            if ax_config is not None:
+                mocks.enter_context(patch('intent_browser.runner.refresh_observation', side_effect=lambda env: env.obs()))
+            mocks.enter_context(patch('intent_browser.runner.observation_text', return_value='Inspect'))
+            mocks.enter_context(patch('intent_browser.harness.flatten_axtree_to_str', return_value='Inspect'))
             options = dict(harness_profile=profile, max_steps=2,
                            max_input_tokens=limit, input_counter=counter)
             if factory is None:

@@ -104,6 +104,7 @@ def send_frame(connection, value, bound, deadline):
 @dataclass(frozen=True)
 class Encoding:
     ids: list
+    offsets: list
 
 
 class SharedTokenizer:
@@ -136,7 +137,18 @@ class SharedTokenizer:
                 raise SharedTokenizerError('Tokenizer socket owner/mode mismatch')
             with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
                 connection.settimeout(max(0.001, deadline - time.monotonic()))
-                connection.connect(self.config.socket_path)
+                while True:
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        raise TimeoutError('Tokenizer connection admission deadline exceeded')
+                    connection.settimeout(remaining)
+                    try:
+                        connection.connect(self.config.socket_path)
+                        break
+                    except BlockingIOError:
+                        # Linux AF_UNIX timeout-mode connect returns EAGAIN when
+                        # the finite backlog is full. No request has been sent.
+                        time.sleep(min(.005, max(0, deadline-time.monotonic())))
                 peer = struct.unpack('3i', connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
                 if peer[1] != os.getuid():
                     raise SharedTokenizerError('Tokenizer peer owner mismatch')
@@ -168,21 +180,29 @@ class SharedTokenizer:
     def encode(self, text, add_special_tokens=True):
         if not isinstance(text, str) or type(add_special_tokens) is not bool:
             raise ValueError('Tokenizer encode requires text and a boolean special-token flag')
-        ids = self._rpc('encode', text=text, add_special_tokens=add_special_tokens)
-        if not isinstance(ids, list) or any(type(i) is not int or not 0 <= i <= 0xffffffff for i in ids):
-            raise SharedTokenizerError('Invalid token IDs returned')
-        return Encoding(ids)
+        return self._encoding(self._rpc('encode', text=text, add_special_tokens=add_special_tokens), text)
+
+    @staticmethod
+    def _encoding(value, text):
+        if not isinstance(value, dict) or set(value) != {'ids', 'offsets'}:
+            raise SharedTokenizerError('Invalid encoding returned')
+        ids, offsets = value['ids'], value['offsets']
+        if (not isinstance(ids,list) or any(type(i) is not int or not 0 <= i <= 0xffffffff for i in ids)
+                or not isinstance(offsets,list) or len(offsets) != len(ids)
+                or any(not isinstance(pair,list) or len(pair)!=2 or
+                       any(type(i) is not int for i in pair) or not 0 <= pair[0] <= pair[1] <= len(text)
+                       for pair in offsets)):
+            raise SharedTokenizerError('Invalid token IDs/offsets returned')
+        return Encoding(ids, [tuple(pair) for pair in offsets])
 
     def encode_batch(self, texts, add_special_tokens=True):
         if (not isinstance(texts, list) or any(not isinstance(t, str) for t in texts) or
                 type(add_special_tokens) is not bool):
             raise ValueError('Tokenizer batch requires a list of texts and boolean flag')
         results = self._rpc('encode_batch', texts=texts, add_special_tokens=add_special_tokens)
-        if (not isinstance(results, list) or len(results) != len(texts) or
-                any(not isinstance(ids, list) or any(type(i) is not int or not 0 <= i <= 0xffffffff
-                                                     for i in ids) for ids in results)):
-            raise SharedTokenizerError('Invalid batched token IDs returned')
-        return [Encoding(ids) for ids in results]
+        if not isinstance(results,list) or len(results)!=len(texts):
+            raise SharedTokenizerError('Invalid batched encoding returned')
+        return [self._encoding(result,text) for result,text in zip(results,texts)]
 
     def count_batch(self, texts):
         if not isinstance(texts, list) or any(not isinstance(t, str) for t in texts):

@@ -350,7 +350,12 @@ class AXContext(AXExplorer):
     def partial_overview(self,observation,budget=None):
         """Preview only: never prune/acknowledge the full-tree visit ledger."""
         if not hasattr(self,'_preview_explorer'):
-            self._preview_explorer=AXExplorer(self.config)
+            preview=AXExplorer(self.config)
+            if (self.config.shared_tokenizer is not None and
+                    preview.tokenizer._instance != self.tokenizer._instance):
+                from .shared_tokenizer import SharedTokenizerError
+                raise SharedTokenizerError('Shared tokenizer restarted; requalification required')
+            self._preview_explorer=preview
         preview=self._preview_explorer
         preview.capture(observation)
         budget=self.config.overview_tokens if budget is None else budget

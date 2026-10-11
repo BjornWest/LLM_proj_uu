@@ -99,22 +99,29 @@ not limited by token-ID count) and 256 batch entries. Asset files are
 limited to 64 MiB each. Configure finite handler capacity for your workload
 before acceptance (`--max-clients`, maximum 128). An accepted connection waits
 for a handler within the same finite request deadline; one accepted waiter and
-the 16-entry kernel backlog bound pending admission. No implicit retry or local
+the 16-entry kernel backlog bound pending admission. Linux queue-full connection
+admission waits within the client deadline, before any request bytes are sent;
+this never retries an executed RPC. No implicit request retry or local
 fallback occurs. Handler threads and the socket backlog are bounded. Native tokenizer computation is bounded by admitted
 input/output sizes and job resources; the I/O/completion deadline does not
 preempt an in-progress Rust operation. The outer finite supervisor timeout owns
-whole-service termination.
+whole-service termination. Admission observes owner stop at 50ms intervals.
+Terminal diagnostics have at most 100ms additional I/O grace with no further
+encoding. Already-disconnected queued clients are dropped before native work;
+a disconnect during native computation cannot preempt it.
 
 There is no global text/result cache. AX previews use an episode-owned cache
 bounded to 512 entries and a conservative 1 MiB size charge, never caching full
 token lists. Short previews and candidate result sizes are batched; long node
 reads remain explicitly paged. Token IDs, decode flags, budgets, returned entries
-and delivery acknowledgments must match the local path. Full-request counts
+character offsets and delivery acknowledgments must match the local path.
+Single and batched encodings retain native token offsets for fact-provenance
+node paging. New preview clients must share their parent client’s service instance. Full-request counts
 always contact the service, even when AX previews are cached.
 
 Unavailable/mismatched service, oversized requests and transport deadlines are
 explicit infrastructure errors, with safe cause codes (`bound`, `asset`,
-`protocol`, `timeout`, `unavailable`, `connection_closed`, `internal`). Oversized
+`protocol`, `saturated`, `timeout`, `unavailable`, `connection_closed`, `internal`). Oversized
 UTF-8 text or escaped wire payloads can fail before an over-context count is
 available; this is a service-bound failure, not a model task verdict. AX
 speculative count batches exceeding a bound are counted individually and lazily

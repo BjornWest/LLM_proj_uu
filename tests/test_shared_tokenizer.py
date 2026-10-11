@@ -64,6 +64,7 @@ class ServiceFixture(unittest.TestCase):
             for special in (False, True):
                 ids = self.local.encode(text, add_special_tokens=special).ids
                 self.assertEqual(client.encode(text, special).ids, ids)
+                self.assertEqual(client.encode(text, special).offsets, self.local.encode(text,add_special_tokens=special).offsets)
                 self.assertEqual(client.count(text, special), len(ids))
                 for skip in (False, True):
                     self.assertEqual(client.decode(ids, skip), self.local.decode(ids, skip_special_tokens=skip))
@@ -166,6 +167,80 @@ class ServiceFixture(unittest.TestCase):
                 return True
             with ThreadPoolExecutor(max_workers=capacity) as pool:
                 self.assertEqual(list(pool.map(run,range(capacity))),[True]*capacity)
+
+    def test_queue_full_connect_wait_and_large_client_burst(self):
+        config,service=self.start(max_clients=1)
+        clients=[self.client(config) for _ in range(34)]
+        barrier=threading.Barrier(34)
+        dispatch=service.dispatch
+        def slow(request):
+            time.sleep(.003)
+            return dispatch(request)
+        service.dispatch=slow
+        def run(client):
+            barrier.wait(timeout=5)
+            for i in range(20):self.assertEqual(client.count('hello world'),2)
+        with ThreadPoolExecutor(max_workers=34) as pool:
+            list(pool.map(run,clients))
+
+    def test_queue_full_connection_wait_has_finite_deadline(self):
+        path=str(self.root/'full.sock')
+        with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as listener:
+            listener.bind(path);os.chmod(path,0o600);listener.listen(1)
+            holders=[]
+            try:
+                for _ in range(2):
+                    holder=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+                    holder.connect(path);holders.append(holder)
+                started=time.monotonic()
+                with self.assertRaises(SharedTokenizerError) as failure:
+                    self.client(SharedTokenizerConfig(path,timeout_seconds=.08))
+                self.assertEqual(failure.exception.code,'timeout')
+                self.assertLess(time.monotonic()-started,.4)
+            finally:
+                for holder in holders:holder.close()
+
+    def test_saturation_and_native_overrun_diagnostics(self):
+        config,service=self.start(max_clients=1,request_seconds=.12)
+        first,second=self.client(config),self.client(config)
+        entered=threading.Event();dispatch=service.dispatch
+        def slow(request):
+            if request['operation']=='count':
+                entered.set();time.sleep(.45)
+            return dispatch(request)
+        service.dispatch=slow
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            future=pool.submit(first.count,'hello')
+            self.assertTrue(entered.wait(1))
+            with self.assertRaises(SharedTokenizerError) as failure:second.count('hello')
+            self.assertEqual(failure.exception.code,'saturated')
+            with self.assertRaises(SharedTokenizerError) as overrun:future.result(timeout=2)
+            self.assertEqual(overrun.exception.code,'timeout')
+
+    def test_owner_stop_interrupts_admission_wait(self):
+        config,service=self.start(max_clients=1,request_seconds=3)
+        clients=[self.client(config),self.client(config)]
+        entered=threading.Event();release=threading.Event();dispatch=service.dispatch
+        def held(request):
+            entered.set();release.wait(2)
+            return dispatch(request)
+        service.dispatch=held
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            first=pool.submit(clients[0].count,'hello');self.assertTrue(entered.wait(1))
+            second=pool.submit(clients[1].count,'hello');time.sleep(.05)
+            started=time.monotonic();service.stop();self.services[-1][1].join(.5)
+            self.assertFalse(self.services[-1][1].is_alive());self.assertLess(time.monotonic()-started,.5)
+            release.set()
+            self.assertEqual(first.result(timeout=3),1)
+            with self.assertRaises(SharedTokenizerError):second.result(timeout=3)
+
+    def test_new_partial_preview_cannot_repin_after_service_restart(self):
+        from intent_browser.ax_context import AXContext
+        context=AXContext(AXConfig(str(self.path),incremental=True,shared_tokenizer=self.config))
+        self.service.instance='replacement'
+        obs={'url':'http://fixture/','axtree_object':{'nodes':[]}}
+        with self.assertRaisesRegex(SharedTokenizerError,'restarted'):context.partial_overview(obs)
+        self.assertFalse(hasattr(context,'_preview_explorer'))
 
     def test_count_only_not_limited_by_transferred_id_limit(self):
         config,_=self.start(max_ids=1)

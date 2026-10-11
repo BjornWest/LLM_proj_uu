@@ -109,7 +109,7 @@ class TokenizerService:
             encodings = tokenizer.encode_batch(texts, add_special_tokens=request['add_special_tokens'])
             if operation == 'encode_batch' and sum(len(e.ids) for e in encodings) > self.max_ids:
                 raise RequestRejected('bound')
-            result = [len(e.ids) for e in encodings] if operation == 'count_batch' else [e.ids for e in encodings]
+            result = [len(e.ids) for e in encodings] if operation == 'count_batch' else [{'ids':e.ids,'offsets':e.offsets} for e in encodings]
         elif operation == 'decode_batch':
             sequences = request['sequences']
             if (not isinstance(sequences, list) or len(sequences) > 256 or
@@ -126,10 +126,11 @@ class TokenizerService:
             if (not isinstance(text, str) or len(text.encode('utf-8')) > self.max_text_bytes or
                     type(request['add_special_tokens']) is not bool):
                 raise RequestRejected('bound')
-            ids = tokenizer.encode(text, add_special_tokens=request['add_special_tokens']).ids
+            encoding = tokenizer.encode(text, add_special_tokens=request['add_special_tokens'])
+            ids = encoding.ids
             if operation == 'encode' and len(ids) > self.max_ids:
                 raise RequestRejected('bound')
-            result = len(ids) if operation == 'count' else ids
+            result = len(ids) if operation == 'count' else {'ids':ids,'offsets':encoding.offsets}
         elif operation == 'decode':
             ids = request['ids']
             if (not isinstance(ids, list) or len(ids) > self.max_ids or
@@ -152,6 +153,15 @@ class TokenizerService:
                 return
             try:
                 request = receive_frame(connection, self.max_frame_bytes, deadline)
+                # A timed-out queued client closes its socket. Do not encode its
+                # abandoned request after admission. Closing after this check is
+                # still a bounded unavoidable race with native computation.
+                connection.setblocking(False)
+                try:
+                    if connection.recv(1, socket.MSG_PEEK) == b'':
+                        return
+                except BlockingIOError:
+                    pass
                 response = self.dispatch(request)
             except RequestRejected as error:
                 response = {'ok': False, 'error': error.code}
@@ -161,6 +171,9 @@ class TokenizerService:
                 response = {'ok': False, 'error': 'protocol'}
             except Exception:
                 response = {'ok': False, 'error': 'internal'}
+            if time.monotonic() >= deadline:
+                response={'ok':False,'error':'timeout'}
+                deadline=time.monotonic()+.1  # Diagnostic-only grace, no computation.
             send_frame(connection, response, self.max_frame_bytes, deadline)
         except Exception:
             pass  # Closed/timed-out clients do not stop the service or trigger retry.
@@ -192,10 +205,20 @@ class TokenizerService:
                     # consumes the SAME request deadline as handling; no unbounded
                     # handler/queue growth and no spurious instant capacity rejection.
                     deadline = time.monotonic() + self.request_seconds
-                    if not self._slots.acquire(timeout=max(0, deadline-time.monotonic())):
+                    admitted = False
+                    while not self._stop.is_set() and time.monotonic() < deadline:
+                        if self._slots.acquire(timeout=min(.05,max(0,deadline-time.monotonic()))):
+                            admitted=True
+                            break
+                    if not admitted:
                         try:
-                            send_frame(connection, {'ok': False, 'error': 'saturated'},
-                                       self.max_frame_bytes, deadline)
+                            if not self._stop.is_set():
+                                grace=time.monotonic()+.1
+                                # Drain exactly one bounded frame so close does not
+                                # reset unread payload before the rejection arrives.
+                                receive_frame(connection,self.max_frame_bytes,grace)
+                                send_frame(connection, {'ok': False, 'error': 'saturated'},
+                                           self.max_frame_bytes, grace)
                         except Exception:
                             pass
                         finally:

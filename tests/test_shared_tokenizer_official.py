@@ -75,6 +75,34 @@ class OfficialParityTests(unittest.TestCase):
                         self.assertEqual(shared.visible_counter.tokenizer.decode(ids,False),
                                          local.visible_counter.tokenizer.decode(ids,skip_special_tokens=False))
 
+    def test_fact_node_page_offsets_and_projection_match_local(self):
+        from unittest.mock import patch
+        from intent_browser.ax_explorer import AXConfig
+        from tests.test_fact_provenance import ProvenanceTests
+        qwen=ASSETS/ENTRIES['qwen/qwen3.8-27b']['bundle']/'tokenizer.json'
+        projections=[];pages=[]
+        for mode in ('local','shared'):
+            helper=ProvenanceTests();helper.setUp()
+            try:
+                config=self.config if mode=='shared' else None
+                def make_config(*args,**kwargs):
+                    return AXConfig(str(qwen),**kwargs,shared_tokenizer=config)
+                with patch('tests.test_fact_provenance.AXConfig',side_effect=make_config):
+                    context,obs,recorder=helper.fixture('Quote "a" 😀\n'+(' b '*1000),budget=512)
+                context.capture(obs);offset=0;found=[];outputs=[]
+                while True:
+                    out=context.read(context.ref(1),view='node',text_offset=offset,repeat=True)
+                    selected,_=helper.mapped(recorder,out)
+                    outputs.append(out);found.extend(selected['record']['projections'])
+                    offset=out['next_text_offset']
+                    if offset is None:break
+                    self.assertLess(len(outputs),60)
+                self.assertGreater(len(outputs),1);self.assertTrue(found)
+                self.assertFalse(any(name=='fact_recording_unknown' for name,_ in helper.events))
+                projections.append(found);pages.append(outputs)
+            finally:helper.doCleanups()
+        self.assertEqual(pages[0],pages[1]);self.assertEqual(projections[0],projections[1])
+
     def test_unknown_model_missing_bundle_and_unavailable_never_fall_back(self):
         unknown=SimpleNamespace(model='unknown/model',base_url='https://openrouter.ai/api/v1')
         with self.assertRaisesRegex(ValueError,'No model-matched'):
