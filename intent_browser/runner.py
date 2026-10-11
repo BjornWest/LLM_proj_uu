@@ -49,7 +49,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 trace_screenshots=None, async_recording=True, debug_timings=None,
                 checkpoint_control=None, record_fact_provenance=False, fact_source_provider=None,
                 automatic_grading=None, allow_ungraded=False, ungraded_reason=None, fact_capture_observer=None,
-                environment_admission=None):
+                environment_admission=None, env_step_telemetry=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
@@ -83,6 +83,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         validate_options(automatic_grading, allow_ungraded, ungraded_reason)
     from .debug_timings import resolve_debug_timings
     debug_timings=resolve_debug_timings(debug_timings)
+    from .step_telemetry import resolve_step_telemetry
+    env_step_telemetry=resolve_step_telemetry(env_step_telemetry)
     if type(async_recording) is not bool:
         raise ValueError('async_recording must be boolean')
     if trace_screenshots is not None and type(trace_screenshots) is not bool:
@@ -221,6 +223,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             {'search_backend':search_backend,'action_timeout_ms':action_timeout_ms,'retry_policy':retry_policy,
              'observation_text_limit':observation_text_limit,'decision_wait':decision_wait,
              'trace_screenshots':trace_screenshots,'async_recording':async_recording,
+             'env_step_telemetry':env_step_telemetry,
              'max_input_tokens':max_input_tokens,'input_counter':input_counter,
              'clarification_callback':clarification_callback,'clarification_audit_id':clarification_audit_id,
              'site_discovery':site_discovery,'site_discovery_audit_id':site_discovery_audit_id,
@@ -237,7 +240,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings,
             record_fact_provenance=record_fact_provenance,fact_source_provider=fact_source_provider,
             automatic_grading=automatic_grading,allow_ungraded=allow_ungraded,ungraded_reason=ungraded_reason,
-            fact_capture_observer=fact_capture_observer,environment_admission=environment_admission))
+            fact_capture_observer=fact_capture_observer,environment_admission=environment_admission,
+            env_step_telemetry=env_step_telemetry))
     no_browser=agent_actor is not None and agent_actor['browser']=='none'
     if action_timeout_ms is not None:
         validate_action_timeout(action_timeout_ms)
@@ -455,6 +459,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     reset_complete = False
     continuation = None
     screenshot_capture_original = None
+    step_recorder = None
     try:
         if memory_enabled:
             from .memory import MemorySession
@@ -665,7 +670,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 conversation.record(output,value)
 
         def execute_decision(decision, event, index):
-            nonlocal obs, reward, terminated, truncated, info, final_ref, browser_steps, action_errors, phase, search_text
+            nonlocal obs, reward, terminated, truncated, info, final_ref, browser_steps, action_errors, phase, search_text, step_recorder
             action = decision.code
             event["action"] = action
             if agent_runtime:agent_runtime.guard(agent_actor)
@@ -820,7 +825,16 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 started = time.monotonic()
                 if human_browser is not None:human_browser.last_action_execution=None
                 try:
-                    obs, reward, terminated, truncated, info = env.step(action)
+                    if env_step_telemetry:
+                        if step_recorder is None:
+                            from .step_telemetry import EnvStepTelemetry
+                            step_recorder = EnvStepTelemetry(trace.directory)
+                        trace.metadata["env_step_telemetry"] = step_recorder.describe()
+                        write_json(trace.directory / "metadata.json", trace.metadata)
+                        with step_recorder.observe(base_env, step=index, tool=decision.name):
+                            obs, reward, terminated, truncated, info = env.step(action)
+                    else:
+                        obs, reward, terminated, truncated, info = env.step(action)
                 finally:
                     event['browser_step_seconds'] = time.monotonic() - started
                     trace.timings.record('action.env_step',started,step=index,tool=decision.name)
@@ -1489,6 +1503,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 grading_error=f'Automatic grading failed: {type(exc).__name__}: {exc}'
                 grading_gate.fail(grading_error)
 
+        if step_recorder is not None:
+            step_recorder.close()
+            trace.metadata["env_step_telemetry"] = step_recorder.describe()
+            write_json(trace.directory / "metadata.json", trace.metadata)
         if env is not None:
             trace.event('environment_close_started',scope='Inference ended; cleanup/teardown in progress')
             def cleanup_phase(name,callback,seconds=2.0):
