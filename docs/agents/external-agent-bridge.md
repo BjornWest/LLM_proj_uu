@@ -234,6 +234,16 @@ projection is null when a complete snapshot has only a shorter applicable window
 floor checks still cover every applicable window. The legacy default parser is
 unchanged. Server source checks include the actual quota
 reader module as well as the transport package.
+Strict reads also require explicit `ordinaryUsageAllowed=true`, the protocol's
+required legacy view, and a known included-usage plan. Usage-based or unknown
+plans, malformed credit metadata and unknown top-level fields block admission.
+A non-null `individualLimit` must match the spend-control schema; its reported
+`remainingPercent` is floor-checked alongside every quota window. Credits and
+individual monetary strings never enlarge the allowance. Reset timestamps and
+durations must fit positive/nonnegative signed64-bit values; no reset-versus-now
+recovery is inferred. Timestamp plausibility is not a freshness certificate:
+the guard still reads live quota before each dispatch, and custom readers must
+return fresh full responses.
 The durable suite binding records `quota_contract=complete_nullable_windows_v1`;
 an old binding is incompatible. Use a fresh suite identity for a new authorized
 suite rather than resetting an old ledger or refunding consumed cases.

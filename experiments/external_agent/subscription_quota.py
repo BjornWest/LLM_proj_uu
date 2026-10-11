@@ -29,9 +29,13 @@ def _applicable_snapshot(result):
     """
     if not isinstance(result, dict):
         raise ValueError('Malformed subscription quota response')
-    if 'ordinaryUsageAllowed' in result:
-        if result['ordinaryUsageAllowed'] is not True:
-            raise ValueError('Ordinary subscription usage is not confirmed')
+    if result.get('ordinaryUsageAllowed') is not True:
+        raise ValueError('Ordinary subscription usage is not confirmed')
+    if set(result) - {'ordinaryUsageAllowed', 'accountId', 'rateLimits',
+                      'rateLimitsByLimitId', 'rateLimitResetCredits', 'rateLimitUpsell'}:
+        raise ValueError('Unknown subscription quota response fields')
+    if not isinstance(result.get('rateLimits'), dict):
+        raise ValueError('Complete legacy quota view required by read protocol')
 
     allowed = {'limitId', 'limitName', 'normalModelSlug', 'primary', 'secondary',
                'credits', 'individualLimit', 'spendControlReached', 'planType',
@@ -42,11 +46,34 @@ def _applicable_snapshot(result):
             raise ValueError('Known Codex subscription bucket required')
         if set(bucket) - allowed:
             raise ValueError('Unknown subscription quota fields')
+        plans = {'free', 'go', 'plus', 'pro', 'prolite', 'promax', 'team', 'business',
+                 'enterprise', 'edu', 'edu_plus', 'edu_pro', 'self_serve_business_prolite'}
+        if bucket.get('planType') not in plans:
+            raise ValueError('Known included-usage plan required; no usage-based billing')
+        credits = bucket.get('credits')
+        if credits is not None and (not isinstance(credits, dict) or
+                set(credits) - {'hasCredits', 'unlimited', 'balance'} or
+                type(credits.get('hasCredits')) is not bool or
+                type(credits.get('unlimited')) is not bool or
+                (credits.get('balance') is not None and not isinstance(credits['balance'], str))):
+            raise ValueError('Malformed credit metadata; never use it as allowance')
         if bucket.get('rateLimitReachedType') is not None:
             raise ValueError('Subscription limit state blocks dispatch')
         spend = bucket.get('spendControlReached')
         if spend is not None and (type(spend) is not bool or spend):
             raise ValueError('Subscription spend-control state blocks dispatch')
+        individual = bucket.get('individualLimit')
+        if individual is not None:
+            if (not isinstance(individual, dict) or
+                    set(individual) != {'limit', 'used', 'remainingPercent', 'resetsAt'} or
+                    not isinstance(individual['limit'], str) or not individual['limit'] or
+                    not isinstance(individual['used'], str) or not individual['used'] or
+                    type(individual['remainingPercent']) is not int or
+                    not 0 <= individual['remainingPercent'] <= 100 or
+                    type(individual['resetsAt']) is not int or not 0 <= individual['resetsAt'] < 2**63):
+                raise ValueError('Malformed individual subscription limit')
+            individual = {'remaining_percent': individual['remainingPercent'],
+                          'resets_at': individual['resetsAt']}
         windows, states = [], {}
         for name in ('primary', 'secondary'):
             if name not in bucket:
@@ -60,7 +87,8 @@ def _applicable_snapshot(result):
             used, duration, reset = (window['usedPercent'], window['windowDurationMins'], window['resetsAt'])
             if (type(used) not in (int, float) or (type(used) is float and not math.isfinite(used)) or
                     not 0 <= used <= 100 or
-                    type(duration) is not int or duration <= 0 or type(reset) is not int or reset < 0):
+                    type(duration) is not int or not 0 < duration < 2**63 or
+                    type(reset) is not int or not 0 <= reset < 2**63):
                 raise ValueError('Unknown or malformed subscription window: ' + name)
             states[name] = 'applicable'
             windows.append({'name': name, 'duration_minutes': duration,
@@ -72,7 +100,7 @@ def _applicable_snapshot(result):
         return {'weekly': {'used_percent': 100-week['remaining_percent'],
                            'remaining_percent': week['remaining_percent'],
                            'resets_at': week['resets_at'], 'limit_id': 'codex'} if week else None,
-                'windows': windows, 'window_states': states}
+                'windows': windows, 'window_states': states, 'individual_limit': individual}
 
     views = []
     multiple = result.get('rateLimitsByLimitId')
@@ -144,7 +172,8 @@ class SubscriptionQuotaGuard:
         try:
             current = snapshot(self.reader(), require_complete_windows=require_complete_windows)
             record['quota'] = current
-            if any(w['remaining_percent'] <= self.remaining_floor for w in current['windows']):
+            limits = current['windows'] + ([current['individual_limit']] if current.get('individual_limit') else [])
+            if any(w['remaining_percent'] <= self.remaining_floor for w in limits):
                 record['status'] = 'held_at_floor'
                 raise SubscriptionQuotaExhausted('Subscription window at or below the authorized remaining floor')
             record['status'] = 'admitted'

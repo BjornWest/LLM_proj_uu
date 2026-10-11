@@ -18,17 +18,16 @@ from experiments.external_agent.tests.test_episode_admission import worker
 
 
 def single(name='primary', *, used=1, duration=10080):
-    bucket = {'limitId': 'codex', 'primary': None, 'secondary': None}
+    bucket = {'limitId': 'codex', 'planType': 'pro', 'primary': None, 'secondary': None}
     bucket[name] = {'usedPercent': used, 'windowDurationMins': duration, 'resetsAt': 200}
-    return {'rateLimitsByLimitId': {'codex': bucket}, 'rateLimits': deepcopy(bucket)}
+    return {'ordinaryUsageAllowed': True, 'rateLimitsByLimitId': {'codex': bucket}, 'rateLimits': deepcopy(bucket)}
 
 
 @pytest.mark.parametrize('name', ['primary', 'secondary'])
-@pytest.mark.parametrize('shape', ['both', 'legacy', 'multi'])
+@pytest.mark.parametrize('shape', ['both', 'legacy'])
 def test_explicit_null_window_is_known_absence(name, shape):
     raw = single(name)
     if shape == 'legacy': del raw['rateLimitsByLimitId']
-    if shape == 'multi': del raw['rateLimits']
     saved = deepcopy(raw)
     checked = snapshot(raw, require_complete_windows=True)
     assert raw == saved
@@ -86,6 +85,23 @@ def invalid_reads():
     invalid_legacy = single(); invalid_legacy['rateLimits'] = []; bad.append(invalid_legacy)
     for value in (False, None, 1, 'true'):
         item = single(); item['ordinaryUsageAllowed'] = value; bad.append(item)
+    # Keep permission present so each malformed bucket is independently tested.
+    for item in bad:
+        if isinstance(item, dict) and 'ordinaryUsageAllowed' not in item:
+            item['ordinaryUsageAllowed'] = True
+    missing_permission = single(); del missing_permission['ordinaryUsageAllowed']; bad.append(missing_permission)
+    missing_legacy = single(); del missing_legacy['rateLimits']; bad.append(missing_legacy)
+    null_legacy = single(); null_legacy['rateLimits'] = None; bad.append(null_legacy)
+    unknown = single(); unknown['brandNewLimitState'] = False; bad.append(unknown)
+    for value in (None, 12345, 'unknown', 'enterprise_cbp_usage_based', 'self_serve_business_usage_based'):
+        item = single(); item['rateLimits']['planType'] = value; bad.append(item)
+    for value in ('x', {}, {'hasCredits': 1, 'unlimited': False},
+                  {'hasCredits': True, 'unlimited': False, 'balance': 1}):
+        item = single(); item['rateLimits']['credits'] = value; bad.append(item)
+    for value in ('garbage', {}, {'limit': '10', 'used': '0', 'remainingPercent': True, 'resetsAt': 200}):
+        item = single(); item['rateLimits']['individualLimit'] = value; bad.append(item)
+    for field in ('resetsAt', 'windowDurationMins'):
+        item = single(); item['rateLimits']['primary'][field] = 10**30; bad.append(item)
     return bad
 
 
@@ -115,6 +131,19 @@ def test_guard_refreshes_null_into_new_applicable_window_and_blocks_it(tmp_path)
     assert len(guard(require_complete_windows=True)['windows']) == 1
     with pytest.raises(SubscriptionQuotaExhausted): guard(require_complete_windows=True)
     assert not reads
+
+
+@pytest.mark.parametrize('remaining', [0, 1, 2, 99])
+def test_individual_limit_enforces_same_floor_even_without_reached_flag(tmp_path, remaining):
+    raw = single()
+    for bucket in (raw['rateLimits'], raw['rateLimitsByLimitId']['codex']):
+        bucket['individualLimit'] = {'limit': '10', 'used': '1', 'remainingPercent': remaining, 'resetsAt': 200}
+        bucket['spendControlReached'] = False
+    guard = SubscriptionQuotaGuard(tmp_path, reader=lambda: raw)
+    if remaining <= 1:
+        with pytest.raises(SubscriptionQuotaExhausted): guard(require_complete_windows=True)
+    else:
+        assert guard(require_complete_windows=True)['individual_limit']['remaining_percent'] == remaining
 
 
 def test_legacy_default_parser_retains_omitted_window_behavior(tmp_path):

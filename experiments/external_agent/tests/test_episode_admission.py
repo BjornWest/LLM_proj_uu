@@ -22,9 +22,11 @@ from intent_browser.backend import BackendResponseError
 
 
 def quota(weekly=80, short=20):
-    return {'rateLimitsByLimitId': {'codex': {'limitId': 'codex',
+    bucket = {'limitId': 'codex', 'planType': 'pro',
         'primary': {'usedPercent': short, 'windowDurationMins': 300, 'resetsAt': 100},
-        'secondary': {'usedPercent': weekly, 'windowDurationMins': 10080, 'resetsAt': 200}}}}
+        'secondary': {'usedPercent': weekly, 'windowDurationMins': 10080, 'resetsAt': 200}}
+    return {'ordinaryUsageAllowed': True, 'rateLimits': deepcopy(bucket),
+            'rateLimitsByLimitId': {'codex': bucket}}
 
 
 def backend(root, name, config=None, *, reader=quota, **options):
