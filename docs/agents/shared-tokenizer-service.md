@@ -89,14 +89,17 @@ and request results stay unchanged.
 ## Bounds and failure behavior
 
 Transport is same-user Linux AF_UNIX, with a 0700 parent and 0600 socket plus
-peer-UID checks. It is intended for trusted local rollout processes, not a public
+peer-UID checks. Clients use a full-duplex connection until the reply; write
+half-close is unsupported and is treated as abandonment. It is intended for trusted local rollout processes, not a public
 network API. Requests/responses never include prompt text in diagnostic errors.
 
 Defaults are four simultaneous request handlers, four allowlisted asset entries,
 30-second request deadline, 16 MiB frames, 4 MiB aggregate UTF-8 input text,
 one million aggregate transferred output/input IDs (count-only results are
 not limited by token-ID count) and 256 batch entries. Asset files are
-limited to 64 MiB each. Configure finite handler capacity for your workload
+limited to 64 MiB each. The response frame includes IDs and character offsets,
+so its 16 MiB ceiling can reject an encode below the text/ID ceilings; all
+limits apply together. Oversized responses receive a `bound` diagnostic. Configure finite handler capacity for your workload
 before acceptance (`--max-clients`, maximum 128). An accepted connection waits
 for a handler within the same finite request deadline; one accepted waiter and
 the 16-entry kernel backlog bound pending admission. Linux queue-full connection
@@ -113,7 +116,7 @@ a disconnect during native computation cannot preempt it.
 There is no global text/result cache. AX previews use an episode-owned cache
 bounded to 512 entries and a conservative 1 MiB size charge, never caching full
 token lists. Short previews and candidate result sizes are batched; long node
-reads remain explicitly paged. Token IDs, decode flags, budgets, returned entries
+reads remain explicitly paged. Token IDs, decode flags, budgets, returned entries,
 character offsets and delivery acknowledgments must match the local path.
 Single and batched encodings retain native token offsets for fact-provenance
 node paging. New preview clients must share their parent client’s service instance. Full-request counts

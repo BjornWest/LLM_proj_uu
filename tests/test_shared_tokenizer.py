@@ -275,6 +275,15 @@ class ServiceFixture(unittest.TestCase):
         actual=list(islice(remote._packed_candidates(envelope,items,0),1))
         self.assertEqual(actual,expected)
 
+    def test_oversized_encoding_response_reports_bound_not_disconnect(self):
+        config,_=self.start(max_frame_bytes=2048)
+        client=self.client(config)
+        text='hello world '*100
+        self.assertEqual(client.count(text),200)
+        with self.assertRaises(SharedTokenizerError) as failure:client.encode(text)
+        self.assertEqual(failure.exception.code,'bound')
+        self.assertEqual(client.encode('hello').offsets,[(0,5)])
+
     def test_cli_readiness_after_listen(self):
         import select
         manifest=self.root/'manifest.json'

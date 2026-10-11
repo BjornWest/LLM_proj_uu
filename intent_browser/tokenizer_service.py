@@ -17,7 +17,7 @@ import time
 import uuid
 
 from .shared_tokenizer import (PROTOCOL, VERSION, MAX_FRAME_BYTES, _hash,
-                               receive_frame, send_frame)
+                               receive_frame, send_frame, SharedTokenizerError)
 
 
 class RequestRejected(ValueError):
@@ -174,7 +174,13 @@ class TokenizerService:
             if time.monotonic() >= deadline:
                 response={'ok':False,'error':'timeout'}
                 deadline=time.monotonic()+.1  # Diagnostic-only grace, no computation.
-            send_frame(connection, response, self.max_frame_bytes, deadline)
+            try:
+                send_frame(connection, response, self.max_frame_bytes, deadline)
+            except SharedTokenizerError as error:
+                if error.code != 'bound':
+                    raise
+                send_frame(connection, {'ok':False,'error':'bound'},
+                           self.max_frame_bytes,time.monotonic()+.1)
         except Exception:
             pass  # Closed/timed-out clients do not stop the service or trigger retry.
         finally:
