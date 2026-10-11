@@ -1,4 +1,4 @@
-"""One source-isolated B06 with automatic grading and no episode-duration alarm.
+"""One source-isolated B06 with automatic grading and versioned context policy.
 
 The actual provider lifetime, per-request and startup watchdogs remain finite.
 Serving/proof/parser admission is fail-closed; this module never allocates a GPU.
@@ -32,6 +32,56 @@ def isolate(spec):
  sys.dont_write_bytecode=True
  os.environ['HARNESS_AX_TOKENIZER']=str(checked(binding['tokenizer']));os.environ['LD_LIBRARY_PATH']=binding['library_path']
  return binding,root,external,helper
+
+
+def context_limits(spec, live):
+    """Keep historical B06 immutable; native input limit is physical headroom."""
+    schema = spec.get('schema')
+    if schema == 'modal-full-B06-v1':
+        if live.get('server_context') != 131072 or live.get('isl') != 100000:
+            raise ValueError('Historical B06 ISL/context differs')
+        if live.get('input_admission') is not None:
+            raise ValueError('Historical policy cannot be relabelled native')
+        return 131072, 100000
+    if schema != 'modal-native-context-B06-v1':
+        raise ValueError('Explicit reviewed native context schema required')
+    policy = spec.get('context_policy')
+    if (policy != {'server_context': 262144, 'minimum_output_tokens': 1} or
+            type(policy.get('minimum_output_tokens')) is not int or
+            type(policy.get('server_context')) is not int):
+        raise ValueError('Native context with actual output headroom required')
+    if (type(live.get('server_context')) is not int or
+            type(live.get('isl')) is not int or
+            live['server_context'] != 262144 or live['isl'] != 262143):
+        raise ValueError('Native limits must reserve output headroom only')
+    if (live.get('input_admission') != {
+            'scope': 'native-context-output-headroom', 'minimum_output_tokens': 1} or
+            type(live['input_admission'].get('minimum_output_tokens')) is not int):
+        raise ValueError('Explicit native input admission required')
+    return 262144, 262143
+
+
+def agreed_rental_lifetime(spec, live):
+    """Native-policy runs retain an explicitly agreed finite rental deadline."""
+    if spec.get('schema') == 'modal-full-B06-v1':
+        return None
+    seconds = spec.get('rental_seconds')
+    if type(seconds) not in (int, float) or not math.isfinite(seconds) or seconds <= 0:
+        raise ValueError('Agreed finite rental_seconds required before launch')
+    rental = live.get('rental_lifetime')
+    if not isinstance(rental, dict) or set(rental) != {
+            'started_at_utc', 'expires_at_utc', 'agreed_seconds'}:
+        raise ValueError('Actual rental lifetime binding required')
+    values = [rental[k] for k in ('started_at_utc', 'expires_at_utc', 'agreed_seconds')]
+    if any(type(v) not in (int, float) or not math.isfinite(v) for v in values):
+        raise ValueError('Finite rental lifetime required')
+    started, expires, agreed = values
+    platform = live['platform_lifetime']
+    if (agreed != seconds or abs(expires - started - agreed) > 1e-6 or
+            started != platform['started_at_utc'] or expires > platform['expires_at_utc']):
+        raise ValueError('Rental lifetime differs from agreement/platform')
+    return rental
+
 
 class EmergencyStop:
     """Record a terminal infrastructure failure and exit without Playwright cleanup.
@@ -68,9 +118,9 @@ class EmergencyStop:
 
 
 class Watchdogs:
-    """No aggregate episode budget. Expiry comes only from the provider platform."""
+    """Respect actual platform expiry and an explicitly agreed native rental limit."""
     def __init__(self, live, *, startup_seconds=180, request_seconds=600,
-                 utc=time.time, mono=time.monotonic, emergency_stop=None):
+                 utc=time.time, mono=time.monotonic, emergency_stop=None, rental_lifetime=None):
         self.utc, self.mono = utc, mono
         self.emergency_stop = emergency_stop
         for value in (startup_seconds, request_seconds):
@@ -88,12 +138,18 @@ class Watchdogs:
         if live['gpu_deadline_utc'] != expires:
             raise ValueError('Legacy deadline alias must be actual platform expiry')
         self.expires = expires
-        self.deadline_monotonic = mono() + expires - utc()
+        self.expiry_reason = 'Actual provider platform lifetime expired'
+        if rental_lifetime is not None:
+            if not rental_lifetime['started_at_utc'] <= utc() < rental_lifetime['expires_at_utc']:
+                raise ValueError('Rental lifetime is not currently active')
+            self.expires = min(self.expires, rental_lifetime['expires_at_utc'])
+            self.expiry_reason = 'Agreed rental lifetime expired'
+        self.deadline_monotonic = mono() + self.expires - utc()
 
     def remaining(self):
         n = min(self.expires - self.utc(), self.deadline_monotonic - self.mono())
         if n <= 0:
-            raise TimeoutError('Actual provider platform lifetime expired')
+            raise TimeoutError(self.expiry_reason)
         return n
 
     def timeout(self, limit=None):
@@ -102,6 +158,10 @@ class Watchdogs:
     @contextmanager
     def operation(self, name, seconds, *, browser=False):
         """Bound a stalled synchronous operation; always disarm its own alarm."""
+        duration = seconds
+        remaining = self.remaining()
+        expiry_reason = self.expiry_reason if remaining <= duration else name + ' watchdog expired'
+        operation_timeout = min(duration, remaining)
         if browser:
             if self.emergency_stop is None:
                 raise ValueError('Browser watchdog requires durable emergency stop')
@@ -111,8 +171,8 @@ class Watchdogs:
             def browser_expired():
                 if active.is_set():
                     fired.set()
-                    self.emergency_stop(name + ' watchdog expired')
-            timer = threading.Timer(self.timeout(seconds), browser_expired)
+                    self.emergency_stop(expiry_reason)
+            timer = threading.Timer(operation_timeout, browser_expired)
             timer.daemon = True
             timer.start()
             try:
@@ -120,7 +180,7 @@ class Watchdogs:
                 self.remaining()
                 if fired.is_set():
                     # Only a synthetic stop callback can return normally.
-                    raise TimeoutError(name + ' watchdog expired')
+                    raise TimeoutError(expiry_reason)
             finally:
                 active.clear()
                 timer.cancel()
@@ -132,14 +192,14 @@ class Watchdogs:
         def expired(signum, frame):
             nonlocal fired
             fired = True
-            raise TimeoutError(name + ' watchdog expired')
+            raise TimeoutError(expiry_reason)
         signal.signal(signal.SIGALRM, expired)
-        signal.setitimer(signal.ITIMER_REAL, self.timeout(seconds))
+        signal.setitimer(signal.ITIMER_REAL, operation_timeout)
         try:
             yield
             self.remaining()
             if fired:
-                raise TimeoutError(name + ' watchdog expired')
+                raise TimeoutError(expiry_reason)
         finally:
             signal.setitimer(signal.ITIMER_REAL, 0)
             signal.signal(signal.SIGALRM, previous)
@@ -169,14 +229,16 @@ def verify_parser(spec, live):
     return receipt
 
 
-def verify_projection(live):
+def verify_projection(live, ordered_counter_source=None):
     proof = read(checked(live['complete_wire_count_parity_proof']))
     relay = checked(live['relay_source'])
     source = relay.read_text()
     functions = [n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name == 'tokenize_payload']
     if len(functions) != 1:
         raise ValueError('Unique relay projection required')
-    projection = dict(counter_source_sha256='3b89ffe833520c9ec94cf290e30d3aa127241c1ed904754e73c3d4141ea9f29b',
+    counter_sha = (pin(checked(ordered_counter_source))['sha256'] if ordered_counter_source is not None else
+        '3b89ffe833520c9ec94cf290e30d3aa127241c1ed904754e73c3d4141ea9f29b')
+    projection = dict(counter_source_sha256=counter_sha,
         counter_wire_function_sha256='f21b9f8becf3a8713ad3bcf59d610cc59f97406a5d17b6396013191dd5ad2de3',
         tokenize_projection_source_sha256=live['relay_source']['sha256'],
         tokenize_projection_function_sha256=sha256(ast.get_source_segment(source,functions[0]).encode()).hexdigest(),
@@ -193,13 +255,17 @@ def verify_projection(live):
 
 def build_runtime(spec, live, watchdogs):
     verify_parser(spec, live)
-    verify_projection(live)
     source = checked(spec['ordered_counter_source'])
-    if sha256(source.read_bytes()).hexdigest() != '3b89ffe833520c9ec94cf290e30d3aa127241c1ed904754e73c3d4141ea9f29b':
-        raise ValueError('Released db706d65 ordered counter required')
+    expected = {
+        'modal-full-B06-v1': '3b89ffe833520c9ec94cf290e30d3aa127241c1ed904754e73c3d4141ea9f29b',
+        'modal-native-context-B06-v1': '984bcc97815f52d499eb22149c6d0d0535ad1c0d162a559bd0adeb8558f70f79',
+    }.get(spec.get('schema'))
+    if expected is None or sha256(source.read_bytes()).hexdigest() != expected:
+        raise ValueError('Released reviewed ordered counter required')
+    verify_projection(live, spec['ordered_counter_source'])
     api = runpy.run_path(str(source))
-    # Use the existing ordered counter unchanged. Its finite deadline is the
-    # provider's actual platform maximum, never a custom episode budget.
+    # Preserve ordered request encoding and bound the counter to the earlier
+    # agreed rental deadline or actual provider expiry.
     return api['build'](live=live, deadline_monotonic=watchdogs.deadline_monotonic)
 
 
@@ -208,7 +274,7 @@ def episode(spec_path,live_path,output,watchdogs):
  spec=read(spec_path)
  if spec['case']!='B06':raise ValueError('One B06 only')
  live=read(live_path)
- if spec.get('schema') != 'modal-full-B06-v1':raise ValueError('Full episode contract required')
+ server_context, input_limit = context_limits(spec, live)
  with watchdogs.operation('execution startup',watchdogs.startup_seconds):
   checked(spec['factory_source']);checked(spec['original_runtime_source']);checked(spec['original_runtime_spec'])
   dependency_inventory=read(checked(spec['venv_dependency_inventory']))
@@ -270,7 +336,7 @@ def episode(spec_path,live_path,output,watchdogs):
     return original(messages)
   backend.complete=complete;return backend
  def extraction_guard():remaining();guard()
- factories=PrivateFactories(backend_class=backend_class,base_url=runtime['base_url'],model=expected_identity['model'],api_key=runtime['api_key'],server_context=131072,isl=100000,complete_request_counter=runtime['complete_request_counter'],expected_identity=expected_identity,readiness=runtime['readiness'],extraction_before_dispatch=extraction_guard,meter=factory_events.append,timeout=watchdogs.timeout())
+ factories=PrivateFactories(backend_class=backend_class,base_url=runtime['base_url'],model=expected_identity['model'],api_key=runtime['api_key'],server_context=server_context,isl=input_limit,complete_request_counter=runtime['complete_request_counter'],expected_identity=expected_identity,readiness=runtime['readiness'],extraction_before_dispatch=extraction_guard,meter=factory_events.append,timeout=watchdogs.timeout())
  @contextmanager
  def session(*,before_dispatch):
   def admission():
@@ -315,13 +381,13 @@ def episode(spec_path,live_path,output,watchdogs):
  args=[str(recipe),str(output)]
  def formatter_factory(*args):
   remaining();return factories.extraction_backend_factory(*args)
- kwargs={**spec['caller'].get('kwargs',{}),'policy_session':session,'metadata':{'model':expected_identity['model'],'driver':'modal-real-model','tags':['model','modal-full-episode',spec['case']],'training_eligible':False},'runner_options':{'max_steps':None,'max_input_tokens':100000,'retry_policy':None,'input_counter':runtime['runner_input_counter'],'trace_screenshots':False},'viewer_projection':project,'quota_guard':guard,'extraction_backend_factory':formatter_factory,'runner':runner}
+ kwargs={**spec['caller'].get('kwargs',{}),'policy_session':session,'metadata':{'model':expected_identity['model'],'driver':'modal-real-model','tags':['model','modal-full-episode',spec['case']],'training_eligible':False},'runner_options':{'max_steps':None,'max_input_tokens':input_limit,'retry_policy':None,'input_counter':runtime['runner_input_counter'],'trace_screenshots':False},'viewer_projection':project,'quota_guard':guard,'extraction_backend_factory':formatter_factory,'runner':runner}
  inspect.signature(call).bind(*args,**kwargs)
  try:
   result=call(*args,**kwargs)
   save(output.parent/(output.name+'-driver-result.json'),{'result':result,'actual_browser':holder.get('actual_browser',False),'spec':pin(spec_path),'live':pin(live_path),'factory_events':factory_events})
   if result['status']!='graded_and_projected':raise ValueError('Runtime failed: '+str(result.get('reason')))
-  if result['policy_summary']['max_steps'] is not None or result['policy_summary']['max_input_tokens']!=100000:raise ValueError('Actual runner limits differ')
+  if result['policy_summary']['max_steps'] is not None or result['policy_summary']['max_input_tokens']!=input_limit:raise ValueError('Actual runner limits differ')
   if not holder.get('actual_browser'):raise ValueError('No actual browser startup observed')
   save(output/'factory-live-proof.json',{'identity':expected_identity,'events':factory_events,'qualification':'Actual admitted requests/responses; tokens from released full-wire server counter. No synthetic counts/answers.'})
   return {'trace':result['trace'],'task_verdict':result['native_grade']['structured_claims_correct'],'native_grade':result['native_grade'],'canonical':pin(Path(result['trace'])/'evaluation.json'),'HTTP_proof':pin(output/'HTTP-proof.json'),'factory_live_proof':pin(output/'factory-live-proof.json'),'qualification':'Real model B06 and attached extractor; broad effects unknown'}
@@ -330,7 +396,7 @@ def episode(spec_path,live_path,output,watchdogs):
 
 
 def preflight(spec, live):
- if spec.get('schema') != 'modal-full-B06-v1' or spec.get('case') != 'B06':
+ if spec.get('schema') not in {'modal-full-B06-v1','modal-native-context-B06-v1'} or spec.get('case') != 'B06':
   raise ValueError('One B06 full-episode contract required')
  if live.get('dispatch_authorized') is not True:
   raise ValueError('Explicit fresh dispatch authorization required')
@@ -349,10 +415,12 @@ def preflight(spec, live):
   raise ValueError('Accepted B06 serving/task lineage differs')
  if identity.get('source_commit') != serving['first_case']['commit']:
   raise ValueError('Task lineage identity differs')
- if live.get('server_context') != 131072 or live.get('isl') != 100000:
-  raise ValueError('B06 ISL/context differs')
+ context_limits(spec,live)
+ rental=agreed_rental_lifetime(spec,live)
+ if rental is not None and deployment.get('rental_lifetime') != rental:
+  raise ValueError('Actual deployment rental lifetime differs')
  verify_parser(spec,live)
- return Watchdogs(live,startup_seconds=spec['watchdogs']['startup_seconds'],request_seconds=spec['watchdogs']['request_seconds'])
+ return Watchdogs(live,startup_seconds=spec['watchdogs']['startup_seconds'],request_seconds=spec['watchdogs']['request_seconds'],rental_lifetime=rental)
 
 
 def verify_terminal(result):

@@ -44,6 +44,25 @@ def hash_value(value):
     return value
 
 
+
+def serving_limits(live):
+    """Recognize historical limits or explicit native context/output headroom.
+
+    Native ``isl`` is a compatibility alias for context minus one output token,
+    not an independent policy cap. Every real request is sized by the factory.
+    """
+    context, isl = live.get('server_context'), live.get('isl')
+    if type(context) is not int or type(isl) is not int:
+        raise ValueError('Integer serving limits required')
+    admission = live.get('input_admission')
+    if (context, isl) == (131072, 100000) and admission is None:
+        return context, isl, '100000-input-boundary'
+    if (context, isl) == (262144, 262143) and admission == {
+            'scope': 'native-context-output-headroom', 'minimum_output_tokens': 1} and type(admission.get('minimum_output_tokens')) is int:
+        return context, isl, 'native-context-input-boundary'
+    raise ValueError('Historical or explicit native context/headroom binding required')
+
+
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self,*args,**kwargs):raise ValueError('Relay redirects forbidden')
 
@@ -52,6 +71,7 @@ class Bridge:
     def __init__(self,live,deadline,*,exchange=None,mono=time.monotonic,utc=time.time,environ=None):
         if importlib.metadata.version('httpx')!='0.28.1':raise ValueError('Qualified httpx0.28.1 serialization required')
         self.live=deepcopy(live);self.deadline=number(deadline);self.mono,self.utc=mono,utc
+        self.context,self.input_limit,self.boundary_probe=serving_limits(live)
         self.environ=os.environ if environ is None else environ
         self.base=live.get('relay_base_url',live.get('base_url'));u=urlsplit(self.base or '')
         if live.get('base_url',self.base)!=self.base:raise ValueError('Relay URL aliases differ')
@@ -71,8 +91,8 @@ class Bridge:
         if 'server_identity' in self.deployment and checked(self.deployment['server_identity'])!=self.server:raise ValueError('Deployment server identity receipt differs')
         self.session=live['serving_session_id']
         if not isinstance(self.session,str) or not self.session or not isinstance(live.get('pilot_id'),str) or not live['pilot_id']:raise ValueError('Actual serving/pilot ID required')
-        if not self.gates.get('ready') is True or self.gates.get('identity')!=self.identity or self.gates.get('server_context')!=131072 or self.gates.get('isl')!=100000 or any(self.gates.get(k) is not True for k in ['vision','native_tools','exact_complete_request_counter']):raise ValueError('Actual qualified gates required')
-        if live.get('server_context')!=131072 or live.get('isl')!=100000:raise ValueError('Live limits mismatch')
+        if not self.gates.get('ready') is True or self.gates.get('identity')!=self.identity or self.gates.get('server_context')!=self.context or self.gates.get('isl')!=self.input_limit or any(self.gates.get(k) is not True for k in ['vision','native_tools','exact_complete_request_counter']):raise ValueError('Actual qualified gates required')
+        if self.server.get('server_context')!=self.context or self.server.get('isl')!=self.input_limit:raise ValueError('Deployment limits mismatch')
         if self.serving['model']['repository']!='Qwen/Qwen3.8-27B-FP8' or self.serving['model']['revision']!='017b9c7af6b5689d5dd426a76e0bc077eb5ca20a' or self.serving['first_case']['commit']!='95e9ac988ea515f7194cbdc82ae327e248fc94fa':raise ValueError('Approved model/revision/source mismatch')
         if self.serving['tokenizer']['tokenizer.json']['sha256']!='0997f410c57a1f4e53b09e4be8f4a172d90edd9564368fb0847030937229b9f3' or self.serving['tokenizer']['chat_template.jinja']['sha256']!='c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041':raise ValueError('Approved tokenizer/template mismatch')
         expected=dict(model=self.serving['model']['repository'],serving_revision=self.serving['model']['revision'],tokenizer_sha256=self.serving['tokenizer']['tokenizer.json']['sha256'],template_sha256=self.serving['tokenizer']['chat_template.jinja']['sha256'],image_processor_sha256=self.identity['image_processor_sha256'],tool_parser='qwen3_coder',source_commit='95e9ac988ea515f7194cbdc82ae327e248fc94fa')
@@ -87,13 +107,13 @@ class Bridge:
         probes=self.count_proof.get('parity_probes')
         if not isinstance(probes,list) or not probes:raise ValueError('Actual parity probes required')
         labels={row.get('probe') for row in probes}
-        if not {'image-64x64','image-1280x720','image-2048x1024','retained-history','100000-input-boundary'}<=labels:raise ValueError('Missing qualified modality/history/ISL probes')
+        if not {'image-64x64','image-1280x720','image-2048x1024','retained-history',self.boundary_probe}<=labels:raise ValueError('Missing qualified modality/history/ISL probes')
         for row in probes:
-            if type(row.get('input_tokens')) is not int or row['input_tokens']<0 or row.get('server',{}).get('count')!=row['input_tokens'] or row['server'].get('max_model_len')!=131072:raise ValueError('Parity server count differs')
+            if type(row.get('input_tokens')) is not int or row['input_tokens']<0 or row.get('server',{}).get('count')!=row['input_tokens'] or row['server'].get('max_model_len')!=self.context:raise ValueError('Parity server count differs')
             hash_value(row['server'].get('token_ids_sha256'))
-            if row.get('probe') in {'retained-history','100000-input-boundary'}:
+            if row.get('probe') in {'retained-history',self.boundary_probe}:
                 if not isinstance(row.get('generation'),dict) or row['generation'].get('prompt_tokens')!=row['input_tokens']:raise ValueError('Actual GPU parity usage missing')
-        if next(row for row in probes if row['probe']=='100000-input-boundary')['input_tokens']!=100000:raise ValueError('Actual ISL boundary probe differs')
+        if next(row for row in probes if row['probe']==self.boundary_probe)['input_tokens']!=self.input_limit:raise ValueError('Actual ISL boundary probe differs')
         if self.deployment.get('serving_session_id')!=self.session or self.deployment.get('deadline')!=self.gpu_deadline or self.server.get('serving_session_id')!=self.session or self.server.get('deadline')!=self.gpu_deadline:raise ValueError('Pinned deployment lifetime differs')
         relay=live.get('relay_source')
         if not isinstance(relay,dict) or set(relay)!={'path','sha256'}:raise ValueError('Explicit frozen Training relay source pin required')
@@ -148,7 +168,7 @@ class Bridge:
         if current!=self.server:raise ValueError('Live qualification/server lifetime changed')
         self.remaining()
         observed=self.utc();expiry=min(self.gpu_deadline,observed+self.remaining(),observed+30)
-        return dict(ready=True,identity=deepcopy(self.identity),server_context=131072,isl=100000,vision=True,native_tools=True,exact_complete_request_counter=True,issued_at_utc=observed,expires_at_utc=expiry,serving_session_id=self.session,qualification_proof_sha256=self.proof)
+        return dict(ready=True,identity=deepcopy(self.identity),server_context=self.context,isl=self.input_limit,vision=True,native_tools=True,exact_complete_request_counter=True,issued_at_utc=observed,expires_at_utc=expiry,serving_session_id=self.session,qualification_proof_sha256=self.proof)
 
     def count(self,request):
         ready=self.readiness()
@@ -171,7 +191,7 @@ class Bridge:
                     message['reasoning']=reasoning_content
             if request.get('tools') and request.get('tool_choice','auto')!='none':payload['tools']=deepcopy(request['tools'])
             raw=self.exchange('POST','/tokenize',payload)
-            if not isinstance(raw,dict) or type(raw.get('count')) is not int or raw['count']<0 or raw.get('max_model_len')!=131072:raise ValueError('Actual /tokenize count/context invalid')
+            if not isinstance(raw,dict) or type(raw.get('count')) is not int or raw['count']<0 or raw.get('max_model_len')!=self.context:raise ValueError('Actual /tokenize count/context invalid')
             hash_value(raw.get('token_ids_sha256'))
             self.cache={'key':key,'counted_at_monotonic':self.mono(),'counted_at_utc':self.utc(),'request_sha256':wire_digest(request),'tokenize_payload_sha256':wire_digest(payload),'raw':deepcopy(raw)}
         self.readiness() # afterRPC/reuse, fresh health/identity and hard deadline
@@ -181,7 +201,7 @@ class Bridge:
     def runner_count(self,messages,tools):
         # Exact accepted95 NativeToolConfig.request_options defaults: tools,
         # tool_choice auto, parallel_tool_calls False. No omitted native fields.
-        return self.count(dict(model=self.identity['model'],messages=messages,temperature=0,max_tokens=131072,stream=False,tools=tools,tool_choice='auto',parallel_tool_calls=False))
+        return self.count(dict(model=self.identity['model'],messages=messages,temperature=0,max_tokens=self.context,stream=False,tools=tools,tool_choice='auto',parallel_tool_calls=False))
 
 
 def build(*,live,deadline_monotonic):

@@ -109,3 +109,59 @@ zero-provider browser/native/canonical/HTTP acceptance and fresh Training
 serving/parity evidence remain necessary before allocation/dispatch.
 
 Terminal verification uses the frozen `trace_grades.read_grade` reader to validate the recorded episode hashes. Its `binding_status` is computed in memory; raw grade sidecars do not store that field. The canonical grade, selected sidecar and HTTP trace identity must all belong to the returned trace.
+
+## Prospective native-context policy
+
+`modal-native-context-B06-v1` is an additive source contract. It implements the
+superseding `SWEEP-QWEN-NATIVE-CONTEXT-POLICY-02`: native Qwen context is 262,144
+complete-request tokens, with no separate 100,000-token input cap and no turn
+ceiling. It **retains the agreed finite rental/attempt time limit**. The original
+`modal-full-B06-v1` contract, completed traces and 131,072/100,000 limits remain
+unchanged.
+
+The new spec must declare `context_policy` as
+`{"server_context": 262144, "minimum_output_tokens": 1}` and a positive finite
+`rental_seconds` from the actual next authorization. No rental duration is
+selected by this preparation. Its fresh live binding must have:
+
+- `server_context=262144`, `isl=262143` and
+  `input_admission={"scope":"native-context-output-headroom","minimum_output_tokens":1}`;
+- `rental_lifetime` with numeric `started_at_utc`, `expires_at_utc` and
+  `agreed_seconds`, matching the spec and the pinned deployment receipt, starting at the actual
+  platform allocation start and contained in its lifetime;
+- the reviewed new counter source pin and regenerated full implementation
+  fingerprint, exact parser/processor identity, and genuinely new serving/count
+  evidence at native context. Old 131,072-context proofs cannot be relabelled.
+
+`isl=262143` is a compatibility alias required by the existing runner and private
+factory. It is derived from physical context minus one output token, not an
+independent input policy. The unchanged, pinned factory counts the complete
+request and sends `max_tokens=262144-input_tokens`, recounting the final request
+before dispatch. For example, 200,000 input tokens leave 62,144 output tokens;
+262,143 input tokens leave one. A 262,144-token input is not dispatched. Both
+policy and extraction use this rule. Image, tool schema and retained reasoning
+counts remain part of the complete request.
+
+The rental deadline bounds the caller's monotonic counter deadline and operation
+watchdogs; actual platform expiry, startup/request stalls and controller cleanup
+remain enforced. The native counter currently requires a first genuine
+`native-context-input-boundary` proof at 262,143 input tokens, alongside modality,
+retained-history and output-control parity. A separately reviewed compatible
+capability consumer may later reuse that proof with fresh instance readiness;
+this source change does not rerun qualification or grant rental/inference.
+Training must establish actual KV capacity at native context and adjust
+concurrency/topology rather than lower context silently.
+
+This is source preparation for the existing B06 caller, not authorization to run
+B06 again. The next evaluation instances should be narrower. Fresh output-root
+registration, capability reuse and actual native-context serving/runtime/viewer
+acceptance remain separate blockers; automatic grading and Events requirements
+are retained. No historical recording is rewritten.
+
+The native counter source is pinned in the caller to its exact reviewed SHA,
+not just to a spec/proof agreement. Rental windows cannot restart later on the
+same allocation. An expired agreed rental is reported as rental expiry, rather
+than incorrectly as an operation stall. Deadline interruption still uses the
+inherited failure path: a partial episode without completed automatic grading
+and HTTP projection is a system failure with an unknown task verdict. No
+grading reserve or extra paid time is inferred by this source preparation.
