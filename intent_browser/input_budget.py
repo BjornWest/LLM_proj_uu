@@ -19,14 +19,14 @@ DEFAULT_MAX_INPUT_TOKENS = 100_000
 
 
 class QwenInputCounter:
-    def __init__(self, tokenizer_path):
-        from tokenizers import Tokenizer
+    def __init__(self, tokenizer_path, *, shared_tokenizer=None):
+        from .shared_tokenizer import load_tokenizer
         from jinja2.sandbox import ImmutableSandboxedEnvironment
         path = Path(tokenizer_path)
         template = path.with_name('chat_template.jinja')
         if not template.is_file():
             raise ValueError('Input limit requires local chat_template.jinja beside tokenizer.json')
-        self.tokenizer = Tokenizer.from_file(str(path))
+        self.tokenizer = load_tokenizer(path, shared=shared_tokenizer)
         env = ImmutableSandboxedEnvironment(trim_blocks=True, lstrip_blocks=True)
         env.filters['tojson'] = lambda value, **kwargs: json.dumps(value, ensure_ascii=False, **kwargs)
         def fail(message): raise ValueError(message)
@@ -37,6 +37,8 @@ class QwenInputCounter:
             'template_sha256': hashlib.sha256(template.read_bytes()).hexdigest(),
             'scope': 'Estimated next input including tools, retained reasoning and images; hosted formatting may differ',
             'image_sizing': {'patch_size':16,'merge_size':2,'min_pixels':65536,'max_pixels':16777216}}
+        if shared_tokenizer is not None:
+            self.provenance['tokenizer_service'] = self.tokenizer.provenance
 
     def __call__(self, messages, tools):
         from PIL import Image
@@ -78,7 +80,8 @@ class QwenInputCounter:
                 images += 1
         text = self.template.render(messages=selected,tools=tools or [],add_generation_prompt=True,
                                     enable_thinking=True,preserve_thinking=True)
-        tokens=len(self.tokenizer.encode(text,add_special_tokens=False).ids)+image_extra
+        from .shared_tokenizer import count_text
+        tokens=count_text(self.tokenizer,text)+image_extra
         return {**self.provenance,'input_tokens':tokens,'images':images}
 
 

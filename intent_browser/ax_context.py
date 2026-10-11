@@ -230,9 +230,9 @@ class AXContext(AXExplorer):
         """entries=(public item, delivery records); stage only items that fit."""
         result={**output,'items':[],'offset':offset,'total_entries':total,'next_offset':offset}
         records={}
-        for item,updates in entries:
-            candidate={**result,'items':result['items']+[item],'next_offset':offset+len(result['items'])+1}
-            if self.tokens(encoded(candidate))>budget-70:break
+        candidates=self._packed_candidates(result,[item for item,_ in entries],offset)
+        for (candidate,count),(_,updates) in zip(candidates,entries):
+            if count>budget-70:break
             result=candidate;records.update(updates)
         result['next_offset']=offset+len(result['items']) if offset+len(result['items'])<total else None
         if len(result['items'])<len(entries):result['budget_limited']=True
@@ -245,9 +245,12 @@ class AXContext(AXExplorer):
 
     def _entries(self,refs,verbose,repeat):
         result=[]
-        for ref in refs:
-            item,record=self._item(ref,verbose,repeat)
-            result.append((item,{ref:record} if record else {}))
+        for start in range(0,len(refs),16):
+            selected=refs[start:start+16]
+            self._prime_nodes([self._indices[ref] for ref in selected])
+            for ref in selected:
+                item,record=self._item(ref,verbose,repeat)
+                result.append((item,{ref:record} if record else {}))
         return result
 
     def _page_entries(self,verbose,repeat):
@@ -431,6 +434,16 @@ class AXContext(AXExplorer):
             and (not role or n['role'].casefold()==role.casefold())
             and (not terms or (len(matched[n['index']])==len(terms) if match=='all' else bool(matched[n['index']])))]
         entries=[]
+        selected=indices[offset:offset+limit]
+        to_prime=set(selected)
+        for i in selected:
+            parent=self.nodes[i]['parent']
+            for _ in range(3):
+                if parent is None:break
+                to_prime.add(parent);parent=self.nodes[parent]['parent']
+            to_prime.update(j for j in range(max(0,i-context),min(len(self.nodes),i+context+1))
+                            if scope is None or j in scope)
+        self._prime_nodes(sorted(to_prime))
         for i in indices[offset:offset+limit]:
             ref=self.ref(i);item,record=self._item(ref,verbose,repeat);updates={ref:record} if record else {}
             # Location uses the same presenter: known ancestors are short refs,
@@ -530,6 +543,7 @@ class AXContext(AXExplorer):
                 raise ValueError('radius results require limit 1..50 and nonnegative integer offset')
             indices,distances=self._radius_nodes(index,radius)
             entries=[]
+            self._prime_nodes(indices[offset:offset+limit])
             for i in indices[offset:offset+limit]:
                 ref=self.ref(i);item,record=self._item(ref,verbose,repeat)
                 entries.append(({**item,'distance':distances[i]},{ref:record} if record else {}))

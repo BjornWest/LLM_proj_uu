@@ -3,11 +3,12 @@
 Only BrowserGym's public captured AX tree is indexed. No DOM queries, task goal,
 private grader state, browser actions or inference occur during a query.
 """
-from collections import deque
+from collections import deque, OrderedDict
 from dataclasses import dataclass
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 
 AX_TOOLS = ('ax_search', 'ax_read')
@@ -27,8 +28,13 @@ class AXConfig:
     repeat: bool = False
     revisit_reuse: bool = False
     agent_overview: bool = False
+    shared_tokenizer: object = None
 
     def __post_init__(self):
+        if self.shared_tokenizer is not None:
+            from .shared_tokenizer import SharedTokenizerConfig
+            if not isinstance(self.shared_tokenizer, SharedTokenizerConfig):
+                raise ValueError('AX shared tokenizer requires SharedTokenizerConfig')
         for value in (self.incremental, self.verbose, self.repeat, self.revisit_reuse, self.agent_overview):
             if type(value) is not bool: raise ValueError('AX presentation controls must be boolean')
         if (self.revisit_reuse or self.agent_overview) and not self.incremental:
@@ -40,7 +46,8 @@ class AXConfig:
             raise ValueError('AX requires an existing local tokenizer.json; no automatic download')
 
     def describe(self):
-        return {**({'revisit_reuse':'exact-public-tree-v1', 'revisit_cache_entries':64} if self.revisit_reuse else {}),
+        return {**({'tokenizer_service': self.shared_tokenizer.describe()} if self.shared_tokenizer is not None else {}),
+                **({'revisit_reuse':'exact-public-tree-v1', 'revisit_cache_entries':64} if self.revisit_reuse else {}),
                 **({'agent_overview_tokens':[0,512,1000,2000,4000],
                     'overview_control':'one next automatic observation; last executed browser call wins'} if self.agent_overview else {}),
                 'version': 'incremental-ax-v1' if self.incremental else 'progressive-ax-v1', 'overview_tokens': self.overview_tokens,
@@ -55,22 +62,90 @@ class AXConfig:
 
 class AXExplorer:
     def __init__(self, config):
-        from tokenizers import Tokenizer
+        from .shared_tokenizer import load_tokenizer
         self.config = config
-        self.tokenizer = Tokenizer.from_file(config.tokenizer_path)
+        self.tokenizer = load_tokenizer(config.tokenizer_path, shared=config.shared_tokenizer)
         self.nodes = []
         self.snapshot = None
         self._raw_digest = None
         self._token_cache = {}
+        self._clip_cache = OrderedDict()
+        self._clip_cache_bytes = 0
 
     def tokens(self, text):
-        return len(self.tokenizer.encode(text, add_special_tokens=False).ids)
+        from .shared_tokenizer import count_text
+        return count_text(self.tokenizer, text)
 
     def _clip(self, text, cap):
         # Clip label previews, never the indexed/searchable source text.
+        cached = self._clip_cache.get((str(text), cap))
+        if cached is not None:
+            self._clip_cache.move_to_end((str(text), cap))
+            return cached[0]
         ids = self.tokenizer.encode(str(text), add_special_tokens=False).ids
         if len(ids) <= cap: return str(text), False
         return self.tokenizer.decode(ids[:cap], skip_special_tokens=False) + '…', True
+
+    def _prime_clips(self, pairs):
+        """Small episode-owned batches, bounded cached previews (not full IDs)."""
+        if self.config.shared_tokenizer is None:
+            return
+        pairs = list(dict.fromkeys((str(t), cap) for t, cap in pairs
+                                   if len(str(t).encode('utf-8')) <= 8192))
+        pairs = [p for p in pairs if p not in self._clip_cache]
+        for start in range(0, len(pairs), 128):
+            selected = pairs[start:start+128]
+            texts = list(dict.fromkeys(t for t, _ in selected))
+            encodings = self.tokenizer.encode_batch(texts, add_special_tokens=False)
+            by_text = dict(zip(texts, (e.ids for e in encodings)))
+            partial = [(t, cap) for t, cap in selected if len(by_text[t]) > cap]
+            decoded = self.tokenizer.decode_batch([by_text[t][:cap] for t, cap in partial],
+                                                 skip_special_tokens=False) if partial else []
+            shortened = dict(zip(partial, decoded))
+            for text, cap in selected:
+                clipped = (text, cap) in shortened
+                result = ((shortened[(text, cap)]+'…') if clipped else text, clipped)
+                cost = sys.getsizeof(text)+sys.getsizeof(result[0])+256
+                if cost > 1024*1024:
+                    continue
+                self._clip_cache[(text, cap)] = (result, cost)
+                self._clip_cache_bytes += cost
+                while len(self._clip_cache) > 512 or self._clip_cache_bytes > 1024*1024:
+                    _, (_, previous_cost) = self._clip_cache.popitem(last=False)
+                    self._clip_cache_bytes -= previous_cost
+
+    def _prime_nodes(self, indices):
+        if self.config.shared_tokenizer is None:
+            return
+        for start in range(0, len(indices), 16):
+            pairs = []
+            for index in indices[start:start+16]:
+                n = self.nodes[index]
+                pairs.extend((n['name'], cap) for cap in (16, 24, 40, 60))
+                pairs.extend((n['value'], cap) for cap in (24, 40, 60))
+                pairs.extend((str(v), 24) for v in list(n['properties'].values())[:8]
+                             if not isinstance(v, (bool, int, float)) and v is not None)
+            self._prime_clips(pairs)
+
+    def _batch_candidate_counts(self, texts):
+        if self.config.shared_tokenizer is not None:
+            return self.tokenizer.count_batch(texts)
+        return [self.tokens(t) for t in texts]
+
+    def _packed_candidates(self, result, items, offset):
+        """Preserve sequential prefix decisions; amortize up to 16 counts/RPC."""
+        width = 16 if self.config.shared_tokenizer is not None else 1
+        for start in range(0, len(items), width):
+            candidates = []
+            scratch = result
+            for item in items[start:start+width]:
+                scratch = {**scratch, 'items': scratch['items']+[item],
+                           'next_offset': offset+len(scratch['items'])+1}
+                candidates.append(scratch)
+            counts = self._batch_candidate_counts([encoded(c) for c in candidates])
+            for candidate, count in zip(candidates, counts):
+                yield candidate, count
+                result = candidate
 
     def capture(self, observation):
         tree = observation['axtree_object']
@@ -212,9 +287,8 @@ class AXExplorer:
     def _fit(self, output, items, offset, total):
         output.update(items=[], offset=offset, total_entries=total, next_offset=offset,
                       result_tokens_limit=self.config.result_tokens)
-        for item in items:
-            candidate = {**output, 'items': output['items']+[item], 'next_offset': offset+len(output['items'])+1}
-            if self.tokens(encoded(candidate)) > self.config.result_tokens-64: break
+        for candidate, count in self._packed_candidates(output, items, offset):
+            if count > self.config.result_tokens-64: break
             output = candidate
         output['next_offset'] = offset+len(output['items']) if offset+len(output['items']) < total else None
         output['budget_limited'] = len(output['items']) < len(items)
@@ -236,6 +310,15 @@ class AXExplorer:
                    and (not role or n['role'].casefold() == role.casefold())
                    and needle in n['search_text']]
         items = []
+        selected_indices = matches[offset:offset+limit]
+        to_prime = set(selected_indices)
+        for index in selected_indices:
+            parent = self.nodes[index]['parent']
+            for _ in range(3):
+                if parent is None: break
+                to_prime.add(parent);parent = self.nodes[parent]['parent']
+            to_prime.update(range(max(0,index-context),min(len(self.nodes),index+context+1)))
+        self._prime_nodes(sorted(to_prime))
         for index in matches[offset:offset+limit]:
             entry = self.brief(index)
             entry['location'] = self.location(index)
@@ -289,6 +372,7 @@ class AXExplorer:
                 i, level = todo.pop(); indices.append(i)
                 if level < depth: todo.extend((child,level+1) for child in reversed(self.nodes[i]['children']))
         else: raise ValueError('Unsupported AX view')
+        self._prime_nodes(indices[offset:offset+limit])
         return self._fit(output, [self.brief(i) for i in indices[offset:offset+limit]], offset, len(indices))
 
     def execute(self, name, arguments):

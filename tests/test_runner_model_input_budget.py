@@ -29,7 +29,7 @@ class Counter:
 
 
 def exercise(tmp_path, *, model='z-ai/glm-5.3-flash', limit=100000,
-             counter=None, factory=None):
+             counter=None, factory=None, ax_config=None):
     activity = {'environments': 0, 'resets': 0, 'requests': [], 'actions': []}
 
     class Env:
@@ -63,8 +63,7 @@ def exercise(tmp_path, *, model='z-ai/glm-5.3-flash', limit=100000,
     backend = ChatCompletionsBackend('https://openrouter.ai/api/v1', model)
     backend.client.close()
     backend.client = httpx.Client(transport=httpx.MockTransport(transport))
-    profile = replace(native_tools_profile(), feedback_factory=SemanticFeedback)
-    assert profile.ax_config is None  # AX budgeting cannot select the policy tokenizer.
+    profile = replace(native_tools_profile(), feedback_factory=SemanticFeedback, ax_config=ax_config)
     try:
         with patch('intent_browser.runner.observation_text', return_value='Inspect'), \
                 patch('intent_browser.harness.flatten_axtree_to_str', return_value='Inspect'):
@@ -165,3 +164,18 @@ def test_installed_official_default_counter_records_model_and_stops_before_dispa
     assert rows[0]['input_budget']['model'] == model
     assert rows[0]['input_budget']['method'] == method
     assert rows[0]['input_budget']['tokenizer_sha256'] == entry['files']['tokenizer.json']['sha256']
+
+
+def test_default_factory_passes_opt_in_shared_config_before_environment_setup(tmp_path):
+    from intent_browser.ax_explorer import AXConfig
+    from intent_browser.shared_tokenizer import SharedTokenizerConfig
+    tokenizer = REGISTRY.parent.parent / '.local/model-tokenizers/qwen3.8-27b-1d4bf0f2/tokenizer.json'
+    service = SharedTokenizerConfig(str(tmp_path / 'not-started.sock'))
+    config = AXConfig(str(tokenizer), shared_tokenizer=service)
+    # Construction must reach the qualified factory before env/AX setup; it fails
+    # deliberately there, so unavailable transport never starts the environment.
+    factory = Mock(side_effect=ValueError('service preflight unavailable'))
+    with pytest.raises(ValueError, match='service preflight unavailable'):
+        exercise(tmp_path, factory=factory, ax_config=config)
+    factory.assert_called_once()
+    assert factory.call_args.kwargs == {'ax_tokenizer_path': str(tokenizer), 'shared_tokenizer': service}

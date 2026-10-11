@@ -30,8 +30,8 @@ class _ConfiguredTemplate:
 
 class OfficialQwenInputCounter(QwenInputCounter):
     """Keep legacy image/history handling, render the actual reasoning mode."""
-    def __init__(self, tokenizer_path, reasoning):
-        super().__init__(tokenizer_path)
+    def __init__(self, tokenizer_path, reasoning, *, shared_tokenizer=None):
+        super().__init__(tokenizer_path, shared_tokenizer=shared_tokenizer)
         effort = reasoning.get('effort', 'xhigh')
         enabled = reasoning.get('enabled', effort != 'none')
         if type(enabled) is not bool:
@@ -96,13 +96,14 @@ def glm_image_tokens(height, width, processor):
 
 
 class GlmInputCounter:
-    def __init__(self, model, entry, bundle, *, reasoning_effort=None):
+    def __init__(self, model, entry, bundle, *, reasoning_effort=None, shared_tokenizer=None):
         from jinja2.sandbox import ImmutableSandboxedEnvironment
-        from tokenizers import Tokenizer
+        from .shared_tokenizer import load_tokenizer
         self.model = model
         # ASCII JSON reserialization is semantically identical to the pinned
         # official file and avoids its direct-load incompatibility with 0.23.2.
-        self.tokenizer = Tokenizer.from_str(json.dumps(json.loads((bundle / 'tokenizer.json').read_text())))
+        self.tokenizer = load_tokenizer(bundle / 'tokenizer.json', shared=shared_tokenizer,
+                                        normalization='ascii-json')
         env = ImmutableSandboxedEnvironment(trim_blocks=True, lstrip_blocks=True,
                                             extensions=['jinja2.ext.loopcontrols'])
         env.filters['tojson'] = lambda value, **kwargs: json.dumps(value, **kwargs)
@@ -120,6 +121,8 @@ class GlmInputCounter:
             'scope': 'Complete next input using official model tokenizer/template and image processor sizing; '
                      'hosted processing may differ. Not cumulative usage or an output reservation.',
         }
+        if shared_tokenizer is not None:
+            self.provenance['tokenizer_service'] = self.tokenizer.provenance
 
     def __call__(self, messages, tools):
         from PIL import Image
@@ -162,11 +165,12 @@ class GlmInputCounter:
                 images += 1
         text = self.template.render(messages=selected, tools=tools or [], add_generation_prompt=True,
                                     reasoning_effort=self.reasoning_effort)
-        count = len(self.tokenizer.encode(text, add_special_tokens=False).ids) + image_extra
+        from .shared_tokenizer import count_text
+        count = count_text(self.tokenizer, text) + image_extra
         return {**self.provenance, 'input_tokens': count, 'images': images}
 
 
-def model_matched_input_counter(backend, *, ax_tokenizer_path=None, assets_root=None):
+def model_matched_input_counter(backend, *, ax_tokenizer_path=None, assets_root=None, shared_tokenizer=None):
     """Default factory for a bounded episode; explicit caller counters bypass it.
 
     OpenRouter always needs an exact registered model; AX text tokenization is
@@ -179,18 +183,19 @@ def model_matched_input_counter(backend, *, ax_tokenizer_path=None, assets_root=
     if not is_openrouter and model not in registry['models']:
         if not ax_tokenizer_path:
             raise ValueError('Input limit requires an explicit counter or local tokenizer')
-        return OpaqueReasoningInputCounter(QwenInputCounter(ax_tokenizer_path))
+        return OpaqueReasoningInputCounter(QwenInputCounter(ax_tokenizer_path, shared_tokenizer=shared_tokenizer))
     entry, bundle = _assets(model, assets_root)
     reasoning = getattr(backend, 'request_options', {}).get('reasoning') or {}
     if entry['counter'] == 'qwen':
-        counter = OfficialQwenInputCounter(bundle / 'tokenizer.json', reasoning)
+        counter = OfficialQwenInputCounter(bundle / 'tokenizer.json', reasoning, shared_tokenizer=shared_tokenizer)
         counter.provenance.update(model=model, repository=entry['repository'], revision=entry['revision'],
                                   registry_sha256=hashlib.sha256(REGISTRY.read_bytes()).hexdigest())
     elif entry['counter'] == 'glm':
-        counter = GlmInputCounter(model, entry, bundle, reasoning_effort=reasoning.get('effort'))
+        counter = GlmInputCounter(model, entry, bundle, reasoning_effort=reasoning.get('effort'),
+                                  shared_tokenizer=shared_tokenizer)
     elif entry['counter'] == 'mimo':
         from .mimo_input_budget import MimoInputCounter
-        counter = MimoInputCounter(model, entry, bundle, reasoning)
+        counter = MimoInputCounter(model, entry, bundle, reasoning, shared_tokenizer=shared_tokenizer)
         counter.provenance['registry_sha256'] = hashlib.sha256(REGISTRY.read_bytes()).hexdigest()
     else:
         raise ValueError('Unsupported registered input counter: ' + entry['counter'])

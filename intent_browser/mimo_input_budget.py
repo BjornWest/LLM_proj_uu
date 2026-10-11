@@ -14,9 +14,9 @@ class MimoInputCounter(QwenInputCounter):
     Image sizing uses MiMo's pinned Qwen2VL processor configuration, rather
     than the unrelated hard-coded Qwen3.8 budgets in the parent counter.
     """
-    def __init__(self, model, entry, bundle, reasoning):
+    def __init__(self, model, entry, bundle, reasoning, *, shared_tokenizer=None):
         from jinja2.sandbox import ImmutableSandboxedEnvironment
-        super().__init__(bundle / 'tokenizer.json')
+        super().__init__(bundle / 'tokenizer.json', shared_tokenizer=shared_tokenizer)
         enabled = reasoning.get('enabled', reasoning.get('effort') != 'none')
         if type(enabled) is not bool:
             raise ValueError('MiMo reasoning.enabled must be boolean')
@@ -36,6 +36,8 @@ class MimoInputCounter(QwenInputCounter):
             'scope': 'Complete next input using official MiMo tokenizer/template/processor configuration; '
                      'hosted formatting may differ. Not cumulative usage or output reservation.',
         }
+        if shared_tokenizer is not None:
+            self.provenance['tokenizer_service'] = self.tokenizer.provenance
 
     def __call__(self, messages, tools):
         selected = deepcopy(messages)

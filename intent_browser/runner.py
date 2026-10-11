@@ -188,8 +188,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     if max_input_tokens is not None and input_counter is None:
         from .model_input_budget import model_matched_input_counter
         ax_config = getattr(harness_profile, 'ax_config', None)
-        input_counter = model_matched_input_counter(
-            backend, ax_tokenizer_path=getattr(ax_config, 'tokenizer_path', None))
+        counter_options = {'ax_tokenizer_path': getattr(ax_config, 'tokenizer_path', None)}
+        shared_tokenizer = getattr(ax_config, 'shared_tokenizer', None)
+        if shared_tokenizer is not None:
+            counter_options['shared_tokenizer'] = shared_tokenizer
+        input_counter = model_matched_input_counter(backend, **counter_options)
     if type(record_fact_provenance) is not bool:
         raise ValueError('record_fact_provenance must be boolean')
     if record_fact_provenance and fact_capture_observer is not None:
