@@ -1,7 +1,8 @@
 """Optional exhaustive validation around the frozen commerce producer.
 
-The old producer and accepted callers are unchanged. Each Execution owns its
-factory/exporter bindings; no process-wide monkeypatch or environment switch.
+Sampling behavior and accepted caller APIs are preserved. The producer reads
+one defaults snapshot per world; an off-mode Execution reuses it across worlds.
+Each Execution owns its factory/exporter bindings, without process-wide rebinding.
 The explicit registered slice retains historical five-concept defaults.
 Compilation/source/input checks happen at construction/entry.
 """
@@ -300,7 +301,7 @@ class Execution:
                 'exhaustive_generated_context_checks': self.validation == 'full',
                 'shared_compiled_packages': self.validation == 'off',
                 'shared_completed_manufacture': self.validation == 'off',
-                'population_definitions': 'once_per_execution' if self.validation == 'off' else 'legacy_repeated_loads',
+                'population_definitions': 'once_per_execution' if self.validation == 'off' else 'once_per_world',
                 'shared_factual_stage_concepts': list(SHARED_ADDITIONS),
                 'limitations': ['External mutable-world export and primitive parameter guards remain.',
                                'Ported footwear pilots keep their existing internal checks.',

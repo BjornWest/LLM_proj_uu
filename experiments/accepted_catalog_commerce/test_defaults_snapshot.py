@@ -1,5 +1,6 @@
 """Read-once defaults retain native world bytes, reload boundaries and callers."""
 from copy import deepcopy
+from pathlib import Path
 import json
 import unittest
 from unittest.mock import patch
@@ -69,8 +70,30 @@ class DefaultsSnapshotTests(unittest.TestCase):
         self.assertEqual(reads.call_count, 2)
         self.assertEqual(first[0], before[0])
         self.assertEqual(second[0], before[1])
+        self.assertEqual(worlds[0]['provenance']['population_defaults_sha256'], commerce.native.digest(first[0]))
         self.assertEqual(worlds[1]['provenance']['population_defaults_sha256'], commerce.native.digest(second[0]))
+        self.assertTrue(any(len(page['listing_trace']['sku_ids']) < 4
+                            for retailer in worlds[0]['retailers'] for page in retailer['catalog']))
+        self.assertTrue(all(len(page['listing_trace']['sku_ids']) == 4
+                            for retailer in worlds[1]['retailers'] for page in retailer['catalog']))
         self.assertNotEqual(worlds[0]['world_id'], worlds[1]['world_id'])
+
+    def test_execution_record_matches_actual_defaults_lifetime_without_accepted_ledger(self):
+        from .execution import Execution
+        original_load = population.load
+        for mode, expected_reads, lifetime in (('full', 2, 'once_per_world'),
+                                                ('off', 1, 'once_per_execution')):
+            with self.subTest(mode=mode), \
+                 patch.object(package_export, 'LEDGER', Path('/nonexistent/defaults-snapshot-ledger.json')), \
+                 patch.object(Execution, 'sample', lambda self, *args, **kwargs: stand_in(*args, **kwargs)), \
+                 patch.object(population, 'load', wraps=original_load) as reads:
+                execution = Execution(validation=mode)
+                for _ in range(2):
+                    execution.generate(5, concept_ids=['footwear.walking_shoes'],
+                                       tasks=['footwear.walking_shoes'],
+                                       controls={'world_size': 1}, review_count=0)
+                self.assertEqual(reads.call_count, expected_reads)
+                self.assertEqual(execution.record()['population_definitions'], lifetime)
 
     def test_metadata_only_default_call_still_loads_and_matches_explicit_snapshot(self):
         loaded = population.load()
