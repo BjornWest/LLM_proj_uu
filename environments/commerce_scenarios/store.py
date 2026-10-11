@@ -155,6 +155,21 @@ class SessionStore:
             if self._events or self._setup_events or self._sessions:
                 self._binding_mismatch = True
                 raise ValueError('Bind the episode before the first session request')
+            if self._fault is not None:
+                raise ValueError('Session store has a prior state fault')
+            hooks = []
+            for name in ('quote', 'scope'):
+                hook = getattr(self._settings.get(name), 'bind_episode', None)
+                if hook is not None and all(hook is not prior for prior in hooks):
+                    hooks.append(hook)
+            try:
+                for hook in hooks:
+                    hook(episode_id)
+            except Exception:
+                # A partially bound callback cannot be retried as a different
+                # episode or presented as a complete session.
+                self._fault = 'Episode callback binding failed'
+                raise
             self._episode_id, self._binding = episode_id, value
 
     def begin(self):

@@ -383,6 +383,42 @@ class Controls(unittest.TestCase):
         with self.assertRaises(ValueError):
             store.seal()
 
+    def test_callback_binding_runs_once_before_publishing_session_identity(self):
+        calls = []
+        def bind(episode_id):
+            self.assertIsNone(store.journal()['episode_id'])
+            calls.append(episode_id)
+        def quote(*args, **kwargs):
+            return overlay(*args, **kwargs)
+        def inside(*args, **kwargs):
+            return scope(*args, **kwargs)
+        quote.bind_episode = inside.bind_episode = bind
+        store = self.store(quote=quote, scope=inside)
+        store.bind_episode('actual', {'bound': 1})
+        store.bind_episode('actual', {'bound': 1})
+        with self.assertRaisesRegex(ValueError, 'immutable'):
+            store.bind_episode('foreign', {'bound': 2})
+        self.assertEqual(calls, ['actual'])
+
+    def test_failed_callback_binding_cannot_be_retried_or_sealed_complete(self):
+        calls = []
+        def bind(episode_id):
+            calls.append(episode_id)
+            raise ValueError('Native binding refused')
+        def quote(*args, **kwargs):
+            return overlay(*args, **kwargs)
+        quote.bind_episode = bind
+        store = self.store(quote=quote, scope=scope)
+        with self.assertRaisesRegex(ValueError, 'Native binding refused'):
+            store.bind_episode('actual', {'bound': 1})
+        with self.assertRaisesRegex(ValueError, 'prior state fault'):
+            store.bind_episode('foreign', {'bound': 2})
+        self.assertEqual(calls, ['actual'])
+        journal = store.seal()
+        self.assertIsNone(journal['episode_id'])
+        self.assertFalse(journal['complete'])
+        self.assertEqual(store.snapshot()['state_fault'], 'Episode callback binding failed')
+
     def test_order_needs_a_matching_armed_total_and_a_known_basket(self):
         calls = []
         def native(request):

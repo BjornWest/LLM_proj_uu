@@ -207,6 +207,27 @@ def test_settled_native_quantity_refusal_is_reported_once():
     assert page.orders == [] and page.current['cart'][0]['quantity'] == 1
 
 
+def test_collapsed_navigation_anchor_does_not_advance_on_its_summary_click():
+    class HiddenAnchor(Node):
+        def is_visible(self):
+            return False
+
+        def locator(self, selector):
+            return Node(self.page, 'disclosure')
+
+    class CollapsedNavigation(Page):
+        def locator(self, selector):
+            if selector.startswith('main a'):
+                return HiddenAnchor(self, 'checkout_link')
+            return super().locator(selector)
+
+    driver = policy(episode(), prepared('removed_extras_reappear'), 'positive')
+    page = CollapsedNavigation()
+    drive(driver, page)
+    assert page.orders == [{'quantity': 1, 'extra': False, 'option_id': 'shop/a/basket1/slow'}]
+    assert page.returned
+
+
 @pytest.mark.parametrize('case', ('positive', 'wrong', 'missing-capture', 'no-recurrence'))
 def test_navigation_only_policy_support_is_explicitly_rejected(case):
     p = prepared('checkout_navigation_reset')

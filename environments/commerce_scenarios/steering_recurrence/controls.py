@@ -154,7 +154,9 @@ def policy(episode, prepared, case='positive'):
 
     def go(page, target):
         anchor = page.locator('main a[href=' + json.dumps(target) + ']').first
-        return act(anchor) if anchor.count() else ('goto', {'url': origin + '/' + target})
+        # Opening an ancestor disclosure is not navigation. Only advance the
+        # navigation operation after clicking a visible link or an actual goto.
+        return act(anchor) if anchor.count() and anchor.is_visible() else ('goto', {'url': origin + '/' + target})
 
     def transition(page, target):
         action = go(page, target)
