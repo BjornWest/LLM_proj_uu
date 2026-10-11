@@ -116,6 +116,25 @@ class AtomicProductTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 fixture('read_public_fact', fact={'field': 'sku.facts.' + field})
 
+    def test_reference_configuration_label_is_formatting_only(self):
+        f = fixture('read_public_fact')
+        original = deepcopy(f)
+        expected = f[2]['expected_claims']
+        for label in ('reference configuration: ', 'Reference Configuration : '):
+            claims = {**expected, 'qualifier': label + expected['qualifier']}
+            frozen = deepcopy(claims)
+            self.assertEqual(run(f, claims=claims)['verdict'], 'pass')
+            self.assertEqual(claims, frozen)
+        self.assertEqual(f, original)
+        for qualifier in (None, 'reference configuration: ',
+                          'reference configuration: Wrong configuration',
+                          'not the reference configuration: '+expected['qualifier'],
+                          'reference configuration: reference configuration: '+expected['qualifier']):
+            with self.subTest(qualifier=qualifier):
+                self.assertEqual(run(f, claims={**expected, 'qualifier': qualifier})['verdict'], 'fail')
+        self.assertEqual(run(f, claims={**expected, 'value': 'Wrong value',
+                                       'qualifier': 'reference configuration: '+expected['qualifier']})['verdict'], 'fail')
+
     def test_fact_duplicate_or_empty_not_a_supported_target(self):
         f = fixture('read_public_fact');w, task, _, args, _, _ = f
         rows = args['catalog']['products'][0]['variants'][0]['details'][0]['facts']
