@@ -18,6 +18,9 @@ import time
 
 MAX_CONCURRENCY = 34
 CONTROL_TIMEOUT = 20
+# RPC: 5s connect + two 15s calls + websocket close allowance; leave
+# headroom for local ledger I/O. Custom guard readers must also be bounded.
+QUOTA_READ_ALLOWANCE = 50
 
 
 @dataclass(frozen=True)
@@ -67,11 +70,16 @@ class EpisodeLease:
         self.barrier = self.slot = None
         self.episode_id = None
 
+    @property
+    def control_timeout(self):
+        return CONTROL_TIMEOUT + (self.config.max_concurrent_episodes * QUOTA_READ_ALLOWANCE
+                                  if self.config else 0)
+
     @contextmanager
     def _control(self):
         self.root.mkdir(parents=True, exist_ok=True)
         with (self.root / 'control.lock').open('a+') as gate:
-            deadline = time.monotonic() + CONTROL_TIMEOUT
+            deadline = time.monotonic() + self.control_timeout
             while True:
                 try:
                     fcntl.flock(gate, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -158,6 +166,7 @@ class EpisodeLease:
                             'suite_id': self.config.suite_id,
                             'max_suite_episodes': self.config.max_suite_episodes,
                             'suite_episodes_started': len(record['episodes']),
+                            'admission_wait_seconds': self.control_timeout,
                             'admission_ledger': str(path), 'subscription_lock': str(self.lock_path)}
                 finally:
                     # These probe locks must be gone BEFORE another admission
@@ -192,7 +201,9 @@ class EpisodeLease:
             # Fresh reads/check receipts serialize across all suite processes.
             # Release the control lock before inference: in-flight usage cannot
             # be reserved exactly and is not represented as invented credits.
-            quota_guard()
+            checked = quota_guard()
+            if {window['name'] for window in checked['windows']} != {'primary', 'secondary'}:
+                raise ValueError('Both subscription windows must be verified; no dispatch')
             record['dispatches'] += 1
             record['episodes'][self.episode_id]['dispatches'] += 1
             if phase_record is not None:
@@ -216,8 +227,10 @@ class EpisodeLease:
                     raise ValueError('Phase already consumed or another phase is active')
                 if phase == 'formatter' and phases.get('policy', {}).get('status') != 'closed':
                     raise ValueError('Formatter requires the policy phase to be closed first')
-                if any(p['session_id'] == session_id for p in phases.values()):
-                    raise ValueError('Formatter requires a fresh session/cache identity')
+                if any(p['session_id'] == session_id
+                       for episode in record['episodes'].values()
+                       for p in episode.get('phases', {}).values()):
+                    raise ValueError('Suite phases require a fresh session/cache identity across all cases')
                 phases[phase] = {'session_id': session_id, 'status': 'active', 'dispatches': 0}
             _write(path, record)
 

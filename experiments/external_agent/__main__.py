@@ -39,6 +39,8 @@ def main():
         try:
             if args.suite_id is not None:
                 EpisodeConcurrency(args.suite_id, args.max_concurrent_episodes, args.max_suite_episodes)
+                if args.subscription_lock is None or not args.episode_id:
+                    raise ValueError('Suite mode requires --subscription-lock and a stable --episode-id')
             elif args.max_concurrent_episodes != 1 or args.max_suite_episodes is not None:
                 raise ValueError('Parallel admission requires --suite-id and --max-suite-episodes')
         except ValueError as exc:

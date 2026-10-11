@@ -161,7 +161,9 @@ def test_parallel_requires_guard_and_at_least_one_percent_floor(tmp_path):
     assert not (tmp_path / 'unused').exists()
 
 
-@pytest.mark.parametrize('reader', [lambda: quota(weekly=99), lambda: quota(short=99), lambda: {}])
+@pytest.mark.parametrize('reader', [lambda: quota(weekly=99), lambda: quota(short=99), lambda: {},
+    lambda: {'rateLimitsByLimitId': {'codex': {'limitId': 'codex',
+        'secondary': {'usedPercent': 80, 'windowDurationMins': 10080, 'resetsAt': 200}}}}])
 def test_quota_failure_never_sends_releases_capacity_and_consumes_start(tmp_path, reader):
     cfg = EpisodeConcurrency('suite', 1, 2)
     a, b = backend(tmp_path, 'a', cfg, reader=reader), backend(tmp_path, 'b', cfg)
@@ -205,6 +207,30 @@ def test_shared_quota_reads_serialize_but_inference_runs_concurrently(tmp_path):
         assert ledger['dispatches'] == 8
         assert all(item['dispatches'] == 1 for item in ledger['episodes'].values())
         assert len((tmp_path / 'quota/checks.jsonl').read_text().splitlines()) == 8
+    finally:
+        for item in items: item.close()
+
+
+def test_34_wide_slow_healthy_quota_reader_does_not_poison_queued_cases(tmp_path):
+    cfg = EpisodeConcurrency('slow-suite', 34, 34)
+    def reader():
+        time.sleep(.8)  # Reviewer reproduction: 34 * .8 exceeds former 20s wait.
+        return quota()
+    items = [backend(tmp_path, f'b{i}', cfg, reader=reader) for i in range(34)]
+    start = threading.Barrier(34)
+    for i, item in enumerate(items): info = item.begin_episode(str(i))
+    assert info['admission_wait_seconds'] >= 34 * 50
+    def turn(item):
+        start.wait(timeout=10)
+        return item.complete([{'role': 'user', 'content': 'hello'}])
+    try:
+        with patch('experiments.external_agent.backend.subprocess.run',
+                   side_effect=lambda *args, input, **kw: worker(input)) as send:
+            with ThreadPoolExecutor(max_workers=34) as pool:
+                responses = list(pool.map(turn, items))
+        assert len(responses) == send.call_count == 34
+        assert all(not item.failed for item in items)
+        assert json.loads(Path(info['admission_ledger']).read_text())['dispatches'] == 34
     finally:
         for item in items: item.close()
 
@@ -400,12 +426,117 @@ def test_formatter_gets_one_dispatch_and_no_silent_retry(tmp_path):
 
 def test_cli_requires_complete_finite_configuration_before_server_start(tmp_path):
     for flags in (['--max-concurrent-episodes', '2'], ['--suite-id', 'suite'],
-                  ['--suite-id', 'suite', '--max-suite-episodes', '35']):
+                  ['--suite-id', 'suite', '--max-suite-episodes', '35'],
+                  ['--suite-id', 'suite', '--max-suite-episodes', '2'],
+                  ['--suite-id', 'suite', '--max-suite-episodes', '2', '--subscription-lock', str(tmp_path / 'lock')]):
         call = subprocess.run([sys.executable, '-m', 'experiments.external_agent', 'serve',
             '--model', 'gpt-6-luna', '--output', str(tmp_path / 'unused'), *flags],
             capture_output=True, text=True, timeout=10)
         assert call.returncode == 2
         assert not (tmp_path / 'unused').exists()
+
+
+def test_parallel_backend_requires_explicit_shared_lock(tmp_path):
+    with pytest.raises(ValueError, match='explicit canonical'):
+        ExternalAgentBackend('gpt-6-luna', tmp_path / 'unused', pi_cli='fixture-only',
+            episode_concurrency=EpisodeConcurrency('suite', 1, 1),
+            quota_guard=SubscriptionQuotaGuard(tmp_path / 'quota', reader=quota))
+    assert not (tmp_path / 'unused').exists()
+
+
+def test_default_error_retains_exclusive_lease_until_close(tmp_path):
+    a, b = backend(tmp_path, 'a'), backend(tmp_path, 'b')
+    try:
+        a.begin_episode('a')
+        with patch('experiments.external_agent.backend.subprocess.run', side_effect=RuntimeError('fixture')):
+            with pytest.raises(BackendResponseError): a.complete([{'role': 'user', 'content': 'hello'}])
+        with pytest.raises(ValueError, match='Another external'): b.begin_episode('b')
+        a.close(); b.begin_episode('b')
+    finally:
+        a.close(); b.close()
+
+
+def test_failure_record_and_backend_error_survive_phase_close_write_failure(tmp_path):
+    from experiments.external_agent import episode_admission as admission
+    cfg = EpisodeConcurrency('suite', 1, 2)
+    item = backend(tmp_path, 'one', cfg)
+    item.begin_episode('one')
+    original = admission._write
+    def write(path, record):
+        if record['episodes']['one'].get('phases', {}).get('policy', {}).get('status') == 'closed':
+            raise OSError('fixture disk full')
+        return original(path, record)
+    try:
+        with (patch('experiments.external_agent.backend.subprocess.run', side_effect=RuntimeError('fixture worker error')),
+              patch.object(admission, '_write', write)):
+            with pytest.raises(BackendResponseError) as failure:
+                item.complete([{'role': 'user', 'content': 'hello'}])
+        assert failure.value.response_payload == {'error_type': 'RuntimeError', 'cleanup_error_type': 'OSError'}
+        assert json.loads((tmp_path / 'one/0001/failure.json').read_text())['type'] == 'RuntimeError'
+        assert json.loads((tmp_path / 'one/0001/lease-cleanup-failure.json').read_text())['type'] == 'OSError'
+        assert item.failed and item._lease is None
+        replacement = backend(tmp_path, 'two', cfg)
+        replacement.begin_episode('two'); replacement.close()
+    finally:
+        item.close()
+
+
+def test_sessions_cannot_be_reused_across_case_leases(tmp_path):
+    cfg = EpisodeConcurrency('suite', 2, 2)
+    cases = [SuiteEpisode(cfg, tmp_path / 'subscription.lock',
+        SubscriptionQuotaGuard(tmp_path / 'quota', reader=quota), model='gpt-6-luna') for _ in range(2)]
+    try:
+        for i, case in enumerate(cases): case.begin_episode(str(i))
+        cases[0].claim_phase('policy', 'shared', model='gpt-6-luna', reasoning_effort='medium', provider_output_limit=False)
+        cases[0].finish_phase('policy', 'shared')
+        with pytest.raises(ValueError, match='across all cases'):
+            cases[1].claim_phase('policy', 'shared', model='gpt-6-luna', reasoning_effort='medium', provider_output_limit=False)
+    finally:
+        for case in cases: case.close()
+
+
+def test_suite_cli_validates_complete_registration_without_starting_server(tmp_path, monkeypatch):
+    from experiments.external_agent import __main__ as cli
+    calls = []
+    monkeypatch.setattr(cli, 'serve', calls.append)
+    monkeypatch.setattr(sys, 'argv', ['bridge', 'serve', '--model', 'gpt-6-luna',
+        '--output', str(tmp_path / 'out'), '--suite-id', 'suite', '--max-suite-episodes', '2',
+        '--max-concurrent-episodes', '2', '--subscription-lock', str(tmp_path / 'shared.lock'), '--episode-id', 'case'])
+    cli.main()
+    assert len(calls) == 1 and calls[0].episode_id == 'case'
+    assert calls[0].max_concurrent_episodes == 2 and not (tmp_path / 'out').exists()
+
+
+def test_suite_serve_records_queue_metadata_and_checks_actual_quota_reader(tmp_path, monkeypatch):
+    from experiments.external_agent import server
+    from scripts import product_width_watch
+    helper = tmp_path / 'quota-reader.py'
+    helper.write_text('# fixture source pin\n')
+    monkeypatch.setattr(product_width_watch, '__file__', str(helper))
+    monkeypatch.setattr('experiments.external_agent.backend.shutil.which', lambda name: 'fixture-only')
+    class FixtureServer:
+        server_port = 12345
+        def __init__(self, backend, token, **kwargs): self.backend = backend
+        def serve_forever(self, **kwargs):
+            helper.write_text('# changed source\n')
+            with patch('experiments.external_agent.backend.subprocess.run') as send:
+                with pytest.raises(BackendResponseError):
+                    self.backend.complete([{'role': 'user', 'content': 'hello'}])
+                send.assert_not_called()
+            raise KeyboardInterrupt()
+        def server_close(self): pass
+    monkeypatch.setattr(server, 'BridgeServer', FixtureServer)
+    args = SimpleNamespace(output=tmp_path / 'out', suite_id='suite', max_concurrent_episodes=2,
+        max_suite_episodes=2, subscription_lock=tmp_path / 'shared.lock', episode_id='case',
+        model='gpt-6-luna', timeout=180, reasoning_effort='medium', provider_output_limit=True,
+        port=0, max_requests=200)
+    server.serve(args)
+    meta = json.loads((tmp_path / 'out/server.json').read_text())
+    assert str(helper) in meta['sources']
+    assert meta['episode_admission']['concurrency'] == 2
+    assert meta['minimum_client_timeout_seconds'] == 180 + 10 + meta['episode_admission']['admission_wait_seconds']
+    assert meta['subscription_remaining_floor_percent'] == 1
+    assert not (tmp_path / 'out/quota').exists()
 
 
 def test_corrupt_ledger_fails_closed_and_releases_kernel_lease(tmp_path):

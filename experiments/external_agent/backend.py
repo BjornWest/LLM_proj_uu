@@ -48,6 +48,8 @@ class ExternalAgentBackend:
                 raise ValueError('Declare an explicit EpisodeConcurrency configuration')
             if not isinstance(quota_guard, SubscriptionQuotaGuard) or quota_guard.remaining_floor < 1:
                 raise ValueError('Finite parallel suites require a subscription quota guard with floor >= 1%')
+            if suite_episode is None and lock_path is None:
+                raise ValueError('Finite suites require an explicit canonical shared subscription lock path')
         self.model, self.reasoning_effort = model, reasoning_effort
         self.max_tokens, self.timeout = max_tokens, timeout
         self.artifacts = Path(artifacts).resolve()
@@ -200,11 +202,20 @@ class ExternalAgentBackend:
             return Completion(message.get('content') or '', raw, request)
         except Exception as exc:
             self.failed = True
-            self._release_lease()
+            # Record the actual dispatch failure before fallible phase cleanup.
             if not (directory / 'failure.json').exists():
                 save(directory / 'failure.json', {'type': type(exc).__name__,
                      'dispatch_state': 'inspect dispatch.json; unknown on interruption',
                      'automatic_retries': 0})
+            if self.episode_concurrency is not None:
+                try:
+                    self._release_lease()
+                except Exception as cleanup_error:
+                    save(directory / 'lease-cleanup-failure.json', {'type': type(cleanup_error).__name__,
+                         'original_failure_type': type(exc).__name__, 'automatic_retries': 0})
+                    raise BackendResponseError('External bridge failed with lease cleanup error; see ' + str(directory),
+                        request, {'error_type': type(exc).__name__, 'cleanup_error_type': type(cleanup_error).__name__},
+                        http_status=exc.http_status if isinstance(exc, BackendResponseError) else None) from exc
             if isinstance(exc, BackendResponseError): raise
             raise BackendResponseError('External bridge failed; see ' + str(directory),
                                        request, {'error_type': type(exc).__name__}) from exc

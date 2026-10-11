@@ -183,6 +183,8 @@ finally:
 Each backend/HTTP server still serves exactly one episode. Every participant,
 including bridges loaded from different frozen roots, must use the **same canonical
 subscription lock path**, never a per-case lock or separate path per frozen root.
+Suite mode rejects an omitted explicit lock path; the CLI also requires a stable
+`--episode-id` so relaunching a case cannot silently manufacture a new identity.
 The CLI exposes the same opt-in:
 
 ```bash
@@ -219,8 +221,24 @@ telemetry stops that backend without a send, retry or paid fallback. The ledger
 counts dispatch admissions, not confirmed model sends or billing: interruption
 after admission can leave an unknown attempt. Quota receipts remain separate.
 The control lock is released before model inference, so already in-flight usage
-can cross the floor; this is not an exact provider-side reservation. Control-lock
-waiting is bounded to 20 seconds and cannot authorize a bypass.
+can cross the floor; this is not an exact provider-side reservation. Both primary
+and secondary windows must be present in suite mode, even though the legacy guard
+can accept a weekly-only snapshot. Server source checks include the actual quota
+reader module as well as the transport package.
+
+Control waiting is bounded to `20 + 50 * max_concurrent_episodes` seconds, allowing
+the declared pool's queued quota reads rather than treating a healthy queue as a
+quota failure. The 50-second allowance covers the existing reader's connect,
+initialization, rate-limit and close timeouts plus local I/O headroom; custom
+readers must also be bounded. This bounds a wait, not overall episode wall time
+or provider inference. `begin_episode` metadata records `admission_wait_seconds`;
+`server.json` records `minimum_client_timeout_seconds = admission_wait_seconds +
+provider timeout + 10`. Suite HTTP callers must use at least that timeout (1910
+seconds for concurrency34/provider180); their separate finite episode wall-time
+limit remains in force. Provider request timeout stays180. Healthy 0.8-second
+quota reads queued by all34 cases are covered by synthetic acceptance. Serialized
+quota reads can still throttle dispatch; actual RPC latency/capacity needs runtime
+qualification. No automatic retry follows a genuinely exceeded admission deadline.
 
 One episode's completion calls remain nonconcurrent, with private artifacts,
 session/cache identity, replay map and failure state. `close()` waits for its

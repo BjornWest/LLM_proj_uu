@@ -71,6 +71,11 @@ class Handler(BaseHTTPRequestHandler):
 def serve(args):
     output = args.output.resolve(); output.mkdir(parents=True, exist_ok=False)
     source_files = [*Path(__file__).parent.glob('*.py'), *Path(__file__).parent.glob('*.mjs')]
+    if getattr(args, 'suite_id', None):
+        # Resolve the actual module used by the guard in this frozen runtime,
+        # rather than assuming a location relative to a copied bridge package.
+        from scripts import product_width_watch
+        source_files.append(Path(product_width_watch.__file__))
     hashes = {str(f.resolve()): hashlib.sha256(f.read_bytes()).hexdigest() for f in source_files}
     def unchanged():
         if any(hashlib.sha256(Path(p).read_bytes()).hexdigest() != h for p, h in hashes.items()):
@@ -100,6 +105,7 @@ def serve(args):
             'usage_scope': 'Explicit finite authorized suite; no automatic retries or paid fallback' if config else
                            'Small-scale supervised development only; not bulk evaluation/training',
             'episode_admission': admission,
+            'minimum_client_timeout_seconds': args.timeout + 10 + admission.get('admission_wait_seconds', 0),
             'subscription_remaining_floor_percent': 1 if config else None,
             'output_limit': 'provider_default (explicit override)' if args.provider_output_limit else
                             'Forwarded as max_output_tokens; subscription endpoint rejects this parameter'})
