@@ -31,7 +31,7 @@ def grade(env, trace, outcome):
 
 
 def project(raw, binding):
-    return Evaluation('admission-state','1',trust='native_state',task_completed=raw['done'],
+    return Evaluation('admission-state','1',trust='native_state',task_completed=raw['done'],authorization_satisfied=True,
                       limitations=['Synthetic state only.'])
 
 
@@ -77,8 +77,9 @@ class AdmissionTests(unittest.TestCase):
             if callback:return callback(ready,env,backend,events)
         options={'environment_admission':wait} if callback is not False else {}
         if delegated:
-            from intent_browser.harness import native_tools_profile, with_subagents
-            options['harness_profile']=with_subagents(native_tools_profile(parallel_tool_calls=None,compact_feedback=True))
+            from dataclasses import replace
+            from intent_browser.harness import native_tools_profile, with_subagents, SemanticFeedback
+            options['harness_profile']=replace(with_subagents(native_tools_profile(parallel_tool_calls=None,compact_feedback=True)),feedback_factory=SemanticFeedback)
         if contract:options['automatic_grading']=AutomaticGrading('admission-fixture-v1',bind,grade,project)
         else:options.update(allow_ungraded=True,ungraded_reason='Explicit synthetic admission lifecycle test')
         with patch('intent_browser.runner.observation_text',side_effect=lambda obs,limit=16000:obs['view']):
