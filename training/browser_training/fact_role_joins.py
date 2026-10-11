@@ -2,6 +2,9 @@
 from collections import defaultdict
 from copy import deepcopy
 import json
+import math
+
+from .task_prefix_coverage import slice16, text_hash
 
 def checked_occurrences(normalized):
     rows = normalized.get('occurrences', [])
@@ -21,6 +24,120 @@ def checked_occurrences(normalized):
                         or type(span.get('start')) is not int or type(span.get('end')) is not int):
                     raise ValueError('Malformed public occurrence source interval')
     return rows
+
+
+def public_part_texts(row, sources):
+    """Validate the recorded UTF-16 parts against exact original AX text."""
+    result = {}
+    for part in row['parts']:
+        if not part['spans'] or part['part'] in result:
+            return None
+        text = ''
+        for span in part['spans']:
+            source = sources.get(span['source_id'])
+            if source is None:
+                return None
+            if source.get('sha256') != text_hash(source['text']):
+                raise ValueError('Changed public part source text')
+            text += slice16(source['text'], span['start'], span['end'])
+        result[part['part']] = text
+    return result
+
+
+def typed_slot_assertions(normalized, sources):
+    """Expand declared product assertions, requiring the entire public slot.
+
+    No scalar substring matching: each assertion retains every original part,
+    including the reference-configuration wording in a multi-fact value.
+    The displayed SKU identifies the page, not the assertion's product subject.
+    """
+    result = []
+    for row in checked_occurrences(normalized):
+        b = row['binding']
+        if (b.get('authority') != 'native_existing_public_dom'
+                or b.get('source_family') != 'retailer' or b.get('field') is not None
+                or not isinstance(b.get('slot_id'), str) or not b['slot_id']
+                or b.get('status') != 'known' or not isinstance(b.get('displayed_value'), str)):
+            continue
+        assertions = b.get('assertions', [])
+        if not isinstance(assertions, list) or not all(isinstance(a, dict) for a in assertions):
+            raise ValueError('Malformed typed slot assertions')
+        parts = public_part_texts(row, sources)
+        if not parts or not parts.get('label') or parts.get('value') != b['displayed_value']:
+            continue
+        label = next(p for p in row['parts'] if p['part'] == 'label')['spans']
+        # The native probe adopts a full label element. A suffix registration
+        # could otherwise silently drop reference/maximum/basis qualifiers.
+        if (len(label) != 1 or label[0]['start'] != 0
+                or label[0]['end'] != len(sources[label[0]['source_id']]['text'].encode('utf-16-le')) // 2):
+            continue
+        for assertion in assertions:
+            value = assertion.get('value')
+            if (not isinstance(assertion.get('semantic_id'), str) or not assertion['semantic_id']
+                    or not isinstance(assertion.get('field'), str) or not assertion['field']
+                    or assertion.get('authority') != 'catalog_fact' or assertion.get('status') != 'known'
+                    or not b.get('product_id')
+                    or row['effective_state'].get('product_id') != b['product_id']
+                    or assertion.get('subject') != {'kind': 'product', 'id': b['product_id']}
+                    or type(value) not in (str, bool, int, float)
+                    or type(value) is float and not math.isfinite(value)
+                    or assertion.get('unit') is not None and not isinstance(assertion['unit'], str)
+                    or not isinstance(assertion.get('qualifiers', {}), dict)):
+                continue
+            expanded = deepcopy(row)
+            expanded['id'] += '/assertion/' + assertion['semantic_id']
+            expanded['binding'].update(field=assertion['field'],
+                unit=assertion.get('unit'), typed_assertion=deepcopy(assertion),
+                authority='native_complete_public_slot_assertion')
+            result.append(expanded)
+    return result
+
+
+def page_title_axes(normalized, sources):
+    """The native catalog title grammar binds a single page-key axis.
+
+    catalog_adapter builds name + ' — ' + page-key values. Restrict this
+    bridge to one string axis: exported object ordering cannot qualify a
+    multi-axis suffix. The recorded title must match in full; state alone
+    cannot earn exposure. No page/probe modification or new capture is needed.
+    """
+    groups = defaultdict(list)
+    for row in checked_occurrences(normalized):
+        b, state = row['binding'], row['effective_state']
+        if (b.get('field') == 'product_name' and b.get('authority') == 'native_existing_public_dom'
+                and b.get('source_family') == 'retailer'):
+            groups[json.dumps(state, sort_keys=True)].append(row)
+    result = []
+    for rows in groups.values():
+        if len(rows) != 1:
+            continue
+        row = rows[0]; b, state = row['binding'], row['effective_state']
+        axes = state.get('page_configuration')
+        if not isinstance(axes, dict) or len(axes) != 1:
+            continue
+        axis, value = next(iter(axes.items()))
+        title = b.get('displayed_value')
+        if (not isinstance(axis, str) or not axis or not isinstance(value, str) or not value
+                or not isinstance(title, str) or not title.endswith(' — ' + value)
+                or len(title) <= len(' — ' + value)
+                or any(not b.get(k) or b.get(k) != state.get(k)
+                       for k in ('product_id', 'page_id', 'sku_id', 'offer_id'))
+                or b.get('site_id') != state.get('site')):
+            continue
+        texts = public_part_texts(row, sources)
+        if texts != {'value': title} or len(row['parts'][0]['spans']) != 1:
+            continue
+        span = row['parts'][0]['spans'][0]
+        start = span['end'] - len(value.encode('utf-16-le')) // 2
+        expanded = deepcopy(row)
+        expanded['id'] += '/page-axis/' + axis
+        expanded['binding'].update(field='sku.' + axis, displayed_value=value, status='known',
+            authority='native_single_page_axis_title', title_grammar='catalog-page-name-v1')
+        # The whole title is the identifying context; the suffix is its value.
+        expanded['parts'] = [dict(part='label', spans=[deepcopy(span)]),
+            dict(part='value', spans=[dict(span, start=start)])]
+        result.append(expanded)
+    return result
 
 def selected_configurations(normalized, sources=None):
     groups=defaultdict(list)
@@ -53,7 +170,8 @@ def selected_configurations(normalized, sources=None):
                 authority='native_visible_configuration_join',field='selected_configuration',
                 product_id=state['product_id'],sku_id=state['sku_id'],site_id=state['site'],
                 displayed_value=wanted),effective_state=deepcopy(state),
-                parts=[] if missing_axes else parts,unresolved_axes=missing_axes))
+                parts=[] if missing_axes else parts,unresolved_axes=missing_axes,
+                resolved_axis_parts=parts if missing_axes else []))
     return result
 
 def resolved_parts(occurrence,sources):

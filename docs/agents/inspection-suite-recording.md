@@ -114,6 +114,23 @@ capturing a source. Native state/terminal outcomes use their existing separate
 adapters and grader proofs. The successful-full-extraction visibility assumption
 remains an explicitly labeled alternative to strict receipt evidence.
 
+Typed assertions inside a native public content slot can supply a field mapping
+when the compiled task declares the exact slot/label/assertion (or an explicit
+producer assertion ID), subject and unit. Each witness requires the complete
+original label and value block, preserving reference-configuration wording and
+other qualifiers. A reference-product weight never becomes the selected SKU's
+weight. Substring reads can earn partial exposure, never complete assertion
+coverage. Unsupported assertion shapes and unknown/NA stay unresolved.
+
+For the native catalog's single string page-key axis, the exact product-title
+suffix supplies the page-axis value. This uses the existing producer grammar
+`name + ' — ' + page-key value`, the recorded product/page/SKU/offer/state and
+the exact full title AX source. The full title remains identifying context.
+Multi-axis titles, missing/ambiguous bindings and different text stay unresolved;
+state alone cannot earn coverage. Missing configuration axes retain the known
+axis parts as diagnostics while the full configuration remains unknown. These
+offline mappings need no Website, Harness, capture or historical artifact edits.
+
 ## Acceptance
 
 Evidence for the Luna34/Qwen-ready preparation lives under
