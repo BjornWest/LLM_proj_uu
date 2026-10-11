@@ -221,10 +221,22 @@ telemetry stops that backend without a send, retry or paid fallback. The ledger
 counts dispatch admissions, not confirmed model sends or billing: interruption
 after admission can leave an unknown attempt. Quota receipts remain separate.
 The control lock is released before model inference, so already in-flight usage
-can cross the floor; this is not an exact provider-side reservation. Both primary
-and secondary windows must be present in suite mode, even though the legacy guard
-can accept a weekly-only snapshot. Server source checks include the actual quota
+can cross the floor; this is not an exact provider-side reservation. Suite mode
+validates full quota reads before recording admission, using
+`snapshot(raw, require_complete_windows=True)` / the same guard keyword. Both
+`primary` and `secondary` keys must be explicitly reported. A null window is
+recorded as `not_applicable`; every non-null window must have known, valid usage,
+duration and reset fields and remain above the quota floor. At least one known
+window is required. Omitted fields, unknown bucket/window fields, malformed data,
+conflicting legacy/multi-bucket views or a reported limit state block dispatch.
+Credits and other buckets never supply subscription allowance. The `weekly`
+projection is null when a complete snapshot has only a shorter applicable window;
+floor checks still cover every applicable window. The legacy default parser is
+unchanged. Server source checks include the actual quota
 reader module as well as the transport package.
+The durable suite binding records `quota_contract=complete_nullable_windows_v1`;
+an old binding is incompatible. Use a fresh suite identity for a new authorized
+suite rather than resetting an old ledger or refunding consumed cases.
 
 Control waiting is bounded to `20 + 50 * max_concurrent_episodes` seconds, allowing
 the declared pool's queued quota reads rather than treating a healthy queue as a

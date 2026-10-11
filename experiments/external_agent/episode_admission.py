@@ -203,9 +203,9 @@ class EpisodeLease:
             # Fresh reads/check receipts serialize across all suite processes.
             # Release the control lock before inference: in-flight usage cannot
             # be reserved exactly and is not represented as invented credits.
-            checked = quota_guard()
-            if {window['name'] for window in checked['windows']} != {'primary', 'secondary'}:
-                raise ValueError('Both subscription windows must be verified; no dispatch')
+            # Full reads distinguish an explicitly absent window (null) from
+            # missing/unknown data, before the guard writes an admitted receipt.
+            quota_guard(require_complete_windows=True)
             record['dispatches'] += 1
             record['episodes'][self.episode_id]['dispatches'] += 1
             if phase_record is not None:
@@ -265,7 +265,8 @@ class SuiteEpisode:
         self.binding = {'model': model, 'reasoning_effort': reasoning_effort,
                         'formatter_reasoning_effort': formatter_reasoning_effort,
                         'provider_output_limit': provider_output_limit,
-                        'quota_floor_percent': quota_guard.remaining_floor}
+                        'quota_floor_percent': quota_guard.remaining_floor,
+                        'quota_contract': 'complete_nullable_windows_v1'}
         self.lease = EpisodeLease(lock_path, config, binding=self.binding)
         self.mutex = threading.Lock()
         self.phase = self.session_id = None
