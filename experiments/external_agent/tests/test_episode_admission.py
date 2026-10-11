@@ -1,5 +1,6 @@
 """Offline admission/transport controls: no OAuth or provider requests."""
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from copy import deepcopy
 import json
 import multiprocessing
@@ -91,6 +92,27 @@ def test_exact_34_concurrent_admissions_and_35th_rejected(tmp_path):
             items[34].begin_episode('episode34')
     finally:
         for item in items: item.close()
+
+
+def test_free_probe_locks_are_released_before_control_handoff(tmp_path):
+    cfg = EpisodeConcurrency('suite', 2, 2)
+    first = EpisodeLease(tmp_path / 'subscription.lock', cfg)
+    second = EpisodeLease(tmp_path / 'subscription.lock', cfg)
+    control = first._control
+    admitted = []
+    @contextmanager
+    def next_admission_immediately_after_unlock():
+        with control():
+            yield
+        # Deterministic worst-case scheduler: next process enters as soon as
+        # control unlocks, before begin() runs any outside-context cleanup.
+        admitted.append(second.begin('second'))
+    try:
+        with patch.object(first, '_control', next_admission_immediately_after_unlock):
+            assert first.begin('first')['suite_episodes_started'] == 1
+        assert admitted[0]['suite_episodes_started'] == 2
+    finally:
+        first.close(); second.close()
 
 
 @pytest.mark.parametrize('replacement', [EpisodeConcurrency('other', 2, 3),

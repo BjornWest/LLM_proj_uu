@@ -118,8 +118,8 @@ class EpisodeLease:
                 self.episode_id = episode_id
                 return {'concurrency': 1}
             free = []
-            try:
-                with self._control():
+            with self._control():
+                try:
                     # Lock all free slots while checking active bindings. Slots
                     # left by dead processes are free regardless of stale text.
                     active = 0
@@ -159,9 +159,15 @@ class EpisodeLease:
                             'max_suite_episodes': self.config.max_suite_episodes,
                             'suite_episodes_started': len(record['episodes']),
                             'admission_ledger': str(path), 'subscription_lock': str(self.lock_path)}
-            finally:
-                for slot in free:
-                    slot.close()
+                finally:
+                    # These probe locks must be gone BEFORE another admission
+                    # acquires control; otherwise empty/stale free slots look
+                    # like real active episodes to the next process.
+                    for slot in free:
+                        slot.close()
+                    if self.episode_id is None and self.slot is not None:
+                        self.slot.close()
+                        self.slot = None
         except BaseException:
             self.close()
             raise
