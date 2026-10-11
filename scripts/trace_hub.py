@@ -69,9 +69,9 @@ def fingerprint(directory):
     return sorted(result)
 
 
-def initial_summary(directory):
+def initial_summary(directory, previous=None):
     """Read small metadata/lifecycle files, never steps or model payloads."""
-    from agent_trace.adapters.browsergym import episode_end, read_json
+    from agent_trace.adapters.browsergym import episode_end, episode_title, initial_goal, read_json
     from agent_trace.trace import read_events
     metadata=read_json(directory,'metadata.json')
     if 'browsergym_version' not in metadata:return None
@@ -88,8 +88,19 @@ def initial_summary(directory):
         text=' '.join(value.split()) if isinstance(value,str) else ''
         return text if len(text)<=60 else text[:60].rsplit(' ',1)[0]+'…'
     goal=task.get('trusted_policy_goal') or metadata.get('goal') or episode.get('resolved_goal')
-    title=compact(metadata.get('trace_title') or metadata.get('title') or task.get('title')) or compact(goal)
-    title=title or compact(metadata.get('source_task_id')) or (compact(metadata.get('task')) if metadata.get('task')!='openended' else '') or 'Browser task'
+    goal_source='task.json' if task.get('trusted_policy_goal') else 'metadata.json' if metadata.get('goal') else 'episode.json'
+    previous=previous or {}
+    recording_id=metadata.get('episode_id')
+    # Only a loaded model-input goal needs retention. Metadata/reset titles can
+    # be reread, and a reused directory must not inherit another episode's goal.
+    same_recording=(isinstance(recording_id,str) and bool(recording_id) and recording_id==previous.get('recording_id'))
+    if same_recording and started and previous.get('started_at') and started!=previous['started_at']:
+        same_recording=False
+    if recording_id is None and previous.get('recording_id') is None:
+        same_recording=isinstance(started,str) and bool(started) and started==previous.get('started_at')
+    retained=(previous.get('task_title'),'steps.jsonl') if same_recording and previous.get('task_title_source')=='steps.jsonl' else None
+    reset_goal=initial_goal(directory) if not goal else None
+    title,title_source=episode_title(metadata,task,goal,goal_source,retained=retained,reset_goal=reset_goal)
     model=metadata.get('model');driver=metadata.get('driver')
     model_label=compact(model.rsplit('/',1)[-1]) if isinstance(model,str) else ''
     driver_label=(model_label or 'Model not recorded') if driver=='llm' else compact(driver) or model_label
@@ -97,7 +108,8 @@ def initial_summary(directory):
     if (directory/FILENAME).exists():label+=' · derived grade available'
     case=(metadata.get('calibration_case') or {}).get('case_id')
     return dict(id=hashlib.sha256(('browsergym:'+directory.name).encode()).hexdigest()[:20],
-        title=' · '.join(str(v) for v in (case,title,driver_label,label) if v),
+        title=' · '.join(str(v) for v in (case,title,driver_label,label) if v),task_title=title,
+        task_title_source=title_source,recording_id=recording_id,
         started_at=started,updated_at=max(known) if known else '',
         state='recorded' if episode else 'incomplete',environment='browsergym',
         episode_end=episode_end(episode,metadata,lifecycle),
@@ -164,7 +176,7 @@ class Hub:
                 if cached.get('revision')==revision:summary=cached['summary']
         except (OSError,ValueError,KeyError,AttributeError):pass
         if summary is None:
-            summary=initial_summary(directory)
+            summary=initial_summary(directory,previous)
             if summary is not None:summary=retain_summary_counts(summary,previous)
         if summary is None:return None
         member=self.suite_memberships.get(directory.resolve())

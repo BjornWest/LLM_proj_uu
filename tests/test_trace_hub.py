@@ -85,6 +85,130 @@ def test_catalog_does_not_read_steps_or_project_messages(setup,monkeypatch):
     assert all(row['summary_pending'] for row in json.loads(raw))
 
 
+def test_unopened_title_uses_reset_goal_without_reading_model_payload(setup,monkeypatch):
+    from agent_trace.adapters import browsergym
+    h,a,b=setup;run=b/'new'
+    (run/'initial-state.json').write_text(json.dumps({'resolved_goal':'Compare wet-paving grip Å😀',
+                                                   'task_state':{'private':'never use this as title'}}))
+    original=Path.read_text
+    def read(path,*args,**kwargs):
+        assert path.name!='steps.jsonl','Sidebar read model context'
+        return original(path,*args,**kwargs)
+    monkeypatch.setattr(Path,'read_text',read)
+    monkeypatch.setattr(browsergym,'project',lambda *a,**kw:pytest.fail('Unopened trace projected'))
+    row=next(r for r in json.loads(h.snapshot()[0]) if r['id']==trace_id('new'))
+    assert row['task_title']=='Compare wet-paving grip Å😀'
+    assert row['title']=='Compare wet-paving grip Å😀 · Model not recorded · outcome unknown'
+    assert row['summary_pending'] and row['model_turn_count'] is None
+
+
+@pytest.mark.parametrize('restart',[False,True])
+def test_live_refresh_preserves_recovered_title_but_refreshes_suffix(setup,monkeypatch,restart):
+    from agent_trace.adapters import browsergym
+    h,a,b=setup;run=b/'new'
+    (run/'steps.jsonl').write_text(json.dumps({'step':0,'model_request':{'messages':[
+        {'role':'user','content':'USER GOAL: Compare wet-paving grip.\n\nCURRENT BROWSER OBSERVATION\nPage'}]}})+'\n')
+    before=json.loads(h.load(h.lookup(trace_id('new')))[0])
+    assert before['task_title']=='Compare wet-paving grip.'
+    # No initial-state file: older writers only stored the goal in model input.
+    (run/'metadata.json').write_text(json.dumps({'browsergym_version':'fixture','driver':'llm','model':'test/new-model'}))
+    (run/'evaluation.json').write_text(json.dumps({'safe_success':True}))
+    with (run/'steps.jsonl').open('a') as f:f.write(json.dumps({'step':1,'action':None})+'\n')
+    if restart:h=Hub(h.registry)
+    monkeypatch.setattr(browsergym,'project',lambda *a,**kw:pytest.fail('Unselected trace projected'))
+    original=Path.read_text
+    def read(path,*args,**kwargs):
+        assert path.name!='steps.jsonl','Sidebar reread model context'
+        return original(path,*args,**kwargs)
+    monkeypatch.setattr(Path,'read_text',read)
+    row=next(r for r in json.loads(h.snapshot()[0]) if r['id']==trace_id('new'))
+    assert row['task_title']=='Compare wet-paving grip.'
+    assert row['title']=='Compare wet-paving grip. · new-model · safe success'
+    assert row['summary_stale'] and row['model_turn_count']==before['model_turn_count']
+    # Repeated updates also keep the title after the last full summary is gone.
+    with (run/'events.jsonl').open('a') as f:
+        f.write(json.dumps({'event':'tool_started','timestamp':'2026-02-01T01:00:00Z'})+'\n')
+    again=next(r for r in json.loads(h.snapshot()[0]) if r['id']==trace_id('new'))
+    assert again['title']==row['title']
+
+
+def test_current_title_and_goal_override_retained_title(setup):
+    h,a,b=setup;run=b/'new'
+    (run/'steps.jsonl').write_text(json.dumps({'step':0,'messages':[
+        {'role':'user','content':'USER GOAL: Initial goal'}]})+'\n')
+    assert json.loads(h.load(h.lookup(trace_id('new')))[0])['task_title']=='Initial goal'
+    (run/'metadata.json').write_text(json.dumps({'browsergym_version':'fixture','trace_title':'Author title'}))
+    assert json.loads(h.snapshot()[0])[0]['task_title']=='Author title'
+    (run/'metadata.json').write_text(json.dumps({'browsergym_version':'fixture'}))
+    (run/'task.json').write_text(json.dumps({'trusted_policy_goal':'Updated trusted goal'}))
+    assert json.loads(h.snapshot()[0])[0]['task_title']=='Updated trusted goal'
+
+
+@pytest.mark.parametrize('raw',['','{','null','[]','"scalar"','{"resolved_goal":false}'])
+def test_optional_reset_goal_does_not_break_entire_catalog(setup,raw):
+    h,a,b=setup
+    (b/'new/initial-state.json').write_text(raw)
+    rows=json.loads(h.snapshot()[0])
+    assert len(rows)==2 and rows[0]['task_title']=='Browser task'
+
+
+@pytest.mark.parametrize('field',['task','source_task_id'])
+def test_loaded_goal_ranks_above_task_identifier_on_repeated_updates(setup,field):
+    h,a,b=setup;run=b/'new'
+    (run/'metadata.json').write_text(json.dumps({'browsergym_version':'fixture',field:'miniwob.click-test'}))
+    (run/'steps.jsonl').write_text(json.dumps({'step':0,'messages':[
+        {'role':'user','content':'USER GOAL: Click the button.'}]})+'\n')
+    assert json.loads(h.load(h.lookup(trace_id('new')))[0])['task_title']=='Click the button.'
+    for step in [1,2]:
+        with (run/'steps.jsonl').open('a') as f:f.write(json.dumps({'step':step})+'\n')
+        assert json.loads(h.snapshot()[0])[0]['task_title']=='Click the button.'
+
+
+@pytest.mark.parametrize('restart',[False,True])
+def test_reused_directory_does_not_retain_other_episode_goal(setup,restart):
+    import shutil
+    h,a,b=setup;run=b/'new'
+    (run/'steps.jsonl').write_text(json.dumps({'step':0,'messages':[
+        {'role':'user','content':'USER GOAL: Old run goal: delete account.'}]})+'\n')
+    h.load(h.lookup(trace_id('new')))
+    shutil.rmtree(run)
+    episode(b,'new','2026-04-01T00:00:00Z')
+    if restart:h=Hub(h.registry)
+    assert json.loads(h.snapshot()[0])[0]['task_title']=='Browser task'
+
+
+@pytest.mark.parametrize('name,key',[('metadata.json','trace_title'),('task.json','trusted_policy_goal'),
+                                    ('initial-state.json','resolved_goal')])
+def test_withdrawn_readable_title_is_not_retained(setup,name,key):
+    h,a,b=setup;run=b/'new'
+    (run/name).write_text(json.dumps({'browsergym_version':'fixture',key:'Withdrawn title'}))
+    assert json.loads(h.load(h.lookup(trace_id('new')))[0])['task_title']=='Withdrawn title'
+    (run/name).write_text(json.dumps({'browsergym_version':'fixture'}))
+    assert json.loads(h.snapshot()[0])[0]['task_title']=='Browser task'
+
+
+def test_legacy_single_message_and_reset_title_stay_equal(setup):
+    h,a,b=setup;run=b/'new'
+    (run/'initial-state.json').write_text(json.dumps({'resolved_goal':'Click the button.'}))
+    (run/'steps.jsonl').write_text(json.dumps({'step':0,'messages':[
+        {'role':'user','content':'USER GOAL: Click the button.\nRecent actions: []\nURL: https://example.test/'}]})+'\n')
+    assert json.loads(h.snapshot()[0])[0]['task_title']=='Click the button.'
+    assert json.loads(h.load(h.lookup(trace_id('new')))[0])['task_title']=='Click the button.'
+    with (run/'steps.jsonl').open('a') as f:f.write(json.dumps({'step':1})+'\n')
+    assert json.loads(h.snapshot()[0])[0]['task_title']=='Click the button.'
+
+
+def test_lazy_and_loaded_reset_goal_titles_agree_before_first_turn(setup):
+    h,a,b=setup;run=b/'new'
+    (run/'steps.jsonl').unlink()
+    (run/'initial-state.json').write_text(json.dumps({'resolved_goal':'Check grip on wet paving'}))
+    originals={p.name:p.read_bytes() for p in run.iterdir()}
+    lazy=json.loads(h.snapshot()[0])[0]
+    loaded=json.loads(h.load(h.lookup(lazy['id']))[0])
+    assert lazy['title']==loaded['title']=='Check grip on wet paving · Model not recorded · outcome unknown'
+    assert originals=={p.name:p.read_bytes() for p in run.iterdir()}
+
+
 def test_load_only_selected_trace_and_reuse_cache(setup,monkeypatch):
     from agent_trace.adapters import browsergym
     h,a,b=setup;calls=[];original=browsergym.project
