@@ -1,6 +1,5 @@
 """Drop-in Backend running Pi's Codex transport in a tool-free child process."""
 from copy import deepcopy
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -11,6 +10,8 @@ import uuid
 
 from intent_browser.backend import Completion, BackendResponseError
 from .protocol import request_body, completion, digest
+from .episode_admission import EpisodeConcurrency, EpisodeLease, SuiteEpisode
+from .subscription_quota import SubscriptionQuotaGuard
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -28,7 +29,25 @@ class ExternalAgentBackend:
 
     def __init__(self, model, artifacts, *, reasoning_effort='medium', max_tokens=16384,
                  timeout=180, pi_cli=None, command=None, lock_path=None, before_dispatch=None,
-                 provider_output_limit=False):
+                 provider_output_limit=False, episode_concurrency=None, quota_guard=None,
+                 suite_episode=None, episode_phase='policy'):
+        if suite_episode is not None:
+            if not isinstance(suite_episode, SuiteEpisode) or episode_concurrency is not None:
+                raise ValueError('Supply one case-owned SuiteEpisode, not a second configuration')
+            if quota_guard is not None and quota_guard is not suite_episode.quota_guard:
+                raise ValueError('Case-owned suite quota guard differs')
+            if lock_path is not None and Path(lock_path).resolve() != suite_episode.lease.lock_path:
+                raise ValueError('Case-owned subscription lock differs')
+            episode_concurrency, quota_guard = suite_episode.config, suite_episode.quota_guard
+        elif episode_phase != 'policy':
+            raise ValueError('Formatter continuation requires a case-owned SuiteEpisode')
+        if episode_phase not in ('policy', 'formatter'):
+            raise ValueError('Declare policy or formatter phase')
+        if episode_concurrency is not None:
+            if not isinstance(episode_concurrency, EpisodeConcurrency):
+                raise ValueError('Declare an explicit EpisodeConcurrency configuration')
+            if not isinstance(quota_guard, SubscriptionQuotaGuard) or quota_guard.remaining_floor < 1:
+                raise ValueError('Finite parallel suites require a subscription quota guard with floor >= 1%')
         self.model, self.reasoning_effort = model, reasoning_effort
         self.max_tokens, self.timeout = max_tokens, timeout
         self.artifacts = Path(artifacts).resolve()
@@ -47,7 +66,13 @@ class ExternalAgentBackend:
         self.provider_output_limit = provider_output_limit
         self.mutex = threading.Lock()
         self._lease = None
-        self.lock_path = Path(lock_path or ROOT / '.local/external-agent/subscription.lock')
+        self.lock_path = Path(lock_path or (suite_episode.lease.lock_path if suite_episode else
+                                          ROOT / '.local/external-agent/subscription.lock'))
+        self.episode_concurrency = episode_concurrency
+        self.quota_guard = quota_guard
+        self.suite_episode = suite_episode
+        self.episode_phase = episode_phase
+        self._owns_suite_episode = suite_episode is None
 
     def configure_tools(self, options):
         if not {'tools', 'tool_choice'} <= set(options) or set(options) - {'tools', 'tool_choice', 'parallel_tool_calls'}:
@@ -56,21 +81,38 @@ class ExternalAgentBackend:
         self.request_options = deepcopy(options)
 
     def begin_episode(self, episode_id):
+        with self.mutex:
+            return self._begin_episode(episode_id)
+
+    def _begin_episode(self, episode_id):
         if self.session_id is not None:
             raise ValueError('Use a fresh external backend for each episode')
         if not isinstance(episode_id, str) or not episode_id:
             raise ValueError('Missing episode identity')
-        self.lock_path.parent.mkdir(parents=True, exist_ok=True)
-        self._lease = self.lock_path.open('a')
+        lease = self.suite_episode
+        if self.episode_concurrency is not None and lease is None:
+            lease = SuiteEpisode(self.episode_concurrency, self.lock_path, self.quota_guard,
+                model=self.model, reasoning_effort=self.reasoning_effort,
+                provider_output_limit=self.provider_output_limit)
+        if lease is None:
+            lease = EpisodeLease(self.lock_path)
         try:
-            fcntl.flock(self._lease, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            self._lease.close(); self._lease = None
-            raise ValueError('Another external subscription episode is active') from None
+            if isinstance(lease, SuiteEpisode):
+                if self._owns_suite_episode:
+                    lease.begin_episode(episode_id)
+                admission = lease.claim_phase(self.episode_phase, episode_id, model=self.model,
+                    reasoning_effort=self.reasoning_effort, provider_output_limit=self.provider_output_limit)
+            else:
+                admission = lease.begin(episode_id)
+        except BaseException:
+            if self._owns_suite_episode:
+                lease.close()
+            raise
+        self._lease = lease
         self.session_id = episode_id
         return {'session_id': episode_id, 'requested_model': self.model,
                 'provider': 'openai-codex', 'transport': 'external-pi-v1',
-                'billing': 'subscription', 'concurrency': 1}
+                'billing': 'subscription', **admission}
 
     def complete(self, messages):
         if not self.mutex.acquire(blocking=False):
@@ -130,6 +172,8 @@ class ExternalAgentBackend:
         try:
             if self.before_dispatch is not None:
                 self.before_dispatch()
+            if self.episode_concurrency is not None:
+                self._lease.admit_dispatch(self.quota_guard)
             process = subprocess.run(self.command, input=json.dumps(envelope), capture_output=True,
                                      text=True, timeout=self.timeout + 10, cwd=directory, env=env)
             # Raw transport is already saved by the worker, including partial SSE.
@@ -156,6 +200,7 @@ class ExternalAgentBackend:
             return Completion(message.get('content') or '', raw, request)
         except Exception as exc:
             self.failed = True
+            self._release_lease()
             if not (directory / 'failure.json').exists():
                 save(directory / 'failure.json', {'type': type(exc).__name__,
                      'dispatch_state': 'inspect dispatch.json; unknown on interruption',
@@ -165,6 +210,18 @@ class ExternalAgentBackend:
                                        request, {'error_type': type(exc).__name__}) from exc
 
     def close(self):
+        # Do not release a slot while an admitted worker is still in flight.
+        with self.mutex:
+            self._release_lease()
+
+    def _release_lease(self):
         if self._lease is not None:
-            fcntl.flock(self._lease, fcntl.LOCK_UN)
-            self._lease.close(); self._lease = None
+            lease, self._lease = self._lease, None
+            if isinstance(lease, SuiteEpisode):
+                try:
+                    lease.finish_phase(self.episode_phase, self.session_id)
+                finally:
+                    if self._owns_suite_episode:
+                        lease.close()
+            else:
+                lease.close()

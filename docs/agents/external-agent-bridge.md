@@ -142,12 +142,139 @@ every optional harness combination or live background performance.
 
 ## Usage scope and evidence
 
-Bjorn explicitly requested existing Codex subscription use for small-scale
-development, **not large parallel automation, bulk benchmarks or training-data
-generation**. This is a project operating restriction, not a determination that
-any particular use complies with provider terms. The bridge enforces one active
-local subscription episode and one completion at a time, plus a finite request
-allowance. It has no automatic transport retries or provider fallbacks.
+The default remains one active local subscription episode and one completion
+at a time, plus a finite request allowance. On 2026-10-11 Bjorn additionally
+authorized exactly 34 GPT-6 Luna/medium evaluation episodes in parallel, dispatched
+by Evaluation. That finite authorization does not authorize open-ended automation
+or training-data generation. The explicit suite configuration below changes
+cross-episode admission; it never changes the per-episode request lock, context,
+tools, grading or replay. There are no automatic transport retries or provider
+fallbacks.
+
+### Explicit finite concurrent suite
+
+Direct Python callers use the following additional backend arguments (source
+qualification is offline; Evaluation owns actual suite composition and dispatch):
+
+```python
+from experiments.external_agent.backend import ExternalAgentBackend
+from experiments.external_agent.episode_admission import EpisodeConcurrency
+from experiments.external_agent.subscription_quota import SubscriptionQuotaGuard
+
+config = EpisodeConcurrency(
+    suite_id="LUNA34-PARALLEL-EVALUATION-20261011-01",
+    max_concurrent_episodes=34, max_suite_episodes=34,
+)
+backend = ExternalAgentBackend(
+    "gpt-6-luna", episode_transport_directory,
+    reasoning_effort="medium", provider_output_limit=True,
+    lock_path=canonical_shared_subscription_lock,
+    episode_concurrency=config,
+    quota_guard=SubscriptionQuotaGuard(episode_quota_directory, remaining_floor=1),
+    before_dispatch=verify_frozen_sources,
+)
+try:
+    metadata = backend.begin_episode(stable_unique_episode_id)
+    # The ordinary runner uses this private backend; no bridge-owned agent loop.
+finally:
+    backend.close()
+```
+
+Each backend/HTTP server still serves exactly one episode. Every participant,
+including bridges loaded from different frozen roots, must use the **same canonical
+subscription lock path**, never a per-case lock or separate path per frozen root.
+The CLI exposes the same opt-in:
+
+```bash
+.venv/bin/python -m experiments.external_agent serve \
+  --model gpt-6-luna --reasoning-effort medium --provider-output-limit \
+  --suite-id LUNA34-PARALLEL-EVALUATION-20261011-01 \
+  --max-concurrent-episodes 34 --max-suite-episodes 34 \
+  --subscription-lock /home/bjorn/code/LLM_proj_uu/.local/external-agent/subscription.lock \
+  --episode-id UNIQUE_CASE_EPISODE_ID --max-requests 200 --timeout 180 \
+  --output UNIQUE_EPISODE_OUTPUT
+```
+
+Finite integer limits must satisfy `1 <= concurrency <= suite episodes <= 34`.
+Suite identity, limits, model, reasoning effort, output-limit mode and quota floor
+must agree across participants. The ordinary exclusive lock conflicts with a
+parallel suite in either direction. Only one suite configuration can be live on
+the shared lock; incompatible participants fail before admission.
+
+The `<subscription.lock>.admission/` directory contains kernel-held episode lock
+files and an atomic, fsynced ledger keyed by the suite identity's SHA-256. The
+ledger consumes an episode identity at successful admission, even if it later
+fails or the process dies; the same identity cannot be admitted again, and no
+more than the declared total may start. A full concurrent pool rejects admission
+rather than waiting or scheduling a retry. Closed/crashed processes release
+kernel leases; stale lock-file text does not hold capacity. Do not delete lock
+files or reset ledgers to manufacture more allowance. Use a new suite identity
+only for separately authorized work.
+
+Before each worker dispatch the shared control lock serializes a **fresh**
+`SubscriptionQuotaGuard` read/check and records an admitted-dispatch counter.
+Parallel configuration requires this guard with a remaining floor of at least
+1%; CLI suite mode always uses 1%. Either window at/below the floor or unavailable
+telemetry stops that backend without a send, retry or paid fallback. The ledger
+counts dispatch admissions, not confirmed model sends or billing: interruption
+after admission can leave an unknown attempt. Quota receipts remain separate.
+The control lock is released before model inference, so already in-flight usage
+can cross the floor; this is not an exact provider-side reservation. Control-lock
+waiting is bounded to 20 seconds and cannot authorize a bypass.
+
+One episode's completion calls remain nonconcurrent, with private artifacts,
+session/cache identity, replay map and failure state. `close()` waits for its
+current completion before releasing capacity. Worker transport failures release
+capacity but poison that backend; they do not restore consumed suite allowance.
+Process death can leave an unknown upstream attempt and must not trigger replay.
+Offline synthetic qualification establishes local admission/isolation, not the
+subscription's actual simultaneous serving capacity or 34-browser host capacity.
+
+### One case, separate policy and grading sessions
+
+For callers that open a fresh formatter after closing policy, create a **case-owned**
+`SuiteEpisode` first. Its one consumed episode allowance and concurrent lease span
+both phases; never construct a second independent episode for the formatter.
+
+```python
+from experiments.external_agent.episode_admission import SuiteEpisode
+
+case = SuiteEpisode(config, canonical_shared_subscription_lock, quota_guard,
+    model="gpt-6-luna", reasoning_effort="medium",
+    formatter_reasoning_effort="low", provider_output_limit=True)
+case.begin_episode(stable_unique_case_id)
+try:
+    policy = ExternalAgentBackend("gpt-6-luna", policy_artifacts,
+        suite_episode=case, episode_phase="policy", reasoning_effort="medium",
+        provider_output_limit=True, before_dispatch=verify_frozen_sources)
+    try:
+        policy.begin_episode(unique_policy_session_id)
+        # Ordinary policy runner.
+    finally:
+        policy.close()
+    formatter = ExternalAgentBackend("gpt-6-luna", formatter_artifacts,
+        suite_episode=case, episode_phase="formatter", reasoning_effort="low",
+        provider_output_limit=True, before_dispatch=verify_frozen_sources)
+    try:
+        formatter.begin_episode(unique_formatter_session_id)
+        # Existing separate answer-extraction/grading pass, if required.
+    finally:
+        formatter.close()
+finally:
+    case.close()
+```
+
+Keep the object in the case-owning process. Policy close releases only its phase;
+case close releases capacity after grading. Exactly one policy and at most one
+formatter phase may attach, sequentially, with different session/cache identities
+and private replay/context/artifacts. Formatter requires policy close; a failed
+policy may still receive its separately authorized grading pass. Neither a second
+policy nor formatter reattachment is permitted. Closing a case with an active
+backend is rejected; close that backend first. Phase claims are durable even when
+their dispatch fails. The formatter may admit at most one model dispatch; a
+second call is rejected without a send or automatic retry. The suite counter measures **cases**, not the sum of policy
+and formatter sessions. CLI servers use the single-policy convenience API; the
+case-owned two-phase API is for the existing Python suite caller.
 
 The bridge listens only on loopback and requires its random local credential;
 it exposes no browser/action endpoints. Failed/unknown transport attempts stop

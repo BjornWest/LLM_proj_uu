@@ -11,6 +11,8 @@ import uuid
 
 from intent_browser.backend import BackendResponseError
 from .backend import ExternalAgentBackend, save
+from .episode_admission import EpisodeConcurrency
+from .subscription_quota import SubscriptionQuotaGuard
 
 
 class BridgeServer(ThreadingHTTPServer):
@@ -47,7 +49,7 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError:
             return self.reply(413, {'error': 'Missing or excessive request length'})
         if not self.server.dispatch_lock.acquire(blocking=False):
-            return self.reply(409, {'error': 'One development request at a time'})
+            return self.reply(409, {'error': 'One request per episode at a time'})
         try:
             if self.server.attempts >= self.server.max_requests:
                 return self.reply(429, {'error': 'Declared request allowance exhausted; no dispatch'})
@@ -73,13 +75,17 @@ def serve(args):
     def unchanged():
         if any(hashlib.sha256(Path(p).read_bytes()).hexdigest() != h for p, h in hashes.items()):
             raise RuntimeError('Bridge source changed; stop and prepare a new bridge')
+    suite_id = getattr(args, 'suite_id', None)
+    config = EpisodeConcurrency(suite_id, args.max_concurrent_episodes, args.max_suite_episodes) if suite_id else None
+    quota_guard = SubscriptionQuotaGuard(output / 'quota', remaining_floor=1) if config else None
     backend = ExternalAgentBackend(args.model, output / 'transport', timeout=args.timeout,
         reasoning_effort=args.reasoning_effort, before_dispatch=unchanged,
-        provider_output_limit=args.provider_output_limit)
+        provider_output_limit=args.provider_output_limit,
+        lock_path=getattr(args, 'subscription_lock', None), episode_concurrency=config, quota_guard=quota_guard)
     token = secrets.token_urlsafe(32)
-    session_id = str(uuid.uuid4())
+    session_id = getattr(args, 'episode_id', None) or str(uuid.uuid4())
     try:
-        backend.begin_episode(session_id)
+        admission = backend.begin_episode(session_id)
         server = BridgeServer(backend, token, port=args.port, max_requests=args.max_requests)
         base_url = f'http://127.0.0.1:{server.server_port}/v1'
         envfile = output / 'bridge.env'
@@ -91,7 +97,10 @@ def serve(args):
             'max_requests': args.max_requests, 'reasoning_effort': args.reasoning_effort,
             'sources': hashes, 'policy_owner': 'existing intent_browser runner',
             'tools_executed_by_bridge': [], 'model_calls_at_start': 0,
-            'usage_scope': 'Small-scale supervised development only; not bulk evaluation/training',
+            'usage_scope': 'Explicit finite authorized suite; no automatic retries or paid fallback' if config else
+                           'Small-scale supervised development only; not bulk evaluation/training',
+            'episode_admission': admission,
+            'subscription_remaining_floor_percent': 1 if config else None,
             'output_limit': 'provider_default (explicit override)' if args.provider_output_limit else
                             'Forwarded as max_output_tokens; subscription endpoint rejects this parameter'})
         print(json.dumps({'base_url': base_url, 'model': args.model, 'credential_file': str(envfile),
