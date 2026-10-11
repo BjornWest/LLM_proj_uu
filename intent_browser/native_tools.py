@@ -444,7 +444,7 @@ class NativeBrowserTools(BrowserTools):
 
 
     def parse_for_dispatch(self, completion, *, batching=False, allow_search=False,
-                           has_call_id=lambda _: False):
+                           has_call_id=lambda _: False, recover_missing_calls=True):
         """Return bounded argument errors only after validating the whole envelope.
 
         Completed replies without calls receive a separate controller correction.
@@ -457,16 +457,20 @@ class NativeBrowserTools(BrowserTools):
         from .retry_policy import argument_diagnostic
         raw = completion.raw
         choices = raw.get('choices') if isinstance(raw,dict) else None
-        if isinstance(choices,list) and len(choices)==1 and isinstance(choices[0],dict):
+        if recover_missing_calls and isinstance(choices,list) and len(choices)==1 and isinstance(choices[0],dict):
             choice=choices[0];message=choice.get('message')
             if isinstance(message,dict):
                 calls=message.get('tool_calls')
                 no_calls=calls is None or (isinstance(calls,list) and not calls)
                 diagnostic=completion_diagnostic(raw,completion.request)
-                if (no_calls and choice.get('finish_reason') in ('stop','tool_calls')
+                native_finish=str(choice.get('native_finish_reason') or '').lower()
+                incomplete_native=native_finish in ('length','max_tokens','max_token','malformed_function_call','safety','content_filter','error')
+                if (no_calls and choice.get('finish_reason')=='stop'
                         and message.get('role')=='assistant' and not message.get('refusal')
                         and (message.get('content') is None or isinstance(message.get('content'),str))
-                        and not (diagnostic and diagnostic['retry_unchanged'] is False)):
+                        and diagnostic is None and not incomplete_native
+                        and raw.get('error') is None and choice.get('error') is None
+                        and message.get('function_call') is None):
                     if self.reasoning_replay=='preserve':
                         reasoning_for_replay(message)  # Malformed reasoning remains an envelope error.
                     raise MissingNativeToolCall('No native tool call returned; nothing executed')
@@ -695,7 +699,7 @@ class NativeConversation(EvidenceConversation):
         self._pending_human=[]
         return deepcopy(self._messages)
 
-    def recover(self, raw, notice, *, preserve_reasoning=True, notice_source=None):
+    def recover(self, raw, notice, *, preserve_reasoning=True, notice_source=None, preserve_empty_content=False):
         """Append a marked controller notice, never invent an executed tool result.
 
         Invalid tool-call objects remain exact in the trace. On the wire their
@@ -713,7 +717,7 @@ class NativeConversation(EvidenceConversation):
             if message.get('tool_calls'):
                 proposal = json.dumps(message['tool_calls'], ensure_ascii=False)
                 content += '\n[Rejected, unexecuted tool proposal]\n' + (proposal if len(proposal) <= REJECTED_ARGUMENT_HISTORY_CHAR_LIMIT else '[See exact retained response; proposal exceeds recovery context bound]')
-            assistant = {'role': 'assistant', 'content': content or '[No executable action returned]'}
+            assistant = {'role': 'assistant', 'content': content if preserve_empty_content else (content or '[No executable action returned]')}
             if preserve_reasoning:
                 assistant.update(reasoning_for_replay(message))
         self._pending_retry = ((assistant, notice) if notice_source is None else (assistant, notice, notice_source))

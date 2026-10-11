@@ -362,7 +362,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         profile_metadata['native_tool_request_options'] = native_options
         profile_metadata['native_reply_feedback'] = {
             'version':'native-no-call-feedback-v1', 'scope':'completed replies without native calls',
-            'recovery':'next ordinary decision, controller notice; no automatic action or generation replay'}
+            'recovery':'next ordinary decision, controller notice; no automatic action or generation replay',
+            'enabled':retry_policy is None, 'configured_retry_policy_preserved':True}
         profile_metadata['invalid_argument_feedback'] = {
             'version':'native-argument-rejection-v1','whole_batch_rejected':True,
             'browser_action_replay':False,'argument_clamping':False,
@@ -1078,7 +1079,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     try:
                         decisions, assistant, argument_results, argument_channel = harness_profile.tools.parse_for_dispatch(
                             completion, batching=batching, allow_search=search_backend is not None,
-                            has_call_id=conversation.has_call_id)
+                            has_call_id=conversation.has_call_id,recover_missing_calls=retry_policy is None)
                     except MissingNativeToolCall:
                         value={'execution':'not_executed','reason':'missing_native_tool_call',
                             'feedback':'No native tool call was returned. Use the provided native tool schema for your next decision. '
@@ -1088,7 +1089,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                         source=delivery.register('batch_result',notice,step=index,
                             provenance={'scope':'Completed reply without calls; no action dispatched'}) if delivery else None
                         conversation.recover(completion.raw,notice,
-                            preserve_reasoning=harness_profile.tools.reasoning_replay=='preserve',notice_source=source)
+                            preserve_reasoning=harness_profile.tools.reasoning_replay=='preserve',notice_source=source,
+                            preserve_empty_content=True)
                         event.update(kind='native_protocol_rejection',policy_feedback=value,actions=[],
                             browser_stepped=False,action_dispatch_started=False,not_executed=True,
                             native_feedback_channel='controller',native_feedback_reason='missing_native_tool_call',
