@@ -48,7 +48,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                 observation_pipeline="auto", human_handover=None, human_handover_ui=None,
                 trace_screenshots=None, async_recording=True, debug_timings=None,
                 checkpoint_control=None, record_fact_provenance=False, fact_source_provider=None,
-                automatic_grading=None, allow_ungraded=False, ungraded_reason=None, fact_capture_observer=None):
+                automatic_grading=None, allow_ungraded=False, ungraded_reason=None, fact_capture_observer=None,
+                environment_admission=None):
     """Run an episode with trusted caller-selected prompt options.
 
     Terminal wording changes only the completion instruction. The observation
@@ -60,6 +61,11 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
     cap; external wall-time/resource bounds remain the caller's responsibility.
     """
     from .automatic_grading import GradingGate, validate_options, failure_evaluation
+    from .episode_admission import EpisodeAdmissionCancelled, await_activation
+    if environment_admission is not None and not callable(environment_admission):
+        raise ValueError('environment_admission must be a trusted callable or None')
+    if environment_admission is not None and agent_actor is not None and agent_actor.get('parent') is not None:
+        raise ValueError('Environment admission is a root-episode boundary, not a helper hook')
     auxiliary_grading = None
     if agent_actor is not None and agent_actor.get('parent') is not None:
         parent_gate = getattr(agent_runtime, 'grading_gate', None)
@@ -229,7 +235,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             trace_screenshots=trace_screenshots,async_recording=async_recording,debug_timings=debug_timings,
             record_fact_provenance=record_fact_provenance,fact_source_provider=fact_source_provider,
             automatic_grading=automatic_grading,allow_ungraded=allow_ungraded,ungraded_reason=ungraded_reason,
-            fact_capture_observer=fact_capture_observer))
+            fact_capture_observer=fact_capture_observer,environment_admission=environment_admission))
     no_browser=agent_actor is not None and agent_actor['browser']=='none'
     if action_timeout_ms is not None:
         validate_action_timeout(action_timeout_ms)
@@ -452,7 +458,7 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             from .memory import MemorySession
             memory_session=MemorySession(memory_adapter,trace)
             trace.event('memory_initialized',artifact='memory-initial.json',version='user-memory-v1')
-        if hasattr(backend, 'begin_episode'):
+        if environment_admission is None and hasattr(backend, 'begin_episode'):
             routing = backend.begin_episode(trace.episode_id)
             if routing:
                 trace.metadata['routing'] = routing
@@ -856,6 +862,19 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                     navigation.check_active()
 
         grading_gate.bind(env,obs)
+        if environment_admission is not None:
+            previous_goal = obs['goal']
+            obs = await_activation(environment_admission, trace,
+                lambda: refresh_observation(env, complete=True))
+            if obs['goal'] != previous_goal:
+                raise ValueError('Task goal changed while the environment was parked')
+            grading_gate.check(force=True)
+            if hasattr(backend, 'begin_episode'):
+                routing = backend.begin_episode(trace.episode_id)
+                if routing:
+                    trace.metadata['routing'] = routing
+                    write_json(trace.directory / 'metadata.json', trace.metadata)
+                    trace.event('model_session_started', **routing)
         final_ref = trace.observation(0, obs, render_observation(obs))
         for index in (range(max_steps) if max_steps is not None else decision_indices()):
             if fact_recorder is not None: fact_recorder.step=index
@@ -1419,7 +1438,8 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
             env.unwrapped.page.wait_for_timeout(hold_seconds * 1000)
     except (Exception, KeyboardInterrupt) as exc:
         trace.timings.exception(exc,phase='episode')
-        stop_reason = "error" if isinstance(exc, Exception) else "interrupted"
+        stop_reason = ("admission_cancelled" if isinstance(exc, EpisodeAdmissionCancelled)
+                       else "error" if isinstance(exc, Exception) else "interrupted")
         error = f"{type(exc).__name__}: {exc}"
     finally:
         if fact_recorder is not None: fact_recorder.close()
@@ -1435,7 +1455,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
                    "stop_reason": stop_reason, "error": error, "final_reward": reward}
         trace.event("evaluation_started", reset_complete=reset_complete)
         try:
-            if episode_task and reset_complete:
+            if stop_reason == 'admission_cancelled':
+                evaluation = Evaluation('episode-admission', '1', trust='infrastructure_failure',
+                    technical_error=error, limitations=['Cancelled before provider/session activation; no task verdict.'])
+            elif episode_task and reset_complete:
                 evaluation = episode_task.evaluate(env, trace, outcome)
             else:
                 evaluation = Evaluation(
@@ -1455,8 +1478,10 @@ def run_episode(env_factory, backend, metadata, output="runs", max_steps=DEFAULT
         execution_error=error
         cleanup_errors=[]
         write_json(trace.directory / 'evaluation-before-close.json',evaluation_data)
-        grading_error = None
-        if automatic_grading is not None and automatic_grading.phase == 'before_close':
+        grading_error = error if stop_reason == 'admission_cancelled' else None
+        if grading_error is not None:
+            grading_gate.fail(grading_error)
+        if automatic_grading is not None and grading_error is None and automatic_grading.phase == 'before_close':
             try:grading_gate.collect(env,outcome)
             except (Exception, KeyboardInterrupt) as exc:
                 grading_error=f'Automatic grading failed: {type(exc).__name__}: {exc}'
