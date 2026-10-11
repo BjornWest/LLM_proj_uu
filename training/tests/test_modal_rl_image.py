@@ -9,7 +9,7 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 TRAINING = Path(__file__).resolve().parents[1]
 
@@ -129,6 +129,53 @@ class ControllerTests(unittest.TestCase):
                 self.assertEqual(plan['source_sha256'],hashes)
                 self.assertEqual(plan['measured_cohorts'],6);self.assertEqual(plan['job_cap_seconds'],2700)
                 self.assertFalse(output.exists())
+                # Actual controller CLI must bind larger per-arm cohorts, not
+                # accidentally keep the historical common-batch GPU arguments.
+                argv += ['--arm-batch','dflash=10','--arm-batch','mtp3=17',
+                         '--arm-batch','baseline=23','--job-cap-seconds','2100']
+                with patch.object(sys,'argv',argv),patch.object(module.subprocess,'check_output',side_effect=['','offline-test-commit']),contextlib.redirect_stdout(io.StringIO()) as out:
+                    module.main()
+                plan=json.loads(out.getvalue())
+                self.assertEqual(plan['arm_batches'],{'dflash':[10],'mtp3':[17],'baseline':[23]})
+                self.assertEqual(plan['measured_cohorts'],3)
+                self.assertEqual(plan['measured_requests_upper_bound'],50)
+                self.assertEqual(plan['warmup_requests_upper_bound'],50)
+                self.assertEqual(plan['job_cap_seconds'],2100)
+                self.assertFalse(output.exists())
+                # Execute the real non-dry-run controller with cloud calls mocked.
+                # Two independent local parents may use the SAME basename; their
+                # shared-volume run IDs must differ and match persisted plans.
+                archive=io.BytesIO()
+                with module.tarfile.open(fileobj=archive,mode='w:gz'):pass
+                prepared={'snapshot':'base','draft':'draft','prompts':'prompts'}
+                call=Mock(object_id='mock-call')
+                call.get.return_value=({'status':'COMPLETE'},archive.getvalue())
+                runs=[]
+                for parent in ('one','two'):
+                    destination=root/parent/'same-basename'
+                    run_argv=argv[:]
+                    run_argv.remove('--dry-run')
+                    run_argv[run_argv.index('--output')+1]=str(destination)
+                    queue=Mock()
+                    with patch.object(sys,'argv',run_argv),patch.object(module.subprocess,'check_output',side_effect=['','offline-test-commit']), \
+                         patch.object(module.app,'run',return_value=contextlib.nullcontext()), \
+                         patch.object(module.app,'get_dashboard_url',return_value='mock-url'), \
+                         patch.object(module.modal,'enable_output',return_value=contextlib.nullcontext()), \
+                         patch.object(module.modal.Queue,'ephemeral',return_value=contextlib.nullcontext(queue)), \
+                         patch.object(module.prepare,'remote',return_value=prepared) as prepare_call, \
+                         patch.object(module.benchmark,'spawn',return_value=call) as spawn, \
+                         patch.dict(sys.modules,{'dotenv':SimpleNamespace(dotenv_values=lambda _: {})}), \
+                         contextlib.redirect_stdout(io.StringIO()):
+                        module.main()
+                    actual=json.loads((destination/'plan.json').read_text())
+                    run_id=actual['run_id'];runs.append(run_id)
+                    self.assertTrue(run_id.startswith('same-basename-'))
+                    prepare_call.assert_called_once_with(hashes,23)
+                    self.assertEqual(spawn.call_args.args[0],run_id)
+                    self.assertEqual(spawn.call_args.args[4],['dflash=10','mtp3=17','baseline=23'])
+                    self.assertEqual(spawn.call_args.args[3],queue)
+                    call.cancel.assert_called_with(terminate_containers=True)
+                self.assertNotEqual(*runs)
         finally:sys.path[:]=original_path
 
     def test_remote_import_does_not_assemble_image(self):

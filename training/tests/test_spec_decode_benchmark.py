@@ -37,6 +37,20 @@ class BenchmarkTests(unittest.TestCase):
         with self.assertRaises(ValueError):b.choose_common_batch(low,16)
         with self.assertRaises(ValueError):b.choose_common_batch(dict(cache_max_requests=1,scheduler_max_requests=32))
 
+    def test_explicit_matrix_preserves_requested_batches_and_fails_closed(self):
+        matrix=b.parse_arm_batches(['dflash=10','mtp3=17','baseline=23'])
+        self.assertEqual(list(matrix),['dflash','mtp3','baseline'])
+        for arm, limit in [('dflash',11),('mtp3',18),('baseline',24)]:
+            capacity=dict(cache_max_requests=limit,scheduler_max_requests=32)
+            self.assertEqual(b.select_batches(capacity,matrix,arm), (matrix[arm],None))
+            with self.assertRaisesRegex(ValueError,'exceeds observed capacity'):
+                b.select_batches(dict(cache_max_requests=matrix[arm][0]-1,scheduler_max_requests=32),matrix,arm)
+        self.assertEqual(b.select_batches(dict(cache_max_requests=11,scheduler_max_requests=32),None,'dflash'),([1,11],11))
+        self.assertIsNone(b.parse_arm_batches(None))
+        for values in [['unknown=10'],['dflash=0'],['dflash=33'],['dflash='],
+                       ['dflash=10,10'],['dflash=10','dflash=11'],['dflash=1.5']]:
+            with self.assertRaises(ValueError):b.parse_arm_batches(values)
+
     def test_invalid_capacity_fails(self):
         config=SimpleNamespace(model_config=SimpleNamespace(max_model_len=262144),speculative_config=None,
             scheduler_config=SimpleNamespace(max_num_seqs=32))

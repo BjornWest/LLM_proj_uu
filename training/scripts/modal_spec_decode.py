@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One bounded Modal RTX PRO job: three engine starts, six measured cohorts."""
+"""One bounded Modal RTX PRO job with a declared finite throughput matrix."""
 import argparse
 import hashlib
 import io
@@ -18,7 +18,7 @@ import modal
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
-from spec_decode_benchmark import ARMS,BATCH,ISL,OSL,MODEL,REVISION,DRAFT,DRAFT_REVISION,CACHE_BLOCK_SIZE,save
+from spec_decode_benchmark import ARMS,BATCH,ISL,OSL,MODEL,REVISION,DRAFT,DRAFT_REVISION,CACHE_BLOCK_SIZE,parse_arm_batches,save
 PYTHON="/opt/rl/.venv/bin/python"
 # One mapping binds uploaded sources and copied build inputs to actual container
 # locations. No legacy episode module, relay, parser patch or volume factory.
@@ -63,7 +63,7 @@ app=modal.App("qwen38-spec-decode-six-cohorts",image=image,include_source=False)
 
 @app.function(cpu=4,memory=16384,timeout=1200,retries=0,max_containers=1,scaledown_window=2,
               volumes={"/model-cache":cache})
-def prepare(source_hashes):
+def prepare(source_hashes, prompt_count=BATCH):
     verify_sources(source_hashes)
     code=f"""
 import json,hashlib,os
@@ -101,12 +101,12 @@ for arm in ARMS:
 from vllm.model_executor.models.registry import ModelRegistry
 assert 'DFlash2DraftModel' in ModelRegistry.get_supported_archs()
 tok=AutoTokenizer.from_pretrained(base,local_files_only=True)
-prompts=[make_prompt(tok,i,ISL) for i in range(BATCH)]
+prompts=[make_prompt(tok,i,ISL) for i in range({prompt_count})]
 assert all(len(p)==ISL for p in prompts)
 path=Path('/model-cache/spec-decode-60k-v1');path.mkdir(exist_ok=True)
-data=json.dumps(prompts).encode();(path/'prompts.json').write_bytes(data)
+data=json.dumps(prompts).encode();prompt_path=path/'prompts-{prompt_count}.json';prompt_path.write_bytes(data)
 cuda=Path(distribution('nvidia-cuda-nvcc').locate_file('nvidia/cu13'))
-print(json.dumps(dict(snapshot=str(base),draft=str(draft),prompts=str(path/'prompts.json'),
+print(json.dumps(dict(snapshot=str(base),draft=str(draft),prompts=str(prompt_path),
     cache_fix=cache_fix,prompt_sha256=hashlib.sha256(data).hexdigest(),cuda_home=str(cuda),vllm=version('vllm'),
     torch=version('torch'),cuda=torch.version.cuda,transformers=version('transformers'),
     flashinfer=version('flashinfer-python'),psutil=version('psutil'),
@@ -125,7 +125,7 @@ print(json.dumps(dict(snapshot=str(base),draft=str(draft),prompts=str(path/'prom
 @app.function(gpu="RTX-PRO-6000",cpu=8,memory=98304,timeout=2760,startup_timeout=60,
               retries=0,max_containers=1,scaledown_window=2,
               volumes={"/model-cache":cache,"/results":results})
-def benchmark(run_id,prepared,deadline,claims):
+def benchmark(run_id,prepared,deadline,claims,arm_batches=None):
     if claims.get(timeout=5)!="start-once":raise ValueError("Invalid invocation claim")
     if time.time()>=deadline:raise TimeoutError("Expired before GPU work")
     run=Path("/results")/run_id;run.mkdir(exist_ok=False)
@@ -179,6 +179,8 @@ for path in (Path(sys.argv[2])/'benchmark').glob('*/server-process.json'):
     command=[PYTHON,"/opt/training/scripts/spec_decode_benchmark.py","--snapshot",prepared['snapshot'],
         "--draft",prepared['draft'],"--prompts",prepared['prompts'],"--output",str(run/"benchmark"),
         "--deadline",str(deadline-30)]
+    for value in arm_batches or []:
+        command.extend(["--arm-batch",value])
     report=dict(status="INCOMPLETE")
     try:
         with (run/"worker.log").open("w") as log:
@@ -219,7 +221,12 @@ def main():
     p.add_argument("--prepare-only",action="store_true")
     p.add_argument("--dry-run",action="store_true")
     p.add_argument("--job-cap-seconds",type=int,default=2700)
+    p.add_argument("--arm-batch",action="append",help="Explicit finite ARM=BATCH[,BATCH] matrix")
     a=p.parse_args()
+    try:matrix=parse_arm_batches(a.arm_batch)
+    except ValueError as exc:p.error(str(exc))
+    prompt_count=max(n for batches in matrix.values() for n in batches) if matrix else BATCH
+    requests=sum(sum(batches) for batches in matrix.values()) if matrix else 3*(1+BATCH)
     if not 300<=a.job_cap_seconds<=2700:p.error("Job cap must be 300..2700 seconds")
     dirty=subprocess.check_output(["git","status","--porcelain"],cwd=ROOT,text=True).strip()
     if dirty:raise RuntimeError("Refuse an uncommitted benchmark source tree")
@@ -227,8 +234,10 @@ def main():
     plan=dict(model=MODEL,revision=REVISION,draft=DRAFT,draft_revision=DRAFT_REVISION,
         gpu="RTX-PRO-6000",gpu_count=1,job_cap_seconds=a.job_cap_seconds,retries=0,
         cache_block_size=CACHE_BLOCK_SIZE,cache_fix="configuration-only; CPU allocator regression + GPU realised-spec gate",
-        arms=list(ARMS),batches=[1,"common selected from DFlash capacity, maximum 16"],measured_cohorts=6,input_tokens=ISL,output_tokens=OSL,
-        measured_requests_upper_bound=3*(1+BATCH),warmup_requests_upper_bound=3*(1+BATCH),warmup_output_tokens=64,source_sha256=hashes,
+        arms=list(matrix) if matrix else list(ARMS),
+        arm_batches=matrix,batches=None if matrix else [1,"common selected from DFlash capacity, maximum 16"],
+        measured_cohorts=sum(len(batches) for batches in matrix.values()) if matrix else 6,input_tokens=ISL,output_tokens=OSL,
+        measured_requests_upper_bound=requests,warmup_requests_upper_bound=requests,warmup_output_tokens=64,source_sha256=hashes,
         allow_ungraded=True,ungraded_reason="Explicit throughput benchmark; no browser/task episode or task-success claim",
         git_commit=subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip(),
         note="Synthetic text-only browser histories; vision-capable engine; warmed prefixes; no browser/task quality claims")
@@ -236,18 +245,22 @@ def main():
     from dotenv import dotenv_values
     for key,value in dotenv_values(a.env_file).items():
         if key in ("MODAL_TOKEN_ID","MODAL_TOKEN_SECRET") and value:os.environ.setdefault(key,value)
-    a.output.mkdir(parents=True,exist_ok=False);save(a.output/"plan.json",plan)
+    a.output.mkdir(parents=True,exist_ok=False)
+    # The volume is shared across projects/cohorts, unlike a local parent path.
+    # Preserve historical directories and bind an unpredictable unique remote ID.
+    plan["run_id"]=a.output.name+"-"+uuid.uuid4().hex
+    save(a.output/"plan.json",plan)
     for name in SOURCE_DESTINATIONS:
         target=a.output/"sources"/name;target.parent.mkdir(parents=True,exist_ok=True)
         target.write_bytes((ROOT/name).read_bytes())
     with modal.enable_output(),app.run():
         save(a.output/"app.json",dict(app_id=app.app_id,url=app.get_dashboard_url()))
-        prepared=prepare.remote(hashes);save(a.output/"prepared.json",prepared)
+        prepared=prepare.remote(hashes,prompt_count);save(a.output/"prepared.json",prepared)
         if a.prepare_only:return
         deadline=time.time()+a.job_cap_seconds
         with modal.Queue.ephemeral() as claims:
             claims.put("start-once")
-            call=benchmark.spawn(a.output.name,prepared,deadline,claims)
+            call=benchmark.spawn(plan["run_id"],prepared,deadline,claims,a.arm_batch)
             save(a.output/"call.json",dict(call_id=call.object_id,deadline=deadline))
             try:
                 report,data=call.get(timeout=max(1,deadline-time.time()))

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Six finite, GPU-local throughput cohorts; no browser/task quality claims."""
+"""Finite GPU-local throughput cohorts; no browser/task quality claims."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import copy
@@ -67,6 +67,36 @@ def choose_common_batch(capacity, current=None):
     if current is not None and current>limit:
         raise ValueError("Later engine cannot support the already selected common batch")
     return limit if current is None else current
+
+
+def parse_arm_batches(values):
+    """An explicit finite matrix; absent values preserve the historical matrix."""
+    if not values:
+        return None
+    matrix = {}
+    for value in values:
+        arm, separator, raw = value.partition("=")
+        if not separator or arm not in ARMS or arm in matrix:
+            raise ValueError("Use unique known arms in ARM=BATCH[,BATCH] entries")
+        try:
+            batches = [int(n) for n in raw.split(",")]
+        except ValueError as exc:
+            raise ValueError("Batch sizes must be integers") from exc
+        if any(n < 1 or n > 32 for n in batches) or len(set(batches)) != len(batches):
+            raise ValueError("Use unique batch sizes in 1..32")
+        matrix[arm] = batches
+    return matrix
+
+
+def select_batches(capacity, matrix, arm, current=None):
+    if matrix is None:
+        common = choose_common_batch(capacity, current)
+        return [1, common], common
+    batches = matrix[arm]
+    limit = min(capacity['cache_max_requests'], capacity['scheduler_max_requests'])
+    if max(batches) > limit:
+        raise ValueError(f"Requested {arm} batch {max(batches)} exceeds observed capacity {limit}")
+    return batches, current
 
 
 def instrument():
@@ -255,7 +285,9 @@ def summarize(rows, before, after, samples, arm):
 def run(args):
     root=args.output;root.mkdir(parents=True,exist_ok=False)
     prompts=json.loads(args.prompts.read_text())
-    if len(prompts)!=BATCH or any(len(p)!=ISL for p in prompts):raise ValueError("Invalid prompts")
+    matrix=parse_arm_batches(args.arm_batch)
+    needed=max(n for batches in matrix.values() for n in batches) if matrix else BATCH
+    if len(prompts)!=needed or any(len(p)!=ISL for p in prompts):raise ValueError("Invalid prompts")
     hardware_code = """
 import json,torch
 from importlib.metadata import version
@@ -267,14 +299,15 @@ print(json.dumps(dict(name=torch.cuda.get_device_name(),capability=list(torch.cu
     hardware=json.loads(subprocess.check_output([sys.executable,'-c',hardware_code],text=True,timeout=30).strip().splitlines()[-1])
     save(root/"hardware.json",hardware)
     report=dict(status="INCOMPLETE",arms=[],input_tokens=ISL,output_tokens=OSL,
-        requested_common_batch=BATCH,common_batch=None,
+        requested_common_batch=BATCH if matrix is None else None,common_batch=None,
+        requested_arm_batches=matrix,
         hardware=hardware,sampling=dict(temperature=.6,top_p=.95,top_k=20,ignore_eos=True),
         caveat="Forced fixed-length generation after natural EOS may affect speculative acceptance")
     save(root/"report.json",report)
     monitor_log=(root/"gpu.csv").open("w")
     monitor=subprocess.Popen(["nvidia-smi","--query-gpu=timestamp,name,utilization.gpu,memory.used,power.draw,clocks.sm,clocks.mem","--format=csv","-l","1"],stdout=monitor_log)
     try:
-        for arm in ARMS:
+        for arm in (matrix if matrix else ARMS):
             directory=root/arm;directory.mkdir()
             print(json.dumps(dict(phase="engine-start",arm=arm,time=time.time())),flush=True)
             argv=command(args.snapshot,args.draft,arm)
@@ -299,17 +332,19 @@ print(json.dumps(dict(name=torch.cuda.get_device_name(),capability=list(torch.cu
                     draft_groups=[g for g in capacity['groups'] if g['kind']=='SlidingWindowSpec']
                     if not draft_groups or any(g['block_size']!=832 or g['natural_page_bytes']!=g['page_bytes'] for g in draft_groups):
                         raise ValueError("DFlash cache fix not realised; retained raw capacity receipt")
-                common=choose_common_batch(capacity,report['common_batch'])
+                counts,common=select_batches(capacity,matrix,arm,report['common_batch'])
                 report['common_batch']=common
                 capacity['requested_batch_predicted_fraction']=capacity['common_batch_predicted_fraction']
-                capacity['common_batch_predicted_fraction']=common*capacity['blocks_per_request']/capacity['usable_pool_blocks']
+                capacity['common_batch_predicted_fraction']=None if common is None else common*capacity['blocks_per_request']/capacity['usable_pool_blocks']
+                capacity['selected_batches']=counts
+                capacity['selected_batch_predicted_fractions']={str(n):n*capacity['blocks_per_request']/capacity['usable_pool_blocks'] for n in counts}
                 capacity['selected_common_batch']=common
                 save(directory/"capacity.json",capacity)
                 if arm=="dflash" and capacity["draft_model_dtype"]!="torch.bfloat16":raise ValueError("Draft model is not BF16")
                 print(json.dumps(dict(phase="engine-ready",arm=arm,capacity=capacity)),flush=True)
                 result=dict(arm=arm,capacity=capacity,startup_seconds=time.time()-startup,cohorts=[])
                 report["arms"].append(result);save(root/"report.json",report)
-                for count in (1,common):
+                for count in counts:
                     cohort=directory/f"batch-{count}";cohort.mkdir()
                     if time.time()>=args.deadline-30:raise TimeoutError("Job deadline")
                     # Reset between cohorts, retaining no unrelated cached histories.
@@ -362,4 +397,5 @@ if __name__=="__main__":
         p.add_argument("--snapshot",required=True);p.add_argument("--draft",required=True)
         p.add_argument("--prompts",type=Path,required=True);p.add_argument("--output",type=Path,required=True)
         p.add_argument("--deadline",type=float,required=True)
+        p.add_argument("--arm-batch",action="append",help="Explicit finite ARM=BATCH[,BATCH] matrix")
         run(p.parse_args())
