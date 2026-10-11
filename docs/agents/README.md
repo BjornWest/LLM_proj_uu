@@ -20,6 +20,8 @@ The [repository guidance](../../AGENTS.md) describes the documentation policy.
 
 ## Existing references
 
+- [Episode capacity controller](episode-capacity-control.md): shared vLLM telemetry and turn-boundary parking; CPU-only qualification, prospective suite/RL caller integration.
+
 - [Product-review evidence and templates](product-review-evidence.md): exact-SKU opinion generation, reusable prose, request/memory criteria, count grading and frozen-corpus binding.
 
 - [Four comparison layouts and partial coverage](comparison-coverage-and-layouts.md): independent base designs, filter capabilities, sampled membership and retailer-only discovery.
