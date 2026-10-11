@@ -20,7 +20,9 @@ def bind(env, trace, obs):
     env.events.append('bind')
     return {'task_id':'admission-fixture', 'goal_sha256':hashlib.sha256(obs['goal'].encode()).hexdigest(),
             'reference_files':{str(env.reference):file_hash(env.reference)},
-            'source_files':{str(Path(__file__).resolve()):file_hash(__file__)}}
+            'source_files':{str(Path(name).resolve()):file_hash(name) for name in (__file__,
+                __import__('intent_browser.automatic_grading',fromlist=['x']).__file__,
+                __import__('agent_trace.adapters.browsergym',fromlist=['x']).__file__)}}
 
 
 def grade(env, trace, outcome):
@@ -34,7 +36,7 @@ def project(raw, binding):
 
 
 class AdmissionTests(unittest.TestCase):
-    def episode(self, callback=None, *, contract=False, model_failure=False):
+    def episode(self, callback=None, *, contract=False, model_failure=False, delegated=False):
         temp=TemporaryDirectory();self.addCleanup(temp.cleanup);root=Path(temp.name)
         events=[]
         class Env:
@@ -52,11 +54,17 @@ class AdmissionTests(unittest.TestCase):
             def close(self):events.append('close');self.closed=True
         env=Env();env.events=events;env.reference.write_text('{"goal":"Read"}')
         class Backend:
-            calls=0;begins=0;messages=None
+            calls=0;begins=0;messages=None;request_options=None
+            supports_images=True
+            def configure_tools(self,options):self.request_options=options
             def begin_episode(self,ident):events.append('begin');self.begins+=1;return {'session_id':ident}
             def complete(self,messages):
                 events.append('provider');self.calls+=1;self.messages=messages
                 if model_failure:raise RuntimeError('provider fixture failed')
+                if self.request_options is not None:
+                    return Completion('',{'choices':[{'finish_reason':'tool_calls','message':{
+                        'role':'assistant','content':None,'tool_calls':[{'id':'done-call','type':'function',
+                        'function':{'name':'send_msg_to_user','arguments':'{"text":"Done"}'}}]}}]})
                 return Completion("send_msg_to_user('Done')",{'fixture':True})
         backend=Backend()
         def factory(_):events.append('create');return env
@@ -68,6 +76,9 @@ class AdmissionTests(unittest.TestCase):
             env.view='fresh'
             if callback:return callback(ready,env,backend,events)
         options={'environment_admission':wait} if callback is not False else {}
+        if delegated:
+            from intent_browser.harness import native_tools_profile, with_subagents
+            options['harness_profile']=with_subagents(native_tools_profile(parallel_tool_calls=None,compact_feedback=True))
         if contract:options['automatic_grading']=AutomaticGrading('admission-fixture-v1',bind,grade,project)
         else:options.update(allow_ungraded=True,ungraded_reason='Explicit synthetic admission lifecycle test')
         with patch('intent_browser.runner.observation_text',side_effect=lambda obs,limit=16000:obs['view']):
@@ -88,6 +99,27 @@ class AdmissionTests(unittest.TestCase):
         rows=[json.loads(x) for x in (directory/'events.jsonl').read_text().splitlines()]
         types=[x.get('event') or x.get('kind') for x in rows]
         self.assertTrue(any(x.get('event')=='episode_admitted' or x.get('kind')=='episode_admitted' or x.get('type')=='episode_admitted' for x in rows),rows)
+
+    def test_root_delegation_keeps_single_root_admission(self):
+        _,summary,events,env,backend=self.episode(contract=True,delegated=True)
+        self.assertEqual(events.count('ready'),1);self.assertEqual(env.resets,1)
+        self.assertEqual(backend.begins,1);self.assertEqual(backend.calls,1)
+        self.assertEqual(summary['stop_reason'],'agent_finished');self.assertTrue(env.closed)
+
+    def test_changed_task_goal_rejected_before_session(self):
+        def callback(_,env,*args):
+            initial=env.obs
+            def changed():return {**initial(),'goal':'A different goal'}
+            env._get_obs=changed
+        _,summary,_,env,backend=self.episode(callback)
+        self.assertIn('Task goal changed',summary['error']);self.assertEqual(backend.begins,0)
+        self.assertTrue(env.closed)
+
+    def test_changed_grading_reference_while_parked_rejected_before_session(self):
+        def callback(_,env,*args):env.reference.write_text('changed')
+        _,summary,_,env,backend=self.episode(callback,contract=True)
+        self.assertIn('binding changed',summary['error']);self.assertEqual(backend.begins,0)
+        self.assertTrue(env.closed)
 
     def test_cancellation_closes_without_lease_provider_or_native_task_verdict(self):
         def cancel(*_):raise EpisodeAdmissionCancelled('Queue stopped')
