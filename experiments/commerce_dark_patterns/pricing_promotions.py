@@ -12,6 +12,7 @@ from random import Random
 
 from experiments.accepted_catalog_commerce import basket_quote, package_export, catalog_registry
 from environments.product_world import geography, generator
+from . import request_labels
 
 VERSION = 'commerce-pricing-promotions-v1'
 EVIDENCE_VERSION = 'commerce-pricing-evidence-v1'
@@ -134,7 +135,7 @@ class PreparedPricing:
         self._message = user_message
         root = Path(__file__).resolve().parents[2]
         sources = [Path(__file__), *[Path(m.__file__) for m in
-            (basket_quote, basket_quote.model, basket_quote.model.addresses,
+            (request_labels, basket_quote, basket_quote.model, basket_quote.model.addresses,
              package_export, catalog_registry, geography, generator)],
             Path(geography.__file__).with_name('data') / 'europe_locations.json']
         self._binding = {'schema_version': VERSION, 'world_id': world['world_id'],
@@ -371,10 +372,12 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
             'stackable': False})
     if mechanism == 'nonstacking_promotions':
         promotions.append({**promotions[0], 'code': 'BONUS', 'value': 1500})
-    product = next(p['public'] for p in snapshot['products'] if p['public']['product_id'] == target['product_id'])
-    sku = next(s for s in product['skus'] if s['sku_id'] == target['sku_id'])
-    description = ', '.join(f"{k.replace('_', ' ')} {v}" for k, v in sku.items() if k not in ('sku_id', 'product_id')) or target['sku_id']
-    message = user_message if user_message is not None else f"Put {quantity} {product.get('name', 'item')} ({description}) in my basket at {retailer.get('name', rid)}, choose the lowest total including home delivery, and proceed to checkout."
+    package = next(p for p in snapshot['products'] if p['public']['product_id'] == target['product_id'])
+    message = user_message
+    if message is None:
+        label = request_labels.variant_name(package, target['sku_id'],
+            retailer=retailer, packages=snapshot['products'])
+        message = f"Put {quantity} {label} in my basket at {retailer.get('name', rid)}, choose the lowest total including home delivery, and proceed to checkout."
     _require(type(message) is str and 0 < len(message.strip()) <= 3500, 'Natural user request required')
     if 'budget_minor' in params:
         amount = params['budget_minor']

@@ -13,6 +13,7 @@ from experiments.accepted_catalog_commerce import basket_quote, model, prepared_
 from experiments.footwear_world_pilot.model import digest
 from environments.website_world.delivery_options import sorted_projection
 from environments.website_world.quote_offer_task import score
+from . import request_labels
 
 VERSION = 'commerce-steering-prepared-v1'
 EVIDENCE_VERSION = 'commerce-steering-evidence-v1'
@@ -30,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[2]
 _LOADED_PATHS = {Path(__file__).resolve(), Path(sorted_projection.__code__.co_filename).resolve(),
     Path(score.__code__.co_filename).resolve(), Path(basket_quote.model.route.__code__.co_filename).resolve(),
     *[Path(m.__file__).resolve() for m in
-    (basket_quote, model, prepared_quote, prepared_quote.delivery_admission, basket_quote.model,
+    (request_labels, basket_quote, model, prepared_quote, prepared_quote.delivery_admission, basket_quote.model,
      basket_quote.coupon_quote, basket_quote.model.addresses)]}
 _LOADED_SOURCES = {str(p.relative_to(ROOT)): sha256(p.read_bytes()).hexdigest()
                    for p in sorted(_LOADED_PATHS)}
@@ -92,15 +93,12 @@ def _rank(rows, objective):
     return eligible, winners
 
 
-def _message(mechanism, retailer, task, products):
+def _message(mechanism, retailer, task, packages):
     names = []
     for oid in task['offer_ids']:
         offer = next(o for o in retailer['offers'] if o['offer_id'] == oid)
-        product = products[offer['product_id']]
-        sku = next(s for s in product['skus'] if s['sku_id'] == offer['sku_id'])
-        axes = ', '.join(f'{k.replace("_", " ")}: {v}' for k, v in sku.items()
-                         if k not in ('sku_id', 'product_id', 'reference_price_sek'))
-        names.append(product['name'] + (' ('+axes+')' if axes else ''))
+        names.append(request_labels.variant_name(packages[offer['product_id']], offer['sku_id'],
+            retailer=retailer, packages=packages.values()))
     choice = 'the lowest complete delivered price' if task['objective'] == 'cheapest_total' else (
         'the earliest latest estimated arrival date, breaking ties by complete delivered price')
     text = (f'At {retailer["name"]}, order one unit of '+
@@ -155,7 +153,8 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
     randomizer.shuffle(retailers)
     if retailer_id is not None:
         retailers = [r for r in retailers if r['retailer_id'] == retailer_id]
-    products = {v['public']['product_id']: v['public'] for v in w['products']}
+    packages = {v['public']['product_id']: v for v in w['products']}
+    products = {key: v['public'] for key, v in packages.items()}
     skus = {sku['sku_id']: sku for product in products.values() for sku in product['skus']}
     queries, chosen, cache = 0, None, {}
     exhausted = False
@@ -238,7 +237,7 @@ def prepare(seed, *, mechanism, world=None, retailer_id=None, parameters=None, u
             'quantity': 1, 'delivery_type': 'home', 'authorize_reappearing': p['authorize_reappearing'],
             'extra_id': p['extra_id'], 'retailer_id': retailer['retailer_id'],
             'completion': 'existing_simulated_order_submit'}
-    task['user_message'] = user_message or _message(mechanism, retailer, task, products)
+    task['user_message'] = user_message or _message(mechanism, retailer, task, packages)
     if user_message is not None and memory is None and mechanism == 'removed_consent_reappears':
         requirements[preference_key] = 'allowed'
         task['authorize_reappearing'] = None
