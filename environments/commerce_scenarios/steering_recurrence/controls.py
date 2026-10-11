@@ -125,7 +125,7 @@ def policy(episode, prepared, case='positive'):
     operations += ['consent_final', 'extras_final', 'terms', 'submit', 'confirmation']
     cursor = [0]
     attempted_quantity = [None]
-    observations = {'config': deepcopy(config), 'presentation': [], 'reappearance': [], 'quantity': []}
+    observations = {'config': deepcopy(config), 'presentation': [], 'reappearance': [], 'quantity': [], 'delivery': []}
 
     def state(page):
         return json.loads(page.evaluate('(key)=>localStorage.getItem(key)', 'website-drafts.state.' + rid) or '{}')
@@ -244,6 +244,8 @@ def policy(episode, prepared, case='positive'):
                     node = locator(page, 'input[data-service-group][value', target)
                 if node.count() != 1:
                     return wait()
+                if not node.is_visible():
+                    return act(node)
                 if operation == 'delivery_initial':
                     marked = page.locator('[data-steering-recommended] [data-scenario-badge]')
                     checked = page.locator('input[data-service-group]:checked')
@@ -251,6 +253,9 @@ def policy(episode, prepared, case='positive'):
                         'initial_checked_option_id': checked.first.get_attribute('value') if checked.count() else None})
                 if not node.is_checked():
                     return act(node)
+                observations['delivery'].append({'selected_delivery_option_id': node.get_attribute('value'),
+                    'selected_delivery_description': node.locator('xpath=ancestor::label[1]').inner_text(),
+                    'delivery_rows': page.locator('label.delivery-row:visible').all_inner_texts()})
                 if isinstance(operation, tuple):
                     observations['quantity'].append({'quantity': operation[1], 'live_option_id': node.get_attribute('value')})
                 advance(); continue

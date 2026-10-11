@@ -38,7 +38,15 @@ class Node:
     def input_value(self):
         return self.page.quantity_field
 
+    def inner_text(self):
+        return 'Native carrier — Home delivery — 110 SEK'
+
+    def all_inner_texts(self):
+        return [self.inner_text()] if self.exists else []
+
     def locator(self, selector):
+        if selector == 'xpath=ancestor::label[1]':
+            return Node(self.page, 'delivery_row', self.exists, self.value)
         if self.kind == 'home_rows':
             return Node(self.page, 'radio', self.exists,
                         f'shop/a/basket{self.page.quantity}/slow')
@@ -87,7 +95,7 @@ class Page:
             return Node(self, 'address', self.step == 1)
         if selector == '[data-scenario-extra="warranty"]':
             return Node(self, 'extra', self.step == 3)
-        if selector == 'label.delivery-row':
+        if selector in ('label.delivery-row', 'label.delivery-row:visible'):
             return Node(self, 'home_rows', self.step == 2 and valid)
         if selector.startswith('input[data-service-group][value='):
             value = json.loads(selector.split('[value=')[1][:-1])

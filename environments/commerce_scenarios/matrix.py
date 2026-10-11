@@ -128,6 +128,16 @@ def prepare(world_dir, output, *, families=None, seed=7, max_pricing_candidates=
     return value
 
 
+def _control_completed(result):
+    """A native wrong-case failure alone cannot prove a driver finished."""
+    policy = result.get('policy_summary')
+    return (type(policy) is dict and policy.get('stop_reason') == 'agent_finished'
+            and policy.get('truncated') is False
+            and policy.get('cleanup_errors', []) == []
+            and all(policy.get(key) is None for key in
+                    ('policy_execution_error', 'execution_error', 'cleanup_error', 'error')))
+
+
 def run(matrix_path, output, *, families=None, max_steps=80, max_input_tokens=500000, cases=None):
     from .publication import prepare_episode, run_saved
     matrix_path, output = Path(matrix_path).resolve(strict=True), Path(output).resolve()
@@ -161,15 +171,19 @@ def run(matrix_path, output, *, families=None, max_steps=80, max_input_tokens=50
             raise ValueError('Frozen native instance changed: '+key)
         prepared = None
         try:
-            prepared = prepare_episode(matrix['world_dir'], instance, row['case'])
+            options = {'offer_id': row['offer_id']} if 'offer_id' in row else {}
+            prepared = prepare_episode(matrix['world_dir'], instance, row['case'], **options)
             config = prepared.config
             if (prepared.instance_sha256 != row['sha256'] or
                     (config['family'], config['mechanism'], config['case']) !=
-                    (row['family'], row['mechanism'], row['case'])):
+                    (row['family'], row['mechanism'], row['case']) or
+                    ('offer_id' in row and config.get('offer_id') != row['offer_id'])):
                 raise ValueError('Prepared episode differs from frozen matrix control: '+key)
             result = run_saved(prepared, output/key, max_steps=max_steps, max_input_tokens=max_input_tokens)
             record = {'case': row, 'result': result, 'observations': getattr(prepared.policy, 'observations', [])}
-            record['accepted'] = (result['publication']['status'] == row['expected']
+            record['control_completed'] = _control_completed(result)
+            record['accepted'] = (record['control_completed']
+                                  and result['publication']['status'] == row['expected']
                                   and result['publication']['control_matches_expectation'] is True)
         except Exception as error:
             record = {'case': row, 'accepted': False, 'system_error': type(error).__name__+': '+str(error),

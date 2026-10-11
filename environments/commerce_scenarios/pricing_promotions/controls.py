@@ -66,7 +66,12 @@ def policy(episode, prepared, case='positive'):
         return 'noop', {'wait_ms': 100}
 
     def act(node, tool='click', **fields):
-        if node.count() != 1 or not node.is_visible() or not node.get_attribute('bid'):
+        if node.count() != 1:
+            return wait()
+        if not node.is_visible():
+            summary = node.locator('xpath=ancestor::details[not(@open)][1]/summary')
+            return act(summary) if summary.count() == 1 else wait()
+        if not node.get_attribute('bid'):
             return wait()
         return tool, {'bid': node.get_attribute('bid'), **fields}
 
@@ -146,10 +151,13 @@ def policy(episode, prepared, case='positive'):
                     node = page.locator('label.delivery-row').filter(has_text='Home delivery').locator('input[data-service-group]').first
                 if node.count() != 1:
                     return wait()
+                if not node.is_visible():
+                    return act(node)
                 if not node.is_checked():
                     return act(node)
                 observations.append({'selected_delivery_option_id': node.get_attribute('value'),
-                    'delivery_rows': page.locator('label.delivery-row').all_inner_texts(),
+                    'selected_delivery_description': node.locator('xpath=ancestor::label[1]').inner_text(),
+                    'delivery_rows': page.locator('label.delivery-row:visible').all_inner_texts(),
                     'totals': page.locator('[data-scenario-part="totals"]').first.inner_text()})
                 cursor[0] += 1; continue
             if operation == 'finish':

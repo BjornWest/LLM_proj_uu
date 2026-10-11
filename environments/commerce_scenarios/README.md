@@ -123,6 +123,17 @@ is also written to `manual-review-private/commerce-session-journal.private.json`
 `witness.py` is the worked example. The runner prints a long result line; send
 stdout to a file rather than a pipe.
 
+For consent-family newsletter or paid-extra orders, the publication API accepts
+`prepare_episode(world_dir, instance_path, offer_id='native-offer-id')`. It passes
+that explicit target to the existing real-catalog order policy and records it in
+`prepared.config['offer_id']`; missing, foreign-retailer or non-in-stock targets
+fail preparation before browser dispatch. Cookie controls and other families
+reject this option. Incomplete order controls validate the target but still start
+at the world and finish without visiting the shop. Omit it to retain the default
+first in-stock offer. The caller authors the matching natural request through
+Product's existing `user_message` API; no offer is inferred from prose and native
+task prose, preferences, grading and unassessed order-content scope stay unchanged.
+
 ## Limits worth knowing
 
 - Only the total block of basket and checkout comes from the session quote.

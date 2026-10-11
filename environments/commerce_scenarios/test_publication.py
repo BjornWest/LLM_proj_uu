@@ -17,6 +17,7 @@ from unittest.mock import patch, Mock
 
 from experiments.commerce_dark_patterns import consent_extras, registry
 from . import publication as pub
+from . import consent_extras as consent_website
 
 WORLD = {'world_id': 'source-only', 'retailers': [{'retailer_id': 'shop', 'name': 'Shop'}]}
 
@@ -58,6 +59,96 @@ class PublicationTests(unittest.TestCase):
     def prepare(self, case='positive'):
         with patch.object(pub, 'ScenarioEpisode', FakeEpisode):
             return pub.prepare_episode(self.world, self.path, case)
+
+    def order_target_fixture(self, mechanism='paid_warranty'):
+        """One authored catalog fixture, real Product and Website policy builder."""
+        world = {**WORLD, 'retailers': [*WORLD['retailers'], {'retailer_id': 'other', 'name': 'Other'}]}
+        request = 'Order one Orla T-shirt, navy, size L, one-shirt pack, at Shop.'
+        self.instance = registry.prepare(7, mechanism=mechanism, world=world, retailer_id='shop', user_message=request,
+            parameters={'public_preference_memory': {'newsletter': 'forbidden'}}
+                       if mechanism == 'newsletter_prechecked' else None)
+        save(self.path, self.instance)
+        catalog = {'products': [
+            {'id': 'default-product', 'variants': [{'key': 'default-key', 'offerId': 'shop/default',
+                'state': 'in_stock', 'selection': {}}]},
+            {'id': 'orla', 'variants': [{'key': 'orla-key', 'offerId': 'shop/orla-navy-l-single',
+                'state': 'in_stock', 'selection': {'colour': 'navy', 'size': 'L', 'pack': 'one-shirt'}}]},
+            {'id': 'unavailable', 'variants': [{'key': 'unavailable-key', 'offerId': 'shop/unavailable',
+                'state': 'unavailable', 'selection': {}}]},
+            {'id': 'backorder', 'variants': [{'key': 'backorder-key', 'offerId': 'shop/backorder',
+                'state': 'backorder', 'selection': {}}]}],
+            'rememberedAddress': {'name': 'Buyer', 'street': 'Street 1', 'postcode': '75220', 'city': 'Uppsala'}}
+        class CatalogEpisode(FakeEpisode):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.runtime.world = deepcopy(world)
+                self.runtime.public_catalogs = {'shop': deepcopy(catalog), 'other': {'products': [
+                    {'id': 'foreign', 'variants': [{'offerId': 'other/orla', 'state': 'in_stock'}]}]}}
+                self.runtime.origins = {'shop': 'http://shop.local'}
+                self.runtime.bindings = {'retailer_pages': {'shop': {
+                    product['id']: 'http://shop.local/#/product/' + product['id'] for product in catalog['products']}}}
+        return CatalogEpisode, request
+
+    def test_explicit_order_target_reaches_real_policy_and_preserves_custom_request(self):
+        for mechanism in ('newsletter_prechecked', 'paid_warranty'):
+            for case in pub.CASES:
+                with self.subTest(mechanism=mechanism, case=case):
+                    episode_class, request = self.order_target_fixture(mechanism)
+                    original = self.path.read_bytes()
+                    with patch.object(pub, 'ScenarioEpisode', episode_class), \
+                            patch.object(consent_website, 'policy_for', wraps=consent_website.policy_for) as builder:
+                        prepared = pub.prepare_episode(self.world, self.path, case, offer_id='shop/orla-navy-l-single')
+                        self.addCleanup(prepared.close)
+                        builder.assert_called_once_with(prepared.episode, self.instance,
+                            'positive' if case == 'incomplete' else case, offer_id='shop/orla-navy-l-single')
+                    self.assertEqual(prepared.config['offer_id'], 'shop/orla-navy-l-single')
+                    self.assertEqual(prepared.episode.public_task['user_message'], request)
+                    self.assertEqual(prepared.adapter.request, request)
+                    self.assertEqual(prepared.adapter.instance, self.instance)
+                    self.assertEqual(self.path.read_bytes(), original)
+                    self.assertFalse(self.instance['prepared']['reference']['order_contents_graded'])
+                    if case == 'incomplete':
+                        self.assertEqual(prepared.config['start'], 'world')
+                        self.assertEqual(prepared.policy(None)[0], 'send_msg_to_user')
+                    else:
+                        self.assertEqual(prepared.policy(None), ('goto', {'url': 'http://shop.local/#/product/orla'}))
+            with patch.object(pub, 'ScenarioEpisode', episode_class):
+                default = pub.prepare_episode(self.world, self.path)
+            self.addCleanup(default.close)
+            self.assertNotIn('offer_id', default.config)
+            self.assertEqual(default.policy(None), ('goto', {'url': 'http://shop.local/#/product/default-product'}))
+
+    def test_foreign_unavailable_and_missing_order_targets_reject_before_browser(self):
+        episode_class, request = self.order_target_fixture()
+        for offer_id in ('other/orla', 'shop/unavailable', 'shop/backorder', 'shop/absent'):
+            for case in pub.CASES:
+                with self.subTest(offer_id=offer_id, case=case), \
+                        patch.object(pub, 'ScenarioEpisode', episode_class), self.assertRaises(ValueError):
+                    pub.prepare_episode(self.world, self.path, case, offer_id=offer_id)
+                FakeEpisode.created[-1].runtime.close.assert_called_once()
+
+    def test_typed_offer_cookie_and_other_family_options_reject_before_runtime(self):
+        episode_class, request = self.order_target_fixture()
+        for offer_id in (False, 1, [], '', ' ', ' shop/orla-navy-l-single '):
+            with self.subTest(offer_id=offer_id), patch.object(pub, 'ScenarioEpisode', episode_class), \
+                    self.assertRaises(ValueError):
+                pub.prepare_episode(self.world, self.path, offer_id=offer_id)
+        for mechanism in consent_extras.COOKIE_MECHANISMS:
+            save(self.path, registry.prepare(7, mechanism=mechanism, world=WORLD))
+            with self.subTest(mechanism=mechanism), self.assertRaises(ValueError):
+                self.prepare_with_target()
+        for family in ('pricing_promotions', 'steering_recurrence'):
+            instance = {**self.instance, 'family': family, 'mechanism': registry.FAMILIES[family][0]}
+            save(self.path, instance)
+            with self.subTest(family=family), patch.object(pub.registry, 'validate_ready', return_value=instance), \
+                    patch.object(pub.registry, '_prepared', return_value=(consent_extras, self.instance['prepared'])), \
+                    patch.object(pub, 'ScenarioEpisode', episode_class), self.assertRaises(ValueError):
+                pub.prepare_episode(self.world, self.path, offer_id='shop/orla-navy-l-single')
+        self.assertEqual(FakeEpisode.created, [])
+
+    def prepare_with_target(self):
+        with patch.object(pub, 'ScenarioEpisode', FakeEpisode):
+            return pub.prepare_episode(self.world, self.path, offer_id='shop/orla-navy-l-single')
 
     def test_real_native_consent_binding_public_request_and_complete_source_closure(self):
         prepared = self.prepare()

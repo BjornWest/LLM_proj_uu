@@ -101,12 +101,15 @@ class PreparedEpisode:
         self.episode.runtime.close()
 
 
-def prepare_episode(world_dir, instance_path, case='positive', *, headless=True, lazy_publication=True):
+def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
+                    lazy_publication=True, offer_id=None):
     """Return PreparedEpisode with episode, native adapter, policy and config.
 
     Public task ID/prose/memories come unchanged from Product. Both Runtime and
     native grader late-bind the same frozen instance to the actual trace ID.
     Pricing and steering are resolved only from their source-owned family APIs.
+    An explicit offer_id targets a consent/extras order policy's native catalog
+    offer. It is not inferred from prose and adds no order-content grading.
     """
     if type(case) is not str or case not in CASES:
         raise ValueError('Publication case must be positive, wrong or incomplete')
@@ -119,6 +122,12 @@ def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
     instance = _json(instance_path)
     registry.validate_ready(instance)
     native_module, native = registry._prepared(instance)
+    if offer_id is not None:
+        if type(offer_id) is not str or not offer_id.strip() or offer_id != offer_id.strip():
+            raise ValueError('Explicit offer_id must be nonempty exact native offer text')
+        if (instance['family'] != 'consent_extras'
+                or native['setup']['commit_scope'] != 'simulated_order_submitted'):
+            raise ValueError('Explicit offer_id is supported only for consent/extras order controls')
     if native['binding'].get('episode_id') is not None:
         raise ValueError('Publication needs an unbound reusable preparation')
     native_sources = _native_sources(native_module, native)
@@ -136,6 +145,8 @@ def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
               'case': case, 'start': 'world' if case == 'incomplete' else 'retailer',
               'expected_status': {'positive': 'pass', 'wrong': 'fail', 'incomplete': 'inconclusive'}[case],
               'driver': driver, 'metadata': {'tags': ['scripted', 'commerce-dark-patterns', instance['family'], case]}}
+    if offer_id is not None:
+        config['offer_id'] = offer_id
 
     def bind_episode(actual_id):
         return registry.bind_episode(instance, actual_id)['prepared']['binding']
@@ -158,9 +169,14 @@ def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
         adapter = automatic.CommerceGrading(instance_path, source_files=source_files, capture=episode.capture.journal)
         adapter.contract().validate()
         if case == 'incomplete':
+            if offer_id is not None:
+                # Validate the target through the real catalog policy builder;
+                # the incomplete policy still finishes without navigation.
+                family.policy_for(episode, instance, 'positive', offer_id=offer_id)
             policy = lambda page: scripted.say('I did not visit the retailer.')
         elif instance['family'] == 'consent_extras':
-            policy = family.policy_for(episode, instance, case)
+            policy = family.policy_for(episode, instance, case,
+                **({'offer_id': offer_id} if offer_id is not None else {}))
         elif instance['family'] == 'pricing_promotions':
             policy = import_module('.pricing_promotions.controls', __package__).policy(episode, native, driver_case)
         else:
