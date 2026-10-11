@@ -10,6 +10,7 @@ import time
 import unittest
 from unittest.mock import patch
 from scripts import modal_b06_full_episode as caller
+from scripts import trace_grades
 
 
 def pin(path, value):
@@ -216,6 +217,25 @@ class AdmissionTests(unittest.TestCase):
 
 
 
+class RetainedControlTests(unittest.TestCase):
+    def test_actual_positive_wrong_missing_controls_use_verified_reader(self):
+        acceptance=os.environ.get('FULL_B06_RETAINED_CONTROLS')
+        if not acceptance or not Path(acceptance).is_file():
+            self.skipTest('Set FULL_B06_RETAINED_CONTROLS to the pinned three-control acceptance')
+        rows=json.loads(Path(acceptance).read_text())['rows']
+        self.assertEqual([r['case'] for r in rows],['positive','wrong','missing'])
+        for row in rows:
+            with self.subTest(case=row['case']):
+                native=json.loads(caller.checked(row['result']).read_text())['result']['native_grade']
+                proof=json.loads(caller.checked(row['HTTP_proof']).read_text())
+                raw=json.loads(caller.checked(proof['derived_grade']).read_text())
+                self.assertNotIn('binding_status',raw)
+                self.assertEqual(trace_grades.read_grade(row['trace'])['binding_status'],'verified')
+                result={'trace':row['trace'],'task_verdict':row['expected_task_verdict'],
+                        'native_grade':native,'canonical':row['canonical'],'HTTP_proof':row['HTTP_proof']}
+                self.assertIs(caller.verify_terminal(result),row['expected_task_verdict'])
+
+
 class CompletionTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
@@ -224,8 +244,18 @@ class CompletionTests(unittest.TestCase):
 
     def result_for(self, verdict):
         canonical=pin(self.trace/'evaluation.json',{'task_completed':verdict,'technical_error':None,'limitations':['Explicit fixture inconclusive reason'] if verdict is None else []})
-        derived=pin(self.trace/'derived-answer-grade.json',{'structured_claims_correct':verdict,'binding_status':'verified'})
-        proof=pin(self.root/'HTTP-proof.json',{'status':'verified','url':'http://localhost:8878/#fixture-only',
+        for name in trace_grades.BOUND_FILES:
+            if name != 'evaluation.json':
+                (self.trace/name).write_text('{}')
+        derived=pin(self.trace/'derived-answer-grade.json',{
+            'schema':trace_grades.SCHEMA,'episode_id':self.trace.name,
+            'episode_artifact_sha256':{name:trace_grades.sha(self.trace/name) for name in trace_grades.BOUND_FILES},
+            'structured_claims_correct':verdict,'requirements':{},'additional_checks':{},
+            'safe_success':None,'full_response_evaluated':False,'claims':{},'oracle_answer':{},
+            'source_artifact_sha256':{},'derivations':[],'limitations':[],
+            'extractor':{'model':'fixture','provider':'fixture','version':'fixture'}})
+        ident=hashlib.sha256(('browsergym:'+self.trace.name).encode()).hexdigest()[:20]
+        proof=pin(self.root/'HTTP-proof.json',{'status':'verified','url':'http://localhost:8878/#'+ident,
                                              'canonical_grade':canonical,'derived_grade':derived})
         return {'trace':str(self.trace),'task_verdict':verdict,
                 'native_grade':{'structured_claims_correct':verdict},'canonical':canonical,'HTTP_proof':proof}
@@ -245,6 +275,30 @@ class CompletionTests(unittest.TestCase):
         with self.assertRaises(ValueError):caller.verify_terminal(changed)
         (self.trace/'evaluation.json').write_text('{}')
         with self.assertRaises(ValueError):caller.verify_terminal(self.result)
+
+
+    def test_raw_verified_flag_cannot_hide_changed_episode_evidence(self):
+        proof=json.loads((self.root/'HTTP-proof.json').read_text())
+        raw=json.loads((self.trace/'derived-answer-grade.json').read_text())
+        raw['binding_status']='verified'
+        proof['derived_grade']=pin(self.trace/'derived-answer-grade.json',raw)
+        changed={**self.result,'HTTP_proof':pin(self.root/'HTTP-proof.json',proof)}
+        (self.trace/'natural-answer.json').write_text('{"changed":true}')
+        with self.assertRaises(ValueError):caller.verify_terminal(changed)
+
+    def test_foreign_trace_and_HTTP_identity_fail_closed(self):
+        for alteration in ['trace','url','derived']:
+            with self.subTest(alteration=alteration):
+                result=self.result_for(True)
+                proof=json.loads((self.root/'HTTP-proof.json').read_text())
+                if alteration=='trace':result['trace']=str(self.root/'foreign')
+                elif alteration=='url':proof['url']='http://localhost:8878/#foreign'
+                else:
+                    foreign=self.root/'foreign-derived.json'
+                    foreign.write_bytes((self.trace/'derived-answer-grade.json').read_bytes())
+                    proof['derived_grade']=caller.pin(foreign)
+                result['HTTP_proof']=pin(self.root/'HTTP-proof.json',proof)
+                with self.assertRaises(ValueError):caller.verify_terminal(result)
 
     def test_actual_sqlite_events_follow_grade_and_projected_completion(self):
         # Only Events SQLite is real. Policy/extractor/browser/network are mocked;
@@ -364,6 +418,7 @@ import json,os,runpy,signal,socket,sys,threading,time
 from pathlib import Path
 sys.path.insert(0,sys.argv[1])
 from scripts import modal_b06_full_episode as caller
+from scripts import trace_grades
 from playwright.sync_api import sync_playwright
 out=Path(sys.argv[2]);mode=sys.argv[3]
 api=runpy.run_path(os.environ['FULL_B06_EVENTS_HELPER'])

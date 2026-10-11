@@ -371,9 +371,21 @@ def verify_terminal(result):
         raise ValueError('Terminal HTTP grade projection missing')
     if proof.get('canonical_grade') != result['canonical']:
         raise ValueError('HTTP/canonical grade binding differs')
-    derived = read(checked(proof['derived_grade']))
+    # binding_status is a read_grade projection, never a persisted sidecar field.
+    # Revalidate the bound episode artifacts rather than trusting raw JSON flags.
+    from scripts.trace_grades import read_grade
+    trace = Path(result['trace']).resolve()
+    if checked(result['canonical']) != trace / 'evaluation.json':
+        raise ValueError('Canonical grade belongs to another trace')
+    derived_path = checked(proof['derived_grade'])
+    derived = read_grade(trace)
     if derived.get('binding_status') != 'verified':
         raise ValueError('Published grade binding is unverified')
+    if derived_path != trace / derived['artifact_filename']:
+        raise ValueError('Published grade belongs to another trace or revision')
+    ident = sha256(('browsergym:' + trace.name).encode()).hexdigest()[:20]
+    if proof['url'].split('#')[-1] != ident:
+        raise ValueError('HTTP grade projection belongs to another trace')
     if derived['structured_claims_correct'] is not verdict:
         raise ValueError('Terminal published derived grade differs')
     return verdict

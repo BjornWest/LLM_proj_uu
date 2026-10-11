@@ -107,3 +107,5 @@ helper path explicitly with `FULL_B06_EVENTS_HELPER` for local tests; no claim o
 serving parity or runtime promotion follows from them. Existing-world
 zero-provider browser/native/canonical/HTTP acceptance and fresh Training
 serving/parity evidence remain necessary before allocation/dispatch.
+
+Terminal verification uses the frozen `trace_grades.read_grade` reader to validate the recorded episode hashes. Its `binding_status` is computed in memory; raw grade sidecars do not store that field. The canonical grade, selected sidecar and HTTP trace identity must all belong to the returned trace.
