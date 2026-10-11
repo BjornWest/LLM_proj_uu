@@ -166,7 +166,9 @@ class EpisodeLease:
                             'suite_id': self.config.suite_id,
                             'max_suite_episodes': self.config.max_suite_episodes,
                             'suite_episodes_started': len(record['episodes']),
-                            'admission_wait_seconds': self.control_timeout,
+                            'admission_lock_wait_seconds': self.control_timeout,
+                            'quota_read_allowance_seconds': QUOTA_READ_ALLOWANCE,
+                            'admission_wait_seconds': self.control_timeout + QUOTA_READ_ALLOWANCE,
                             'admission_ledger': str(path), 'subscription_lock': str(self.lock_path)}
                 finally:
                     # These probe locks must be gone BEFORE another admission

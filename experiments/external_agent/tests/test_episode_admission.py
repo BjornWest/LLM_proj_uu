@@ -219,7 +219,9 @@ def test_34_wide_slow_healthy_quota_reader_does_not_poison_queued_cases(tmp_path
     items = [backend(tmp_path, f'b{i}', cfg, reader=reader) for i in range(34)]
     start = threading.Barrier(34)
     for i, item in enumerate(items): info = item.begin_episode(str(i))
-    assert info['admission_wait_seconds'] >= 34 * 50
+    assert info['admission_lock_wait_seconds'] == 20 + 34 * 50
+    assert info['quota_read_allowance_seconds'] == 50
+    assert info['admission_wait_seconds'] == 20 + 35 * 50
     def turn(item):
         start.wait(timeout=10)
         return item.complete([{'role': 'user', 'content': 'hello'}])

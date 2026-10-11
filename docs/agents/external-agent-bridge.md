@@ -231,9 +231,12 @@ the declared pool's queued quota reads rather than treating a healthy queue as a
 quota failure. The 50-second allowance covers the existing reader's connect,
 initialization, rate-limit and close timeouts plus local I/O headroom; custom
 readers must also be bounded. This bounds a wait, not overall episode wall time
-or provider inference. `begin_episode` metadata records `admission_wait_seconds`;
+or provider inference. `begin_episode` metadata separately records
+`admission_lock_wait_seconds` and `quota_read_allowance_seconds` (50 seconds).
+`admission_wait_seconds` is their sum: it includes this request's own quota read
+after acquiring the lock, as well as its queue wait.
 `server.json` records `minimum_client_timeout_seconds = admission_wait_seconds +
-provider timeout + 10`. Suite HTTP callers must use at least that timeout (1910
+provider timeout + 10`. Suite HTTP callers must use at least that timeout (1960
 seconds for concurrency34/provider180); their separate finite episode wall-time
 limit remains in force. Provider request timeout stays180. Healthy 0.8-second
 quota reads queued by all34 cases are covered by synthetic acceptance. Serialized
@@ -242,7 +245,14 @@ qualification. No automatic retry follows a genuinely exceeded admission deadlin
 
 One episode's completion calls remain nonconcurrent, with private artifacts,
 session/cache identity, replay map and failure state. `close()` waits for its
-current completion before releasing capacity. Worker transport failures release
+current completion before releasing capacity; it does not cancel a queued quota
+check or an in-flight worker. Disconnecting an HTTP client likewise does not
+cancel the server's queued request, which may still dispatch later. Keep the
+HTTP watchdog at the declared minimum, subject to the separate whole-episode
+deadline. If that deadline requires stopping a case, terminate its bounded
+process tree and retain the consumed case/possible upstream attempt as unknown;
+do not replay it. There is no phase-close cancellation API in this release.
+Worker transport failures release
 capacity but poison that backend; they do not restore consumed suite allowance.
 Process death can leave an unknown upstream attempt and must not trigger replay.
 Offline synthetic qualification establishes local admission/isolation, not the
