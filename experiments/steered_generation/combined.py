@@ -9,14 +9,15 @@ probability that all parts hold is the product of the parts'. Parts that fail
 the check are refused as coupled; they need a joint block.
 """
 import json
-from math import prod
+from math import fsum, log, prod
 
 from experiments.world_requirement_construction import model as edits
 
-from . import blocks, price_bounds, prices, stock, streams
+from . import blocks, cheapest, price_bounds, prices, stock, streams
 
 VERSION = "steered-requirements-v1"
-KINDS = {edits.VERSION: prices, stock.VERSION: stock, price_bounds.VERSION: price_bounds}
+KINDS = {edits.VERSION: prices, stock.VERSION: stock, price_bounds.VERSION: price_bounds,
+         cheapest.VERSION: cheapest}
 
 
 def resolve(requirement):
@@ -67,6 +68,11 @@ def steer(session, natural, natural_opened, requirement, api, rng):
                                     "means every draw outside these blocks. "
                                     "Upstream draws are not reweighted; use probability_given_upstream as the "
                                     "importance weight across seeds."}
+    if any(step.log_probability is not None for step in steps):
+        record["log_probability_given_upstream"] = fsum(
+            log(step.probability) if step.log_probability is None else step.log_probability for step in steps)
+        # None when the product is below the float range; the logarithm holds.
+        record["probability_given_upstream"] = record["probability_given_upstream"] or None
     streams.relabel(world, record, api)
     return world, [step.check(world) for step in steps], record
 

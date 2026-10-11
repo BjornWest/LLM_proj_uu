@@ -49,10 +49,11 @@ def need(retailer_id, sku_id, **stated):
 
 class RealProducer(unittest.TestCase):
     inputs = INPUTS
+    product = staticmethod(stand_in)
 
     @classmethod
     def setUpClass(cls):
-        patch = mock.patch.object(package_export, "sample", stand_in)
+        patch = mock.patch.object(package_export, "sample", cls.product)
         patch.start()
         cls.addClassCleanup(patch.stop)
         cls.api = SimpleNamespace(basic=basic_offer_task, native=native, population=population,

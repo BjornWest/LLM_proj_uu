@@ -9,7 +9,9 @@ them replayed in one pass, and the probability that every requirement holds is
 the product of theirs.
 """
 from dataclasses import dataclass
+from fractions import Fraction
 import json
+from math import fsum, prod
 from types import SimpleNamespace
 from typing import Callable
 
@@ -31,6 +33,66 @@ class Coupled(ValueError):
     reason = "coupled_requirements"
 
 
+class NumericalLimit(ArithmeticError):
+    """A positive probability is too small for a float. Says nothing about possibility."""
+    reason = "numerical_limit"
+
+
+def times(*factors):
+    """A product of probabilities that is zero only when one of them is."""
+    result = prod(factors)
+    if not result and all(factors):
+        raise NumericalLimit("A positive probability underflows")
+    return result
+
+
+def power(base, count):
+    result = base ** count
+    if base and not result:
+        raise NumericalLimit("A positive probability underflows")
+    return result
+
+
+# Shares of the total above 2**-30 are resolved comfortably by a 53-bit uniform draw.
+FLOAT_RESOLVES = 2 ** 30
+# Float weights at least this large are far from the subnormal range, where the
+# product of the uniform draw and the total is quantized.
+ORDINARY = 2.0 ** -500
+
+
+def pick(rng, options, weights):
+    """One option, with probability proportional to its weight, whatever the weights' range.
+
+    `rng.choices` draws one 53-bit uniform number, so an option whose share of
+    the total is far below 1e-16 may be unreachable or badly quantized, and
+    with a subnormal total it can even return an option of weight zero.
+    Only options with a positive weight are offered to it, and only weights of
+    ordinary size and evenness: floats well above the subnormal range go as
+    they are, other even weights after division by their exact total. Very
+    uneven weights are taken as exact rationals with a uniform draw of enough
+    bits that every positive weight keeps its interval, its relative selection
+    error below 2**-64.
+    """
+    live = [(option, weight) for option, weight in zip(options, weights) if weight > 0]
+    if not live:
+        raise ValueError("No option has a positive weight")
+    names, positive = zip(*live)
+    if (all(type(weight) is float for weight in positive) and min(positive) >= ORDINARY and
+            min(positive) * FLOAT_RESOLVES > fsum(positive)):
+        return rng.choices(names, weights=positive)[0]
+    exact = [Fraction(weight) for weight in positive]
+    total, smallest = sum(exact), min(exact)
+    if smallest * FLOAT_RESOLVES > total:
+        return rng.choices(names, weights=[float(weight / total) for weight in exact])[0]
+    bits = 64 + (total / smallest).numerator.bit_length()
+    point, reached = Fraction(rng.getrandbits(bits), 1 << bits) * total, Fraction(0)
+    for option, weight in zip(names, exact):
+        reached += weight
+        if point < reached:
+            return option
+    raise AssertionError("The draw fell outside the weights")
+
+
 @dataclass
 class Step:
     """One requirement's sampled draws, ready to replay.
@@ -39,7 +101,8 @@ class Step:
     the draws decide, `reads` those the requirement's probability depends on
     besides. `record(world)` checks that the producer recorded the plan and
     describes the block; `check(world)` reads the requirement off the finished
-    world.
+    world. A block whose probability can fall below the float range gives its
+    logarithm as well; `probability` is then 0.0.
     """
     script: dict
     probability: float
@@ -47,6 +110,7 @@ class Step:
     reads: set
     record: Callable
     check: Callable
+    log_probability: float = None
 
 
 def bound(value):

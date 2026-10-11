@@ -192,10 +192,148 @@ It is checked like the others: against the producer's own `_offer_price`
 under other seeds, for the probability and for the distribution of the price
 when the bounds hold.
 
+## The fourth block: a concept's stock and prices together
+
+Requirement (`steered-cheapest-available-v1`): a concept, a product and the
+retailers that must be exactly the ones with the concept's cheapest available
+offer, on that product; and optionally offers that must be listed below that
+winning price.
+
+```json
+{"schema": "steered-cheapest-available-v1",
+ "concept_id": "footwear.walking_sandals",
+ "product_id": "footwear-brand-20/footwear.walking_sandals/02",
+ "retailer_ids": ["footwear-02"],
+ "listed_below": [{"retailer_id": "footwear-03",
+                   "sku_id": "footwear-brand-20/footwear.walking_sandals/02-grey-standard-38"}]}
+```
+
+An offer listed below the cheapest available price is unavailable by
+definition, so `listed_below` is "a cheaper offer exists but is sold out". It
+says more than that one SKU is out. At a retailer that is not a designated
+winner, every SKU of the product priced at or below the winner must be
+unavailable too, or the retailer would win or tie; where all sizes share a
+price, the retailer has nothing of the product available. A named offer may
+also be the winner's own: then every SKU of the pair priced below the winning
+price is unavailable and at least one at the winning price is available ("the
+winner's cheaper sizes are sold out").
+
+The first block answers "who is cheapest" on prices alone and takes stock as
+it is. Here stock decides who competes, so stock and prices are one block:
+for every listed retailer/product pair of the concept, the price draw, the
+condition at every stock location and every SKU's zero, quantity and
+supplier-eligibility draws. None of the seed's own draws of these is kept, so
+repeated samples from one natural world are independent draws of the block.
+
+The coupling stays inside each pair. A pair draws its price and its stock
+independently of every other pair, and the requirement asks a pair for one
+thing: the price of its cheapest available SKU, or that it has none.
+
+- For one outcome of the price draw (`prices.atoms`), sort the pair's SKUs by
+  price. The cheapest available price is at a level when every SKU listed
+  cheaper is unavailable and at least one SKU at the level is available.
+- A SKU is unavailable when no location holds it and it gets no supplier
+  order. Locations draw their conditions independently, and under a condition
+  every SKU draws with the same probabilities. So the probability that m SKUs
+  are all unavailable is a product over locations of a sum over conditions
+  (`cheapest.nothing`), and the probability that m are unavailable and one
+  more is available is a short chain over the locations (`cheapest.chain`),
+  with the stock block's states.
+- `cheapest.outcomes` lists a pair's outcomes (price atom, level) with their
+  probabilities and `Spread` sums them by price. The term for a winning price
+  w is the product over pairs of: exactly w for a designated pair; above w or
+  nothing available for any other; and for a pair with an offer named in
+  `listed_below`, only the outcomes in which that offer is priced below w. The
+  terms are disjoint and their sum is the probability of the requirement given
+  everything upstream of the concept's stock and prices: assortment, SKU
+  listing, locations, stock tendencies and the supplier setting.
+- Zero always means impossible. Every sum is over products of probabilities,
+  with no subtraction, so an outcome that cannot happen has probability
+  exactly zero. In the other direction three things keep a possible outcome
+  from being lost to the float range:
+  - A product over a few hundred pairs easily falls below the smallest float
+    although every factor is positive (thirteen pairs with nothing available
+    were enough in the sixth Codex review's example), so products over pairs
+    are kept as sums of logarithms (`log_terms`). The record gives
+    `log_probability_given_upstream` always and `probability_given_upstream`
+    as a float, or `null` when it is below the float range.
+  - Within one pair the factors stay floats. A product of positive factors
+    that underflows raises `NumericalLimit`, in the block model and in
+    `stock.atoms`, and the runner reports `refused` with reason
+    `numerical_limit`. The chance that a SKU holds something at a location is
+    kept as its own number, not as one minus the chance that it holds
+    nothing, which can round to one. No native configuration comes near
+    either limit.
+  - Sampling keeps the same support. `rng.choices` draws one 53-bit number, so
+    an option whose share is far below 1e-16 may be unreachable or badly
+    quantized, and with a subnormal total it can return an option of weight
+    zero (eighth review); on the medium world one requirement has winning
+    prices at shares like 1e-354 (seventh review). Every choice among weighted
+    options therefore goes through `blocks.pick`. Only options with a
+    positive weight are offered. Float weights well above the subnormal range
+    and of ordinary evenness go to `rng.choices` as before; other even
+    weights go to it after division by their exact total; very uneven ones
+    are taken as exact rationals with a uniform draw of enough bits that
+    every positive weight keeps its interval. The winning price is picked
+    from the logarithms (`cheapest.pick_log`), and the weights of the
+    backward stock sampling are exact products of the stored values, so
+    sampling does not meet a numerical limit the model did not. `shares`,
+    the winning price's distribution as floats, is for comparisons only.
+
+  This is a numerical implementation of the conditional model, not exact
+  arithmetic. Conditioning uses float masses and logarithms, and Decimal
+  exponentials rounded to 40 significant digits. Backward products and the
+  rational cumulative walk are exact for those stored values; forward and
+  backward masses agree up to float rounding. The rational draw preserves
+  every positive weight, with relative selection error below 2**-64; ordinary
+  selection, the supplier draws of unconstrained SKUs and the draw inside a
+  price interval use a 53-bit uniform number, as the producer does. The
+  support guarantee holds within the Decimal exponent range (logarithms up to
+  about 2e18 apart; beyond it `pick_log` raises `NumericalLimit`), which
+  includes every configuration tested. The price model's own approximations
+  are stated under "The first block". The guarantee is the fourth block's:
+  the one-offer stock block keeps its float sums and `rng.choices`, and only
+  gains the refusal in `stock.atoms`.
+
+Sampling follows the same factors backwards: a winning price by its term; per
+pair an outcome by its probability and a price draw inside its atom; then the
+pair's stock. The first available SKU at the level, in offer order, is the
+witness. The conditions and the witness's stock are sampled backwards along
+the chain, the unavailable SKUs get zero draws, and every remaining SKU is
+drawn as the producer draws it under the sampled conditions.
+
+Reason codes: `not_listed` (a designated retailer does not list the product,
+or a retailer does not list a named SKU) and `no_outcome`. An unknown
+retailer, product, SKU or concept, or a named offer of another concept, is a
+`ValueError`, raised before any listing is looked at, whatever else the
+requirement names.
+
+Checks, besides the ones every block gets:
+
+- The producer must record every leaf of the block as planned: conditions,
+  and each offer's price, quantities and supplier order (`cheapest.planned`
+  against `cheapest.recorded`).
+- The native oracle must name exactly the designated winners, list every
+  named offer as unavailable, and price it below its minimum.
+- `cheapest.trial` restates the producer's stock and price lines for the
+  concept with the producer's own stream, weighted-choice and pricing
+  functions. Real producer passes under other seeds must equal it leaf for
+  leaf; it then gives the frequency of the requirement and the distribution
+  of the winning price to compare the model with.
+- Unit tests compare the stock probabilities with a brute-force enumeration of
+  the conditions from the configuration, on the test world and on a copy of it
+  with a scarcer stock configuration in which a quantity draw can itself be
+  zero. They compare planned samples with rejection sampling (redraws under
+  other seeds that happen to satisfy the requirement) on twelve statistics;
+  sold-out offers are rare under the producer's configuration, so that
+  comparison runs on the scarce copy. The sixth Codex review mutated the
+  sampler three ways (always the first witness, conditions from their prior,
+  equality allowed at the ceiling) and each was caught by these tests.
+
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the three kinds above, that must all hold.
+of the four kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -210,7 +348,8 @@ price of one retailer/product:
 | --- | --- | --- |
 | One offer's stock | stock of its retailer/product (all SKUs: the conditions are shared) | nothing |
 | One offer's price | price of its retailer/product | nothing |
-| Who is cheapest | price of every pair of the concept with an available offer | stock of every pair of the concept, which decides who competes |
+| Who is cheapest, on prices | price of every pair of the concept with an available offer | stock of every pair of the concept, which decides who competes |
+| Who is cheapest, on stock and prices | stock and price of every listed pair of the concept | nothing |
 
 `blocks.independent` accepts a list of blocks when no block decides a
 resource that another decides or depends on. The producer draws separate
@@ -225,8 +364,8 @@ Anything else is refused with `coupled_requirements` and a sentence naming
 the two requirements and the shared resource. In particular:
 
 - two SKUs of one product at one retailer (shared stock conditions);
-- who is cheapest for a concept together with a stock requirement on any
-  offer of that concept, in either order;
+- who is cheapest for a concept, of either kind, together with a stock
+  requirement on any offer of that concept, in either order;
 - who is cheapest together with a price bound on a competing pair;
 - two price bounds on one retailer/product.
 
@@ -235,7 +374,9 @@ retailers or of different products; who is cheapest for one concept with
 stock or price requirements on other concepts.
 
 A refusal says the parts cannot be sampled separately. It says nothing about
-probability; a joint block could still sample them.
+probability; a joint block could still sample them. The fourth block is such a
+joint block for one case, a cheaper offer that is sold out. It does not yet
+take a stock or price requirement on a named offer of its own concept.
 
 Coupling is settled first, from each module's `footprint`, which needs no
 probability. Only then is each part asked for one. The order matters: a part's
@@ -270,13 +411,32 @@ ever be cheapest. Receipts and worlds are under
 | `run-v5-regression/` | `832238a6` | every `run-v4` requirement again |
 | `run-v6-all/` | `390247b` | every requirement again with the sampling defaults read once; 20,000 redraws |
 | `run-v7-all/` | `ac1eacc` | every requirement again after coupling was moved ahead of probabilities; 20,000 redraws |
+| `run-v8-sold-out/` | `74ad475` | stock and prices together on sandals, tablets and trainers, alone and combined; 200,000 redraws |
+| `run-v8-shoe/` | `74ad475` | stock and prices together on walking shoes; 30,000 redraws |
+| `run-v8-regression/` | `74ad475` | every earlier requirement again; 20,000 redraws |
+| `run-v9-sold-out/`, `run-v9-shoe/`, `run-v9-regression/` | `7dd4727` | the three `run-v8` runs again after the sixth review's fixes |
+| `medium/run-v9-shoes/`, `medium/run-v9-others/` | `7dd4727` | a medium world from dev's producer; see "A medium world" |
+| `run-v10-sold-out/`, `run-v10-shoe/`, `run-v10-regression/`, `medium/run-v10-shoes/`, `medium/run-v10-others/` | `50a3a79` | all five again after the seventh review's fixes; fewer redraws on the medium world (3,000 and 40,000) |
+| `run-v11-sold-out/`, `run-v11-shoe/`, `run-v11-regression/`, `medium/run-v11-shoes/`, `medium/run-v11-others/` | `311e8ff` (code `d9973a9`) | all five again after the eighth review's fix, with shorter redraw counts (50,000, 10,000, 20,000; 1,000 and 10,000 on the medium world) |
 
-Requirement files are in `steering/`, `steering/stock/`, `steering/price/` and
-`steering/combined/`. Commit `832238a6` moved the single-requirement paths
-onto `blocks.replay`, `390247b` added the shared sampling defaults and
-`ac1eacc` changed the order of the coupling check; each rerun reproduces
-every earlier steered world with the identical world identity (27 of 27,
-then 48 of 48 twice), with the same probabilities and refusals.
+Requirement files are in `steering/`, `steering/stock/`, `steering/price/`,
+`steering/cheapest/` and `steering/combined/`. Commit `832238a6` moved the
+single-requirement paths onto `blocks.replay`, `390247b` added the shared
+sampling defaults, `ac1eacc` changed the order of the coupling check and
+`74ad475` added the joint block and moved the stock stream names into shared
+helpers, `7dd4727` keeps products over pairs as logarithms and `50a3a79`
+guards the stock outcomes and samples through `blocks.pick`; each rerun
+reproduces every earlier steered world with the identical world identity (27
+of 27, then 48 of 48 six times), with the same probabilities and refusals.
+`d9973a9` changes which weights `blocks.pick` hands to the float choice; the
+`run-v11` runs reproduce every `run-v10` sample of the fourth block as well,
+with the identical world identity (15, 6, 15 and 12 samples) and identical
+probabilities, as they must when no weight is near the subnormal range.
+`74ad475` is a commit of the branch based on `e3fbfadd`
+(`dev/world-steered-generation-20261010-r1`); `7dd4727` is on the branch based
+on dev (`dev/world-steered-generation-20261011-r2`), where the same change is
+`676a6e6`. From `run-v9` on the steering code runs from the dev-based checkout
+and the seed-73 producer is still the accepted tree at `e3fbfadd`.
 `run-v3` is the same price evidence at the earlier reviewed
 commit, with identical probabilities and hit counts. `run-v1` and `run-v2`
 used the removed keep-if-it-fits rule; their worlds satisfy their
@@ -435,6 +595,126 @@ The real producer redrew the blocks of each combination under 40 other seeds
 (160 passes): for every part, what the producer recorded equalled the part's
 reading, and the verdict on the world equalled the reading's.
 
+### The cheapest available offer, with stock
+
+`run-v8-sold-out/` and `run-v8-shoe/`, three samples each; `run-v9-sold-out/`
+and `run-v9-shoe/` repeat them at `7dd4727` with the same sampled winning
+prices and the same hit counts, and probabilities equal to fifteen digits (the
+world identities differ, since the record gained the logarithm).
+`run-v10-sold-out/` and `run-v10-shoe/` repeat them at `50a3a79`: the same
+hit counts and refusals, probabilities equal to fourteen digits, and other
+samples, since the winning price is now drawn through `cheapest.pick_log`;
+every one of them passes the same checks. The table gives the `run-v8`
+timings; `run-v10` samples took 0.52 to 0.82 s with five runs sharing the
+machine. "Redraws" are the
+block's reading of the producer's stock and price lines under other seeds
+(200,000 for sandals, tablets and trainers, 30,000 for walking shoes, whose
+concept has 322 offers); expected hits are the computed probability times the
+redraws, with one standard error.
+
+| Requirement | Pairs / offers in the concept | Probability given upstream | Sample | Hits in redraws | Expected | Winning-price TV |
+| --- | --- | --- | --- | --- | --- | --- |
+| Walking shoe: `footwear-02` alone is cheapest available (`shoe-footwear-02`) | 49 / 322 | 0.1013 | 0.58 to 0.65 s | 3,053 | 3,039 ± 52 | 0.023 |
+| The same, with `footwear-03`'s offer of the shoe listed below it (`shoe-sold-out-footwear-03`) | 49 / 322 | 8.29e-5 (1 in 12,063) | 0.61 to 0.68 s | 0 | 2.5 ± 1.6 | too few hits |
+| Sandal: `footwear-02` alone is cheapest, `footwear-03`'s offer listed below it (`sandal-sold-out-footwear-03`) | 9 / 35 | 0.00328 (1 in 305) | 0.49 to 0.51 s | 638 | 655 ± 26 | 0.077 |
+| Sandal: two retailers listed below the winner (`sandal-two-sold-out`) | 9 / 35 | 1.05e-6 (1 in 952,493) | 0.52 s | 0 | 0.2 ± 0.5 | too few hits |
+| Tablet: one shop, its cheaper model listed below the winning one (`tablet-sold-out-same-shop`) | 2 / 4 | 0.1402 | 0.51 to 0.52 s | 28,026 | 28,042 ± 155 | 0.021 |
+| Trainer: a winner at more than three times the natural winning price, the natural winner listed below it (`trainer-unlikely-apparel-06`) | 4 / 35 | 2.66e-14 | 0.51 to 0.77 s | 0 | 0 | too few hits |
+| Walking shoe: the winner's own offer listed below the winner (`refused-own-size-footwear-02`) | | refused, `no_outcome` | | | | |
+
+In every sample the native oracle names exactly the designated winner, lists
+each named offer as unavailable and prices it below the minimum, and a direct
+scan of the saved leaves agrees. In the shoe and sandal samples the retailer
+listed below the winner has no size of the product available, as the
+requirement implies where all sizes share a price. A steered sample scripts
+between 12 streams (tablets) and about 3,450 (walking shoes); the block model
+takes 0.01 to 0.08 s.
+
+The real producer redrew the concept's stock and price streams under 40 other
+seeds for each of the six sampled requirements (240 passes): every recorded
+condition, price, quantity and supplier order equalled the block's reading,
+and the verdict on the world equalled the reading's. The requirement held in
+7, 0, 1, 0, 7 and 0 of the 40 passes.
+
+What the redraws support: the probability to within a few percent where it is
+above about 1 in 1,000 (three requirements), and the distribution of the
+winning price there; the winning-price distances are at the size sampling
+noise gives for those hit counts. For the rarer requirements the redraws
+cannot distinguish the computed probability from a wrong one; they rest on
+the same model and code path as the likelier ones, on the unit tests'
+comparison with rejection sampling on a stock-poor world, and on the producer
+recording every planned leaf.
+
+Combined with other concepts (`combined/sold-out-sandal-and-other-concepts`):
+the sandal requirement, a t-shirt on supplier order at `apparel-06` and a
+tablet at 7,000 kr or less at `marketplace-07`. Probability 2.35e-6 (1 in
+424,694), 0.68 to 1.02 s per sample; part hits in 200,000 redraws 638, 1,525
+and 19,004 against 655 ± 26, 1,504 ± 39 and 19,114 ± 132 expected; no joint
+hit, with 0.5 expected. The sandal requirement with a stock requirement on a
+sandal offer (`combined/refused-sold-out-sandal-and-stock`) is refused with
+`coupled_requirements`.
+
+### A medium world
+
+The world sizes asked for (Bjorn, 2026-10-11): a medium world has 4 to 8
+task-relevant stores and ideally twice that again as backdrop, and 100 or more
+products, of which 20 to 30 are in the task's niche and 5 to 10 compete.
+
+`steering/medium/`: the generation input of the saved world
+`.local/website-comparison-scoped-world-20261006-v1/` (seed 62, `world_size`
+4, five concepts, 8 reviews per product), generated by dev's producer in the
+steering checkout at `7dd4727` with real manufactured products: 21 retailers,
+90 products, 1,181 SKUs, 2,849 offers, 37,516 streams per pass. Walking shoes:
+20 retailers, 30 products, 193 retailer/product pairs, 1,569 offers, 64 of
+them unavailable in the natural world. Requirement files were chosen by
+`medium/explore.py` from the block model's own probabilities.
+
+Cost: the first pass, which manufactures the products, 168 s; an unsteered
+replay 0.7 to 0.8 s; the block model 0.05 to 0.6 s; a steered sample with all
+checks 1.5 to 2.8 s, measured with two runs sharing the machine.
+
+| Requirement | Pairs / offers in the concept | Probability given upstream | Sample | Redraws | Hits | Expected |
+| --- | --- | --- | --- | --- | --- | --- |
+| Walking shoe: `marketplace-07` alone is cheapest available | 193 / 1,569 | 0.1266 | 2.0 to 2.1 s | 8,000 | 1,030 | 1,013 ± 30 |
+| The same, with `department_store-07`'s offer of the shoe listed below it | 193 / 1,569 | 0.00288 (1 in 347) | 1.9 to 2.2 s | 8,000 | 27 | 23.1 ± 4.8 |
+| The same, with a second retailer's offer listed below it | 193 / 1,569 | 1.83e-5 (1 in 54,633) | 2.0 to 2.6 s | 8,000 | 0 | 0.1 |
+| Walking shoe: the pair at the middle of the ranking by probability wins | 193 / 1,569 | 6.7e-104 | 1.9 to 2.8 s | 8,000 | 0 | 0 |
+| Tablet: `marketplace-03` alone is cheapest available | 40 / 61 | 0.8256 | 1.5 to 1.8 s | 100,000 | 82,424 | 82,560 ± 120 |
+| The same, with `marketplace-00`'s offer of the tablet listed below it | 40 / 61 | 0.0131 (1 in 76) | 1.7 to 2.8 s | 100,000 | 1,363 | 1,312 ± 36 |
+| Trainer: a winner with another retailer's offer listed below it | 37 / 384 | 0.000698 (1 in 1,433) | 1.7 to 1.8 s | 100,000 | 77 | 69.8 ± 8.4 |
+| T-shirt: a winner with another retailer's offer listed below it | 40 / 152 | 0.000499 (1 in 2,004) | 1.5 to 2.2 s | 100,000 | 53 | 49.9 ± 7.1 |
+| The sold-out shoe requirement, a sandal unavailable at one retailer and a trainer at 85% of its reference price or less at another | | 5.43e-7 (1 in 1,841,302) | 2.5 to 2.6 s | 8,000 | 0 joint; parts 27, 34, 283 | parts 23.1 ± 4.8, 39.2 ± 6.2, 307 ± 17 |
+
+Every sample passed the same checks as on seed 73: the producer recorded every
+planned leaf, the native oracle names exactly the designated winner with each
+named offer unavailable and cheaper, a direct scan of the saved leaves agrees,
+and nothing outside the block's resources differs from the natural world. The
+real producer redrew each requirement's streams under 10 other seeds (90
+passes), equal to the block's reading leaf for leaf. The winning-price
+distances are 0.004 (tablet winner), 0.030 (tablet sold out) and 0.051 (shoe
+winner); the others have too few hits to say much.
+
+The redraws dominate the run time, not the sampling: one redraw of the shoe
+concept's 1,569 offers takes about 80 ms in the block's reading, so 8,000 of
+them take eleven minutes per requirement. They are a check on the model, not a
+cost of a sample.
+
+`medium/run-v10-shoes/` and `medium/run-v10-others/` repeat the nine
+requirements at `50a3a79` with 3,000 and 40,000 redraws: the same
+probabilities to fourteen digits, every sample passing the same checks, 1.4
+to 3.1 s per sample with five runs sharing the machine. Hits against
+expected: shoe winner 384 against 380 ± 18, sold-out shoe 7 against 8.7 ±
+2.9, tablet winner 32,806 against 33,024 ± 76, sold-out tablet 549 against
+525 ± 23, trainer 26 against 27.9 ± 5.3, t-shirt 21 against 20.0 ± 4.5. The
+tablet winner is 2.9 standard errors low in these 40,000 redraws; they are
+the first 40,000 of the 100,000 in the table above, which end 1.1 low.
+
+This is one medium world. It is the size asked for in retailers and in the
+niche (20 retailers and 30 products sell walking shoes); it has 90 products,
+not 100 or more, and the 38-concept saved world
+(`.local/website-38-concept-world-20261006-v1/`, 30 retailers, 621 products)
+has not been steered.
+
 ### Cost against world size
 
 A side measurement, not part of the pinned runner: the real commerce producer
@@ -463,33 +743,67 @@ proportional; that is an extrapolation, not a measurement. The stand-in
 products also carry no review or description text, so real worlds are larger
 on disk than these.
 
+The joint stock-and-price block does more work per sample than a one-offer
+block, since it models and redraws the whole concept. The same worlds, with
+the requirement "the runner-up retailer/product of the shoe concept is the
+only cheapest available one, and the natural winner's offer is listed below
+it"; sampling defaults read once. Script, log and launcher receipt:
+`steering/scale-v3.py`, `scale-v3.log`, `scale-v3-bounded/`, run at `74ad475`.
+
+| `world_size` | Products | Retailers | Offers | Shoe retailers | Shoe products | Shoe retailer/product pairs | Shoe offers | Unsteered pass | Block model | Steered sample, all included | Streams steered |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 29 | 14 | 1,151 | 12 | 13 | 69 | 852 | 0.40 s | 0.12 s | 0.63 to 0.64 s | 8,804 |
+| 2 | 63 | 25 | 4,032 | 24 | 25 | 199 | 2,473 | 0.61 s | 0.40 s | 1.3 to 1.4 s | 25,777 |
+| 4 | 125 | 33 | 11,549 | 33 | 51 | 548 | 6,763 | 1.2 s | 1.3 s | 3.2 to 3.6 s | 73,106 |
+| 8 | 234 | 46 | 28,742 | 45 | 88 | 1,254 | 15,535 | 2.4 s | 3.2 s | 7.2 to 8.2 s | 166,629 |
+
+The requirement held in all twelve samples. Its probability is of the order
+of 1e-20 at sizes 1 to 4 and 3e-9 at size 8: the stand-in products list 13
+sizes at one price, so an offer listed below the winner means all 13 sizes
+sold out at that retailer.
+
+In the terms of "A medium world" above: the task's concept in a medium world
+has at most 24 retailers and 30 products, which is the `world_size` 2 row for
+the block (24 retailers, 25 products, 199 pairs). The measured medium world
+with real products (193 pairs) takes about two seconds per sample. Its pairs
+list fewer SKUs (8 on average against 12 with the stand-ins), and its world
+carries review and description text that the checks also digest.
+
 ## What is not done
 
-- **Independent requirements only.** Requirements are combined when their
-  blocks are independent; see "Several requirements in one world" for what is
-  refused. Two SKUs of one product at one retailer share the conditions and
-  need a joint chain over the locations.
+- **Requirements on named offers inside a who-is-cheapest concept.** The
+  joint block samples who is cheapest together with sold-out cheaper offers.
+  A stock or price requirement on a named offer of the same concept ("the
+  winner has at most two left", "the sold-out offer is on supplier order at
+  another shop") is still refused as coupled. It would enter the joint block
+  as a restriction on that pair's outcomes; not built.
+- **Two SKUs of one product at one retailer** in two one-offer stock
+  requirements share the conditions and are refused. They need a joint chain
+  over the locations, as the joint block has for its own purpose.
+- **One-offer stock samples share the seed's sibling draws.** The stock block
+  samples the named SKU's draws and the shared conditions; the product's other
+  SKUs at the retailer keep the seed's own zero and quantity draws, evaluated
+  under the sampled conditions. Each sample is a valid conditional sample, but
+  repeated samples from one natural world are correlated through those kept
+  draws. The joint block redraws every SKU and has no such correlation.
 - **Upstream of stock is not steered.** Assortment, SKU listing, the number
   of locations and which of them ship, stock tendencies and whether the
   retailer takes supplier orders are the seed's. Requirements they rule out
   are refused with a reason code, not repaired.
-- **Stock and price of competing offers together.** "The cheapest offer is
-  sold out while a dearer one is in stock" couples stock and price:
-  availability decides who competes on price. That is the requirement a real
-  cheapest-available task needs and it is refused today. The coupling stays
-  inside each retailer/product pair (its stock decides which of its SKUs
-  compete; pairs still draw independently), so the who-is-cheapest sum should
-  extend to it by summing each pair over its availability outcomes; not built.
-  The earlier Z3 pilot (`experiments/constrained_world_pilot/`) is not
+- **The earlier Z3 pilot** (`experiments/constrained_world_pilot/`) is not
   connected.
+- **Only retail stock and prices.** Reviews, review sites and comparison-site
+  content are not steered; a task about them gets its world from the ordinary
+  generation.
 - **No publication.** Steered worlds are native worlds only:
   `browser_runtime_ready` is false. `unified_generation.generate` accepts a
   `world_factory`, which is where a steered world would enter so that
   surrounding sites, presentation and bindings are built by the ordinary
   pipeline; its sampling audit would have to record the steering.
-- **One upstream.** Evidence on the manufactured world is one seed and mostly
-  one SKU of one concept (one combination adds a t-shirt and a tablet); the
-  unit tests add two stand-in worlds.
+- **Two upstreams with real products.** Seed 73 (12 retailers, 25 products)
+  and one medium world (21 retailers, 90 products). The unit tests add three
+  stand-in worlds and the scaling measurements four more, with stand-in
+  products.
 
 ## What a released version needs
 
@@ -499,9 +813,10 @@ Coordination with Product, who own the producer:
    plan, in place of the attribute swap.
 2. A manufacture seam: a way to supply already manufactured products, in place
    of the second attribute swap.
-3. `population.load()` read once per generation (or `list_skus` given the
-   configuration the producer already holds), in place of the third swap. See
-   the measurement below.
+3. `population.load()` read once per generation. Done in dev's producer on
+   2026-10-11 (`9fd8a123`, `ebd3ef3e`; see "Producer defaults integration"),
+   after the measurement below. The session's third swap now only shares the
+   snapshot across passes and can go.
 4. Preferably, draw sites that declare their distribution (a named Bernoulli,
    categorical, integer range or clamped normal). The price model here mirrors
    `_offer_price` by hand and is checked against it empirically; declared
@@ -534,8 +849,9 @@ session's repeated worlds; its module swap and thread-safety limitation remain.
 .venv/bin/python -m pytest -q experiments/steered_generation/
 ```
 
-`test_stock.py` and `test_combined.py` run the real commerce producer with
-stand-in products; the whole directory takes about half a minute.
+`test_stock.py`, `test_combined.py` and `test_cheapest.py` run the real
+commerce producer with stand-in products; the whole directory takes a little
+over a minute.
 
 From the repository root of a checkout at the steering commit:
 

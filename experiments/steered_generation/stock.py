@@ -61,20 +61,37 @@ def after(state, stocked, shipping):
 def atoms(probabilities, zero_probability, quantity_ranges):
     """The outcomes of one location's draws for one SKU, with their probabilities.
 
-    Returns (mass, condition, quantity); quantity None is the zero draw.
+    Returns (mass, condition, quantity); quantity None is the zero draw. An
+    outcome is left out only when it cannot happen; one whose positive
+    probability underflows is an error.
     """
     total, result = fsum(probabilities.values()), []
     for condition, weight in probabilities.items():
         empty = min(1, max(0, zero_probability[condition]))
         low, high = quantity_ranges[condition]
-        result.append((weight / total * empty, condition, None))
-        result += [(weight / total * (1 - empty) / (high - low + 1), condition, quantity)
-                   for quantity in range(low, high + 1)]
+        found = [(weight / total * empty, condition, None)]
+        found += [(weight / total * (1 - empty) / (high - low + 1), condition, quantity)
+                  for quantity in range(low, high + 1)]
+        if any(not mass and weight > 0 and (empty if quantity is None else 1 - empty) > 0
+               for mass, _, quantity in found):
+            raise blocks.NumericalLimit("A positive stock probability underflows")
+        result += found
     return [atom for atom in result if atom[0] > 0]
 
 
 def amount(atom):
     return atom[2] or 0
+
+
+def stream_keys(api, retailer_id, product_id, sku_id, source_id):
+    """The producer's stream keys for one SKU's stock draws at one location; the condition is the product's."""
+    base = api.commerce.VERSION + "/" + retailer_id + "/"
+    return {"condition": base + product_id + "/" + source_id + "/condition",
+            "zero": base + sku_id + "/" + source_id + "/zero", "quantity": base + sku_id + "/" + source_id + "/quantity"}
+
+
+def supplier_key(api, retailer_id, sku_id):
+    return api.commerce.VERSION + "/" + retailer_id + "/" + sku_id + "/supplier-eligible"
 
 
 def footprint(world, requirement, api):
@@ -99,7 +116,6 @@ def site(world, requirement, api):
     if set(bounds) - set(rows):
         raise ZeroMass("no_such_source", "The retailer has no such stock location in this world")
     ranges = config["stock"]["quantity_ranges"][retailer["scale"]]
-    base = api.commerce.VERSION + "/" + rid + "/"
     sources = []
     for source in retailer["source_locations"]:
         name = source["source_id"]
@@ -108,13 +124,12 @@ def site(world, requirement, api):
         sources.append(SimpleNamespace(
             source_id=name, shipping=source["shipping_enabled"],
             atoms={False: [a for a in allowed if not amount(a)], True: [a for a in allowed if amount(a)]},
-            keys={"condition": base + pid + "/" + name + "/condition", "zero": base + sid + "/" + name + "/zero",
-                  "quantity": base + sid + "/" + name + "/quantity"}))
+            keys=stream_keys(api, rid, pid, sid, name)))
     return SimpleNamespace(
         requirement=requirement, retailer_id=rid, sku_id=sid, product_id=pid, offer_id=offer["offer_id"],
         concept_id=products[sid]["concept_id"], sources=sources, supplier_enabled=retailer["supplier_enabled"],
         eligible=min(1, max(0, config["supplier"]["sku_eligible_probability"])),
-        supplier_key=base + sid + "/supplier-eligible", config=config, scale=retailer["scale"],
+        supplier_key=supplier_key(api, rid, sid), config=config, scale=retailer["scale"],
         probabilities={name: row["probabilities"] for name, row in rows.items()})
 
 

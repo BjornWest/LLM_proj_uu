@@ -3,11 +3,14 @@
 Run as a module from the repository root:
     python -m experiments.steered_generation.run ...
 One natural pass through the real producer, then one cheap steered pass per
-requested sample. A requirement file is a who-is-cheapest price requirement, a
-one-offer stock or price requirement, or several of those to hold together.
+requested sample. A requirement file is a who-is-cheapest requirement (on
+prices alone, or on stock and prices together with offers listed below the
+winner), a one-offer stock or price requirement, or several of those to hold
+together.
 No browser, provider or sidecar publication.
 """
 import argparse
+from collections import Counter
 from hashlib import sha256
 import importlib
 import json
@@ -19,11 +22,11 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import blocks, combined, price_bounds, prices, stock, streams
+from . import blocks, cheapest, combined, price_bounds, prices, stock, streams
 
 HERE = Path(__file__).resolve().parent
-OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "combined.py",
-              "run.py"),
+OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
+              "combined.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -122,6 +125,9 @@ def stock_case(args, session, natural, opened, api, requirement, case, folder):
     except prices.ZeroMass as error:
         case.update(status="zero_probability_given_upstream", reason=error.reason)
         return
+    except blocks.NumericalLimit as error:
+        case.update(status="refused", reason=error.reason, detail=str(error))
+        return
     place = block.site
     case.update(status="sampled", probability_given_upstream=block.probability, offer_id=place.offer_id,
                 stock_locations=len(place.sources), natural=stock.recorded(natural, place))
@@ -192,6 +198,75 @@ def bound_case(args, session, natural, opened, api, requirement, case, folder):
                       "Conditional price distribution disagrees with the real pricing function")
 
 
+def cheapest_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        clock = time.monotonic()
+        block = cheapest.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    except cheapest.NumericalLimit as error:
+        case.update(status="refused", reason=error.reason, detail=str(error))
+        return
+    concept = requirement["concept_id"]
+    before = cheapest.recorded(natural, concept)
+    case.update(status="sampled", probability_given_upstream=block.probability or None,
+                log_probability_given_upstream=block.log_probability, model_seconds=time.monotonic() - clock,
+                retailer_products=len(block.places), offers=len(before["offers"]),
+                winning_prices_modelled=len(block.shares),
+                natural_unavailable_offers=sum(not held(row) for row in before["offers"].values()))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        try:
+            world, found, record = cheapest.steer(session, natural, opened, requirement, api,
+                                                  sample_rng(natural, case, index))
+        except cheapest.NumericalLimit as error:
+            case.update(status="refused", reason=error.reason, detail=str(error))
+            return
+        seconds = time.monotonic() - clock
+        # The saved leaves themselves, read without the block model or the native oracle.
+        leaves = cheapest.recorded(world, concept)
+        minimum, scanned = pinned.direct_scan(world, requirement)
+        designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
+        below = [next(row for row in leaves["offers"].values()
+                      if (row["retailer_id"], row["sku_id"]) == (named["retailer_id"], named["sku_id"]))
+                 for named in requirement.get("listed_below", [])]
+        pinned.ensure(scanned == designated and minimum == record["winning_price_minor"] and
+                      all(row["price_minor"] < minimum and not held(row) for row in below),
+                      "Direct full-population scan disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "task.private.json": found["task"],
+                                      "reference.private.json": found["reference"], "steering.json": record})
+        case["samples"].append({
+            "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
+            "winning_price_minor": minimum, "winner_count": len(found["reference"]["winners"]),
+            "listed_below": found["listed_below"],
+            "unavailable_offers": sum(not held(row) for row in leaves["offers"].values()),
+            "retailer_products_with_nothing_available": sum(
+                row["cheapest_available_minor"] is None for row in record["restocked"]),
+            "streams_steered": record["streams_steered"],
+            "streams_opened_only_when_steered": record["streams_opened_only_when_steered"],
+            "streams_opened_only_naturally": record["streams_opened_only_naturally"], "files": files})
+    reading = cheapest.trial(natural, requirement, api)
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [reading], case)
+    if args.validate_trials and block.probability:
+        winning = Counter(reading.winning(seed) for seed in range(10 ** 6, 10 ** 6 + args.validate_trials))
+        del winning[None]
+        hits = sum(winning.values())
+        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        # Winning-price distribution given the requirement: model against the reading's redraws.
+        distance = sum(abs(block.shares.get(p, 0) - winning.get(p, 0) / hits)
+                       for p in set(block.shares) | set(winning)) / 2 if hits else None
+        validation.update(winning_price_total_variation=distance)
+        pinned.ensure(hits < 1000 or distance < 0.1,
+                      "Conditional winning-price distribution disagrees with the producer's draws")
+
+
+def held(row):
+    """Whether an offer's recorded leaves make it available: stock anywhere or a supplier order."""
+    return any(row["stock_by_source"].values()) or row["supplier_order"]
+
+
 def combined_case(args, session, natural, opened, api, requirement, case, folder):
     for index in range(args.samples):
         clock = time.monotonic()
@@ -200,7 +275,7 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
         except prices.ZeroMass as error:
             case.update(status="zero_probability_given_upstream", reason=error.reason, part=error.part)
             return
-        except blocks.Coupled as error:
+        except (blocks.Coupled, cheapest.NumericalLimit) as error:
             case.update(status="refused", reason=error.reason, detail=str(error))
             return
         seconds = time.monotonic() - clock
@@ -217,9 +292,11 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
         producer_redraws(args, session, natural, combined.trial(natural, requirement, api), case)
     if args.validate_trials:
         alone, together = combined.empirical(natural, requirement, api, args.validate_trials, 10 ** 6)
-        validation = frequency_check(case, case["probability_given_upstream"], together, args.validate_trials)
+        # A probability below the float range is recorded as None and has no frequency to compare.
+        validation = frequency_check(case, case["probability_given_upstream"] or 0.0, together, args.validate_trials)
         validation["parts"] = []
         for probability, hits in zip(case["part_probabilities"], alone):
+            probability = probability or 0.0
             error = sqrt(probability * (1 - probability) / args.validate_trials)
             validation["parts"].append({"hits": hits, "computed": probability, "standard_error": error})
             pinned.ensure(abs(hits / args.validate_trials - probability) <= 4 * error,
@@ -227,7 +304,8 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
 
 
 CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_case),
-         price_bounds.VERSION: ("price", bound_case), combined.VERSION: ("combined", combined_case)}
+         price_bounds.VERSION: ("price", bound_case), cheapest.VERSION: ("stock_and_prices", cheapest_case),
+         combined.VERSION: ("combined", combined_case)}
 
 
 def main():
@@ -246,7 +324,7 @@ def main():
     parser.add_argument("--producer-redraws", type=int, default=0,
                         help="run the real producer this many times with the block's streams opened under "
                              "other seeds and compare it with the block module's reading (not for a "
-                             "who-is-cheapest requirement by itself)")
+                             "who-is-cheapest requirement on prices alone)")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     started = time.monotonic()
