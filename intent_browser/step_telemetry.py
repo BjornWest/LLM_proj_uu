@@ -150,14 +150,22 @@ class EnvStepTelemetry:
                       'no_reply': bool(no_reply)}
             if method == 'send' and isinstance(params, dict):
                 detail['cdp_method'] = _label(params.get('method'))
-            self.pending[token] = detail
-            self._emit('rpc_started', **detail)
+            if not no_reply:
+                self.pending[token] = detail
+            self._emit('rpc_send_started' if no_reply else 'rpc_started', **detail)
             try:
                 callback = original_send(obj, method, params, no_reply)
             except BaseException as exc:
                 self.pending.pop(token, None)
-                self._emit('rpc_finished', **detail, error_type=_label(type(exc).__name__))
+                self._emit('rpc_send_failed' if no_reply else 'rpc_finished',
+                           **detail, error_type=_label(type(exc).__name__))
                 raise
+
+            if no_reply:
+                # Playwright dispatch deliberately never resolves these futures.
+                # Sending is not a browser reply or proof of execution.
+                self._emit('rpc_send_finished', **detail, scope='transport_send_only')
+                return callback
 
             def finished(future):
                 if not self.active or token not in self.pending:

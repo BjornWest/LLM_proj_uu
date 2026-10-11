@@ -180,6 +180,41 @@ def test_rpc_starts_flushed_before_send_and_future_error_redacted(tmp_path):
         recorder.close(); conn.loop.close()
 
 
+def test_real_installed_dispatch_no_reply_is_send_not_pending_wait(tmp_path):
+    from playwright._impl._connection import Connection as NativeConnection
+    loop = asyncio.new_event_loop()
+    messages = []
+    transport = SimpleNamespace(send=messages.append)
+    connection = NativeConnection(None, lambda *args: None, transport, loop)
+    env = SimpleNamespace(page=SimpleNamespace(_impl_obj=SimpleNamespace(_connection=connection)),
+                          step=lambda: None)
+    channel = SimpleNamespace(_was_collected=False, _guid='fixture', _type='Frame')
+    recorder = EnvStepTelemetry(tmp_path)
+    connection._api_zone.set({'apiName': 'fixture', 'frames': []})
+    try:
+        with recorder.observe(env, step=0, tool='click'):
+            async def exercise():
+                ignored = connection._send_message_to_server(channel, 'waitForEventInfo', {}, no_reply=True)
+                ignored_id = messages[-1]['id']
+                connection.dispatch({'id': ignored_id, 'result': {}})
+                assert ignored_id not in connection._callbacks and not ignored.future.done()
+                assert ignored.future._callbacks is None  # No diagnostic completion observer.
+                ordinary = connection._send_message_to_server(channel, 'click', {})
+                connection.dispatch({'id': messages[-1]['id'], 'result': {}})
+                await asyncio.sleep(0)
+                assert ordinary.future.done()
+            loop.run_until_complete(exercise())
+        out = rows(tmp_path)
+        assert out[-1]['pending_rpc_count'] == 0
+        assert [r['event'] for r in out if r.get('method') == 'waitForEventInfo'] == [
+            'rpc_send_started', 'rpc_send_finished']
+        assert next(r for r in out if r['event'] == 'rpc_send_finished')['scope'] == 'transport_send_only'
+        assert any(r['event'] == 'rpc_finished' and r['method'] == 'click' for r in out)
+        assert '_send_message_to_server' not in vars(connection)
+    finally:
+        recorder.close(); loop.close()
+
+
 @pytest.mark.parametrize('cancel', [False, True])
 def test_pending_rpc_and_late_reply_cannot_cross_next_step(tmp_path, cancel):
     env, conn, calls = fixture(); recorder = EnvStepTelemetry(tmp_path)

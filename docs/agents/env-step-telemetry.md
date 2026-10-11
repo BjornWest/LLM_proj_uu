@@ -27,7 +27,11 @@ Playwright 1.44.0 connection sends record the protocol method/channel type and,
 for a CDP send, its method such as `Fetch.fulfillRequest` or
 `Accessibility.getFullAXTree`. Arguments, URLs, expressions, response bodies,
 exception text and stack locals are omitted. Starts precede send; completion
-observes the existing future, without cancelling it or waiting again.
+observes the existing future, without cancelling it or waiting again. Fire-and-forget
+`no_reply` sends use distinct `rpc_send_started`/`rpc_send_finished` events and
+never enter pending-reply tracking: their native futures deliberately remain
+unresolved. A send-finished event proves only transport send returned, not browser
+execution or a reply.
 
 To inspect an unfinished episode, find its last unmatched phase and RPC starts.
 For example, a successful `action_execution` finish followed by an unmatched
