@@ -508,3 +508,187 @@ def test_poller_callback_failure_stays_explicit_and_recovers(feed):
         assert p.status()['last_error'] is None
     finally:
         p.close()
+
+
+def test_dispatch_retirement_is_idempotent_and_not_episode_cancellation():
+    c, _ = setup()
+    c.retire_dispatch('2')
+    c.retire_dispatch('2')
+    row = c.status()['episodes']['2']
+    assert row['dispatch_retired'] and not row['done'] and not row['cancelled']
+    with pytest.raises(TurnCancelled, match='dispatch retired'):
+        c.acquire_turn('2', 'policy:next', timeout=1)
+    with pytest.raises(ValueError, match='lifecycle cap'):
+        c.register_episode('replacement')
+    events = [e for e in c.status()['events'] if e['episode_id'] == '2']
+    assert [e['kind'] for e in events] == ['episode_registered', 'dispatch_retired']
+    assert c.status()['resume_credits'] == 0
+    c.finish_episode('2')
+    c.retire_dispatch('2')  # Terminal retained row: also an idempotent no-op.
+    c.register_episode('replacement')
+    kinds = [e['kind'] for e in c.status()['events'] if e['episode_id'] == '2']
+    assert kinds == ['episode_registered', 'dispatch_retired', 'episode_finished']
+
+
+def test_dispatch_retirement_wakes_waiter_without_granting_a_turn():
+    c = EpisodeCapacityController()  # Missing telemetry keeps acquire pending.
+    c.register_episode('case')
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(c.acquire_turn, 'case', 'policy:1', timeout=2)
+        eventually(lambda: c.status()['episodes']['case']['waiting'])
+        c.retire_dispatch('case')
+        with pytest.raises(TurnCancelled, match='dispatch retired'):
+            future.result(timeout=1)
+    row = c.status()['episodes']['case']
+    assert not row['waiting'] and row['request_id'] is None and row['turns'] == 0
+    assert not row['cancelled'] and not row['done']
+
+
+def test_retired_inflight_actor_retains_both_caps_until_verified_cleanup():
+    c = EpisodeCapacityController(ParkingConfig(max_generation_requests=1, max_active_episodes=2))
+    c.observe(CapacitySnapshot(time.monotonic(), 0, 0, 0, .4, 0))
+    c.register_episode('ended')
+    c.register_episode('live')
+    c.acquire_turn('ended', 'outstanding', timeout=1)
+    c.retire_dispatch('ended')
+    for _ in range(2):  # Failed cleanup must neither end nor forgive the permit.
+        with pytest.raises(ValueError, match='HTTP work in flight'):
+            c.finish_episode('ended')
+        c.retire_dispatch('ended')
+    with pytest.raises(ValueError, match='lifecycle cap'):
+        c.register_episode('new')
+    with pytest.raises(TimeoutError):
+        c.acquire_turn('live', 'blocked', timeout=.03)
+    with pytest.raises(TurnCancelled, match='dispatch retired'):
+        c.acquire_turn('ended', 'another', timeout=1)
+    row = c.status()['episodes']['ended']
+    assert row['request_id'] == 'outstanding' and not row['done'] and not row['cancelled']
+    c.release_turn('ended', 'outstanding')  # Caller has verified HTTP cleanup.
+    with c.turn('live', 'next', timeout=1):
+        pass
+    with pytest.raises(ValueError, match='lifecycle cap'):
+        c.register_episode('new')  # Request release alone does not end lifecycle.
+    c.finish_episode('ended')
+    c.register_episode('new')
+    events = [e['kind'] for e in c.status()['events'] if e['episode_id'] == 'ended']
+    assert events.count('dispatch_retired') == 1
+    assert events.count('episode_finished') == 1
+    assert 'episode_cancelled' not in events and 'episode_parked' not in events
+
+
+def test_retired_parked_actor_no_longer_covers_live_backlog():
+    c, clock = setup()
+    establish(c)
+    observe(c, clock, waiting=1, kv=.95)
+    observe(c, clock, waiting=1, kv=.95)
+    assert parked(c) == {'2'}
+    c.retire_dispatch('2')
+    assert not parked(c)
+    assert c.status()['resume_credits'] == 0
+    observe(c, clock, waiting=1, kv=.95)
+    assert parked(c) == {'1'}  # A real live actor replaces the closed channel.
+    observe(c, clock)
+    assert parked(c) == {'1'}  # Retirement itself did not grant a resume.
+    c.finish_episode('2')  # Only actual terminal cleanup grants the resume.
+    assert not parked(c)
+    assert not c.status()['episodes']['2']['cancelled']
+    resumed = [e['episode_id'] for e in c.status()['events'] if e['kind'] == 'episode_resumed']
+    assert resumed == ['1']
+
+
+def test_retired_high_priority_actor_is_not_used_as_the_remaining_drainer():
+    c, clock = setup()
+    establish(c)
+    c.retire_dispatch('0')
+    observe(c, clock, waiting=9, kv=.99)
+    observe(c, clock, waiting=9, kv=.99)
+    assert parked(c) == {'2'}  # Keep live '1', not ended high-priority '0'.
+    c.acquire_turn('1', 'draining', timeout=1)
+    c.release_turn('1', 'draining')
+    assert not c.status()['episodes']['0']['park_requested']
+
+
+def test_retirement_drops_bound_grant_without_transferring_it():
+    c, clock = setup(4, 4)
+    establish(c, 4)
+    observe(c, clock, waiting=2, kv=.95)
+    observe(c, clock, waiting=2, kv=.95)
+    c.finish_episode('0')
+    assert c.status()['episodes']['2']['resume_granted']
+    c.retire_dispatch('2')
+    assert c.status()['resume_credits'] == 0
+    observe(c, clock)
+    assert parked(c) == {'3'}
+    assert not c.status()['episodes']['3']['resume_granted']
+    c.finish_episode('2')
+    assert not parked(c)
+    resumed = [e['episode_id'] for e in c.status()['events'] if e['kind'] == 'episode_resumed']
+    assert resumed == ['3']
+
+
+def test_retired_inflight_parking_request_never_becomes_a_ghost_park_on_release():
+    c, clock = setup()
+    establish(c)
+    c.acquire_turn('2', 'ongoing', timeout=1)
+    observe(c, clock, waiting=1, kv=.95)
+    observe(c, clock, waiting=1, kv=.95)
+    assert c.status()['episodes']['2']['park_requested']
+    c.retire_dispatch('2')
+    assert c.status()['episodes']['2']['request_id'] == 'ongoing'
+    c.release_turn('2', 'ongoing')
+    row = c.status()['episodes']['2']
+    assert not row['park_requested'] and not row['parked'] and not row['resume_granted']
+    assert row['request_id'] is None and not row['done']
+    assert not any(e['kind'] == 'episode_parked' and e['episode_id'] == '2' for e in c.status()['events'])
+    observe(c, clock, waiting=1, kv=.95)
+    assert parked(c) == {'1'}
+    c.finish_episode('0')
+    assert c.status()['episodes']['1']['resume_granted']
+    assert not c.status()['episodes']['2']['resume_granted']
+
+
+def test_cancel_then_retire_preserves_existing_cancellation_and_one_retirement_event():
+    c, _ = setup()
+    c.cancel_episode('2')
+    c.retire_dispatch('2')
+    c.retire_dispatch('2')
+    assert c.status()['episodes']['2']['cancelled']
+    assert c.status()['episodes']['2']['dispatch_retired']
+    c.finish_episode('2')
+    kinds = [e['kind'] for e in c.status()['events'] if e['episode_id'] == '2']
+    assert kinds.count('episode_cancelled') == 1 and kinds.count('dispatch_retired') == 1
+    assert kinds.count('episode_finished') == 1
+
+
+def test_retire_dispatch_concurrent_calls_emit_one_event():
+    c, _ = setup()
+    gate = threading.Barrier(8)
+    def retire(_):
+        gate.wait(timeout=2)
+        c.retire_dispatch('2')
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(retire, range(8)))
+    assert sum(e['kind'] == 'dispatch_retired' for e in c.status()['events']) == 1
+    assert not c.status()['episodes']['2']['cancelled']
+
+
+def test_retire_fresh_capacity_waiter_before_holder_releases():
+    c = EpisodeCapacityController(ParkingConfig(max_generation_requests=1, max_active_episodes=2))
+    c.observe(CapacitySnapshot(time.monotonic(), 0, 0, 0, .4, 0))
+    c.register_episode('holder')
+    c.register_episode('ended')
+    c.acquire_turn('holder', 'held', timeout=1)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(c.acquire_turn, 'ended', 'waiting', timeout=2)
+        eventually(lambda: c.status()['episodes']['ended']['waiting'])
+        c.retire_dispatch('ended')
+        c.release_turn('holder', 'held')
+        with pytest.raises(TurnCancelled, match='dispatch retired'):
+            future.result(timeout=1)
+    row = c.status()['episodes']['ended']
+    assert row['request_id'] is None and row['turns'] == 0 and not row['waiting']
+    assert not row['done'] and not row['cancelled']
+    with pytest.raises(ValueError, match='lifecycle cap'):
+        c.register_episode('new')
+    c.finish_episode('ended')
+    c.register_episode('new')

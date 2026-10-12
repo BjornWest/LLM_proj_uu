@@ -295,7 +295,8 @@ class EpisodeCapacityController:
             self.admissions += 1
             self.rows[episode_id] = dict(priority=priority, order=self.admissions,
                 request_id=None, waiting=False, turns=0, park_requested=False,
-                parked=False, resume_granted=False, done=False, cancelled=False)
+                parked=False, resume_granted=False, done=False, cancelled=False,
+                dispatch_retired=False)
             self._emit("episode_registered", episode_id, priority=priority)
 
     def _rank(self, item):
@@ -312,7 +313,7 @@ class EpisodeCapacityController:
             return
         candidates = sorted(((i, r) for i, r in self.rows.items()
             if r["parked"] and r["resume_granted"] and not r["done"]
-            and not r["cancelled"]), key=self._rank)
+            and not r["cancelled"] and not r["dispatch_retired"]), key=self._rank)
         for episode, row in candidates:
             row.update(parked=False, park_requested=False, resume_granted=False)
             self._emit("episode_resumed", episode)
@@ -334,11 +335,13 @@ class EpisodeCapacityController:
             if previous is not None and snapshot.preemptions > previous.preemptions:
                 self._emit("preemption_observed", count=snapshot.preemptions - previous.preemptions)
             victims = sum(r["park_requested"] and not r["done"] and not r["cancelled"]
+                          and not r["dispatch_retired"]
                           for r in self.rows.values())
             needed = max(0, snapshot.capacity_waiting - victims) if self.streak >= self.config.sustained_samples else 0
             if needed and self._fresh():
                 candidates = sorted(((i, r) for i, r in self.rows.items()
                     if not r["done"] and not r["cancelled"] and not r["park_requested"]
+                    and not r["dispatch_retired"]
                     and r["turns"] > 0), key=self._rank, reverse=True)
                 # Leave one established episode able to drain toward completion.
                 for episode, row in candidates[:min(needed, max(0, len(candidates) - 1))]:
@@ -359,7 +362,8 @@ class EpisodeCapacityController:
         if inflight >= self.config.max_generation_requests:
             return None
         pending = [(i, r) for i, r in self.rows.items() if r["waiting"]
-                   and not r["park_requested"] and not r["done"] and not r["cancelled"]]
+                   and not r["park_requested"] and not r["done"] and not r["cancelled"]
+                   and not r["dispatch_retired"]]
         pressure = self.telemetry.capacity_waiting > 0 or self.telemetry.kv_usage >= self.config.high_water
         if pressure:
             # With no requests in flight, permit one existing episode to progress.
@@ -377,12 +381,16 @@ class EpisodeCapacityController:
         deadline = self.clock() + timeout
         with self.condition:
             row = self.rows[episode_id]
+            if row["dispatch_retired"]:
+                raise TurnCancelled("Episode dispatch retired")
             if row["request_id"] is not None or row["waiting"]:
                 raise ValueError("Only one generation request per episode may be pending")
             row["waiting"] = True
             self._emit("turn_waiting", episode_id, request_id=request_id)
             try:
                 while True:
+                    if row["dispatch_retired"]:
+                        raise TurnCancelled("Episode dispatch retired")
                     if self.closed or row["done"] or row["cancelled"] or (stop_event is not None and stop_event.is_set()):
                         raise TurnCancelled("Episode/controller cancelled")
                     if self.clock() >= deadline:
@@ -425,6 +433,28 @@ class EpisodeCapacityController:
             self._emit("episode_cancelled", episode_id)
             self.condition.notify_all()
 
+    def retire_dispatch(self, episode_id):
+        """Permanently close generation admission without ending the lifecycle.
+
+        Idempotent for retained rows, including terminal rows. Use when the
+        generation channel ends or cleanup fails: wake/reject acquisitions and
+        remove this actor from parking/resume decisions without logging episode
+        cancellation. Retired actors still consume the active lifecycle cap;
+        their outstanding request still consumes the generation cap until the
+        caller verifies HTTP cleanup and releases its exact request ID. Only
+        finish_episode at actual terminal cleanup grants another actor a resume.
+        This method does not abort HTTP work, release permits or finish episodes.
+        """
+        with self.condition:
+            row = self.rows[episode_id]
+            if row["dispatch_retired"] or row["done"]:
+                return
+            row.update(dispatch_retired=True, park_requested=False, parked=False,
+                       resume_granted=False)
+            self._emit("dispatch_retired", episode_id,
+                       in_flight=row["request_id"] is not None)
+            self.condition.notify_all()
+
     def finish_episode(self, episode_id):
         """After native terminal cleanup, never merely after a tool/model turn."""
         with self.condition:
@@ -436,6 +466,7 @@ class EpisodeCapacityController:
             # must never leak to an episode parked after that completion.
             candidates = [(i, r) for i, r in self.rows.items()
                 if r["park_requested"] and not r["done"] and not r["cancelled"]
+                and not r["dispatch_retired"]
                 and not r["resume_granted"]]
             if candidates:
                 granted, recipient = min(candidates, key=self._rank)
@@ -452,7 +483,7 @@ class EpisodeCapacityController:
         with self.condition:
             return dict(episodes={i: dict(r) for i, r in self.rows.items()},
                         telemetry=None if self.telemetry is None else asdict(self.telemetry),
-                        telemetry_fresh=self._fresh(), resume_credits=sum(r["resume_granted"] and not r["done"] and not r["cancelled"] for r in self.rows.values()),
+                        telemetry_fresh=self._fresh(), resume_credits=sum(r["resume_granted"] and not r["done"] and not r["cancelled"] and not r["dispatch_retired"] for r in self.rows.values()),
                         closed=self.closed, events=list(self.events))
 
     def close(self):
