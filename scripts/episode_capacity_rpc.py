@@ -20,11 +20,49 @@ class CapacityChannelError(RuntimeError):
     pass
 
 
+class CapacityTransportTimeout(CapacityChannelError):
+    """Our IPC timeout, distinct from a Python signal-handler TimeoutError."""
+
+
+class CapacityDispatchRetired(CapacityChannelError):
+    """Admission ended intentionally, without cancelling the episode."""
+
+
+class CapacitySuiteStopped(CapacityChannelError):
+    """The parent cohort stopped; no further active admission is allowed."""
+
+
+class CapacityParentError(CapacityChannelError):
+    """Typed parent diagnostic, without requiring message-string parsing."""
+    def __init__(self, reply):
+        self.reply = dict(reply)
+        self.parent_error_type = reply['error_type']
+        self.parent_reason = reply['reason']
+        self.telemetry_fresh = reply['telemetry_fresh']
+        super().__init__(f"Parent {self.parent_error_type}: {reply['message']}; telemetry_fresh={self.telemetry_fresh}")
+
+    def __reduce__(self):
+        return type(self), (self.reply,), dict(self.__dict__)
+
+
+def _socket_call(function, *args):
+    try:
+        return function(*args)
+    except TimeoutError as exc:
+        # These calls are builtin socket operations. A socket timeout originates
+        # in this frame; a Python signal handler adds its own traceback frame.
+        # Never convert that foreign control-flow exception into a recoverable
+        # channel fault, even when its text is also "timed out".
+        if exc.__traceback__.tb_next is None:
+            raise CapacityTransportTimeout(str(exc)) from exc
+        raise
+
+
 def _send(connection, value):
     data = json.dumps(value, allow_nan=False).encode()
     if len(data) > 4096:
         raise CapacityChannelError('Capacity frame too large')
-    connection.sendall(struct.pack('!I', len(data)) + data)
+    _socket_call(connection.sendall, struct.pack('!I', len(data)) + data)
 
 
 def _receive(connection, *, deadline=None, clock=time.monotonic):
@@ -34,9 +72,9 @@ def _receive(connection, *, deadline=None, clock=time.monotonic):
             if deadline is not None:
                 remaining = deadline - clock()
                 if remaining <= 0:
-                    raise TimeoutError('Capacity receive deadline expired')
+                    raise CapacityTransportTimeout('Capacity receive deadline expired')
                 connection.settimeout(remaining)
-            part = connection.recv(n - len(data))
+            part = _socket_call(connection.recv, n - len(data))
             if not part:
                 if eof and not data:
                     return None
@@ -73,16 +111,38 @@ class CapacityParent:
     sockets. Children have no register, finish, telemetry or foreign-case API.
     A disconnected child's permit is retained until the caller verifies cleanup.
     """
-    def __init__(self, controller, connections, *, deadline, clock=time.monotonic):
+    def __init__(self, controller, connections, *, deadline, clock=time.monotonic,
+                 suite_stop_event=None):
         if not connections or any(type(k) is not str or not k for k in connections):
             raise ValueError('Expected finite unique run/case IDs')
         if not math.isfinite(deadline) or deadline <= clock():
             raise ValueError('Expected future caller/rental deadline')
+        if not callable(getattr(controller, 'retire_dispatch', None)):
+            raise ValueError('Reviewed retire_dispatch controller API required')
+        # Use the exception from the controller's own frozen namespace; importing
+        # another module copy would miss its retirement wake. No target import.
+        acquire = getattr(controller, 'acquire_turn', None)
+        acquire = getattr(acquire, '__func__', acquire)
+        namespace = getattr(acquire, '__globals__', {})
+        if namespace.get('EpisodeCapacityController') is not type(controller):
+            raise ValueError('Direct reviewed controller namespace required; wrappers are unqualified')
+        self.turn_cancelled_type = namespace.get('TurnCancelled')
+        if (not isinstance(self.turn_cancelled_type, type)
+                or not issubclass(self.turn_cancelled_type, Exception)
+                or self.turn_cancelled_type.__module__ != type(controller).__module__):
+            raise ValueError('Reviewed controller TurnCancelled namespace required')
+        if suite_stop_event is not None and not isinstance(suite_stop_event, threading.Event):
+            raise ValueError('Shared suite stop event must be threading.Event')
+        self.suite_stop_event = suite_stop_event if suite_stop_event is not None else threading.Event()
+        self.cleanup_failures = {}
+        self.stop_cause = None
+        self.secondary_exits = deque(maxlen=2048)
+        self.shutdown_requested = {}
         self.controller, self.deadline, self.clock = controller, deadline, clock
         self.connections = dict(connections)
         self.active, self.finished, self.threads = set(), set(), {}
         self.errors = {}
-        self.ended, self.finishing = set(), set()
+        self.ending, self.ended, self.finishing = set(), set(), set()
         self.stops = {case:threading.Event() for case in connections}
         self.lock = threading.Lock()
         self.closed = False
@@ -107,8 +167,12 @@ class CapacityParent:
     def activate(self, case, *, priority=0):
         """Call only after the real queue active admission, never during prewarm."""
         with self.lock:
-            if (self.closed or case not in self.connections or case in self.active
-                    or case in self.finished or case in self.finishing or case in self.ended
+            if self.suite_stop_event.is_set():
+                raise CapacitySuiteStopped('Suite stopped before capacity activation')
+            if (self.closed
+                    or case not in self.connections or case in self.active
+                    or case in self.finished or case in self.finishing
+                    or case in self.ending or case in self.ended
                     or case not in self.threads or not self.threads[case].is_alive()):
                 raise ValueError('Invalid/duplicate parent activation')
             self.controller.register_episode(case, priority=priority)
@@ -185,6 +249,10 @@ class CapacityParent:
                         except Exception as exc:
                             if monitor_errors:
                                 raise CapacityChannelError('Capacity watcher failed: '+str(monitor_errors[0])) from exc
+                            row = self.controller.status()['episodes'][case]
+                            if (isinstance(exc, self.turn_cancelled_type)
+                                    and row['dispatch_retired'] and not row['cancelled']):
+                                raise CapacityDispatchRetired('Episode dispatch retired') from exc
                             raise
                         acquired = True
                         acquire_wait_seconds = self.clock()-acquire_started
@@ -199,9 +267,12 @@ class CapacityParent:
                             self.controller.release_turn(case, request_id)
                         raise CapacityChannelError('Capacity watcher failed: '+
                             (str(monitor_errors[0]) if monitor_errors else 'did not stop'))
-                    if stop.is_set():
+                    row = self.controller.status()['episodes'][case]
+                    if stop.is_set() or row['dispatch_retired'] or row['cancelled']:
                         # Permit has not been sent, so no HTTP request can exist.
                         self.controller.release_turn(case, request_id)
+                        if row['dispatch_retired'] and not row['cancelled']:
+                            raise CapacityDispatchRetired('Episode dispatch retired before permit')
                         raise CapacityChannelError('Child disconnected/cancelled before permit')
                     # If this send fails, do not release possibly-sent HTTP work.
                     _send(connection, {'type': 'permit', 'request_id': request_id,
@@ -215,45 +286,94 @@ class CapacityParent:
                     raise CapacityChannelError('Unknown capacity operation')
         except Exception as exc:
             failed = True
+            row = self.controller.status()['episodes'].get(case, {})
+            reason = ('explicit_cancellation' if row.get('cancelled') else
+                'dispatch_retirement' if isinstance(exc, CapacityDispatchRetired) else
+                'rental_deadline' if isinstance(exc, (TimeoutError, CapacityTransportTimeout))
+                    and self.clock() >= self.deadline else 'channel_failure')
             with self.lock:
-                self.errors[case] = {'type': type(exc).__name__, 'message': str(exc)}
+                requested = self.shutdown_requested.get(case)
+                cause = self.stop_cause
+                if requested in ('explicit_cancellation','cohort_abort','infrastructure_abort'):
+                    reason = requested
+                elif case in self.cleanup_failures or (cause and case == cause['case'] and cause['infrastructure']):
+                    reason = 'infrastructure_abort'
+                self.errors[case] = {'type': type(exc).__name__, 'message': str(exc), 'reason': reason}
             try:
                 _send(connection, {'type': 'error', 'error_type':type(exc).__name__,
-                    'message': str(exc)[:500], 'telemetry_fresh':self.controller.status()['telemetry_fresh']})
-            except OSError:
+                    'message': str(exc)[:500], 'reason':reason,
+                    'telemetry_fresh':self.controller.status()['telemetry_fresh']})
+            except (OSError, CapacityChannelError):
                 pass
         finally:
             with self.lock:
+                self.ending.add(case)
                 registered = case in self.active and case not in self.finished
                 finishing = case in self.finishing
-                self.ended.add(case)
+                requested = self.shutdown_requested.get(case)
+                cause = self.stop_cause
+                cleanup_failure = self.cleanup_failures.get(case)
+                protected_root = bool(cleanup_failure or (cause and cause['infrastructure'] and case == cause['case']))
+            if registered:
+                self.controller.retire_dispatch(case)
             if registered and not finishing:
                 row = self.controller.status()['episodes'][case]
-                if failed or row['request_id'] is not None:
+                retirement_wake = self.errors.get(case, {}).get('reason') == 'dispatch_retirement'
+                if not protected_root and ((failed and not retirement_wake) or row['request_id'] is not None):
+                    if not failed and row['request_id'] is not None:
+                        with self.lock:
+                            self.errors[case] = dict(type='CapacityChannelError',
+                                message=('Parent stopped channel with an in-flight request' if requested
+                                    else 'Child disconnected with an in-flight request'),
+                                reason=requested if requested in ('explicit_cancellation','cohort_abort')
+                                    else 'cohort_abort' if requested else 'inflight_disconnect')
                     self._cancel_registered(case)
+                elif protected_root and not failed and row['request_id'] is not None:
+                    with self.lock:
+                        evidence = cleanup_failure or cause
+                        self.errors[case] = dict(type=evidence['type'],message=evidence['message'],
+                            reason='infrastructure_abort')
             connection.close()
+            # Observing ended guarantees the row is retired, not merely that
+            # this thread is about to retire it. Never publish the inverse.
+            with self.lock:self.ended.add(case)
 
     def _cancel_registered(self, case):
         row = self.controller.status()['episodes'].get(case)
         if row is not None and not row['done'] and not row['cancelled']:
             self.controller.cancel_episode(case)
 
-    def _shutdown(self, case):
+    def _retire_registered(self, case):
+        with self.lock:
+            registered = case in self.active and case not in self.finished
+        if registered:
+            self.controller.retire_dispatch(case)
+
+    def _shutdown(self, case, *, reason='parent_shutdown'):
+        with self.lock:self.shutdown_requested.setdefault(case, reason)
         self.stops[case].set()
         try:
             self.connections[case].shutdown(socket.SHUT_RDWR)
         except OSError:
             pass
 
-    def cancel(self, case):
+    def cancel(self, case, *, cohort_abort=False):
         """Wake local wait; this does not establish remote HTTP cleanup."""
         with self.lock:
             if case not in self.connections:
                 raise ValueError('Unknown case')
+            cause = self.stop_cause
+            if cohort_abort and (case in self.finishing or case in self.finished
+                    or case in self.cleanup_failures
+                    or (cause and cause['infrastructure'] and cause['case'] == case)):
+                return
             registered = case in self.active and case not in self.finished
-        if registered:
-            self._cancel_registered(case)
-        self._shutdown(case)
+            # Serialize the cancellation decision with final-verification entry;
+            # neither can pass its parent lock check and act after the other.
+            if registered:
+                self._cancel_registered(case)
+                self.controller.retire_dispatch(case)
+        self._shutdown(case, reason='cohort_abort' if cohort_abort else 'explicit_cancellation')
 
     def finish_after_cleanup(self, case, *, verify_cleanup, record_terminal, timeout=5):
         """Trusted outer boundary after child exit, HTTP abort/drain and grading.
@@ -261,7 +381,10 @@ class CapacityParent:
         Both callbacks must return literal True. ``record_terminal`` verifies
         persisted grade/projection or explicit infrastructure failure evidence;
         it must not demand a passing task verdict. Failed cleanup retains the
-        controller permit and active episode, and must block queue refill.
+        controller permit and active episode. This is a final verification
+        boundary, not a recoverable probe. Failure aborts the cohort and wakes
+        all local waiters, retaining sent requests until verified cleanup.
+        The queue must share suite_stop_event so failure stops refill too.
         """
         if not callable(verify_cleanup) or not callable(record_terminal):
             raise ValueError('Explicit cleanup and terminal evidence callbacks required')
@@ -271,15 +394,24 @@ class CapacityParent:
             if case not in self.connections or case in self.finished or case in self.finishing:
                 raise ValueError('Duplicate episode finish')
             self.finishing.add(case)
+        stage = 'worker_cleanup'
         try:
+            # Dispatch retirement excludes ended actors from parking decisions
+            # but never frees the active cap, a sent permit or a resume credit.
+            self._retire_registered(case)
             self._shutdown(case)
             thread = self.threads.get(case)
             if thread:
                 thread.join(timeout)
                 if thread.is_alive():
                     raise TimeoutError('Capacity worker not stopped; ownership retained')
-            if verify_cleanup() is not True or record_terminal() is not True:
+            stage = 'verify_cleanup'
+            if verify_cleanup() is not True:
                 raise CapacityChannelError('Cleanup/terminal evidence incomplete; ownership retained')
+            stage = 'record_terminal'
+            if record_terminal() is not True:
+                raise CapacityChannelError('Cleanup/terminal evidence incomplete; ownership retained')
+            stage = 'release_and_finish'
             with self.lock:
                 if case in self.active:
                     row = self.controller.status()['episodes'][case]
@@ -287,8 +419,48 @@ class CapacityParent:
                         self.controller.release_turn(case, row['request_id'])
                     self.controller.finish_episode(case)
                 self.finished.add(case)
+        except BaseException as exc:
+            row = self.controller.status()['episodes'].get(case, {})
+            with self.lock:
+                # Parent-observed final verification failures are authoritative
+                # for every actor, regardless of the first cohort stop cause.
+                self.cleanup_failures.setdefault(case, dict(type=type(exc).__name__,
+                    message=str(exc),stage=stage,request_id=row.get('request_id')))
+            self.abort_after_failure(case, exc, infrastructure=True)
+            raise
         finally:
             with self.lock:self.finishing.discard(case)
+
+    def abort_after_failure(self, case, error, *, infrastructure):
+        """Terminal stop with explicit caller-owned infrastructure classification.
+
+        The trusted outer caller must invoke this on an exit path that cannot
+        reach final verification. Use infrastructure=False for ordinary user or
+        native cancellation. The first cause is retained; later exits are
+        secondary, and never cancel an infrastructure root or a finishing row.
+        This does not prove HTTP abort/drain, free any
+        permit/cap, or finish an episode. Later cleanup never clears the stop.
+        """
+        if (case not in self.connections or not isinstance(error, BaseException)
+                or type(infrastructure) is not bool):
+            raise ValueError('Known case, actual failure and explicit infrastructure boolean required')
+        with self.lock:
+            exit_record = dict(case=case,type=type(error).__name__,message=str(error),
+                infrastructure=infrastructure)
+            if self.stop_cause is None:
+                self.stop_cause = dict(exit_record)
+            else:
+                self.secondary_exits.append(exit_record)
+            cause = dict(self.stop_cause)
+            self.suite_stop_event.set()
+        root = cause['case']
+        if cause['infrastructure']:
+            self._retire_registered(root)
+            self._shutdown(root, reason='infrastructure_abort')
+        else:
+            self.cancel(root, cohort_abort=True)
+        for other in self.connections:
+            if other != root:self.cancel(other, cohort_abort=True)
 
     def close(self):
         # Shutdown wakes local RPC, but deliberately does not finish episodes or
@@ -296,7 +468,7 @@ class CapacityParent:
         with self.lock:
             self.closed = True
         for case in self.connections:
-            self.cancel(case)
+            self.cancel(case, cohort_abort=True)
             self.connections[case].close()
         for thread in self.threads.values():
             thread.join(5)
@@ -306,17 +478,22 @@ class CapacityParent:
 
 class CapacityClient:
     """One client shared by this case's policy and formatter wrappers."""
-    def __init__(self, connection, *, deadline, clock=time.monotonic, on_event=None):
+    def __init__(self, connection, *, deadline, clock=time.monotonic, on_event=None,
+                 cleanup_timeout=5.0):
         if not math.isfinite(deadline) or deadline <= clock():
             raise ValueError('Future caller/rental deadline required')
         if on_event is not None and not callable(on_event):
             raise ValueError('Capacity event sink must be callable')
+        if (type(cleanup_timeout) not in (int, float) or not math.isfinite(cleanup_timeout)
+                or not 0 < cleanup_timeout <= 5):
+            raise ValueError('IPC cleanup timeout must be a number in (0, 5] seconds')
         self.connection, self.deadline, self.clock = connection, deadline, clock
         self.lock = threading.Lock()
         self.sequence = 0
         self.broken = False
         self.events, self.infrastructure_error = deque(maxlen=2048), None
         self.on_event = on_event
+        self.cleanup_timeout = cleanup_timeout
 
     def _event(self, **row):
         row.setdefault('observed_monotonic', self.clock())
@@ -332,7 +509,7 @@ class CapacityClient:
             self.broken = True
             self.connection.close()
             raise TimeoutError('Caller/rental deadline expired')
-        end = self.clock() + (5 if releasing else remaining)
+        end = self.clock() + (self.cleanup_timeout if releasing else remaining)
         try:
             self.connection.settimeout(max(.001, end-self.clock()))
             _send(self.connection, frame)
@@ -347,7 +524,24 @@ class CapacityClient:
                         sequence=frame['sequence'], **reply)
                     continue
                 if reply.get('type') == 'error':
-                    raise CapacityChannelError(f"Parent {reply.get('error_type')}: {reply.get('message')}; telemetry_fresh={reply.get('telemetry_fresh')}")
+                    if (set(reply) != {'type','error_type','message','reason','telemetry_fresh'}
+                            or type(reply['error_type']) is not str or type(reply['message']) is not str
+                            or reply['reason'] not in ('explicit_cancellation','dispatch_retirement',
+                                'rental_deadline','channel_failure','inflight_disconnect',
+                                'cohort_abort','infrastructure_abort')
+                            or type(reply['telemetry_fresh']) is not bool):
+                        raise CapacityChannelError('Malformed parent error diagnostic')
+                    error = CapacityParentError(reply)
+                    try:
+                        self._event(kind='capacity_parent_error', parent_error_type=reply['error_type'],
+                            parent_reason=reply['reason'], telemetry_fresh=reply['telemetry_fresh'])
+                    except BaseException as sink_error:
+                        sink_error.capacity_parent_error = error
+                        if sink_error.__cause__ is None:
+                            raise sink_error from error
+                        sink_error.add_note('Capacity parent diagnostic retained in capacity_parent_error; original sink cause preserved.')
+                        raise
+                    raise error
                 return reply
         except BaseException:
             self.broken = True
@@ -440,7 +634,10 @@ class ActiveCapacityAdmission:
         inner = self.admission.runner_callback(cancellation_type)
         def callback(ready):
             inner(ready)
-            self.parent.activate(self.episode_id, priority=self.priority)
+            try:
+                self.parent.activate(self.episode_id, priority=self.priority)
+            except CapacitySuiteStopped as exc:
+                raise cancellation_type(str(exc)) from exc
         return callback
 
 
