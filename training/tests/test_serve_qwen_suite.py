@@ -63,6 +63,15 @@ def test_dry_run_never_checks_installed_parser_or_touches_cuda(tmp_path):
     assert not receipt.exists() and not (tmp_path / 'not-created').exists()
 
 
+def test_launcher_runs_under_safe_path_without_implicit_script_directory(tmp_path):
+    result = subprocess.run([sys.executable, '-P', '-B', str(SCRIPTS / 'serve_qwen_suite.py'),
+        '--snapshot', '/missing', '--receipt', str(tmp_path / 'unused'),
+        '--cache-root', str(tmp_path / 'unused-cache'), '--dry-run'],
+        check=True, capture_output=True, text=True, timeout=15,
+        env={**os.environ, 'PYTHONSAFEPATH': '1'})
+    assert json.loads(result.stdout)['model_GPU_or_dispatch'] is False
+
+
 def test_missing_parser_patch_rejected_before_apply_or_gpu(tmp_path, monkeypatch):
     monkeypatch.delenv('PYTHONPATH', raising=False)
     monkeypatch.delenv('PYTHONHOME', raising=False)

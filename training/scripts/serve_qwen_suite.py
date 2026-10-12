@@ -15,6 +15,7 @@ from pathlib import Path
 import sys
 import uuid
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from browser_training.compiler_environment import compiler_environment
 from browser_training import vllm_qwen_schema_patch as schema

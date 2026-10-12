@@ -100,10 +100,10 @@ cmp "$QWEN_RELEASE/training/envs/rl/uv.lock" "$QWEN_RUNTIME/rl/uv.lock"
 export QWEN_RL_PY="$QWEN_RUNTIME/rl/.venv/bin/python"
 "$QWEN_UV" pip check --python "$QWEN_RL_PY"
 
-"$QWEN_RL_PY" -B "$QWEN_RELEASE/training/scripts/apply_vllm_cpu_kv_patch.py" \
+env -u PYTHONPATH -u PYTHONHOME "$QWEN_RL_PY" -B "$QWEN_RELEASE/training/scripts/apply_vllm_cpu_kv_patch.py" \
   --install-in-place --receipt "$QWEN_RUNTIME/mtp-offload-backport.json"
-"$QWEN_RL_PY" -B "$QWEN_RELEASE/training/scripts/apply_vllm_cpu_kv_patch.py" --verify-only
-"$QWEN_RL_PY" -B "$QWEN_RELEASE/training/scripts/apply_vllm_qwen_schema_patch.py"
+env -u PYTHONPATH -u PYTHONHOME "$QWEN_RL_PY" -B "$QWEN_RELEASE/training/scripts/apply_vllm_cpu_kv_patch.py" --verify-only
+env -u PYTHONPATH -u PYTHONHOME "$QWEN_RL_PY" -B "$QWEN_RELEASE/training/scripts/apply_vllm_qwen_schema_patch.py"
 "$QWEN_RL_PY" -B "$QWEN_RELEASE/training/scripts/verify_gpu.py" --min-gpus 1
 df -B1 /dev/shm /model-cache
 free -b
@@ -116,6 +116,31 @@ existing compiler helper rather than assuming the image's `PATH` is correct.
 The environment, compiler caches and receipts are outside the frozen bundle;
 installing them must not add files inside a source root whose manifest rejects
 unlisted files. The copied lock inputs remain byte-identical to the release.
+
+The browser-suite environment has its own lock at `training/envs/suite-browser`,
+separate from vLLM and the older OpenEnv training environment. It pins the
+qualified Playwright/BrowserGym/tokenizers stack and websockets15.0.1, satisfying
+all nine prepared case roots. CPU imports, native source guards and eight adapter
+controls passed after an entirely offline cached installation. This does not
+qualify the final model caller or the remote operating-system libraries.
+
+```bash
+mkdir -p "$QWEN_RUNTIME/suite-browser"
+cp "$QWEN_RELEASE/training/envs/suite-browser/pyproject.toml" "$QWEN_RUNTIME/suite-browser/pyproject.toml"
+cp "$QWEN_RELEASE/training/envs/suite-browser/uv.lock" "$QWEN_RUNTIME/suite-browser/uv.lock"
+"$QWEN_UV" sync --project "$QWEN_RUNTIME/suite-browser" --locked \
+  --python 3.12.12 --default-index https://pypi.org/simple
+export QWEN_BROWSER_PY="$QWEN_RUNTIME/suite-browser/.venv/bin/python"
+"$QWEN_UV" pip check --python "$QWEN_BROWSER_PY"
+```
+
+The retained Playwright1.44 driver selects Ubuntu22.04 dependency names even on
+Ubuntu24.04. Do not assume its generic `install-deps` succeeds there: the final
+worker must install the Ubuntu24.04 packages providing the actual required
+libraries and run a zero-provider native browser preflight. Keep Chromium1117;
+a newer Playwright/Chromium pair changes the reviewed adapter identity. The
+browser binary/assets, explicit AX tokenizer path and case caller/common-source
+path map still need packaging; no mutable source import or missing-asset fallback.
 
 At least **21GiB free `/dev/shm`** is required for the 20GiB CPU-KV tier. Size
 tmpfs and finite service memory caps from the measured host RAM, preserving room
@@ -222,6 +247,77 @@ Keep model history and browser exchanges on the VM. Return compact status rows,
 Events/grades and selected trace artifacts incrementally with bounded transfers;
 never resend every full history to the workstation each turn. Final trace/viewer
 projection and teardown receipts must be returned before declaring completion.
+
+## Source transfer capsule
+
+`training/scripts/portable_source_bundle.py build` consumes an exact released
+inventory hash. It verifies each unique source blob, transfers it once, and
+records a capsule checksum. `unpack` verifies the checksum, paths and every blob
+before reconstructing separate root files with their Git executable modes.
+There are no writable hardlinks between case roots and no shared Python heap
+claim. Existing outputs are refused. A capsule is private source preparation;
+outside assets, environments, recipes and the final caller remain separate.
+The Linux/WSL tool uses atomic no-clobber publication and writes reproducible
+tar/gzip metadata. Conventional credential paths are rejected; exact inventory
+review remains required for other private material, public templates or PEM files.
+
+```bash
+python3 -B training/scripts/portable_source_bundle.py build \
+  --inventory EXACT_RELEASED_INVENTORY.json \
+  --inventory-sha256 RELEASED_SHA256 --output PRIVATE_SOURCE_CAPSULE.tar.gz
+python3 -B training/scripts/portable_source_bundle.py unpack \
+  --archive PRIVATE_SOURCE_CAPSULE.tar.gz --archive-sha256 RECORDED_CAPSULE_SHA256 \
+  --destination NEW_PRIVATE_SOURCE_DIRECTORY
+```
+
+Heavy local packaging must use the project's bounded-job launcher. No network,
+model download or cloud allocation occurs. The first proposed34-case inventory
+has about1.64GB unique source content versus5.87GB across its nine roots; this
+reduces transfer, not runtime RAM. A later reviewed inventory needs a new capsule.
+
+## Allocation deadline and deletion
+
+`training/scripts/verda_deadline.py` cannot allocate. It watches one already
+allocated VM from the workstation. Its spec binds the canonical instance/run
+UUIDs, actual hostname/type/location, provider creation timestamp, the earliest
+allocation start, a finite absolute UTC deadline, all attached volume UUIDs and
+the explicitly approved subset to delete. The instance must carry exactly one
+matching `run` tag. Anchor the deadline at allocation, never at SSH/model readiness.
+
+```bash
+python3 -B training/scripts/verda_deadline.py --spec PRIVATE_ALLOCATION.json
+# After approved allocation and binding actual IDs/timestamps:
+python3 -B training/scripts/verda_deadline.py --spec PRIVATE_ALLOCATION.json \
+  --execute --env-file /LOCAL/IGNORED/.env --receipt PRIVATE_CLEANUP.json \
+  --finish-marker PRIVATE_FINISH.json
+```
+
+The first command is a network-free plan. The executing watchdog authenticates
+and verifies identity before reporting `watching`; only then start remote work.
+The local finish marker must contain exactly `{"run_id": "...", "instance_id":
+"..."}` and should be written after bounded artifact return. SIGINT, SIGTERM, SIGHUP, SIGQUIT, a finish
+marker or the absolute deadline lead to deletion; a backward wall-clock jump
+does not renew the running allowance. Deletion acceptance remains distinct from
+confirmed removal through two consecutive absent reads. Absence before any verified ownership observation is an
+error, not confirmed termination. Receipt-storage failures do not prevent
+deleting the owned VM; incomplete API responses are retried and ambiguous
+deletions are read back. A brief startup read outage is retried for at most30s
+within the original allowance. Cleanup retries are bounded and never create/retry an
+allocation. Storage drift causes deletion of the owned GPU with all disks
+retained and an explicit failure, preserving any unbound disk.
+
+Keep this workstation/process alive through cleanup. The API has no demonstrated
+provider-enforced TTL, so local power loss or provider/network failure can leave
+billing active. Unconfirmed cleanup exits with an error and a private receipt;
+inspect the provider console. Socket/body timeouts include OAuth, but DNS, multi-address connection attempts
+and TLS connection setup can exceed them. No provider-enforced billing cap is claimed. This component is not the complete rental
+controller: creation/ambiguous-create recovery, SSH process ownership and an
+independent remote process timeout still belong to the combined launcher. No
+provider credential is uploaded to the VM. Its remote timeout alone cannot stop
+Verda billing. A restart uses the original absolute deadline, not a new duration. If the
+provider is already deleting the VM and no longer exposes identity fields, a
+restart cannot reuse an old receipt as authority: inspect the provider console
+and retain this as an unqualified restart boundary until real API behavior is known.
 
 No current VM exists. The final reviewed portable bundle, caller/telemetry
 integration, global termination controller, fresh host acceptance and allocation
