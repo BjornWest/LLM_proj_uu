@@ -122,7 +122,7 @@ def test_common_once_only_formatter_receives_public_task_not_observations(tmp_pa
         def close(self):pass
     kw=dict(trace=trace,inputs=inputs,output=tmp_path/'grading',grader_factory=CatalogStatisticsGrader,backend_factory=lambda _:Backend(),source_paths=[])
     result=grade_saved_once(**kw);assert result['structured_claims_correct'] and len(calls)==1
-    assert json.loads((trace/FILENAME).read_text())['grading_version']=='website-catalog-statistics-grading-v4'
+    assert json.loads((trace/FILENAME).read_text())['grading_version']=='website-catalog-statistics-grading-v5'
     assert read_grade(trace)['binding_status'] == 'verified'
     with pytest.raises(FileExistsError):grade_saved_once(**kw)
     assert len(calls)==1
@@ -208,11 +208,13 @@ def test_sentence_ending_count_is_grounded():
 
 
 @pytest.mark.parametrize('quote',['There are 0 models.','The mean is not undefined.','undefined: false'])
-def test_empty_mean_cannot_infer_undefined_from_zero_count_or_opposite_statement(quote):
+def test_extractor_owned_empty_mean_cannot_infer_undefined_from_zero_count_or_opposite_statement(quote):
     w,s,t,r,sites=fixture(empty=True);text,c=answer(r)
     text+=' '+quote;c['undefined']={'value':True,'evidence':quote}
-    with pytest.raises(ValueError,match='explicit undefined'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['undefined'] == c['undefined']
+    c['undefined']['value']=False
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('quote',['The mean is undefined.','There are no priced models.','There are no observations.','The mean is not defined.'])
@@ -223,11 +225,13 @@ def test_explicit_undefined_statement_is_supported(quote):
 
 
 @pytest.mark.parametrize('quote',['"undefined": false','The mean is never undefined.','The mean is not actually undefined.'])
-def test_negated_or_json_false_undefined_does_not_ground_true(quote):
+def test_extractor_owned_negated_or_json_false_undefined_does_not_ground_true(quote):
     w,s,t,r,sites=fixture(empty=True);text,c=answer(r)
     text+=' '+quote;c['undefined']={'value':True,'evidence':quote}
-    with pytest.raises(ValueError,match='explicit undefined'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['undefined'] == c['undefined']
+    c['undefined']['value']=False
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('actual,quoted', [('-2','2'),('−2','2'),('2 000','2')])
@@ -246,11 +250,13 @@ def test_numeral_quote_cannot_cut_sign_or_grouping_from_actual_answer(actual,quo
     'The mean is not actually undefined.',
     '"undefined": false',
 ])
-def test_short_undefined_quote_cannot_drop_actual_negation(actual):
+def test_extractor_owned_short_undefined_quote_cannot_drop_actual_negation(actual):
     w,s,t,r,sites=fixture(empty=True);text,c=answer(r)
     text+=' '+actual;c['undefined']={'value':True,'evidence':'undefined'}
-    with pytest.raises(ValueError,match='explicit undefined'):
-        CatalogStatisticsGrader(w,t,r,sites,surrounding=s).grade(c,text)
+    g=CatalogStatisticsGrader(w,t,r,sites,surrounding=s)
+    assert g.validate_claims(c,text)['undefined'] == c['undefined']
+    c['undefined']['value']=False
+    assert not g.grade(c,text)['structured_claims_correct']
 
 
 def test_currency_quote_cannot_cut_token_from_actual_answer_word():

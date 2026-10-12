@@ -48,6 +48,48 @@ def test_correct_ties_and_bare_product_link_with_explicit_size():
         assert grader.grade(claims, text)['structured_claims_correct'] is True
 
 
+def test_public_standard_width_alias_preserves_raw_claim_and_grounding():
+    grader = ListedOfferGrader(*fixture())
+    text, c = answer()
+    c['variant']['width']['value'] = 'standard width'
+    original = deepcopy(c)
+    grade = grader.grade(c, text)
+    assert grade['structured_claims_correct']
+    assert grade['claims']['variant']['width'] == original['variant']['width']
+    assert c == original
+    # Alias matching cannot excuse a value absent from the actual answer.
+    with pytest.raises(ValueError, match='quote'):
+        grader.grade(c, text.replace('standard width', 'standard fit'))
+
+
+@pytest.mark.parametrize('selector,claim_width', [('standard', 'standard width'), ('standard', 'standard')])
+def test_width_alias_is_consistent_for_native_value_claim_and_url(selector, claim_width):
+    grader = ListedOfferGrader(*fixture())
+    text, c = answer(url='https://a.test/#/product/olive?width='+selector.replace(' ', '%20'))
+    c['variant']['width']['value'] = claim_width
+    assert grader.grade(c, text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('width', ['wide', 'wide width', 'not standard width', 'regular'])
+def test_only_declared_width_alias_matches(width):
+    grader = ListedOfferGrader(*fixture())
+    text, c = answer()
+    text += ' Width: '+width
+    c['variant']['width'] = {'value':width, 'evidence':'Width: '+width}
+    assert not grader.grade(c, text)['oracle_grade']['requirements']['public_selection_identity']
+
+
+def test_standard_width_alias_does_not_override_conflicting_url_or_other_field():
+    grader = ListedOfferGrader(*fixture())
+    text, c = answer(url='https://a.test/#/product/olive?width=wide')
+    c['variant']['width']['value'] = 'standard width'
+    assert not grader.grade(c, text)['structured_claims_correct']
+    c['offer_url'] = {'value':'https://a.test/#/product/olive','evidence':'https://a.test/#/product/olive'}
+    text += ' https://a.test/#/product/olive'
+    c['variant']['colour'] = {'value':'standard width','evidence':'standard width'}
+    assert not grader.grade(c, text)['structured_claims_correct']
+
+
 def test_wrong_price_and_nonoptimal_price_are_distinct():
     grader = ListedOfferGrader(*fixture())
     text, c = answer(price='700')
@@ -290,9 +332,9 @@ def test_inherited_offer_grade_reports_changed_identity_version():
     grader = ListedOfferGrader(*fixture())
     text, claims = answer()
     result = grader.grade(claims, text)
-    assert result['grading_version'] == 'website-listed-offer-grading-v2'
-    assert result['identity_grading_version'] == 'website-listed-offer-grading-v2'
-    assert grader.contract['identity_grading_version'] == 'website-listed-offer-grading-v2'
+    assert result['grading_version'] == 'website-listed-offer-grading-v3'
+    assert result['identity_grading_version'] == 'website-listed-offer-grading-v3'
+    assert grader.contract['identity_grading_version'] == 'website-listed-offer-grading-v3'
 
 
 @pytest.mark.parametrize("adapter_name", ["adapter", "catalog_adapter"])
@@ -345,3 +387,30 @@ def test_aliases_match_actual_adapter_page_titles_with_integer_keys(adapter_name
                 for variant in page['variants']:
                     assert page['name'].casefold() in grader.product_names[variant['offerId']]
                     assert '#/product/' + page['id'] in bindings['retailer_offers'][variant['offerId']]['url']
+
+
+@pytest.mark.parametrize('selector', ['standard%20width','standard+width','STANDARD%20WIDTH'])
+def test_width_prose_alias_does_not_admit_non_native_url_selector(selector):
+    g=ListedOfferGrader(*fixture());text,c=answer(url='https://a.test/#/product/olive?width='+selector)
+    c['variant']['width']['value']='standard width'
+    assert not g.grade(c,text)['structured_claims_correct']
+
+
+@pytest.mark.parametrize('family,grader_name',[
+    ('feature_offer','FeatureOfferGrader'), ('memory_offer','MemoryOfferGrader'),
+    ('catalog_relaxation','CatalogRelaxationGrader')])
+def test_shared_width_alias_and_wrong_width_through_inherited_graders(family,grader_name):
+    from importlib import import_module
+    tests=import_module('environments.website_world.test_'+family+'_task')
+    module=import_module('environments.website_world.'+family+'_grading')
+    w,t,r,b,i=tests.fixture();g=getattr(module,grader_name)(w,t,r,b,inventory=i)
+    text,c=tests.claims() if family=='catalog_relaxation' else answer()
+    c['variant']['width']['value']='standard width';original=deepcopy(c)
+    result=g.grade(c,text)
+    assert result['structured_claims_correct']
+    assert result['identity_grading_version']=='website-listed-offer-grading-v3'
+    assert result['claims']['variant']['width']==original['variant']['width'] and c==original
+    text+=' Wide width.';c['variant']['width']={'value':'wide','evidence':'wide'}
+    # Ground the exact case-sensitive word while keeping a wrong native width.
+    text+=' wide'
+    assert not g.grade(c,text)['structured_claims_correct']

@@ -35,7 +35,9 @@ def fixture(original, *, threshold=90000, quantity=2, membership=False, no_stock
     alternate = deepcopy(offer)
     alternate.update(offer_id=offer['offer_id']+'/authored-alternate', sku_id=alternate_sku['sku_id'])
     r['offers'].append(alternate)
-    r['catalog'] = [{'pages': [{'listings': [{'sku_id': o['sku_id']} for o in r['offers']]}]}]
+    r['catalog'] = [{'product_id':pid, 'pages': [{'page_key':{}, 'listings': [
+        {'sku_id':o['sku_id']} for o in r['offers'] if o['product_id']==pid]}]}
+        for pid in dict.fromkeys(o['product_id'] for o in r['offers'])]
     if no_stock:
         offer['stock_by_source'] = dict.fromkeys(offer['stock_by_source'], 0)
     if foreign:
@@ -149,7 +151,8 @@ def test_foreign_or_unrelated_policy_link_fails(world,url):
 def test_negated_assessment_and_ungrounded_values_reject(world):
     v=fixture(world);text,c=claims(v)
     c['assessment']={'value':'all_free','evidence':'Not all free'};text+='Not all free'
-    with pytest.raises(ValueError):v[-1].grade(c,text)
+    assert v[-1].validate_claims(c,text)['assessment']==c['assessment']
+    assert not v[-1].grade(c,text)['structured_claims_correct']
     text,c=claims(v);c['subtotal']['evidence']='absent quote'
     with pytest.raises(ValueError):v[-1].grade(c,text)
 
@@ -160,11 +163,12 @@ def test_negated_assessment_and_ungrounded_values_reject(world):
     ({'no_stock': True}, 'assessment', 'Not unavailable'),
     ({'quantity': 1}, 'subtotal_test', 'Not below threshold'),
     ({'threshold': None}, 'subtotal_test', 'Not no threshold')])
-def test_negation_cannot_assert_a_matching_native_verdict(world,options,field,wording):
+def test_semantic_wording_is_extractor_owned_and_missing_verdict_fails(world,options,field,wording):
     v=fixture(world,**options);text,c=claims(v)
     c[field]['evidence']=wording;text+=' '+wording
-    with pytest.raises(ValueError,match='Negated assessment'):
-        v[-1].grade(c,text)
+    assert v[-1].validate_claims(c,text)[field]==c[field]
+    c[field]={'value':None,'evidence':None}
+    assert not v[-1].grade(c,text)['structured_claims_correct']
 
 
 def test_explicit_does_not_meet_is_below_threshold(world):

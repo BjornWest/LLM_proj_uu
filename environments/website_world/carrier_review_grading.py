@@ -1,14 +1,13 @@
 """Carrier subject binding over the shared grounded review arithmetic grader."""
 from copy import deepcopy
-import re
 from urllib.parse import urlsplit, parse_qsl, unquote
 
-from jsonschema import Draft202012Validator
 from experiments.answer_grading.extraction import claim, obj, validate_claims, _quote
 from . import carrier_review_task as native
+from .numeric_claim_grounding import validate_mean_claim
 from .catalog_review_grading import ReviewSummaryGrader, INSTRUCTIONS
 
-VERSION = 'website-carrier-review-grading-v1'
+VERSION = 'website-carrier-review-grading-v2'
 
 
 class CarrierReviewGrader(ReviewSummaryGrader):
@@ -52,22 +51,9 @@ class CarrierReviewGrader(ReviewSummaryGrader):
             'Regular does not imply home-only delivery. Do not infer opinions from hidden shipment quality.')
 
     def validate_claims(self, claims, answer):
-        c = deepcopy(claims)
-        verdict = c.get('verdict', {'value': None, 'evidence': None})
-        c['verdict'] = {'value': None, 'evidence': None}
-        c = validate_claims(c, answer, schema=self.schema)
-        c['verdict'] = verdict
-        Draft202012Validator(self.schema).validate(c)
-        if verdict['value'] is None:
-            if verdict['evidence'] is not None:
-                raise ValueError('Absent verdict requires absent evidence')
-        else:
-            _quote(verdict['evidence'], answer)
-            markers = {'more_positive': r'\bmore[ _]positive\b', 'more_negative': r'\bmore[ _]negative\b',
-                'tie': r'\b(tie|tied|equal|same number)\b',
-                'insufficient_evidence': r'\b(insufficient[ _]evidence|not enough|too few)\b'}
-            if not re.search(markers[verdict['value']], verdict['evidence'], re.I):
-                raise ValueError('Verdict needs explicit directional wording')
+        c = validate_claims(claims,answer,schema=self.schema,
+                            semantic_fields=('verdict','mean_rating','mean_undefined'))
+        validate_mean_claim(c['mean_rating'],answer)
         return c
 
     def _identity(self, claims):

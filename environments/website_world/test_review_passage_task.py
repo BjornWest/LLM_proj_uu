@@ -219,6 +219,6 @@ def test_actual_once_only_grade_and_viewer_pin_the_observed_public_request(tmp_p
     assert grade['structured_claims_correct'] and calls == ['constructed', 'format', 'closed']
     view = read_grade(trace)
     assert view['binding_status'] == 'verified' and view['structured_claims_correct'] is True
-    assert view['grading_version'] == 'website-review-passage-grading-v1'
+    assert view['grading_version'] == 'website-review-passage-grading-v2'
     with pytest.raises(FileExistsError): grade_saved_once(**kwargs)
     assert calls == ['constructed', 'format', 'closed']

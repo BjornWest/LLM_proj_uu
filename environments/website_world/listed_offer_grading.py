@@ -14,11 +14,18 @@ from experiments.answer_grading.extraction import (
 from . import basic_offer_task
 from .adapter import digest
 
-VERSION = 'website-listed-offer-grading-v2'
+VERSION = 'website-listed-offer-grading-v3'
 
 
 def _text(value):
     return str(value).strip().casefold()
+
+
+def _variant_matches(field, native_value, claimed_value):
+    """One public claim alias; keep native values and URL parameters literal."""
+    native, claimed = _text(native_value), _text(claimed_value)
+    return native == claimed or (field == 'width' and native == 'standard'
+                                 and claimed == 'standard width')
 
 
 def _url(value):
@@ -178,10 +185,15 @@ class ListedOfferGrader:
                 continue
             if claims['sku_id']['value'] is not None and claims['sku_id']['value'] != sku['sku_id']:
                 continue
-            if any(k not in self.dimensions[product['product_id']] or _text(sku.get(k)) != _text(v)
-                   for k, v in {**variant, **selectors}.items()):
+            if any(k not in self.dimensions[product['product_id']]
+                   or not _variant_matches(k, sku.get(k), v) for k, v in variant.items()):
                 continue
-            if any(k in selectors and _text(selectors[k]) != _text(v) for k, v in variant.items()):
+            # Query selectors are executable menu values, not prose aliases.
+            if any(k not in self.dimensions[product['product_id']]
+                   or _text(sku.get(k)) != _text(v) for k, v in selectors.items()):
+                continue
+            if any(k in selectors and not _variant_matches(k, selectors[k], v)
+                   for k, v in variant.items()):
                 continue
             matches.append(oid)
         return sorted(matches), 'Exact product page plus explicitly stated selectors/identities'

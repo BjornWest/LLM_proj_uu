@@ -71,11 +71,10 @@ def test_service_and_money_cannot_disambiguate_an_unidentified_item(world):
     assert not g.grade(c, text + '. 1.00 SEK')['structured_claims_correct']
 
 
-def test_inconsistent_optional_split_claim_is_grounding_error(world):
+def test_split_semantics_belong_to_extractor_not_lexical_validator(world):
     g, text, c = sample(world)
     c['orders'][0]['split'] = {'value': True, 'evidence': 'single shipment'}
-    with pytest.raises(ValueError, match='Split'):
-        g.grade(c, text + '. single shipment')
+    assert g.validate_claims(c, text + '. single shipment')['orders'][0]['split']==c['orders'][0]['split']
 
 
 def test_wrong_order_currency_does_not_hide_behind_correct_combined_total(world):
@@ -84,12 +83,11 @@ def test_wrong_order_currency_does_not_hide_behind_correct_combined_total(world)
     assert not g.grade(c, text + '. 1.00 EUR')['structured_claims_correct']
 
 
-def test_unspoken_and_foreign_service_values_reject(world):
+def test_wrong_native_method_and_foreign_service_values_fail(world):
     g, text, c = sample(world)
     d = c['orders'][0]['lines'][0]['delivery']
     d['delivery_type'] = {'value': 'parcel_locker', 'evidence': 'home delivery'}
-    with pytest.raises(ValueError, match='unspoken'):
-        g.grade(c, text + '. home delivery')
+    assert not g.grade(c, text + '. home delivery')['structured_claims_correct']
     d['delivery_type'] = {'value': 'home', 'evidence': 'home delivery'}
     d['carrier_name'] = {'value': 'Foreign carrier', 'evidence': 'Foreign carrier'}
     assert not g.grade(c, text + '. home delivery. Foreign carrier')['structured_claims_correct']

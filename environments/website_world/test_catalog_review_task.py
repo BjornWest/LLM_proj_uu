@@ -255,11 +255,12 @@ def test_empty_review_mean_requires_explicit_undefined_statement(shown):
     ('The mean is never undefined.','undefined'),
     ('"mean_undefined": false','"mean_undefined": false'),
 ])
-def test_empty_review_mean_does_not_infer_undefined_from_zero_or_contradictory_quote(shown,quote):
+def test_extractor_owned_empty_review_mean_does_not_infer_undefined_from_zero_or_contradictory_quote(shown,quote):
     args=empty_ratings_fixture();text,c=claims_for(args[1],args[2])
     text+=' '+shown;c['mean_undefined']={'value':True,'evidence':quote}
-    with pytest.raises(ValueError,match='explicit undefined'):
-        grader(*args).grade(c,text)
+    assert grader(*args).validate_claims(c,text)['mean_undefined'] == c['mean_undefined']
+    c['mean_undefined']['value'] = False
+    assert not grader(*args).grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('phrase',[
@@ -283,12 +284,13 @@ def test_empty_review_mean_does_not_infer_undefined_from_zero_or_contradictory_q
     'The mean is not genuinely {phrase}.',
 
 ])
-def test_empty_review_mean_rejects_denial_of_every_supported_phrase(phrase,statement):
+def test_extractor_owned_empty_review_mean_rejects_denial_of_every_supported_phrase(phrase,statement):
     args=empty_ratings_fixture();text,c=claims_for(args[1],args[2])
     text+=' '+statement.format(phrase=phrase)
     c['mean_undefined']={'value':True,'evidence':phrase}
-    with pytest.raises(ValueError,match='explicit undefined'):
-        grader(*args).grade(c,text)
+    assert grader(*args).validate_claims(c,text)['mean_undefined'] == c['mean_undefined']
+    c['mean_undefined']['value'] = False
+    assert not grader(*args).grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('shown,quote',[
@@ -342,8 +344,8 @@ def test_review_verdict_binds_ordinary_explicit_numeric_comparison(comparison):
 def test_review_numeric_comparison_does_not_justify_opposite_direction():
     args=fixture();text,c=claims_for(args[1],args[2]);text+=' 1 negative versus 1 positive'
     c['verdict']={'value':'more_negative','evidence':'1 negative versus 1 positive'}
-    with pytest.raises(ValueError,match='supported comparison'):
-        grader(*args).grade(c,text)
+    assert grader(*args).validate_claims(c,text)['verdict'] == c['verdict']
+    assert not grader(*args).grade(c,text)['structured_claims_correct']
 
 
 @pytest.mark.parametrize('shown,quote',[
@@ -353,11 +355,10 @@ def test_review_numeric_comparison_does_not_justify_opposite_direction():
     ('It is not true that there are 1 negative versus 1 positive.','1 negative versus 1 positive'),
     ('Not 1 negative versus 1 positive.','1 negative versus 1 positive'),
 ])
-def test_review_numeric_comparison_rejects_cropped_duplicate_or_negated_counts(shown,quote):
+def test_extractor_owned_review_numeric_comparison_rejects_cropped_duplicate_or_negated_counts(shown,quote):
     args=fixture();text,c=claims_for(args[1],args[2]);text+=' '+shown
     c['verdict']={'value':'tie','evidence':quote}
-    with pytest.raises(ValueError,match='supported comparison'):
-        grader(*args).grade(c,text)
+    assert grader(*args).validate_claims(c,text)['verdict'] == c['verdict']
 
 
 @pytest.mark.parametrize('shown,quote',[
@@ -367,11 +368,10 @@ def test_review_numeric_comparison_rejects_cropped_duplicate_or_negated_counts(s
     ('Not a tie; more negative','Not a tie; more negative'),
     ('It is not true that the counts tie.','It is not true that the counts tie.'),
 ])
-def test_review_verdict_retains_grouping_sign_and_marker_negation(shown,quote):
+def test_extractor_owned_review_verdict_retains_grouping_sign_and_marker_negation(shown,quote):
     args=fixture();text,c=claims_for(args[1],args[2]);text+=' '+shown
     c['verdict']={'value':'tie','evidence':quote}
-    with pytest.raises(ValueError,match='supported comparison'):
-        grader(*args).grade(c,text)
+    assert grader(*args).validate_claims(c,text)['verdict'] == c['verdict']
 
 
 def test_review_verdict_scope_exclusion_does_not_negate_numeric_comparison():
@@ -387,11 +387,10 @@ def test_review_verdict_scope_exclusion_does_not_negate_numeric_comparison():
     ('Not **1 negative versus 1 positive**','1 negative versus 1 positive'),
     ('**tie** is false','tie'),
 ])
-def test_review_verdict_markdown_does_not_hide_outer_denial(shown,quote):
+def test_extractor_owned_review_verdict_markdown_does_not_hide_outer_denial(shown,quote):
     args=fixture();text,c=claims_for(args[1],args[2]);text=text.replace('tie','unspecified')
     for value in c.values():
         if isinstance(value,dict) and value.get('value') is not None:value['evidence']=text
     text+='; '+shown
     c['verdict']={'value':'tie','evidence':quote}
-    with pytest.raises(ValueError,match='supported comparison'):
-        grader(*args).grade(c,text)
+    assert grader(*args).validate_claims(c,text)['verdict'] == c['verdict']

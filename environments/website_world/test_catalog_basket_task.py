@@ -26,7 +26,9 @@ def fixture(world, *, overlap=False, extras=True, budget=None):
         s['size_label'] = 'M'
         shirt['sku_status'][s['sku_id']] = {'sku.size_label': 'known'}
     for r in w['retailers']:
-        r['catalog'] = [{'pages': [{'listings': [{'sku_id': o['sku_id']} for o in r['offers']]}]}]
+        r['catalog'] = [{'product_id':pid, 'pages': [{'page_key':{}, 'listings':[
+            {'sku_id':o['sku_id']} for o in r['offers'] if o['product_id']==pid]}]}
+            for pid in dict.fromkeys(o['product_id'] for o in r['offers'])]
     reqs = [{'requirement_id': 'shoes', 'quantity': 1, 'concept_id': 'footwear.walking_shoes', 'predicates': []},
             {'requirement_id': 'shirt', 'quantity': 1, 'concept_id': 'tops.t_shirts',
              'predicates': [{'field': 'product.facts.market_range', 'operator': 'eq', 'value': 'women'},

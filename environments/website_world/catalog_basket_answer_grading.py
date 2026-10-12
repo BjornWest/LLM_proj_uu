@@ -1,6 +1,5 @@
 """Grounded natural basket plans, resolved independently of the native optimum."""
 from copy import deepcopy
-import re
 
 from jsonschema import Draft202012Validator
 from experiments.answer_grading.extraction import MONEY, claim, obj, validate_claims, money_minor, _quote
@@ -8,7 +7,7 @@ from experiments.accepted_catalog_commerce.prepared_quote import prepare
 from . import basic_offer_task, catalog_basket_grading as structured, catalog_checkout_domain
 from .listed_offer_grading import ListedOfferGrader
 
-VERSION = 'website-catalog-basket-answer-grading-v1'
+VERSION = 'website-catalog-basket-answer-grading-v2'
 SERVICE_FIELDS = ('carrier_name', 'tier', 'delivery_type', 'location_id', 'location_name')
 INSTRUCTIONS = '''Extract only the final answer into the supplied schema. You are a
 formatter, not a solver. No private world, matching set, reference or expected
@@ -35,21 +34,11 @@ Do not invent an order or service to make a plan complete. Return JSON only.'''
 
 
 def _ground(record, schema, answer, *, normalized=()):
-    """Reuse common literal grounding; handle declared semantic enums separately."""
-    candidate = deepcopy(record)
-    saved = {k: candidate[k] for k in normalized}
-    for k in normalized:
-        candidate[k] = {'value': None, 'evidence': None}
+    """Mechanical literal grounding with explicitly declared semantic fields."""
     temporary = obj({**schema['properties'], 'source_urls': {'type': 'array'}})
-    value = validate_claims({**candidate, 'source_urls': []}, answer, schema=temporary)
+    value = validate_claims({**deepcopy(record), 'source_urls': []}, answer,
+                            schema=temporary, semantic_fields=normalized)
     value.pop('source_urls')
-    value.update(saved)
-    for k, c in saved.items():
-        if c['value'] is None:
-            if c['evidence'] is not None:
-                raise ValueError('Absent normalized claim needs absent evidence')
-        else:
-            _quote(c['evidence'], answer)
     return value
 
 
@@ -91,13 +80,7 @@ class CatalogBasketAnswerGrader:
         Draft202012Validator(self.schema).validate(c)
         c = validate_claims(c, answer, schema=self.schema)
         for order in c['orders']:
-            _ground(order, self.order_schema, answer)
-            split = order['split']
-            if split['value'] is not None:
-                pattern = (r'\b(split\s*:\s*true|split shipments|separate shipments)\b' if split['value']
-                           else r'\b(split\s*:\s*false|no split|without splitting|do not split|single shipment)\b')
-                if not re.search(pattern, split['evidence'], re.I):
-                    raise ValueError('Split claim needs an explicit supported instruction')
+            _ground(order, self.order_schema, answer, normalized=('split',))
             for line in order['lines']:
                 _ground(line, self.line_schema, answer)
                 for value in line['variant'].values():
@@ -107,12 +90,6 @@ class CatalogBasketAnswerGrader:
                         _quote(value['evidence'], answer)
                         if value['value'] not in value['evidence']: raise ValueError('Variant is absent from its quote')
                 _ground(line['delivery'], self.line_schema['properties']['delivery'], answer, normalized=('delivery_type',))
-                mode = line['delivery']['delivery_type']
-                if mode['value'] is not None:
-                    marker = {'home': r'\bhome\b', 'parcel_locker': r'\b(locker|pickup box|parcel_locker)\b',
-                              'staffed_counter': r'\b(staffed|staffed_counter|collection counter)\b',
-                              'retailer_branch': r'\b(shop pickup|store pickup|branch|retailer_branch)\b'}[mode['value']]
-                    if not re.search(marker, mode['evidence'], re.I): raise ValueError('Delivery method is unspoken')
         return c
 
     def _service(self, choices, claim_values):

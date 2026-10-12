@@ -4,7 +4,7 @@ import unittest
 
 from .test_variant_link_task import fixture
 from . import variant_link_task as native
-from .variant_link_answer_grading import VariantLinkGrader, _boolean_supported
+from .variant_link_answer_grading import VariantLinkGrader
 
 
 def sample(mode):
@@ -30,10 +30,15 @@ def sample(mode):
 
 
 class VariantLinkAnswerTests(unittest.TestCase):
-    def test_negated_full_selection_phrase_is_a_limitation(self):
-        text = 'This link does not open the exact variant. You must select size 38.'
-        self.assertTrue(_boolean_supported('link_encodes_full_selection', False, text))
-        self.assertFalse(_boolean_supported('link_encodes_full_selection', True, text))
+    def test_semantic_boolean_provenance_is_not_english_interpretation(self):
+        grader, answer, claims = sample('colour')
+        text = 'The recipient needs another step; the URL leaves part of the choice open.'
+        answer += '\n'+text
+        for key in ('link_encodes_full_selection','recipient_must_select'):
+            claims[key]['evidence'] = text
+        self.assertTrue(grader.grade(claims,answer)['structured_claims_correct'])
+        claims['recipient_must_select']['value'] = False
+        self.assertFalse(grader.grade(claims,answer)['structured_claims_correct'])
 
     def test_all_url_modes_pass_and_publish_shape_is_complete(self):
         for mode in ('all', 'colour', 'none'):
@@ -56,13 +61,12 @@ class VariantLinkAnswerTests(unittest.TestCase):
         claims.pop('recipient_must_select')
         self.assertFalse(grader.grade(claims, answer)['structured_claims_correct'])
 
-    def test_nonquoted_or_inverted_boolean_is_rejected(self):
+    def test_nonquoted_claim_is_rejected_and_wrong_boolean_is_graded_false(self):
         grader, answer, claims = sample('colour')
-        for edit in ('quote', 'value'):
-            altered = deepcopy(claims)
-            if edit == 'quote': altered['url']['evidence'] = 'not in answer'
-            else: altered['recipient_must_select']['value'] = False
-            with self.assertRaises(ValueError): grader.grade(altered, answer)
+        altered = deepcopy(claims);altered['url']['evidence'] = 'not in answer'
+        with self.assertRaises(ValueError): grader.grade(altered, answer)
+        altered = deepcopy(claims);altered['recipient_must_select']['value'] = False
+        self.assertFalse(grader.grade(altered, answer)['structured_claims_correct'])
 
     def test_ambiguous_answer_or_wrong_manual_option_fails(self):
         grader, answer, claims = sample('colour')

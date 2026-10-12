@@ -1,27 +1,17 @@
 """Grounded shipping-deal audit; resolve the exact public SKU before amounts."""
 from copy import deepcopy
-import re
 from urllib.parse import urlsplit
 
-from jsonschema import Draft202012Validator
 from experiments.answer_grading.extraction import MONEY, claim, money_minor, _quote, validate_claims
 from . import basic_offer_task, catalog_shipping_claim_task as native
 from .adapter import digest
 from .listed_offer_grading import ListedOfferGrader
 
-VERSION = 'website-catalog-shipping-claim-grading-v1'
+VERSION = 'website-catalog-shipping-claim-grading-v2'
 MONEY_FIELDS = ('unit_price', 'subtotal', 'advertised_threshold', 'minimum_shipping', 'maximum_shipping')
 ENUMS = {'subtotal_test': ['no_threshold', 'below_threshold', 'meets_threshold'],
          'assessment': ['unavailable', 'none_free', 'some_free', 'all_free']}
-PATTERNS = {
-    'no_threshold': r'\b(no (?:free[- ](?:shipping|delivery) )?(?:threshold|minimum)|no_threshold)\b',
-    'below_threshold': r'\b(below (?:the )?(?:threshold|minimum)|does not (?:reach|meet) (?:the )?(?:threshold|minimum)|below_threshold)\b',
-    'meets_threshold': r'\b((?:reaches?|meets?) (?:the )?(?:threshold|minimum)|meets_threshold)\b',
-    'unavailable': r'\b(unavailable|no (?:delivery |shipping )?options (?:are )?available)\b',
-    'none_free': r'\b(none (?:of (?:these|the) options (?:are )?)?(?:are )?free|no (?:delivery |shipping )?options? (?:are )?free|none_free)\b',
-    'some_free': r'\b(some (?:of (?:these|the) options (?:are )?)?(?:are )?free|some_free)\b',
-    'all_free': r'\b(all (?:of (?:these|the) options (?:are )?)?(?:are )?free|all_free)\b',
-}
+POLICY_ROUTES = ('/info/shipping', '/info/terms', '/checkout')
 INSTRUCTIONS = '''Extract the final answer into the schema; do not solve the audit.
 No private expected values, quote oracle or tools are available. Never infer a
 missing SKU, amount, count or verdict from the request, another claim or arithmetic.
@@ -71,28 +61,8 @@ class ShippingClaimGrader:
             raise ValueError('Variant claims must be an object')
         for key in self.contract['variant_fields']:
             c['variant'].setdefault(key, {'value': None, 'evidence': None})
-        # Semantic phrase normalization has explicit grounding separate from
-        # literal string validation; expected outcomes never repair a quote.
-        enums = {key: c.get(key, {'value': None, 'evidence': None}) for key in ENUMS}
-        for key in ENUMS:c[key] = {'value': None, 'evidence': None}
-        c = validate_claims(c, answer, schema=self.schema)
-        c.update(enums); Draft202012Validator(self.schema).validate(c)
-        for key, row in enums.items():
-            if row['value'] is None:
-                if row['evidence'] is not None:raise ValueError('Absent assessment requires absent evidence')
-            else:
-                _quote(row['evidence'], answer)
-                wording = re.search(PATTERNS[row['value']], row['evidence'], re.I)
-                if not wording:
-                    raise ValueError('Assessment lacks explicit matching wording')
-                # The phrase itself must be asserted. Keep the legitimate
-                # below-threshold phrase "does not meet" inside its match;
-                # reject a negation outside any normalized verdict instead.
-                if re.search(r"\b(?:not|never|neither|cannot|can't|isn't|aren't)\s*(?:that\s*)?$",
-                             row['evidence'][:wording.start()], re.I):
-                    raise ValueError('Negated assessment is unsupported')
-                if row['value'] in ('meets_threshold', 'all_free') and re.search(r'\b(?:not|never|neither|doesn.t)\b', row['evidence'], re.I):
-                    raise ValueError('Negated affirmative assessment is unsupported')
+        c = validate_claims(c, answer, schema=self.schema,
+                            semantic_fields=tuple(ENUMS))
         for row in c['variant'].values():
             if row['value'] is None:
                 if row['evidence'] is not None:raise ValueError('Absent variant needs absent evidence')
@@ -124,7 +94,7 @@ class ShippingClaimGrader:
         link = self.identity.links[subject['offer_id']]['url']
         policy = urlsplit(c['policy_url']['value'] or ''); actual = urlsplit(link)
         checks['actual_policy_or_checkout_link'] = (policy.scheme, policy.netloc, policy.path) == (
-            actual.scheme, actual.netloc, actual.path) and policy.fragment in ('/info/shipping', '/checkout') and not policy.query
+            actual.scheme, actual.netloc, actual.path) and policy.fragment in POLICY_ROUTES and not policy.query
         return {'grading_version': VERSION,
             'identity_grading_version': self.identity.contract['identity_grading_version'],
             'response_contract': deepcopy(self.contract),

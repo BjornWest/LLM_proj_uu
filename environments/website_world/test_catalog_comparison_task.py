@@ -122,8 +122,7 @@ def test_unknown_annotation_cannot_be_claimed_from_a_positive_value_quote():
     c['rows'][0]['facts']['product.facts.cushioning'] = {
         'status': {'value':'unknown', 'evidence':'moderate'},
         **{k:{'value':None,'evidence':None} for k in ('value','unit','basis')}}
-    with pytest.raises(ValueError,match='explicit uncertainty'):
-        CatalogComparisonGrader(w,t,r,b,inventory=i).grade(c,text)
+    assert not CatalogComparisonGrader(w,t,r,b,inventory=i).grade(c,text)['structured_claims_correct']
 
 
 def test_natural_empty_carried_population_and_fewer_than_limit():
