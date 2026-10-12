@@ -7,11 +7,12 @@ from copy import deepcopy
 
 from .fact_exposure import object_digest, require
 from .task_requirements import compile_task, input_node, _validate_graph
+from .atomic_product_requirements import NATIVE_SCHEMAS
 
 
 def compile_suite_task(task, *, native_inputs=None, scoring_reference=None):
     schema = task.get('schema_version')
-    if schema == 'website-atomic-product-task-v1':
+    if type(schema) is str and schema in NATIVE_SCHEMAS:
         from .atomic_product_requirements import compile_atomic
         require(isinstance(native_inputs, dict) and set(native_inputs) ==
                 {'native_make', 'world', 'catalog', 'bindings', 'checkout_domain'},

@@ -96,6 +96,32 @@ are neither public disclosure nor policy delivery. Field/quote declaration hashe
 resolve under the exact imported native producer root independently of the
 separate inspection package location.
 
+Declaration-bearing atomic fact tasks additionally accept
+`website-atomic-product-task-v2`. The adapter calls the same checked native
+constructor and compares the entire canonical task before compilation. It retains
+the complete `public_fact.qualifier_declaration` in compiled semantics, including
+all declaration labels and producer source pins. These labels are an answer-schema
+vocabulary, not individually required page reads or evidence of delivery. The
+public row, unit and original displayed qualifier still define the source need;
+reference configuration never becomes selected-SKU configuration. Literal atomic
+tasks remain v1, and an existing v1 task still requires its original native factory.
+Declaration metadata on a v1 task and an empty v2 declaration are rejected before
+calling that factory; intermediate producer versions cannot masquerade as literal v1.
+
+For a prospective v2 run, retain the complete reviewed producer closure (including
+`qualifier_domains.py` and inherited declaration assets), recreate task/reference
+through its native constructor against the saved world/catalog/bindings/domain,
+and compile a new plan with this adapter. Pin the new task SHA, actual source
+schema, compiled program and inspection package in the next caller configuration.
+Compiled `task_sha256` is the compact sorted JSON object digest used by inspection;
+the producer reference's `task_sha256` uses its spaced sorted JSON digest. File pins
+are SHA256 of the original file bytes. Retain and validate each in its own role;
+they are different hashes of the same task, not interchangeable pins.
+Keep the old plan, task/reference and trace intact; do not change only a v1 schema
+string or graft declaration metadata onto it. The accepted v1 plan cannot stand
+in for the recompiled v2 task. Compilation does not establish runtime/extractor,
+browser exposure, automatic grading or production acceptance.
+
 `build_inventory` accepts pinned original-task and compiled-program documents,
 plus recorded captures. It retains every required information-need template,
 records exact source witnesses and scoped configuration/quote joins, and gives
