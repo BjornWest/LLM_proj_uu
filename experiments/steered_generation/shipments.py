@@ -8,8 +8,9 @@ block redraws every shipment of the carrier, history and review, so a carrier
 whose handovers all went well can come out with complaints about them.
 
 It covers the two aspects whose observation has a short story in the
-producer: `handoff` and `punctuality`. Both exist for a shipment delivered
-to the door at the first attempt. Which service the shipment used, whether it
+producer: `handoff` and `punctuality`. Both are observed exactly when a
+shipment is not collected and its first home-delivery attempt does not fail
+(a parcel left in the lobby is the negative handoff). Which service the shipment used, whether it
 went to a collection point, whether the first attempt failed, the dates and
 whether the promise was kept are each a draw of fixed probability in
 `carrier_service_pilot.model.history`; `shares` multiplies them out, with the

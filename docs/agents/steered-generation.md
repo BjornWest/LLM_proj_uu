@@ -697,8 +697,10 @@ for the aspects `handoff` and `punctuality`.
 ```
 
 Here the block is every shipment of the carrier, history and review. Both
-aspects are observed for a shipment delivered to the door at the first
-attempt, and what decides that and its outcome is a short chain of draws in
+aspects are observed exactly when a shipment is not collected and its first
+home-delivery attempt does not fail; a noncompliant handoff leaves the
+parcel in the lobby and supplies the negative handoff observation. What
+decides that and its outcome is a short chain of draws in
 `carrier_service_pilot.model.history`, each of fixed probability: which of
 the carrier's two services the shipment used (0.7 for the first), whether it
 went to a collection point (a quarter of regular shipments when the carrier
@@ -719,7 +721,12 @@ A sample picks the counts, places them on shipments at random and redraws
 each shipment's two streams (history and review) under fresh seeds until it
 is of its class. The class is read with the producer's own `history`
 function under the reseeded stream, and the review's lines as in the ninth;
-only the probabilities are this code's arithmetic. Nothing of the carrier's
+only the probabilities are this code's arithmetic. Shipment class
+probabilities are formed with ordinary floats before the multinomial
+calculation takes logarithms; at extreme subnormal text probabilities, a
+positive class can round to zero and be treated as impossible. The same
+1,000,000-proposal limit and successful-run selection caveat described for
+product reviews apply to each shipment. Nothing of the carrier's
 own shipments is kept. The carrier's quality levels, its policy and its
 services are upstream: a carrier with strong handover keeps its promise 95
 times in 100 and complaints stay rare, but they are possible, and the
@@ -782,6 +789,25 @@ the files for a generation input after one natural pass; the runner then
 samples and checks whichever of them is wanted. A comparison site goes with
 the surrounding-site controls the world is published with, given as
 `surrounding` in the task.
+
+The runner does both steps after one natural pass when it is given the task
+instead of requirement files:
+
+```
+python3 scripts/run_bounded_job.py -- python -B -m experiments.steered_generation.run \
+    --native-root ROOT --native-commit COMMIT --steering-commit COMMIT \
+    --generation-input INPUT.json --task TASK.json --candidate verdict_tie \
+    --samples 2 --validate-trials 2000 --producer-redraws 2 --output FOLDER
+```
+
+It writes every candidate of the task under `FOLDER/candidates/`, runs the
+named ones (all of them without `--candidate`; an unknown name is an error
+that lists the names), and records the task's digest and the candidates with
+their probabilities in the receipt. Each sample folder holds the steered
+world, what the check read off it and the steering record. Tried on two
+suite tasks (`suite/variants/one-command/`): H10's review task with
+`verdict_tie` took 8 s in all, B16's carrier task with
+`redrawn_shipments_verdict_more_negative` 30 s.
 
 For the memory and clarification tasks (`cheapest_matching_with_memory`,
 `cheapest_matching_after_clarification`) the native module's own `resolve`
@@ -893,6 +919,7 @@ ever be cheapest. Receipts and worlds are under
 | `suite/variants/B09/`, `H10/` (`run-v1`) | `6040664` | the product-review tasks' candidates; 10,000 redraws |
 | `suite/variants/B09-rare/`, `B16/`, `B16-tracking/` (`run-v1`) | `51aefce` | rarer review requirements (200,000 redraws); the carrier-review task's candidates (10,000) |
 | `suite/variants/B16-shipments/`, `B16-punctuality/` (`run-v1`) | `e837e7f` | the carrier-review task with the carrier's shipments redrawn; 50,000 redraws |
+| `suite/variants/one-command/`, `medium/reviews/run-product/`, `run-carrier/` | `7450c15` | the runner given a task: two suite tasks, and both review task forms on the medium world; 20,000 redraws there |
 
 Requirement files are in `steering/`, `steering/stock/`, `steering/price/`,
 `steering/cheapest/` and `steering/combined/`. Commit `832238a6` moved the
@@ -1383,6 +1410,17 @@ counts is 2.0 standard errors (the reviews-only `verdict_more_positive`,
 1,183 against 1,116 ± 33). The two rarest rows have one and nine hits, so
 their counts test little; their probabilities rest on the factors that
 `test_shipments.py` checks one by one.
+
+On the medium world's input with 24 reviews per product (21 retailers, 90
+products, 2,849 offers; `medium/reviews/`, one runner command per task with
+`--task`, 20,000 redraws, steering commit `7450c15`): the product-review
+task form on the first walking shoe with at least two assessing comments
+(four verdicts, probabilities 0.53, 0.32, 0.11 and 0.042) and the carrier
+task form of B16 (two reviews-only candidates; four with the shipments
+redrawn, down to 2.1e-4 for "more negative" and 6.2e-5 for "tie"). All ten
+candidates were sampled three times and checked; the redraw counts are
+within 1.7 standard errors (the largest, 10,520 against 10,636 ± 71). The natural pass takes 370 s there, a pass with
+manufacture reused 0.9 s and a sample about 2 s.
 
 All of these are dev-producer worlds from the suite's inputs, not the
 suite's frozen worlds, and nothing here is published or bound to a task

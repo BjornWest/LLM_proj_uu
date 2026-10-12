@@ -8,7 +8,10 @@ prices alone, on stock and prices together with offers listed below the
 winner, or on a product's listed prices), a shortlist of models, a one-offer
 stock or price requirement, a basket's subtotal against a free-shipping
 threshold, what a product's or a carrier's reviews say about a topic, or
-several of those to hold together.
+several of those to hold together. With `--task` the requirement files are
+written here instead: the candidates `variants` lists for a native task
+specification on the natural world, all of them or those named with
+`--candidate`.
 No browser, provider or sidecar publication.
 """
 import argparse
@@ -25,11 +28,11 @@ import time
 from experiments.world_requirement_construction import model as edits, run as pinned
 
 from . import (blocks, carriers, cheapest, combined, listed, price_bounds, prices, reviews, shipments, shortlist, stock,
-               streams, threshold)
+               streams, threshold, variants)
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
-              "listed.py", "shortlist.py", "threshold.py", "reviews.py", "carriers.py", "shipments.py", "combined.py", "run.py"),
+              "listed.py", "shortlist.py", "threshold.py", "reviews.py", "carriers.py", "shipments.py", "combined.py", "variants.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -499,7 +502,12 @@ def main():
     parser.add_argument("--generation-input", type=Path, required=True)
     parser.add_argument("--expected-natural-world-id",
                         help="fail unless the natural pass reproduces this saved world")
-    parser.add_argument("--requirement", type=Path, required=True, action="append")
+    parser.add_argument("--requirement", type=Path, action="append", default=[])
+    parser.add_argument("--task", type=Path,
+                        help="a native task specification as JSON; its requirement candidates on the natural world "
+                             "are written under OUTPUT/candidates and run")
+    parser.add_argument("--candidate", action="append",
+                        help="with --task, the name of a candidate to run (repeatable; all of them without it)")
     parser.add_argument("--samples", type=int, default=1)
     parser.add_argument("--validate-trials", type=int, default=0,
                         help="redraw the block this many times under other seeds, outside the producer's "
@@ -510,6 +518,8 @@ def main():
                              "who-is-cheapest requirement on prices alone)")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    if bool(args.requirement) == bool(args.task) or args.candidate and not args.task:
+        parser.error("give requirement files or a task, and candidate names only with a task")
     started = time.monotonic()
     root = args.native_root.resolve()
     api = pinned.load_native(root, args.native_commit)
@@ -530,7 +540,24 @@ def main():
     pinned.ensure(again["world_id"] == natural["world_id"], "An unsteered pass must reproduce the natural world")
     pinned.ensure(not edits.price_rule_violations(natural, api.native.rounded_price), "Natural world breaks the price rule")
     output = args.output.resolve()
+    task = None
+    if args.task:
+        task_raw = args.task.read_bytes()
+        found = variants.of(natural, json.loads(task_raw), api)
+        wanted = [row["name"] for row in found] if args.candidate is None else args.candidate
+        if set(wanted) - {row["name"] for row in found} or len(set(wanted)) != len(wanted):
+            raise ValueError("Unknown or repeated candidate; this task has on this world: " +
+                             ", ".join(row["name"] for row in found))
     output.mkdir(parents=True, exist_ok=False)
+    if args.task:
+        (output / "candidates").mkdir()
+        for row in found:
+            (output / "candidates" / (row["name"] + ".json")).write_text(
+                json.dumps(row["requirement"], indent=2, ensure_ascii=False) + "\n")
+        args.requirement = [output / "candidates" / (name + ".json") for name in wanted]
+        task = {"path": str(args.task), "sha256": edits.byte_digest(task_raw),
+                "candidates": [{key: row[key] for key in ("name", "summary", "log_probability")} for row in found],
+                "run": wanted}
     cases = []
     for path in args.requirement:
         requirement_raw = path.read_bytes()
@@ -546,6 +573,7 @@ def main():
     final_pins = pinned.verify_sources(root, own_paths)
     pinned.ensure(native_pins.items() <= final_pins.items(), "Consumed native sources changed")
     pinned.ensure(args.generation_input.read_bytes() == inputs_raw, "Generation input changed")
+    pinned.ensure(not args.task or args.task.read_bytes() == task_raw, "Task specification changed")
     pinned.ensure(all(edits.byte_digest(Path(p).read_bytes()) == digest for p, digest in own_paths.items()),
                   "Steering source changed")
     pinned.ensure(session.generate()[0]["world_id"] == natural["world_id"],
@@ -558,6 +586,7 @@ def main():
                "streams_opened_per_pass": len(opened), "distinct_streams": len(set(opened)),
                "natural_pass_seconds": natural_seconds, "unsteered_replay_seconds": replay_seconds,
                "sampling_defaults_read_once": session.defaults is not None,
+               **({"task": task} if task else {}),
                "cases": cases, "browser_runtime_ready": False, "provider_calls": 0,
                "elapsed_seconds": time.monotonic() - started}
     (output / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
