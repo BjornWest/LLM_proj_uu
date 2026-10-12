@@ -1055,6 +1055,32 @@ Limits. The history streams are not redrawn for the stars: given the levels,
 what happened to each shipment is the seed's. The levels are private
 parameters; a task sees them through the metrics and the reviews.
 
+### The three together on the medium world
+
+Scripts and outputs under
+`.local/coordination/world-requirement-construction-20261010/steering/walkthrough/`
+(`case-seller`, `case-carrier`, `case-stars`; not pinned runs), on the medium
+world of "A medium world" (21 retailers, 90 products), four seconds a sample:
+
+- "The cheapest available walking shoe is at a retailer with no express
+  delivery whose warehouse takes two days to dispatch": probability 0.060;
+  under 1,500 other seeds of the same streams it held in 7.0%. In the seed's
+  own world two retailers have such a policy and one of them never has the
+  cheapest shoe. Over 200 samples seven retailers win, each about as often
+  as its chance of winning times its chance of such a policy says (0.10 to
+  0.21), and the winner's contracts and dispatch days are redrawn; the other
+  twenty retailers' are the seed's.
+- "... at a retailer that ships with one named carrier only, and that
+  carrier's punctuality comments are more negative than positive": 0.0093
+  times 0.17, as two independent blocks. Only a small retailer can have one
+  carrier, so the two small retailers that can win share the samples.
+- "... ships with one named carrier only, and that carrier is rated at most
+  3.6", for the carrier the seed rates highest (4.59, one weak-free set of
+  levels): 0.0093 times 0.012. In 20 samples the average is 3.34 to 3.59;
+  the carrier has one weak aspect in 5, two in 12 and three in 3, and its
+  delivery metrics follow (attempts on the promised day 84% to 66% where
+  punctuality turns weak).
+
 ## Requirement candidates for a native task
 
 `variants.of(world, task, api)` takes a native task specification (the
