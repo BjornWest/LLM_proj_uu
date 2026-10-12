@@ -37,13 +37,16 @@ convolution), and sampling goes on to choose every review's rating exactly:
 the totals of the three classes, then each review's stars in turn. A review
 is then redrawn in two steps, its rating stream until it gives the rating and
 its other streams until it is of its class; nothing but the rating itself
-passes from the first to the second.
+passes from the first to the second. That holds where no other draw of the
+block sets the rating's chances, as in every program so far; where one does,
+the whole block is redrawn until rating and class are both met.
 """
 from collections import Counter
 from fractions import Fraction
-from functools import lru_cache
+from functools import lru_cache, reduce
 from importlib import import_module
 import json
+from operator import or_
 from math import ceil, erfc, exp, floor, fsum, lgamma, log, sqrt
 import sys
 from types import SimpleNamespace
@@ -139,8 +142,9 @@ def site(world, requirement, api):
         ranges = spec["concepts"][concept]["price_ranges_sek"]
         low, high = min(v[0] for v in ranges.values()), max(v[1] for v in ranges.values())
         shift = -(spec["execution_to_review"]["value_price_penalty"] * ((public["reference_price_sek"] - low) / (high - low) - .5))
+    # The rating's own draw has no other draw above it: it can be redrawn alone.
     return SimpleNamespace(
-        **common, reader=sys.modules[__name__], concept=concept, footwear=footwear, shift=shift,
+        **common, reader=sys.modules[__name__], staged=True, concept=concept, footwear=footwear, shift=shift,
         execution=private["execution"], concentration=spec["rating_concentration"], spread=spec["reviewer_spread"],
         lengths=lengths, policy=footwear.review_topic_policy(item, spec, eligible))
 
@@ -300,13 +304,24 @@ def conditional(found, share):
             for name in share if share[name] > 0}
 
 
+def reachable(given, numbers, low, high):
+    """Whether so many reviews of each class can total within two bounds at all, by the ratings each class can have."""
+    totals = 1
+    for name, number in numbers.items():
+        for _ in range(number):
+            totals = reduce(or_, (totals << rating - 1 for rating, share in given[name].items() if share > 0))
+    low = max(low, 0)
+    return low <= high and bool(totals >> low & (1 << high - low + 1) - 1)
+
+
 def starred(place, found, share, terms):
     """Each count's log probability with the chance that the stars then total within the stated mean.
 
     Given the counts, the stars of the three classes of reviews total
-    independently. Counts under which the mean cannot be met drop out; one
-    whose chance is below the smallest float drops out with them, unless none
-    is left.
+    independently. Counts under which the mean cannot be met drop out. One
+    under which it can, but with a chance below the smallest float, drops out
+    with them unless no count is left: then the requirement is possible and
+    cannot be weighed.
     """
     count, given = place.count, conditional(found, share)
     low, high = (total - count for total in span(place.requirement, count))
@@ -321,8 +336,8 @@ def starred(place, found, share, terms):
                 chance = fsum(mass * window(tail, low - index, high - index) for index, mass in enumerate(both) if mass)
                 if chance > 0:
                     weighed[positive, negative] = terms[positive, negative] + log(chance)
-                # Where every rating can occur, so can every total from the least to the greatest.
-                lost = lost or not chance and max(low, 0) <= min(high, 4 * count)
+                lost = lost or not chance and reachable(given, {
+                    POSITIVE: positive, NEGATIVE: negative, REST: count - positive - negative}, low, high)
             if negative < most.get(positive, -1):
                 both = spread(both, given[NEGATIVE])
         if positive < max(most):
@@ -475,6 +490,16 @@ def prepare(natural, requirement, api, rng):
         stars = {index: chosen[wanted[index]].pop() for index in order}
     seeds, starts, tries = {}, {}, 0
     for index in range(place.count):
+        if index in stars and not place.staged:
+            # Other draws of the block set the rating's chances: the whole block, until rating and class are both met.
+            for _ in range(TRIES):
+                seeds[index], tries = rng.getrandbits(64), tries + 1
+                found = reader.redrawn(place, index, seeds[index])
+                if (reader.rated(place, found), reader.said(place, found)) == (stars[index], wanted[index]):
+                    break
+            else:
+                raise NumericalLimit("A review's rating and class are too rare to reach by redrawing the review")
+            continue
         # With a rating to meet, the rating's stream first and on its own: only the rating passes to the rest.
         for _ in range(TRIES if index in stars else 0):
             starts[index], tries = rng.getrandbits(64), tries + 1
@@ -513,7 +538,10 @@ def prepare(natural, requirement, api, rng):
                                       "the requirement: the counts exactly, " + (
                                           "every review's star rating exactly given the counts and the stated mean, "
                                           "then each review by redrawing its rating until it is that rating and its "
-                                          "other draws until it is of its class. " if stars else
+                                          "other draws until it is of its class. " if stars and place.staged else
+                                          "every review's star rating exactly given the counts and the stated mean, "
+                                          "then each review by redrawing those draws until it has that rating and "
+                                          "is of its class. " if stars else
                                           "then each review by redrawing those draws until it is of its class. ") +
                                       "Every other draw is the seed's own; the "
                                       "requirement depends on no other draw. Use the probability as the importance "

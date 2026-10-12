@@ -257,6 +257,24 @@ class StarTests(Reviews):
                 self.assertEqual(set(terms), set(direct))
                 for key, value in terms.items():
                     self.assertAlmostEqual(exp(value) / direct[key], 1, places=10, msg=key)
+        # Classes that cannot have every rating: a mean no total reaches is impossible, not a numerical limit.
+        only = {(rating, name): float((rating, name) in ((1, reviews.POSITIVE), (3, reviews.REST))) / 2
+                for rating in range(1, 6) for name in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST)}
+        for count, limits, possible in ((1, {"min": 5}, False), (2, {"min": 2.5, "max": 2.5}, False), (2, {"min": 2}, True),
+                                        (3, {"min": 1.4, "max": 1.6}, False), (3, {"min": 1.6, "max": 1.7}, True)):
+            place = SimpleNamespace(count=count, requirement={"mean_rating": limits})
+            share = reviews.marginal(only)
+            terms = reviews.starred(place, only, share, reviews.multinomial(count, share, lambda positive, negative: True)[0])
+            self.assertEqual(bool(terms), possible, (count, limits))
+        self.assertTrue(reviews.reachable({"a": {1: .5, 5: .5}}, {"a": 2}, 4, 4))
+        self.assertFalse(reviews.reachable({"a": {1: .5, 5: .5}}, {"a": 2}, 1, 3))
+        self.assertFalse(reviews.reachable({"a": {1: .5, 5: .5}}, {"a": 2}, 5, 4))
+        # A mean that can be met, but only with a chance below the smallest float: refused as a numerical limit.
+        rare = {(rating, name): {1: .999, 5: .001}.get(rating, 0.0) * (name == reviews.REST)
+                for rating in range(1, 6) for name in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST)}
+        place = SimpleNamespace(count=300, requirement={"mean_rating": {"min": 5}})
+        with self.assertRaises(blocks.NumericalLimit):
+            reviews.starred(place, rare, reviews.marginal(rare), {(0, 0): 0.0})
         # The mean is compared as the decimal it is written as, not as the nearest float.
         self.assertEqual(reviews.span({"mean_rating": {"min": 4.2, "max": 4.2}}, 5), (21, 21))
         self.assertEqual(reviews.span({"mean_rating": {"min": 3.34}}, 3), (11, 15))

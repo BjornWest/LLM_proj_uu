@@ -15,8 +15,9 @@ evaluates every derived value and condition (`resolve`, `_eval`); what is
 written here is the order of the steps, as `sample` runs them, and the
 probability of each outcome of a resolved draw: a weighted or uniform choice,
 a whole number from a range, the star rating, the set of topics, and a normal
-draw that the program reads only through `>=` thresholds. A loop is followed
-where it only derives and collects values.
+draw that the program reads only through `>=` thresholds (found on the
+expressions as the program parses them). A loop is followed where it only
+derives and collects values.
 
 The producer may wrap a package's review program in checks that refuse
 anything but a whole sample. The reading here runs on a plain copy made from
@@ -26,20 +27,17 @@ steered pass whose reviews differ from the copy's fails. So is a world where
 following the steps here from a review's recorded draws gives another rating
 or says another thing than the review does.
 """
+import ast
 from collections import defaultdict
 from copy import deepcopy
 from importlib import import_module
 import json
 from math import erfc, exp, fsum, lgamma, log, sqrt
-import re
 import sys
 from types import SimpleNamespace
 
 from . import reviews, streams
 
-# A path compared with a number by `>=` and nothing more: no arithmetic or further comparison on either side.
-# Read on text whose runs of white space are single spaces.
-ALONE, NUMBER = r"(?<![\w.])(?<![-+*/%<>=!])(?<![-+*/%<>=!] )", r" ?>= ?(\d+(?:\.\d*)?|\.\d+)(?![\w.])(?! ?[-+*/%<>=!])"
 # Review programs rebuilt from a world, by the producer module, the world's seed and the product.
 BUILT = {}
 
@@ -63,10 +61,62 @@ def written_by(step):
     return [row["target"] for row in inner(step)] + [step["for_each"]["binding"]] if inner(step) else [step["target"]]
 
 
+def expressions(twin, step):
+    """Every expression a step, or a loop with its steps, evaluates, with the conditions of the fields it writes."""
+    texts = []
+
+    def one(row):
+        texts.extend(row[key] for key in ("derive", "when", "weights_from", "values_from", "eligible_from",
+                                          "count_from", "positioning_from") if key in row)
+        texts.extend(row[key] for key in ("min", "max", "mean", "sd", "round_to", "execution", "concentration")
+                     if isinstance(row.get(key), str))
+        texts.extend(adjustment["when"] for adjustment in row.get("adjustments", []))
+        for case in row.get("cases", []):
+            one(case)
+        texts.extend([*row.get("values_expr", {}).values(), *row.get("emit", {}).values()])
+        if row.get("target") and "applicable_when" in twin.fields[row["target"]]:
+            texts.append(twin.fields[row["target"]]["applicable_when"])
+
+    for row in [step, *inner(step)]:
+        one(row)
+    return texts + [step["for_each"]["from"]] if "for_each" in step else texts
+
+
 def read_by(twin, step):
-    """The paths a step, or a loop with its steps, reads."""
+    """The paths a step, or a loop with its steps, reads: the program's own account, which `expressions` must match."""
     found = set().union(twin._step_refs(step), *(twin._step_refs(row) for row in inner(step)))
-    return found | twin.expression(step["for_each"]["from"]).references if "for_each" in step else found
+    found = found | twin.expression(step["for_each"]["from"]).references if "for_each" in step else found
+    if found != set().union(*(twin.expression(text).references for text in expressions(twin, step))):
+        raise unmodelled("a step that reads in a way this reading does not look at")
+    return found
+
+
+def thresholds(twin, text, target):
+    """The numbers an expression compares a path with by `>=`; None where it mentions the path in any other way.
+
+    Read on the expression as the program parses it: the path alone on the
+    left, one `>=`, a number written out on the right.
+    """
+    found = []
+
+    def path(node):
+        names = []
+        while isinstance(node, ast.Attribute):
+            names.append(node.attr)
+            node = node.value
+        return ".".join(reversed([*names, node.id])) if isinstance(node, ast.Name) else None
+
+    def plain(node):
+        if isinstance(node, (ast.Name, ast.Attribute)) and path(node) is not None:
+            return not touches(path(node), target)
+        if (isinstance(node, ast.Compare) and len(node.ops) == 1 and isinstance(node.ops[0], ast.GtE) and
+                path(node.left) == target and isinstance(node.comparators[0], ast.Constant) and
+                type(node.comparators[0].value) in (int, float)):
+            found.append(float(node.comparators[0].value))
+            return True
+        return all([plain(child) for child in ast.iter_child_nodes(node)])
+
+    return found if plain(twin.expression(text).tree) else None
 
 
 def program(world, item, api):
@@ -152,19 +202,21 @@ def site(world, item, api, native, **common):
         else:
             block.add(name)
         if step["sample"] == "normal":
-            # Every mention of the draw, in the other steps and in the statements' conditions, is a threshold.
-            texts = [re.sub(r"\s+", " ", text) for text in [json.dumps(other) for other in steps if other is not step] + [
-                pool["when"] for rows in pools.values() for pool in rows if "when" in pool]]
-            name = re.escape(step["target"]) + r"(?![\w.])"
-            cuts = [re.findall(ALONE + name + NUMBER, text) for text in texts]
-            if (not any(cuts) or
-                    any(len(found) != len(re.findall(r"(?<![\w.])" + name, text)) for found, text in zip(cuts, texts)) or
-                    any(touches(step["target"], path) and path != step["target"] for path in needed)):
+            # Every mention of the draw, in what the other steps and the statements evaluate, is a threshold.
+            texts = [text for other in steps if other is not step for text in expressions(twin, other)] + [
+                pool["when"] for rows in pools.values() for pool in rows if "when" in pool]
+            cuts = [thresholds(twin, text, step["target"]) for text in texts]
+            if None in cuts or not any(cuts):
                 raise unmodelled("a continuous draw read other than through thresholds it must reach")
-            bounds[step["id"]] = sorted({float(cut) for found in cuts for cut in found})
+            bounds[step["id"]] = sorted({cut for found in cuts for cut in found})
+    # Whether the rating can be redrawn on its own: no other draw sets its parameters.
+    above, staged = read_by(twin, rating[0]), True
+    for step in reversed(steps[:steps.index(rating[0])]):
+        if any(touches(target, path) for target in written_by(step) for path in above):
+            above, staged = above | read_by(twin, step), staged and "sample" not in step
     return SimpleNamespace(
         **common, reader=sys.modules[__name__], program=found, pools=pools, steps=steps, bounds=bounds,
-        block=frozenset(block), drawn=frozenset(drawn), rating=rating[0],
+        block=frozenset(block), drawn=frozenset(drawn), rating=rating[0], staged=staged,
         emits=sorted({row["target"] for step in steps for row in (inner(step) or [step]) if "emit" in row}),
         seeds=[streams.program_review_seed(common["seed"], index) for index in range(common["count"])])
 

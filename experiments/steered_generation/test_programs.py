@@ -156,6 +156,8 @@ class ModelTests(Programs):
         self.assertEqual(self.place(TRAINERS, "value").drawn, {"rating", "topics", "value_favourability"})
         # The option reviewed is drawn where the statement's condition or the price paid names it.
         self.assertIn("tested_sku", self.place(SHIRTS, "value").drawn)
+        # No program in git lets another draw set the rating's chances: the rating can be redrawn alone.
+        self.assertTrue(all(self.place(concept, aspect).staged for concept, aspect in self.cases()))
         self.assertIn("tested_sku", self.place(TABLETS, "value").drawn)
         self.assertLessEqual({"owner_pen", "owner_keyboard", "topic_applicability"}, self.place(TABLETS, "pen_marks").drawn)
         self.assertEqual(programs.keys(place, 3), [(streams.PROGRAM, place.seed, 3, name) for name in sorted(place.block)])
@@ -395,6 +397,38 @@ class RefusalTests(Programs):
         pool(document, "value.positive")["when"] += " and review.value_favourability >= .7 and not review.keen"
 
     @staticmethod
+    def spaced(document):
+        """A second threshold on the value score, written as the expression language also allows."""
+        step(document, "sentiment_value")["derive"] = "review.value_favourability >= .5 and review . value_favourability >= .7"
+
+    @staticmethod
+    def fielded(document):
+        """A threshold on the value score in a field's own condition, which no step's text shows."""
+        document["fields"]["review.keen"] = {"type": "boolean", "applicable_when": "review.value_favourability >= .7"}
+        document["steps"].append({"id": "keen", "target": "review.keen", "derive": "True"})
+        pool(document, "value.positive")["when"] += " and known(review.keen)"
+
+    @staticmethod
+    def swayed(document):
+        """A rating whose chances another draw of the block sets."""
+        document["fields"]["review.quality"] = {"type": "number", "min": 0, "max": 1}
+        rating = step(document, "rating")
+        document["steps"].insert(document["steps"].index(rating), {
+            "id": "quality", "target": "review.quality", "sample": "weighted_choice", "weights": {"low": 1, "high": 1},
+            "values": {"low": 0, "high": 1}})
+        rating["execution"] = "review.quality"
+
+    def drawn_by(self, place):
+        """The natural world with one product's reviews as the altered program in place draws them."""
+        world, twin = deepcopy(self.natural), place.program.twin
+        for index, row in enumerate(self.item(world, place.product_id)["reviews"]):
+            review = twin.sample(place.seeds[index], inputs=deepcopy(place.program.entities))
+            row.update(private_trace=review["trace"], rating=review["entities"]["review"]["rating"],
+                       statements=[{"meaning_id": found["id"]} for found in twin.document["language"]
+                                   if "when" not in found or twin._eval(found["when"], review["entities"])])
+        return world
+
+    @staticmethod
     def counted(document):
         """A whole-number draw that the comfort statements' conditions read."""
         document["fields"]["review.wears"] = {"type": "integer", "min": 1, "max": 4}
@@ -433,7 +467,8 @@ class RefusalTests(Programs):
     def test_steps_no_program_in_git_has_are_followed(self):
         plain = programs.cells(self.place())
         worth = programs.cells(self.place(TRAINERS, "value"))
-        for change, aspect in ((self.half, "value"), (self.banded, "value"), (self.counted, "everyday_comfort"),
+        for change, aspect in ((self.half, "value"), (self.banded, "value"), (self.spaced, "value"), (self.fielded, "value"),
+                               (self.swayed, "everyday_comfort"), (self.counted, "everyday_comfort"),
                                (self.looped, "everyday_comfort"), (self.gated, "everyday_comfort")):
             with self.subTest(change=change.__name__):
                 self.altered(change)
@@ -459,6 +494,26 @@ class RefusalTests(Programs):
                         self.assertAlmostEqual(cells[rating, reviews.NEGATIVE], worth[rating, reviews.NEGATIVE], places=12)
                         self.assertLess(cells[rating, reviews.POSITIVE], worth[rating, reviews.POSITIVE])
                     self.assertGreater(sum(seen[rating, reviews.POSITIVE] for rating in range(1, 6)), 20)
+                elif change in (self.spaced, self.fielded):
+                    # Praise needs a score of 0.7; found though no step's text has the threshold in the usual form.
+                    self.assertEqual(place.bounds, {"value_favourability": [.5, .7]})
+                    self.assertGreater(sum(seen[rating, reviews.POSITIVE] for rating in range(1, 6)), 20)
+                    for rating in range(1, 6):
+                        self.assertLess(cells[rating, reviews.POSITIVE], worth[rating, reviews.POSITIVE])
+                elif change is self.swayed:
+                    self.assertEqual((place.staged, "quality" in place.drawn), (False, True))
+                    self.assertGreater(min(seen[1, reviews.REST], seen[5, reviews.REST]), 1500)
+                    # A mean to meet: every review's planned rating holds, though the rating's own stream is not enough.
+                    world = self.drawn_by(place)
+                    for seed, limits in enumerate(({"min": 5}, {"max": 1.5}, {"min": 3, "max": 3})):
+                        need = self.need(verdict="more_negative", mean_rating=limits)
+                        plan = reviews.prepare(world, need, self.api, Random(seed))
+                        found = reviews.site(world, need, self.api)
+                        rows = [programs.redrawn(found, index, plan.script[programs.keys(found, index)[0]].seed)
+                                for index in range(found.count)]
+                        self.assertTrue(reviews.holds(need, *reviews.counted(found, rows)), limits)
+                        self.assertTrue(all(len({plan.script[key].seed for key in programs.keys(found, index)}) == 1
+                                            for index in range(found.count)))
                 elif change is self.counted:
                     self.assertIn("wears", place.drawn)
                     self.assertIn("wears", place.block)

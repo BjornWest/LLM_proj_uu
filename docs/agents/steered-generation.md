@@ -597,7 +597,11 @@ a resolved draw: a weighted or a uniform choice, a whole number from a range,
 the rating, the set of topics, and a normal draw that the program reads only
 through `>=` thresholds (the value score, at one half, after the program's
 clipping and rounding). Such a draw is followed as the thresholds it
-reaches, with one value standing for each case. Because the order of the steps is written here a
+reaches, with one value standing for each case. The thresholds are found on
+the expressions as the program parses them, in everything the needed steps
+and the topic's statements evaluate, the conditions of the fields they write
+included; a mention of the draw that is not the draw alone, `>=`, and a
+number written out refuses the program. Because the order of the steps is written here a
 second time, every recorded review of a natural world is also followed from
 its recorded draws alone, and the world is refused if that gives another
 rating or says another thing than the review does.
@@ -620,7 +624,12 @@ total (`reviews.ratings`). A review with a rating to meet is then redrawn in
 two steps: its rating stream until it gives that rating, and its other
 streams until the review is of its class. Nothing but the rating passes from
 the first step to the second, so the two together are a draw of the review
-given both.
+given both. That needs the rating's chances to be set by no other draw of
+the block, which holds for the pilot sampler and for every review program in
+git (the rating follows the product's execution alone). Where a program lets
+another draw set them, the whole block is redrawn until the review has both
+the rating and the class, which is the same conditional draw at a higher
+cost.
 
 A sample picks the counts from that distribution, places them on reviews at
 random, and then redraws each review's block streams under fresh seeds until
@@ -677,7 +686,8 @@ is refused ("Not modelled") where what the topic depends on includes a loop
 that draws or holds another loop, a collected value under a condition of its
 own, a draw of another kind than the six above, a normal draw read otherwise
 than by `>=` against a number written out (any arithmetic on either side, a
-strict comparison or a use of the value itself refuses it), a statement about
+strict comparison or a use of the value itself refuses it), a step that
+reads something the reading's own list of its expressions does not show, a statement about
 the topic that is neither for nor against, or a review that would be both.
 None of the 37 review programs in git does any of these (see the evidence
 for the concepts whose data is not in git). The walk branches on every
@@ -690,9 +700,11 @@ writes a neutral or a mixed comment, or a second statement on a topic under
 other circumstances, so those counts are always zero and steering cannot ask
 for them: the suite's "opposite opinions in one comment" and "same words,
 different circumstances" instances were written by hand onto a saved world.
-With a mean stated, a count whose stars could total within the bounds only
-with a probability below the smallest float is left out of the sum; if that
-is every count, the requirement is refused as a numerical limit. Probabilities
+With a mean stated, whether a count's stars can total within the bounds at
+all is decided exactly, from the ratings each class of review can have. A
+count that can, but only with a probability below the smallest float, is
+left out of the sum; if no count is left and one of them could, the
+requirement is refused as a numerical limit and not as impossible. Probabilities
 use floating-point logarithms of gamma functions and the complementary error
 function; they are exact to that arithmetic. Which reviews a review site
 shows, and in what order, is built from the world downstream and is not part
