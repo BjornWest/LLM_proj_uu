@@ -69,6 +69,7 @@ class ResetLifecycleControls(unittest.TestCase):
 
     def runner(self,*args,output,automatic_grading,**kwargs):
         self.assertEqual(automatic_grading.phase,'external')
+        self.dispatched_options = deepcopy(kwargs)
         trace=output/'episode';trace.mkdir(parents=True)
         (trace/'steps.jsonl').write_text('')
         (trace/'metadata.json').write_text(json.dumps({'episode_id':'episode'}))
@@ -110,14 +111,14 @@ class ResetLifecycleControls(unittest.TestCase):
         self.assertTrue(summary['infrastructure_completed'])
         return {'status':'verified' if self.projection else 'missing','qualification':'Authored offline projection, no HTTP'}
 
-    def execute(self):
+    def execute(self, *, max_steps=1):
         with patch.dict('sys.modules',{'agent_trace.adapters.browsergym':self.viewer_module}), \
              patch.object(execution.shared,'load',return_value={}), \
              patch.object(execution,'VariantResetEpisode',self.Episode), \
              patch.object(finalization,'extract_saved_deferred',side_effect=self.deferred), \
              patch.object(finalization,'publish_finalized_answer',side_effect=self.publish):
             return execution.run(self.recipe,self.folder/'run',policy_session=self.session,
-                metadata={'tags':['scripted']},runner_options={'max_steps':1,'max_input_tokens':1000},
+                metadata={'tags':['scripted']},runner_options={'max_steps':max_steps,'max_input_tokens':1000},
                 viewer_projection=self.viewer,quota_guard=lambda:self.events.append('quota'),
                 extraction_backend_factory=lambda _:None,runner=self.runner,authority_approval=self.authority)
 
@@ -166,6 +167,16 @@ class ScopedResetLifecycleControls(ResetLifecycleControls):
         super().setUp()
         self.authority=None
         (self.recipe/'variant-reset-scoring-scope.private.json').write_text(json.dumps('observed_variant_cart_state'))
+
+    def test_unlimited_turns_reach_runner_and_keep_once_only_grading(self):
+        result = self.execute(max_steps=None)
+        self.assertEqual(result['status'], 'graded_and_projected')
+        self.assertIsNone(self.dispatched_options['max_steps'])
+        self.assertEqual(self.dispatched_options['max_input_tokens'], 1000)
+        plan = json.loads((self.folder/'run/execution-plan.private.json').read_text())
+        self.assertIsNone(plan['runner_options']['max_steps'])
+        self.assertEqual(self.events, ['quota', 'policy-open', 'policy-return', 'policy-close',
+            'runtime-close', 'grade', 'publish', 'viewer'])
 
     def test_actual_missing_output_finalizes_native_failure_with_zero_extraction(self):
         owner=self

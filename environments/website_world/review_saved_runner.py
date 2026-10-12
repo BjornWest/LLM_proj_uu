@@ -1,4 +1,4 @@
-"""Finite review answer run with grading attached before dispatch.
+"""Review answer run with grading attached before dispatch.
 
 English presentation remains editable; native task/reference/ID/memories do not.
 This is prospective source only until the frozen setup and HTTP gates pass.
@@ -21,7 +21,7 @@ VERSION = 'website-saved-review-automatic-runner-v1'
 
 def run(output, run_directory, *, policy_session, metadata, runner_options,
         viewer_projection, quota_guard, extraction_backend_factory=None, runner=None):
-    """One finite policy lease, at most one ordinary answer formatter, no retries.
+    """One policy lease, at most one ordinary answer formatter, no retries.
 
     Grading and publication follow policy/Runtime cleanup. All native input and
     actual public request bytes are pinned before policy dispatch.
@@ -32,9 +32,13 @@ def run(output, run_directory, *, policy_session, metadata, runner_options,
         raise ValueError('Require policy, quota and actual HTTP projection callables')
     if extraction_backend_factory is not None and not callable(extraction_backend_factory):
         raise ValueError('Extraction backend must be callable')
-    if type(runner_options) is not dict or any(type(runner_options.get(k)) is not int
-            or runner_options[k] <= 0 for k in ('max_steps', 'max_input_tokens')):
-        raise ValueError('Declare finite positive turn and context bounds')
+    if (type(runner_options) is not dict
+            or type(runner_options.get('max_input_tokens')) is not int
+            or runner_options['max_input_tokens'] <= 0
+            or 'max_steps' not in runner_options
+            or (runner_options['max_steps'] is not None and
+                (type(runner_options['max_steps']) is not int or runner_options['max_steps'] <= 0))):
+        raise ValueError('Declare max_steps as None or a positive integer and a positive input token limit')
     reserved = {'env_factory', 'backend', 'metadata', 'output', 'episode_task', 'harness_profile',
         'site_discovery', 'observation_pipeline', 'terminal_response_instruction',
         'automatic_grading', 'allow_ungraded', 'ungraded_reason', 'agent_runtime', 'agent_actor'}
