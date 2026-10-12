@@ -7,7 +7,7 @@ main[data-suite-mode="true"]>:not(#suite-view){display:none!important}
 const suitesButton=node('button','','Suites');suitesButton.id='show-suites';suitesButton.onclick=()=>{location.hash='suites'};
 const suitesToolbar=node('div','suite-toolbar');suitesToolbar.append(suitesButton);el('sessions').before(suitesToolbar);
 const suitePanel=node('section');suitePanel.id='suite-view';suitePanel.hidden=true;document.querySelector('main').append(suitePanel);
-let suiteGeneration=0,suiteSignature=null;
+let suiteGeneration=0,suiteSignature=null,suiteRequest=null;
 const suiteFilters=new Map();
 const originalList=list;
 list=function(){
@@ -79,22 +79,28 @@ refresh=async function(options={}){
  const hash=decodeURIComponent(location.hash.slice(1)),enabled=hash==='suites'||hash.startsWith('suite/');
  const changed=document.querySelector('main').dataset.suiteMode!==String(enabled);
  suiteMode(enabled);
- if(!enabled){suiteGeneration++;suiteSignature=null;return originalRefresh(options)}
+ if(!enabled){suiteGeneration++;suiteSignature=null;suiteRequest?.abort();suiteRequest=null;return originalRefresh(options)}
+ if(options.background&&suiteRequest)return;
+ suiteRequest?.abort();const request=new AbortController();suiteRequest=request;
  // Invalidate in-flight trace refreshes before they can render into suite mode.
  traceRequest?.abort();generation++;
  const own=++suiteGeneration;
  try{
   const route=hash==='suites'?'/api/suites':'/api/suites/'+encodeURIComponent(hash.slice(6));
-  const [response,catalog]=await Promise.all([fetch(route),changed||!sessions.length?fetch('/api/sessions'):Promise.resolve(null),refreshCollections(undefined,()=>own===suiteGeneration)]);
+  const [response,catalog]=await Promise.all([fetch(route,{signal:request.signal}),changed||!sessions.length?fetch('/api/sessions',{signal:request.signal}):Promise.resolve(null),refreshCollections(undefined,()=>own===suiteGeneration)]);
   if(!response.ok)throw Error('Suite unavailable ('+response.status+')');
   const data=await response.json();if(own!==suiteGeneration)return;
   if(catalog?.ok){const items=await catalog.json();if(own!==suiteGeneration)return;sessions=items;}
   list();
-  const signature=hash+JSON.stringify(data);
+  // Recency changes reorder index rows but do not alter card/table contents.
+  // Keep focused inputs and table scroll when only the timestamp advances.
+  const content=({updated_at,...suite})=>suite;
+  const signature=hash+JSON.stringify(hash==='suites'?data.map(content):content(data));
   if(signature!==suiteSignature){suiteSignature=signature;hash==='suites'?renderSuiteIndex(data):renderSuiteDetail(data)}
   if(changed||options.navigate){document.querySelector('main').scrollTop=0;if(getComputedStyle(document.querySelector('main')).overflowY==='visible')window.scrollTo(0,0)}
   el('connection').textContent='Connected · suite status refreshed '+new Date().toLocaleTimeString();
  }catch(error){if(own===suiteGeneration)el('connection').textContent=error.message+' · existing view retained'}
+ finally{if(suiteRequest===request)suiteRequest=null}
 };
 
 refresh({navigate:true});

@@ -1,8 +1,10 @@
 """Read-only trusted suite registration and public projection; no model calls."""
 from collections import Counter
+import datetime as dt
 import hashlib
 import json
 from pathlib import Path
+import stat
 
 SCHEMA = 'episode-suite-plan-v1'
 
@@ -13,6 +15,38 @@ def read(path):
 
 def trace_id(path):
     return hashlib.sha256(('browsergym:' + Path(path).name).encode()).hexdigest()[:20]
+
+
+def timestamp(value):
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = dt.datetime.fromisoformat(value)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=dt.timezone.utc)
+        return parsed.astimezone(dt.timezone.utc)
+    except (ValueError, OverflowError):
+        return None
+
+
+def episode_updated_at(trace, summary):
+    recorded = timestamp(summary.get('updated_at'))
+    if recorded is not None:
+        return recorded
+    # Cold/direct callers may have no summary. Stat recording files only;
+    # later copies or grader output must not count as episode activity.
+    latest = None
+    for name in ('metadata.json', 'events.jsonl', 'steps.jsonl', 'episode.json',
+                 'trace.jsonl', 'session.json'):
+        try:
+            info = (trace / name).stat()
+            if not stat.S_ISREG(info.st_mode):
+                continue
+            modified = dt.datetime.fromtimestamp(info.st_mtime, dt.timezone.utc)
+            latest = modified if latest is None else max(latest, modified)
+        except (OSError, ValueError, OverflowError):
+            continue
+    return latest or timestamp(summary.get('started_at'))
 
 
 def safe_trace(case):
@@ -85,11 +119,18 @@ class SuiteCatalog:
 
     def detail(self, ident, *, summaries=None, verify=True):
         path, plan = self.plans()[ident]; rows = []; summaries = summaries or {}
+        suite_updated = next((value for name in ('updated_at', 'created_at', 'started_at')
+                              if (value := timestamp(plan.get(name))) is not None), None)
+        episode_updates = []
         metric_path = path.parent / 'suite-metrics.json'
         metrics = {c['case_id']: c.get('usage') for c in read(metric_path)['cases']} if metric_path.is_file() else {}
         for case in plan['cases']:
             trace = safe_trace(case); tid = trace_id(trace) if trace else None
             summary = summaries.get(tid, {})
+            if suite_updated is None and trace is not None:
+                updated = episode_updated_at(trace, summary)
+                if updated is not None:
+                    episode_updates.append(updated)
             row = {'case_id': case['case_id'], 'task_id': case['task_id'], 'task_title': case.get('task_title', case['task_id']),
                    'model': case['model']['model'], 'transport': case['model']['transport'], 'repeat': case['repeat'],
                    'scenario_sha256': case.get('scenario_sha256'), 'trace_id': tid, 'trace_url': '/#' + tid if tid else None,
@@ -126,11 +167,18 @@ class SuiteCatalog:
                         row.update(verdict=row['answer_checks'], verdict_scope='derived_answer_checks')
             rows.append(row)
         verdicts = Counter('pass' if r['verdict'] is True else 'fail' if r['verdict'] is False else 'unknown' for r in rows)
+        updated = suite_updated or max(episode_updates, default=None)
         return {'id': plan['id'], 'title': plan['title'], 'description': plan.get('description', ''), 'tags': plan.get('tags', []),
+                'updated_at': updated.isoformat() if updated is not None else None,
                 'limits': plan.get('limits'), 'case_count': len(rows), 'counts': dict(verdicts),
                 'states': dict(Counter(r['state'] for r in rows)), 'cases': rows,
                 'training_eligible': False, 'grade_scope_note': 'Recorded safe success and derived answer checks are distinct. Unexecuted, unknown and technical errors are retained.'}
 
     def index(self, summaries=None):
-        return [{k: v for k, v in self.detail(ident, summaries=summaries, verify=True).items() if k != 'cases'}
+        rows = [{k: v for k, v in self.detail(ident, summaries=summaries, verify=True).items() if k != 'cases'}
                 for ident in self.plans()]
+        # Stable IDs resolve ties independently of registration order.
+        rows.sort(key=lambda row: row['id'])
+        rows.sort(key=lambda row: timestamp(row['updated_at']) or dt.datetime.min.replace(tzinfo=dt.timezone.utc),
+                  reverse=True)
+        return rows

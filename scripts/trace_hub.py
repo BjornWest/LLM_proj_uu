@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import threading
+import time
 from urllib.parse import urlsplit,parse_qs,unquote
 from agent_trace.collections import CollectionStore, collection_post, declared_collection, declared_tags, normalize_collection, parent_ids
 try:
@@ -135,6 +136,8 @@ class Hub:
         self.collections=CollectionStore(Path(registry).parent/'collections.json');self.collection_roots={}
         self.registry=Path(registry);self.mode=mode;self.caches={};self.lock=threading.Lock()
         self.entries={};self.bodies=OrderedDict();self.body_lock=threading.Lock()
+        self.suite_refresh_lock=threading.Lock()
+        self.last_snapshot_at=self.last_suite_attempt_at=float('-inf')
         self.cache_bytes=cache_bytes;self.body_bytes=0
         self.ledger=ledger
         self.cache_directory=self.registry.parent/('summary-cache-ledger' if ledger else 'summary-cache')
@@ -233,7 +236,21 @@ class Hub:
                 groups[index]=entry['summary']
             self.entries=entries
             groups.sort(key=lambda g:(started_key(g),g['id']),reverse=True)
+            self.last_snapshot_at=time.monotonic()
             return json.dumps(groups).encode(),LazySessions(self,entries)
+
+    def suite_summaries(self):
+        # Multiple suite tabs share one refresh per polling interval. A broken
+        # unrelated recording must not hide an otherwise readable suite.
+        with self.suite_refresh_lock:
+            if time.monotonic()-max(self.last_snapshot_at,self.last_suite_attempt_at)>=2.5:
+                try:
+                    self.snapshot()
+                except (OSError,ValueError,KeyError):
+                    pass
+                finally:
+                    self.last_suite_attempt_at=time.monotonic()
+            return {k:v['summary'] for k,v in self.entries.items() if 'summary' in v}
 
     def lookup(self,ident):
         """Revalidate only the selected trace, without rebuilding its siblings."""
@@ -322,11 +339,11 @@ def make_handler(registry, *, hub_class=Hub, html_factory=None):
                 elif url.path=='/api/collections':body=json.dumps(hub.collections.index()).encode();mime='application/json'
                 elif url.path=='/api/sessions':body,_=hub.snapshot();mime='application/json'
                 elif url.path=='/api/suites':
-                    summaries={k:v['summary'] for k,v in hub.entries.items() if 'summary' in v}
+                    summaries=hub.suite_summaries()
                     body=json.dumps(hub.suites.index(summaries)).encode();mime='application/json'
                 elif url.path.startswith('/api/suites/'):
                     ident=unquote(url.path.removeprefix('/api/suites/'))
-                    try:result=hub.suites.detail(ident,summaries={k:v['summary'] for k,v in hub.entries.items() if 'summary' in v})
+                    try:result=hub.suites.detail(ident,summaries=hub.suite_summaries())
                     except KeyError:self.send_error(404);return
                     body=json.dumps(result).encode();mime='application/json'
                 elif url.path.startswith('/api/sessions/'):
