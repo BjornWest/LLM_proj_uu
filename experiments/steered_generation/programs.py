@@ -12,15 +12,19 @@ outcomes of the rating's draw and of the draws those conditions depend on,
 directly or through other steps; no other step is looked at. The program's
 own code resolves every draw's parameters and
 evaluates every derived value and condition (`resolve`, `_eval`); what is
-written here is only the probability of each outcome of a resolved draw: a
-weighted or uniform choice, the star rating, the set of topics, and a normal
-draw that the program reads through one threshold.
+written here is the order of the steps, as `sample` runs them, and the
+probability of each outcome of a resolved draw: a weighted or uniform choice,
+a whole number from a range, the star rating, the set of topics, and a normal
+draw that the program reads through one threshold. A loop is followed where
+it only derives and collects values.
 
 The producer may wrap a package's review program in checks that refuse
 anything but a whole sample. The reading here runs on a plain copy made from
 the wrapped program's own document, which draws from the same streams; a
 world whose recorded reviews that copy does not reproduce is refused, and a
-steered pass whose reviews differ from the copy's fails.
+steered pass whose reviews differ from the copy's fails. So is a world where
+following the steps here from a review's recorded draws gives another rating
+or says another thing than the review does.
 """
 from collections import defaultdict
 from copy import deepcopy
@@ -34,7 +38,7 @@ from types import SimpleNamespace
 from . import reviews, streams
 
 # A derived value that reads a normal draw through one threshold.
-THRESHOLD = re.compile(r"\s*([A-Za-z_][\w.]*)\s*>=\s*(\d+(?:\.\d+)?)\s*")
+THRESHOLD = re.compile(r"\s*([A-Za-z_][\w.]*)\s*>=\s*(\d+(?:\.\d*)?|\.\d+)\s*")
 # Review programs rebuilt from a world, by the producer module, the world's seed and the product.
 BUILT = {}
 
@@ -46,6 +50,22 @@ def unmodelled(what):
 def touches(path, other):
     """Whether two dotted paths name the same value or one inside the other."""
     return path == other or path.startswith(other + ".") or other.startswith(path + ".")
+
+
+def inner(step):
+    """The steps a loop runs for each of its values; none for a step that is not a loop."""
+    return step["steps"] if "for_each" in step else []
+
+
+def written_by(step):
+    """The paths a step, or a loop with its steps, writes."""
+    return [row["target"] for row in inner(step)] + [step["for_each"]["binding"]] if inner(step) else [step["target"]]
+
+
+def read_by(twin, step):
+    """The paths a step, or a loop with its steps, reads."""
+    found = set().union(twin._step_refs(step), *(twin._step_refs(row) for row in inner(step)))
+    return found | twin.expression(step["for_each"]["from"]).references if "for_each" in step else found
 
 
 def program(world, item, api):
@@ -107,18 +127,22 @@ def site(world, item, api, native, **common):
         raise unmodelled("a review whose stars are not one rating draw")
     steps, needed = [], read | {rating[0]["target"]}
     for step in reversed(twin.document.get("steps", [])):
-        if "for_each" in step or "emit" in step:
-            raise unmodelled("a review program with loops")
-        if any(touches(step["target"], path) for path in needed):
+        if any(touches(target, path) for target in written_by(step) for path in needed):
+            if any("for_each" in row or "sample" in row for row in inner(step)):
+                raise unmodelled("a loop that draws, or holds another loop")
+            if any("emit" in row and ("when" in row or "applicable_when" in twin.fields[row["target"]])
+                   for row in (inner(step) or [step])):
+                raise unmodelled("a collected value under a condition of its own")
             steps.append(step)
-            needed |= twin._step_refs(step)
+            needed |= read_by(twin, step)
     steps.reverse()
     bounds, block, drawn = {}, set(), []
     for step in steps:
-        if "derive" in step:
+        if "sample" not in step:
             continue
         name = step.get("stream", step["id"])
-        if "{" in name or step["sample"] not in ("weighted_choice", "uniform_choice", "rating", "review_topics", "normal"):
+        if "{" in name or step["sample"] not in ("weighted_choice", "uniform_choice", "uniform_int", "rating",
+                                                 "review_topics", "normal"):
             raise unmodelled("a review step drawn by " + step["sample"])
         drawn.append(step["id"])
         if step["sample"] == "review_topics":
@@ -128,7 +152,7 @@ def site(world, item, api, native, **common):
             block.add(name)
         if step["sample"] == "normal":
             users = [other for other in steps if other is not step and
-                     any(touches(step["target"], path) for path in twin._step_refs(other))]
+                     any(touches(step["target"], path) for path in read_by(twin, other))]
             match = THRESHOLD.fullmatch(users[0].get("derive", "")) if len(users) == 1 else None
             if (match is None or match[1] != step["target"] or "when" in users[0] or
                     "applicable_when" in twin.fields[users[0]["target"]] or
@@ -138,6 +162,7 @@ def site(world, item, api, native, **common):
     return SimpleNamespace(
         **common, reader=sys.modules[__name__], program=found, pools=pools, steps=steps, bounds=bounds,
         block=frozenset(block), drawn=frozenset(drawn), rating=rating[0],
+        emits=sorted({row["target"] for step in steps for row in (inner(step) or [step]) if "emit" in row}),
         seeds=[streams.program_review_seed(common["seed"], index) for index in range(common["count"])])
 
 
@@ -231,6 +256,12 @@ def outcomes(place, step, context):
             raise unmodelled("a uniform choice among nothing")
         for option in options:
             yield deepcopy(option), 1 / len(options)
+    elif step["sample"] == "uniform_int":
+        low, high, grid = params["min"], params["max"], params.get("round_to")
+        if type(low) is not int or type(high) is not int or not low <= high <= low + 10000:
+            raise unmodelled("a whole-number draw without a short range")
+        for value in range(low, high + 1):
+            yield (value if grid is None else round(value / grid) * grid), 1 / (high - low + 1)
     elif step["sample"] == "rating":
         yield from stars(params["execution"], params["concentration"]).items()
     else:
@@ -254,53 +285,132 @@ def told(place, entities):
     return next((side for side, holds in sides.items() if holds), reviews.REST)
 
 
+def follow(place, choose, visit):
+    """Run the steps the reading needs from the product's entities, once for every way the draws can fall.
+
+    `choose` gives a draw's outcomes with their probabilities (for a normal
+    draw, the sides of its threshold); `visit` gets the entities and the
+    probability at the end of each way. The order and the handling of a step
+    are `sample`'s: a step whose condition fails is not applicable, a loop
+    runs its steps for each value under the group's bindings, and collected
+    rows add to their list. A package gives every path one producing step, so
+    a list's rows all come from one step, which starts it afresh on each way.
+    """
+    twin, module = place.program.twin, place.program.module
+    context = deepcopy(place.program.entities)
+    for path, definition in twin.fields.items():
+        if "constant" in definition:
+            module.set_path(context, path, deepcopy(definition["constant"]))
+    start = {target: deepcopy(module.get_path(context, target)) for target in place.emits}
+
+    def settle(step):
+        """A step that draws nothing: not applicable, collected or derived."""
+        target = step["target"]
+        conditions = [text for text in (twin.fields[target].get("applicable_when"), step.get("when")) if text is not None]
+        if conditions and not all(twin._eval(text, context) for text in conditions):
+            module.set_path(context, target, module.NOT_APPLICABLE)
+        elif "emit" in step:
+            row, rows = {name: twin._eval(text, context) for name, text in step["emit"].items()}, module.get_path(context, target)
+            if module.unresolved(rows):
+                rows = []
+                module.set_path(context, target, rows)
+            rows.append(row)
+        else:
+            module.set_path(context, target, twin._eval(step["derive"], context))
+
+    def renew(step):
+        """Before a collecting step runs: its list as the entities had it, not as another way left it."""
+        for row in (inner(step) or [step]):
+            if "emit" in row:
+                holder, names = context, row["target"].split(".")
+                for name in names[:-1]:
+                    holder = holder.setdefault(name, {})
+                if module.unresolved(start[row["target"]]):
+                    holder.pop(names[-1], None)
+                else:
+                    holder[names[-1]] = deepcopy(start[row["target"]])
+
+    def walk(position, mass, decided):
+        if position == len(place.steps):
+            visit(context, mass)
+            return
+        step, ahead = place.steps[position], position + 1
+        if "for_each" in step:
+            renew(step)
+            if "when" not in step or twin._eval(step["when"], context):
+                values = twin._eval(step["for_each"]["from"], context)
+                if not isinstance(values, (list, set)):
+                    raise unmodelled("a loop over something that is not a collection")
+                saved = deepcopy(context.get("group", {}))
+                for value in sorted(values) if isinstance(values, set) else list(values):
+                    context["group"] = deepcopy(saved)
+                    module.set_path(context, step["for_each"]["binding"], value)
+                    for row in step["steps"]:
+                        settle(row)
+                context["group"] = saved
+            walk(ahead, mass, decided)
+        elif "sample" not in step:
+            if step["target"] in decided:
+                module.set_path(context, step["target"], decided[step["target"]])
+            else:
+                renew(step)
+                settle(step)
+            walk(ahead, mass, decided)
+        else:
+            target, definition = step["target"], twin.fields[step["target"]]
+            conditions = [text for text in (definition.get("applicable_when"), step.get("when")) if text is not None]
+            if conditions and not all(twin._eval(text, context) for text in conditions):
+                module.set_path(context, target, module.NOT_APPLICABLE)
+                walk(ahead, mass, decided)
+                return
+            for value, share in choose(step, context):
+                if step["sample"] == "normal":
+                    # The draw itself is never set: only its threshold's side is read.
+                    walk(ahead, mass * share, {**decided, place.bounds[step["id"]][0]: value})
+                else:
+                    module.set_path(context, target, value)
+                    walk(ahead, mass * share, decided)
+
+    walk(0, 1.0, {})
+
+
 def cells(place):
     """The probability that one review has each star rating and is positive, negative or neither about the topic.
 
-    Walks the steps the rating and the topic's statements depend on in the
-    program's order, branching on every outcome of a draw, as `sample` runs
-    them for one.
+    Follows the steps the rating and the topic's statements depend on,
+    branching on every outcome of a draw.
     """
     name = json.dumps(place.requirement["topic"], sort_keys=True)
     if name in place.program.cells:
         return dict(place.program.cells[name])
-    twin, module = place.program.twin, place.program.module
-    context, found = deepcopy(place.program.entities), defaultdict(list)
-    for path, definition in twin.fields.items():
-        if "constant" in definition:
-            module.set_path(context, path, deepcopy(definition["constant"]))
+    twin, module, found = place.program.twin, place.program.module, defaultdict(list)
 
-    def walk(position, mass, decided):
-        if position == len(place.steps):
-            found[module.get_path(context, place.rating["target"]), told(place, context)].append(mass)
-            return
-        step = place.steps[position]
-        target, ahead = step["target"], position + 1
-        conditions = [text for text in (twin.fields[target].get("applicable_when"), step.get("when")) if text is not None]
-        if conditions and not all(twin._eval(text, context) for text in conditions):
-            module.set_path(context, target, module.NOT_APPLICABLE)
-            walk(ahead, mass, decided)
-        elif "derive" in step:
-            module.set_path(context, target, decided[target] if target in decided
-                            else twin._eval(step["derive"], context))
-            walk(ahead, mass, decided)
-        elif step["sample"] == "normal":
-            # The draw itself is never set: only its threshold's side is read.
-            later, bound = place.bounds[step["id"]]
-            for side, share in zip((True, False), tails(twin.resolve(step, context), bound)):
-                if share > 0:
-                    walk(ahead, mass * share, {**decided, later: side})
-        else:
-            for value, share in outcomes(place, step, context):
-                module.set_path(context, target, value)
-                walk(ahead, mass * share, decided)
+    def choose(step, context):
+        if step["sample"] != "normal":
+            return outcomes(place, step, context)
+        return [(side, share) for side, share in zip(
+            (True, False), tails(twin.resolve(step, context), place.bounds[step["id"]][1])) if share > 0]
 
-    walk(0, 1.0, {})
+    follow(place, choose, lambda context, mass: found[
+        module.get_path(context, place.rating["target"]), told(place, context)].append(mass))
     if not set(rating for rating, _ in found) <= set(range(1, 6)):
         raise unmodelled("a review without a star rating from one to five")
     place.program.cells[name] = {(rating, side): fsum(found.get((rating, side), [])) for rating in range(1, 6)
                                  for side in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST)}
     return dict(place.program.cells[name])
+
+
+def replayed(place, found):
+    """What following the steps from a review's recorded block draws says of it: the topic's class and the rating."""
+    recorded, module, seen = {name: json.loads(outcome) for name, outcome in found[0]}, place.program.module, []
+
+    def choose(step, context):
+        value = recorded[step["id"]]
+        return [(value >= place.bounds[step["id"]][1] if step["sample"] == "normal" else value, 1.0)]
+
+    follow(place, choose, lambda context, mass: seen.append(
+        (told(place, context), module.get_path(context, place.rating["target"]))))
+    return seen[0]
 
 
 def shares(place):
@@ -358,6 +468,9 @@ def written(world, place):
 
 
 def reads(world, place):
-    """Refuse a natural world whose reviews are not what this reading draws under the world's seed."""
-    if written(world, place) != [redrawn(place, index) for index in range(place.count)]:
+    """Refuse a natural world whose reviews are not what this reading draws under the world's seed, or follows."""
+    rows = written(world, place)
+    if rows != [redrawn(place, index) for index in range(place.count)]:
         raise ValueError("The product's recorded reviews are not what its review program draws under the world's seed")
+    if any(replayed(place, row) != row[1:] for row in rows):
+        raise ValueError("Following the review program's steps from a review's recorded draws gives another review")

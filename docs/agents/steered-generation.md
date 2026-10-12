@@ -589,11 +589,17 @@ the price paid is the option's. For a tablet's stylus it includes whether
 the owner has a pen at all. The probability that one review has a given
 rating and says a given thing is then a sum over the outcomes of those draws,
 walked in the program's order. The program's own code resolves each draw's
-parameters and evaluates each derived value and condition; written here is
-only the probability of each outcome of a resolved draw: a weighted or a
-uniform choice, the rating, the set of topics, and a normal draw that the
-program reads through one threshold (the value score, at one half, after the
-program's clipping and rounding).
+parameters and evaluates each derived value and condition; written here are
+the order of the steps as the program's `sample` runs them (a step whose
+condition fails is not applicable; a loop that only derives and collects
+values runs its steps for each value) and the probability of each outcome of
+a resolved draw: a weighted or a uniform choice, a whole number from a range,
+the rating, the set of topics, and a normal draw that the program reads
+through one threshold (the value score, at one half, after the program's
+clipping and rounding). Because the order of the steps is written here a
+second time, every recorded review of a natural world is also followed from
+its recorded draws alone, and the world is refused if that gives another
+rating or says another thing than the review does.
 
 Either way the reviews of a product draw independently and alike, so the
 three numbers (positive, negative, neither) are multinomial with one review's
@@ -666,10 +672,13 @@ draws read by the rule written out in `reviews.said`.
 
 Limits. On the pilot concepts, not the topics whose score depends on the
 option bought or the wearer (`size_fit`, `forefoot_room`). A review program
-is refused ("Not modelled") where it has loops, a draw of another kind than
-the five above, a normal draw read otherwise than through one threshold, a
-statement about the topic that is neither for nor against, or a review that
-would be both. None of the 37 authored review programs does any of these.
+is refused ("Not modelled") where what the topic depends on includes a loop
+that draws or holds another loop, a collected value under a condition of its
+own, a draw of another kind than the six above, a normal draw read otherwise
+than through one threshold, a statement about the topic that is neither for
+nor against, or a review that would be both. None of the 37 review programs
+in git does any of these (see the evidence for the concepts whose data is
+not in git).
 Only the topic count over all of a product's reviews and the mean of its
 stars: not the count of each star, not one option's reviews. No producer
 writes a neutral or a mixed comment, or a second statement on a topic under
@@ -1495,6 +1504,54 @@ redrawn, down to 2.1e-4 for "more negative" and 6.2e-5 for "tie"). All ten
 candidates were sampled three times and checked; the redraw counts are
 within 1.7 standard errors (the largest, 10,520 against 10,636 ± 71). The natural pass takes 370 s there, a pass with
 manufacture reused 0.9 s and a sample about 2 s.
+
+Every concept, and the stars (`steering/reviews-r10/`, steering commit
+`16ca53f`, one runner command per task with `--task`). The world is the
+suite's ordinary review task's input again (seed 78, five concepts, 100
+reviews per product; natural pass 426 to 437 s). Four review tasks on it, one
+per producer of reviews: the suite's own (grip on wet paving, the walking
+shoe Vallheden Strand), everyday comfort of a casual trainer, marks made with
+a pen on a tablet, and value of a T-shirt, the last three with at least two
+assessing comments asked for. Each has six candidates: the four verdicts, and
+the verdict against the stars twice.
+
+| Task | Verdicts, likeliest to rarest | More negative, mean rating 4 or more | More positive, mean rating 2 or less | Seconds per sample |
+| --- | --- | --- | --- | --- |
+| Shoe, grip | 0.51, 0.33, 0.16, 0.0013 | 2.5e-17 | 2.0e-10 | 1.9 to 3.3 |
+| Trainer, comfort | 0.84, 0.087, 0.075, 0.0023 | 0.084 | 4.9e-58 | 2.2 to 4.4 |
+| Tablet, pen | 0.76, 0.13, 0.080, 0.032 | 0.026 | 1.9e-51 | 3.6 to 14 |
+| T-shirt, value | 0.92, 0.041, 0.035, 0.0018 | 1.5e-41 | 0.0051 | 98 to 110 |
+
+All 66 samples (three per candidate, two for the T-shirt) satisfied their
+requirement by the native task's reference, by the direct reading of the
+saved reviews, and, where a mean is stated, by the product's rating summary:
+the high-star samples have means of 4.0 to 4.27 with two to seven complaints
+against none to four comments of praise, the low-star ones 1.87 to 2.0.
+Redraws through the producer equalled the reading's in all 54 passes. The
+frequencies over other seeds (2,000 redraws for the shoe, 1,500 for the
+trainer, 600 for the tablet, 300 for the T-shirt) are within four standard
+errors of the computed probabilities for all 24 candidates; for the rare
+ones that only says that they did not occur. How likely the verdict against
+the stars is depends on the product: this trainer and this tablet are well
+made, so a mean of four stars is the usual case and complaints under it are
+as likely as complaints at all; the shoe is middling, and a hundred ratings
+averaging four or more with more complaints than praise among them is a
+2.5e-17 event for it. The T-shirt's samples take as long as its hundred reviews do
+through the producer's wrapped review program, about a second each.
+
+The other concepts. The producer supports 130 concepts; the data of 39 are
+in git (37 with a review program, and the two pilot concepts), and the rest
+read files that exist only in the shared working tree. A world of all 130
+from that tree (seed 5, eight reviews per product, 378 products; a scratch
+check from the shared tree, not a pinned run, and not reproducible from a
+commit) has a product for 126 of them. At `16ca53f` the reading followed 700
+topics of the first 118 concepts before its time limit (every one of the 36
+git concepts with a product among them), each compared with 1,200 whole
+reviews drawn by the program under seeds of their own (largest deviation of
+a class's frequency 3.1 standard errors over about 2,100 comparisons), and
+refused 58 topics in 22 concepts whose data is not in git, for three
+reasons: the value threshold written `.5`, a whole-number draw, and a loop
+that collects rows. The commit after it reads all three.
 
 All of these are dev-producer worlds from the suite's inputs, not the
 suite's frozen worlds, and nothing here is published or bound to a task

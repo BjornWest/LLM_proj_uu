@@ -363,6 +363,14 @@ class ProducerTests(Programs):
             self.assertTrue(limits.get("min", 1) <= seen.get("mean_rating", 3) <= limits.get("max", 5))
 
 
+def pool(document, name):
+    return next(row for row in document["language"] if row["id"] == name)
+
+
+def step(document, name):
+    return next(row for row in document["steps"] if row["id"] == name)
+
+
 class RefusalTests(Programs):
     def altered(self, change):
         """The trainers' review program with its document changed, in place of the one the reading rebuilds."""
@@ -374,10 +382,83 @@ class RefusalTests(Programs):
         programs.BUILT[key] = SimpleNamespace(**{**vars(found), "twin": package_export.ProductPackage(document), "cells": {}})
         self.addCleanup(programs.BUILT.pop, key, None)
 
-    def test_a_program_the_reading_cannot_follow_is_refused(self):
-        pool = lambda document, name: next(p for p in document["language"] if p["id"] == name)
-        step = lambda document, name: next(s for s in document["steps"] if s["id"] == name)
+    @staticmethod
+    def half(document):
+        """The value threshold written without its leading zero."""
+        step(document, "sentiment_value")["derive"] = "review.value_favourability >= .5"
 
+    @staticmethod
+    def counted(document):
+        """A whole-number draw that the comfort statements' conditions read."""
+        document["fields"]["review.wears"] = {"type": "integer", "min": 1, "max": 4}
+        document["steps"].append({"id": "wears", "target": "review.wears", "sample": "uniform_int", "min": 1, "max": 4})
+        for name in ("everyday_comfort.positive", "everyday_comfort.negative"):
+            pool(document, name)["when"] += " and review.wears >= 2"
+
+    @staticmethod
+    def looped(document):
+        """A loop that collects two rows per review; the comfort statements need the reviewed option among them."""
+        option = {"sku_id": {"type": "string"}, "product_id": {"type": "string"}, "colour": {"type": "string"},
+                  "width": {"type": "string"}, "size_eu": {"type": "integer"}}
+        document["fields"].update({
+            "internal.kinds": {"type": "array", "items": {"type": "enum", "values": ["a", "b"]}, "constant": ["a", "b"]},
+            "group.kind": {"type": "enum", "values": ["a", "b"]},
+            "internal.rows": {"type": "array", "items": {"type": "object", "properties": option}}})
+        # The second row is the option itself up to three stars; a row left from another rating would show.
+        row = {**{name: "review.subject." + name for name in option},
+               "size_eu": "review.subject.size_eu if review.rating <= 3 and group.kind == 'b' else 0"}
+        document["steps"].append({"id": "rows", "for_each": {"binding": "group.kind", "from": "internal.kinds"},
+                                  "steps": [{"id": "row", "target": "internal.rows", "emit": row}]})
+        for name in ("everyday_comfort.positive", "everyday_comfort.negative"):
+            pool(document, name)["when"] += " and review.subject in internal.rows"
+
+    @staticmethod
+    def gated(document):
+        """A draw and a derived value that apply only to some ratings; the comfort statements need both known."""
+        document["fields"].update({"review.wears": {"type": "integer", "min": 1, "max": 2},
+                                   "review.keen": {"type": "boolean"}})
+        document["steps"] += [
+            {"id": "wears", "target": "review.wears", "sample": "uniform_int", "min": 1, "max": 2, "when": "review.rating >= 2"},
+            {"id": "keen", "target": "review.keen", "derive": "review.rating >= 3", "when": "review.rating <= 4"}]
+        for name in ("everyday_comfort.positive", "everyday_comfort.negative"):
+            pool(document, name)["when"] += " and known(review.wears) and known(review.keen)"
+
+    def test_steps_no_program_in_git_has_are_followed(self):
+        plain = programs.cells(self.place())
+        worth = programs.cells(self.place(TRAINERS, "value"))
+        for change, aspect in ((self.half, "value"), (self.counted, "everyday_comfort"), (self.looped, "everyday_comfort"),
+                               (self.gated, "everyday_comfort")):
+            with self.subTest(change=change.__name__):
+                self.altered(change)
+                place = self.place(TRAINERS, aspect)
+                cells, twin, trials = programs.cells(place), place.program.twin, 6000
+                self.assertAlmostEqual(sum(cells.values()), 1, places=12)
+                seen = Counter()
+                for seed in range(10 ** 7, 10 ** 7 + trials):
+                    review = twin.sample(seed, inputs=deepcopy(place.program.entities))
+                    found = (programs.draws(place, review["trace"]), programs.told(place, review["entities"]),
+                             review["entities"]["review"]["rating"])
+                    seen[found[2], found[1]] += 1
+                    # Following the steps from the draws alone says what the program's own run says.
+                    self.assertEqual(programs.replayed(place, found), found[1:])
+                for cell, chance in cells.items():
+                    self.assertLess(abs(seen[cell] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 1e-9, cell)
+                if change is self.half:
+                    self.assertEqual(cells, worth)
+                elif change is self.counted:
+                    self.assertIn("wears", place.drawn)
+                    self.assertIn("wears", place.block)
+                    for rating in range(1, 6):
+                        self.assertAlmostEqual(cells[rating, reviews.POSITIVE], plain[rating, reviews.POSITIVE] * 3 / 4, places=12)
+                else:
+                    self.assertEqual("internal.rows" in place.emits, change is not self.gated)
+                    kept = {self.looped: (1, 2, 3), self.gated: (2, 3, 4)}[change]
+                    for rating in range(1, 6):
+                        for side in (reviews.POSITIVE, reviews.NEGATIVE):
+                            self.assertAlmostEqual(cells[rating, side], plain[rating, side] * (rating in kept), places=12)
+                programs.BUILT.clear()
+
+    def test_a_program_the_reading_cannot_follow_is_refused(self):
         def neutral(document):
             pool(document, "everyday_comfort.negative")["meaning"]["polarity"] = "neutral"
 
@@ -395,8 +476,16 @@ class RefusalTests(Programs):
         def unclipped(document):
             step(document, "value_favourability")["bounds_mode"] = "truncate"
 
+        def wide(document):
+            self.counted(document)
+            step(document, "wears")["max"] = 20000
+
+        def guarded(document):
+            self.looped(document)
+            step(document, "rows")["steps"][0]["when"] = "review.rating >= 2"
+
         for change, topic in ((neutral, "everyday_comfort"), (both, "everyday_comfort"), (raw, "value"), (twice, "value"),
-                              (unclipped, "value")):
+                              (unclipped, "value"), (wide, "everyday_comfort"), (guarded, "everyday_comfort")):
             with self.subTest(change=change.__name__):
                 self.altered(change)
                 with self.assertRaises(ValueError) as caught:
@@ -406,6 +495,18 @@ class RefusalTests(Programs):
         # A change the topic does not depend on is no obstacle.
         self.altered(neutral)
         self.assertGreater(reviews.model(self.natural, self.need(TRAINERS, "value", verdict="tie"), self.api).probability, 0)
+
+    def test_a_reading_that_follows_the_steps_wrongly_is_refused(self):
+        # A product with praise of its value, followed with the value score's threshold out of reach.
+        place = next(found for found in (self.place(TRAINERS, "value", index) for index in range(len(self.products[TRAINERS])))
+                     if any(row[1] == reviews.POSITIVE for row in programs.written(self.natural, found)))
+        rows = programs.written(self.natural, place)
+        self.assertEqual([programs.replayed(place, row) for row in rows], [row[1:] for row in rows])
+        programs.reads(self.natural, place)
+        place.bounds = {"value_favourability": ("review.positive_value", 1.5)}
+        with self.assertRaises(ValueError) as caught:
+            programs.reads(self.natural, place)
+        self.assertIn("Following", str(caught.exception))
 
     def test_a_world_the_program_does_not_reproduce_is_refused(self):
         requirement = self.need(verdict="tie")
