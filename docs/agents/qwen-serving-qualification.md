@@ -136,7 +136,8 @@ evidence and process-birth rejection, monotonic expiry, strict profile binding,
 private no-clobber publication, unavailable HTTP503, no mutation routes and no
 generation calls during reuse.
 
-Until Evaluation's caller is integrated, supply its exact frozen source export:
+When testing from an isolated tree without Evaluation's caller, supply its
+exact frozen source export:
 
 ```bash
 QWEN_TEST_RUNTIME_SOURCE=/ABSOLUTE/REVIEWED/qwen_suite_runtime.py \
@@ -152,5 +153,5 @@ remain runnable. A test against an unreviewed caller candidate is preparation,
 not source adoption. Do not replace the caller's independent review or actual
 native-world/grade/viewer/recording acceptance with these mock HTTP results.
 The source hash is checked before loading the external test input. The default
-hash names the original caller candidate; supply the exact release hash when
+hash names the reviewed `97e2d82` caller's runtime (`4491d896…`); supply the exact release hash when
 deliberately testing a revised caller. No default skip is claimed as acceptance.
