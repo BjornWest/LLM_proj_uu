@@ -8,8 +8,9 @@ native review-summary task reads the steered worlds.
 """
 from collections import Counter
 from copy import deepcopy
-from itertools import permutations
-from math import prod
+from fractions import Fraction
+from itertools import permutations, product
+from math import exp, prod
 from pathlib import Path
 from random import Random
 from tempfile import TemporaryDirectory
@@ -199,6 +200,202 @@ class ModelTests(Reviews):
         self.assertEqual((step.writes, step.reads), ({("reviews", "", self.shoes[0])}, set()))
 
 
+class StarTests(Reviews):
+    """A mean star rating stated with, or without, what the comments say."""
+
+    def typical(self, product=None):
+        place = reviews.site(self.natural, self.need(product, verdict="tie"), self.api)
+        return round(sum(rating * mass for rating, mass in reviews.stars(place).items()), 1)
+
+    def starred(self):
+        usual, other = self.typical(), self.typical(self.sandals[0])
+        return [self.need(verdict="more_negative", mean_rating={"min": round(usual + .2, 2)}),
+                self.need(mean_rating={"max": round(usual - .2, 2)}),
+                self.need(positive={"min": 2}, mean_rating={"min": round(usual - .1, 2), "max": round(usual + .1, 2)}),
+                self.need(self.sandals[0], HEAT, verdict="more_positive", mean_rating={"max": round(other - .15, 2)})]
+
+    def synthetic(self, count, **stated):
+        """A few reviews with arbitrary chances of each rating and class, small enough to enumerate."""
+        rng = Random(5)
+        weights = {(rating, name): rng.random() * (1 if name == reviews.REST else .3) for rating in range(1, 6)
+                   for name in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST)}
+        cells = {cell: weight / sum(weights.values()) for cell, weight in weights.items()}
+        place = SimpleNamespace(count=count, requirement=reviews.resolve(
+            {"schema": reviews.VERSION, "product_id": "x", "topic": GRIP, **stated}))
+        return place, cells, reviews.marginal(cells)
+
+    def test_a_reviews_stars_and_class_together_match_other_seeds(self):
+        for product, topic in self.cases()[:3]:
+            with self.subTest(product=product, aspect=topic["aspect"]):
+                requirement = self.need(product, topic, verdict="tie")
+                place, reading = reviews.site(self.natural, requirement, self.api), reviews.trial(self.natural, requirement, self.api)
+                rows = [row for seed in range(1500) for row in reading.reading(seed)]
+                seen, model = Counter((reviews.rated(place, row), reviews.said(place, row)) for row in rows), reviews.cells(place)
+                self.assertAlmostEqual(sum(model.values()), 1, places=12)
+                self.assertEqual(len(model), 15)
+                for cell, chance in model.items():
+                    self.assertLess(abs(seen[cell] / len(rows) - chance), 4.5 * (chance * (1 - chance) / len(rows)) ** .5 + 1e-9, cell)
+                self.assertEqual(reviews.shares(place), reviews.marginal(model))
+
+    def test_star_totals_match_enumeration(self):
+        bounds = ({"min": 3.5}, {"max": 2.25}, {"min": 2.5, "max": 3.5}, {"min": 5}, {"max": 1}, {"min": 3, "max": 3},
+                  {"min": 1}, {"min": 3.34}, {"max": 3.33})
+        counts = ({}, {"verdict": "more_negative"}, {"verdict": "tie", "min_assessed": 2}, {"positive": {"min": 1}},
+                  {"verdict": "insufficient_evidence"})
+        for count, limits, stated in [(count, limits, stated) for count in (1, 2, 3) for limits in bounds for stated in counts] + [
+                (4, {"min": 3.75}, {"verdict": "more_negative"}), (4, {"min": 2.5, "max": 2.75}, {})]:
+            with self.subTest(count=count, limits=limits, stated=stated):
+                place, cells, share = self.synthetic(count, mean_rating=limits, **stated)
+                direct = Counter()
+                for rows in product(cells.items(), repeat=count):
+                    names = Counter(name for (_, name), _ in rows)
+                    mean = Fraction(sum(rating for (rating, _), _ in rows), count)
+                    if reviews.holds(place.requirement, names[reviews.POSITIVE], names[reviews.NEGATIVE], mean):
+                        direct[names[reviews.POSITIVE], names[reviews.NEGATIVE]] += prod(mass for _, mass in rows)
+                found = reviews.multinomial(count, share, lambda positive, negative: reviews.agreed(place.requirement, positive, negative))
+                terms = reviews.starred(place, cells, share, found[0]) if found else {}
+                self.assertEqual(set(terms), set(direct))
+                for key, value in terms.items():
+                    self.assertAlmostEqual(exp(value) / direct[key], 1, places=10, msg=key)
+        # The mean is compared as the decimal it is written as, not as the nearest float.
+        self.assertEqual(reviews.span({"mean_rating": {"min": 4.2, "max": 4.2}}, 5), (21, 21))
+        self.assertEqual(reviews.span({"mean_rating": {"min": 3.34}}, 3), (11, 15))
+        self.assertEqual(reviews.span({"mean_rating": {"max": 3.33}}, 3), (3, 9))
+        self.assertEqual(reviews.span({}, 7), (7, 35))
+        self.assertTrue(reviews.holds({"mean_rating": {"min": 4.2}}, 0, 0, Fraction(21, 5)))
+        self.assertFalse(reviews.holds({"mean_rating": {"min": 4.2}}, 0, 0, Fraction(209, 50)))
+        self.assertFalse(reviews.holds({"mean_rating": {"min": 1}}, 0, 0, None))
+        self.assertFalse(reviews.holds({"mean_rating": {"min": 1}}, 0, 0))
+
+    def test_chosen_ratings_match_enumeration(self):
+        for limits, positive, negative in (({"min": 3.67}, 1, 1), ({"max": 2.4}, 2, 0), ({"min": 2.5, "max": 3.5}, 0, 2),
+                                           ({"min": 2}, 1, 0)):
+            with self.subTest(limits=limits, positive=positive, negative=negative):
+                place, cells, share = self.synthetic(3, mean_rating=limits)
+                names = [reviews.POSITIVE] * positive + [reviews.NEGATIVE] * negative + [reviews.REST] * (3 - positive - negative)
+                direct = {stars: prod(cells[rating, name] / share[name] for rating, name in zip(stars, names))
+                          for stars in product(range(1, 6), repeat=3)
+                          if reviews.holds(place.requirement, positive, negative, Fraction(sum(stars), 3))}
+                rng, trials, seen = Random(8), 30000, Counter()
+                for _ in range(trials):
+                    drawn = reviews.ratings(rng, place, cells, share, positive, negative)
+                    seen[tuple(drawn[reviews.POSITIVE] + drawn[reviews.NEGATIVE] + drawn[reviews.REST])] += 1
+                self.assertLessEqual(set(seen), set(direct))
+                self.assertGreater(len(seen), len(direct) * .8)
+                for stars, weight in direct.items():
+                    chance = weight / sum(direct.values())
+                    self.assertLess(abs(seen[stars] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5, stars)
+
+    def test_probabilities_match_other_seeds(self):
+        trials = 4000
+        for requirement in self.starred():
+            with self.subTest(requirement=requirement):
+                block = reviews.model(self.natural, requirement, self.api)
+                seen = reviews.empirical(self.natural, requirement, self.api, trials, 10 ** 6)
+                hits, chance = sum(seen.values()), block.probability
+                self.assertLess(abs(hits / trials - chance), 4 * (chance * (1 - chance) / trials) ** .5)
+                self.assertGreater(hits, 60)
+                # Count by count as well: the stars weigh each count differently.
+                found = Counter()
+                for counts, times in seen.items():
+                    found[counts[:2]] += times
+                for counts, times in found.most_common(3):
+                    part = exp(block.log_terms[counts])
+                    self.assertLess(abs(times / trials - part), 4.5 * (part * (1 - part) / trials) ** .5, counts)
+        # Either side of any mean, and the counts with no mean stated, add up.
+        usual = self.typical()
+        whole = reviews.model(self.natural, self.need(verdict="more_negative"), self.api).probability
+        parts = [reviews.model(self.natural, self.need(verdict="more_negative", mean_rating=limits), self.api).probability
+                 for limits in ({"max": usual}, {"min": usual + .001})]
+        self.assertAlmostEqual(sum(parts), whole, places=12)
+        self.assertAlmostEqual(reviews.model(self.natural, self.need(mean_rating={"min": 1, "max": 5}), self.api).probability, 1, places=12)
+
+    def test_samples_match_rejection_sampling(self):
+        requirement = self.need(verdict="more_negative", mean_rating={"min": round(self.typical() + .15, 2)})
+        place = reviews.site(self.natural, requirement, self.api)
+        reading = reviews.trial(self.natural, requirement, self.api)
+        accepted = [rows for rows in map(reading.reading, range(10 ** 6, 10 ** 6 + 12000))
+                    if reviews.holds(requirement, *reviews.counted(place, rows))]
+        rng, sampled = Random(11), []
+        for _ in range(min(400, len(accepted))):
+            step = reviews.prepare(self.natural, requirement, self.api, rng)
+            seeds = [[step.script[key].seed for key in reviews.keys(place, index)] for index in range(place.count)]
+            # The rating's stream has a seed of its own; the review's other streams share one.
+            self.assertTrue(all(len(set(found[1:])) == 1 for found in seeds))
+            sampled.append([reviews.redrawn(place, index, found[1], found[0]) for index, found in enumerate(seeds)])
+            self.assertTrue(reviews.holds(requirement, *reviews.counted(place, sampled[-1])))
+        self.assertGreater(len(accepted), 250)
+        features = {
+            "positive": lambda rows: reviews.counted(place, rows)[0],
+            "negative": lambda rows: reviews.counted(place, rows)[1],
+            "written": lambda rows: sum(bool(row[2]) for row in rows),
+            "stars": lambda rows: sum(row[0] for row in rows),
+            "five_stars": lambda rows: sum(row[0] == 5 for row in rows),
+            "stars_complaining": lambda rows: sum(row[0] for row in rows if reviews.said(place, row) == reviews.NEGATIVE),
+            "place_of_stars": lambda rows: sum(i * row[0] for i, row in enumerate(rows)),
+            "silent_score": lambda rows: sum(row[1] for row in rows if reviews.said(place, row) == reviews.REST),
+            "topics": lambda rows: sum(len(row[3]) for row in rows)}
+        for name, feature in features.items():
+            with self.subTest(feature=name):
+                mine, theirs = [feature(rows) for rows in sampled], [feature(rows) for rows in accepted]
+                spread = lambda values: (sum((v - sum(values) / len(values)) ** 2 for v in values) / len(values) ** 2) ** .5
+                self.assertLess(abs(sum(mine) / len(mine) - sum(theirs) / len(theirs)),
+                                4.5 * (spread(mine) ** 2 + spread(theirs) ** 2) ** .5 + 1e-9)
+
+    def test_steered_worlds_hold_through_the_producer_and_the_native_tasks(self):
+        usual = self.typical()
+        needs = self.starred() + [
+            # The rare ones: complaints under a high mean rating, praise under a low one, and a mean alone.
+            self.need(verdict="more_negative", mean_rating={"min": 4}),
+            self.need(verdict="more_positive", min_assessed=3, mean_rating={"max": 2}),
+            self.need(mean_rating={"min": round(usual + .8, 2)})]
+        for index, requirement in enumerate(needs):
+            with self.subTest(requirement=requirement):
+                product = requirement["product_id"]
+                world, found, record = reviews.steer(self.session, self.natural, self.opened, requirement, self.api, Random(index))
+                item, limits = self.item(world, product), requirement["mean_rating"]
+                total = sum(row["rating"] for row in item["reviews"])
+                self.assertEqual((record["steered_star_total"], found["mean_rating"]), (total, total / len(item["reviews"])))
+                self.assertTrue(limits.get("min", 1) * 40 - 1e-9 <= total <= limits.get("max", 5) * 40 + 1e-9)
+                self.assertEqual(requirement.get("verdict", found["verdict"]), found["verdict"])
+                # The native rating task's own reading of the steered world.
+                declared = catalog_review_task.ReviewInventory(item["public"]["concept_id"])
+                spec = {"kind": catalog_review_task.KIND, "concept_id": declared.concept_id, "operation": "rating_summary",
+                        "product_index": sorted(self.shoes if product in self.shoes else self.sandals).index(product)}
+                reference = catalog_review_task.reference(world, catalog_review_task.make(world, spec, inventory=declared),
+                                                          inventory=declared)
+                self.assertEqual((reference["summary"]["rating_sum"], reference["summary"]["rating_count"]), (total, 40))
+                before = self.item(self.natural, product)
+                self.assertEqual({k: v for k, v in item.items() if k not in ("reviews", "rating_summary")},
+                                 {k: v for k, v in before.items() if k not in ("reviews", "rating_summary")})
+                self.assertEqual([p for p in world["products"] if p is not item],
+                                 [p for p in self.natural["products"] if p is not before])
+        self.assertLess(reviews.model(self.natural, needs[4], self.api).probability, 1e-3)
+        # A redraw through the producer reads as the block's own reading does, mean and all.
+        reading = reviews.trial(self.natural, needs[0], self.api)
+        for seed in range(900, 903):
+            found = blocks.redraw(self.session, self.natural, [reading], seed)
+            self.assertEqual((found.identical, found.agreed), ([True], [True]))
+
+    def test_bad_and_impossible_means(self):
+        good = self.need(verdict="tie")
+        for bad in ({}, {"min": 0}, {"max": 5.5}, {"min": 4, "max": 3}, {"min": True}, {"min": "4"}, {"mean": 4},
+                    {"min": float("nan")}, 4, None):
+            with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
+                reviews.model(self.natural, {**good, "mean_rating": bad}, self.api)
+            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        # No whole number of stars gives forty ratings a mean strictly between two neighbouring totals.
+        with self.assertRaises(prices.ZeroMass):
+            reviews.model(self.natural, self.need(mean_rating={"min": 3.01, "max": 3.02}), self.api)
+        self.assertGreater(reviews.model(self.natural, self.need(mean_rating={"min": 3.025, "max": 3.025}), self.api).probability, 0)
+        self.assertGreater(reviews.model(self.natural, self.need(mean_rating={"min": 5}), self.api).log_probability, -400)
+        # A product without ratings has no mean to bound; what its comments say is settled.
+        empty = streams.Session(self.api, {**INPUTS, "review_count": 0}).generate()[0]
+        with self.assertRaises(prices.ZeroMass):
+            reviews.model(empty, self.need(mean_rating={"min": 1}), self.api)
+        self.assertEqual(reviews.model(empty, self.need(verdict="insufficient_evidence"), self.api).probability, 1)
+
+
 class ProducerTests(Reviews):
     def test_steered_worlds_hold_through_the_producer_and_the_native_review_task(self):
         for index, requirement in enumerate(self.requirements()):
@@ -324,13 +521,22 @@ class ProducerTests(Reviews):
         task = {"kind": "summarize_product_reviews", "concept_id": SHOES, "operation": "topic_counts", "product_index": 2,
                 "topic": GRIP, "min_assessed": 2}
         found = variants.of(self.natural, task, self.api)
-        self.assertEqual({row["name"] for row in found}, {"verdict_" + verdict for verdict in reviews.VERDICTS})
-        self.assertEqual([row["log_probability"] for row in found], sorted((row["log_probability"] for row in found), reverse=True))
-        self.assertAlmostEqual(sum(2.718281828459045 ** row["log_probability"] for row in found), 1, places=10)
+        plain, against = found[:4], found[4:]
+        self.assertEqual({row["name"] for row in plain}, {"verdict_" + verdict for verdict in reviews.VERDICTS})
+        self.assertEqual([row["log_probability"] for row in plain], sorted((row["log_probability"] for row in plain), reverse=True))
+        self.assertAlmostEqual(sum(2.718281828459045 ** row["log_probability"] for row in plain), 1, places=10)
+        # And the verdict against the stars: complaints under a high mean rating, praise under a low one.
+        self.assertEqual([row["name"] for row in against], ["high_stars_verdict_more_negative", "low_stars_verdict_more_positive"])
+        self.assertEqual([row["requirement"]["mean_rating"] for row in against], [{"min": 4}, {"max": 2}])
         for index, row in enumerate(found):
             self.assertEqual((row["requirement"]["product_id"], row["requirement"]["min_assessed"]), (self.shoes[2], 2))
             world, seen, _ = reviews.steer(self.session, self.natural, self.opened, row["requirement"], self.api, Random(index))
-            self.assertEqual("verdict_" + seen["verdict"], row["name"])
+            self.assertEqual(seen["verdict"], row["requirement"]["verdict"])
+            self.assertEqual(row["name"].endswith("verdict_" + seen["verdict"]), True)
+            if "mean_rating" in row["requirement"]:
+                self.assertTrue(4 <= seen["mean_rating"] if "min" in row["requirement"]["mean_rating"] else seen["mean_rating"] <= 2)
+                self.assertLess(row["log_probability"], next(
+                    other["log_probability"] for other in plain if other["requirement"]["verdict"] == seen["verdict"]))
         for bad in ({**task, "operation": "rating_summary"}, {**task, "subject_scope": "sku"}, {**task, "product_index": 99},
                     {**task, "sku_index": 0}, {**task, "topic": {"aspect": "size_fit", "context": {}}},
                     {k: v for k, v in task.items() if k != "topic"}, {k: v for k, v in task.items() if k != "concept_id"}):
