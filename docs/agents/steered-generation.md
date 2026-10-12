@@ -603,7 +603,8 @@ and the topic's statements evaluate, the conditions of the fields they write
 included; a mention of the draw that is not the draw alone, `>=`, and a
 number written out refuses the program, and so does a field that marks some
 value of the draw as unknown, since one value could then not stand for its
-neighbours. Because the order of the steps is written here a
+neighbours. A threshold is kept as the number the program has, whole or
+not. Because the order of the steps is written here a
 second time, every recorded review of a natural world is also followed from
 its recorded draws alone, and the world is refused if that gives another
 rating or says another thing than the review does.

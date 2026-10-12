@@ -100,7 +100,8 @@ def thresholds(twin, text, target):
     """The numbers an expression compares a path with by `>=`; None where it mentions the path in any other way.
 
     Read on the expression as the program parses it: the path alone on the
-    left, one `>=`, a number written out on the right.
+    left, one `>=`, a number written out on the right. The numbers are the
+    program's own values, whole or not.
     """
     found = []
 
@@ -117,7 +118,8 @@ def thresholds(twin, text, target):
         if (isinstance(node, ast.Compare) and len(node.ops) == 1 and isinstance(node.ops[0], ast.GtE) and
                 path(node.left) == target and isinstance(node.comparators[0], ast.Constant) and
                 type(node.comparators[0].value) in (int, float)):
-            found.append(float(node.comparators[0].value))
+            # The number as the program has it: a whole number is compared exactly, and a float of it may differ.
+            found.append(node.comparators[0].value)
             return True
         return all([plain(child) for child in ast.iter_child_nodes(node)])
 

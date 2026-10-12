@@ -402,6 +402,13 @@ class RefusalTests(Programs):
         step(document, "sentiment_value")["derive"] = "review.value_favourability >= .5 and review . value_favourability >= .7"
 
     @staticmethod
+    def huge(document):
+        """A whole-number threshold that no float equals: the nearest float is below it and would not reach it."""
+        document["fields"]["review.value_favourability"].update(min=0, max=2e16)
+        step(document, "value_favourability").update(min=0, max=2e16, mean=9007199254740992, sd=1e14, round_to=2)
+        step(document, "sentiment_value")["derive"] = "review.value_favourability >= 9007199254740993"
+
+    @staticmethod
     def fielded(document):
         """A threshold on the value score in a field's own condition, which no step's text shows."""
         document["fields"]["review.keen"] = {"type": "boolean", "applicable_when": "review.value_favourability >= .7"}
@@ -468,6 +475,7 @@ class RefusalTests(Programs):
         plain = programs.cells(self.place())
         worth = programs.cells(self.place(TRAINERS, "value"))
         for change, aspect in ((self.half, "value"), (self.banded, "value"), (self.spaced, "value"), (self.fielded, "value"),
+                               (self.huge, "value"),
                                (self.swayed, "everyday_comfort"), (self.counted, "everyday_comfort"),
                                (self.looped, "everyday_comfort"), (self.gated, "everyday_comfort")):
             with self.subTest(change=change.__name__):
@@ -500,6 +508,11 @@ class RefusalTests(Programs):
                     self.assertGreater(sum(seen[rating, reviews.POSITIVE] for rating in range(1, 6)), 20)
                     for rating in range(1, 6):
                         self.assertLess(cells[rating, reviews.POSITIVE], worth[rating, reviews.POSITIVE])
+                elif change is self.huge:
+                    self.assertEqual(place.bounds, {"value_favourability": [9007199254740993]})
+                    self.assertIs(type(place.bounds["value_favourability"][0]), int)
+                    self.assertGreater(sum(cells[rating, reviews.POSITIVE] for rating in range(1, 6)), .02)
+                    self.assertGreater(sum(seen[rating, reviews.POSITIVE] for rating in range(1, 6)), 100)
                 elif change is self.swayed:
                     self.assertEqual((place.staged, "quality" in place.drawn), (False, True))
                     self.assertGreater(min(seen[1, reviews.REST], seen[5, reviews.REST]), 1500)
