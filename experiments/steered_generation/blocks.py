@@ -167,7 +167,8 @@ def background(world, writes):
     Stock of a retailer/product: the condition at each location, every SKU's
     quantities and supplier order, and the warehouse stock on its catalog
     pages. Price: every SKU's price and recorded draw. A retailer's threshold:
-    its free-shipping threshold. A product's reviews: the reviews and the
+    its free-shipping threshold. A retailer's contracts: its carrier contracts.
+    Its dispatch: the days its warehouse takes. A product's reviews: the reviews and the
     rating summary counted from them. A carrier's reviews: its reviews and the
     summary counted from them, the corpus identity, and the wording of every
     other carrier review, since the producer picks a phrase by how often each
@@ -181,6 +182,12 @@ def background(world, writes):
         price = {product for kind, retailer_id, product in writes if kind == "price" and retailer_id == rid}
         if ("threshold", rid, "") in writes:
             value = {k: v for k, v in value.items() if k != "free_shipping_threshold_minor"}
+        if ("contracts", rid, "") in writes:
+            value = {k: v for k, v in value.items() if k != "contracts"}
+        if ("dispatch", rid, "") in writes:
+            value = {**value, "source_locations": [
+                {k: v for k, v in row.items() if k != "dispatch_days"} if row["kind"] == "warehouse" else row
+                for row in value["source_locations"]]}
         if not stock and not price:
             return value
 

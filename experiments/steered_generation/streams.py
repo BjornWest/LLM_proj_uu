@@ -74,6 +74,11 @@ class Scripted:
         value = self._next("choice")
         return self._require(value in options, value)
 
+    def sample(self, population, k):
+        value = self._next("sample")
+        return list(self._require(type(value) is list and len(value) == k and len(set(value)) == k and
+                                  set(value) <= set(population), value))
+
     def choices(self, population, weights=None, *, k=1):
         value = self._next("choices")
         allowed = [item for item, weight in zip(population, weights or [1] * len(population)) if weight > 0]
