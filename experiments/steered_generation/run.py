@@ -5,8 +5,8 @@ Run as a module from the repository root:
 One natural pass through the real producer, then one cheap steered pass per
 requested sample. A requirement file is a who-is-cheapest requirement (on
 prices alone, on stock and prices together with offers listed below the
-winner, or on a product's listed prices), a one-offer stock or price
-requirement, or several of those to hold together.
+winner, or on a product's listed prices), a shortlist of models, a one-offer
+stock or price requirement, or several of those to hold together.
 No browser, provider or sidecar publication.
 """
 import argparse
@@ -22,11 +22,11 @@ import time
 
 from experiments.world_requirement_construction import model as edits, run as pinned
 
-from . import blocks, cheapest, combined, listed, price_bounds, prices, stock, streams
+from . import blocks, cheapest, combined, listed, price_bounds, prices, shortlist, stock, streams
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
-              "listed.py", "combined.py", "run.py"),
+              "listed.py", "shortlist.py", "combined.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 
 
@@ -227,9 +227,11 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
         # The saved leaves themselves, read without the block model or the native oracle.
         leaves = cheapest.recorded(world, concept)
         minimum = cheapest.judged(leaves, requirement, block.scope)
-        pinned.ensure(minimum is not None and minimum == record["winning_price_minor"],
+        # The winning rank is the winners' price unless the requirement ranks otherwise.
+        name = "winning_price_minor" if type(minimum) is int else "winning_rank"
+        pinned.ensure(minimum is not None and cheapest.plain(minimum) == record.get(name),
                       "Direct reading of the saved leaves disagrees with the steered result")
-        if not {"predicates", "comparison_site_id"} & set(requirement):
+        if not set(requirement) - {"schema", "concept_id", "product_id", "retailer_ids", "listed_below"}:
             # Every offer competes: the full-population scan that knows nothing of this block applies too.
             designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
             below = [next(row for row in leaves["offers"].values()
@@ -242,7 +244,8 @@ def cheapest_case(args, session, natural, opened, api, requirement, case, folder
                                       "reference.private.json": found["reference"], "steering.json": record})
         case["samples"].append({
             "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds,
-            "winning_price_minor": minimum, "winner_count": len(found["reference"]["winners"]),
+            name: cheapest.plain(minimum),
+            "winner_count": len(block.scope.settled(found["reference"])["winners"]),
             "listed_below": found["listed_below"],
             "unavailable_offers": sum(not held(row) for row in leaves["offers"].values()),
             "retailer_products_with_nothing_available": sum(
@@ -278,7 +281,12 @@ def listed_case(args, session, natural, opened, api, requirement, case, folder):
                 winning_prices_modelled=len(block.shares), natural_lowest_listed=min(listed.lowest(natural, pairs).values()))
     for index in range(args.samples):
         clock = time.monotonic()
-        world, found, record = listed.steer(session, natural, opened, requirement, api, sample_rng(natural, case, index))
+        try:
+            world, found, record = listed.steer(session, natural, opened, requirement, api,
+                                                sample_rng(natural, case, index))
+        except blocks.NumericalLimit as error:
+            case.update(status="refused", reason=error.reason, detail=str(error))
+            return
         seconds = time.monotonic() - clock
         # The saved price leaves themselves, read without the block model.
         lowest = listed.lowest(world, pairs)
@@ -306,6 +314,55 @@ def listed_case(args, session, natural, opened, api, requirement, case, folder):
         validation.update(winning_price_total_variation=distance)
         pinned.ensure(hits < 1000 or distance < 0.1,
                       "Conditional winning-price distribution disagrees with the real pricing function")
+
+
+def shortlist_case(args, session, natural, opened, api, requirement, case, folder):
+    try:
+        clock = time.monotonic()
+        block = shortlist.model(natural, requirement, api)
+    except prices.ZeroMass as error:
+        case.update(status="zero_probability_given_upstream", reason=error.reason)
+        return
+    except blocks.NumericalLimit as error:
+        case.update(status="refused", reason=error.reason, detail=str(error))
+        return
+    concept = requirement["concept_id"]
+    case.update(status="sampled", probability_given_upstream=block.probability or None,
+                log_probability_given_upstream=block.log_probability, model_seconds=time.monotonic() - clock,
+                retailer_products=len(block.places), models=len(block.models), cutoffs_modelled=len(block.shares))
+    for index in range(args.samples):
+        clock = time.monotonic()
+        try:
+            world, found, record = shortlist.steer(session, natural, opened, requirement, api,
+                                                   sample_rng(natural, case, index))
+        except blocks.NumericalLimit as error:
+            case.update(status="refused", reason=error.reason, detail=str(error))
+            return
+        seconds = time.monotonic() - clock
+        # The saved leaves themselves, read without the block model or the native oracle.
+        cutoff = shortlist.listing(cheapest.recorded(world, concept), requirement, block.scope)
+        pinned.ensure(cutoff is not None and cutoff == record["cutoff"],
+                      "Direct reading of the saved leaves disagrees with the steered result")
+        files = write(folder(index), {"world.private.json": world, "task.private.json": found["task"],
+                                      "reference.private.json": found["reference"], "steering.json": record})
+        selected = found["reference"]["selected_models"]
+        case["samples"].append({
+            "folder": folder(index).name, "world_id": world["world_id"], "seconds": seconds, "cutoff": cutoff,
+            "selected_models": len(selected),
+            "models_at_the_cutoff": sum(m["price_minor"] == found["reference"]["cutoff_price_minor"] for m in selected),
+            "streams_steered": record["streams_steered"], "files": files})
+    reading = shortlist.trial(natural, requirement, api)
+    if args.producer_redraws:
+        producer_redraws(args, session, natural, [reading], case)
+    if args.validate_trials and block.probability:
+        seen = Counter(reading.winning(seed) for seed in range(10 ** 6, 10 ** 6 + args.validate_trials))
+        del seen[None]
+        hits = sum(seen.values())
+        validation = frequency_check(case, block.probability, hits, args.validate_trials)
+        distance = sum(abs(block.shares.get(c, 0) - seen.get(c, 0) / hits)
+                       for c in set(block.shares) | set(seen)) / 2 if hits else None
+        validation.update(cutoff_total_variation=distance)
+        pinned.ensure(hits < 1000 or distance < 0.1, "Conditional cutoff distribution disagrees with the producer's draws")
 
 
 def held(row):
@@ -351,7 +408,7 @@ def combined_case(args, session, natural, opened, api, requirement, case, folder
 
 CASES = {edits.VERSION: ("prices", price_case), stock.VERSION: ("stock", stock_case),
          price_bounds.VERSION: ("price", bound_case), cheapest.VERSION: ("stock_and_prices", cheapest_case),
-         listed.VERSION: ("listed_prices", listed_case),
+         listed.VERSION: ("listed_prices", listed_case), shortlist.VERSION: ("shortlist", shortlist_case),
          combined.VERSION: ("combined", combined_case)}
 
 

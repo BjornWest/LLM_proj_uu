@@ -380,6 +380,41 @@ saved seed 73 the scope computed this way for `comparison-01` equals the 36
 pairs stored in the suite's own comparison-scoped task on that world (B01,
 H09; `steering/readings/explore.log`).
 
+`cheapest.listed` remembers a site's pairs per world identity, and
+`cheapest.inventory` a concept's field declarations. Scope caching assumes
+content-bound world identities and unchanged native source declarations;
+comparison-site membership is unchanged by steering, while each world's
+listing prices and entry offers are regenerated.
+
+### Other rankings
+
+Three native tasks rank the available offers by something other than the
+listed price alone, and the requirement can state each (at most one, not with
+branch stock):
+
+| Field | Ranking | Native oracle |
+| --- | --- | --- |
+| `priorities` | stated numeric product facts in order (lowest or highest first), then the listed price; only SKUs whose prioritised facts are known compete | `catalog_priority_task.reference` |
+| `unit_basis: net_food_mass_kg` | the listed price over the pack's net food mass | `catalog_unit_price_task.reference` |
+| `relaxations` with `selected` | criteria sets in order: the original predicates, then each permitted relaxation; the set named by `selected` must be the first with an available match, and within it the listed price decides | `catalog_relaxation_task.reference` |
+
+In the block an offer's rank is `scope.key(sku, price)`: the price, the pair
+(facts, price), or the price per kilogram as an exact fraction. Levels,
+winners and "listed below the winner" are all in terms of that rank, so an
+offer listed below the winner is one that would rank ahead of it if it were
+available. A relaxation adds `scope.barred`: every SKU that meets an earlier
+criteria set must be unavailable, whatever its price; in the model such SKUs
+count as unavailable in every outcome of their pair, and pairs that hold only
+barred SKUs are in the block.
+
+Which offers compete and what they are ranked by is not restated here for
+the priority and unit-price tasks. `cheapest.stocked` makes a copy of the
+world in which every listed offer holds one unit at every location, and the
+native oracle's candidates on that copy are the offers that can compete at
+all, each with the facts or the pack mass the oracle ranks it by. The record
+gives `winning_price_minor` when the rank is a price and `winning_rank`
+otherwise.
+
 ## The fifth block: who lists a product cheapest
 
 Requirement (`steered-cheapest-listed-v1`): a product and the retailers that
@@ -410,10 +445,50 @@ pairs kept as logarithms and choices made through `blocks.pick`, as in the
 fourth block. It is checked against the real `_offer_price` under other seeds
 and against the comparison site's own rows for the steered world.
 
+## The sixth requirement: which models make the shortlist
+
+Requirement (`steered-shortlist-v1`): a concept, predicates, a limit and the
+models that must be exactly the native shortlist.
+
+```json
+{"schema": "steered-shortlist-v1",
+ "concept_id": "footwear.walking_shoes",
+ "predicates": [{"field": "sku.size_eu", "operator": "eq", "value": 42}],
+ "availability": "positive_stock", "limit": 3,
+ "product_ids": ["...", "...", "...", "..."]}
+```
+
+The native shortlist task ranks every model by the lowest price among its
+available matching offers at any retailer; the cutoff is the price of the
+model in the limit's place, and every model at or below it is on the list.
+Naming more models than the limit therefore asks for a tie at the cutoff, and
+naming fewer asks for a world in which no other model has an available
+matching offer.
+
+It is not a new block: `shortlist.py` uses the fourth block's pairs,
+outcomes and stock sampling for the same concept, and decides the same
+resources. Models share no retailer/product pair, and a model's lowest
+available price is the lowest over its pairs, so for a cutoff c:
+
+- every other model must be above c or without an available offer: a product
+  over its pairs;
+- every named model is below c or at c, each as a sum over which of its
+  pairs is the first to decide it (so no probability is found by
+  subtraction);
+- fewer named models may be below c than the limit, which is a small count
+  over the named models (`shortlist.counts`).
+
+The terms for different cutoffs are disjoint. Sampling goes backwards through
+the same factors: the cutoff, how many and which named models are below it,
+the deciding pair of each model, then each pair's outcome, price and stock as
+in the fourth block. With a limit of one this must equal the fourth block
+summed over every set of the model's retailers, and a unit test checks that
+to twelve places. The check uses `catalog_shortlist_task.reference`.
+
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the five kinds above, that must all hold.
+of the six kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -431,6 +506,7 @@ price of one retailer/product:
 | Who is cheapest, on prices | price of every pair of the concept with an available offer | stock of every pair of the concept, which decides who competes |
 | Who is cheapest, on stock and prices | stock and price of every listed pair of the concept with an offer that competes | nothing |
 | Who lists a product cheapest | price of every compared pair of the product | nothing |
+| Which models make the shortlist | stock and price of every listed pair of the concept with an offer that competes | nothing |
 
 `blocks.independent` accepts a list of blocks when no block decides a
 resource that another decides or depends on. The producer draws separate
@@ -766,8 +842,61 @@ Every sample passed the native oracle of its reading (`feature_offer_task`,
 `catalog_branch_task`, the comparison-scoped `basic_offer_task`) and the
 direct reading of the saved leaves by the same rule. The combination was
 checked by its two parts' own checks; the native comparison-stock oracle is
-applied to that combination in the unit tests, not in the pinned runner. The
-medium world has not been run with these readings.
+applied to that combination in the unit tests, not in the pinned runner.
+
+The same ten kinds of requirement on the medium world of "A medium world"
+(`medium/readings/run-v1/` at `816f35f`, dev's producer; requirement files
+chosen by `medium/readings/explore.py`; 4,000 redraws, 5 producer redraws
+each): all sampled and checked, 1.4 to 3.0 s per sample. Hits against
+expected: comparison-site winner 683 against 668 ± 24 (105 competing pairs),
+with a listed offer below it 18 against 20.4 ± 4.5; size 42 with physical
+stock 541 against 531 ± 22 (167 pairs), sold out 20 against 19.4 ± 4.4; the
+B05 predicates the same counts (the same shoe wins under both); branch stock
+in Uppsala 1,125 against 1,140 ± 29, sold out 262 against 264 ± 16; advertised
+cheapest 995 against 1,026 ± 28; with the variant only on supplier order
+(1 in 1,547) 1 joint hit against 2.6 ± 1.6.
+
+### Other rankings and shortlists
+
+Pinned runs at `d0c3272` through dev's producer in the steering checkout,
+launched by `suite/launch.sh`. The first four use the 34-task suite's own
+generation inputs and task specifications for B11 to B14 (`suite/B11/` to
+`suite/B14/`, each with its `suite-task.json`); B11's own world has only two
+shoe models in size 42, so its three-model shortlist with a tie cannot exist
+there and the B11 task is also run on the seed-73 and medium inputs
+(`suite/B11-seed73/`, `suite/B11-medium/`). Requirement files were chosen by
+`suite/explore.py`. Three samples each, 10 producer redraws each (all equal
+to the reading); `summarize-suite.py` prints these figures.
+
+| World | Requirement | Probability given upstream | Sample | Redraws | Hits | Expected |
+| --- | --- | --- | --- | --- | --- | --- |
+| B12 (7 retailers, 300 offers) | the first relaxation, up to 340 g, is the first criteria set with a match (nothing in the world meets the original 220 g) | 0.410 | 0.86 to 0.88 s | 20,000 | 8,229 | 8,203 ± 70 |
+| B12 | the second relaxation, up to 450 g, decides: all ten size-42 variants meeting the first are out of stock | 1.7e-20 | 0.79 to 0.86 s | 20,000 | 0 | 0 |
+| B13 (2 retailers, 15 offers) | cheapest per kilogram: the likeliest winner | 0.995 | 0.57 to 0.65 s | 100,000 | 99,518 | 99,510 ± 22 |
+| B13 | cheapest per kilogram: an unlikely winner | 2.0e-4 (1 in 4,945) | 0.54 to 0.62 s | 100,000 | 24 | 20.2 ± 4.5 |
+| B14 (8 retailers, 456 offers) | lightest size-42 shoe in stock, then price: the likeliest winner | 0.559 | 0.80 to 0.83 s | 20,000 | 11,167 | 11,181 ± 70 |
+| B14 | the same with an offer that would rank ahead listed below it | 0.106 | 0.77 to 0.87 s | 20,000 | 2,159 | 2,119 ± 44 |
+| B14 | a heavier shoe wins: every lighter one in the size is out of stock | 1.0e-47 | 0.79 to 0.83 s | 20,000 | 0 | 0 |
+| B11 (4 retailers, 72 offers) | the shortlist is the two models that exist in the size, fewer than the limit of three | 0.111 | 0.50 to 0.53 s | 20,000 | 2,184 | 2,228 ± 45 |
+| Seed-73 input (12 retailers, 411 offers; 9 models in the size) | the natural three-model shortlist | 0.811 | 0.69 to 0.74 s | 20,000 | 16,258 | 16,228 ± 55 |
+| Seed-73 input | four models for a limit of three: a tie at the cutoff | 0.0248 (1 in 40) | 0.67 to 0.75 s | 20,000 | 500 | 495 ± 22 |
+| Seed-73 input | another three-model shortlist | 5.6e-24 | 0.69 to 0.71 s | 20,000 | 0 | 0 |
+| Medium input (21 retailers, 2,849 offers; 29 models in the size) | the natural three-model shortlist | 0.811 | 2.3 to 2.5 s | 4,000 | 3,266 | 3,246 ± 25 |
+| Medium input | four models for a limit of three: a tie at the cutoff | 0.0294 (1 in 34) | 2.4 to 2.6 s | 4,000 | 111 | 118 ± 11 |
+| Medium input | another three-model shortlist | 3.2e-12 | 4.0 to 4.2 s | 4,000 | 0 | 0 |
+
+Every sample passed the native oracle of its task (`catalog_relaxation_task`,
+`catalog_unit_price_task`, `catalog_priority_task`, `catalog_shortlist_task`)
+and the direct reading of the saved leaves by the same rule. In the tie
+samples the native shortlist has four models, two of them at the cutoff. The
+two natural-shortlist probabilities agree to four digits by coincidence
+(0.811405 and 0.811428); each is confirmed by its own redraws.
+
+These worlds come from dev's producer, so they are not the suite's frozen
+worlds: the inputs and the task specifications are the suite's, the world
+identities are not, and nothing here has been published or bound to a task
+instance.
+
 
 ### A medium world
 
@@ -910,10 +1039,7 @@ carries review and description text that the checks also digest.
 - **Only retail stock and prices.** Reviews and review sites are not steered,
   and neither is which products a comparison site lists (that is the seed's,
   and the requirement can only confine the comparison to it). Delivery fees,
-  free-shipping thresholds and delivery options are not modelled. Ranking
-  beyond the single winner (the three cheapest with a tie at the cutoff, the
-  cheapest per kilogram, nothing matching until a requirement is relaxed) is
-  not built.
+  free-shipping thresholds and delivery options are not modelled.
 - **No publication.** Steered worlds are native worlds only:
   `browser_runtime_ready` is false. `unified_generation.generate` accepts a
   `world_factory`, which is where a steered world would enter so that

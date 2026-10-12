@@ -91,7 +91,7 @@ class ModelTests(Cheapest):
             self.assertEqual(len(block.places), len(prices.competing(world, SHOES)))
             for pair, spread in block.spread.items():
                 self.assertAlmostEqual(fsum(o.mass for o in spread.outcomes), 1, places=8, msg=pair)
-                self.assertGreater(len({o.price for o in spread.outcomes}), 3)
+                self.assertGreater(len({o.rank for o in spread.outcomes}), 3)
 
     def test_stock_probabilities_match_enumeration_of_the_configuration(self):
         for world in (self.natural, self.scarce):

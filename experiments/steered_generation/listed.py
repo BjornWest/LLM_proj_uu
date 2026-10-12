@@ -114,8 +114,9 @@ def check(world, requirement, api):
     requirement, pairs, sidecar = compared(world, requirement, api)
     edits.check_price_rule(world, api.native.rounded_price)
     found = lowest(world, pairs)
-    minimum = min(found.values())
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
+    # No compared pair at all (a comparison site that lists none of them) is unmet, not an error.
+    minimum = min(found.values(), default=None)
     if {pair for pair, price in found.items() if price == minimum} != designated:
         raise Unmet("The retailers listing the product cheapest are not exactly the designated ones")
     observed = {"minimum_listed_price_minor": minimum, "retailer_ids": sorted(rid for rid, _ in designated)}

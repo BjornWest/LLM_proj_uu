@@ -11,6 +11,11 @@ its product, as in the native feature task) and what makes one available
 (stock anywhere or a supplier order; physical stock only; or physical stock at
 a pickup branch in a named city, as in the native branch task), and it can
 confine the comparison to the retailer/product pairs a comparison site lists.
+"Cheapest" can be another ranking with the price last: the price per kilogram
+of food, or stated product facts first (the native unit-price and priority
+tasks). And earlier sets of criteria can be required to have no available
+match at all, so that a permitted relaxation decides (the native relaxation
+task).
 
 Which offers compete is decided by stock, so stock and prices are one block.
 The coupling stays inside each retailer/product pair: a pair draws one price
@@ -27,7 +32,7 @@ positive factors is an error (`NumericalLimit`), never a zero. Sampling keeps
 the same support: every choice among weighted options goes through
 `blocks.pick`, which can return any option with a positive weight.
 """
-from bisect import bisect_right
+from bisect import bisect_left, bisect_right
 from collections import Counter
 from decimal import MAX_EMAX, MIN_EMIN, Decimal, localcontext
 from fractions import Fraction
@@ -47,11 +52,15 @@ from .stock import DISPATCH, NOT_SHIPPABLE, NOWHERE, after
 VERSION = "steered-cheapest-available-v1"
 # What makes an offer available, in the native tasks' words.
 PURCHASABLE, PHYSICAL, BRANCH = "purchasable", "positive_stock", "positive_pickup_branch_stock"
+# Rankings other than the listed price, each read by its own native task.
+RANKINGS = {"priorities": ".catalog_priority_task", "unit_basis": ".catalog_unit_price_task",
+            "relaxations": ".catalog_relaxation_task"}
 
 
 def resolve(requirement):
     required = {"schema", "concept_id", "product_id", "retailer_ids"}
-    optional = {"listed_below", "predicates", "availability", "city", "country", "comparison_site_id", "surrounding"}
+    optional = {"listed_below", "predicates", "availability", "city", "country", "comparison_site_id", "surrounding",
+                "selected", *RANKINGS}
     if (type(requirement) is not dict or not required <= set(requirement) <= required | optional or
             requirement["schema"] != VERSION):
         raise ValueError("Declare a concept, a product, the retailers that are cheapest and optionally offers "
@@ -63,13 +72,27 @@ def resolve(requirement):
                 any(type(value) is not str or not value for value in row.values()) for row in below) or
             len({(row["retailer_id"], row["sku_id"]) for row in below}) != len(below)):
         raise ValueError("Offers listed below the winning price are distinct retailer and SKU pairs")
+    stated(requirement)
+    return json.loads(json.dumps(requirement))
+
+
+def stated(requirement):
+    """Check how a requirement states who competes, what is available and how offers rank."""
     availability = requirement.get("availability", PURCHASABLE)
     if availability not in (PURCHASABLE, PHYSICAL, BRANCH):
         raise ValueError("Availability is one of " + ", ".join((PURCHASABLE, PHYSICAL, BRANCH)))
-    if "predicates" in requirement and (type(requirement["predicates"]) is not list or not requirement["predicates"]):
+    ranking = [name for name in RANKINGS if name in requirement]
+    if len(ranking) > 1 or ranking and availability == BRANCH:
+        raise ValueError("State at most one of priorities, a unit basis and relaxations, and not with branch stock")
+    if ("relaxations" in requirement) != ("selected" in requirement) or type(requirement.get("selected", "")) is not str:
+        raise ValueError("Relaxations go with the label of the criteria set that must be the first with a match")
+    # The unit-price task alone may leave the predicates out.
+    needed = ranking != ["unit_basis"]
+    if "predicates" in requirement and (type(requirement["predicates"]) is not list or
+                                        needed and not requirement["predicates"]):
         raise ValueError("Predicates are a nonempty list")
-    if availability != PURCHASABLE and "predicates" not in requirement:
-        raise ValueError("The native tasks that require physical stock need at least one predicate")
+    if needed and (availability != PURCHASABLE or ranking) and "predicates" not in requirement:
+        raise ValueError("The native tasks that require physical stock or rank by features need at least one predicate")
     if (availability == BRANCH) != ("city" in requirement) or "country" in requirement and availability != BRANCH:
         raise ValueError("A city, and optionally a country, go with availability at a pickup branch and only with it")
     if any(type(requirement[key]) is not str or not requirement[key]
@@ -78,7 +101,6 @@ def resolve(requirement):
     if "surrounding" in requirement and ("comparison_site_id" not in requirement or
                                          type(requirement["surrounding"]) is not dict):
         raise ValueError("Surrounding-site controls are a mapping and go with a comparison site")
-    return json.loads(json.dumps(requirement))
 
 
 def winner(requirement):
@@ -118,24 +140,101 @@ def listed(world, requirement, package):
     return LISTED[key], sidecar
 
 
+def reading(skus, pairs, sources, supplier, reference, key=None, barred=(), settled=None):
+    """One native task's reading of a requirement; see `scope`."""
+    return SimpleNamespace(
+        skus=set(skus) - set(barred), pairs=pairs, sources=sources, supplier=supplier, reference=reference,
+        key=key or (lambda sku_id, price: price), barred=frozenset(barred),
+        settled=settled or (lambda found: found if found["status"] == "match" else None))
+
+
+def matching(world, concept, declared, predicates, feature):
+    """The concept's SKUs that meet predicates, by the native evaluation."""
+    compiled = feature.PredicateSet(declared.fields, predicates, known_paths=declared.known_paths)
+    return {s["sku_id"] for p in world["products"] if p["public"]["concept_id"] == concept for s in p["public"]["skus"]
+            if compiled.evaluate(p["public"], s, catalog_status=p.get("catalog_status", {}),
+                                 sku_status=p.get("sku_status", {}).get(s["sku_id"], {}))["state"] == "match"}
+
+
+def stocked(world):
+    """The world with every listed offer holding one unit at every location.
+
+    A native oracle lists as candidates the offers that are available; on this
+    world those are all the offers that can compete at all, with whatever the
+    oracle ranks them by.
+    """
+    return {**world, "retailers": [{**r, "offers": [{**o, "stock_by_source": dict.fromkeys(o["stock_by_source"], 1)}
+                                                    for o in r["offers"]]} for r in world["retailers"]]}
+
+
+def ranked(world, requirement, api, name, declared, pairs, sidecar, site):
+    """The reading of a requirement whose ranking is not the listed price alone.
+
+    Priorities: only SKUs whose prioritised facts are known compete, ranked by
+    those facts in order and then by price. Unit basis: ranked by the listed
+    price over the pack's net food mass. Both are read off the native
+    oracle's candidates on the fully stocked world. Relaxations: the criteria
+    set named by `selected` is compared on price, and every SKU meeting an
+    earlier set is barred: it must be unavailable.
+    """
+    package, concept = api.basic.__package__, requirement["concept_id"]
+    native, feature = import_module(package + RANKINGS[name]), import_module(package + ".feature_offer_task")
+    spec = {"kind": native.KIND, "concept_id": concept, "predicates": requirement.get("predicates", []),
+            "availability": requirement.get("availability", PURCHASABLE), name: requirement[name], **site}
+
+    def reference(found):
+        surrounding = sidecar(found)
+        task = native.make(found, spec, inventory=declared, surrounding=surrounding)
+        return task, native.reference(found, task, inventory=declared, surrounding=surrounding)
+
+    supplier = spec["availability"] == PURCHASABLE
+    if name == "relaxations":
+        scenarios = native.make(world, spec, inventory=declared, surrounding=sidecar(world))["scenarios"]
+        labels = [scenario["label"] for scenario in scenarios]
+        if requirement["selected"] not in labels:
+            raise ValueError("The selected criteria set is one of " + ", ".join(labels))
+        chosen = labels.index(requirement["selected"])
+        sets = [matching(world, concept, declared, scenario["feature_task"]["predicates"], feature)
+                for scenario in scenarios[:chosen + 1]]
+        return reading(sets[-1], pairs, None, supplier, reference, barred=set().union(*sets[:-1]),
+                       settled=lambda found: (found["scenario_references"][chosen]
+                                              if found["selected_index"] == chosen else None))
+    rows = reference(stocked(world))[1]["candidates"]
+    if name == "priorities":
+        signs = [1 if row["direction"] == "min" else -1 for row in requirement["priorities"]]
+        first = {row["sku_id"]: tuple(Decimal(str(value)) * sign for value, sign in zip(row["priority_values"], signs))
+                 for row in rows}
+        return reading(first, pairs, None, supplier, reference, key=lambda sku_id, price: (*first[sku_id], price))
+    grams = {row["sku_id"]: row["quantity_g"] for row in rows}
+    return reading(grams, pairs, None, supplier, reference, key=lambda sku_id, price: native.ratio(price, grams[sku_id]))
+
+
 def scope(world, requirement, api):
     """Which offers compete and what makes one available, as the native task for the requirement reads them.
 
-    `skus` are the concept's SKUs that meet the predicates (all of them
-    without predicates); `pairs` the retailer/product pairs a comparison site
-    confines the comparison to (None for all); `sources` gives, per retailer,
-    the stock locations that count (None for all); `supplier` says whether a
-    supplier order makes an offer available. `reference(world)` is the native
-    oracle's reading of a world for this requirement.
+    `skus` are the concept's SKUs that compete (all of them without
+    predicates); `pairs` the retailer/product pairs a comparison site confines
+    the comparison to (None for all); `sources` gives, per retailer, the stock
+    locations that count (None for all); `supplier` says whether a supplier
+    order makes an offer available. `key(sku_id, price)` is what an offer is
+    ranked by, lowest first; the listed price unless the requirement states
+    another ranking. `barred` are SKUs that must be unavailable whatever their
+    price. `reference(world)` is the native oracle's reading of a world for
+    this requirement, and `settled(reference)` the part of it whose winners
+    and candidates decide, or None when the requirement cannot hold.
+
+    Reads only the concept and the fields `stated` checks, so other
+    requirement kinds over the same block can use it.
     """
-    requirement = resolve(requirement)
+    stated(requirement)
     concept, package = requirement["concept_id"], api.basic.__package__
     items = [p for p in world["products"] if p["public"]["concept_id"] == concept]
     pairs, sidecar, site = None, lambda found: None, {}
     if "comparison_site_id" in requirement:
         (pairs, sidecar), site = listed(world, requirement, package), {
             "comparison_site_id": requirement["comparison_site_id"]}
-    if "predicates" not in requirement:
+    ranking = next((name for name in RANKINGS if name in requirement), None)
+    if "predicates" not in requirement and not ranking:
         def reference(found):
             if not site:
                 return edits._reference(found, requirement, api)
@@ -144,14 +243,12 @@ def scope(world, requirement, api):
                                   surrounding=surrounding)
             return task, api.basic.reference(found, task, surrounding=surrounding)
 
-        return SimpleNamespace(skus={s["sku_id"] for p in items for s in p["public"]["skus"]}, pairs=pairs,
-                               sources=None, supplier=True, reference=reference)
+        return reading({s["sku_id"] for p in items for s in p["public"]["skus"]}, pairs, None, True, reference)
     feature, branch = (import_module(package + name) for name in (".feature_offer_task", ".catalog_branch_task"))
     declared = inventory(package, concept)
-    compiled = feature.PredicateSet(declared.fields, requirement["predicates"], known_paths=declared.known_paths)
-    skus = {s["sku_id"] for p in items for s in p["public"]["skus"]
-            if compiled.evaluate(p["public"], s, catalog_status=p.get("catalog_status", {}),
-                                 sku_status=p.get("sku_status", {}).get(s["sku_id"], {}))["state"] == "match"}
+    if ranking:
+        return ranked(world, requirement, api, ranking, declared, pairs, sidecar, site)
+    skus = matching(world, concept, declared, requirement["predicates"], feature)
     spec = {"concept_id": concept, "predicates": requirement["predicates"], **site}
     if requirement.get("availability", PURCHASABLE) != BRANCH:
         spec.update(kind=feature.KIND, availability=requirement.get("availability", PURCHASABLE))
@@ -161,8 +258,7 @@ def scope(world, requirement, api):
             task = feature.make(found, spec, inventory=declared, surrounding=surrounding)
             return task, feature.reference(found, task, inventory=declared, surrounding=surrounding)
 
-        return SimpleNamespace(skus=skus, pairs=pairs, sources=None, supplier=spec["availability"] == PURCHASABLE,
-                               reference=reference)
+        return reading(skus, pairs, None, spec["availability"] == PURCHASABLE, reference)
     spec.update(kind=branch.KIND, city=requirement["city"], country=requirement.get("country", "SE"))
     spec = branch.resolve(spec, inventory=declared, concept_ids=world["config"]["concept_ids"])
 
@@ -178,10 +274,10 @@ def scope(world, requirement, api):
         b["location"]["country"] == spec["country"] and
         any(s["source_id"] == b["branch_id"] and s["kind"] == "branch" for s in r["source_locations"])}
         for r in world["retailers"]}
-    return SimpleNamespace(skus=skus, pairs=pairs, sources=sources, supplier=False, reference=reference)
+    return reading(skus, pairs, sources, False, reference)
 
 
-def named(world, requirement, api):
+def named(world, requirement, api, found=None):
     """The requirement, with every name and predicate it states checked against the world.
 
     A malformed requirement, an unknown name or an undeclared predicate is an
@@ -199,7 +295,8 @@ def named(world, requirement, api):
         raise ValueError("Unknown retailer or product")
     if concepts[requirement["product_id"]] != requirement["concept_id"]:
         raise ValueError("The product is not of this concept")
-    found = scope(world, requirement, api)
+    # Who competes does not depend on stock or prices, so a scope read off the natural world serves a steered one.
+    found = found or scope(world, requirement, api)
     below = []
     for row in requirement.get("listed_below", []):
         if row["retailer_id"] not in known or row["sku_id"] not in skus:
@@ -214,9 +311,10 @@ def named(world, requirement, api):
 
 
 def competing(world, requirement, found):
-    """The listed retailer/product pairs of the concept with an offer that competes."""
+    """The listed retailer/product pairs of the concept with an offer that competes or is barred."""
     return {(r["retailer_id"], o["product_id"]) for r in world["retailers"] for o in r["offers"]
-            if o["sku_id"] in found.skus and (found.pairs is None or (r["retailer_id"], o["product_id"]) in found.pairs)}
+            if (o["sku_id"] in found.skus or o["sku_id"] in found.barred) and
+            (found.pairs is None or (r["retailer_id"], o["product_id"]) in found.pairs)}
 
 
 def footprint(world, requirement, api):
@@ -257,6 +355,7 @@ def site(world, retailer, product_id, api, found):
     return SimpleNamespace(
         pair=(rid, product_id), offers=offers, locations=locations, config=config, scale=retailer["scale"],
         competing=[o for o in offers if o["sku_id"] in found.skus], supplier_counts=found.supplier,
+        barred=[o for o in offers if o["sku_id"] in found.barred], rank=found.key,
         counting=[l for l in locations if found.sources is None or l.source_id in found.sources[rid]],
         supplier_enabled=retailer["supplier_enabled"],
         eligible=min(1, max(0, config["supplier"]["sku_eligible_probability"])) if retailer["supplier_enabled"] else 0,
@@ -267,13 +366,16 @@ def site(world, retailer, product_id, api, found):
         price_key=prices.stream_keys([(rid, product_id)], api)[(rid, product_id)], chains={})
 
 
+def places(world, found, api):
+    """Every pair of the block, with its offers, locations and stream keys."""
+    retailers = {r["retailer_id"]: r for r in world["retailers"]}
+    return {pair: site(world, retailers[pair[0]], pair[1], api, found) for pair in sorted(competing(world, None, found))}
+
+
 def sites(world, requirement, api):
     """The block's pairs with their stream keys, without the block model's probabilities."""
     requirement, below, found = named(world, requirement, api)
-    retailers = {r["retailer_id"]: r for r in world["retailers"]}
-    places = {pair: site(world, retailers[pair[0]], pair[1], api, found)
-              for pair in sorted(competing(world, requirement, found))}
-    return SimpleNamespace(requirement=requirement, places=places, below=below, scope=found)
+    return SimpleNamespace(requirement=requirement, places=places(world, found, api), below=below, scope=found)
 
 
 def weight(location, count, stocked=None):
@@ -333,49 +435,50 @@ def chain(place, count):
 
 
 def outcomes(place, below, price_config, native_round):
-    """Every way the pair's cheapest available price can come about, with its probability.
+    """Every way the pair's best available rank can come about, with its probability.
 
-    Only the pair's competing offers are compared. One outcome per price atom
-    and price level of the pair under that atom: the SKUs listed cheaper are
+    Only the pair's competing offers are compared, by their rank: the listed
+    price, unless the requirement ranks otherwise. One outcome per price atom
+    and rank level of the pair under that atom: the SKUs ranked ahead are
     unavailable and at least one SKU at the level is available; and one per
-    atom for no SKU being available (price None).
-    `ceiling` is the highest price among the pair's offers that must be listed
-    below the winning price, so the outcome counts only for a winning price
-    above it.
+    atom for no SKU being available (rank None). The pair's barred SKUs are
+    unavailable in every outcome. `ceiling` is the last rank among the pair's
+    offers that must be listed below the winner, so the outcome counts only
+    for a winning rank after it.
     """
     result = []
     for atom in prices.atoms([o["price_trace"]["reference_minor"] for o in place.offers], price_config):
         draw = prices.representative(atom)
-        listed = {o["offer_id"]: edits._price(o["price_trace"]["reference_minor"], draw, price_config, native_round)
-                  for o in place.competing}
+        listed = {o["offer_id"]: place.rank(o["sku_id"], edits._price(
+            o["price_trace"]["reference_minor"], draw, price_config, native_round)) for o in place.competing}
         ceiling = max((listed[offer_id] for offer_id in below), default=None)
-        cheaper = []
-        for price in sorted(set(listed.values())):
-            level = [o for o in place.competing if listed[o["offer_id"]] == price]
+        ahead = list(place.barred)
+        for rank in sorted(set(listed.values())):
+            level = [o for o in place.competing if listed[o["offer_id"]] == rank]
             # The first available SKU at the level, in offer order, is the witness.
-            mass = times(atom[0], fsum(chain(place, len(cheaper) + index).probability for index in range(len(level))))
-            result.append(SimpleNamespace(mass=mass, price=price, atom=atom, ceiling=ceiling,
-                                          cheaper=list(cheaper), level=level))
-            cheaper += level
-        result.append(SimpleNamespace(mass=times(atom[0], nothing(place, len(cheaper))), price=None, atom=atom,
-                                      ceiling=ceiling, cheaper=cheaper, level=[]))
+            mass = times(atom[0], fsum(chain(place, len(ahead) + index).probability for index in range(len(level))))
+            result.append(SimpleNamespace(mass=mass, rank=rank, atom=atom, ceiling=ceiling,
+                                          cheaper=list(ahead), level=level))
+            ahead += level
+        result.append(SimpleNamespace(mass=times(atom[0], nothing(place, len(ahead))), rank=None, atom=atom,
+                                      ceiling=ceiling, cheaper=ahead, level=[]))
     return [found for found in result if found.mass > 0]
 
 
 def accepts(found, winning, designated):
-    """Whether an outcome of a pair fits a winning price: at it for a designated pair, above it or absent otherwise."""
+    """Whether an outcome of a pair fits a winning rank: at it for a designated pair, after it or absent otherwise."""
     if found.ceiling is not None and found.ceiling >= winning:
         return False
-    return found.price == winning if designated else found.price is None or found.price > winning
+    return found.rank == winning if designated else found.rank is None or found.rank > winning
 
 
 class Spread:
-    """A pair's outcomes, summed by cheapest available price.
+    """A pair's outcomes, summed by best available rank.
 
     For a pair with no offer that must be listed below the winner, the two
-    sums the requirement needs are tabulated once: the probability of a price
-    exactly, and of every price above it together with no available offer.
-    Sums run from the top price down, over probabilities only.
+    sums the requirement needs are tabulated once: the probability of a rank
+    exactly, and of every rank after it together with no available offer.
+    Sums run from the last rank down, over probabilities only.
     """
 
     def __init__(self, found):
@@ -384,7 +487,7 @@ class Spread:
         if self.table:
             by_price = {}
             for outcome in found:
-                by_price.setdefault(outcome.price, []).append(outcome.mass)
+                by_price.setdefault(outcome.rank, []).append(outcome.mass)
             absent = fsum(by_price.pop(None, []))
             self.prices = sorted(by_price)
             self.at = {price: fsum(by_price[price]) for price in self.prices}
@@ -392,11 +495,18 @@ class Spread:
             for price in reversed(self.prices):
                 self.from_index.append(self.from_index[-1] + self.at[price])
             self.from_index.reverse()
+            self.to_index = [0.0]
+            for price in self.prices:
+                self.to_index.append(self.to_index[-1] + self.at[price])
 
     def mass(self, winning, designated):
         if not self.table:
             return fsum(o.mass for o in self.outcomes if accepts(o, winning, designated))
         return self.at.get(winning, 0.0) if designated else self.from_index[bisect_right(self.prices, winning)]
+
+    def before(self, rank):
+        """The probability of a best available rank ahead of the given one; tabulated spreads only."""
+        return self.to_index[bisect_left(self.prices, rank)]
 
 
 def model(world, requirement, api):
@@ -416,7 +526,7 @@ def model(world, requirement, api):
     found = sites(world, requirement, api)
     requirement, places, block_scope = found.requirement, found.places, found.scope
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
-    if not designated <= set(places):
+    if not all(pair in places and places[pair].competing for pair in designated):
         raise ZeroMass("not_listed", "A designated retailer lists no competing offer of the product in this world")
     below = {}
     for pair, sku_id in found.below:
@@ -428,7 +538,7 @@ def model(world, requirement, api):
     spread = {pair: Spread(outcomes(place, below.get(pair, ()), config, native_round))
               for pair, place in places.items()}
     log_terms = {}
-    for price in sorted(set.intersection(*({o.price for o in spread[pair].outcomes} for pair in designated)) - {None}):
+    for price in sorted(set.intersection(*({o.rank for o in spread[pair].outcomes} for pair in designated)) - {None}):
         masses = []
         for pair, found in spread.items():
             masses.append(found.mass(price, pair in designated))
@@ -540,15 +650,17 @@ def sample(block, rng):
     distribution.
     """
     winning = pick_log(rng, sorted(block.log_terms), [block.log_terms[price] for price in sorted(block.log_terms)])
-    draws = {}
-    for pair in sorted(block.places):
-        place = block.places[pair]
-        options = [o for o in block.spread[pair].outcomes if accepts(o, winning, pair in block.designated)]
-        outcome = pick(rng, options, [o.mass for o in options])
-        draws[pair] = SimpleNamespace(
-            price=prices.draw_within(outcome.atom, place.offers, block.config, block.native_round, rng),
-            stock=stocking(place, outcome, rng), cheapest_available=outcome.price)
-    return winning, draws
+    return winning, {pair: settle(block, pair, [o for o in block.spread[pair].outcomes
+                                                if accepts(o, winning, pair in block.designated)], rng)
+                     for pair in sorted(block.places)}
+
+
+def settle(block, pair, options, rng):
+    """One pair's price and stock draws, given the outcomes its best available rank may take."""
+    place = block.places[pair]
+    outcome = pick(rng, options, [o.mass for o in options])
+    return SimpleNamespace(price=prices.draw_within(outcome.atom, place.offers, block.config, block.native_round, rng),
+                           stock=stocking(place, outcome, rng), cheapest_available=outcome.rank)
 
 
 def planned(block, draws):
@@ -592,32 +704,44 @@ def conditions(world, pair):
             for row in r["conditions"] if row["product_id"] == pair[1]}
 
 
+def plain(rank):
+    """A rank as JSON: a price as it is, a price per gram as two integers, facts and price as a list."""
+    if isinstance(rank, Fraction):
+        return {"numerator": rank.numerator, "denominator": rank.denominator}
+    return [str(part) if isinstance(part, Decimal) else part for part in rank] if isinstance(rank, tuple) else rank
+
+
 def restocked(natural, block, draws):
     """What the planned stock draws do to each pair."""
-    return [{"retailer_id": pair[0], "product_id": pair[1], "cheapest_available_minor": draws[pair].cheapest_available,
+    return [{"retailer_id": pair[0], "product_id": pair[1],
+             "cheapest_available_minor": plain(draws[pair].cheapest_available),
              "competing_offers": len(block.places[pair].competing),
              "natural_conditions": conditions(natural, pair), "steered_conditions": draws[pair].stock.conditions,
              "held_unavailable": draws[pair].stock.unavailable, "held_available": draws[pair].stock.witness,
              "offers": len(block.places[pair].offers)} for pair in sorted(draws)]
 
 
-def check(world, requirement, api):
+def check(world, requirement, api, found=None):
     """Read the requirement off a world with the native oracle: the winners, and the offers listed below them."""
-    requirement, _, found = named(world, requirement, api)
+    requirement, _, found = named(world, requirement, api, found)
     edits.check_price_rule(world, api.native.rounded_price)
     task, reference = found.reference(world)
+    decided = found.settled(reference)
     designated = {(rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}
-    if reference["status"] != "match" or {(w["retailer_id"], w["product_id"]) for w in reference["winners"]} != designated:
-        raise Unmet("Cheapest available offers are not exactly the designated retailers' product")
-    listed = {o["offer_id"]: o["price_minor"] for r in world["retailers"] for o in r["offers"]}
+    if decided is None or not decided["winners"] or {
+            (w["retailer_id"], w["product_id"]) for w in decided["winners"]} != designated:
+        raise Unmet("The best available offers are not exactly the designated retailers' product")
+    winning = found.key(decided["winners"][0]["sku_id"], decided["winners"][0]["price_minor"])
+    listed = {o["offer_id"]: o for r in world["retailers"] for o in r["offers"]}
     offers = {(r["retailer_id"], o["sku_id"]): o["offer_id"] for r in world["retailers"] for o in r["offers"]}
-    candidates = {row["offer_id"] for row in reference["candidates"]}
+    candidates = {row["offer_id"] for row in decided["candidates"]}
     below = []
     for row in requirement.get("listed_below", []):
         offer_id = offers.get((row["retailer_id"], row["sku_id"]))
-        if offer_id is None or offer_id in candidates or listed[offer_id] >= reference["minimum_price_minor"]:
-            raise Unmet(f"{row['retailer_id']} does not list {row['sku_id']} unavailable below the winning price")
-        below.append({"offer_id": offer_id, "price_minor": listed[offer_id]})
+        if (offer_id is None or offer_id in candidates or
+                found.key(row["sku_id"], listed[offer_id]["price_minor"]) >= winning):
+            raise Unmet(f"{row['retailer_id']} does not list {row['sku_id']} unavailable below the winner")
+        below.append({"offer_id": offer_id, "price_minor": listed[offer_id]["price_minor"]})
     return {"task": task, "reference": reference, "listed_below": below}
 
 
@@ -634,7 +758,9 @@ def prepare(natural, requirement, api, rng):
                 "natural_world_id": natural["world_id"],
                 # None when the probability is below the float range; the logarithm always holds.
                 "probability_given_upstream": block.probability or None,
-                "log_probability_given_upstream": block.log_probability, "winning_price_minor": winning,
+                "log_probability_given_upstream": block.log_probability,
+                # The winning rank: the winners' listed price, unless the requirement ranks otherwise.
+                **({"winning_price_minor": winning} if type(winning) is int else {"winning_rank": plain(winning)}),
                 "repriced": prices.replayed(natural, world, {pair: found.price for pair, found in draws.items()},
                                             {pair: block.places[pair].price_key for pair in draws}),
                 "restocked": restocked(natural, block, draws),
@@ -648,8 +774,8 @@ def prepare(natural, requirement, api, rng):
                                       "weight across seeds."}
 
     return Step(script=scripts(block, draws), probability=block.probability, log_probability=block.log_probability,
-                **vars(footprint(natural, requirement, api)), record=record,
-                check=lambda world: check(world, requirement, api))
+                writes={(kind, *pair) for pair in block.places for kind in ("stock", "price")}, reads=set(),
+                record=record, check=lambda world: check(world, requirement, api, block.scope))
 
 
 def steer(session, natural, natural_opened, requirement, api, rng):
@@ -657,35 +783,53 @@ def steer(session, natural, natural_opened, requirement, api, rng):
     return blocks.steer(session, natural, natural_opened, prepare(natural, requirement, api, rng), api)
 
 
-def judged(found, requirement, limits=None):
-    """The winning price when recorded leaves satisfy the requirement, else None.
+def lowest(found, limits=None):
+    """Each pair's best rank among its available offers, and every compared offer's rank.
 
     The native oracles' rule written out separately from the block model.
     Among the offers that compete, one is available when it holds stock at a
     location that counts or, where that counts, has a supplier order; offers
-    of pairs a comparison site does not list are left out. Without `limits` (a
-    scope) every offer competes, every location counts and so does a supplier
-    order.
+    of pairs a comparison site does not list are left out. Returns (None,
+    None) when a barred offer is available. Without `limits` (a scope) every
+    offer competes on its listed price, every location counts and so does a
+    supplier order.
     """
-    lowest, compared = {}, {}
+    best, compared = {}, {}
     for row in found["offers"].values():
-        if limits is not None and (row["sku_id"] not in limits.skus or limits.pairs is not None and
+        barred = limits is not None and row["sku_id"] in limits.barred
+        if limits is not None and (row["sku_id"] not in limits.skus and not barred or limits.pairs is not None and
                                    (row["retailer_id"], row["product_id"]) not in limits.pairs):
             continue
-        compared[(row["retailer_id"], row["sku_id"])] = row["price_minor"]
         sources = None if limits is None or limits.sources is None else limits.sources[row["retailer_id"]]
         stocked = any(quantity for name, quantity in row["stock_by_source"].items() if sources is None or name in sources)
-        if stocked or row["supplier_order"] and (limits is None or limits.supplier):
+        available = stocked or row["supplier_order"] and (limits is None or limits.supplier)
+        if barred:
+            if available:
+                return None, None
+            continue
+        rank = row["price_minor"] if limits is None else limits.key(row["sku_id"], row["price_minor"])
+        compared[(row["retailer_id"], row["sku_id"])] = rank
+        if available:
             pair = (row["retailer_id"], row["product_id"])
-            lowest[pair] = min(lowest.get(pair, row["price_minor"]), row["price_minor"])
-    if not lowest:
+            best[pair] = min(best.get(pair, rank), rank)
+    return best, compared
+
+
+def judged(found, requirement, limits=None):
+    """The winning rank when recorded leaves satisfy the requirement, else None.
+
+    The winners are the pairs whose best available rank is the lowest of all;
+    see `lowest` for what is compared.
+    """
+    best, compared = lowest(found, limits)
+    if not best:
         return None
-    winning = min(lowest.values())
-    if {pair for pair, price in lowest.items() if price == winning} != {
+    winning = min(best.values())
+    if {pair for pair, rank in best.items() if rank == winning} != {
             (rid, requirement["product_id"]) for rid in requirement["retailer_ids"]}:
         return None
     below = [compared.get((row["retailer_id"], row["sku_id"]), winning) for row in requirement.get("listed_below", [])]
-    return winning if all(price < winning for price in below) else None
+    return winning if all(rank < winning for rank in below) else None
 
 
 def recorded(world, concept_id, pairs=None):
@@ -705,23 +849,21 @@ def recorded(world, concept_id, pairs=None):
                        for r in world["retailers"] for o in r["offers"] if within(r, o["product_id"])}}
 
 
-def trial(natural, requirement, api):
-    """This module's reading of the producer's stock and price lines for the concept, under another seed.
+def reader(natural, places, api):
+    """This module's reading of the producer's stock and price lines for pairs, under another seed.
 
     Uses the producer's own stream, weighted-choice and pricing functions and
-    none of the block model. `blocks.redraw` checks it against the real
-    producer leaf for leaf; it is then cheap enough to estimate frequencies
-    from.
+    none of the block model. Returns `reading(seed)`, in the form of
+    `recorded`, and the stream keys it opens.
     """
-    block = sites(natural, requirement, api)
-    requirement, config = block.requirement, natural["config"]
+    config = natural["config"]
     products = {p["public"]["product_id"]: p["public"] for p in natural["products"]}
     skus = {s["sku_id"]: s for p in products.values() for s in p["skus"]}
 
     def reading(seed):
         stream = lambda key: api.population.stream(seed, key)
         found = {"conditions": {}, "offers": {}}
-        for pair, place in block.places.items():
+        for pair, place in places.items():
             condition = {l.source_id: api.population.weighted(stream(l.condition_key), l.probabilities)
                          for l in place.locations}
             found["conditions"].update({"/".join((*pair, name)): value for name, value in condition.items()})
@@ -742,23 +884,36 @@ def trial(natural, requirement, api):
                     "stock_by_source": amounts, "supplier_order": supplier}
         return found
 
-    keys = {place.price_key for place in block.places.values()}
-    for place in block.places.values():
+    keys = {place.price_key for place in places.values()}
+    for place in places.values():
         keys.update(l.condition_key for l in place.locations)
         for row in place.keys.values():
             keys.add(row["supplier"])
             keys.update(key for name, found in row.items() if name != "supplier" for key in found.values())
+    return reading, keys
+
+
+def trial(natural, requirement, api):
+    """The block's reading under another seed, with the requirement's verdict on it.
+
+    `blocks.redraw` checks the reading against the real producer leaf for
+    leaf; it is then cheap enough to estimate frequencies from.
+    """
+    block = sites(natural, requirement, api)
+    requirement = block.requirement
+    reading, keys = reader(natural, block.places, api)
     return SimpleNamespace(
-        keys=keys, **vars(footprint(natural, requirement, api)), reading=reading,
+        keys=keys, writes={(kind, *pair) for pair in block.places for kind in ("stock", "price")}, reads=set(),
+        reading=reading,
         winning=lambda seed: judged(reading(seed), requirement, block.scope),
         holds=lambda seed: judged(reading(seed), requirement, block.scope) is not None,
         recorded=lambda world: recorded(world, requirement["concept_id"], set(block.places)),
-        satisfied=lambda world: satisfied(world, requirement, api))
+        satisfied=lambda world: satisfied(world, requirement, api, block.scope))
 
 
-def satisfied(world, requirement, api):
+def satisfied(world, requirement, api, found=None):
     try:
-        return bool(check(world, requirement, api))
+        return bool(check(world, requirement, api, found))
     except Unmet:
         return False
 
