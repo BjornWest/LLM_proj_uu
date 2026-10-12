@@ -130,17 +130,26 @@ class _BrowserLease:
                     if filename is not None: video.save_as(filename)
                     video.delete()
                     saved_videos.add(page)
-                    self.recordings.append({'status': 'saved' if filename is not None else 'probe_deleted'})
+                    self.recordings.append({'kind': 'episode_page' if filename is not None else 'probe',
+                                            'path': filename.name if filename is not None else None,
+                                            'status': 'saved' if filename is not None else 'probe_deleted'})
                 except PlaywrightError as error:
                     # The pinned public API reports this exact failure when a
                     # page closes before Playwright receives any video artifact.
                     # No transfer/network/target errors are treated as empty video.
                     if page.is_closed() and error.message in ('Page closed', 'Page did not produce any video frames'):
                         saved_videos.add(page)
-                        self.recordings.append({'status': 'no_video_frame'})
+                        self.recordings.append({'kind': 'episode_page' if filename is not None else 'probe',
+                                                'path': filename.name if filename is not None else None,
+                                                'status': 'no_video_frame'})
                     else: errors.append(error)
                 except Exception as error: errors.append(error)
-            if errors: raise PoolError('Video finalization failed') from errors[0]
+                if errors and page not in saved_videos:
+                    self.recordings.append({'kind': 'episode_page' if filename is not None else 'probe',
+                        'path': filename.name if filename is not None else None, 'status': 'failed',
+                        'error': type(errors[-1]).__name__+': '+str(errors[-1])})
+            if errors: raise PoolError('Video finalization failed: '+
+                '; '.join(type(error).__name__+': '+str(error) for error in errors)) from errors[0]
         self.context.close = close_context
         return self.context
 
@@ -225,7 +234,8 @@ class SharedChat(Chat):
             if resource is not None:
                 try: resource.close()
                 except Exception as error: errors.append(error)
-        if errors: raise PoolError('Chat context/connection cleanup failed') from errors[0]
+        if errors: raise PoolError('Chat context/connection cleanup failed: '+
+            '; '.join(type(error).__name__+': '+str(error) for error in errors)) from errors[0]
 
 
 class SharedBrowserEnv(BrowserEnv):

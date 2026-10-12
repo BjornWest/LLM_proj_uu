@@ -162,11 +162,30 @@ class Recording(unittest.TestCase):
                 self.assertTrue(Path(info['recording_file']).is_file())
                 self.assertTrue(Path(info['chat']['recording_file']).is_file())
                 self.assertFalse(list(artifacts.rglob('*.webm')))
+                recordings=[v for lease in episode.metadata()['contexts']for v in lease['recordings']]
+                self.assertTrue(any(v['kind']=='probe'for v in recordings))
+                self.assertTrue(all(v['path']for v in recordings if v['kind']=='episode_page'))
                 self.assertTrue(all('id' not in row for row in client.status()['ended']))
                 events=[json.loads(line) for line in (Path(tmp)/'pool/events.jsonl').read_text().splitlines()]
                 for lease in episode.leases:
                     ack=[x for x in events if x['kind']=='lease_release_acknowledged' and x['lease_id']==lease.record['lease_id']]
                     self.assertEqual(len(ack),1); self.assertEqual(ack[0]['reason'],'released')
+
+
+    def test_video_save_failure_is_preserved_in_error_and_metadata(self):
+        from playwright.sync_api import Error
+        with tempfile.TemporaryDirectory() as tmp,PoolSupervisor(Path(tmp)/'pool') as client:
+            episode=client.episode('save-error');env=episode.wrap(factory('red'))(str(Path(tmp)/'video'))
+            env.reset(seed=1)
+            def failed_save(path):raise Error('synthetic transfer failure')
+            env.page.video.save_as=failed_save
+            with self.assertRaisesRegex(PoolError,'synthetic transfer failure'):env.close()
+            episode.close()
+            recordings=[v for lease in episode.metadata()['contexts']for v in lease['recordings']]
+            failures=[v for v in recordings if v['status']=='failed']
+            self.assertTrue(failures);self.assertTrue(all('synthetic transfer failure'in v['error']for v in failures))
+            self.assertTrue(all(v['kind']=='episode_page'and v['path']for v in failures))
+            self.assertEqual(client.status()['leases'],[])
 
 
 
@@ -222,6 +241,26 @@ class Failure(unittest.TestCase):
             finally:
                 if process.poll() is None:process.kill();process.wait(timeout=5)
 
+
+
+    def test_cli_process_group_sigint_is_clean_with_live_browser(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pool=Path(tmp)/'pool'
+            process=subprocess.Popen([sys.executable,'-m','intent_browser.chromium_pool',
+                '--directory',str(pool)],stdout=subprocess.DEVNULL,start_new_session=True)
+            try:
+                deadline=time.monotonic()+20
+                while not (pool/'descriptor.json').exists():
+                    self.assertIsNone(process.poll());self.assertLess(time.monotonic(),deadline);time.sleep(.025)
+                client=PoolClient.from_file(pool/'descriptor.json')
+                client.request('acquire',{'owner':'ctrl-c','role':'task','options':{'headless':True}})
+                os.killpg(process.pid,signal.SIGINT);process.wait(timeout=25)
+                self.assertEqual(process.returncode,0)
+                with self.assertRaises(PoolError):client.status()
+                events=[json.loads(line)for line in (pool/'events.jsonl').read_text().splitlines()]
+                self.assertTrue(any(x.get('reason')=='supervisor_shutdown'for x in events))
+            finally:
+                if process.poll()is None:os.killpg(process.pid,signal.SIGKILL);process.wait(timeout=5)
 
     def test_controller_death_stops_broker_without_replay(self):
         with tempfile.TemporaryDirectory() as tmp:

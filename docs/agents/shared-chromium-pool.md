@@ -148,3 +148,9 @@ Qualification rehashes the installed executable and selected driver/source files
 for every client. This adds cold attachment work; it is not a startup speedup, nor
 a complete digest of every dependency module. A release must pin its complete
 execution dependency closure separately.
+
+Signal handling belongs to the broker, so native launchServer signal handlers are
+disabled. Recording entries distinguish probes from episode pages, identify the
+local artifact name and retain real save/transfer failure messages. Failed remote
+artifacts and worker-death recordings remain until their browser member exits;
+clean successful transfers delete the remote copy.

@@ -67,7 +67,9 @@ function launchOptions(raw) {
     if (raw[key] != null && (!Array.isArray(raw[key]) || raw[key].some(x => typeof x !== 'string')))
       fail('Invalid ' + key);
   return { headless: raw.headless, slowMo: raw.slow_mo || 0, args: raw.args || [],
-    ignoreDefaultArgs: raw.ignore_default_args || [], executablePath: config.executable, timeout: 10000 };
+    ignoreDefaultArgs: raw.ignore_default_args || [], executablePath: config.executable, timeout: 10000,
+    // The suite supervisor owns signals; native launchServer SIGINT exits130.
+    handleSIGINT: false, handleSIGTERM: false, handleSIGHUP: false };
 }
 async function acquire(body) {
   if (closing) fail('Pool is shutting down');
