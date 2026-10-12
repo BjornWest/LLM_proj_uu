@@ -921,6 +921,84 @@ modelled at this level: tracking and notices have longer chains, and
 handling and collection are observed for collected parcels, whose receipt
 date depends on opening hours.
 
+## The eleventh requirement: a retailer's shipping policy
+
+Requirement (`steered-retailer-shipping-v1`): a retailer and one or more of
+the carriers it must or must not have a contract with, how many carriers it
+has, whether any of its contracts offers express or economy delivery, the
+lowest standard collection fee among its contracts, the lowest standard
+home-delivery fee (a contract's collection fee plus its home difference),
+and the days its warehouse takes to dispatch.
+
+```json
+{"schema": "steered-retailer-shipping-v1", "retailer_id": "footwear-04",
+ "carriers": {"include": ["carrier-03"], "exclude": ["carrier-07"]},
+ "carrier_count": {"max": 2}, "express": false,
+ "collection_fee_minor": {"min": 5900}, "dispatch_days": {"min": 2}}
+```
+
+The producer draws, per retailer, how many carriers (uniformly in a range
+set by the retailer's scale: one to three, two to four, three to five), which
+ones (an ordered sample of the world's eight carriers without replacement),
+per contract whether it has an economy and an express tier (a coin each),
+per contract a collection fee and a home difference (each a weighted choice
+from a five-row table) and the warehouse's dispatch days (a weighted choice
+of none, one or two). All are named streams, and nothing else in the world
+reads them: the contracts are recorded on the retailer and used afterwards
+by quotes and pages. So they are the block, `policies.py`: the contract
+draws when the requirement is about contracts, the dispatch draw when it is
+about dispatch, as two resources, `("contracts", retailer, "")` and
+`("dispatch", retailer, "")`.
+
+Contracts draw independently and alike whichever carrier they are with. The
+probability is a sum over the number of carriers of the chance that the set
+of carriers is as required (a ratio of binomial numbers) times the chance
+that so many contracts are as required; the latter folds the contracts in
+one at a time, keeping only what a requirement reads of them (a tier seen,
+the lowest fees so far). A sample chooses the number and that summary, the
+contracts back from the last to the first, and the carriers, and replays
+all of it through the producer; a plan can now script an ordered sample. The
+check reads the recorded contracts and dispatch days. The tables are read
+again when a requirement is modelled; a world whose recorded digests of the
+sampling defaults and the delivery plan are not the files' is refused.
+
+Limits. Fees are the contract's own standard numbers: what a shopper is
+quoted adds the tier's difference, distance and the free-shipping threshold
+(`basket_quote`), and which options a site shows is decided after the world
+is finished (see "What is not done"). A branch's dispatch days and whether a
+carrier takes bulky parcels are the seed's.
+
+## The twelfth requirement: who is cheapest, with that retailer's policy
+
+Requirement (`steered-cheapest-seller-policy-v1`): a ranking in the fourth
+block's words but without a winner, and a policy in the eleventh's words but
+without a retailer. It holds when one retailer's product alone is the
+cheapest available offer of the ranking and that retailer's policy is as
+stated.
+
+```json
+{"schema": "steered-cheapest-seller-policy-v1",
+ "cheapest": {"concept_id": "footwear.walking_shoes"},
+ "policy": {"express": false, "carrier_count": {"max": 1}}}
+```
+
+This is the case "the best offer is at a shop whose delivery the customer
+does not like". Without it one would look for a seed in which some retailer
+that can win happens to have such a policy, and steer the ranking to it; the
+policies the seed drew would then never have been asked anything.
+`sellers.py` states it as what it is: one of several things that exclude one
+another, "this retailer's product alone is cheapest, and this retailer's
+policy is as stated", one for every retailer and product of the ranking.
+Stock and prices are drawn apart from policies, so each alternative's
+probability is the product of the fourth block's and the eleventh's, the
+requirement's is their sum, and a sample picks an alternative in proportion
+and samples its two blocks. The winner's policy is drawn as required; every
+other retailer's is the seed's own, which is its distribution given the
+requirement. The check finds the winner in the saved leaves, then asks the
+native oracle and the recorded contracts. As a part of several requirements
+it declares everything it could decide: the ranking's stock and prices and
+the policy of every retailer in it.
+
 ## Requirement candidates for a native task
 
 `variants.of(world, task, api)` takes a native task specification (the
@@ -993,7 +1071,7 @@ only that matching offers exist, not which is cheapest.
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the ten kinds above, that must all hold.
+of the twelve kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
@@ -1829,9 +1907,11 @@ carries review and description text that the checks also digest.
   services are the seed's. Which reviews a review
   site shows, and which products a comparison site lists, are the seed's.
 - **Delivery cost.** A retailer's free-shipping threshold can be steered
-  against a basket's subtotal. Carrier fees, which carriers and service tiers
-  a retailer has, and so the delivered total (the single-item delivery and
-  order-set tasks) are not modelled. One obstacle is outside this code: with
+  against a basket's subtotal, and so can its contracts: which carriers and
+  tiers it has and their standard fees. The delivered total of an order (the
+  single-item delivery and order-set tasks) is not modelled: it adds tier
+  differences, distance and the threshold to those fees, over every retailer
+  that lists the product. One obstacle is outside this code: with
   delivery options enabled, which routes a retailer admits is decided by a
   hash that includes the finished world's identity
   (`delivery_admission.py`), so any steered change reshuffles the admitted

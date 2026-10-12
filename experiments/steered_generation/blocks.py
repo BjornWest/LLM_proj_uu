@@ -3,8 +3,9 @@
 A block is the set of draws one requirement resamples. It names the leaves it
 decides and the leaves its probability was computed from as resources:
 ("stock", retailer, product), ("price", retailer, product), for a
-retailer's free-shipping threshold ("threshold", retailer, ""), for a
-product's review corpus ("reviews", "", product), for a carrier's
+retailer's free-shipping threshold ("threshold", retailer, ""), for its
+carrier contracts ("contracts", retailer, "") and its warehouse's dispatch
+days ("dispatch", retailer, ""), for a product's review corpus ("reviews", "", product), for a carrier's
 ("carrier_reviews", "", carrier) and for its shipments' histories
 ("carrier_shipments", "", carrier). The producer
 gives every draw its own stream, so blocks whose resources do not meet are
