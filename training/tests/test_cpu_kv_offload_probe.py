@@ -278,16 +278,20 @@ class DriverLifecycleTests(unittest.TestCase):
                 popen.assert_not_called()
             self.assertFalse(result['passed']);self.assertIn('refuse model startup',result['error'])
 
-    def test_real_unpatched_package_is_rejected_before_model_start(self):
+    def test_missing_backport_is_rejected_before_model_start(self):
         import tempfile,time
         from types import SimpleNamespace
         from unittest.mock import patch
         with tempfile.TemporaryDirectory()as tmp:
             root=Path(tmp)
-            with patch.object(p.subprocess,'Popen')as popen:
+            with patch('importlib.metadata.version',return_value='0.28.0'),\
+                    patch('apply_vllm_cpu_kv_patch.apply_patch',side_effect=RuntimeError(
+                        'Required MTP offload backport is not installed'))as verify,\
+                    patch.object(p.subprocess,'Popen')as popen:
                 result=p.run(SimpleNamespace(output=root/'out',prompts=root/'unused-prompts',
                     snapshot='/unused',deadline=time.time()+900))
                 popen.assert_not_called()
+                verify.assert_called_once_with(verify_only=True)
             self.assertFalse(result['passed'])
             self.assertIn('Required MTP offload backport is not installed',result['error'])
 

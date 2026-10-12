@@ -31,7 +31,18 @@ The pinned identity is:
 | Qualified cache profile |native MTP3, FP8 E4M3 KV,1664-token blocks, `prefix_match_unit=null`,20 GiB native CPU offload, LRU|
 
 An arbitrary `uv sync` can restore stock package files. Reapply before starting
-workers, then verify; a historical image receipt is not enough:
+workers, then verify; a historical image receipt is not enough.
+
+For an existing RL environment installed before this deployment change, run the
+two commands below once before its next launch. The shared RL launcher and
+`verify_stack.py --role rl` require the patch for **every preset**, including
+baseline and tiny smoke models, even when CPU offloading is disabled. A stock
+environment intentionally reports `Required MTP offload backport is not
+installed` in the verification subprocess's stderr; the launcher's final
+exception is `CalledProcessError`. This is a migration requirement, not a
+model-loading failure.
+Stop running workers before modifying their package. New bootstrap and Modal
+image paths apply this automatically; repeat it after a sync replaces the source.
 
 ```bash
 training/envs/rl/.venv/bin/python -B training/scripts/apply_vllm_cpu_kv_patch.py --install-in-place

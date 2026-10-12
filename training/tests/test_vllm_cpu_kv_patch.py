@@ -1,6 +1,8 @@
 """Patch integrity and installation controls; no model or GPU imports."""
 from importlib.metadata import distribution
 from pathlib import Path
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -9,12 +11,62 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import apply_vllm_cpu_kv_patch as p
 
 
+def stock_source(data):
+    """Recover a hash-checked stock fixture without changing installed vLLM."""
+    digest=p.sha256(data)
+    if digest==p.BASE_SHA256:return data
+    if digest!=p.RESULT_SHA256:raise RuntimeError('Unknown installed scheduler source')
+    if p.sha256(p.PATCH_FILE.read_bytes())!=p.PATCH_SHA256:
+        raise RuntimeError('Backport artifact differs from pinned patch bytes')
+    with tempfile.TemporaryDirectory(prefix='vllm-stock-test-',dir='/tmp')as folder:
+        root=Path(folder);source=root/p.SOURCE_PATH
+        source.parent.mkdir(parents=True);source.write_bytes(data)
+        env={k:v for k,v in os.environ.items()if not k.startswith('GIT_')}
+        env['GIT_CEILING_DIRECTORIES']=str(root.parent)
+        result=subprocess.run(['git','apply','--reverse','--include='+p.SOURCE_PATH,str(p.PATCH_FILE)],
+            cwd=root,env=env,text=True,capture_output=True,timeout=20)
+        if result.returncode:raise RuntimeError('Stock fixture reverse-apply failed: '+result.stderr)
+        recovered=source.read_bytes()
+    if p.sha256(recovered)!=p.BASE_SHA256:raise RuntimeError('Recovered stock fixture hash mismatch')
+    return recovered
+
+
 class PatchTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.base=Path(distribution('vllm').locate_file(p.SOURCE_PATH)).read_bytes()
-        if p.sha256(cls.base)!=p.BASE_SHA256:
-            raise RuntimeError('Run controls against the unmodified pinned0.28 source')
+        package=distribution('vllm')
+        if package.version!='0.28.0':raise RuntimeError('Controls require pinned vLLM0.28.0')
+        cls.installed=Path(package.locate_file(p.SOURCE_PATH)).read_bytes()
+        cls.base=stock_source(cls.installed)
+
+    @classmethod
+    def tearDownClass(cls):
+        if Path(distribution('vllm').locate_file(p.SOURCE_PATH)).read_bytes()!=cls.installed:
+            raise AssertionError('Installed scheduler changed during tests')
+
+    def test_installed_distribution_verify_is_read_only_in_both_states(self):
+        if p.sha256(self.installed)==p.RESULT_SHA256:
+            self.assertEqual(p.apply_patch(verify_only=True)['status'],'verified')
+        else:
+            with self.assertRaisesRegex(RuntimeError,'not installed'):
+                p.apply_patch(verify_only=True)
+        self.assertEqual(Path(distribution('vllm').locate_file(p.SOURCE_PATH)).read_bytes(),self.installed)
+
+    def test_installed_distribution_wrong_version_is_rejected_before_lookup(self):
+        from unittest.mock import Mock,patch
+        package=Mock(version='0.28.1')
+        with patch.object(p,'distribution',return_value=package):
+            with self.assertRaisesRegex(RuntimeError,'exactly vLLM0.28.0'):
+                p.apply_patch(verify_only=True)
+        package.locate_file.assert_not_called()
+
+    def test_fixture_accepts_both_pinned_states_and_rejects_unknown_bytes(self):
+        self.assertEqual(stock_source(self.base),self.base)
+        with tempfile.TemporaryDirectory()as folder:
+            source=Path(folder)/'scheduler.py';source.write_bytes(self.base);p.apply_patch(source)
+            self.assertEqual(stock_source(source.read_bytes()),self.base)
+        with self.assertRaisesRegex(RuntimeError,'Unknown installed'):
+            stock_source(self.base+b'\n# unknown\n')
 
     def test_real_application_idempotence_and_verify(self):
         with tempfile.TemporaryDirectory()as folder:
@@ -50,23 +102,28 @@ class PatchTests(unittest.TestCase):
 
     def test_installed_package_requires_explicit_modification_opt_in(self):
         with self.assertRaisesRegex(RuntimeError,'requires --install-in-place'):p.apply_patch()
-        self.assertEqual(Path(distribution('vllm').locate_file(p.SOURCE_PATH)).read_bytes(),self.base)
+        self.assertEqual(Path(distribution('vllm').locate_file(p.SOURCE_PATH)).read_bytes(),self.installed)
 
     def test_native_lookup_restores_sparse_recurrent_checkpoints(self):
         """Same retained keys: original lookup misses; patched lookup restores."""
-        import importlib,importlib.util,os
+        import importlib.util
         from types import SimpleNamespace
         from unittest.mock import patch
         with patch.dict(os.environ,{'VLLM_TARGET_DEVICE':'cpu'}):
             import torch
             from vllm.v1.kv_cache_interface import KVCacheGroupSpec,FullAttentionSpec,MambaSpec
-            original=importlib.import_module('vllm.distributed.kv_transfer.kv_connector.v1.offloading.scheduler')
             with tempfile.TemporaryDirectory()as folder:
+                original_source=Path(folder)/'stock.py';original_source.write_bytes(self.base)
+                original_name='mtp_offload_stock_native_test'
+                original_spec=importlib.util.spec_from_file_location(original_name,original_source)
+                original=importlib.util.module_from_spec(original_spec)
                 source=Path(folder)/'scheduler.py';source.write_bytes(self.base);p.apply_patch(source)
                 name='mtp_offload_patch_native_test'
                 spec=importlib.util.spec_from_file_location(name,source)
-                updated=importlib.util.module_from_spec(spec);sys.modules[name]=updated
+                updated=importlib.util.module_from_spec(spec)
+                sys.modules[original_name]=original;sys.modules[name]=updated
                 try:
+                    original_spec.loader.exec_module(original)
                     spec.loader.exec_module(updated)
                     hits=[]
                     for module in (original,updated):
@@ -101,7 +158,8 @@ class PatchTests(unittest.TestCase):
                         hits.append((cold,warm))
                     self.assertEqual(hits[0],(0,0))
                     self.assertEqual(hits[1],(58240,0))
-                finally:sys.modules.pop(name,None)
+                finally:
+                    sys.modules.pop(name,None);sys.modules.pop(original_name,None)
 
 
 if __name__=='__main__':unittest.main()
