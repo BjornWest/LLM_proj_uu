@@ -10,7 +10,7 @@ second, so tests that run it through the producer use few of its products.
 from collections import Counter
 from copy import deepcopy
 from itertools import permutations
-from math import erfc, nextafter, prod, sqrt
+from math import erfc, exp, lgamma, nextafter, prod, sqrt
 from pathlib import Path
 from random import Random
 from tempfile import TemporaryDirectory
@@ -235,9 +235,38 @@ class ModelTests(Programs):
         self.assertEqual(programs.tails({**params, "mean": 10, "sd": .5}, .5)[0], 1.0)
         self.assertLess(0, programs.tails({**params, "mean": 10, "sd": .5}, .5)[1])
         self.assertLess(programs.tails({**params, "mean": 10, "sd": .5}, .5)[1], 1e-50)
-        for bad in ({**params, "bounds_mode": "truncate"}, {**params, "sd": 0}, {**params, "min": 1}):
+        for bad in ({**params, "bounds_mode": "truncate"}, {**params, "sd": 0}, {**params, "min": 1},
+                    # Sizes at which a midpoint, a quotient or a product here would overflow or lose its digits.
+                    {**params, "min": 1e308, "max": 1.5e308, "mean": 1.25e308, "sd": 1e307},
+                    {**params, "mean": 1e308, "sd": 1.5e308}, {**params, "sd": 1e-200}, {**params, "round_to": 1e-200},
+                    {**params, "mean": float("nan")}, {**params, "max": float("inf")}, {**params, "mean": 10 ** 400}):
             with self.assertRaises(ValueError):
                 programs.tails(bad, .5)
+        with self.assertRaises(ValueError):
+            programs.tails(params, 1e200)
+        # The ends of the supported sizes still give tails that add up.
+        for edge in ({**params, "min": -1e150, "max": 1e150, "mean": 0, "sd": 1e150, "round_to": None},
+                     {**params, "min": 0, "max": 1e-140, "mean": 0, "sd": 1e-150, "round_to": 1e-150}):
+            above, below = programs.tails(edge, edge["max"] / 2)
+            self.assertAlmostEqual(above + below, 1, places=12)
+        # A rating's concentration: within its sizes the five chances add up; outside it is refused.
+        for concentration in (1e-60, 1e-6, 1.5, 1e6, 1e60):
+            for execution in (0, .37, 1):
+                found = programs.stars(execution, concentration)
+                self.assertAlmostEqual(sum(found.values()), 1, places=14)
+                self.assertTrue(all(0 <= chance <= 1 for chance in found.values()))
+        # The same numbers as the difference of log-gammas gives where that is accurate.
+        beta = lambda x, y: lgamma(x) + lgamma(y) - lgamma(x + y)
+        for hits, chance in enumerate(programs.stars(.37, 1.5).values()):
+            a, b = (.05 + .9 * .37) * 1.5, (1 - .05 - .9 * .37) * 1.5
+            self.assertAlmostEqual(chance, (1, 4, 6, 4, 1)[hits] * exp(beta(a + hits, b + 4 - hits) - beta(a, b)), places=13)
+        for execution, concentration in ((.5, 1e70), (.5, 1e-70), (.5, float("nan")), (1.5, 1.5), (.5, True)):
+            with self.assertRaises(ValueError):
+                programs.stars(execution, concentration)
+        self.assertEqual(reviews.whole({1: .25, 2: .75}), {1: .25, 2: .75})
+        for found in ({1: .25, 2: .5}, {1: float("nan"), 2: .5}, {1: 1.5, 2: -.5}):
+            with self.assertRaises(ValueError):
+                reviews.whole(found)
 
     def test_probabilities_match_other_seeds(self):
         for requirement, trials in zip(self.requirements(), (2500, 2500, 2500, 1200, 1200, 600, 2500, 1200)):
@@ -562,6 +591,19 @@ class RefusalTests(Programs):
         def whole(document):
             pool(document, "value.positive")["when"] += " and known(review.value_favourability)"
 
+        def vast(document):
+            # A range whose midpoint is beyond the largest float.
+            document["fields"]["review.value_favourability"].update(min=1e308, max=1.5e308)
+            step(document, "value_favourability").update(min=1e308, max=1.5e308, mean=1.25e308, sd=1e307, round_to=1)
+            step(document, "sentiment_value")["derive"] = "review.value_favourability >= 1.25e308"
+
+        def spread(document):
+            # A spread whose multiple is beyond the largest float.
+            step(document, "value_favourability").update(min=0, max=1, mean=1e308, sd=1.5e308, round_to=1)
+
+        def sharp(document):
+            step(document, "rating")["concentration"] = 1e70
+
         def unknown(document):
             # A value the field counts as unknown reads differently from its neighbours within one band.
             document["fields"]["review.value_favourability"]["unknown_values"] = [.5]
@@ -581,6 +623,7 @@ class RefusalTests(Programs):
 
         for change, topic in ((neutral, "everyday_comfort"), (both, "everyday_comfort"), (strict, "value"), (scaled, "value"),
                               (doubled, "value"), (chained, "value"), (whole, "value"), (unknown, "value"),
+                              (vast, "value"), (spread, "value"), (sharp, "everyday_comfort"),
                               (unclipped, "value"), (wide, "everyday_comfort"), (guarded, "everyday_comfort")):
             with self.subTest(change=change.__name__):
                 self.altered(change)

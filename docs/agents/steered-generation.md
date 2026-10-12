@@ -604,7 +604,11 @@ included; a mention of the draw that is not the draw alone, `>=`, and a
 number written out refuses the program, and so does a field that marks some
 value of the draw as unknown, since one value could then not stand for its
 neighbours. A threshold is kept as the number the program has, whole or
-not. Because the order of the steps is written here a
+not. The arithmetic is written for numbers of ordinary size and refuses
+others instead of approximating: a normal draw's range, mean, spread, grid
+and thresholds up to 1e150 in size (spread and grid from 1e-150), a rating's
+concentration from 1e-60 to 1e60; and one review's probabilities must come out
+adding up to one. Because the order of the steps is written here a
 second time, every recorded review of a natural world is also followed from
 its recorded draws alone, and the world is refused if that gives another
 rating or says another thing than the review does.

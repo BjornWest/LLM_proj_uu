@@ -32,12 +32,16 @@ from collections import defaultdict
 from copy import deepcopy
 from importlib import import_module
 import json
-from math import erfc, exp, fsum, lgamma, log, sqrt
+from math import erfc, fsum, prod, sqrt
 import sys
 from types import SimpleNamespace
 
 from . import reviews, streams
 
+# The sizes of number the arithmetic here is written for. A normal draw's range, mean, spread, grid and thresholds
+# within these never overflow a product, quotient or midpoint below, and neither do the products of four factors
+# that a rating's concentration within its own enters. Anything outside is refused, not approximated.
+SMALL, LARGE, CONCENTRATIONS = 1e-150, 1e150, (1e-60, 1e60)
 # Review programs rebuilt from a world, by the producer module, the world's seed and the product.
 BUILT = {}
 
@@ -243,10 +247,15 @@ def rating_key(place, index):
 
 def stars(execution, concentration):
     """The probability of each star rating: one more than a beta-binomial count of four."""
+    if not (type(concentration) in (int, float) and CONCENTRATIONS[0] <= concentration <= CONCENTRATIONS[1] and
+            type(execution) in (int, float) and 0 <= execution <= 1):
+        raise unmodelled("a rating whose concentration or execution is beyond ordinary size")
     mean = .05 + .9 * execution
     a, b = mean * concentration, (1 - mean) * concentration
-    beta = lambda x, y: lgamma(x) + lgamma(y) - lgamma(x + y)
-    return {1 + hits: exp(log((1, 4, 6, 4, 1)[hits]) + beta(a + hits, b + 4 - hits) - beta(a, b)) for hits in range(5)}
+    # Ratios of beta functions as rising products: no difference of large logarithms.
+    rising = lambda start, count: prod(start + more for more in range(count))
+    return {1 + hits: (1, 4, 6, 4, 1)[hits] * rising(a, hits) * rising(b, 4 - hits) / rising(a + b, 4)
+            for hits in range(5)}
 
 
 def topic_sets(policy, eligible, lengths):
@@ -310,6 +319,10 @@ def tails(params, bound):
     low, high, step = params["min"], params["max"], params.get("round_to")
     if params.get("bounds_mode") != "clip" or params["sd"] <= 0 or not low < high:
         raise unmodelled("a normal draw that is not clipped to a range")
+    sizes = [low, high, params["mean"], params["sd"], bound, *([] if step is None else [step])]
+    if (not all(type(size) in (int, float) and abs(size) <= LARGE for size in sizes) or params["sd"] < SMALL or
+            step is not None and not step >= SMALL):
+        raise unmodelled("a normal draw with a range, mean, spread, grid or threshold beyond ordinary size")
     ended = (lambda x: round(x / step) * step) if step is not None else (lambda x: x)
     if ended(low) >= bound:
         return 1.0, 0.0
@@ -469,8 +482,9 @@ def cells(place):
         module.get_path(context, place.rating["target"]), told(place, context)].append(mass))
     if not set(rating for rating, _ in found) <= set(range(1, 6)):
         raise unmodelled("a review without a star rating from one to five")
-    place.program.cells[name] = {(rating, side): fsum(found.get((rating, side), [])) for rating in range(1, 6)
-                                 for side in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST)}
+    place.program.cells[name] = reviews.whole({
+        (rating, side): fsum(found.get((rating, side), [])) for rating in range(1, 6)
+        for side in (reviews.POSITIVE, reviews.NEGATIVE, reviews.REST)})
     return dict(place.program.cells[name])
 
 

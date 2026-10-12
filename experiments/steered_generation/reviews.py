@@ -237,9 +237,21 @@ def cells(place):
     told = {int(slots): mass * about(int(slots)) if int(slots) else 0.0 for slots, mass in length.items()}
     assessed, silent = fsum(told.values()), fsum(mass - told[int(slots)] for slots, mass in length.items())
     against = lambda rating: erfc((centre(place, rating) - .5) / (place.spread * sqrt(2))) / 2
-    return {(rating, name): mass * part for rating, mass in stars(place).items()
-            for name, part in ((POSITIVE, assessed * favourable(place, rating)), (NEGATIVE, assessed * against(rating)),
-                               (REST, silent))}
+    return whole({(rating, name): mass * part for rating, mass in stars(place).items()
+                  for name, part in ((POSITIVE, assessed * favourable(place, rating)),
+                                     (NEGATIVE, assessed * against(rating)), (REST, silent))})
+
+
+def whole(found):
+    """One review's probabilities, refused where they are not probabilities that add up to one.
+
+    A last guard on the arithmetic: weights or parameters of a size that
+    overflows or cancels somewhere above show here as a sum off by more than
+    rounding, or as a share that is not a number from zero to one.
+    """
+    if not all(0 <= mass <= 1 for mass in found.values()) or abs(fsum(found.values()) - 1) > 1e-9:
+        raise ValueError("Not modelled: draws whose probabilities do not add up to one in this arithmetic")
+    return found
 
 
 def marginal(found):
