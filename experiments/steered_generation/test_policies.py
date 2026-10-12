@@ -25,6 +25,29 @@ INPUTS = {"seed": 5, "concept_ids": [SHOES, SANDALS], "tasks": [SHOES], "control
           "city_id": "uppsala", "review_count": 0}
 
 
+def plain(requirement, contracts, days):
+    """A requirement read off contracts and dispatch days in the document's words, apart from `policies.holds`."""
+    carriers = [row["carrier_id"] for row in contracts]
+    named = requirement.get("carriers", {})
+    checks = [all(carrier in carriers for carrier in named.get("include", [])),
+              not any(carrier in carriers for carrier in named.get("exclude", []))]
+    limited = lambda limits, value: limits.get("min", value) <= value <= limits.get("max", value)
+    if "carrier_count" in requirement:
+        checks.append(limited(requirement["carrier_count"], len(carriers)))
+    for tier in ("economy", "express"):
+        if tier in requirement:
+            checks.append(any(tier in row["tiers"] for row in contracts) == requirement[tier])
+    if "collection_fee_minor" in requirement:
+        checks.append(bool(contracts) and limited(requirement["collection_fee_minor"],
+                                                  min(row["collection_fee_minor"] for row in contracts)))
+    if "home_fee_minor" in requirement:
+        checks.append(bool(contracts) and limited(requirement["home_fee_minor"], min(
+            row["collection_fee_minor"] + row["home_delta_minor"] for row in contracts)))
+    if "dispatch_days" in requirement:
+        checks.append(limited(requirement["dispatch_days"], days))
+    return all(checks)
+
+
 class Policies(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -98,7 +121,8 @@ class ModelTests(Policies):
                                                                            *(["express"] if kind[1] else [])],
                                           "collection_fee_minor": int(kind[2]), "home_delta_minor": int(kind[3])}
                                          for carrier, (kind, _) in zip(chosen, drawn)]
-                            if policies.holds(policies.resolve(need), contracts, 0):
+                            self.assertEqual(policies.holds(policies.resolve(need), contracts, 0), plain(need, contracts, 0))
+                            if plain(need, contracts, 0):
                                 direct += prod(share for _, share in drawn) / comb(len(self.carriers), count) / len(place.counts)
                 self.assertAlmostEqual(policies.model(self.natural, need, self.api).probability, direct, places=12)
 
@@ -116,16 +140,18 @@ class ModelTests(Policies):
         self.assertAlmostEqual(policies.model(self.natural, self.need(dispatch_days={"min": 0}), self.api).probability, 1, places=12)
 
     def test_samples_match_rejection_sampling(self):
-        requirement = self.need(express=True, collection_fee_minor={"min": 5900}, carriers={"exclude": [self.carriers[2]]})
+        requirement = self.need(express=True, collection_fee_minor={"min": 5900},
+                                carriers={"include": [self.carriers[5]], "exclude": [self.carriers[2]]})
         reading = policies.trial(self.natural, requirement, self.api)
-        accepted = [reading.reading(seed)[0] for seed in range(10 ** 6, 10 ** 6 + 30000) if reading.holds(seed)]
+        accepted = [found[0] for found in (reading.reading(seed) for seed in range(10 ** 6, 10 ** 6 + 30000))
+                    if plain(requirement, *found)]
         rng, sampled = Random(11), []
         for _ in range(600):
             step = policies.prepare(self.natural, requirement, self.api, rng)
             names = step.script[self.retailers["medium"]["retailer_id"] + "/carriers"][0][1]
             self.assertEqual(len(names), len(set(names)))
             sampled.append(step)
-        self.assertGreater(len(accepted), 1500)
+        self.assertGreater(len(accepted), 400)
         planned = []
         for step in sampled:
             place = policies.site(self.natural, requirement, self.api)
@@ -147,6 +173,8 @@ class ModelTests(Policies):
             "lowest_fee": lambda rows: min(row["collection_fee_minor"] for row in rows),
             "home": lambda rows: sum(row["home_delta_minor"] for row in rows),
             "has_first_carrier": lambda rows: any(row["carrier_id"] == self.carriers[0] for row in rows),
+            "place_of_the_included": lambda rows: [row["carrier_id"] for row in rows].index(self.carriers[5]),
+            "included_has_express": lambda rows: next(row["express"] for row in rows if row["carrier_id"] == self.carriers[5]),
             "first_is_last_carrier": lambda rows: rows[0]["carrier_id"] == self.carriers[-1]}
         for name, feature in features.items():
             with self.subTest(feature=name):
@@ -155,6 +183,22 @@ class ModelTests(Policies):
                 self.assertLess(abs(sum(mine) / len(mine) - sum(theirs) / len(theirs)),
                                 4.5 * (spread(mine) ** 2 + spread(theirs) ** 2) ** .5 + 1e-9)
         self.assertFalse(any(row["carrier_id"] == self.carriers[2] for rows in planned for row in rows))
+
+    def test_dispatch_days_are_drawn_in_proportion(self):
+        requirement = self.need(dispatch_days={"min": 1})
+        place = policies.site(self.natural, requirement, self.api)
+        allowed = {name: share for name, share in place.days.items() if int(name) >= 1}
+        self.assertGreater(len(allowed), 1)
+        rng, seen, trials = Random(2), Counter(), 400
+        for _ in range(trials):
+            step = policies.prepare(self.natural, requirement, self.api, rng)
+            self.assertEqual(set(step.script), {place.keys.dispatch})
+            seen[step.script[place.keys.dispatch][0][1]] += 1
+        for name, share in allowed.items():
+            chance = share / sum(allowed.values())
+            self.assertLess(abs(seen[name] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5)
+        self.assertAlmostEqual(policies.model(self.natural, requirement, self.api).probability,
+                               sum(allowed.values()) / sum(place.days.values()), places=12)
 
     def test_zero_probability_and_bad_requirements(self):
         many = self.carriers[:5]
@@ -193,8 +237,7 @@ class ProducerTests(Policies):
                 world, found, record = policies.steer(self.session, self.natural, self.opened, requirement, self.api, Random(index))
                 retailer = next(r for r in world["retailers"] if r["retailer_id"] == requirement["retailer_id"])
                 before = next(r for r in self.natural["retailers"] if r["retailer_id"] == requirement["retailer_id"])
-                self.assertTrue(policies.holds(policies.resolve(requirement), retailer["contracts"],
-                                               retailer["source_locations"][0]["dispatch_days"]))
+                self.assertTrue(plain(requirement, retailer["contracts"], retailer["source_locations"][0]["dispatch_days"]))
                 self.assertEqual((found["contracts"], found["warehouse_dispatch_days"]),
                                  (retailer["contracts"], retailer["source_locations"][0]["dispatch_days"]))
                 self.assertEqual(world["status"], streams.STATUS)

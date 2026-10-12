@@ -125,12 +125,12 @@ class ModelTests(Ratings):
 
     def test_low_ratings_come_with_worse_service(self):
         """Given a low average the levels lean weak, in the proportion the alternatives state, and samples follow it."""
-        requirement = self.need(average_stars={"max": 3.7})
+        requirement = self.need(average_stars={"max": 3.4})
         block = ratings.model(self.natural, requirement, self.api)
         place = block.site
         weak = lambda levels: sum(level == "weak" for level in levels.values())
         expected = sum(exp(row.value - block.log_probability) * weak(row.levels) for row in block.alternatives)
-        self.assertGreater(expected, 1.2 * 4 * place.table["weak"])
+        self.assertGreater(expected, 2.5 * 4 * place.table["weak"])
         rng, seen, totals = Random(3), [], []
         for _ in range(120):
             step = ratings.prepare(self.natural, requirement, self.api, rng)
@@ -143,7 +143,34 @@ class ModelTests(Ratings):
         spread = (sum((value - expected) ** 2 for value in seen) / len(seen)) ** .5
         self.assertLess(abs(sum(seen) / len(seen) - expected), 4.5 * spread / len(seen) ** .5)
         # Under the bound the total is not pushed further down than it needs to be.
-        self.assertGreater(sum(totals) / len(totals), 3.45 * place.count)
+        self.assertGreater(sum(totals) / len(totals), 3.2 * place.count)
+
+    def test_samples_match_rejection_sampling(self):
+        """With the levels stated the histories are fixed; the planned stars are compared with the producer's own
+        draws of every review, kept when the average is as required."""
+        place = ratings.site(self.natural, self.need(average_stars={"max": 5}), self.api)
+        requirement = self.need(levels=dict(place.natural), average_stars={"max": 4.2})
+        happened = ratings.histories(place, place.natural)
+        drawn = ([ratings.rated(place, index, history, seed) for index, history in enumerate(happened)]
+                 for seed in range(10 ** 6, 10 ** 6 + 4000))
+        accepted = [stars for stars in drawn if ratings.average(sum(stars), len(stars)) <= 4.2]
+        self.assertGreater(len(accepted), 400)
+        rng, planned = Random(5), []
+        for _ in range(300):
+            step = ratings.prepare(self.natural, requirement, self.api, rng)
+            planned.append([ratings.rated(place, index, history, step.script[place.review(index)].seed)
+                            for index, history in enumerate(happened)])
+            self.assertLessEqual(ratings.average(sum(planned[-1]), place.count), 4.2)
+        features = {"total": sum, "ones": lambda stars: stars.count(1), "threes": lambda stars: stars.count(3),
+                    "fives": lambda stars: stars.count(5), "first": lambda stars: stars[0], "last": lambda stars: stars[-1],
+                    "first_half": lambda stars: sum(stars[:len(stars) // 2]),
+                    "at_the_bound": lambda stars: ratings.average(sum(stars), len(stars)) > 4.1}
+        for name, feature in features.items():
+            with self.subTest(feature=name):
+                mine, theirs = [feature(stars) for stars in planned], [feature(stars) for stars in accepted]
+                error = lambda values: (sum((v - sum(values) / len(values)) ** 2 for v in values) / len(values) ** 2) ** .5
+                self.assertLess(abs(sum(mine) / len(mine) - sum(theirs) / len(theirs)),
+                                4.5 * (error(mine) ** 2 + error(theirs) ** 2) ** .5 + 1e-9)
 
     def test_zero_probability_and_bad_requirements(self):
         good = self.need(average_stars={"max": 3.7})

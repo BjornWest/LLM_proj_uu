@@ -108,13 +108,19 @@ class SellerTests(Sellers):
     def test_winners_are_picked_in_proportion(self):
         requirement = self.need(express=False)
         block = sellers.model(self.natural, requirement, self.api)
-        rng, seen, trials = Random(7), Counter(), 400
+        rng, seen, trials = Random(7), Counter(), 160
+        retailers = sorted({pair[0] for pair, _ in block.alternatives})
         for _ in range(trials):
-            pair = sellers.pick_log(rng, [pair for pair, _ in block.alternatives], [value for _, value in block.alternatives])
-            seen[pair] += 1
-        for pair, value in block.alternatives:
-            chance = exp(value - block.log_probability)
-            self.assertLess(abs(seen[pair] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 2 / trials, pair)
+            # The winner a plan samples is the retailer whose contracts it scripts.
+            step = sellers.prepare(self.natural, requirement, self.api, rng)
+            chosen = [retailer for retailer in retailers if retailer + "/carrier_count" in step.script]
+            self.assertEqual(len(chosen), 1)
+            seen[chosen[0]] += 1
+        for retailer in retailers:
+            chance = sum(exp(value - block.log_probability) for pair, value in block.alternatives if pair[0] == retailer)
+            self.assertLess(abs(seen[retailer] / trials - chance), 4.5 * (chance * (1 - chance) / trials) ** .5 + 1 / trials,
+                            retailer)
+        self.assertGreater(len(seen), 3)
 
     def test_redraws_combinations_and_refusals(self):
         requirement = self.need(express=False)
