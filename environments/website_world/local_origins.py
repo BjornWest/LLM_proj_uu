@@ -26,6 +26,7 @@ from intent_browser.navigation import origin
 VERSION = 'website-local-origins-v1'
 PHASE_SCHEMA = 'website-local-origin-phases-v1'
 _PHASE_PATHS = frozenset(('/', '/api/session', '/api/basket-quote', '/api/order'))
+_PHASE_METHODS = frozenset(('GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'TRACE', 'CONNECT'))
 
 
 def _origin(url):
@@ -153,7 +154,7 @@ class LocalOriginBridge(LogicalOrigins):
         row = {'schema': PHASE_SCHEMA, 'monotonic_ns': monotonic_ns(), 'phase': phase,
                'request_id': getattr(request, '_phase_request_id', None),
                'network_id': getattr(request, '_phase_network_id', None),
-               'method': method if re.fullmatch(r'[A-Z]{1,16}', method) else None,
+               'method': method if isinstance(method, str) and method in _PHASE_METHODS else None,
                'origin': logical, 'path': path if path in _PHASE_PATHS else '<redacted>', **fields}
         try:
             with self._diagnostics_lock:

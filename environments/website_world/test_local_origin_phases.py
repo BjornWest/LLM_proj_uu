@@ -198,3 +198,28 @@ def test_direct_route_still_records_http_without_requiring_cdp_callback(tmp_path
         assert fulfilled[0]['status'] == 200 and SECRET not in path.read_text()
     finally:
         value.close()
+
+
+@pytest.mark.parametrize('method,recorded', [(b'POST', None), ('SECRET', None), ('PATCH', 'PATCH')])
+def test_method_projection_is_type_safe_allowlisted_and_does_not_change_forwarding(tmp_path, method, recorded):
+    path = tmp_path/'receipts.ndjson'
+    forwarded = []
+
+    def http(request):
+        forwarded.append(request.method)
+        return response(request)
+
+    value = bridge(path, http)
+    fulfilled = []
+    route = SimpleNamespace(fulfill=lambda **fields: fulfilled.append(fields))
+    request = SimpleNamespace(url='https://shop.test/api/order', method=method,
+                              all_headers=lambda: {}, post_data_buffer=b'')
+    try:
+        value.route(route, request)
+        assert fulfilled[0]['status'] == 200
+        assert forwarded == [method]
+        assert all(row['method'] == recorded for row in rows(path))
+        assert value.diagnostics_error is None
+        assert 'SECRET' not in path.read_text()
+    finally:
+        value.close()

@@ -102,14 +102,17 @@ class PreparedEpisode:
 
 
 def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
-                    lazy_publication=True, offer_id=None):
+                    lazy_publication=True, offer_id=None, origin_diagnostics_path=None):
     """Return PreparedEpisode with episode, native adapter, policy and config.
 
     Public task ID/prose/memories come unchanged from Product. Both Runtime and
     native grader late-bind the same frozen instance to the actual trace ID.
     Pricing and steering are resolved only from their source-owned family APIs.
-    An explicit offer_id targets a consent/extras order policy's native catalog
-    offer. It is not inferred from prose and adds no order-content grading.
+    An explicit offer_id targets a consent/extras order or declared cookie
+    preservation continuation. It is not inferred from prose and adds no
+    order-content or shopping-completion grading to cookie tasks.
+    origin_diagnostics_path enables private LocalOriginBridge phase receipts;
+    it changes no execution timeout, task, action or grading behavior.
     """
     if type(case) is not str or case not in CASES:
         raise ValueError('Publication case must be positive, wrong or incomplete')
@@ -126,15 +129,16 @@ def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
         if type(offer_id) is not str or not offer_id.strip() or offer_id != offer_id.strip():
             raise ValueError('Explicit offer_id must be nonempty exact native offer text')
         if (instance['family'] != 'consent_extras'
-                or native['setup']['commit_scope'] != 'simulated_order_submitted'):
-            raise ValueError('Explicit offer_id is supported only for consent/extras order controls')
+                or not import_module('.consent_extras', __package__).accepts_order_target(native)):
+            raise ValueError('Explicit offer_id needs a consent/extras order or preference-preservation cookie control')
     if native['binding'].get('episode_id') is not None:
         raise ValueError('Publication needs an unbound reusable preparation')
     native_sources = _native_sources(native_module, native)
     family, settings, pieces = _family(instance)
     driver_case = ('no-session' if case == 'incomplete' else case) if instance['family'] == 'pricing_promotions' else case
     if instance['family'] == 'consent_extras':
-        driver = family.case_config(instance, case)
+        driver = family.case_config(instance, case,
+            **({'offer_id': offer_id} if offer_id is not None else {}))
     elif instance['family'] == 'pricing_promotions':
         driver = import_module('.pricing_promotions.controls', __package__).control_config(native, driver_case)
     else:
@@ -152,10 +156,13 @@ def prepare_episode(world_dir, instance_path, case='positive', *, headless=True,
         return registry.bind_episode(instance, actual_id)['prepared']['binding']
 
     episode = ScenarioEpisode(world_dir, settings, assets=pieces, lazy_publication=lazy_publication,
-        headless=headless, task={'task_id': automatic.task_id(instance),
+        headless=headless, origin_diagnostics_path=origin_diagnostics_path,
+        task={'task_id': automatic.task_id(instance),
             'user_message': automatic.public_request(instance), 'memories': automatic.public_memories(instance),
             'start': config['start']}, bind_episode=bind_episode, source_files=native_sources)
     try:
+        if origin_diagnostics_path is not None:
+            config['origin_phase_diagnostics'] = {'path': str(episode.runtime.origin_diagnostics_path)}
         world = episode.runtime.world
         digest = (native_module.world_digest if instance['family'] == 'consent_extras' else
                   native_module._digest if instance['family'] == 'pricing_promotions' else native_module.digest)

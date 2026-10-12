@@ -49,7 +49,7 @@ def runtime_arguments(world, *, lazy_publication=None):
 
 class ScenarioEpisode:
     def __init__(self, world, settings, *, task, bind_episode, assets=None,
-                 lazy_publication=None, source_files=None, headless=True):
+                 lazy_publication=None, source_files=None, headless=True, origin_diagnostics_path=None):
         """`task` is `{task_id, user_message, memories, start}` with start 'retailer' or 'world'.
 
         `bind_episode(episode_id) -> binding` is called in the task's `prepare`
@@ -61,7 +61,10 @@ class ScenarioEpisode:
         if not callable(bind_episode):
             raise ValueError('Supply the bind_episode(episode_id) callback')
         self.output, self.manifest, arguments = runtime_arguments(world, lazy_publication=lazy_publication)
-        self.runtime = ScenarioRuntime(self.output/'pin', scenario=settings, scenario_assets=assets, **arguments)
+        if origin_diagnostics_path is not None and not arguments['readable_origins']:
+            raise ValueError('Origin phase diagnostics require readable logical origins')
+        self.runtime = ScenarioRuntime(self.output/'pin', scenario=settings, scenario_assets=assets,
+                                       origin_diagnostics_path=origin_diagnostics_path, **arguments)
         try:
             runtime = self.runtime
             if runtime.session is None:

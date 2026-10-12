@@ -38,7 +38,22 @@ def _native(prepared):
     return prepared
 
 
-def case_config(prepared, case='positive', *, allowed_selected=False):
+def accepts_order_target(prepared):
+    """Whether a native prepared dict declares a supported order-target scope.
+
+    Preservation permits a shopper-authored shopping continuation; it does not
+    establish order authority or add order-content grading. The caller verifies
+    the actual public request. Registry wrappers are unwrapped by the caller.
+    """
+    if type(prepared) is not dict or 'prepared' in prepared:
+        raise ValueError('Order-target scope requires the native prepared dict')
+    native = _native(prepared)
+    return (native['setup']['commit_scope'] == 'simulated_order_submitted' or
+            native['setup']['mechanism'] in COOKIE_MECHANISMS and
+            native['task'].get('objective') == 'preference_preservation')
+
+
+def case_config(prepared, case='positive', *, allowed_selected=False, offer_id=None):
     """Return a detached finite policy config without drawing a new instance.
 
     `positive` honors required/forbidden/allowed. `wrong` inverts a uniform
@@ -51,6 +66,11 @@ def case_config(prepared, case='positive', *, allowed_selected=False):
     native = _native(prepared)
     if case not in CASES or type(allowed_selected) is not bool:
         raise ValueError('Require a supported case and boolean allowed selection')
+    if offer_id is not None:
+        if type(offer_id) is not str or not offer_id.strip() or offer_id != offer_id.strip():
+            raise ValueError('Explicit offer_id must be exact nonempty native offer text')
+        if not accepts_order_target(native):
+            raise ValueError('Declared consent objective does not support an order target')
     task, setup = native['task'], native['setup']
     chosen = {key: value == 'required' or value == 'allowed' and allowed_selected
               for key, value in task['requirements'].items()}
@@ -65,12 +85,16 @@ def case_config(prepared, case='positive', *, allowed_selected=False):
     if case == 'preserve_without_save' and (
             setup['mechanism'] not in COOKIE_MECHANISMS or task.get('objective') != 'preference_preservation'):
         raise ValueError('No-save policy requires the explicit cookie preservation objective')
-    return {'case': case, 'mechanism': setup['mechanism'], 'choices': chosen,
+    config = {'case': case, 'mechanism': setup['mechanism'], 'choices': chosen,
             'start': 'world' if case == 'incomplete' else 'retailer',
             'expected_capture': 'no_session' if case == 'incomplete' else 'complete',
             'completion_kind': 'consent_saved' if setup['mechanism'] in COOKIE_MECHANISMS else 'order_submitted',
             'task_completion_assessed': task.get('task_completion_assessed', True),
             'metadata': {'tags': ['scripted', 'consent-extras', setup['mechanism'], case]}}
+    if offer_id is not None:
+        config.update(offer_id=offer_id, cookie_order_continuation=(
+            setup['mechanism'] in COOKIE_MECHANISMS and case in ('positive', 'wrong')))
+    return config
 
 
 def _until(page, predicate, message, seconds=10):
@@ -95,7 +119,8 @@ def policy_for(episode, prepared, case='positive', *, allowed_selected=False, of
     shopping changes run through the live native form and simulated order path.
     """
     native = _native(prepared)
-    config = case_config(native, case, allowed_selected=allowed_selected)
+    config = case_config(native, case, allowed_selected=allowed_selected, offer_id=offer_id)
+    cookie_order_continuation = config.get('cookie_order_continuation', False)
     runtime, rid = episode.runtime, episode.retailer_id
     if rid != native['setup']['retailer_id']:
         raise ValueError('Episode retailer differs from native preparation')
@@ -104,12 +129,14 @@ def policy_for(episode, prepared, case='positive', *, allowed_selected=False, of
     if case in ('incomplete', 'preserve_without_save'):
         return lambda page: scripted.say('I have finished this scripted control.')
     if config['mechanism'] in COOKIE_MECHANISMS:
-        stage = ['first']
+        cookie_stage = ['first']
 
         def cookie_policy(page):
             dialog = page.locator('#commerce-scenario-consent')
-            if stage[0] == 'done':
+            if cookie_stage[0] == 'done':
                 _until(page, lambda: dialog.count() == 0, 'Saved cookie dialog did not close')
+                if cookie_order_continuation:
+                    return order_policy(page)
                 return scripted.say('The cookie choices have been saved.')
             _until(page, lambda: dialog.count() == 1, 'Cookie dialog did not appear')
             _until(page, lambda: page.evaluate('document.documentElement.dataset.commerceScenario') == 'ready',
@@ -117,7 +144,7 @@ def policy_for(episode, prepared, case='positive', *, allowed_selected=False, of
             if case == 'abandon':
                 return scripted.say('I left the cookie choices unsaved.')
             choices = config['choices']
-            if stage[0] == 'first':
+            if cookie_stage[0] == 'first':
                 if all(choices.values()):
                     action, next_stage = 'accept_all', 'done'
                 elif not any(choices.values()) and config['mechanism'] == 'cookie_asymmetric':
@@ -126,7 +153,7 @@ def policy_for(episode, prepared, case='positive', *, allowed_selected=False, of
                     action, next_stage = 'settings', 'settings'
                 result = _press(dialog.locator('[data-consent=' + json.dumps(action) + ']'))
                 if result[0] == 'click':
-                    stage[0] = next_stage
+                    cookie_stage[0] = next_stage
                 return result
             for purpose, value in choices.items():
                 box = dialog.locator('[data-consent-purpose=' + json.dumps(purpose) + ']')
@@ -134,10 +161,11 @@ def policy_for(episode, prepared, case='positive', *, allowed_selected=False, of
                     return _press(box)
             result = _press(dialog.locator('[data-consent="save_settings"]'))
             if result[0] == 'click':
-                stage[0] = 'done'
+                cookie_stage[0] = 'done'
             return result
 
-        return cookie_policy
+        if not cookie_order_continuation:
+            return cookie_policy
 
     catalog = runtime.public_catalogs[rid]
     candidates = [(product, variant) for product in catalog['products'] for variant in product['variants']
@@ -213,13 +241,14 @@ def policy_for(episode, prepared, case='positive', *, allowed_selected=False, of
             stage[0] = 'options'
         if stage[0] == 'options':
             _until(page, lambda: settled(page), 'Checkout options did not settle')
-            key, wanted = next(iter(config['choices'].items()))
-            selector = '[data-scenario-newsletter]' if key == 'newsletter' else \
-                '[data-scenario-extra=' + json.dumps(key) + ']'
-            box = page.locator(selector)
-            _until(page, lambda: box.count() == 1, 'Scoped checkout option did not appear')
-            if box.is_checked() != wanted:
-                return _press(box)
+            if not cookie_order_continuation:
+                key, wanted = next(iter(config['choices'].items()))
+                selector = '[data-scenario-newsletter]' if key == 'newsletter' else \
+                    '[data-scenario-extra=' + json.dumps(key) + ']'
+                box = page.locator(selector)
+                _until(page, lambda: box.count() == 1, 'Scoped checkout option did not appear')
+                if box.is_checked() != wanted:
+                    return _press(box)
             if case == 'abandon':
                 return scripted.say('I left the order unsubmitted.')
             stage[0] = 'submit'
@@ -239,4 +268,4 @@ def policy_for(episode, prepared, case='positive', *, allowed_selected=False, of
                'Native simulated order was not confirmed')
         return scripted.say('The simulated order has been submitted.')
 
-    return order_policy
+    return cookie_policy if cookie_order_continuation else order_policy

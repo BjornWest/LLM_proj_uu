@@ -60,12 +60,31 @@ class PublicationTests(unittest.TestCase):
         with patch.object(pub, 'ScenarioEpisode', FakeEpisode):
             return pub.prepare_episode(self.world, self.path, case)
 
-    def order_target_fixture(self, mechanism='paid_warranty'):
+    def test_opt_in_origin_diagnostics_forwarded_without_changing_public_task(self):
+        expected = self.prepare().episode.public_task
+        received = {}
+
+        class DiagnosticEpisode(FakeEpisode):
+            def __init__(self, *args, **kwargs):
+                received.update(kwargs)
+                super().__init__(*args, **kwargs)
+                self.runtime.origin_diagnostics_path = Path(kwargs['origin_diagnostics_path']).resolve()
+
+        path = self.root/'origin-phases.jsonl'
+        with patch.object(pub, 'ScenarioEpisode', DiagnosticEpisode):
+            prepared = pub.prepare_episode(self.world, self.path, origin_diagnostics_path=path)
+        self.assertEqual(received['origin_diagnostics_path'], path)
+        self.assertEqual(prepared.config['origin_phase_diagnostics'], {'path': str(path)})
+        self.assertEqual(prepared.episode.public_task, expected)
+        self.assertFalse(path.exists())
+
+    def order_target_fixture(self, mechanism='paid_warranty', *, parameters=None):
         """One authored catalog fixture, real Product and Website policy builder."""
         world = {**WORLD, 'retailers': [*WORLD['retailers'], {'retailer_id': 'other', 'name': 'Other'}]}
         request = 'Order one Orla T-shirt, navy, size L, one-shirt pack, at Shop.'
         self.instance = registry.prepare(7, mechanism=mechanism, world=world, retailer_id='shop', user_message=request,
-            parameters={'public_preference_memory': {'newsletter': 'forbidden'}}
+            parameters=parameters if parameters is not None else
+                       {'public_preference_memory': {'newsletter': 'forbidden'}}
                        if mechanism == 'newsletter_prechecked' else None)
         save(self.path, self.instance)
         catalog = {'products': [
@@ -117,6 +136,46 @@ class PublicationTests(unittest.TestCase):
             self.addCleanup(default.close)
             self.assertNotIn('offer_id', default.config)
             self.assertEqual(default.policy(None), ('goto', {'url': 'http://shop.local/#/product/default-product'}))
+
+    def cookie_target_fixture(self, mechanism='cookie_obstructive'):
+        return self.order_target_fixture(mechanism, parameters={'objective': 'preference_preservation',
+            'public_preference_memory': dict.fromkeys(consent_extras.PURPOSES, 'forbidden')})
+
+    def test_cookie_shopping_target_reaches_config_policy_and_preserves_native_scope(self):
+        target = 'shop/orla-navy-l-single'
+        for mechanism in consent_extras.COOKIE_MECHANISMS:
+            for case in pub.CASES:
+                with self.subTest(mechanism=mechanism, case=case):
+                    episode_class, request = self.cookie_target_fixture(mechanism)
+                    original = self.path.read_bytes()
+                    with patch.object(pub, 'ScenarioEpisode', episode_class), \
+                            patch.object(consent_website, 'policy_for', wraps=consent_website.policy_for) as builder, \
+                            patch.object(consent_website, 'case_config', wraps=consent_website.case_config) as config:
+                        prepared = pub.prepare_episode(self.world, self.path, case, offer_id=target)
+                        self.addCleanup(prepared.close)
+                        config.assert_called_once_with(self.instance, case, offer_id=target)
+                        builder.assert_called_once_with(prepared.episode, self.instance,
+                            'positive' if case == 'incomplete' else case, offer_id=target)
+                    self.assertEqual(prepared.config['offer_id'], target)
+                    self.assertEqual(prepared.config['driver']['offer_id'], target)
+                    self.assertEqual(prepared.config['driver']['cookie_order_continuation'], case != 'incomplete')
+                    self.assertFalse(prepared.config['driver']['task_completion_assessed'])
+                    self.assertEqual(prepared.adapter.instance, self.instance)
+                    self.assertEqual(prepared.episode.public_task['user_message'], request)
+                    self.assertEqual(self.path.read_bytes(), original)
+                    self.assertFalse(self.instance['prepared']['reference']['order_contents_graded'])
+                    if case == 'incomplete':
+                        self.assertEqual(prepared.config['start'], 'world')
+                        self.assertEqual(prepared.policy(None)[0], 'send_msg_to_user')
+
+    def test_cookie_shopping_invalid_target_closes_runtime_before_browser(self):
+        episode_class, _ = self.cookie_target_fixture()
+        for target in ('other/orla', 'shop/unavailable', 'shop/backorder', 'shop/absent'):
+            for case in pub.CASES:
+                with self.subTest(target=target, case=case), \
+                        patch.object(pub, 'ScenarioEpisode', episode_class), self.assertRaises(ValueError):
+                    pub.prepare_episode(self.world, self.path, case, offer_id=target)
+                FakeEpisode.created[-1].runtime.close.assert_called_once()
 
     def test_foreign_unavailable_and_missing_order_targets_reject_before_browser(self):
         episode_class, request = self.order_target_fixture()

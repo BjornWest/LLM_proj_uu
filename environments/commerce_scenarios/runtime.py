@@ -7,6 +7,7 @@ served assets are projected after the native chain. Every other host, and a
 `ScenarioRuntime` built without a scenario, is the native one.
 """
 from copy import deepcopy
+from pathlib import Path
 from secrets import token_hex
 
 from experiments.accepted_catalog_commerce.execution import _bind
@@ -37,11 +38,16 @@ def admit_post_route(host, path, callback):
 
 
 class ScenarioRuntime(Runtime):
-    def __init__(self, *args, scenario=None, scenario_assets=None, **kwargs):
+    def __init__(self, *args, scenario=None, scenario_assets=None, origin_diagnostics_path=None, **kwargs):
         """`scenario` are settings for one retailer (see `settings.options`).
 
         `scenario_assets` maps served names to bytes of a family's page pieces.
         """
+        if origin_diagnostics_path is not None and (
+                not isinstance(origin_diagnostics_path, (str, Path)) or not str(origin_diagnostics_path).strip()):
+            raise ValueError('origin_diagnostics_path must be a nonempty filesystem path')
+        self.origin_diagnostics_path = (None if origin_diagnostics_path is None
+                                        else Path(origin_diagnostics_path).resolve())
         self.scenario = options(scenario)
         self.session = None
         self.scenario_evidence = None
@@ -106,6 +112,24 @@ class ScenarioRuntime(Runtime):
                     post_routes={'/api/order': lambda request: store.submit_order(request, native_order)})
         admit_post_route(host, SESSION_PATH, store.handle)
         return host
+
+    def attach_browser(self, context):
+        """Opt-in bridge receipts; ordinary episodes use the unchanged native attach."""
+        if self.origin_diagnostics_path is None:
+            return super().attach_browser(context)
+        if self.origin_map is None:
+            raise ValueError('Origin phase diagnostics require readable logical origins')
+        if any(owned is context for owned, _ in self._browser_bridges):
+            raise ValueError('Readable-origin bridge already attached to context')
+        from environments.website_world.local_origins import LocalOriginBridge
+        bridge = LocalOriginBridge(self.origin_map, diagnostics_path=self.origin_diagnostics_path)
+        try:
+            bridge.attach(context)
+        except BaseException:
+            bridge.close()
+            raise
+        self._browser_bridges.append((context, bridge))
+        return bridge
 
     def served_asset_hashes(self, retailer_id):
         """SHA-256 of every asset this retailer serves."""

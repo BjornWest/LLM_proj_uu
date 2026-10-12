@@ -9,7 +9,7 @@ Addenda 1–3. The native simulated order is the newsletter/paid-extra commit.
 
 ```python
 from environments.commerce_scenarios.consent_extras import (
-    settings_for, assets, sources, case_config, policy_for)
+    settings_for, assets, sources, accepts_order_target, case_config, policy_for)
 
 native = instance['prepared']                 # frozen Product registry instance
 config = case_config(instance, 'positive')    # or 'wrong', 'incomplete'
@@ -32,7 +32,11 @@ native extra use `preselected='start'`, preserving the declared selected baselin
 Paid identity, integer SEK price, label and one-time/monthly billing survive
 unchanged. The family page displays explicit one-time/monthly terms.
 
-`case_config(native_or_registry_instance, case, allowed_selected=False)` returns
+`accepts_order_target(native_prepared)` declares support for ordinary native order
+tasks or explicit cookie `preference_preservation`; it evaluates no English order
+authority. Publication callers pass `instance['prepared']` to this helper.
+
+`case_config(native_or_registry_instance, case, allowed_selected=False, offer_id=None)` returns
 choices, start, expected capture, completion kind/scope and scripted metadata.
 `policy_for(episode, native_or_registry_instance, case, allowed_selected=False,
 offer_id=None, address=None)` returns a finite live-page `next_action(page)`.
@@ -52,6 +56,24 @@ requires the explicit native `preference_preservation` objective; it assesses
 no shopping completion. `incomplete` must use `start='world'`; it finishes before
 visiting the retailer and allows the original journal to seal as `no_session`.
 No callback edits or repairs evidence.
+
+With `objective='preference_preservation'` and an explicit exact `offer_id`, cookie
+positive/wrong policies validate the in-stock target before any page action,
+resolve the popup with the existing preference actions and then continue the
+shared native order flow on the same episode/session. The config records
+`cookie_order_continuation=True`; no checkout extras are inferred from cookie
+purpose choices. `consent_saved`, preservation without a target and
+`preserve_without_save` and `abandon` retain their terminal behavior. Those two
+remain scope-only no-save controls, even if a target is supplied; they do not
+validate its stock or navigate to it. Shopping continuation
+is an observed driver witness; native `task_completion_assessed=False`, canonical
+shopping completion and viewer completion stay unassessed. There is no additional
+order-content grader or order-authority inference.
+
+The parent owns publication admission/forwarding: accept the explicit target
+according to `accepts_order_target(native)` and pass it to `case_config` as well
+as `policy_for`. The family extension requires that composed publication source
+to be independently reviewed before actual browser use.
 
 ## Coverage and acceptance status
 
@@ -87,6 +109,7 @@ PYTHONPATH="$WEBSITE_TREE:$PRODUCT_TREE" \
 python3 /home/bjorn/code/LLM_proj_uu/scripts/run_bounded_job.py --memory-mib 2048 -- \
   /home/bjorn/code/LLM_proj_uu/.venv/bin/python -m unittest \
   environments.commerce_scenarios.consent_extras.test_family \
+  environments.commerce_scenarios.consent_extras.test_continuation \
   environments.commerce_scenarios.consent_extras.test_policies -v
 ```
 
