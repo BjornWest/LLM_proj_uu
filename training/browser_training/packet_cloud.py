@@ -22,7 +22,8 @@ UPLOAD_FILES = (
     "browser_training/browser_benchmark_prompts.py", "browser_training/vllm_capacity.py",
     "browser_training/vllm_phases.py", "scripts/vllm_benchmark_server.py",
     "scripts/benchmark_vllm_native.py", "scripts/download_models.py",
-    "scripts/verify_gpu.py",
+    "scripts/verify_gpu.py", "scripts/apply_vllm_cpu_kv_patch.py",
+    "patches/vllm028_mtp_cpu_offload.patch",
 )
 
 

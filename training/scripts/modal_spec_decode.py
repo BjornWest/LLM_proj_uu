@@ -27,6 +27,8 @@ SOURCE_DESTINATIONS = {
     "scripts/spec_decode_benchmark.py": "/opt/training/scripts/spec_decode_benchmark.py",
     "scripts/spec_cache_preflight.py": "/opt/training/scripts/spec_cache_preflight.py",
     "scripts/modal_rl_image.py": "/opt/training/scripts/modal_rl_image.py",
+    "scripts/apply_vllm_cpu_kv_patch.py": "/opt/training/scripts/apply_vllm_cpu_kv_patch.py",
+    "patches/vllm028_mtp_cpu_offload.patch": "/opt/training/patches/vllm028_mtp_cpu_offload.patch",
     "browser_training/browser_benchmark_prompts.py": "/opt/training/browser_training/browser_benchmark_prompts.py",
     "browser_training/compiler_environment.py": "/opt/training/browser_training/compiler_environment.py",
     "browser_training/__init__.py": "/opt/training/browser_training/__init__.py",
@@ -52,7 +54,7 @@ if modal.is_local():
     from modal_rl_image import build_image
     image = build_image(ROOT)
     for relative, destination in SOURCE_DESTINATIONS.items():
-        if not relative.startswith("envs/rl/"):
+        if not relative.startswith("envs/rl/") and relative not in ("scripts/apply_vllm_cpu_kv_patch.py", "patches/vllm028_mtp_cpu_offload.patch"):
             image = image.add_local_file(ROOT/relative, destination)
 else:
     image = None

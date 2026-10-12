@@ -79,7 +79,11 @@ def main():
         # The launcher can run in the small CPU environment. Record packages
         # using the server interpreter, otherwise the manifest would list pytest
         # and PyYAML instead of the vLLM stack actually being launched.
-        config = {**vars(args), "model_revision": REVISIONS[args.model], "command": cmd}
+        patch_receipt = json.loads(subprocess.check_output([
+            str(ROOT / "envs/rl/.venv/bin/python"), "-B",
+            str(ROOT / "scripts/apply_vllm_cpu_kv_patch.py"), "--verify-only"], text=True))
+        config = {**vars(args), "model_revision": REVISIONS[args.model], "command": cmd,
+                  "vllm_cpu_kv_patch": patch_receipt}
         subprocess.run([str(ROOT / "envs/rl/.venv/bin/python"), "-c",
                         "import json,sys; from browser_training.provenance import capture; capture(sys.argv[1], json.loads(sys.argv[2]))",
                         str(ROOT / "outputs/server"), json.dumps(config)], check=True)

@@ -89,8 +89,9 @@ production changes are retained. The installer checks version0.28.0 plus exact
 original, patch and resulting file hashes; unknown bytes fail before mutation.
 Reapplication is idempotent. It must run before importing vLLM or starting
 workers, with no concurrent package installation. No binary kernels or model
-weights change. The common `build_image` factory and other serving apps stay
-unchanged; only this probe's image applies the backport.
+weights change. The common `build_image` factory and bare-host bootstrap now
+install and verify the backport. See [durable deployment and integrated
+test](qwen38-capacity-offload-deployment.md).
 Installed-package modification requires explicit `--install-in-place` (the
 image build supplies it); default verification and explicit scratch-file tests
 do not mutate the shared local environment.
@@ -98,13 +99,15 @@ do not mutate the shared local environment.
 Scope guard: this probe requires `prefix_match_unit: null` and1664-token blocks.
 In0.28, removing the all-groups fallback can also enable partial-tail offload
 when hash units are finer than physical blocks. That unqualified interaction
-must be resolved before using this patch with finer hash units or outside the
-isolated probe. Live configuration validation rejects non-null hash units.
+must be resolved before using this patch with finer hash units. Controlled
+capacity tests retain the same null/1664 guard; browser adoption remains pending. Live configuration validation rejects non-null hash units.
 
 CPU preflight and GPU driver both verify the installed patched source, and save
 its identity. Stock0.28 cannot silently serve this prospective probe. These
-guards establish source identity, not GPU restoration correctness. A new
-isolated GPU result is still required before capacity/browser adoption.
+guards establish source identity. The2026-10-12 isolated GPU run subsequently
+passed: both histories restored58,240tokens and2.03GiB from CPU, matching output
+IDs and the full-clear negative control. Natural LRU/capacity/browser acceptance
+remains separate; see the deployment guide for the prospective controlled test.
 Local installer/probe controls include an actual native lookup with identical
 **synthetic** sparse checkpoint keys derived from0.28's MTP backoff: stock
 classification misses, patched classification restores exactly58,240 tokens,

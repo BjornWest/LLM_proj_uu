@@ -44,13 +44,17 @@ class ImageFactoryTests(unittest.TestCase):
         with patch.dict(sys.modules, {'modal': fake}):
             builder.build_image(TRAINING)
         copies = [c for c in calls if c[0]=='add_local_file']
-        self.assertEqual(len(copies), 2)
+        self.assertEqual(len(copies), 4)
         self.assertTrue(all(c[2]=={'copy': True} for c in copies))
+        patch_commands = [c[1] for c in calls if c[0]=='run_commands'][1]
+        self.assertIn('--install-in-place',patch_commands[0])
+        self.assertIn('--verify-only',patch_commands[1])
         commands = next(c[1] for c in calls if c[0]=='run_commands')
         self.assertIn('--locked --python 3.12.12', commands[1])
         self.assertIn('uv pip check', commands[2])
         self.assertEqual([c[0] for c in calls],
-            ['debian_slim','apt_install','uv_pip_install','add_local_file','add_local_file','run_commands','env'])
+            ['debian_slim','apt_install','uv_pip_install','add_local_file','add_local_file','run_commands',
+             'add_local_file','add_local_file','run_commands','env'])
 
     def test_missing_lock_and_remote_build_fail_before_image_definition(self):
         fake = SimpleNamespace(is_local=lambda: True)
@@ -95,11 +99,35 @@ class ControllerTests(unittest.TestCase):
         paths=['scripts/modal_spec_decode.py','scripts/modal_rl_image.py','scripts/spec_decode_benchmark.py',
                'scripts/spec_cache_preflight.py','browser_training/browser_benchmark_prompts.py',
                'browser_training/compiler_environment.py','browser_training/__init__.py',
-               'envs/rl/pyproject.toml','envs/rl/uv.lock']
+               'envs/rl/pyproject.toml','envs/rl/uv.lock',
+               'scripts/apply_vllm_cpu_kv_patch.py','patches/vllm028_mtp_cpu_offload.patch']
         for name in paths:
             target=root/name;target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copyfile(TRAINING/name,target)
         self.assertFalse((root/'scripts/modal_b06').exists())
+
+    def test_cpu_preparation_scenario_binding_and_generated_validation(self):
+        import ast
+        original_path=list(sys.path)
+        try:
+            with patch('socket.socket.connect',side_effect=AssertionError('Offline only')):
+                module=load('cpu_preparation_binding_test',TRAINING/'scripts/modal_cpu_kv_offload.py')
+                with patch.object(sys,'argv',['probe','--scenario','capacity','--env-file','/absent','--output','/absent','--job-cap-seconds','600']),contextlib.redirect_stderr(io.StringIO()):
+                    with self.assertRaises(SystemExit)as invalid:module.main()
+                    self.assertEqual(invalid.exception.code,2)
+                prepared={'revision':module.REVISION,'scenario':'capacity'}
+                module.validate_prepared(prepared,'capacity')
+                with self.assertRaisesRegex(ValueError,'scenario differs'):module.validate_prepared(prepared,'restore')
+                with self.assertRaisesRegex(ValueError,'Wrong checkpoint'):module.validate_prepared(dict(prepared,revision='wrong'),'capacity')
+                output=SimpleNamespace(returncode=0,stdout='{"scenario":"capacity"}',stderr='')
+                with patch.object(module,'verify_sources'),patch.object(module.subprocess,'run',return_value=output)as child,patch.object(module,'cache',SimpleNamespace(commit=lambda:None)):
+                    module.prepare.get_raw_f()({},'capacity')
+                code=child.call_args.args[0][-1]
+                ast.parse(code)
+                self.assertIn('range(6)',code)
+                self.assertIn("validate_prompts(prompts['main'])",code)
+                self.assertIn("scenario='capacity'",code)
+        finally:sys.path[:]=original_path
 
     def test_actual_sdk_import_and_dry_run_without_legacy_files_or_network(self):
         original_path=list(sys.path)
@@ -109,7 +137,7 @@ class ControllerTests(unittest.TestCase):
                 module=load('legacy_free_benchmark_test',root/'scripts/modal_spec_decode.py')
                 self.assertFalse(module.image.is_hydrated)
                 hashes=module.source_hashes(root)
-                self.assertEqual(len(hashes),9)
+                self.assertEqual(len(hashes),11)
                 self.assertIn('envs/rl/uv.lock',hashes)
                 # Verify copied inputs at their actual mapping; corruption must fail.
                 mapped={name:str(root/name) for name in hashes}
@@ -186,7 +214,7 @@ class ControllerTests(unittest.TestCase):
                 with patch.object(self.modal,'is_local',return_value=False),patch.dict(sys.modules,{'modal_rl_image': None}):
                     module=load('remote_benchmark_test',root/'scripts/modal_spec_decode.py')
                 self.assertIsNone(module.image)
-                self.assertEqual(len(module.source_hashes(root)),9)
+                self.assertEqual(len(module.source_hashes(root)),11)
         finally:sys.path[:]=original_path
 
 

@@ -25,6 +25,7 @@ for stack in "${roles[@]}"; do
   uv sync --project "$TRAINING_ROOT/envs/$stack" --python 3.12.12 --locked "${extras[@]}"
   if [[ "$stack" == rl ]]; then
     "$TRAINING_ROOT/envs/rl/.venv/bin/python" scripts/patch_trl_policy.py --apply
+    "$TRAINING_ROOT/envs/rl/.venv/bin/python" "$TRAINING_ROOT/scripts/apply_vllm_cpu_kv_patch.py" --install-in-place
   fi
   uv pip check --python "$TRAINING_ROOT/envs/$stack/.venv/bin/python"
   "$TRAINING_ROOT/envs/$stack/.venv/bin/python" scripts/verify_stack.py --role "$stack"
@@ -68,6 +69,7 @@ if [[ "$role" == sft-packing || "$role" == rl-sm120 ]]; then
   uv pip check --python "$TRAINING_ROOT/envs/$build_stack/.venv/bin/python"
   if [[ "$role" == rl-sm120 ]]; then
     "$TRAINING_ROOT/envs/rl/.venv/bin/python" scripts/patch_trl_attention.py --apply
+    "$TRAINING_ROOT/envs/rl/.venv/bin/python" "$TRAINING_ROOT/scripts/apply_vllm_cpu_kv_patch.py" --install-in-place
     # The optional extra's uv sync above can restore the upstream package.
     "$TRAINING_ROOT/envs/rl/.venv/bin/python" scripts/patch_trl_policy.py --apply
   fi

@@ -48,6 +48,8 @@ def test_no_shell_execution_from_connection(command):
 
 
 def test_upload_allowlist_excludes_secrets_and_unrelated_work(tmp_path):
+    assert "scripts/apply_vllm_cpu_kv_patch.py" in UPLOAD_FILES
+    assert "patches/vllm028_mtp_cpu_offload.patch" in UPLOAD_FILES
     root = tmp_path / "root"
     root.mkdir()
     for relative in UPLOAD_FILES:

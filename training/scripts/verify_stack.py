@@ -36,6 +36,8 @@ def main():
         for key in ("token_budget", "max_staleness", "max_inflight_tasks"):
             assert key in AsyncGRPOConfig.__dataclass_fields__
         assert metadata.version("vllm") == "0.28.0"
+        from apply_vllm_cpu_kv_patch import apply_patch
+        offload_patch = apply_patch(verify_only=True)
         # Report the installed artifact's immutable source URL, not just dev version.
         direct = metadata.distribution("trl").read_text("direct_url.json")
         assert direct and "a04ffd337108285002df29d9ae73ef7e855e03f1" in direct, direct
@@ -50,7 +52,10 @@ def main():
             pass
         else:
             raise RuntimeError("openenv and openenv-core both own the openenv namespace; remove openenv-core")
-    print(json.dumps({"role": args.role, "imports": modules, "status": "PASS"}, indent=2))
+    result = {"role": args.role, "imports": modules, "status": "PASS"}
+    if args.role == "rl":
+        result["vllm_cpu_kv_patch"] = offload_patch
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

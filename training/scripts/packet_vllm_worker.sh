@@ -17,6 +17,7 @@ export HF_TOKEN
 trap 'unset HF_TOKEN' EXIT
 date -u +%FT%TZ >> outputs/packet/worker-started.txt
 if [[ "$stage" == all || "$stage" == setup ]]; then
+command -v git >/dev/null || { echo "git is required for the pinned vLLM backport" >&2; exit 2; }
 df -h . > outputs/packet/disk.txt
 if [[ "$(df -Pk . | awk 'NR==2 {print $4}')" -lt 65000000 ]]; then
   echo 'Need at least 65 GB free for FP8 weights, locked environment and cache.' >&2
@@ -31,10 +32,12 @@ if ! command -v uv >/dev/null || [[ "$(uv --version)" != 'uv 0.10.8' ]]; then
 fi
 uv python install 3.12.12
 uv sync --project envs/rl --locked --python 3.12.12
+envs/rl/.venv/bin/python -B scripts/apply_vllm_cpu_kv_patch.py --install-in-place --receipt outputs/packet/mtp-offload-backport.json
 uv pip freeze --python envs/rl/.venv/bin/python > outputs/packet/packages.txt
 envs/rl/.venv/bin/python scripts/verify_gpu.py --min-gpus 1 > outputs/packet/gpu.txt
 fi
 if [[ "$stage" == all || "$stage" == setup || "$stage" == benchmark ]]; then
+  envs/rl/.venv/bin/python -B scripts/apply_vllm_cpu_kv_patch.py --verify-only
   # Fail before downloading/reloading weights if SSH discarded compiler paths.
   ninja --version > outputs/packet/toolchain.txt
   nvcc --version >> outputs/packet/toolchain.txt

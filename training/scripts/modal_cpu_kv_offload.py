@@ -23,6 +23,8 @@ PYTHON='/opt/rl/.venv/bin/python'
 SOURCES={
     'scripts/modal_cpu_kv_offload.py':'/opt/training/scripts/modal_cpu_kv_offload.py',
     'scripts/cpu_kv_offload_probe.py':'/opt/training/scripts/cpu_kv_offload_probe.py',
+    'scripts/capacity_kv_offload_probe.py':'/opt/training/scripts/capacity_kv_offload_probe.py',
+    'browser_training/capacity_control.py':'/opt/training/browser_training/capacity_control.py',
     'scripts/spec_decode_benchmark.py':'/opt/training/scripts/spec_decode_benchmark.py',
     'scripts/modal_rl_image.py':'/opt/training/scripts/modal_rl_image.py',
     'scripts/apply_vllm_cpu_kv_patch.py':'/opt/training/scripts/apply_vllm_cpu_kv_patch.py',
@@ -44,6 +46,11 @@ def verify_sources(expected):
             raise ValueError('Container source mismatch: '+name)
 
 
+def validate_prepared(prepared, scenario):
+    if prepared['revision']!=REVISION:raise ValueError('Wrong checkpoint revision')
+    if prepared.get('scenario')!=scenario:raise ValueError('CPU preparation scenario differs')
+
+
 def forward_log(path, offset):
     try:text=path.read_text(errors='replace')
     except OSError:return offset
@@ -54,10 +61,8 @@ def forward_log(path, offset):
 if modal.is_local():
     from modal_rl_image import build_image
     image=build_image(ROOT)
-    # Backport only this diagnostic's image; the reusable default image is unchanged.
+    # The shared factory installs these copied inputs before deferred mounts.
     copied=('scripts/apply_vllm_cpu_kv_patch.py','patches/vllm028_mtp_cpu_offload.patch')
-    for name in copied:image=image.add_local_file(ROOT/name,SOURCES[name],copy=True)
-    image=image.run_commands(PYTHON+' -B /opt/training/scripts/apply_vllm_cpu_kv_patch.py --install-in-place --receipt /opt/rl/mtp-offload-backport.json')
     for name,path in SOURCES.items():
         if not name.startswith('envs/rl/')and name not in copied:image=image.add_local_file(ROOT/name,path)
 else:image=None
@@ -68,8 +73,10 @@ app=modal.App('qwen38-mtp3-cpu-kv-restore',image=image,include_source=False)
 
 @app.function(cpu=4,memory=16384,timeout=900,retries=0,max_containers=1,scaledown_window=2,
     volumes={'/model-cache':cache})
-def prepare(expected):
+def prepare(expected,scenario='restore'):
     verify_sources(expected)
+    if scenario not in ('restore','capacity'):raise ValueError('Unknown scenario')
+    prompt_count=6 if scenario=='capacity' else 2
     code=f'''
 import hashlib,json
 from pathlib import Path
@@ -77,7 +84,8 @@ from importlib.metadata import version,distribution
 from huggingface_hub import snapshot_download
 from transformers import AutoTokenizer
 from safetensors import safe_open
-from cpu_kv_offload_probe import server_command,PROMPT_TOKENS
+from cpu_kv_offload_probe import server_command,PROMPT_TOKENS,CACHE_BLOCK_SIZE,prompt_hash
+from capacity_kv_offload_probe import command as capacity_command,validate_prompts
 from apply_vllm_cpu_kv_patch import apply_patch
 from browser_training.browser_benchmark_prompts import make_prompt
 from vllm.entrypoints.openai.cli_args import make_arg_parser,validate_parsed_serve_args
@@ -97,7 +105,7 @@ for name in sorted(index['weight_map']):
     if dtype.startswith('F8'):
         fp8=dict(name=name,dtype=dtype);break
 assert fp8 is not None,'No representative FP8 layer weight found in cached checkpoint'
-argv=server_command(str(base))
+argv=(capacity_command if {scenario!r}=='capacity' else server_command)(str(base))
 parsed=make_arg_parser(FlexibleArgumentParser()).parse_args(argv[argv.index('serve')+2:])
 validate_parsed_serve_args(parsed)
 req=CompletionRequest.model_validate(dict(model={MODEL!r},prompt=[1]*PROMPT_TOKENS,
@@ -105,7 +113,9 @@ req=CompletionRequest.model_validate(dict(model={MODEL!r},prompt=[1]*PROMPT_TOKE
     logprobs=0,return_tokens_as_token_ids=True))
 req.to_sampling_params(max_tokens={OUTPUT_TOKENS})
 tok=AutoTokenizer.from_pretrained(base,local_files_only=True)
-prompts=dict(main=[make_prompt(tok,i,PROMPT_TOKENS)for i in range(2)],tick=tok.encode('Hello',add_special_tokens=False))
+prompts=dict(main=[make_prompt(tok,i,PROMPT_TOKENS)for i in range({prompt_count})],tick=tok.encode('Hello',add_special_tokens=False))
+assert len({{prompt_hash(p[:CACHE_BLOCK_SIZE])for p in prompts['main']}})=={prompt_count},'Pressure histories share their first cache block'
+if {scenario!r}=='capacity':validate_prompts(prompts['main'])
 data=json.dumps(prompts,separators=(',',':')).encode();sha=hashlib.sha256(data).hexdigest()
 folder=Path('/model-cache/cpu-kv-offload-prompts-v1');folder.mkdir(exist_ok=True)
 path=folder/(sha+'.json')
@@ -115,7 +125,7 @@ else:
     temporary=folder/(sha+'-'+uuid.uuid4().hex+'.tmp');temporary.write_bytes(data);temporary.replace(path)
 cuda=Path(distribution('nvidia-cuda-nvcc').locate_file('nvidia/cu13'))
 assert (cuda/'bin/nvcc').is_file() and (cuda/'lib/libcudart.so.13').is_file()
-print(json.dumps(dict(snapshot=str(base),revision={REVISION!r},prompts=str(path),prompt_sha256=sha,
+print(json.dumps(dict(snapshot=str(base),revision={REVISION!r},scenario={scenario!r},prompts=str(path),prompt_sha256=sha,
     cuda_home=str(cuda),fp8_weight=fp8,vllm=version('vllm'),torch=version('torch'),cuda=torch.version.cuda,
     transformers=version('transformers'),vllm_backport=backport,
     checkpoint_config_sha256=hashlib.sha256((base/'config.json').read_bytes()).hexdigest())))
@@ -128,11 +138,13 @@ print(json.dumps(dict(snapshot=str(base),revision={REVISION!r},prompts=str(path)
 
 @app.function(gpu='RTX-PRO-6000',cpu=8,memory=98304,timeout=1260,startup_timeout=60,
     retries=0,max_containers=1,scaledown_window=2,volumes={'/model-cache':cache,'/results':results})
-def probe(run_id,expected,prepared,deadline,claims):
+def probe(run_id,expected,prepared,deadline,claims,scenario='restore'):
+    if scenario not in ('restore','capacity'):raise ValueError('Unknown scenario')
     if claims.get(timeout=5)!='start-once':raise ValueError('Invalid invocation claim')
     verify_sources(expected)
-    if deadline-time.time()<360:raise TimeoutError('Less than six minutes remain; refuse GPU preparation')
-    if prepared['revision']!=REVISION:raise ValueError('Wrong checkpoint revision')
+    minimum=720 if scenario=='capacity' else 360
+    if deadline-time.time()<minimum:raise TimeoutError('Insufficient remaining allowance for scenario preparation')
+    validate_prepared(prepared,scenario)
     if hashlib.sha256(Path(prepared['prompts']).read_bytes()).hexdigest()!=prepared['prompt_sha256']:
         raise ValueError('Prompt file differs')
     if hashlib.sha256((Path(prepared['snapshot'])/'config.json').read_bytes()).hexdigest()!=prepared['checkpoint_config_sha256']:
@@ -160,7 +172,8 @@ def probe(run_id,expected,prepared,deadline,claims):
             '--format=csv,noheader,nounits'],capture_output=True,text=True,check=True,timeout=10)
         (root/'GPU.txt').write_text(hardware.stdout)
         with(root/'worker.log').open('w')as log:
-            child=subprocess.Popen([PYTHON,'/opt/training/scripts/cpu_kv_offload_probe.py',
+            driver='capacity_kv_offload_probe.py' if scenario=='capacity' else 'cpu_kv_offload_probe.py'
+            child=subprocess.Popen([PYTHON,'/opt/training/scripts/'+driver,
                 '--snapshot',prepared['snapshot'],'--prompts',prepared['prompts'],'--output',str(root/'probe'),
                 '--deadline',str(deadline-40)],stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
             forwarded=0;server_forwarded=0;last_commit=time.monotonic()
@@ -210,16 +223,23 @@ def main():
     parser.add_argument('--env-file',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--dry-run',action='store_true')
+    parser.add_argument('--scenario',choices=['restore','capacity'],default='restore')
     parser.add_argument('--prepare-only',action='store_true',help='Remote CPU/cache checks only; never spawn a GPU')
     parser.add_argument('--job-cap-seconds',type=int,default=1200)
     args=parser.parse_args()
     if not 600<=args.job_cap_seconds<=1200:parser.error('Job cap must be600..1200seconds')
+    if args.scenario=='capacity' and args.job_cap_seconds<900:
+        parser.error('Capacity job cap must be900..1200seconds to allow startup and queue headroom')
     plan=dict(model=MODEL,revision=REVISION,gpu='RTX-PRO-6000',GPU_count=1,CPU_bytes=CPU_BYTES,
         mtp=3,input_tokens=PROMPT_TOKENS,output_tokens=OUTPUT_TOKENS,request_upper_bound=MAX_REQUESTS,
         main_requests=7,retries=0,model_downloads=False,prepare_only=args.prepare_only,job_cap_seconds=args.job_cap_seconds,
         vllm_backport=dict(patch_id=PATCH_ID,source_sha256=RESULT_SHA256),
         allow_ungraded=True,ungraded_reason='Isolated inference/KV restoration diagnostic, no browser task quality claims',
-        source_sha256=hashes(),git_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
+        scenario=args.scenario,source_sha256=hashes(),git_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
+    if args.scenario=='capacity':
+        plan.update(main_requests=18,request_upper_bound=18,logical_episodes=6,
+            burst_output_tokens=512,GPU_KV_bytes=12<<30,
+            ungraded_reason='Controlled logical episode/cache test; simulated tools, no BrowserGym task verdict')
     if args.dry_run:print(json.dumps(plan,indent=2));return
     if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():
         raise RuntimeError('Refuse uncommitted experiment source')
@@ -233,12 +253,12 @@ def main():
         target=args.output/'sources'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/name).read_bytes())
     with modal.enable_output(),app.run():
         save(args.output/'app.json',dict(app_id=app.app_id,url=app.get_dashboard_url()))
-        prepared=prepare.remote(plan['source_sha256']);save(args.output/'prepared.json',prepared)
+        prepared=prepare.remote(plan['source_sha256'],args.scenario);save(args.output/'prepared.json',prepared)
         if args.prepare_only:
             print(json.dumps({'status':'CPU_PREPARED','gpu_allocated':False}));return
         deadline=time.time()+args.job_cap_seconds
         with modal.Queue.ephemeral()as claims:
-            claims.put('start-once');call=probe.spawn(run_id,plan['source_sha256'],prepared,deadline,claims)
+            claims.put('start-once');call=probe.spawn(run_id,plan['source_sha256'],prepared,deadline,claims,args.scenario)
             save(args.output/'call.json',dict(call_id=call.object_id,deadline=deadline))
             try:
                 report,data=call.get(timeout=max(1,deadline-time.time()))
