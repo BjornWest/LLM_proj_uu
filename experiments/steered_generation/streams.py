@@ -4,9 +4,11 @@ The commerce producer gives every decision its own named stream
 (`population.stream(seed, key)`), so replacing one stream leaves every other
 draw exactly as the seed makes it. A plan maps stream keys to the results the
 producer's calls on that stream should return. Nothing in the producer is
-copied or edited; three module attributes are swapped for the duration of a
-call. That is an experiment seam, not thread-safe and not a released API.
+copied or edited; a few module and class attributes are swapped for the
+duration of a call. That is an experiment seam, not thread-safe and not a
+released API.
 """
+from collections import Counter
 from contextlib import ExitStack, contextmanager
 from hashlib import sha256
 import json
@@ -149,6 +151,56 @@ def reviewed(footwear, plan):
         footwear.stream = natural
 
 
+# A plan key (PROGRAM, product seed, review index, stream key) names one stream of one review that a
+# product package's review program draws.
+PROGRAM = "program"
+
+
+def program_review_seed(product_seed, index):
+    """The seed the producer runs a package's review program under for one review of a product."""
+    return int.from_bytes(sha256(f"accepted-catalog-review/{product_seed}/{index}".encode()).digest()[:4], "big")
+
+
+def program_seed(seed, review_seed):
+    """The seed a review program's stream opens under when a plan reseeds it; the review's own seed stays part of it."""
+    return f"{seed}/{review_seed}"
+
+
+@contextmanager
+def programmed(package_class, plan):
+    """Within the block, planned streams of package review programs open under another seed.
+
+    `plan` maps (product seed, review index, stream key) to a `Reseeded`
+    entry. A package opens every stream through its class's `rng`, which
+    knows the review's seed and the stream's key and nothing else, and both
+    are short: a planned pair that some other draw of the pass also opens is
+    reseeded with it. No planned stream is opened twice by the review it
+    belongs to, so a pass in which one was fails.
+    """
+    if not all(isinstance(entry, Reseeded) for entry in plan.values()):
+        raise PlanMismatch("A review program's streams can be reseeded, not scripted")
+    planned = {}
+    for (product_seed, index, key), entry in plan.items():
+        if planned.setdefault((program_review_seed(product_seed, index), key), entry) is not entry:
+            raise PlanMismatch("Two planned reviews run under one seed")
+    natural, opened = package_class.rng, Counter()
+
+    def rng(self, seed, key):
+        entry = planned.get((seed, key))
+        if entry is None:
+            return natural(self, seed, key)
+        opened[seed, key] += 1
+        return natural(self, program_seed(entry.seed, seed), key)
+
+    package_class.rng = rng
+    try:
+        yield
+    finally:
+        package_class.rng = natural
+    if any(count > 1 for count in opened.values()):
+        raise PlanMismatch("A planned review stream was opened by more than one draw of the pass")
+
+
 # A plan key (CARRIER, stream key) names one stream of the carrier-evidence producer.
 CARRIER = "carrier"
 
@@ -288,18 +340,24 @@ class Session:
         """Returns the world and the stream keys the producer opened."""
         options = {k: v for k, v in self.inputs.items() if k != "seed"}
         opened, plan = [], plan or {}
-        # A key is a commerce stream's name, (REVIEW, product seed, stream name) or (CARRIER, stream name).
+        # A key is a commerce stream's name, (REVIEW, product seed, stream name),
+        # (PROGRAM, product seed, review index, stream name) or (CARRIER, stream name).
         named = lambda key, kind, length: (type(key) is tuple and len(key) == length and key[0] == kind and
-                                           type(key[-1]) is str and bool(key[-1]))
-        reviews = {key[1:]: entry for key, entry in plan.items() if named(key, REVIEW, 3) and type(key[1]) is int}
+                                           type(key[-1]) is str and bool(key[-1]) and
+                                           all(type(part) is int for part in key[1:-1]))
+        reviews = {key[1:]: entry for key, entry in plan.items() if named(key, REVIEW, 3)}
+        programs = {key[1:]: entry for key, entry in plan.items() if named(key, PROGRAM, 4)}
         carriers = {key[1]: entry for key, entry in plan.items() if named(key, CARRIER, 2)}
         commerce = {key: entry for key, entry in plan.items() if type(key) is str}
-        if len(reviews) + len(carriers) + len(commerce) != len(plan):
+        if len(reviews) + len(programs) + len(carriers) + len(commerce) != len(plan):
             raise PlanMismatch("A plan names commerce streams, product review streams and carrier review streams")
         with ExitStack() as stack:
-            stack.enter_context(self.manufacture.reused(self.native.package_export, {seed for seed, _ in reviews}))
+            stack.enter_context(self.manufacture.reused(self.native.package_export,
+                                                        {key[0] for key in (*reviews, *programs)}))
             if reviews:
                 stack.enter_context(reviewed(self.native.package_export.footwear, reviews))
+            if programs:
+                stack.enter_context(programmed(self.native.package_export.ProductPackage, programs))
             if carriers:
                 stack.enter_context(carried(sys.modules[self.native.commerce.carrier_reviews.__module__], carriers))
             if self.defaults:

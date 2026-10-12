@@ -25,7 +25,7 @@ import json
 from math import log
 from pathlib import Path
 
-from . import carriers, cheapest, combined, listed, prices, reviews, shipments, shortlist, stock, streams, threshold
+from . import blocks, carriers, cheapest, combined, listed, prices, reviews, shipments, shortlist, stock, streams, threshold
 
 # Native task kinds read by the cheapest-available block, with the fields of the task that state the reading.
 # A comparison site goes with the surrounding-site controls the world is published with (`surrounding`).
@@ -217,7 +217,19 @@ def review_verdicts(world, task, api):
         raise ValueError("The task selects a product of its concept by an index within the world")
     base = {"schema": reviews.VERSION, "product_id": products[index], "topic": task.get("topic"),
             "min_assessed": task.get("min_assessed", 1)}
-    return verdicts(world, base, api, reviews)
+    found = verdicts(world, base, api, reviews)
+    # The verdict against the stars, where that can occur: the product's rating summary points the other way.
+    for name, verdict, limits, words in (
+            ("high_stars_verdict_more_negative", "more_negative", {"min": 4},
+             "more comments report the topic unfavourably than favourably, yet the product's mean rating is four stars or more"),
+            ("low_stars_verdict_more_positive", "more_positive", {"max": 2},
+             "more comments report the topic favourably than unfavourably, yet the product's mean rating is two stars or less")):
+        try:
+            found += [entry(name, words, row) for row in ranked(
+                world, [{**base, "verdict": verdict, "mean_rating": limits}], api, reviews)]
+        except blocks.NumericalLimit:
+            pass
+    return found
 
 
 def verdicts(world, base, api, module, prefix="", note=""):

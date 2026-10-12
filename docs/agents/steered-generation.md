@@ -55,9 +55,12 @@ producer. And the result carries a probability.
    pricing function (see the evidence below).
 
 Three module attributes are swapped while the producer runs
-(`population.stream`, `package_export.sample`, `population.load`). That is
-acceptable for an experiment and is not thread-safe. A released version needs
-small seams in the producer instead; see "What a released version needs".
+(`population.stream`, `package_export.sample`, `population.load`), and for a
+review block the stream factory of the producer that writes those reviews
+(`footwear.stream`, the package class's `rng`, the carrier producer's `rng`).
+That is acceptable for an experiment and is not thread-safe. A released
+version needs small seams in the producer instead; see "What a released
+version needs".
 
 ## The first block: prices
 
@@ -532,15 +535,16 @@ costs. Which delivery options exist and what they charge is not steered; see
 Requirement (`steered-review-topic-v1`): a product, a topic of the native
 review-summary task (an aspect and its context) and one or more of: the
 verdict of the task's count, the number of positive comments, the number of
-negative ones.
+negative ones, the mean of the product's star ratings.
 
 ```json
 {"schema": "steered-review-topic-v1",
  "product_id": "footwear-brand-05/footwear.walking_shoes/00",
  "topic": {"aspect": "wet_paving_grip",
            "context": {"activity": "walking", "surface": "wet paving"}},
- "verdict": "tie", "min_assessed": 2,
- "positive": {"min": 3}}
+ "verdict": "more_negative", "min_assessed": 2,
+ "negative": {"min": 3},
+ "mean_rating": {"min": 4}}
 ```
 
 `verdict` is `more_positive`, `more_negative`, `tie` or
@@ -549,27 +553,99 @@ negative ones.
 larger of the two counts decides. `positive` and `negative` are bounds on
 the counts. The task counts written comments: a rating without a comment is
 not counted at all, and a comment that does not report on the topic is "not
-assessed".
+assessed". `mean_rating` is a `min`, a `max` or both, from 1 to 5, on the mean
+of all the product's ratings, with or without a comment, as its rating
+summary and the native rating task have it. A bound is the decimal it is
+written as: with five ratings, a minimum of 4.2 is met by 21 stars.
 
 This is the first block upstream of the commerce producer: reviews are part
-of a product's manufacture. It covers the two pilot concepts (walking shoes
-and walking sandals), whose reviews `footwear_context_pilot.sample_reviews`
-draws with one named stream per draw under the product's own seed. For one
-review the producer draws a star rating (one more than a beta-binomial count
-of four, by the product's execution), a score for every aspect (a normal
-draw around a centre set by the stars, shifted for comfort on a cushioned
-shoe and for value by the price), the comment's length (zero three times out
-of four at the defaults) and the topics of the comment (value with its own
-probability, the others by weight without replacement). A review is positive
-or negative about a topic when it has a comment, the topic is among those
-chosen, and the score is at or above one half or below it.
+of a product's manufacture. Two producers write them, and `reviews.py` reads
+either.
 
-`reviews.py` models exactly those draws: per review the rating, the topic's
-score, the length and the topic choices are the block. The reviews of a
-product draw independently and alike in these, so the three numbers
-(positive, negative, neither) are multinomial with one review's class
-probabilities (`reviews.shares`), and the probability of a requirement is the
-sum over the counts that satisfy it, kept as logarithms.
+The pilot concepts (walking shoes and walking sandals) get their reviews from
+`footwear_context_pilot.sample_reviews`, with one named stream per draw under
+the product's own seed. For one review the producer draws a star rating (one
+more than a beta-binomial count of four, by the product's execution), a score
+for every aspect (a normal draw around a centre set by the stars, shifted for
+comfort on a cushioned shoe and for value by the price), the comment's length
+(zero three times out of four at the defaults) and the topics of the comment
+(value with its own probability, the others by weight without replacement). A
+review is positive or negative about a topic when it has a comment, the topic
+is among those chosen, and the score is at or above one half or below it. Per
+review the rating, the topic's score, the length and the topic choices are
+the block.
+
+Every other concept gets its reviews from the review program of its product
+package: a list of steps, each a draw or a value derived from earlier ones,
+run once per review under that review's own seed, followed by one statement
+for every pool of the program's language whose condition holds. `programs.py`
+reads such a program whatever the concept. It takes the statements of the
+topic, the conditions they are written under, and from the conditions back
+through the steps everything those depend on; the draws among them, and the
+rating's, are the block. For casual trainers' everyday comfort that is the
+rating, the topics and that aspect's own favourable-or-not draw. For a
+T-shirt's value it also includes which option the reviewer bought, because
+the price paid is the option's. For a tablet's stylus it includes whether
+the owner has a pen at all. The probability that one review has a given
+rating and says a given thing is then a sum over the outcomes of those draws,
+walked in the program's order. The program's own code resolves each draw's
+parameters and evaluates each derived value and condition; written here are
+the order of the steps as the program's `sample` runs them (a step whose
+condition fails is not applicable; a loop that only derives and collects
+values runs its steps for each value) and the probability of each outcome of
+a resolved draw: a weighted or a uniform choice, a whole number from a range,
+the rating, the set of topics, and a normal draw that the program reads only
+through `>=` thresholds (the value score, at one half, after the program's
+clipping and rounding). Such a draw is followed as the thresholds it
+reaches, with one value standing for each case. The thresholds are found on
+the expressions as the program parses them, in everything the needed steps
+and the topic's statements evaluate, the conditions of the fields they write
+included; a mention of the draw that is not the draw alone, `>=`, and a
+number written out refuses the program, and so does a field that marks some
+value of the draw as unknown, since one value could then not stand for its
+neighbours. A threshold is kept as the number the program has, whole or
+not. What is read is the distribution each draw is written as; the program
+realises a draw from 53-bit uniform numbers in floating point, which follows
+that distribution closely for numbers of ordinary size and departs from it at
+extremes. Those are refused instead of approximated: a normal draw whose
+range, mean, spread, grid or thresholds are beyond 1e150 in size, or whose
+spread is below a millionth of its mean's size (the draw would then land on
+the mean); a rating whose beta distribution has a shape parameter below 0.04
+or above a million (below about 0.03 Python's gamma sampler underflows often
+enough to show; the programs in git have 0.075 at the least); a weight
+outside 1e-100 to 1e100, or an outcome of a weighted draw rarer than one in
+a billion of its draw. One review's probabilities must also come out as
+probabilities adding up to one. Inside those limits the model is still of
+the written distributions: a normal tail beyond about eight spreads, for
+one, is in the model and not in what the program's sampler can draw. Because the order of the steps is written here a
+second time, every recorded review of a natural world is also followed from
+its recorded draws alone, and the world is refused if that gives another
+rating or says another thing than the review does.
+
+Either way the reviews of a product draw independently and alike, so the
+three numbers (positive, negative, neither) are multinomial with one review's
+class probabilities (`reviews.shares`), and the probability of a requirement
+is the sum over the counts that satisfy it, kept as logarithms.
+
+The stars. A rating and what the review says are drawn together: the rating
+moves the topic's score, so complaints come with low ratings. With a mean
+stated, each count's probability is multiplied by the chance that the stars
+then total within the bounds. Given the counts, the stars of the reviews of
+one class are independent and alike, so their total is a repeated
+convolution of that class's rating distribution, and the three classes' totals
+are independent (`reviews.starred`). A sample goes on to choose every
+review's rating from the exact distribution given the counts and the bounds:
+the three totals, then each review's stars in turn given what the rest must
+total (`reviews.ratings`). A review with a rating to meet is then redrawn in
+two steps: its rating stream until it gives that rating, and its other
+streams until the review is of its class. Nothing but the rating passes from
+the first step to the second, so the two together are a draw of the review
+given both. That needs the rating's chances to be set by no other draw of
+the block, which holds for the pilot sampler and for every review program in
+git (the rating follows the product's execution alone). Where a program lets
+another draw set them, the whole block is redrawn until the review has both
+the rating and the class, which is the same conditional draw at a higher
+cost.
 
 A sample picks the counts from that distribution, places them on reviews at
 random, and then redraws each review's block streams under fresh seeds until
@@ -591,9 +667,26 @@ other aspects' scores, and other topics change which stock phrases later
 reviews use.
 
 How it meets the producer. A session reseeds the planned review streams of
-the product (`streams.reviewed`; plan keys are `("review", product seed,
-stream key)`) and manufactures that one product again instead of taking it
-from the session's store, which for a pilot product takes milliseconds. The
+the product and manufactures that one product again instead of taking it
+from the session's store. For a pilot product the plan keys are `("review",
+product seed, stream key)` (`streams.reviewed`) and manufacture takes
+milliseconds. For a package's review program they are `("program", product
+seed, review index, stream key)` (`streams.programmed`): every package opens
+its streams through one method of the package class, which the session
+replaces for the pass. That method sees the review's seed and the stream's
+name and nothing else, and a review's seed is 32 bits, so a planned stream
+that some other draw of the pass opened as well would be reseeded with it; a
+pass in which a planned stream is opened twice fails. Which program the
+producer runs depends on the brand and the product, and the T-shirt package
+hands its review program out only after manufacturing and wraps it in checks
+that refuse anything but a whole review. So the reading manufactures the
+product again by the producer's own call (which must return the entities the
+world records), takes the program's document and runs a plain copy of it,
+which draws from the same streams. A natural world whose recorded reviews the
+copy does not reproduce is refused, and a steered pass whose reviews differ
+from the copy's fails. The wrapped program is slow (most of a second per
+review), so a steered pass on a T-shirt takes that per review of the
+product; on the other concepts it takes milliseconds. The
 block's resource is `("reviews", "", product)`: it is independent of every
 commerce block and of other products' reviews, and two requirements on one
 product's reviews are coupled. `blocks.background` leaves out that product's
@@ -603,15 +696,38 @@ check reads the steered world with the native
 `catalog_review_task.reference`, and compares its counts with the recorded
 draws read by the rule written out in `reviews.said`.
 
-Limits. Only the pilot concepts: the other concepts' reviews are drawn by a
-package program under one hashed seed per review, which this does not model.
-Not the topics whose score depends on the option bought or the wearer
-(`size_fit`, `forefoot_room`). Only the topic count over all of a product's
-reviews: not the star summary, not one option's reviews. The pilot's reviews
-are never neutral or mixed, so those counts are always zero. Probabilities
+Limits. On the pilot concepts, not the topics whose score depends on the
+option bought or the wearer (`size_fit`, `forefoot_room`). A review program
+is refused ("Not modelled") where what the topic depends on includes a loop
+that draws or holds another loop, a collected value under a condition of its
+own, a draw of another kind than the six above, a normal draw read otherwise
+than by `>=` against a number written out (any arithmetic on either side, a
+strict comparison or a use of the value itself refuses it; so does a field
+that counts some value of the draw as unknown), a step that
+reads something the reading's own list of its expressions does not show (a
+guard: an unlisted expression that reads only what a listed one reads would
+pass it), a statement about
+the topic that is neither for nor against, or a review that would be both.
+None of the 37 review programs in git does any of these (see the evidence
+for the concepts whose data is not in git). The walk branches on every
+outcome of every draw the topic depends on, so its cost is the product of
+their numbers: at most a few seconds per topic for the programs in git, but
+about 50 s where a program draws a whole number from 61 and another from 5.
+Only the topic count over all of a product's reviews and the mean of its
+stars: not the count of each star, not one option's reviews. No producer
+writes a neutral or a mixed comment, or a second statement on a topic under
+other circumstances, so those counts are always zero and steering cannot ask
+for them: the suite's "opposite opinions in one comment" and "same words,
+different circumstances" instances were written by hand onto a saved world.
+With a mean stated, whether a count's stars can total within the bounds at
+all is decided exactly, from the ratings each class of review can have. A
+count that can, but only with a probability below the smallest float, is
+left out of the sum; if no count is left and one of them could, the
+requirement is refused as a numerical limit and not as impossible. Probabilities
 use floating-point logarithms of gamma functions and the complementary error
 function; they are exact to that arithmetic. Which reviews a review site
-shows is built from the world downstream and is not part of this.
+shows, and in what order, is built from the world downstream and is not part
+of this.
 
 ## The ninth requirement: what a carrier's reviews say about an aspect
 
@@ -763,7 +879,7 @@ the block model gives each:
 | `shortlist_matching_models` with an integer `limit` | `natural_shortlist`; `tie_at_cutoff`; `another_shortlist`, the last two the likeliest among the first limit + 3 models of the natural ranking, not among all models |
 | `comparison_cheapest_exact_sku_stock` (with the bound `sku_id`) | the retailer shown cheapest holds the variant, has it only on supplier order, or has it unavailable |
 | `audit_free_shipping_claim` | no threshold; meets; below; just below; just meets |
-| `summarize_product_reviews` (topic counts over a pilot product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed` |
+| `summarize_product_reviews` (topic counts over a product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed`; and against the stars, `high_stars_verdict_more_negative` (mean rating of 4 or more) and `low_stars_verdict_more_positive` (2 or less) |
 | `summarize_carrier_reviews` (topic counts) | the same four verdicts in the task's scope, without those the shipments' histories rule out; for `handoff` and `punctuality` also `redrawn_shipments_verdict_...`, the four verdicts with the carrier's shipments redrawn |
 
 A task is translated field by field, and a task with a field the tool does
@@ -1425,6 +1541,61 @@ candidates were sampled three times and checked; the redraw counts are
 within 1.7 standard errors (the largest, 10,520 against 10,636 ± 71). The natural pass takes 370 s there, a pass with
 manufacture reused 0.9 s and a sample about 2 s.
 
+Every concept, and the stars (`steering/reviews-r10/`, steering commit
+`16ca53f`, one runner command per task with `--task`). The world is the
+suite's ordinary review task's input again (seed 78, five concepts, 100
+reviews per product; natural pass 426 to 437 s). Four review tasks on it, one
+per producer of reviews: the suite's own (grip on wet paving, the walking
+shoe Vallheden Strand), everyday comfort of a casual trainer, marks made with
+a pen on a tablet, and value of a T-shirt, the last three with at least two
+assessing comments asked for. Each has six candidates: the four verdicts, and
+the verdict against the stars twice.
+
+| Task | Verdicts, likeliest to rarest | More negative, mean rating 4 or more | More positive, mean rating 2 or less | Seconds per sample |
+| --- | --- | --- | --- | --- |
+| Shoe, grip | 0.51, 0.33, 0.16, 0.0013 | 2.5e-17 | 2.0e-10 | 1.9 to 3.3 |
+| Trainer, comfort | 0.84, 0.087, 0.075, 0.0023 | 0.084 | 4.9e-58 | 2.2 to 4.4 |
+| Tablet, pen | 0.76, 0.13, 0.080, 0.032 | 0.026 | 1.9e-51 | 3.6 to 14 |
+| T-shirt, value | 0.92, 0.041, 0.035, 0.0018 | 1.5e-41 | 0.0051 | 98 to 110 |
+
+All 66 samples (three per candidate, two for the T-shirt) satisfied their
+requirement by the native task's reference, by the direct reading of the
+saved reviews, and, where a mean is stated, by the product's rating summary:
+the high-star samples have means of 4.0 to 4.27 with two to seven complaints
+against none to four comments of praise, the low-star ones 1.87 to 2.0.
+Redraws through the producer equalled the reading's in all 54 passes. The
+frequencies over other seeds (2,000 redraws for the shoe, 1,500 for the
+trainer, 600 for the tablet, 300 for the T-shirt) are within four standard
+errors of the computed probabilities for all 24 candidates; for the rare
+ones that only says that they did not occur. How likely the verdict against
+the stars is depends on the product: this trainer and this tablet are well
+made, so a mean of four stars is the usual case and complaints under it are
+as likely as complaints at all; the shoe is middling, and a hundred ratings
+averaging four or more with more complaints than praise among them is a
+2.5e-17 event for it. The T-shirt's samples take as long as its hundred reviews do
+through the producer's wrapped review program, about a second each.
+
+The other concepts. The producer supports 130 concepts; the data of 39 are
+in git (37 with a review program, and the two pilot concepts), and the rest
+read files that exist only in the shared working tree. A world of all 130
+from that tree (seed 5, eight reviews per product, 378 products; a scratch
+check from the shared tree, not a pinned run, and not reproducible from a
+commit) has a product for 126 of them. At `16ca53f` the reading followed 700
+topics of the first 118 concepts before its time limit (every one of the 36
+git concepts with a product among them), each compared with 1,200 whole
+reviews drawn by the program under seeds of their own (largest deviation of
+a class's frequency 3.1 standard errors over about 2,100 comparisons), and
+refused 58 topics in 22 concepts whose data is not in git, for four
+reasons: the value threshold written `.5`, the same threshold repeated inside
+the statements' conditions, a whole-number draw, and a loop that collects
+rows. The reading now follows all four. Checked again on the saved world for
+those 22 concepts: 19 are read in full (143 topics, against 300 to 1,200
+whole reviews each, largest deviation 2.7 standard errors); two pet concepts
+are read at about 50 s a topic (14 topics checked), and for the third (padded
+harnesses) the check was stopped after 25 minutes without a result, which is
+the cost named under "Limits". The eight concepts the first pass did not
+reach are unchecked.
+
 All of these are dev-producer worlds from the suite's inputs, not the
 suite's frozen worlds, and nothing here is published or bound to a task
 instance.
@@ -1567,12 +1738,16 @@ carries review and description text that the checks also digest.
   are refused with a reason code, not repaired.
 - **The earlier Z3 pilot** (`experiments/constrained_world_pilot/`) is not
   connected.
-- **Reviews, in part.** Steered: what the reviews of a pilot product
-  (walking shoes, walking sandals) say about a topic, and which of a
-  carrier's reviews mention an aspect. Not steered: reviews of the other
-  concepts, which a package program draws under one hashed seed per review;
-  the star summaries; one option's reviews; the topics that depend on the
-  option bought or the wearer. What happened to a carrier's shipments is
+- **Reviews, in part.** Steered: what a product's reviews say about a topic,
+  for any concept, with or without a bound on the mean of its stars; and
+  which of a carrier's reviews mention an aspect. Not steered: the count of
+  each star; one option's reviews; on walking shoes and sandals the two
+  topics that depend on the option bought or the wearer; which comments a
+  review site's first page shows. Not reachable by steering at all, because
+  no producer draws them: a neutral or a mixed comment, and a second
+  statement on a topic under other circumstances (the suite's "opposite
+  opinions in one comment" and "same words, different circumstances"). Those
+  need the review samplers to write such comments first. What happened to a carrier's shipments is
   steered for handover and punctuality only; for the other aspects it bounds
   what the reviews can be made to say. A carrier's quality levels and
   services are the seed's. Which reviews a review
