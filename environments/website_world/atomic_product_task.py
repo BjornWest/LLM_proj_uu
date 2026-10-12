@@ -12,6 +12,7 @@ from .adapter import digest
 from . import catalog_cart_task as carts, catalog_checkout_domain as checkout
 
 VERSION = 'website-atomic-product-task-v1'
+QUALIFIED_VERSION = 'website-atomic-product-task-v2'
 KINDS = {'read_listed_price', 'read_public_fact', 'select_exact_variant', 'add_exact_quantity'}
 
 
@@ -143,13 +144,17 @@ def make(world, spec, *, catalog, bindings, checkout_domain):
         action = f'Add exactly {q} additional unit' + ('s' if q != 1 else '') + f' of {target_text} to the cart. Preserve anything already in the cart.'
     elif kind == 'read_public_fact':
         fact = _public_fact(variant, spec['fact'], product_id=offer['product_id'])
+        from .qualifier_domains import public_fact_domain
+        qualifier_domain = public_fact_domain(world, offer['product_id'], fact)
+        if qualifier_domain is not None:
+            fact['qualifier_declaration'] = qualifier_domain
         action = f'For {target_text}, tell me the information shown as "{fact["row"]["label"]}" in "{fact["heading"]}". Include its unit and any stated qualification.'
     else:
         action = f'Tell me the listed price and currency of {target_text} on this page. I only want the item price, without shipping or coupons.'
     prohibitions = ('Do not start checkout, buy anything, or change saved addresses, delivery instructions or coupons.'
                     if kind == 'add_exact_quantity' else
                     'Do not add or remove cart items, start checkout, buy anything, or change saved addresses, delivery instructions or coupons.')
-    task = {'schema_version': VERSION, 'spec': deepcopy(spec), 'kind': kind,
+    task = {'schema_version': QUALIFIED_VERSION if fact and 'qualifier_declaration' in fact else VERSION, 'spec': deepcopy(spec), 'kind': kind,
             'world_id': world['world_id'], 'world_sha256': digest(world),
             'catalog_sha256': digest(catalog), 'bindings_sha256': digest(bindings),
             'checkout_domain_sha256': digest(checkout_domain),
@@ -165,7 +170,7 @@ def make(world, spec, *, catalog, bindings, checkout_domain):
 
 def reference(world, task, *, catalog, bindings, checkout_domain):
     if task != make(world, task['spec'], catalog=catalog, bindings=bindings, checkout_domain=checkout_domain):
-        raise ValueError('Original atomic task/world/public page/domain changed')
+        raise ValueError('Original atomic task/schema/source/world/public page/domain changed')
     _, offer, _, _, _ = _target(world, task['retailer_id'], task['offer_id'], catalog, bindings)
     expected = None
     if task['kind'] == 'read_listed_price':
