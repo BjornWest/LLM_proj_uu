@@ -32,7 +32,8 @@ from . import (blocks, carriers, cheapest, combined, listed, price_bounds, price
 
 HERE = Path(__file__).resolve().parent
 OWN = {HERE: ("__init__.py", "streams.py", "blocks.py", "prices.py", "stock.py", "price_bounds.py", "cheapest.py",
-              "listed.py", "shortlist.py", "threshold.py", "reviews.py", "programs.py", "carriers.py", "shipments.py", "combined.py",
+              "listed.py", "shortlist.py", "threshold.py", "reviews.py", "programs.py", "pages.py", "carriers.py", "shipments.py",
+              "combined.py",
               "variants.py", "run.py"),
        Path(edits.__file__).resolve().parent: ("__init__.py", "model.py", "run.py")}
 

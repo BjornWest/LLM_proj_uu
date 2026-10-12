@@ -535,7 +535,8 @@ costs. Which delivery options exist and what they charge is not steered; see
 Requirement (`steered-review-topic-v1`): a product, a topic of the native
 review-summary task (an aspect and its context) and one or more of: the
 verdict of the task's count, the number of positive comments, the number of
-negative ones, the mean of the product's star ratings.
+negative ones, the mean of the product's star ratings, what the first page
+of its comments on a review site shows.
 
 ```json
 {"schema": "steered-review-topic-v1",
@@ -668,6 +669,53 @@ remarks, the other aspects' normal draws, the phrasing), and reads the
 block's draws where the producer makes it: another star rating moves the
 other aspects' scores, and other topics change which stock phrases later
 reviews use.
+
+The first page. A review site lists a product's written comments a page at
+a time: in the order of the review ids, or with the highest or the lowest
+star ratings first and ties in the order of the ids
+(`native_review_pages.reader_section`; the page size is the site's, 12
+unless set). A reader who stops at the first page sees those comments only,
+and with the highest ratings first they are the ones likeliest to praise.
+`first_page` states the page's size, its order (`highest`, `lowest`,
+`identity`) and, for the comments on that page alone, a verdict, a number of
+positive or of negative ones, or several:
+
+```json
+{"schema": "steered-review-topic-v1",
+ "product_id": "footwear-brand-05/footwear.walking_shoes/00",
+ "topic": {"aspect": "wet_paving_grip",
+           "context": {"activity": "walking", "surface": "wet paving"}},
+ "verdict": "more_negative",
+ "first_page": {"size": 4, "order": "highest", "verdict": "more_positive"}}
+```
+
+The page's verdict is the same rule on the page's comments (`min_assessed`
+inside `first_page` is the page's own, 1 unless stated). `pages.py` has the
+arithmetic. A review is of some rating and one of four kinds: a comment for
+the topic, against it, a comment on something else, or no comment. Take the
+ratings in the page's order as levels. Either fewer comments are written
+than the page holds and the page is all of them, or the page ends inside one
+level: it holds every comment above that level and the first few at it in
+the order of the ids. Which comments at that level come first does not
+depend on what they say, so the page's comments are independent draws of
+their levels' kinds, and so are the reviews outside the page once the number
+of further comments at that level is summed over. That sum is an integral
+of a polynomial (the factor that depends on the number is a beta integral),
+which a Gauss-Legendre rule of enough points gives exactly up to rounding;
+the module's docstring has the formula. The probability of a requirement is
+the sum over the ways the page and the whole can both be as required, and a
+sample draws, in turn, one of those ways, the numbers outside the page, and
+which reviews are of which kind, with the page's comments at its last level
+placed on the reviews whose ids come first. Every review then has a kind and
+a rating to be redrawn to, in the two steps described above. The check reads
+the page off the saved reviews by the site's own sort and takes what each
+comment says from the native task's reference. A first page is not combined
+with a mean rating yet, and it is read for the pilot concepts only: for a
+review program, whether a review has a comment at all depends on every
+topic's statements, which the reading does not follow yet. The numbers are
+ordinary floats here, not logarithms: a requirement rarer than the smallest
+float (about 1e-308) is refused as a numerical limit where it is possible at
+all, and at most 400 reviews and a page of 100 are taken.
 
 How it meets the producer. A session reseeds the planned review streams of
 the product and manufactures that one product again instead of taking it
@@ -882,7 +930,7 @@ the block model gives each:
 | `shortlist_matching_models` with an integer `limit` | `natural_shortlist`; `tie_at_cutoff`; `another_shortlist`, the last two the likeliest among the first limit + 3 models of the natural ranking, not among all models |
 | `comparison_cheapest_exact_sku_stock` (with the bound `sku_id`) | the retailer shown cheapest holds the variant, has it only on supplier order, or has it unavailable |
 | `audit_free_shipping_claim` | no threshold; meets; below; just below; just meets |
-| `summarize_product_reviews` (topic counts over a product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed`; and against the stars, `high_stars_verdict_more_negative` (mean rating of 4 or more) and `low_stars_verdict_more_positive` (2 or less) |
+| `summarize_product_reviews` (topic counts over a product's reviews) | `verdict_more_positive`, `verdict_more_negative`, `verdict_tie`, `verdict_insufficient_evidence`, with the task's `min_assessed`; against the stars, `high_stars_verdict_more_negative` (mean rating of 4 or more) and `low_stars_verdict_more_positive` (2 or less); and, for walking shoes and sandals, the first page against the whole, `first_page_more_positive_verdict_more_negative` and `first_page_more_negative_verdict_more_positive` (four comments to a page, highest ratings first, as in the suite's instance; the task does not say how its site pages) |
 | `summarize_carrier_reviews` (topic counts) | the same four verdicts in the task's scope, without those the shipments' histories rule out; for `handoff` and `punctuality` also `redrawn_shipments_verdict_...`, the four verdicts with the carrier's shipments redrawn |
 
 A task is translated field by field, and a task with a field the tool does
@@ -1745,8 +1793,8 @@ carries review and description text that the checks also digest.
   for any concept, with or without a bound on the mean of its stars; and
   which of a carrier's reviews mention an aspect. Not steered: the count of
   each star; one option's reviews; on walking shoes and sandals the two
-  topics that depend on the option bought or the wearer; which comments a
-  review site's first page shows. Not reachable by steering at all, because
+  topics that depend on the option bought or the wearer; what a review
+  site's first page shows for concepts other than those two. Not reachable by steering at all, because
   no producer draws them: a neutral or a mixed comment, and a second
   statement on a topic under other circumstances (the suite's "opposite
   opinions in one comment" and "same words, different circumstances"). Those

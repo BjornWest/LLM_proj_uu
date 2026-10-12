@@ -22,7 +22,7 @@ from experiments.accepted_catalog_commerce import model as commerce, package_exp
 from experiments.footwear_world_pilot import model as native
 from experiments.world_sampling_defaults import model as population
 
-from experiments.steered_generation import blocks, combined, prices, reviews, run, stock, streams, variants
+from experiments.steered_generation import blocks, combined, pages, prices, reviews, run, stock, streams, variants
 
 SHOES, SANDALS = "footwear.walking_shoes", "footwear.walking_sandals"
 INPUTS = {"seed": 5, "concept_ids": [SHOES, SANDALS], "tasks": [SHOES], "controls": None,
@@ -414,6 +414,160 @@ class StarTests(Reviews):
         self.assertEqual(reviews.model(empty, self.need(verdict="insufficient_evidence"), self.api).probability, 1)
 
 
+class FirstPageTests(Reviews):
+    """What a review site's first page of comments shows, against all the comments."""
+
+    def paged(self):
+        return [self.need(verdict="more_negative", first_page={"size": 4, "order": "highest", "verdict": "more_positive"}),
+                self.need(verdict="more_positive", first_page={"size": 4, "order": "highest", "verdict": "more_negative"}),
+                self.need(first_page={"size": 3, "order": "lowest", "negative": {"min": 2}}),
+                self.need(verdict="tie", min_assessed=2,
+                          first_page={"size": 5, "order": "identity", "verdict": "insufficient_evidence"}),
+                self.need(self.sandals[0], HEAT, positive={"min": 3},
+                          first_page={"size": 12, "order": "highest", "positive": {"max": 0}}),
+                # Rare: three comments of praise fill the page, under six complaints or more.
+                self.need(verdict="more_negative", negative={"min": 6},
+                          first_page={"size": 4, "order": "highest", "positive": {"min": 3}, "negative": {"max": 0}})]
+
+    def listed(self, world, requirement):
+        """The first page from the saved reviews alone, as the review site sorts and cuts them, with the native classes."""
+        product, page = requirement["product_id"], requirement["first_page"]
+        item = self.item(world, product)
+        declared = catalog_review_task.ReviewInventory(item["public"]["concept_id"])
+        spec = {"kind": catalog_review_task.KIND, "concept_id": declared.concept_id, "operation": "topic_counts",
+                "product_index": sorted(self.shoes if product in self.shoes else self.sandals).index(product),
+                "topic": requirement["topic"], "min_assessed": requirement.get("min_assessed", 1)}
+        reference = catalog_review_task.reference(world, catalog_review_task.make(world, spec, inventory=declared),
+                                                  inventory=declared)
+        said = {row["review_id"]: row["classification"] for row in reference["review_classifications"]}
+        rows = [row for row in item["reviews"] if row["text"]]
+        # The site's own sort: `native_review_pages.reader_section`.
+        rows.sort(key=lambda r: (r["rating"] if page["order"] == "lowest" else -r["rating"] if page["order"] == "highest" else 0,
+                                 r["review_id"]))
+        shown = Counter(said[row["review_id"]] for row in rows[:page["size"]])
+        return (shown["positive"], shown["negative"]), reference
+
+    def test_a_reviews_stars_and_kind_together_match_other_seeds(self):
+        for product, topic in self.cases()[:3]:
+            with self.subTest(product=product, aspect=topic["aspect"]):
+                requirement = self.need(product, topic, verdict="tie")
+                place, reading = reviews.site(self.natural, requirement, self.api), reviews.trial(self.natural, requirement, self.api)
+                rows = [row for seed in range(1500) for row in reading.reading(seed)]
+                seen, model = Counter((reviews.rated(place, row), reviews.kind(place, row)) for row in rows), reviews.kinds(place)
+                self.assertAlmostEqual(sum(model.values()), 1, places=12)
+                self.assertEqual(len(model), 20)
+                for cell, chance in model.items():
+                    self.assertLess(abs(seen[cell] / len(rows) - chance), 4.5 * (chance * (1 - chance) / len(rows)) ** .5 + 1e-9, cell)
+                # The three classes the counts use are these four kinds with the last two together.
+                merged = reviews.cells(place)
+                for rating in range(1, 6):
+                    self.assertAlmostEqual(merged[rating, reviews.REST], model[rating, pages.OTHER] + model[rating, pages.SILENT], places=15)
+                    self.assertEqual(merged[rating, reviews.POSITIVE], model[rating, reviews.POSITIVE])
+        # The order of the review ids, which the site sorts by, is not the order of the reviews.
+        place = reviews.site(self.natural, self.need(verdict="tie"), self.api)
+        ids = [row["review_id"] for row in self.item(self.natural, self.shoes[0])["reviews"]]
+        self.assertEqual(sorted(range(40), key=lambda index: place.ranks[index]), sorted(range(40), key=lambda index: ids[index]))
+        self.assertNotEqual(place.ranks, list(range(40)))
+
+    def test_probabilities_match_other_seeds(self):
+        trials = 4000
+        for requirement in self.paged():
+            with self.subTest(requirement=requirement):
+                block = reviews.model(self.natural, requirement, self.api)
+                seen = reviews.empirical(self.natural, requirement, self.api, trials, 10 ** 6)
+                hits, chance = sum(seen.values()), block.probability
+                self.assertLess(abs(hits / trials - chance), 4 * (chance * (1 - chance) / trials) ** .5 + 1e-9)
+                self.assertAlmostEqual(sum(exp(value) for value in block.log_terms.values()), chance, places=12)
+        # A page with nothing asked of it leaves the counts' own probability, whatever its size and order.
+        plain = reviews.model(self.natural, self.need(verdict="more_negative"), self.api).probability
+        for size, order in ((1, "highest"), (4, "lowest"), (12, "identity"), (60, "highest")):
+            free = self.need(verdict="more_negative", first_page={"size": size, "order": order, "positive": {"min": 0}})
+            self.assertAlmostEqual(reviews.model(self.natural, free, self.api).probability, plain, places=10)
+        # A page that holds every comment is the whole.
+        whole = self.need(verdict="more_negative", first_page={"size": 60, "order": "highest", "verdict": "more_positive"})
+        with self.assertRaises(prices.ZeroMass):
+            reviews.model(self.natural, whole, self.api)
+
+    def test_samples_match_rejection_sampling(self):
+        requirement = self.need(first_page={"size": 4, "order": "highest", "positive": {"min": 1}})
+        place = reviews.site(self.natural, requirement, self.api)
+        reading = reviews.trial(self.natural, requirement, self.api)
+        accepted = [rows for rows in map(reading.reading, range(10 ** 6, 10 ** 6 + 6000))
+                    if reviews.holds(requirement, *reviews.counted(place, rows))]
+        rng, sampled = Random(11), []
+        for _ in range(min(400, len(accepted))):
+            step = reviews.prepare(self.natural, requirement, self.api, rng)
+            seeds = [[step.script[key].seed for key in reviews.keys(place, index)] for index in range(place.count)]
+            sampled.append([reviews.redrawn(place, index, found[1], found[0]) for index, found in enumerate(seeds)])
+            self.assertTrue(reviews.holds(requirement, *reviews.counted(place, sampled[-1])))
+        self.assertGreater(len(accepted), 250)
+        page = lambda rows: pages.first([(row[0], reviews.kind(place, row)) for row in rows], place.ranks, 4, "highest")
+        features = {
+            "positive": lambda rows: reviews.counted(place, rows)[0],
+            "negative": lambda rows: reviews.counted(place, rows)[1],
+            "page_positive": lambda rows: reviews.counted(place, rows)[3][0],
+            "page_negative": lambda rows: reviews.counted(place, rows)[3][1],
+            "written": lambda rows: sum(bool(row[2]) for row in rows),
+            "stars": lambda rows: sum(row[0] for row in rows),
+            "page_stars": lambda rows: sum(rows[index][0] for index in page(rows)),
+            "page_least_stars": lambda rows: min((rows[index][0] for index in page(rows)), default=0),
+            "page_place": lambda rows: sum(page(rows)),
+            "silent_score": lambda rows: sum(row[1] for row in rows if not row[2]),
+            "topics": lambda rows: sum(len(row[3]) for row in rows)}
+        for name, feature in features.items():
+            with self.subTest(feature=name):
+                mine, theirs = [feature(rows) for rows in sampled], [feature(rows) for rows in accepted]
+                spread = lambda values: (sum((v - sum(values) / len(values)) ** 2 for v in values) / len(values) ** 2) ** .5
+                self.assertLess(abs(sum(mine) / len(mine) - sum(theirs) / len(theirs)),
+                                4.5 * (spread(mine) ** 2 + spread(theirs) ** 2) ** .5 + 1e-9)
+
+    def test_steered_worlds_hold_through_the_producer_and_the_sites_order(self):
+        for index, requirement in enumerate(self.paged()):
+            with self.subTest(requirement=requirement):
+                product, page = requirement["product_id"], requirement["first_page"]
+                world, found, record = reviews.steer(self.session, self.natural, self.opened, requirement, self.api, Random(index))
+                shown, reference = self.listed(world, requirement)
+                self.assertTrue(reviews.agreed(page, *shown), shown)
+                self.assertTrue(reviews.agreed(requirement, reference["counts"]["positive"], reference["counts"]["negative"]))
+                self.assertEqual((found["first_page"]["positive"], found["first_page"]["negative"]), shown)
+                self.assertEqual(record["steered_first_page"], {"positive": shown[0], "negative": shown[1]})
+                self.assertEqual(len(found["first_page"]["review_ids"]), min(page["size"], reference["written_review_count"]))
+                before, after = self.item(self.natural, product), self.item(world, product)
+                self.assertEqual({k: v for k, v in after.items() if k not in ("reviews", "rating_summary")},
+                                 {k: v for k, v in before.items() if k not in ("reviews", "rating_summary")})
+                self.assertEqual([row["review_id"] for row in after["reviews"]], [row["review_id"] for row in before["reviews"]])
+                self.assertEqual([p for p in world["products"] if p is not after],
+                                 [p for p in self.natural["products"] if p is not before])
+        first, rare = self.paged()[0], self.paged()[-1]
+        self.assertLess(reviews.model(self.natural, rare, self.api).probability, 1e-3)
+        self.assertFalse(reviews.satisfied(self.natural, rare, self.api))
+        reading = reviews.trial(self.natural, first, self.api)
+        for seed in range(900, 903):
+            found = blocks.redraw(self.session, self.natural, [reading], seed)
+            self.assertEqual((found.identical, found.agreed), ([True], [True]))
+
+    def test_bad_first_pages(self):
+        good = self.need(verdict="tie")
+        page = {"size": 4, "order": "highest", "verdict": "more_positive"}
+        for bad in ({}, {"size": 4, "order": "highest"}, {**page, "size": 0}, {**page, "size": 101}, {**page, "size": 4.0},
+                    {**page, "order": "newest"}, {**page, "verdict": "mostly_fine"}, {**page, "positive": {}},
+                    {"size": 4, "order": "highest", "positive": {"min": 1}, "min_assessed": 2}, {**page, "min_assessed": 0},
+                    {**page, "stars": 5}, {k: v for k, v in page.items() if k != "size"}, "first", None):
+            with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
+                reviews.model(self.natural, {**good, "first_page": bad}, self.api)
+            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+        with self.assertRaises(ValueError) as caught:
+            reviews.model(self.natural, {**good, "first_page": page, "mean_rating": {"min": 4}}, self.api)
+        self.assertIn("Not modelled", str(caught.exception))
+        # A first page alone is a requirement; more comments on a page than the product has reviews is impossible.
+        self.assertGreater(reviews.model(self.natural, self.need(first_page=page), self.api).probability, 0)
+        with self.assertRaises(prices.ZeroMass):
+            reviews.model(self.natural, self.need(first_page={"size": 4, "order": "highest", "positive": {"min": 5}}), self.api)
+        empty = streams.Session(self.api, {**INPUTS, "review_count": 0}).generate()[0]
+        self.assertEqual(reviews.model(empty, self.need(first_page={"size": 4, "order": "highest", "positive": {"max": 0}}),
+                                       self.api).probability, 1)
+
+
 class ProducerTests(Reviews):
     def test_steered_worlds_hold_through_the_producer_and_the_native_review_task(self):
         for index, requirement in enumerate(self.requirements()):
@@ -539,7 +693,11 @@ class ProducerTests(Reviews):
         task = {"kind": "summarize_product_reviews", "concept_id": SHOES, "operation": "topic_counts", "product_index": 2,
                 "topic": GRIP, "min_assessed": 2}
         found = variants.of(self.natural, task, self.api)
-        plain, against = found[:4], found[4:]
+        plain, against, paged = found[:4], found[4:6], found[6:]
+        # And the first page against the whole.
+        self.assertEqual([row["name"] for row in paged], ["first_page_more_positive_verdict_more_negative",
+                                                          "first_page_more_negative_verdict_more_positive"])
+        self.assertTrue(all(row["requirement"]["first_page"]["size"] == 4 for row in paged))
         self.assertEqual({row["name"] for row in plain}, {"verdict_" + verdict for verdict in reviews.VERDICTS})
         self.assertEqual([row["log_probability"] for row in plain], sorted((row["log_probability"] for row in plain), reverse=True))
         self.assertAlmostEqual(sum(2.718281828459045 ** row["log_probability"] for row in plain), 1, places=10)
@@ -551,6 +709,9 @@ class ProducerTests(Reviews):
             world, seen, _ = reviews.steer(self.session, self.natural, self.opened, row["requirement"], self.api, Random(index))
             self.assertEqual(seen["verdict"], row["requirement"]["verdict"])
             self.assertEqual(row["name"].endswith("verdict_" + seen["verdict"]), True)
+            if "first_page" in row["requirement"]:
+                self.assertTrue(reviews.agreed(row["requirement"]["first_page"], seen["first_page"]["positive"],
+                                               seen["first_page"]["negative"]))
             if "mean_rating" in row["requirement"]:
                 self.assertTrue(4 <= seen["mean_rating"] if "min" in row["requirement"]["mean_rating"] else seen["mean_rating"] <= 2)
                 self.assertLess(row["log_probability"], next(

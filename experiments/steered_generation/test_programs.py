@@ -701,6 +701,15 @@ class RefusalTests(Programs):
 
     def test_zero_probability_and_bad_requirements(self):
         good = self.need(verdict="tie")
+        # The first page is read for the pilot concepts only so far; here it is refused, and no candidate is listed.
+        paged = {**good, "first_page": {"size": 4, "order": "highest", "verdict": "more_positive"}}
+        for call in (reviews.model, lambda *a: reviews.prepare(*a, Random(0))):
+            with self.assertRaises(ValueError) as caught:
+                call(self.natural, paged, self.api)
+            self.assertIn("Not modelled", str(caught.exception))
+        task = {"kind": "summarize_product_reviews", "concept_id": TRAINERS, "operation": "topic_counts", "product_index": 0,
+                "topic": good["topic"], "min_assessed": 1}
+        self.assertFalse(any("first_page" in row["name"] for row in variants.of(self.natural, task, self.api)))
         for impossible in (self.need(positive={"min": 17}), self.need(verdict="more_positive", positive={"max": 0})):
             with self.subTest(impossible=impossible), self.assertRaises(prices.ZeroMass):
                 reviews.model(self.natural, impossible, self.api)

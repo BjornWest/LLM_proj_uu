@@ -229,6 +229,17 @@ def review_verdicts(world, task, api):
                 world, [{**base, "verdict": verdict, "mean_rating": limits}], api, reviews)]
         except blocks.NumericalLimit:
             pass
+    # The first page against the whole, as a review site lists comments four to a page with the highest ratings
+    # first (the suite's instance of it); only where the block reads the concept's reviews for pages.
+    for shown, verdict in (("more_positive", "more_negative"), ("more_negative", "more_positive")):
+        need = {**base, "verdict": verdict, "first_page": {"size": 4, "order": "highest", "verdict": shown}}
+        try:
+            found += [entry(f"first_page_{shown}_verdict_{verdict}",
+                            f"the first four comments, highest ratings first, are {shown.replace('_', ' ')} about the topic "
+                            f"and all the comments together are {verdict.replace('_', ' ')}", row)
+                      for row in ranked(world, [need], api, reviews)]
+        except (blocks.NumericalLimit, ValueError):
+            pass
     return found
 
 

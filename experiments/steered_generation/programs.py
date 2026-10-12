@@ -529,6 +529,14 @@ def shares(place):
     return reviews.marginal(cells(place))
 
 
+def kinds(place):
+    """Whether a review has a comment at all depends on every topic's statements; that is not read here yet."""
+    raise unmodelled("the first page of a concept whose reviews a review program writes")
+
+
+kind = kinds
+
+
 def draws(place, trace):
     """A review's block draws as its trace records them."""
     return tuple((row["id"], json.dumps(row.get("outcome"), sort_keys=True)) for row in trace

@@ -51,7 +51,7 @@ from math import ceil, erfc, exp, floor, fsum, lgamma, log, sqrt
 import sys
 from types import SimpleNamespace
 
-from . import blocks, programs, streams
+from . import blocks, pages, programs, streams
 from .blocks import NumericalLimit, Step, Unmet, bound, pick, within
 from .cheapest import pick_log
 from .prices import ZeroMass
@@ -59,7 +59,7 @@ from .prices import ZeroMass
 VERSION = "steered-review-topic-v1"
 VERDICTS = ("more_positive", "more_negative", "tie", "insufficient_evidence")
 POSITIVE, NEGATIVE, REST = "positive", "negative", "rest"
-STARS = "mean_rating"
+STARS, PAGE = "mean_rating", "first_page"
 # Aspects whose score depends on more than the rating and the product: the option bought and the wearer.
 UNMODELLED = ("size_fit", "forefoot_room")
 # A review's class is redrawn at most this often before the block gives up as numerically out of reach.
@@ -67,12 +67,12 @@ TRIES = 10 ** 6
 
 
 def resolve(requirement):
-    required, stated = {"schema", "product_id", "topic"}, {"verdict", POSITIVE, NEGATIVE, STARS}
+    required, stated = {"schema", "product_id", "topic"}, {"verdict", POSITIVE, NEGATIVE, STARS, PAGE}
     if (type(requirement) is not dict or not required <= set(requirement) <= required | stated | {"min_assessed"} or
             requirement["schema"] != VERSION or not stated & set(requirement) or
             type(requirement["product_id"]) is not str or not requirement["product_id"]):
         raise ValueError("Declare a product, a topic and a verdict, a number of positive or of negative comments, "
-                         "or a mean rating")
+                         "a mean rating or a first page")
     topic = requirement["topic"]
     if type(topic) is not dict or set(topic) != {"aspect", "context"} or type(topic["aspect"]) is not str:
         raise ValueError("A topic is an aspect and its context")
@@ -85,6 +85,18 @@ def resolve(requirement):
             not all(type(value) in (int, float) and 1 <= value <= 5 for value in mean.values()) or
             mean.get("min", 1) > mean.get("max", 5)):
         raise ValueError("A mean rating is a min, a max or both, from 1 to 5")
+    page = requirement.get(PAGE, {"size": 1, "order": pages.ORDERS[0], POSITIVE: {"min": 0}})
+    counts = {"verdict", POSITIVE, NEGATIVE}
+    if (type(page) is not dict or not {"size", "order"} <= set(page) <= {"size", "order", "min_assessed"} | counts or
+            not counts & set(page) or type(page["size"]) is not int or not 1 <= page["size"] <= pages.SIZES or
+            page["order"] not in pages.ORDERS or page.get("verdict", VERDICTS[0]) not in VERDICTS or
+            any(key in page and not bound(page[key]) for key in (POSITIVE, NEGATIVE)) or
+            type(page.get("min_assessed", 1)) is not int or not 1 <= page.get("min_assessed", 1) <= 1000 or
+            "min_assessed" in page and "verdict" not in page):
+        raise ValueError("A first page is a size from 1 to 100, an order (" + ", ".join(pages.ORDERS) + ") and a verdict, "
+                         "a number of positive or of negative comments among its comments")
+    if PAGE in requirement and STARS in requirement:
+        raise ValueError("Not modelled: a first page together with a mean rating")
     least = requirement.get("min_assessed", 1)
     if type(least) is not int or not 1 <= least <= 1000 or "min_assessed" in requirement and "verdict" not in requirement:
         raise ValueError("The least number of assessing comments is 1 to 1000 and goes with a verdict")
@@ -120,9 +132,12 @@ def site(world, requirement, api):
     seed = api.commerce.seed_for(world["seed"], public["product_id"])
     if item.get("sample_seed", seed) != seed:
         raise ValueError("The product was not manufactured under the seed this producer gives it")
+    ids = [row["review_id"] for row in item["reviews"]]
     common = dict(
         requirement=requirement, product_id=public["product_id"], concept_id=public["concept_id"],
         aspect=topic["aspect"], seed=seed, count=len(item["reviews"]),
+        # Where each review stands in the order of the review ids, which a review site lists comments in.
+        ranks=[sorted(ids).index(name) for name in ids],
         index=sorted(p["public"]["product_id"] for p in world["products"]
                      if p["public"]["concept_id"] == public["concept_id"]).index(public["product_id"]))
     if public["concept_id"] not in api.package_export.PILOTS:
@@ -201,6 +216,13 @@ def said(place, found):
     return REST if not length or place.aspect not in topics else POSITIVE if score >= .5 else NEGATIVE
 
 
+def kind(place, found):
+    """A review with these draws as a review site's page has it: positive, negative, another comment, or silent."""
+    _, score, length, topics = found
+    return (pages.SILENT if not length else pages.OTHER if place.aspect not in topics else
+            POSITIVE if score >= .5 else NEGATIVE)
+
+
 def included(weights, aspect, slots):
     """The probability that an aspect is among some weighted draws without replacement."""
     total = fsum(weights.values())
@@ -221,8 +243,8 @@ def favourable(place, rating):
     return erfc((.5 - centre(place, rating)) / (place.spread * sqrt(2))) / 2
 
 
-def cells(place):
-    """The probability that one review has each star rating and is positive, negative or neither about the topic.
+def kinds(place):
+    """The probability that one review has each star rating and is a positive, a negative or another comment, or silent.
 
     The score is a normal draw around the rating's centre, positive from one
     half up; the length and the topic choices do not depend on either.
@@ -235,11 +257,21 @@ def cells(place):
                            value * included(others, place.aspect, slots - 1) + (1 - value) * included(others, place.aspect, slots))
     # A rating without a comment (length zero) says nothing; neither does a comment on other topics.
     told = {int(slots): mass * about(int(slots)) if int(slots) else 0.0 for slots, mass in length.items()}
-    assessed, silent = fsum(told.values()), fsum(mass - told[int(slots)] for slots, mass in length.items())
+    assessed = fsum(told.values())
+    other = fsum(mass - told[int(slots)] for slots, mass in length.items() if int(slots))
+    silent = fsum(mass for slots, mass in length.items() if not int(slots))
     against = lambda rating: erfc((centre(place, rating) - .5) / (place.spread * sqrt(2))) / 2
     return whole({(rating, name): mass * part for rating, mass in stars(place).items()
                   for name, part in ((POSITIVE, assessed * favourable(place, rating)),
-                                     (NEGATIVE, assessed * against(rating)), (REST, silent))})
+                                     (NEGATIVE, assessed * against(rating)), (pages.OTHER, other), (pages.SILENT, silent))})
+
+
+def cells(place):
+    """The probability that one review has each star rating and is positive, negative or neither about the topic."""
+    found = kinds(place)
+    return whole({(rating, name): found[rating, name] if name != REST else
+                  fsum((found[rating, pages.OTHER], found[rating, pages.SILENT]))
+                  for rating in range(1, 6) for name in (POSITIVE, NEGATIVE, REST)})
 
 
 def whole(found):
@@ -277,11 +309,17 @@ def agreed(requirement, positive, negative):
             within(requirement.get(POSITIVE, {}), positive) and within(requirement.get(NEGATIVE, {}), negative))
 
 
-def holds(requirement, positive, negative, mean=None):
-    """Whether the counts and, where one is stated, the mean rating (a fraction; None without ratings) are as required."""
+def holds(requirement, positive, negative, mean=None, page=None):
+    """Whether the counts are as required and, where they are stated, so are the mean rating and the first page.
+
+    The mean is a fraction, None without ratings; the page is its numbers of
+    positive and of negative comments.
+    """
     limits = requirement.get(STARS)
-    return agreed(requirement, positive, negative) and (limits is None or mean is not None and
-                                                        Fraction(str(limits.get("min", 1))) <= mean <= Fraction(str(limits.get("max", 5))))
+    return (agreed(requirement, positive, negative) and
+            (limits is None or mean is not None and
+             Fraction(str(limits.get("min", 1))) <= mean <= Fraction(str(limits.get("max", 5)))) and
+            (PAGE not in requirement or page is not None and agreed(requirement[PAGE], *page)))
 
 
 def span(requirement, count):
@@ -427,6 +465,8 @@ def origin(natural, requirement, api):
 def model(world, requirement, api):
     """The counts that satisfy the requirement in a natural world, with the logarithm of each one's probability."""
     place = origin(world, requirement, api)
+    if PAGE in place.requirement:
+        return paged(place)
     joint = place.reader.cells(place)
     share = marginal(joint)
     found = multinomial(place.count, share, lambda positive, negative: agreed(place.requirement, positive, negative))
@@ -439,6 +479,23 @@ def model(world, requirement, api):
     total = min(0.0, top + log(fsum(exp(value - top) for value in terms.values())))
     return SimpleNamespace(site=place, cells=joint, shares=share, log_terms=terms, log_probability=total,
                            probability=exp(total))
+
+
+def paged(place):
+    """The ways the first page and the whole satisfy the requirement, with the logarithm of each one's probability."""
+    page = place.requirement[PAGE]
+    found = pages.model(place.reader.kinds(place), place.count, page["size"], page["order"],
+                        lambda positive, negative: agreed(page, positive, negative),
+                        lambda positive, negative: agreed(place.requirement, positive, negative))
+    if found.lost:
+        raise NumericalLimit("The first page's requirement is too unlikely in every way to weigh")
+    if not found.options:
+        raise ZeroMass("no_outcome", "No first page and counts of this product's reviews satisfy the requirement in this world")
+    terms = {option: log(value) for option, value in found.options.items()}
+    top = max(terms.values())
+    total = min(0.0, top + log(fsum(exp(value - top) for value in terms.values())))
+    return SimpleNamespace(site=place, page=found, cells=None, shares=marginal(place.reader.cells(place)),
+                           log_terms=terms, log_probability=total, probability=exp(total))
 
 
 def written(world, place):
@@ -454,6 +511,11 @@ def written(world, place):
 def counted(place, rows):
     """The positive and the negative comments among some reviews; with a mean stated, their mean rating as well."""
     seen = Counter(place.reader.said(place, row) for row in rows)
+    if PAGE in place.requirement:
+        page, reader = place.requirement[PAGE], place.reader
+        shown = Counter(reader.kind(place, rows[index]) for index in pages.first(
+            [(reader.rated(place, row), reader.kind(place, row)) for row in rows], place.ranks, page["size"], page["order"]))
+        return seen[POSITIVE], seen[NEGATIVE], None, (shown[POSITIVE], shown[NEGATIVE])
     if STARS not in place.requirement:
         return seen[POSITIVE], seen[NEGATIVE]
     return (seen[POSITIVE], seen[NEGATIVE],
@@ -477,29 +539,54 @@ def check(world, requirement, api):
     # The product's own rating summary, which the native rating task reports.
     summary = next(p for p in world["products"] if p["public"]["product_id"] == place.product_id)["rating_summary"]
     mean = Fraction(summary["rating_sum"], summary["rating_count"]) if summary["rating_count"] else None
-    if read[2:] not in ((), (mean,)):
+    if read[2:3] not in ((), (mean,), (None,)):
         raise AssertionError("The product's rating summary and the recorded draws disagree about the mean rating")
+    shown = None
+    if PAGE in place.requirement:
+        # The page as the review site lists it, from the saved reviews; what each says, by the native task.
+        page, said = place.requirement[PAGE], {row["review_id"]: row["classification"] for row in reference["review_classifications"]}
+        rows = next(p for p in world["products"] if p["public"]["product_id"] == place.product_id)["reviews"]
+        sign = {"highest": -1, "lowest": 1, "identity": 0}[page["order"]]
+        listed = sorted((row for row in rows if row["text"]), key=lambda row: (sign * row["rating"], row["review_id"]))[:page["size"]]
+        seen = Counter(said.get(row["review_id"]) for row in listed)
+        shown = (seen[POSITIVE], seen[NEGATIVE])
+        if read[3] != shown:
+            raise AssertionError("The saved reviews and the recorded draws disagree about the first page")
     if (reference["verdict"] != verdict(place.requirement, counts[POSITIVE], counts[NEGATIVE]) or
-            not holds(place.requirement, counts[POSITIVE], counts[NEGATIVE], mean)):
+            not holds(place.requirement, counts[POSITIVE], counts[NEGATIVE], mean, shown)):
         raise Unmet(f"{place.product_id}: {counts[POSITIVE]} positive, {counts[NEGATIVE]} negative, "
-                    f"{reference['verdict']}, mean rating {mean}")
+                    f"{reference['verdict']}, mean rating {mean}, first page {shown}")
     return {"product_id": place.product_id, "counts": counts, "verdict": reference["verdict"],
             "written_review_count": reference["written_review_count"], "assessed_count": reference["assessed_count"],
-            **({"mean_rating": summary["average_rating"]} if STARS in place.requirement else {})}
+            **({"mean_rating": summary["average_rating"]} if STARS in place.requirement else {}),
+            **({"first_page": {POSITIVE: shown[0], NEGATIVE: shown[1], "review_ids": [row["review_id"] for row in listed]}}
+               if shown else {})}
 
 
 def prepare(natural, requirement, api, rng):
     """Sample the block on the natural world; the step replays it and reads the result."""
     block = model(natural, requirement, api)
     place, reader = block.site, block.site.reader
-    positive, negative = pick_log(rng, list(block.log_terms), list(block.log_terms.values()))
-    order = rng.sample(range(place.count), place.count)
-    wanted = {index: POSITIVE if rank < positive else NEGATIVE if rank < positive + negative else REST
-              for rank, index in enumerate(order)}
-    stars = {}
-    if STARS in place.requirement:
-        chosen = ratings(rng, place, block.cells, block.shares, positive, negative)
-        stars = {index: chosen[wanted[index]].pop() for index in order}
+    said, stars, shown = reader.said, {}, None
+    if PAGE in place.requirement:
+        # What every review is, by the page: its kind, and a rating from those its place in the order allows.
+        said, page = reader.kind, place.requirement[PAGE]
+        targets = pages.placed(rng, pages.sample(rng, block.page), place.ranks)
+        wanted = {index: name for index, (_, name) in enumerate(targets)}
+        stars = {index: pages.choose(rng, group, [block.page.cells[rating, name] for rating in group])
+                 for index, (group, name) in enumerate(targets)}
+        positive, negative = (sum(name == side for name in wanted.values()) for side in (POSITIVE, NEGATIVE))
+        listed = Counter(wanted[index] for index in pages.first(
+            [(stars[index], wanted[index]) for index in range(place.count)], place.ranks, page["size"], page["order"]))
+        shown = {POSITIVE: listed[POSITIVE], NEGATIVE: listed[NEGATIVE]}
+    else:
+        positive, negative = pick_log(rng, list(block.log_terms), list(block.log_terms.values()))
+        order = rng.sample(range(place.count), place.count)
+        wanted = {index: POSITIVE if rank < positive else NEGATIVE if rank < positive + negative else REST
+                  for rank, index in enumerate(order)}
+        if STARS in place.requirement:
+            chosen = ratings(rng, place, block.cells, block.shares, positive, negative)
+            stars = {index: chosen[wanted[index]].pop() for index in order}
     seeds, starts, tries = {}, {}, 0
     for index in range(place.count):
         if index in stars and not place.staged:
@@ -507,7 +594,7 @@ def prepare(natural, requirement, api, rng):
             for _ in range(TRIES):
                 seeds[index], tries = rng.getrandbits(64), tries + 1
                 found = reader.redrawn(place, index, seeds[index])
-                if (reader.rated(place, found), reader.said(place, found)) == (stars[index], wanted[index]):
+                if (reader.rated(place, found), said(place, found)) == (stars[index], wanted[index]):
                     break
             else:
                 raise NumericalLimit("A review's rating and class are too rare to reach by redrawing the review")
@@ -522,7 +609,7 @@ def prepare(natural, requirement, api, rng):
                 raise NumericalLimit("A review's rating is too rare to reach by redrawing it")
         for _ in range(TRIES):
             seeds[index], tries = rng.getrandbits(64), tries + 1
-            if reader.said(place, reader.redrawn(place, index, seeds[index], starts.get(index))) == wanted[index]:
+            if said(place, reader.redrawn(place, index, seeds[index], starts.get(index))) == wanted[index]:
                 break
         else:
             raise NumericalLimit("A review's class is too rare to reach by redrawing the review")
@@ -541,6 +628,7 @@ def prepare(natural, requirement, api, rng):
                 "natural_counts": dict(zip((POSITIVE, NEGATIVE), counted(place, reader.written(natural, place)))),
                 "steered_counts": {POSITIVE: positive, NEGATIVE: negative},
                 **({"steered_star_total": sum(stars.values())} if stars else {}),
+                **({"steered_first_page": shown} if shown else {}),
                 "distribution_claim": "The draws of every review of this product that decide what it says about "
                                       "the topic (" + (
                                           "the star rating, the topic's score, the comment length and the topic "
@@ -550,7 +638,11 @@ def prepare(natural, requirement, api, rng):
                                       "the requirement: the counts exactly, " + (
                                           "every review's star rating exactly given the counts and the stated mean, "
                                           "then each review by redrawing its rating until it is that rating and its "
-                                          "other draws until it is of its class. " if stars and place.staged else
+                                          "other draws until it is of its class. " if stars and place.staged and not shown else
+                                          "what every review is (its star rating; a comment for the topic, against "
+                                          "it or on something else, or no comment) exactly given the first page and "
+                                          "the counts, then each review by redrawing its rating until it is that "
+                                          "rating and its other draws until it is of that kind. " if shown else
                                           "every review's star rating exactly given the counts and the stated mean, "
                                           "then each review by redrawing those draws until it has that rating and "
                                           "is of its class. " if stars else
