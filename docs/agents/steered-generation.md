@@ -1051,8 +1051,9 @@ a retailer that ships with this carrier only, and this carrier is rated at
 most 3.9" is two independent blocks. It does not combine with the ninth or
 the tenth requirement on the same carrier, whose reviews it redraws.
 
-Limits. The history streams are not redrawn for the stars: given the levels,
-what happened to each shipment is the seed's. The levels are private
+Limits. The history streams are not redrawn for the stars: the sample and its
+probability are given those streams, and what happened to each shipment is
+what they give under the sampled levels. The levels are private
 parameters; a task sees them through the metrics and the reviews.
 
 ### The three together on the medium world
@@ -1066,10 +1067,10 @@ world of "A medium world" (21 retailers, 90 products), four seconds a sample:
   delivery whose warehouse takes two days to dispatch": probability 0.060;
   under 1,500 other seeds of the same streams it held in 7.0%. In the seed's
   own world two retailers have such a policy and one of them never has the
-  cheapest shoe. Over 200 samples seven retailers win, each about as often
-  as its chance of winning times its chance of such a policy says (0.10 to
-  0.21), and the winner's contracts and dispatch days are redrawn; the other
-  twenty retailers' are the seed's.
+  cheapest shoe. Over 200 samples nine retailers win: seven of them each
+  about as often as its chance of winning times its chance of such a policy
+  says (0.10 to 0.21), two once each. The winner's contracts and dispatch
+  days are redrawn; the other twenty retailers' are the seed's.
 - "... at a retailer that ships with one named carrier only, and that
   carrier's punctuality comments are more negative than positive": 0.0093
   times 0.17, as two independent blocks. Only a small retailer can have one

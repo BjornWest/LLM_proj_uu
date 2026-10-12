@@ -147,10 +147,16 @@ class SellerTests(Sellers):
         good = self.need(express=False)
         for bad in ({**good, "policy": {}}, {**good, "policy": {"express": 1}}, {**good, "policy": {"retailer_id": "x", "express": True}},
                     {**good, "cheapest": {}}, {**good, "cheapest": {"concept_id": SANDALS, "retailer_ids": ["x"]}},
-                    {**good, "cheapest": {"concept_id": "no.such"}}, {k: v for k, v in good.items() if k != "policy"}, None):
-            with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
-                sellers.model(self.natural, bad, self.api)
-            self.assertNotIsInstance(caught.exception, prices.ZeroMass)
+                    {**good, "cheapest": {"concept_id": "no.such"}}, {k: v for k, v in good.items() if k != "policy"},
+                    {**good, "cheapest": {"concept_id": SANDALS, "unknown_field": True}},
+                    # A malformed ranking is an error whatever the policy, an impossible one included.
+                    {**good, "cheapest": {"concept_id": SANDALS, "unknown_field": True}, "policy": {"carrier_count": {"min": 9}}},
+                    {**good, "cheapest": {"concept_id": SANDALS, "availability": "somewhere"}, "policy": {"carrier_count": {"min": 9}}},
+                    None):
+            for call in (sellers.model, sellers.trial, sellers.footprint, lambda *a: sellers.prepare(*a, Random(0))):
+                with self.subTest(bad=bad), self.assertRaises(ValueError) as caught:
+                    call(self.natural, bad, self.api)
+                self.assertNotIsInstance(caught.exception, prices.ZeroMass)
 
     def test_the_runner_samples_and_checks(self):
         args = SimpleNamespace(samples=2, producer_redraws=2, validate_trials=1500)

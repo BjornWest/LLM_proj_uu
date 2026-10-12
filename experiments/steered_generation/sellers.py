@@ -37,8 +37,9 @@ def resolve(requirement):
             type(requirement["policy"]) is not dict or WINNER & set(requirement["cheapest"]) or
             "concept_id" not in requirement["cheapest"] or {"schema", "retailer_id"} & set(requirement["policy"])):
         raise ValueError("Declare a ranking without a winner (a concept and what competes) and a policy without a retailer")
-    # The policy's own words, checked on any retailer's name.
-    policies.resolve({"schema": policies.VERSION, "retailer_id": "any", **requirement["policy"]})
+    # The ranking's and the policy's own words, checked on any winner's and any retailer's name.
+    cheapest.resolve(ranking(requirement, ("any", "any")))
+    policies.resolve(policy(requirement, "any"))
     return json.loads(json.dumps(requirement))
 
 
@@ -158,6 +159,7 @@ def steer(session, natural, natural_opened, requirement, api, rng):
 def trial(natural, requirement, api):
     """The ranking's leaves and every retailer's policy from the producer's own lines under another seed."""
     requirement = resolve(requirement)
+    footprint(natural, requirement, api)
     shared = cheapest.frame(natural, ranking(requirement), api)
     reading, keys = cheapest.reader(natural, shared.places, api)
     retailers = sorted({retailer for retailer, _ in shared.places})
