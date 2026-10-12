@@ -113,11 +113,16 @@ class SharedMetricsPoller:
     """One persistent HTTP connection, bounded reads/timeouts, shared snapshots.
 
     on_snapshot must be a short local callback, e.g. controller.observe.
+    Optional on_scrape(text, snapshot, model=..., engine=...) observes the same
+    scrape, without another HTTP request. It must do bounded local work; its
+    errors and duration are separate from successfully published telemetry.
+    Python callbacks cannot be preempted: a stuck callback eventually makes
+    capacity stale. status() exposes its in-progress duration for diagnosis.
     Other consumers read status(); they never make their own HTTP requests.
     HTTP failures retain the old timestamp so consumers detect stale telemetry.
     """
     def __init__(self, url, *, model, engine="0", interval=1.0, timeout=2.0,
-                 max_bytes=1024 * 1024, on_snapshot=None):
+                 max_bytes=1024 * 1024, on_snapshot=None, on_scrape=None):
         parsed = urlsplit(url)
         if (parsed.scheme not in {"http", "https"} or not parsed.hostname
                 or parsed.username or parsed.password or parsed.query or parsed.fragment
@@ -127,10 +132,18 @@ class SharedMetricsPoller:
             raise ValueError("Poll interval and timeout must be positive finite seconds")
         if type(max_bytes) is not int or max_bytes < 1:
             raise ValueError("Invalid response limit")
+        if on_scrape is not None and not callable(on_scrape):
+            raise ValueError("Scrape observer must be callable")
         parsed.port  # Reject out-of-range/non-numeric ports at construction.
         self.address, self.model, self.engine = parsed, model, engine
         self.interval, self.timeout, self.max_bytes = interval, timeout, max_bytes
         self.on_snapshot = on_snapshot
+        self.on_scrape = on_scrape
+        self.observer_failures = 0
+        self.observer_error = None
+        self.observer_started_at = None
+        self.observer_last_seconds = None
+        self.observer_max_seconds = 0.0
         self.stop = threading.Event()
         self.lock = threading.Lock()
         self.snapshot = None
@@ -189,12 +202,31 @@ class SharedMetricsPoller:
                         watchdog.join()
                         with self.lock:
                             self.active_socket = None
-                    snapshot = parse_metrics(body.decode("utf-8"), model=self.model, engine=self.engine)
+                    decoded = body.decode("utf-8")
+                    snapshot = parse_metrics(decoded, model=self.model, engine=self.engine)
                     # Callbacks never run under the poller's lock.
                     if self.on_snapshot is not None:
                         self.on_snapshot(snapshot)
                     with self.lock:
                         self.snapshot, self.last_error = snapshot, None
+                    if self.on_scrape is not None:
+                        observer_started = time.monotonic()
+                        with self.lock:
+                            self.observer_started_at = observer_started
+                        try:
+                            self.on_scrape(decoded, snapshot, model=self.model, engine=self.engine)
+                            with self.lock:
+                                self.observer_error = None
+                        except BaseException as exc:
+                            with self.lock:
+                                self.observer_failures += 1
+                                self.observer_error = f"{type(exc).__name__}: {exc}"
+                        finally:
+                            duration = time.monotonic() - observer_started
+                            with self.lock:
+                                self.observer_started_at = None
+                                self.observer_last_seconds = duration
+                                self.observer_max_seconds = max(self.observer_max_seconds, duration)
                     failures = 0
                 except Exception as exc:
                     with self.lock:
@@ -212,7 +244,12 @@ class SharedMetricsPoller:
     def status(self):
         with self.lock:
             return dict(snapshot=None if self.snapshot is None else asdict(self.snapshot),
-                        requests=self.requests, failures=self.failures, last_error=self.last_error)
+                        requests=self.requests, failures=self.failures, last_error=self.last_error,
+                        observer_failures=self.observer_failures, observer_error=self.observer_error,
+                        observer_last_seconds=self.observer_last_seconds,
+                        observer_max_seconds=self.observer_max_seconds,
+                        observer_active_seconds=None if self.observer_started_at is None else
+                            time.monotonic()-self.observer_started_at)
 
     def close(self):
         self.stop.set()

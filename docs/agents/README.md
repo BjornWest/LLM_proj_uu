@@ -175,3 +175,5 @@ maintained copies as part of this transition.
 - [Optional suite inspection recording](inspection-suite-recording.md): pinned provider hook, task adapters and partial prefix coverage.
 
 - [Canonical answer schemas](canonical-answer-schemas.md): declared finite product options, semantic extraction and native comparison boundaries.
+
+- [Qwen serving status](qwen-serving-status.md): SSH engine logs, shared-scrape concurrency and throughput observations, counter limitations and future W&B/journal wiring.
