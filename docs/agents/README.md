@@ -177,3 +177,5 @@ maintained copies as part of this transition.
 - [Canonical answer schemas](canonical-answer-schemas.md): declared finite product options, semantic extraction and native comparison boundaries.
 
 - [Qwen serving status](qwen-serving-status.md): SSH engine logs, shared-scrape concurrency and throughput observations, counter limitations and future W&B/journal wiring.
+
+- [Qwen Verda suite preparation](qwen-verda-suite.md): frozen SSH-host serving, dependency/cache setup, cost/deletion rules and remaining combined deployment gates.
