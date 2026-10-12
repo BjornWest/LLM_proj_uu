@@ -414,3 +414,29 @@ class QwenChildReleaseRegressionTests(unittest.TestCase):
                  patch.object(caller,'checked',side_effect=lambda row:row['path']),patch.object(caller,'load',side_effect=lambda p:records[p]),\
                  patch.object(caller,'qwen_live',return_value=({},live)),patch.object(caller,'helper',side_effect=RuntimeError('passed release before target setup')):
                 with self.assertRaisesRegex(RuntimeError,'passed release before target setup'):caller.execute(runtime,case,scripted=False)
+
+
+class FiniteSuiteSubscriptionTests(unittest.TestCase):
+    def test_real_events_subscription_initialization_accepts_one_and34_members(self):
+        # Exercise the real non-scripted supervisor initialization through the
+        # actual Events API, then stop before roots, environments or providers.
+        from types import SimpleNamespace
+        import runpy
+        events_path=Path('/home/bjorn/code/LLM_proj_uu/.local/coordination/qwen-capability-sweep-20261010/sol-random4-v1/episode_events_frozen.py')
+        api=runpy.run_path(str(events_path))
+        for count in (1,34,56):
+            with self.subTest(count=count),tempfile.TemporaryDirectory() as tmp:
+                ids=['luna-'+str(i) for i in range(count)];authorization=Path(tmp)/'authorization.json';authorization.write_text(json.dumps({'case_ids':ids}))
+                source={'startup_timeout':180,'episode_timeout':10800,'suite_timeout':36000,'shutdown_grace_seconds':30,
+                    'output':str(Path(tmp)/'run'),'authorization':caller.pin(authorization),'suite_id':'cpu','thread_id':'CPU_NOT_DELIVERED',
+                    'queue':{'path':'queue'},'channel':{'path':'channel'},'events_helper':caller.pin(events_path)}
+                helper={'process_identity':lambda pid:'cpu-start','register_roots':lambda spec:(_ for _ in ()).throw(RuntimeError('subscription stage passed'))}
+                real=caller.runpy.run_path
+                def modules(path):return api if path==str(events_path) else {}
+                with patch.object(caller,'check_release'),patch.object(caller,'source_guard'),patch.object(caller,'helper',return_value=helper),                     patch.object(caller,'checked',side_effect=lambda value:Path(value['path'])),patch.object(caller.runpy,'run_path',side_effect=modules):
+                    with self.assertRaisesRegex(RuntimeError,'subscription stage passed'):caller._supervise(source,scripted=False)
+                events=api['Events'](Path(source['output'])/'completion.sqlite')
+                self.assertEqual(len(events.snapshot()['episodes']),count)
+                with caller.sqlite3.connect(events.path) as db:
+                    row=db.execute("SELECT milestones FROM subscriptions WHERE id='cpu-suite'").fetchone()
+                    self.assertEqual(json.loads(row[0]),[n for n in (10,20,30,35,40,50) if n<count])

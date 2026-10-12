@@ -576,7 +576,7 @@ def _supervise(s,scripted=False,stop=None):
  events.register(s['suite_id'],members)
  if not scripted:
   for ident in members:events.subscribe(s['suite_id']+'-'+ident,s['suite_id'],'codex:'+s['thread_id'],episode=ident,final=False)
-  events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[10,20,30,35,40,50],final=True)
+  events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[n for n in (10,20,30,35,40,50) if n<len(members)],final=True)
  h['register_roots'](s)
  stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock();capacity_host=None;serving=None;canary_barrier=CanaryBarrier(['qwen-'+i for i in s['canary_task_ids']],stop) if qwen_mode(s) else None
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
