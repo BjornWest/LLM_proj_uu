@@ -12,6 +12,8 @@ from browsergym.core.chat import Chat
 
 
 def supported(env):
+    from .shared_browsergym import supported_shared
+    if supported_shared(env):return True
     return (version('browsergym-core')=='0.14.3' and type(env) is BrowserEnv
         and getattr(env.close,'__func__',None) is BrowserEnv.close
         and hashlib.sha256(inspect.getsource(BrowserEnv.close).encode()).hexdigest()==

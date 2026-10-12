@@ -13,12 +13,14 @@ dependencies = ["browsergym-core==0.14.3", "httpx>=0.27,<1", "Pillow>=10", "pyth
 miniwob = ["browsergym-miniwob==0.14.3"]
 dev = ["pytest>=8,<10"]
 context = ["tokenizers==0.23.2"]
+shared_chromium = ["playwright==1.44.0"]
 
 [project.scripts]
 intent-browser = "intent_browser.cli:main"
+intent-browser-chromium-pool = "intent_browser.chromium_pool:main"
 
 [tool.setuptools.packages.find]
 include = ["intent_browser*"]
 
 [tool.setuptools.package-data]
-intent_browser = ["observation_revision.js", "assets/chat/*.html", "assets/chat/*.txt"]
+intent_browser = ["observation_revision.js", "assets/chat/*.html", "assets/chat/*.txt", "assets/*.cjs"]
