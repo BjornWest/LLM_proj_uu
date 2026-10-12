@@ -68,6 +68,11 @@ the tool profile must remain explicit.
 
 ## Future host preparation commands
 
+The executable [VM bootstrap and once-only wire probe](qwen-host-bootstrap.md)
+prints a plan by default. Its remote execution and the combined process-owner /
+measurement / artifact-return composition remain unqualified. The manual blocks
+below document the underlying commands.
+
 These commands are for an approved fresh Ubuntu VM after a verified bundle is
 installed at `/opt/qwen-release`. They have not been run remotely. The first
 block downloads dependencies, and the model block downloads about31GB if absent.
