@@ -2,13 +2,18 @@
 from contextlib import contextmanager
 from hashlib import sha256
 from pathlib import Path
-import json,os,runpy,signal,socket,sqlite3,subprocess,sys,tempfile,threading,time,types
+import json,math,os,runpy,signal,socket,sqlite3,subprocess,sys,tempfile,threading,time,types
 
 class EpisodeDeadline(BaseException):
  """Termination must bypass optional recording's ordinary error fallback."""
 
+class CaseDeadline(RuntimeError):
+ """A failed case must not cancel independent paid cases in the queue."""
+
 
 def signal_deadline(*_):
+ for kind in (signal.SIGTERM,signal.SIGINT,signal.SIGALRM):signal.signal(kind,signal.SIG_IGN)
+ signal.alarm(0)
  raise EpisodeDeadline('Case startup/active watchdog or termination')
 
 
@@ -29,7 +34,82 @@ def checked(r):
  return p
 
 def helper(s):return runpy.run_path(str(checked(s['helpers'])))
-def config_hash(s):return sha256(json.dumps({k:v for k,v in s.items() if k not in ('review','ready','sockets','tokenizer_socket')},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+def config_hash(s):return sha256(json.dumps({k:v for k,v in s.items() if k not in ('review','sockets','tokenizer_socket')},sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+
+def case_binding(c):
+ # Scripted answers/journeys are control inputs, not real-case identity.
+ return sha256(json.dumps({k:v for k,v in c.items() if not k.startswith('scripted_') and k!='accepted_trace'},sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
+
+def execution_binding(s,c):
+ excluded={'review','ready','cases','start_order','output','completion_db','suite_id','spec_path','sockets','tokenizer_socket','chromium_descriptor','scripted_hold_seconds','case_dependencies'}
+ fields={k:v for k,v in s.items() if k not in excluded}
+ fields['case_dependencies']=s.get('case_dependencies',{}).get(c['id'],[])
+ return sha256(json.dumps(fields,sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
+
+def verify_ready_case(s,c,row):
+ if row.get('case')!=c['id']:raise ValueError('Acceptance belongs to another case')
+ result=load(checked(row['result']))
+ if (result.get('case')!=c['id'] or result.get('scripted') is not True
+     or result.get('case_binding_sha256')!=case_binding(c)
+     or result.get('execution_binding_sha256')!=execution_binding(s,c)
+     or result.get('caller_driver')!=s['driver']
+     or result.get('caller_commit')!=s['caller_commit']
+     or result.get('status')!='graded_and_projected'
+     or result['result']['viewer_projection'].get('task_completed') is not True):
+  raise ValueError('Acceptance does not bind this scripted case/driver/recipe')
+
+class CaseWatchdog:
+ """Parent-owned wall-clock limits, independent of child's signal handling.
+
+ Startup ends at validated ready. Parked warm actors have no active budget;
+ activation starts the agreed episode budget. Expiry stops the owned bounded
+ launcher and closes its control socket. Containment is not native cleanup.
+ """
+ def __init__(self,process,connection_holder,*,startup_seconds,episode_seconds,cleanup_grace_seconds=30,stop_event=None,clock=time.monotonic):
+  for value in (startup_seconds,episode_seconds,cleanup_grace_seconds):
+   if type(value) not in (int,float) or not math.isfinite(value) or value<=0:raise ValueError('Positive finite case watchdog limits required')
+  self.process,self.connections,self.clock=process,connection_holder,clock
+  self.episode_seconds=episode_seconds;self.grace=cleanup_grace_seconds;self.suite_stop=stop_event
+  self.deadline=clock()+startup_seconds+cleanup_grace_seconds
+  self.phase='startup';self.failure=None;self.lock=threading.Lock();self.stop=threading.Event()
+  self.thread=threading.Thread(target=self._run,daemon=True);self.thread.start()
+ def ready(self):
+  with self.lock:
+   if self.failure is not None:raise CaseDeadline(str(self.failure))
+   self.phase='parked';self.deadline=None
+ def activate(self):
+  with self.lock:
+   if self.failure is not None:raise CaseDeadline(str(self.failure))
+   self.phase='active';self.deadline=self.clock()+self.episode_seconds+self.grace
+ def _run(self):
+  while not self.stop.wait(.05):
+   with self.lock:
+    if self.process.poll() is not None:return
+    if self.suite_stop is not None and self.suite_stop.is_set() and self.phase!='suite_stop':
+     self.phase='suite_stop';self.deadline=self.clock()+self.grace
+     connection=self.connections.get('connection')
+     if connection is not None:
+      try:connection.shutdown(socket.SHUT_RDWR)
+      except OSError:pass
+    if self.deadline is None or self.clock()<self.deadline:continue
+    self.failure={'phase':self.phase,'reason':'independent_case_deadline','observed_monotonic':self.clock()}
+   try:self.process.terminate() # Popen owns/reaps the launcher PID; it kills its bounded scope.
+   except ProcessLookupError:pass
+   finally:
+    connection=self.connections.get('connection')
+    if connection is not None:
+     try:connection.shutdown(socket.SHUT_RDWR)
+     except OSError:pass
+   return
+ def close(self):
+  self.stop.set();self.thread.join(2)
+  if self.thread.is_alive():raise RuntimeError('Case watchdog did not stop')
+
+class WatchedAdmission:
+ def __init__(self,admission,watchdog):self.admission,self.watchdog=admission,watchdog
+ def __getattr__(self,name):return getattr(self.admission,name)
+ def environment_ready(self,ready=None):
+  self.watchdog.ready();self.admission.environment_ready(ready);self.watchdog.activate()
 def source_guard(s,c=None):
  checked(s['driver']);checked(s['helpers']);checked(s['events_helper'])
  if c is not None:checked(c['recipe_manifest'])
@@ -48,11 +128,13 @@ def check_release(s):
   raise ValueError('Require exact authorized subset/order and concurrency/warming limits')
  for c in s['cases']:
   if c['max_input_tokens']!=authorized['max_input_tokens'][c['policy_model']]:raise ValueError('Input capacity changed')
+  prefix={'xiaomi/mimo-v2.6-pro':'mimo','gpt-6-luna':'luna'}[c['policy_model']]
+  if not isinstance(c.get('task_id'),str) or c['id']!=prefix+'-'+c['task_id']:raise ValueError('Case/model/task identity mismatch')
  r=load(checked(s['review']));a=load(checked(s['ready']))
  if r['status']!='approved' or r['configuration_sha256']!=config_hash(s) or a['status']!='passed' or a['driver']!=s['driver'] or {v['case'] for v in a['cases']}!={c['id'] for c in s['cases']}:raise ValueError('Missing reviewed configuration or actual scripted acceptance')
- for v in a['cases']:
-  result=load(checked(v['result']))
-  if result['result']['viewer_projection']['task_completed'] is not True:raise ValueError('Correct acceptance did not pass')
+ if len(a['cases'])!=len(s['cases']):raise ValueError('Duplicate acceptance case')
+ by_id={c['id']:c for c in s['cases']}
+ for v in a['cases']:verify_ready_case(s,by_id[v['case']],v)
 
 
 def address_projection_result(trace, result):
@@ -122,13 +204,16 @@ def execute(s,c,scripted=False):
   if phase=='formatter' and counts['formatter_requests']>1:raise RuntimeError('One formatter maximum')
  def record(value):
   with (out/'http-attempts.jsonl').open('a') as f:f.write(json.dumps({'epoch':time.time(),**value})+'\n')
- def backend(phase):
+ def backend(phase,consumer_before_dispatch=None):
+  def dispatched_guard():
+   if consumer_before_dispatch is not None:consumer_before_dispatch()
+   before(phase)
   if model=='gpt-6-luna':
    if lease is None:raise RuntimeError('Missing case-owned subscription lease')
    raw=ExternalAgentBackend(model,out/(phase+'-transport'),reasoning_effort='medium' if phase=='policy' else 'low',
     timeout=s['request_timeout'],max_tokens=s['max_tokens'],provider_output_limit=False,
     command=[str(checked(s['node'])),str(checked(s['bridge_worker']))],pi_cli=str(checked(s['pi'])),
-    before_dispatch=lambda:before(phase),suite_episode=lease,episode_phase=phase)
+    before_dispatch=dispatched_guard,suite_episode=lease,episode_phase=phase)
    if phase=='formatter':raw.begin_episode(s['suite_id']+'/'+c['id']+'/formatter')
    return raw
   from dotenv import dotenv_values
@@ -137,13 +222,16 @@ def execute(s,c,scripted=False):
   selected=model if phase=='policy' else 'qwen/qwen3.8-27b'
   provider=s['provider_options'] if phase=='policy' else s['extractor_provider_options']
   b=ChatCompletionsBackend('https://openrouter.ai/api/v1',selected,key,timeout=s['request_timeout'],max_tokens=s['max_tokens'],supports_images=True,session_routing=True,request_options={'provider':provider,'reasoning':{'enabled':True}})
-  if phase=='formatter':admission.before_dispatch();b.begin_episode(s['suite_id']+'-'+c['id']+'-formatter')
-  def dispatched(req):before(phase);record({'event':'dispatch','phase':phase,'request_sha256':sha256(req.content).hexdigest()})
+  if phase=='formatter':b.begin_episode(s['suite_id']+'-'+c['id']+'-formatter')
+  def dispatched(req):dispatched_guard();record({'event':'dispatch','phase':phase,'request_sha256':sha256(req.content).hexdigest()})
   def received(resp):
    resp.read()
    try:v=resp.json()
    except ValueError:v={}
-   u=v.get('usage') or {};cost=u.get('cost')
+   if not isinstance(v,dict):v={}
+   u=v.get('usage') or {}
+   if not isinstance(u,dict):u={}
+   cost=u.get('cost')
    if type(cost) in (int,float):counts['reported_cost_usd']+=cost
    else:counts['responses_without_cost']+=1
    record({'event':'response','phase':phase,'http_status':resp.status_code,'model':v.get('model'),'provider':v.get('provider'),'usage':u,'response_id':v.get('id')})
@@ -167,7 +255,7 @@ def execute(s,c,scripted=False):
      return httpx.Response(200,json=response)
     return httpx.Response(200,json={'choices':[{'finish_reason':'tool_calls','message':{'role':'assistant','content':None,'tool_calls':[{'id':'positive','type':'function','function':{'name':'send_msg_to_user','arguments':json.dumps({'text':answer})}}]}}],'usage':{}})
    b.client=httpx.Client(transport=httpx.MockTransport(dispatched))
-  else:b=backend('policy')
+  else:b=backend('policy',before_dispatch)
   try:yield b
   finally:b.close()
  class Formatter:
@@ -221,16 +309,18 @@ def execute(s,c,scripted=False):
   if scripted and result['viewer_projection']['task_completed'] is not True:raise ValueError('Scripted positive native grade did not pass')
   if timings['reset_calls']!=1:raise ValueError('Warm activation reset or duplicated environment')
   timings['finished_monotonic']=time.monotonic()
-  save(out/'result.json',{'case':c['id'],'result':result,'status':'graded_and_projected','timings':timings,'usage':counts,'scripted':scripted})
+  save(out/'result.json',{'case':c['id'],'result':result,'status':'graded_and_projected','timings':timings,'usage':counts,'scripted':scripted,'case_binding_sha256':case_binding(c),'execution_binding_sha256':execution_binding(s,c),'caller_driver':s['driver'],'caller_commit':s['caller_commit']})
  except BaseException as e:
   save(out/'failure.json',{'type':type(e).__name__,'message':str(e),'usage':counts,'timings':timings});raise
  finally:
   signal.alarm(0);connection.close()
-  if lease is not None:lease.close()
   try:
-   if recording is not None:recording.release_package()
+   if lease is not None:lease.close()
   finally:
-   if pooled is not None:pooled.close()
+   try:
+    if recording is not None:recording.release_package()
+   finally:
+    if pooled is not None:pooled.close()
 
 
 def timing_record(ident,t,start,initially_warming):
@@ -270,6 +360,21 @@ def stop_pool_service(spec, root, output, process):
 def supervise(s,scripted=False):
  if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
  if s.get('shared_chromium') and not scripted:raise ValueError('Pooled comparison caller is model-free qualification only')
+ stop=threading.Event();previous={kind:signal.getsignal(kind) for kind in (signal.SIGTERM,signal.SIGINT,signal.SIGALRM)}
+ def terminate_suite(*args):stop.set();signal_deadline(*args)
+ try:
+  signal.signal(signal.SIGTERM,terminate_suite);signal.signal(signal.SIGINT,terminate_suite)
+  return _supervise(s,scripted,stop)
+ finally:
+  for kind,handler in previous.items():signal.signal(kind,handler)
+
+def _supervise(s,scripted=False,stop=None):
+ if type(s.get('shared_chromium',False)) is not bool:raise ValueError('shared_chromium must be boolean')
+ if s.get('shared_chromium') and not scripted:raise ValueError('Pooled comparison caller is model-free qualification only')
+ for name in ('startup_timeout','episode_timeout','suite_timeout'):
+  if type(s.get(name)) is not int or not 0<s[name]<2**31:raise ValueError('Positive integer '+name+' required before any case claim')
+ grace=s.get('shutdown_grace_seconds',30)
+ if type(grace) is not int or not 1<=grace<=120:raise ValueError('Explicit cleanup grace must be1..120 seconds')
  if not scripted:check_release(s)
  h=helper(s);source_guard(s)
  queue=runpy.run_path(str(checked(s['queue'])));channel=runpy.run_path(str(checked(s['channel'])))
@@ -282,7 +387,7 @@ def supervise(s,scripted=False):
   for ident in members:events.subscribe(s['suite_id']+'-'+ident,s['suite_id'],'codex:'+s['thread_id'],episode=ident,final=False)
   events.subscribe(s['suite_id']+'-suite',s['suite_id'],'codex:'+s['thread_id'],milestones=[10,20,30,35,40,50],final=True)
  h['register_roots'](s)
- stop=threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock()
+ stop=stop if stop is not None else threading.Event();service=None;pool_service=None;pool_log=None;listeners={};clocks={};lock=threading.Lock();delivery_lock=threading.Lock()
  with tempfile.TemporaryDirectory(prefix='mq8-') as tmp:
   os.chmod(tmp,0o700);s=dict(s);s['tokenizer_socket']=str(Path(tmp)/'tokenizer.sock');s['sockets']={}
   assets=[Path(s['counter_assets_root'])/'mimo-v2.6-pro-73875d00/tokenizer.json',checked(s['tokenizer'])]
@@ -313,15 +418,18 @@ def supervise(s,scripted=False):
     listener=socket.socket(socket.AF_UNIX);path=str(Path(tmp)/(c['id']+'.sock'));listener.bind(path);listener.listen(1);listener.settimeout(s['startup_timeout']);listeners[c['id']]=listener;s['sockets'][c['id']]=path
    runtime=out/'runtime-spec.json';save(runtime,s)
    def one(c,admission):
-    ident=c['id'];events.start(s['suite_id'],ident);started=time.monotonic();process=None;connection=None
+    ident=c['id'];events.start(s['suite_id'],ident);started=time.monotonic();process=None;connection=None;watchdog=None;connections={}
     with lock:clocks[ident]={'process_launch_monotonic':started}
     try:
      stdout=(out/(ident+'-stdout.log')).open('x');stderr=(out/(ident+'-stderr.log')).open('x')
      process=subprocess.Popen(['python3',s['launcher']['path'],'--memory-mib','2048','--tasks','256','--receipt',str(out/(ident+'-bounded')),'--','timeout','--kill-after=30s',str(s['suite_timeout'])+'s',s['python'],'-I','-B',s['driver']['path'],'scripted-case' if scripted else 'case',str(runtime),ident],stdout=stdout,stderr=stderr,env={**os.environ,'LD_LIBRARY_PATH':s['library_path']})
+     watchdog=CaseWatchdog(process,connections,startup_seconds=s['startup_timeout'],episode_seconds=180 if scripted else s['episode_timeout'],cleanup_grace_seconds=grace,stop_event=stop)
      connection,_=listeners[ident].accept();connection.settimeout(s['suite_timeout'])
+     connections['connection']=connection
      # Ready receipt precedes gate; activation reply is emitted only under queue's cap.
-     proof=channel['serve_admission'](connection,admission,expected_run_root=out/ident/'live/runs')
+     proof=channel['serve_admission'](connection,WatchedAdmission(admission,watchdog),expected_run_root=out/ident/'live/runs')
      code=process.wait(timeout=60);stdout.close();stderr.close()
+     if watchdog.failure is not None:raise CaseDeadline(str(watchdog.failure))
      if code!=0:raise RuntimeError('Child lifecycle exited '+str(code))
      result=load(out/ident/'result.json');grade=load(out/ident/'grade-viewer.json')
      if result['status']!='graded_and_projected' or grade['status']!='verified':raise ValueError('Child grading/viewer unavailable')
@@ -331,17 +439,25 @@ def supervise(s,scripted=False):
       with delivery_lock:api['flush'](events)
      return {'case':ident,'state':'succeeded','payload':payload,'admission':proof}
     except BaseException as e:
+     if watchdog is not None and watchdog.failure is not None:
+      deadline_error=CaseDeadline(str(watchdog.failure));deadline_error.__cause__=e;e=deadline_error
      events.finish(s['suite_id'],ident,'failed',{'system_failure':{'type':type(e).__name__,'message':str(e)},'task_verdict':None})
      if not scripted:
       with delivery_lock:api['flush'](events)
-     raise
+     raise e
     finally:
-     if connection:connection.close()
-     if process and process.poll() is None:
-      process.terminate()
-      try:process.wait(timeout=35)
-      except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10)
-     with lock:clocks[ident]['lifecycle_finished_monotonic']=time.monotonic()
+     try:
+      if watchdog is not None:
+       watchdog.close();save(out/(ident+'-watchdog.json'),{'failure':watchdog.failure,'final_phase':watchdog.phase,'native_cleanup_not_inferred':True})
+     finally:
+      try:
+       if connection:connection.close()
+      finally:
+       if process and process.poll() is None:
+        process.terminate()
+        try:process.wait(timeout=35)
+        except subprocess.TimeoutExpired:process.kill();process.wait(timeout=10)
+       with lock:clocks[ident]['lifecycle_finished_monotonic']=time.monotonic()
    result=queue['run_ordered_suite']({c['id']:c for c in s['cases']},one,max_concurrent_episodes=s['max_concurrent_episodes'],prewarm_count=s['prewarm_count'],start_order=s['start_order'],stop_event=stop)
    result['max_observed_active']=max(e['active'] for e in result['events']);result['max_observed_warming']=max(e['warming_or_ready'] for e in result['events']);result['clocks']=clocks
    if result['max_observed_active']>s['max_concurrent_episodes'] or result['max_observed_warming']>s['prewarm_count']:raise RuntimeError('Concurrency/warming bound violated')
