@@ -802,7 +802,8 @@ python3 scripts/run_bounded_job.py -- python -B -m experiments.steered_generatio
 
 It writes every candidate of the task under `FOLDER/candidates/`, runs the
 named ones (all of them without `--candidate`; an unknown name is an error
-that lists the names), and records the task's digest and the candidates with
+that lists the names, and a task with no candidate on the world is an error
+too, both before anything is written), and records the task's digest and the candidates with
 their probabilities in the receipt. Each sample folder holds the steered
 world, what the check read off it and the steering record. Tried on two
 suite tasks (`suite/variants/one-command/`): H10's review task with
@@ -919,7 +920,8 @@ ever be cheapest. Receipts and worlds are under
 | `suite/variants/B09/`, `H10/` (`run-v1`) | `6040664` | the product-review tasks' candidates; 10,000 redraws |
 | `suite/variants/B09-rare/`, `B16/`, `B16-tracking/` (`run-v1`) | `51aefce` | rarer review requirements (200,000 redraws); the carrier-review task's candidates (10,000) |
 | `suite/variants/B16-shipments/`, `B16-punctuality/` (`run-v1`) | `e837e7f` | the carrier-review task with the carrier's shipments redrawn; 50,000 redraws |
-| `suite/variants/one-command/`, `medium/reviews/run-product/`, `run-carrier/` | `7450c15` | the runner given a task: two suite tasks, and both review task forms on the medium world; 20,000 redraws there |
+| `suite/variants/one-command/` | `7450c15` | the runner given a task: two suite tasks, one named candidate each |
+| `medium/reviews/run-product/`, `run-carrier/` | `79cb000` (executable sources as at `7450c15`) | the runner given a task: both review task forms on the medium world; 20,000 redraws |
 
 Requirement files are in `steering/`, `steering/stock/`, `steering/price/`,
 `steering/cheapest/` and `steering/combined/`. Commit `832238a6` moved the
@@ -1413,7 +1415,8 @@ their counts test little; their probabilities rest on the factors that
 
 On the medium world's input with 24 reviews per product (21 retailers, 90
 products, 2,849 offers; `medium/reviews/`, one runner command per task with
-`--task`, 20,000 redraws, steering commit `7450c15`): the product-review
+`--task`, 20,000 redraws, steering commit `79cb000`, whose executable
+sources equal `7450c15`): the product-review
 task form on the first walking shoe with at least two assessing comments
 (four verdicts, probabilities 0.53, 0.32, 0.11 and 0.042) and the carrier
 task form of B16 (two reviews-only candidates; four with the shipments

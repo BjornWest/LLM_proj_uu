@@ -544,6 +544,9 @@ def main():
     if args.task:
         task_raw = args.task.read_bytes()
         found = variants.of(natural, json.loads(task_raw), api)
+        if not found:
+            # Nothing to run is not a run that passed.
+            raise ValueError("No candidates for this task on this world")
         wanted = [row["name"] for row in found] if args.candidate is None else args.candidate
         if set(wanted) - {row["name"] for row in found} or len(set(wanted)) != len(wanted):
             raise ValueError("Unknown or repeated candidate; this task has on this world: " +
