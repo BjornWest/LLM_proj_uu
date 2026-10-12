@@ -7,7 +7,8 @@ retailer's free-shipping threshold ("threshold", retailer, ""), for its
 carrier contracts ("contracts", retailer, "") and its warehouse's dispatch
 days ("dispatch", retailer, ""), for a product's review corpus ("reviews", "", product), for a carrier's
 ("carrier_reviews", "", carrier) and for its shipments' histories
-("carrier_shipments", "", carrier). The producer
+("carrier_shipments", "", carrier) and for its quality levels
+("carrier_quality", "", carrier). The producer
 gives every draw its own stream, so blocks whose resources do not meet are
 independent given everything upstream: each can be sampled on its own, all of
 them replayed in one pass, and the probability that every requirement holds is
@@ -174,7 +175,7 @@ def background(world, writes):
     summary counted from them, the corpus identity, and the wording of every
     other carrier review, since the producer picks a phrase by how often each
     was used before it. A carrier's shipments: their histories and the
-    metrics counted from them. JSON text, unlike Python equality, keeps true,
+    metrics counted from them. A carrier's quality: its four levels. JSON text, unlike Python equality, keeps true,
     1 and 1.0 apart.
     """
     def retailer(value):
@@ -241,6 +242,13 @@ def background(world, writes):
                           for row in private["shipments"]],
             "carrier_parameters": [{k: v for k, v in row.items() if k != "observed_history_metrics"}
                                    if row["carrier_id"] in shipped else row for row in private["carrier_parameters"]]}
+    levelled = {carrier for kind, _, carrier in writes if kind == "carrier_quality"}
+    if levelled:
+        if not levelled <= shipped:
+            raise AssertionError("A block that redraws a carrier's quality levels redraws its shipments")
+        private = view["carrier_evidence"]["private"]
+        private["carrier_parameters"] = [{k: v for k, v in row.items() if k != "aspect_levels"}
+                                         if row["carrier_id"] in levelled else row for row in private["carrier_parameters"]]
     reviewed = {product for kind, _, product in writes if kind == "reviews"}
     if reviewed:
         view["products"] = [{k: v for k, v in item.items() if k not in ("reviews", "rating_summary")}

@@ -999,6 +999,62 @@ native oracle and the recorded contracts. As a part of several requirements
 it declares everything it could decide: the ranking's stock and prices and
 the policy of every retailer in it.
 
+## The thirteenth requirement: a carrier's stars and how well it serves
+
+Requirement (`steered-carrier-stars-v1`): a carrier and a bound on the
+average stars its summary publishes, the level of one or more aspects of its
+service (strong, mixed or weak punctuality, handling, handoff,
+communication), or both.
+
+```json
+{"schema": "steered-carrier-stars-v1", "carrier_id": "carrier-03",
+ "average_stars": {"max": 3.7}, "levels": {"punctuality": "weak"}}
+```
+
+The producer draws a carrier's four levels, each on its own stream; then
+every shipment's history on the shipment's stream, where a level is the
+chance that the aspect goes well; then every shipment's review on one more
+stream: the comment, and the stars, which are likelier high the more of the
+history went well and are held to the comment's tone. The block,
+`ratings.py`, is the four level streams and every review stream of the
+carrier. The history streams stay the seed's own, so for each of the 81
+choices of levels the histories are known (the producer's own `history`,
+called with those levels) and with them each review's distribution of stars:
+a beta-binomial for the stars as drawn, and the chance that the comment has
+praise, complaints or both for the hold. Reviews draw independently, so the
+total is a sum of independent numbers. The probability is a sum over the
+level choices the requirement allows of the chance of the levels times the
+chance of the required average under them. A sample picks the levels in
+proportion, then the total, then each review's stars given the total, and
+redraws each stream until it gives what was picked.
+
+A low rating therefore comes with worse service, to the extent the producer
+ties the two. On the pilot world (32 shipments a carrier, a tenth of a
+second to model) a carrier naturally rated 4.38:
+
+| Average at most | Probability | Weak aspects expected, of four |
+|---|---|---|
+| any | 1 | 0.6 |
+| 3.8 | 0.16 | 1.4 |
+| 3.6 | 0.063 | 1.7 |
+| 3.2 | 0.0036 | 2.4 |
+| 3.0 | 0.0006 | 2.7 |
+| 2.0 | 2e-11 | 3.7 |
+
+Carriers' natural averages on the pilot and medium worlds lie between 3.8
+and 4.6, so "a carrier with really low ratings" in this producer's terms is
+one at 3.5 or so; lower is reachable at the same cost but is a carrier whose
+reviews are harsher than anything its service explains.
+
+It combines with the twelfth requirement: "the cheapest available offer is at
+a retailer that ships with this carrier only, and this carrier is rated at
+most 3.9" is two independent blocks. It does not combine with the ninth or
+the tenth requirement on the same carrier, whose reviews it redraws.
+
+Limits. The history streams are not redrawn for the stars: given the levels,
+what happened to each shipment is the seed's. The levels are private
+parameters; a task sees them through the metrics and the reviews.
+
 ## Requirement candidates for a native task
 
 `variants.of(world, task, api)` takes a native task specification (the
@@ -1071,7 +1127,7 @@ only that matching offers exist, not which is cheapest.
 ## Several requirements in one world
 
 Requirement (`steered-requirements-v1`): a list of requirements, each of one
-of the twelve kinds above, that must all hold.
+of the thirteen kinds above, that must all hold.
 
 ```json
 {"schema": "steered-requirements-v1",
